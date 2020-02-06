@@ -8,4 +8,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Parse (gzipped) tracking logs in GELF format
+
 [unreleased]: https://github.com/openfun/ralph
