@@ -1,0 +1,30 @@
+# Python
+__pycache__
+*.pyc
+**/__pycache__
+**/*.pyc
+build/
+dist/
+**/*.egg-info
+venv
+.venv
+
+# System-specific files
+.DS_Store
+**/.DS_Store
+
+# Docker
+docker-compose.*
+
+# Docs
+docs
+*.md
+*.log
+
+# Development/test cache & configurations
+.cache
+.circleci
+.git
+
+# Assets
+data
