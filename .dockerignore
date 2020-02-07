@@ -24,7 +24,10 @@ docs
 # Development/test cache & configurations
 .cache
 .circleci
+.coverage
 .git
+.pylint.d
+.pytest_cache
 
 # Assets
 data
