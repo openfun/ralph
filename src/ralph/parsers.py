@@ -6,6 +6,8 @@ import logging
 
 import pandas as pd
 
+from .exceptions import EmptyEventsCollection
+
 logger = logging.getLogger(__name__)
 
 
@@ -64,7 +66,13 @@ class GELFParser(BaseParser):
             logger.debug("Records before filtering: %d", len(records))
 
             for _filter in filters:
-                records = _filter(records)
+                try:
+                    records = _filter(records)
+                except EmptyEventsCollection:
+                    logger.warning(
+                        "Current chunk contains no records, will stop filtering."
+                    )
+                    break
                 logger.debug("Filter: %s (records: %d)", _filter.__name__, len(records))
 
             events = events.append(records, ignore_index=True, sort=False)
