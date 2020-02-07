@@ -39,5 +39,10 @@ venv.bak/
 # Logs
 *.log
 
+# Test & lint
+.coverage
+.pylint.d
+.pytest_cache
+
 # Test fixtures
 data/
