@@ -1,0 +1,357 @@
+# Configuration file anchors
+generate-version-file: &generate-version-file
+  run:
+    name: Create a version.json
+    command: |
+      # Create a version.json à-la-mozilla
+      # https://github.com/mozilla-services/Dockerflow/blob/master/docs/version_object.md
+      printf '{"commit":"%s","version":"%s","source":"https://github.com/%s/%s","build":"%s"}\n' \
+        "$CIRCLE_SHA1" \
+        "$CIRCLE_TAG" \
+        "$CIRCLE_PROJECT_USERNAME" \
+        "$CIRCLE_PROJECT_REPONAME" \
+        "$CIRCLE_BUILD_URL" > version.json
+
+version: 2
+jobs:
+  # Git jobs
+  # Check that the git history is clean and complies with our expectations
+  lint-git:
+    docker:
+      - image: circleci/python:3.8-buster
+    working_directory: ~/fun
+    steps:
+      - checkout
+      # Make sure the changes don't add a "print" statement to the code base.
+      # We should exclude the ".circleci" folder from the search as the very command that checks
+      # the absence of "print" is including a "print(" itself.
+      - run:
+          name: enforce absence of print statements in code
+          command: |
+            ! git diff origin/master..HEAD -- . ':(exclude).circleci' | grep "print("
+      - run:
+          name: Check absence of fixup commits
+          command: |
+            ! git log | grep 'fixup!'
+      - run:
+          name: Install gitlint
+          command: |
+            pip install --user gitlint
+      - run:
+          name: lint commit messages added to master
+          command: |
+            ~/.local/bin/gitlint --commits origin/master..HEAD
+
+  # Check that the CHANGELOG has been updated in the current branch
+  check-changelog:
+    docker:
+      - image: circleci/buildpack-deps:stretch-scm
+    working_directory: ~/fun
+    steps:
+      - checkout
+      - run:
+          name: Check that the CHANGELOG has been modified in the current branch
+          command: |
+            git whatchanged --name-only --pretty="" origin..HEAD | grep CHANGELOG
+
+  # Check that the CHANGELOG max line length does not exceed 80 characters
+  lint-changelog:
+    docker:
+      - image: debian:stretch
+    working_directory: ~/fun
+    steps:
+      - checkout
+      - run:
+          name: Check CHANGELOG max line length
+          command: |
+            # Get the longuest line width (ignoring release links)
+            test $(cat CHANGELOG.md | grep -Ev "^\[.*\]: https://github.com/openfun" | wc -L) -le 80
+
+  # ---- Docker jobs ----
+  # Build the Docker image ready for production
+  build-docker:
+    docker:
+      - image: circleci/buildpack-deps:stretch
+    working_directory: ~/fun
+    steps:
+      # Checkout repository sources
+      - checkout
+      # Generate a version.json file describing app release
+      - <<: *generate-version-file
+      # Activate docker-in-docker (with layers caching enabled)
+      - setup_remote_docker:
+          docker_layer_caching: true
+      # Each image is tagged with the current git commit sha1 to avoid
+      # collisions in parallel builds.
+      - run:
+          name: Build production image
+          command: docker build -t ralph:${CIRCLE_SHA1} --target production .
+      - run:
+          name: Check built image availability
+          command: docker images "ralph:${CIRCLE_SHA1}*"
+
+  # ---- Backend jobs ----
+  # Build backend development environment
+  build:
+    docker:
+      - image: circleci/python:3.8-buster
+    working_directory: ~/fun
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ .Revision }}
+      - run:
+          name: Install development dependencies
+          command: pip install --user .[dev]
+      - save_cache:
+          paths:
+            - ~/.local
+          key: v1-dependencies-{{ .Revision }}
+
+  lint:
+    docker:
+      - image: circleci/python:3.8-buster
+    working_directory: ~/fun
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ .Revision }}
+      - run:
+          name: Lint code with flake8
+          command: ~/.local/bin/flake8
+      - run:
+          name: Lint code with isort
+          command: ~/.local/bin/isort --recursive --check-only .
+      - run:
+          name: Lint code with black
+          command: ~/.local/bin/black src/ralph tests --check
+      - run:
+          name: Lint code with pylint
+          command: ~/.local/bin/pylint src/ralph tests
+      - run:
+          name: Lint code with bandit
+          command: ~/.local/bin/bandit -qr src/ralph
+
+  test:
+    docker:
+      - image: circleci/python:3.8-buster
+    working_directory: ~/fun
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ .Revision }}
+      - run:
+          name: Run tests
+          command: ~/.local/bin/pytest
+
+  # ---- Packaging jobs ----
+  package:
+    docker:
+      - image: circleci/python:3.8-buster
+    working_directory: ~/fun
+    steps:
+      - checkout
+      # Ensure we restore frontend production builds in Richie's static
+      # directory
+      - attach_workspace:
+          at: ~/fun
+      - run:
+          name: Build python package
+          command: python setup.py sdist bdist_wheel
+      # Persist build packages to the workspace
+      - persist_to_workspace:
+          root: ~/fun
+          paths:
+            - dist
+      # Store packages as artifacts to download/test them
+      - store_artifacts:
+          path: ~/fun/dist
+
+  # Publishing to PyPI requires that:
+  #   * you already registered to pypi.org
+  #   * you have define both the TWINE_USERNAME & TWINE_PASSWORD secret
+  #     environment variables in CircleCI UI (with your PyPI credentials)
+  pypi:
+    docker:
+      - image: circleci/python:3.8-buster
+    working_directory: ~/fun
+    steps:
+      - checkout
+      # Restore built python packages
+      - attach_workspace:
+          at: ~/fun
+      - run:
+          name: List built packages
+          command: ls dist/*
+      - run:
+          name: Install base requirements (twine)
+          command: pip install --user .[ci]
+      - run:
+          name: Upload built packages to PyPI
+          command: ~/.local/bin/twine upload dist/*
+
+  # ---- DockerHub publication job ----
+  hub:
+    docker:
+      - image: circleci/buildpack-deps:stretch
+    working_directory: ~/fun
+    steps:
+      # Checkout repository sources
+      - checkout
+      # Generate a version.json file describing app release
+      - <<: *generate-version-file
+      # Activate docker-in-docker (with layers caching enabled)
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Build production image (using cached layers)
+          command: docker build -t ralph:${CIRCLE_SHA1} --target production .
+      - run:
+          name: Check built images availability
+          command: docker images "ralph:${CIRCLE_SHA1}*"
+      # Login to DockerHub to Publish new images
+      #
+      # Nota bene: you'll need to define the following secrets environment vars
+      # in CircleCI interface:
+      #
+      #   - DOCKER_USER
+      #   - DOCKER_PASS
+      - run:
+          name: Login to DockerHub
+          command: echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+      # Tag docker images with the same pattern used in Git (Semantic Versioning)
+      #
+      # Git tag: v1.0.1
+      # Docker tag: 1.0.1(-ci)
+      - run:
+          name: Tag images
+          command: |
+            docker images fundocker/ralph
+            DOCKER_TAG=$([[ -z "$CIRCLE_TAG" ]] && echo $CIRCLE_BRANCH || echo ${CIRCLE_TAG} | sed 's/^v//')
+            RELEASE_TYPE=$([[ -z "$CIRCLE_TAG" ]] && echo "branch" || echo "tag ")
+            # Display either:
+            # - DOCKER_TAG: master (Git branch)
+            # or
+            # - DOCKER_TAG: 1.1.2 (Git tag v1.1.2)
+            echo "DOCKER_TAG: ${DOCKER_TAG} (Git ${RELEASE_TYPE}${CIRCLE_TAG})"
+            docker tag ralph:${CIRCLE_SHA1} fundocker/ralph:${DOCKER_TAG}
+            if [[ -n "$CIRCLE_TAG" ]]; then
+                docker tag ralph:${CIRCLE_SHA1} fundocker/ralph:latest
+            fi
+            docker images | grep -E "^fundocker/ralph\s*(${DOCKER_TAG}.*|latest|master)"
+
+      # Publish images to DockerHub
+      #
+      # Nota bene: logged user (see "Login to DockerHub" step) must have write
+      # permission for the project's repository; this also implies that the
+      # DockerHub repository already exists.
+      - run:
+          name: Publish images
+          command: |
+            DOCKER_TAG=$([[ -z "$CIRCLE_TAG" ]] && echo $CIRCLE_BRANCH || echo ${CIRCLE_TAG} | sed 's/^v//')
+            RELEASE_TYPE=$([[ -z "$CIRCLE_TAG" ]] && echo "branch" || echo "tag ")
+            # Display either:
+            # - DOCKER_TAG: master (Git branch)
+            # or
+            # - DOCKER_TAG: 1.1.2 (Git tag v1.1.2)
+            echo "DOCKER_TAG: ${DOCKER_TAG} (Git ${RELEASE_TYPE}${CIRCLE_TAG})"
+            docker push fundocker/ralph:${DOCKER_TAG}
+            if [[ -n "$CIRCLE_TAG" ]]; then
+              docker push fundocker/ralph:latest
+            fi
+
+workflows:
+  version: 2
+
+  ralph:
+    jobs:
+      # Git jobs
+      #
+      # Check validity of git history
+      - lint-git:
+          filters:
+            tags:
+              only: /.*/
+      # Check CHANGELOG update
+      - check-changelog:
+          filters:
+            branches:
+              ignore: master
+            tags:
+              only: /(?!^v).*/
+      - lint-changelog:
+          filters:
+            branches:
+              ignore: master
+            tags:
+              only: /.*/
+
+      # Docker jobs
+      #
+      # Build images
+      - build-docker:
+          filters:
+            tags:
+              only: /.*/
+
+      # Backend jobs
+      #
+      # Build, lint and test production and development Docker images
+      # (debian-based)
+      - build:
+          filters:
+            tags:
+              only: /.*/
+      - lint:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /.*/
+      - test:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /.*/
+
+      # Packaging: python
+      #
+      # Build the python package
+      - package:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /.*/
+
+      # DockerHub publication.
+      #
+      # Publish docker images only if all build, lint and test jobs succeed
+      # and it has been tagged with a tag starting with the letter v or is on
+      # the master branch
+      - hub:
+          requires:
+            - build-docker
+            - test
+          filters:
+            branches:
+              only: master
+            tags:
+              only: /^v.*/
+
+      # PyPI publication.
+      #
+      # Publish python package to PYPI only if all build, lint and test jobs
+      # succeed and it has been tagged with a tag starting with the letter v
+      - pypi:
+          requires:
+            - package
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
