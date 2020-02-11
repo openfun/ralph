@@ -3,10 +3,9 @@ Ralph tracking logs parsers.
 """
 
 import logging
+import os
 
 import pandas as pd
-
-from .exceptions import EmptyEventsCollection
 
 logger = logging.getLogger(__name__)
 
@@ -57,22 +56,27 @@ class GELFParser(BaseParser):
         """
         logger.info("Parsing: %s", input_file)
 
+        if not os.path.exists(input_file):
+            msg = "Input GELF log file '%s' does not exist"
+            logger.error(msg, input_file)
+            raise OSError(msg % (input_file))
+
         filters = filters or []
         events = pd.DataFrame()
 
         chunks = pd.read_json(input_file, lines=True, chunksize=chunksize)
         for chunk in chunks:
-            records = pd.read_json("\n".join(chunk["_msg"]), lines=True)
+            records = pd.read_json("\n".join(chunk["short_message"]), lines=True)
             logger.debug("Records before filtering: %d", len(records))
 
             for _filter in filters:
-                try:
-                    records = _filter(records)
-                except EmptyEventsCollection:
+                logger.info("Current filter: %s", _filter.__name__)
+                if records.empty:
                     logger.warning(
                         "Current chunk contains no records, will stop filtering."
                     )
                     break
+                records = _filter(records)
                 logger.debug("Filter: %s (records: %d)", _filter.__name__, len(records))
 
             events = events.append(records, ignore_index=True, sort=False)
