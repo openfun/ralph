@@ -26,28 +26,39 @@ def test_baseparser_parse():
         MyParser().parse("foo.log")
 
 
-# pylint: disable=invalid-name
-def test_gelfparser_parse_raw_file(fs, gelf_logger):
-    """Test the GELFParser parsing using a flat GELF file."""
+def test_gelfparser_parse_non_existing_file():
+    """Test the GELFParser with a file path that does not exist."""
 
     parser = GELFParser()
 
     # Input log file does not exists
     with pytest.raises(OSError):
-        parser.parse("/i/do/not/exist")
+        next(parser.parse("/i/do/not/exist"))
+
+
+# pylint: disable=invalid-name
+def test_gelfparser_parse_empty_file(fs):
+    """Test the GELFParser parsing with an empty file."""
+
+    parser = GELFParser()
 
     # Input log file is empty
     empty_file_path = "/var/log/empty"
     fs.create_file(empty_file_path)
-    events = parser.parse(empty_file_path)
-    assert len(events) == 0
-    assert events.equals(pd.DataFrame())
+    with pytest.raises(StopIteration):
+        next(parser.parse(empty_file_path))
+
+
+def test_gelfparser_parse_raw_file(gelf_logger):
+    """Test the GELFParser parsing using a flat GELF file."""
+
+    parser = GELFParser()
 
     # Create two log entries
     gelf_logger.info('{"username": "foo"}')
     gelf_logger.info('{"username": ""}')
 
-    events = parser.parse(gelf_logger.handlers[0].stream.name)
+    events = next(parser.parse(gelf_logger.handlers[0].stream.name))
     assert len(events) == 2
     assert events.equals(pd.DataFrame({"username": ["foo", ""]}))
 
@@ -67,7 +78,7 @@ def test_gelfparser_parse_gzipped_file(fs, gelf_logger):
             shutil.copyfileobj(log_file, gzipped_log_file)
 
     parser = GELFParser()
-    events = parser.parse(gzipped_log_file_name)
+    events = next(parser.parse(gzipped_log_file_name))
     assert len(events) == 2
     assert events.equals(pd.DataFrame({"username": ["foo", "bar"]}))
 
@@ -80,15 +91,21 @@ def test_gelfparser_parse_with_various_chunksizes(fs, gelf_logger):
     gelf_logger.info('{"username": "bar"}')
 
     parser = GELFParser()
-    events = parser.parse(gelf_logger.handlers[0].stream.name, chunksize=1)
+    events = pd.DataFrame()
+    for chunk_events in parser.parse(gelf_logger.handlers[0].stream.name, chunksize=1):
+        events = events.append(chunk_events, ignore_index=True)
     assert len(events) == 2
     assert events.equals(pd.DataFrame({"username": ["foo", "bar"]}))
 
-    events = parser.parse(gelf_logger.handlers[0].stream.name, chunksize=2)
+    parser = GELFParser()
+    events = pd.DataFrame()
+    events = next(parser.parse(gelf_logger.handlers[0].stream.name, chunksize=2))
     assert len(events) == 2
     assert events.equals(pd.DataFrame({"username": ["foo", "bar"]}))
 
-    events = parser.parse(gelf_logger.handlers[0].stream.name, chunksize=10)
+    parser = GELFParser()
+    events = pd.DataFrame()
+    events = next(parser.parse(gelf_logger.handlers[0].stream.name, chunksize=10))
     assert len(events) == 2
     assert events.equals(pd.DataFrame({"username": ["foo", "bar"]}))
 
@@ -109,12 +126,14 @@ def test_gelfparser_parse_filtering_breaks_when_empty(fs, gelf_logger, caplog):
     # Anonymous filter + a lambda filter that should create a warning log
     # message
     with caplog.at_level(logging.WARNING, logger="ralph.parsers"):
-        events = parser.parse(log_file_name, filters=[filters.anonymous, lambda pd: pd])
+        events = next(
+            parser.parse(log_file_name, filters=[filters.anonymous, lambda pd: pd])
+        )
     assert caplog.record_tuples == [
         (
             "ralph.parsers",
             logging.WARNING,
-            "Current chunk contains no records, will stop filtering.",
+            "Current chunk contains no events, will stop filtering.",
         )
     ]
     assert len(events) == 0
@@ -132,6 +151,6 @@ def test_gelfparser_parse_with_filters(fs, gelf_logger):
     gelf_logger.info('{"username": "foo"}')
     gelf_logger.info('{"username": ""}')
 
-    events = parser.parse(log_file_name, filters=[filters.anonymous])
+    events = next(parser.parse(log_file_name, filters=[filters.anonymous]))
     assert len(events) == 1
     assert events.equals(pd.DataFrame({"username": ["foo"]}))

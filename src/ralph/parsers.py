@@ -22,9 +22,8 @@ class BaseParser:
                 filter them.
             chunksize (int): The amount of log records to process at a time.
 
-        Returns:
-            Parser implementation should return a pandas DataFrame object with
-            all parsed and filtered events.
+        Yields:
+            DataFrame: parsed and filtered events from the current file chunk.
 
         """
         raise NotImplementedError
@@ -46,12 +45,12 @@ class GELFParser(BaseParser):
             filters (list): A list of functions to apply on parsed results to
                 filter them.
             chunksize (int): The amount of log records to process at a time. A
-                value between 10.000 and 100.000 seems to be a reasonnable
-                choice to parse 1.5M records in a few minutes (typically 2 or 3
+                value between 3.000 and 10.000 seems to be a reasonnable choice
+                to parse 1.5M records in a few minutes (typically 2 or 3
                 minutes on a modern computer).
 
-        Returns:
-            A pandas DataFrame object with all parsed and filtered events.
+        Yields:
+            DataFrame: parsed and filtered events from the current file chunk.
 
         """
         logger.info("Parsing: %s", input_file)
@@ -62,25 +61,20 @@ class GELFParser(BaseParser):
             raise OSError(msg % (input_file))
 
         filters = filters or []
-        events = pd.DataFrame()
 
         chunks = pd.read_json(input_file, lines=True, chunksize=chunksize)
         for chunk in chunks:
-            records = pd.read_json("\n".join(chunk["short_message"]), lines=True)
-            logger.debug("Records before filtering: %d", len(records))
+            events = pd.read_json("\n".join(chunk["short_message"]), lines=True)
+            logger.debug("Events before filtering: %d", len(events))
 
             for _filter in filters:
-                logger.info("Current filter: %s", _filter.__name__)
-                if records.empty:
+                logger.debug("Current filter: %s", _filter.__name__)
+                if events.empty:
                     logger.warning(
-                        "Current chunk contains no records, will stop filtering."
+                        "Current chunk contains no events, will stop filtering."
                     )
                     break
-                records = _filter(records)
-                logger.debug("Filter: %s (records: %d)", _filter.__name__, len(records))
+                events = _filter(events)
+                logger.debug("Filter: %s (events: %d)", _filter.__name__, len(events))
 
-            events = events.append(records, ignore_index=True, sort=False)
-            logger.debug("Total events: %d", len(events))
-
-        logger.info("Parsed: %d events (after filtering)", len(events))
-        return events
+            yield events
