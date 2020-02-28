@@ -1,6 +1,8 @@
 # -- Base image --
 FROM python:3.8-slim as base
 
+ENV PYTHONUNBUFFERED=1
+
 # Upgrade pip to its latest release to speed up dependencies installation
 RUN pip install --upgrade pip
 

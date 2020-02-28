@@ -13,13 +13,15 @@ logger = logging.getLogger(__name__)
 class BaseParser:
     """Base tracking logs parser."""
 
-    def parse(self, input_file, filters=None, chunksize=1):
+    def parse(self, input_file, filters=None, transformers=None, chunksize=1):
         """Parse GELF formatted logs (one json string event per row).
 
         Args:
             input_file (string): Path to the log file to parse.
             filters (list): A list of functions to apply on parsed results to
                 filter them.
+            transformers (list): A list of functions to apply on parsed results
+                to transform them.
             chunksize (int): The amount of log records to process at a time.
 
         Yields:
@@ -36,7 +38,7 @@ class GELFParser(BaseParser):
     documentation: https://docs.graylog.org/en/latest/pages/gelf.html
     """
 
-    def parse(self, input_file, filters=None, chunksize=50000):
+    def parse(self, input_file, filters=None, transformers=None, chunksize=5000):
         """Parse GELF formatted logs (one json string event per row).
 
         Args:
@@ -44,6 +46,8 @@ class GELFParser(BaseParser):
                 gunzipped).
             filters (list): A list of functions to apply on parsed results to
                 filter them.
+            transformers (list): A list of functions to apply on parsed results
+                to transform them.
             chunksize (int): The amount of log records to process at a time. A
                 value between 3.000 and 10.000 seems to be a reasonnable choice
                 to parse 1.5M records in a few minutes (typically 2 or 3
@@ -61,20 +65,21 @@ class GELFParser(BaseParser):
             raise OSError(msg % (input_file))
 
         filters = filters or []
+        transformers = transformers or []
 
         chunks = pd.read_json(input_file, lines=True, chunksize=chunksize)
         for chunk in chunks:
             events = pd.read_json("\n".join(chunk["short_message"]), lines=True)
             logger.debug("Events before filtering: %d", len(events))
 
-            for _filter in filters:
-                logger.debug("Current filter: %s", _filter.__name__)
+            for ft in filters + transformers:
+                logger.debug("Current filter: %s", ft.__name__)
                 if events.empty:
                     logger.warning(
                         "Current chunk contains no events, will stop filtering."
                     )
                     break
-                events = _filter(events)
-                logger.debug("Filter: %s (events: %d)", _filter.__name__, len(events))
+                events = ft(events)
+                logger.debug("Filter: %s (events: %d)", ft.__name__, len(events))
 
             yield events
