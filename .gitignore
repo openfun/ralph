@@ -46,3 +46,6 @@ venv.bak/
 
 # Test fixtures
 data/
+
+# vscode
+.vscode

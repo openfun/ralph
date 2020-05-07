@@ -1,0 +1,51 @@
+"""
+Common data structures definitions for event fixtures
+"""
+
+RESPONSE_TYPES = [
+    "javascriptresponse",
+    "choiceresponse",
+    "multiplechoiceresponse",
+    "truefalseresponse",
+    "optionresponse",
+    "numericalresponse",
+    "stringresponse",
+    "customresponse",
+    "symbolicresponse",
+    "coderesponse",
+    "externalresponse",
+    "formularesponse",
+    "schematicresponse",
+    "imageresponse",
+    "annotationresponse",
+    "choicetextresponse",
+    "jsmeresponse",
+]
+
+INPUT_TYPES = [
+    "optioninput",
+    "choicegroup",
+    "radiogroup",
+    "checkboxgroup",
+    "javascriptinput",
+    "jsinput",
+    "textline",
+    "filesubmission",
+    "codeinput",
+    "textbox",
+    "matlabinput",
+    "schematic",
+    "imageinput",
+    "crystallography",
+    "vsepr_input",
+    "chemicalequationinput",
+    "formulaequationinput",
+    "drag_and_drop_input",
+    "editamoleculeinput",
+    "designprotein2dinput",
+    "editageneinput",
+    "annotationinput",
+    "radiotextgroup",
+    "checkboxtextgroup",
+    "jsme",
+]
