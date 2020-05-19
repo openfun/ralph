@@ -13,17 +13,12 @@ class BaseEventField:
     by calling it's generator function.
     """
 
-    # pylint: disable=too-many-instance-attributes
-    # pylint: disable=too-many-arguments
     def __init__(
         self,
         generator,
         removed=False,
         optional=False,
         dependency=None,
-        nullable=False,
-        emptiable_str=False,
-        emptiable_dict=False,
         **generator_kwargs
     ):
         """BaseEventField Constuctor
@@ -66,11 +61,6 @@ class BaseEventField:
                 we can use just a string. For example:
                     dependency = "key1"
                 (this is equivalent to: dependency = [["key1"]])
-            nullable (boolean):  Defines if the Field might be None
-            emptiable_str (boolean): Defines if the Field might be an
-                empty string
-            emptiable_dict (boolean): Defines if the Field might be an
-                empty dictionary
             generator_kwargs (kwargs): The generator_kwargs will be
                 passed to the `generator` function as kwargs
         """
@@ -78,9 +68,6 @@ class BaseEventField:
         self.removed = removed
         self.optional = optional
         self.dependency = dependency
-        self.nullable = nullable
-        self.emptiable_str = emptiable_str
-        self.emptiable_dict = emptiable_dict
         self.generator_kwargs = generator_kwargs
         if dependency is not None:
             if isinstance(self.dependency, str):
@@ -94,37 +81,11 @@ class BaseEventField:
             other (any object): any object supporting
                 `this_field_value` + other
         """
-
-        def wrap(*args, **kwargs):
-            return self.generator(*args, **kwargs) + other
-
-        return type(self)(
-            wrap,
-            removed=self.removed,
-            optional=self.optional,
-            dependency=self.dependency,
-            nullable=False,
-            emptiable_str=False,
-            emptiable_dict=False,
-            **self.generator_kwargs
-        )
+        raise NotImplementedError
 
     def __radd__(self, other):
         """see self.__add__"""
-
-        def wrap(*args, **kwargs):
-            return other + self.generator(*args, **kwargs)
-
-        return type(self)(
-            wrap,
-            removed=self.removed,
-            optional=self.optional,
-            dependency=self.dependency,
-            nullable=False,
-            emptiable_str=False,
-            emptiable_dict=False,
-            **self.generator_kwargs
-        )
+        raise NotImplementedError
 
     def __getitem__(self, key):
         """Delegates the [] opreration to the EventField value
@@ -132,20 +93,33 @@ class BaseEventField:
             key (string or slice): any string or slice supporting
                 `this_field_value`[key]
         """
+        raise NotImplementedError
 
-        def wrap(*args, **kwargs):
-            return self.generator(*args, **kwargs)[key]
 
-        return type(self)(
-            wrap,
-            removed=self.removed,
-            optional=self.optional,
-            dependency=self.dependency,
-            nullable=False,
-            emptiable_str=False,
-            emptiable_dict=False,
-            **self.generator_kwargs
-        )
+class EventFieldProperties:
+    """A data class holding the properies needed for the FreeEventField"""
+
+    def __init__(self, nullable=False, emptiable_str=False, emptiable_dict=False):
+        """EventFieldProperties Constuctor
+
+        Args:
+            nullable (boolean):  Defines if the Field might be None
+            emptiable_str (boolean): Defines if the Field might be an
+                empty string
+            emptiable_dict (boolean): Defines if the Field might be an
+                empty dictionary
+        """
+        self.nullable = nullable
+        self.emptiable_str = emptiable_str
+        self.emptiable_dict = emptiable_dict
+
+    def get_true_properties(self):
+        """Returns an array of property names which are set to True"""
+        properties = []
+        for option in self.__dict__:
+            if self.__dict__[option]:
+                properties.append(option)
+        return properties
 
 
 class FreeEventField(BaseEventField):
@@ -153,26 +127,24 @@ class FreeEventField(BaseEventField):
     The FreeEventField does not depend on other EventFields.
     """
 
-    # pylint: disable=too-many-arguments
     def __init__(
         self,
         generator,
         removed=False,
         optional=False,
-        nullable=False,
-        emptiable_str=False,
-        emptiable_dict=False,
+        properties=EventFieldProperties(),
         **generator_kwargs
     ):
+        """FreeEventField Constuctor
+
+        Args:
+            properties (EventFieldProperties): Data object containing
+                properties for this EventField which alter it's behaviour
+        """
         super(FreeEventField, self).__init__(
-            generator,
-            removed=removed,
-            optional=optional,
-            nullable=nullable,
-            emptiable_str=emptiable_str,
-            emptiable_dict=emptiable_dict,
-            **generator_kwargs
+            generator, removed=removed, optional=optional, **generator_kwargs
         )
+        self.properties = properties
 
     def get(self, *EVENT_ARGS):
         """Returns the Event value based on the EVENT_ARGS
@@ -185,11 +157,7 @@ class FreeEventField(BaseEventField):
                 the *EVENT_ARGS which it passes to its child instances
                 and EventFields.
         """
-        properties = []
-        for option in ["nullable", "emptiable_str", "emptiable_dict"]:
-            if self.__dict__[option]:
-                properties.append(option)
-
+        properties = self.properties.get_true_properties()
         if "set_all_filled" in EVENT_ARGS or len(properties) == 0:
             return self.generator(**self.generator_kwargs)
         set_all_null = "set_all_null" in EVENT_ARGS
@@ -206,6 +174,59 @@ class FreeEventField(BaseEventField):
             ):
                 return {}
         return self.generator(**self.generator_kwargs)
+
+    def __add__(self, other):
+        """Delegates the addition opreration to the EventField value
+        Args:
+            other (any object): any object supporting
+                `this_field_value` + other
+        """
+
+        def wrap(**kwargs):
+            return self.generator(**kwargs) + other
+
+        return FreeEventField(
+            wrap,
+            removed=self.removed,
+            optional=self.optional,
+            dependency=self.dependency,
+            properties=self.properties,
+            **self.generator_kwargs
+        )
+
+    def __radd__(self, other):
+        """see self.__add__"""
+
+        def wrap(*args, **kwargs):
+            return other + self.generator(*args, **kwargs)
+
+        return FreeEventField(
+            wrap,
+            removed=self.removed,
+            optional=self.optional,
+            dependency=self.dependency,
+            properties=self.properties,
+            **self.generator_kwargs
+        )
+
+    def __getitem__(self, key):
+        """Delegates the [] opreration to the EventField value
+        Args:
+            key (string or slice): any string or slice supporting
+                `this_field_value`[key]
+        """
+
+        def wrap(*args, **kwargs):
+            return self.generator(*args, **kwargs)[key]
+
+        return FreeEventField(
+            wrap,
+            removed=self.removed,
+            optional=self.optional,
+            dependency=self.dependency,
+            properties=self.properties,
+            **self.generator_kwargs
+        )
 
 
 class TiedEventField(BaseEventField):
@@ -270,6 +291,56 @@ class TiedEventField(BaseEventField):
                 temp = temp[key_list]
             generator_args.append(temp)
         return self.generator(*generator_args, **self.generator_kwargs)
+
+    def __add__(self, other):
+        """Delegates the addition opreration to the EventField value
+        Args:
+            other (any object): any object supporting
+                `this_field_value` + other
+        """
+
+        def wrap(*args, **kwargs):
+            return self.generator(*args, **kwargs) + other
+
+        return TiedEventField(
+            wrap,
+            removed=self.removed,
+            optional=self.optional,
+            dependency=self.dependency,
+            **self.generator_kwargs
+        )
+
+    def __radd__(self, other):
+        """see self.__add__"""
+
+        def wrap(*args, **kwargs):
+            return other + self.generator(*args, **kwargs)
+
+        return TiedEventField(
+            wrap,
+            removed=self.removed,
+            optional=self.optional,
+            dependency=self.dependency,
+            **self.generator_kwargs
+        )
+
+    def __getitem__(self, key):
+        """Delegates the [] opreration to the EventField value
+        Args:
+            key (string or slice): any string or slice supporting
+                `this_field_value`[key]
+        """
+
+        def wrap(*args, **kwargs):
+            return self.generator(*args, **kwargs)[key]
+
+        return TiedEventField(
+            wrap,
+            removed=self.removed,
+            optional=self.optional,
+            dependency=self.dependency,
+            **self.generator_kwargs
+        )
 
 
 class BaseEvent:

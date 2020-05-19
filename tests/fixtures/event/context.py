@@ -4,7 +4,7 @@ Context event field fixture definition
 
 from faker import Faker
 
-from .base import BaseEvent, FreeEventField, TiedEventField
+from .base import BaseEvent, EventFieldProperties, FreeEventField, TiedEventField
 
 # Faker.seed(0)
 FAKE = Faker()
@@ -16,15 +16,20 @@ class BaseContext(BaseEvent):
     def __init__(self, *args, **kwargs):
         super(BaseContext, self).__init__(*args, **kwargs)
         self.user_id = FreeEventField(
-            FAKE.random_int, emptiable_str=True, nullable=True
+            FAKE.random_int,
+            properties=EventFieldProperties(emptiable_str=True, nullable=True),
         )
-        self.org_id = FreeEventField(FAKE.word, emptiable_str=True)
+        self.org_id = FreeEventField(
+            FAKE.word, properties=EventFieldProperties(emptiable_str=True)
+        )
         self.course_id = TiedEventField(
             self.get_course_id, dependency=["context", "org_id"]
         )
         self.path = FAKE.uri_path()
         self.course_user_tags = FreeEventField(
-            lambda: {FAKE.word(): FAKE.word()}, optional=True, emptiable_dict=True
+            lambda: {FAKE.word(): FAKE.word()},
+            optional=True,
+            properties=EventFieldProperties(emptiable_dict=True),
         )
 
     @staticmethod
@@ -43,7 +48,9 @@ class TriggeredContextModule(BaseEvent):
         self.usage_key = TiedEventField(
             self.get_usage_key, dependency=["context", "course_id"]
         )
-        self.display_name = FreeEventField(FAKE.sentence, emptiable_str=True)
+        self.display_name = FreeEventField(
+            FAKE.sentence, properties=EventFieldProperties(emptiable_str=True)
+        )
 
     @staticmethod
     def get_usage_key(course_id):

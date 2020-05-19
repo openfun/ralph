@@ -4,7 +4,7 @@ problem_check triggered event fixture definition
 
 from faker import Faker
 
-from .base import BaseEvent, FreeEventField, TiedEventField
+from .base import BaseEvent, EventFieldProperties, FreeEventField, TiedEventField
 from .data import INPUT_TYPES, RESPONSE_TYPES
 from .server import BaseTriggeredEvent
 
@@ -60,28 +60,36 @@ class ProblemCheckEventField(BaseEvent):
                     ["numericalresponse", "formularesponse"]
                 )
                 answer = str(
-                    FreeEventField(FAKE.random_number, emptiable_str=True).get(
-                        *self.args
-                    )
+                    FreeEventField(
+                        FAKE.random_number,
+                        properties=EventFieldProperties(emptiable_str=True),
+                    ).get(*self.args)
                 )
             if input_type == "optioninput":
                 response_type = "optionresponse"
-                answer = FreeEventField(FAKE.word, emptiable_str=True).get(*self.args)
+                answer = FreeEventField(
+                    FAKE.word, properties=EventFieldProperties(emptiable_str=True)
+                ).get(*self.args)
             if input_type == "checkboxgroup":
                 response_type = "choiceresponse"
                 answer = []
                 for _ in range(FAKE.random_int(0, 10)):
                     answer.append(
-                        FreeEventField(FAKE.word, emptiable_str=True).get(*self.args)
+                        FreeEventField(
+                            FAKE.word,
+                            properties=EventFieldProperties(emptiable_str=True),
+                        ).get(*self.args)
                     )
             if input_type == "choicegroup":
                 response_type = "multiplechoiceresponse"
-                answer = FreeEventField(FAKE.word, emptiable_str=True).get(*self.args)
+                answer = FreeEventField(
+                    FAKE.word, properties=EventFieldProperties(emptiable_str=True)
+                ).get(*self.args)
             if input_type == "textline":
                 response_type = "stringresponse"
-                answer = FreeEventField(FAKE.sentence, emptiable_str=True).get(
-                    *self.args
-                )
+                answer = FreeEventField(
+                    FAKE.sentence, properties=EventFieldProperties(emptiable_str=True)
+                ).get(*self.args)
             if input_type == "drag_and_drop_input":
                 response_type = "customresponse"
                 answer = "[" + FAKE.sentence() + "]"
@@ -90,14 +98,14 @@ class ProblemCheckEventField(BaseEvent):
                 answer = "[" + FAKE.sentence() + "]"
             else:
                 # I haven't tried other input/responses for now...
-                answer = FreeEventField(FAKE.sentence, emptiable_str=True).get(
-                    *self.args
-                )
+                answer = FreeEventField(
+                    FAKE.sentence, properties=EventFieldProperties(emptiable_str=True)
+                ).get(*self.args)
 
             submission[key] = {
-                "question": FreeEventField(FAKE.sentence, emptiable_str=True).get(
-                    *self.args
-                ),
+                "question": FreeEventField(
+                    FAKE.sentence, properties=EventFieldProperties(emptiable_str=True)
+                ).get(*self.args),
                 "answer": answer,
                 "input_type": input_type,
                 "response_type": response_type,
@@ -180,15 +188,20 @@ class ProblemCheckEventField(BaseEvent):
                 lambda c=correct: FAKE.random_element([None, 0, 1])
                 if c == "correct"
                 else None,
-                nullable=True,
+                properties=EventFieldProperties(nullable=True),
             ).get(*self.args)
-            msg = FreeEventField(FAKE.sentence, emptiable_str=True).get(*self.args)
-            hint = FreeEventField(FAKE.sentence, emptiable_str=True).get(*self.args)
+            msg = FreeEventField(
+                FAKE.sentence, properties=EventFieldProperties(emptiable_str=True)
+            ).get(*self.args)
+            hint = FreeEventField(
+                FAKE.sentence, properties=EventFieldProperties(emptiable_str=True)
+            ).get(*self.args)
             hintmode = FAKE.random_element([None, "on_request", "always"])
             time = FAKE.date(pattern="%Y%m%d%H%M%S", end_datetime=None)
             secret = FAKE.md5(raw_output=False)
             queuestate = FreeEventField(
-                lambda s=secret, t=time: {"key": s, "time": t}, nullable=True
+                lambda s=secret, t=time: {"key": s, "time": t},
+                properties=EventFieldProperties(nullable=True),
             ).get(*self.args)
             correct_map[key] = {
                 "correctness": correct,

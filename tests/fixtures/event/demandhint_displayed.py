@@ -4,7 +4,7 @@ edx.problem.hint.demandhint_displayed event fixture definition
 
 from faker import Faker
 
-from .base import BaseEvent, FreeEventField, TiedEventField
+from .base import BaseEvent, EventFieldProperties, FreeEventField, TiedEventField
 from .server import BaseServerEvent, BaseTriggeredEvent
 
 # Faker.seed(0)
@@ -24,7 +24,9 @@ class DemandHintDisplayedEventField(BaseEvent):
             BaseServerEvent.get_module_id, dependency="context"
         )
         self.hint_len = hint_len
-        self.hint_text = FreeEventField(FAKE.sentence, emptiable_str=True)
+        self.hint_text = FreeEventField(
+            FAKE.sentence, properties=EventFieldProperties(emptiable_str=True)
+        )
 
 
 class DemandHintDisplayedEvent(BaseTriggeredEvent):

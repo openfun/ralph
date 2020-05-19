@@ -6,7 +6,7 @@ from urllib.parse import urlencode
 
 from faker import Faker
 
-from .base import FreeEventField, TiedEventField
+from .base import EventFieldProperties, FreeEventField, TiedEventField
 from .server import BaseServerEvent
 
 # Faker.seed(0)
@@ -26,7 +26,11 @@ class BrowserEvent(BaseServerEvent):
         super(BrowserEvent, self).__init__(*args, **kwargs)
         self.event_source = "browser"
         self.page = FAKE.url()
-        self.session = FreeEventField(FAKE.md5, emptiable_str=True, raw_output=False)
+        self.session = FreeEventField(
+            FAKE.md5,
+            properties=EventFieldProperties(emptiable_str=True),
+            raw_output=False,
+        )
         self.context.path = "/event"
         self.context.course_user_tags = FreeEventField(lambda: "", removed=True)
         self.event_type = kwargs.get("sub_type", "page_close")
@@ -123,10 +127,13 @@ class BrowserEvent(BaseServerEvent):
             "textbook.pdf.search.navigatednext",
             "textbook.pdf.searchcasesensitivity.toggled",
         ]:
-            status = FreeEventField(lambda: "Phrase not found", emptiable_str=True).get(
-                *self.args
-            )
-            query = FreeEventField(FAKE.word, emptiable_str=True).get(*self.args)
+            status = FreeEventField(
+                lambda: "Phrase not found",
+                properties=EventFieldProperties(emptiable_str=True),
+            ).get(*self.args)
+            query = FreeEventField(
+                FAKE.word, properties=EventFieldProperties(emptiable_str=True)
+            ).get(*self.args)
             event_json = {
                 "caseSensitive": FAKE.boolean(),
                 "highlightAll": FAKE.boolean(),

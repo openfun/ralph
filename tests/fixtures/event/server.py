@@ -4,7 +4,7 @@ Server event fixture definition
 
 from faker import Faker
 
-from .base import BaseEvent, FreeEventField
+from .base import BaseEvent, EventFieldProperties, FreeEventField
 from .context import BaseContext, TriggeredContext
 
 # Faker.seed(0)
@@ -21,14 +21,19 @@ class BaseServerEvent(BaseEvent):
     # pylint: disable=too-many-instance-attributes
     def __init__(self, *args, **kwargs):
         super(BaseServerEvent, self).__init__(*args, **kwargs)
-        self.username = FreeEventField(FAKE.user_name, emptiable_str=True)
-        self.ip = FreeEventField(  # pylint: disable=invalid-name
-            FAKE.ipv4_public, emptiable_str=True
+        emptiable_str_property = EventFieldProperties(emptiable_str=True)
+        self.username = FreeEventField(
+            FAKE.user_name, properties=emptiable_str_property
         )
-        self.agent = FreeEventField(FAKE.user_agent, emptiable_str=True)
+        self.ip = FreeEventField(  # pylint: disable=invalid-name
+            FAKE.ipv4_public, properties=emptiable_str_property
+        )
+        self.agent = FreeEventField(FAKE.user_agent, properties=emptiable_str_property)
         self.host = FAKE.hostname()
-        self.referer = FreeEventField(FAKE.url, emptiable_str=True)
-        self.accept_language = FreeEventField(FAKE.locale, emptiable_str=True)
+        self.referer = FreeEventField(FAKE.url, properties=emptiable_str_property)
+        self.accept_language = FreeEventField(
+            FAKE.locale, properties=emptiable_str_property
+        )
         self.event_source = "server"
         self.time = FAKE.iso8601()
         self.page = None
