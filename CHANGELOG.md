@@ -11,5 +11,6 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Parse (gzipped) tracking logs in GELF format
+- Generate tracking logs as dataframes
 
 [unreleased]: https://github.com/openfun/ralph
