@@ -33,7 +33,7 @@ for c, events in enumerate(
         try:
             statement = xapi(event)
         except NotImplementedStatementType:
-            # logger.warning(f"Ignored unsupported event type: {event.event_type}")
+            logger.warning("Ignored unsupported event type: %s", event.event_type)
             continue
         except IgnoredEvent:
             logger.warning("Ignored event: %s", event)
@@ -41,4 +41,3 @@ for c, events in enumerate(
         else:
             logger.info(event)
             logger.info("%s: %s", statement.__class__.__name__, statement)
-    # break

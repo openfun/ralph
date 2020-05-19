@@ -30,6 +30,8 @@ class ProblemCheck(Base):
             "objectType": "Activity",
             "id": activity_identifier(self._event),
             "definition": {
+                # FIXME
+                # Handle non-capa activity
                 "type": "http://adlnet.gov/expapi/activities/interaction",
                 "name": {"en-US": activity_name(self._event)},
                 "description": {"en-US": "Problem check in an OpenEdx course"},
@@ -48,6 +50,8 @@ class ProblemCheck(Base):
                 "scaled": float(event["grade"] / event["max_grade"]),
             },
             "success": event["success"] == "correct",
+            # FIXME
+            # this is silly
             "response": json.dumps(event["submission"]),
         }
 
