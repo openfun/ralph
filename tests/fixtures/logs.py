@@ -12,6 +12,7 @@ from djehouty.libgelf.formatters import GELFFormatter
 
 from .event.base import BaseEventObjFactory
 from .event.feedback_displayed import FeedbackDisplayedObjFactory
+from .event.server import ServerEventObjFactory
 
 
 @pytest.fixture
@@ -35,12 +36,14 @@ class EventType(Enum):
     """Represents a list of defined Event Types"""
 
     BASEEVENT = auto()
+    SERVER = auto()
     FEEDBACK_DISPLAYED = auto()
 
 
 EVENT_TYPES = {
     EventType.BASEEVENT.value: BaseEventObjFactory,
     EventType.FEEDBACK_DISPLAYED.value: FeedbackDisplayedObjFactory,
+    EventType.SERVER.value: ServerEventObjFactory,
 }
 
 
