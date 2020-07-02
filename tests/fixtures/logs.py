@@ -11,6 +11,7 @@ import pytest
 from djehouty.libgelf.formatters import GELFFormatter
 
 from .event.base import BaseEventObjFactory
+from .event.browser import BrowserEventObjFactory
 from .event.feedback_displayed import FeedbackDisplayedObjFactory
 from .event.server import ServerEventObjFactory
 
@@ -37,6 +38,7 @@ class EventType(Enum):
 
     BASEEVENT = auto()
     SERVER = auto()
+    BROWSER = auto()
     FEEDBACK_DISPLAYED = auto()
 
 
@@ -44,6 +46,7 @@ EVENT_TYPES = {
     EventType.BASEEVENT.value: BaseEventObjFactory,
     EventType.FEEDBACK_DISPLAYED.value: FeedbackDisplayedObjFactory,
     EventType.SERVER.value: ServerEventObjFactory,
+    EventType.BROWSER.value: BrowserEventObjFactory,
 }
 
 

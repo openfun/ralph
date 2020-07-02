@@ -15,13 +15,6 @@ from .mixins import JSONFactoryMixin, ObjFactoryMixin
 FAKE = Faker()
 
 
-def get_block_id(context, prefix, block_type, suffix=None):
-    """Returns a random problem block usage locator"""
-    course_key = context["course_id"][10:]
-    suffix = suffix if suffix else "@" + FAKE.md5(raw_output=False)
-    return "{}:{}+type@{}+block{}".format(prefix, course_key, block_type, suffix)
-
-
 class _FeedbackDisplayedEventFactory(factory.Factory):
     """Represents the Event Field factory of an
     edx.problem.hint.feedback_displayed event
@@ -46,15 +39,10 @@ class _FeedbackDisplayedEventFactory(factory.Factory):
     @factory.lazy_attribute
     # pylint: disable=no-member
     def module_id(self):
-        """Returns the module_id filed which depends on the
-        context.coures_id and context.module.usage_key
+        """Returns the module_id filed which is equal to the
+        context.module.usage_key
         """
-        return get_block_id(
-            self.context,
-            "block-v1",
-            "problem",
-            "@" + self.context["module"]["usage_key"][-32:],
-        )
+        return self.context["module"]["usage_key"]
 
     @factory.lazy_attribute
     def problem_part_id(self):

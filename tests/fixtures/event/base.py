@@ -128,6 +128,8 @@ class _BaseEventFactory(factory.Factory):
     def context(self):
         """Returns the context field"""
         exclude_course_user_tags = FAKE.boolean()
+        if "course_user_tags" in self.context_args:
+            exclude_course_user_tags = False
         # pylint: disable=protected-access
         _BaseContextFactory._meta.exclude = ()
         if exclude_course_user_tags:
