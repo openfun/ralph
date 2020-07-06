@@ -3,7 +3,7 @@ Base event schema definitions
 """
 from ipaddress import IPv4Address
 
-from marshmallow import Schema, ValidationError, fields, validates_schema
+from marshmallow import Schema, ValidationError, fields, validates, validates_schema
 from marshmallow.validate import URL, Equal
 
 
@@ -17,7 +17,7 @@ class BaseContextSchema(Schema):
     path = fields.Url(required=True, relative=True)
 
     # pylint: disable=no-self-use
-    @validates_schema
+    @validates("user_id")
     def validate_user_id(self, value):
         """"check user_id field empty or None or an Integer"""
         if value is not None and value != "" and not isinstance(value, int):
@@ -63,6 +63,9 @@ class BaseContextSchema(Schema):
         "+type@problem+block@{usage_key[-32:]}"
         "/handler/xmodule_handler/problem_check"
         """
+        if "module" not in data:
+            return
+
         path = data["path"]
         valid_path = (
             f"/courses/"
@@ -139,7 +142,7 @@ class BaseEventSchema(Schema):
     )
 
     # pylint: disable=no-self-use
-    @validates_schema
+    @validates("username")
     def validate_username(self, value):
         """"check username field empty or 2-30 chars long"""
         if len(value) == 1 or len(value) > 30:
@@ -148,7 +151,7 @@ class BaseEventSchema(Schema):
             )
 
     # pylint: disable=no-self-use
-    @validates_schema
+    @validates("referer")
     def validate_referer(self, value):
         """allow referer be empty"""
         if value != "":
