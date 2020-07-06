@@ -16,7 +16,8 @@ class BaseContextSchema(Schema):
     course_id = fields.Str(required=True)
     path = fields.Url(required=True, relative=True)
 
-    # pylint: disable=no-self-use
+    # pylint: disable=no-self-use, unused-argument
+
     @validates("user_id")
     def validate_user_id(self, value):
         """"check user_id field empty or None or an Integer"""
@@ -25,7 +26,6 @@ class BaseContextSchema(Schema):
                 "user_id should be None or empty string or an Integer"
             )
 
-    # pylint: disable=no-self-use
     @validates_schema
     def validate_course_id(self, data, **kwargs):
         """the course_id should be equal to
@@ -55,12 +55,11 @@ class BaseContextSchema(Schema):
         if len(course) == 0 or len(session) == 0:
             raise ValidationError("course and session should not be empty")
 
-    # pylint: disable=no-self-use
     @validates_schema
     def validate_path(self, data, **kwargs):
         """path should be equal to
         " /courses/{course_id}/xblock/block-v1:{course_id[10:]}"
-        "+type@problem+block@{usage_key[-32:]}"
+        "+type@problem+block@{usage_key}"
         "/handler/xmodule_handler/problem_check"
         """
         if "module" not in data:
@@ -142,6 +141,7 @@ class BaseEventSchema(Schema):
     )
 
     # pylint: disable=no-self-use
+
     @validates("username")
     def validate_username(self, value):
         """"check username field empty or 2-30 chars long"""
@@ -150,9 +150,18 @@ class BaseEventSchema(Schema):
                 "username should be empty or between 2 and 30 chars long"
             )
 
-    # pylint: disable=no-self-use
     @validates("referer")
     def validate_referer(self, value):
         """allow referer be empty"""
         if value != "":
             URL(relative=True)(value)
+
+    @staticmethod
+    def get_course_key(data):
+        """Returns the course key: organisation+course+sesssion"""
+        return data["context"]["course_id"][10:]
+
+    @staticmethod
+    def get_block_id(data, prefix="block-v1", block_type="problem", suffix="@"):
+        """Returns the block id: {prefix}:{course_key}+type@{block_type}+block{suffix}"""
+        return f"{prefix}:{BaseEventSchema.get_course_key(data)}+type@{block_type}+block{suffix}"

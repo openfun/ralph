@@ -9,6 +9,8 @@ from marshmallow.validate import URL, Equal, OneOf
 
 from .base import BaseEventSchema
 
+MD5_HASH_LEN = 32
+
 BROWSER_EVENT_TYPE_FIELD = [
     "book",
     "page_close",
@@ -39,6 +41,21 @@ BROWSER_NAME_FIELD = [
     "textbook.pdf.searchcasesensitivity.toggled",
 ]
 
+BROWSER_EVENT_VALID_AMAUNT = [
+    "0.5",
+    "0.75",
+    "1",
+    "1.25",
+    "1.5",
+    "2",
+    "3",
+    "4",
+    "auto",
+    "page-actual",
+    "page-fit",
+    "page-width",
+]
+
 
 class BrowserEventSchema(BaseEventSchema):
     """Represents a common browser event.
@@ -49,7 +66,7 @@ class BrowserEventSchema(BaseEventSchema):
     event_source = fields.Str(
         required=True,
         validate=Equal(
-            comparable="browser", error='The event event_source field is not "browser"'
+            comparable="browser", error="The event event_source field is not `browser`"
         ),
     )
     event_type = fields.Str(
@@ -64,7 +81,8 @@ class BrowserEventSchema(BaseEventSchema):
     session = fields.Str(required=True)
     event = fields.Field(required=True)
 
-    # pylint: disable=no-self-use
+    # pylint: disable=no-self-use, unused-argument
+
     @validates_schema
     def validate_name(self, data, **kwargs):
         """The name field should be equal to the event_type in case event_type
@@ -72,12 +90,11 @@ class BrowserEventSchema(BaseEventSchema):
 
         if data["event_type"] != "book" and data["event_type"] != data["name"]:
             raise ValidationError(
-                "the name field should be equal to the event_type when event_type is not `book`"
+                "The name field should be equal to the event_type when event_type is not `book`"
             )
         if data["event_type"] == "book" and data["name"] not in BROWSER_NAME_FIELD:
-            raise ValidationError("the name field is not one of the allowed values")
+            raise ValidationError("The name field is not one of the allowed values")
 
-    # pylint: disable=no-self-use
     @validates_schema
     def validate_context_path(self, data, **kwargs):
         """Check that the context.path is equal to `/event`"""
@@ -86,15 +103,14 @@ class BrowserEventSchema(BaseEventSchema):
                 f"Path should be `/event`, not `{data['context']['path']}`"
             )
 
-    # pylint: disable=no-self-use
     @validates_schema
     def validate_event_page_close(self, data, **kwargs):
         """Check that event is empty dict when name is `page_close`"""
-        if data["name"] == "page_close":
-            if data["event"] != "{}":
-                raise ValidationError("Event should be empty when name is `page_close`")
+        if data["name"] == "page_close" and data["event"] != "{}":
+            raise ValidationError(
+                "Event should be an empty JSON when name is `page_close`"
+            )
 
-    # pylint: disable=no-self-use
     @validates_schema
     def validate_event_problem_show(self, data, **kwargs):
         """Check that event is a parsable JSON object when name is `problem_show`"""
@@ -105,23 +121,14 @@ class BrowserEventSchema(BaseEventSchema):
             raise ValidationError(
                 "Event context.org_id should not be empty for problem_show browser events"
             )
-        try:
-            event = json.loads(data["event"])
-        except (json.JSONDecodeError, TypeError):
-            raise ValidationError("Event should contain a parsable JSON string")
-
-        if len(event) != 1 or "problem" not in event:
-            raise ValidationError("Event should contain a `problem` key")
-
-        # FIXME implement a course key getter from a context course id
-        course_key = data["context"]["course_id"][10:]
-        # FIXME do not hard-code problem key parsing size
-        if event["problem"][:-32] != f"block-v1:{course_key}+type@problem+block@":
+        event = self.validate_event_keys(data, {"problem"})
+        block_id = self.get_block_id(data)
+        if event["problem"][:-MD5_HASH_LEN] != block_id:
             raise ValidationError(
-                f"Event problem should start with `block-v1:{course_key}+type@problem+block`"
+                f"Event problem should start with `{block_id}`, not "
+                f"{event['problem'][:-MD5_HASH_LEN]}"
             )
 
-    # pylint: disable=no-self-use
     @validates_schema
     def validate_event_problem_check(self, data, **kwargs):
         """Check that event is a standard URL-encoded string or empty"""
@@ -133,10 +140,9 @@ class BrowserEventSchema(BaseEventSchema):
         except (ValueError, AttributeError):
             raise ValidationError("Event should be a valid URL-encoded string")
 
-    # pylint: disable=no-self-use
     @validates_schema
     def validate_event_problem_graded_reset_save(self, data, **kwargs):
-        """check that event is a list of lenght 2 and that the first
+        """Check that event is a list of lenght 2 and that the first
         value is a valid URL-encoded string or empty
         for event_types `problem_graded`, `problem_reset` and `problem_save`
         """
@@ -156,44 +162,35 @@ class BrowserEventSchema(BaseEventSchema):
                 "Event list first item should be a valid URL-encoded string"
             )
 
-    # pylint: disable=no-self-use
     @validates_schema
     def validate_event_seq_goto(self, data, **kwargs):
-        """check that the event is a string containing a json object
-        with 3 keys: `new`: integer, `old`: integer, `id`: string
+        """Check that the event is a parsable JSON object with 3 keys:
+        `new`: integer, `old`: integer, `id`: string
         Same validation applies to `seq_next`, `seq_prev` names
         """
-        if data["name"] not in ["seq_goto", "seq_next", "seq_prev"]:
+        if data["name"] not in ["seq_goto"]:
             return
 
-        try:
-            event = json.loads(data["event"])
-        except (json.JSONDecodeError, TypeError):
-            raise ValidationError("Event should contain a parsable JSON string")
-
-        required_keys = {"new", "old", "id"}
-        keys = set(event.keys())
-        if len(required_keys.intersection(keys)) != 3:
-            raise ValidationError(
-                f"{required_keys.difference(keys)} key is required for event"
-            )
-
+        event = self.validate_event_keys(data, {"new", "old", "id"})
         if not isinstance(event["new"], int) or not isinstance(event["old"], int):
             raise ValidationError("Event new and old fields should be integer")
 
-        # FIXME course key parser
-        course_key = data["context"]["course_id"][10:]
-        if event["id"][:-32] != f"block-v1:{course_key}+type@sequential+block@":
+        block_id = self.get_block_id(data, block_type="sequential")
+        block_id_len = len(block_id)
+        if event["id"][:block_id_len] != block_id:
             raise ValidationError(
-                f"the event.id value should start with "
-                f"block-v1:{course_key}+type@problem+block"
+                f"The id should start with {block_id} , not "
+                f"{event['id'][:block_id_len]}"
+            )
+        if len(event["id"][block_id_len:]) != 32:
+            raise ValidationError(
+                f"The id should end with a {MD5_HASH_LEN} long MD5 hash"
             )
 
-    # pylint: disable=no-self-use
     @validates_schema
     def validate_event_seq_next_seq_prev(self, data, **kwargs):
-        """check that the event is a string containing a json object
-        with 3 keys: `new`: integer, `old`: integer, `id`: string
+        """Check that the event is a parsable JSON object with 3 keys:
+        `new`: integer, `old`: integer, `id`: string
         and that `new` is equal to (`old` + 1) for seq_next
         (and the opposite) for seq_prev
         """
@@ -201,23 +198,23 @@ class BrowserEventSchema(BaseEventSchema):
             return
 
         diff = 1 if data["name"] == "seq_next" else -1
-
-        try:
-            event = json.loads(data["event"])
-        except (json.JSONDecodeError, TypeError):
-            raise ValidationError("Event should contain a parsable json string")
-
+        event = self.validate_event_keys(data, {"new", "old", "id"})
+        block_id = self.get_block_id(data, block_type="sequential")
+        if event["id"][:-MD5_HASH_LEN] != block_id:
+            raise ValidationError(
+                f"the event.id value should start with {block_id} , not "
+                f"{event['id'][:-MD5_HASH_LEN]}"
+            )
         if event["old"] + diff != event["new"]:
             raise ValidationError(
                 f"Event new ({event['new']}) should be equal to old "
                 f"({event['old']}) + diff ({diff})"
             )
 
-    # pylint: disable=no-self-use
     @validates_schema
     def validate_event_textbook_pdf(self, data, **kwargs):
-        """check that the event is a string containing a json object
-        with 3 keys: `name`: string, `page`: integer > 0, `chapter`: url
+        """Check that the event is a parsable JSON object with 3 keys:
+        `name`: string, `page`: integer > 0, `chapter`: url
         and `name` should be equal to event `name`
         """
         if data["name"] not in (
@@ -227,18 +224,90 @@ class BrowserEventSchema(BaseEventSchema):
         ):
             return
 
+        event = self.validate_event_keys(data, {"chapter", "page", "name"})
+        self.check_chapter_page_name(data, event)
+
+    @validates_schema
+    def validate_event_textbook_pdf_thumbnail_navigated(self, data, **kwargs):
+        """Check that the event is a parsable JSON object with 4 keys:
+         `name`: string, `page`: integer > 0, `chapter`: url
+         `thumbnail_title`: string """
+        if data["name"] != "textbook.pdf.thumbnail.navigated":
+            return
+
+        event = self.validate_event_keys(
+            data, {"chapter", "page", "name", "thumbnail_title"}
+        )
+        self.check_chapter_page_name(data, event)
+        if not isinstance(event["thumbnail_title"], str):
+            raise ValidationError("thumbnail_title should be a string")
+
+    @validates_schema
+    def validate_event_textbook_pdf_zoom_buttons_changed(self, data, **kwargs):
+        """Check that the event is a parsable JSON object with 4 keys:
+        `name`: string, `page`: integer > 0, `chapter`: url,
+        `direction`: string (one of [`in`, `out`] or [`up`, `down`])
+        """
+        if data["name"] not in [
+            "textbook.pdf.zoom.buttons.changed",
+            "textbook.pdf.page.scrolled",
+        ]:
+            return
+
+        event = self.validate_event_keys(data, {"chapter", "page", "name", "direction"})
+        self.check_chapter_page_name(data, event)
+        valid_directions = (
+            ["in", "out"] if data["name"][-7:] == "changed" else ["up", "down"]
+        )
+        if event["direction"] not in valid_directions:
+            raise ValidationError(f"direction should be one of {valid_directions}")
+
+    @validates_schema
+    def validate_event_textbook_pdf_zoom_menu_changed(self, data, **kwargs):
+        """Check that the event is a parsable JSON object with 4 keys:
+        `name`: string, `page`: integer > 0, `chapter`: url,
+        `amaunt`: string
+        """
+        if data["name"] != "textbook.pdf.zoom.menu.changed":
+            return
+
+        event = self.validate_event_keys(data, {"chapter", "page", "name", "amaunt"})
+        self.check_chapter_page_name(data, event)
+        if event["amaunt"] not in BROWSER_EVENT_VALID_AMAUNT:
+            raise ValidationError(
+                f"amaunt should be one of {BROWSER_EVENT_VALID_AMAUNT}"
+            )
+
+    @validates("session")
+    def validate_session(self, value):  # pylint: no-self-use
+        """"Check session field empty or MD5_HASH_LEN chars long"""
+        if value != "" and len(value) != MD5_HASH_LEN:
+            raise ValidationError(
+                f"Session should be empty or {MD5_HASH_LEN} chars long (MD5)"
+            )
+
+    @staticmethod
+    def validate_event_keys(data, required_keys):
+        """Parse JSON string and check that it contains the keys in the
+        `required_keys` set and no other keys
+        """
         try:
             event = json.loads(data["event"])
         except (json.JSONDecodeError, TypeError):
-            raise ValidationError("Event should contain a parsable json string")
-
-        required_keys = {"name", "page", "chapter"}
+            raise ValidationError("Event should contain a parsable JSON string")
         keys = set(event.keys())
-        if len(required_keys.intersection(keys)) != 3:
+        if keys != required_keys:
             raise ValidationError(
-                f"{required_keys.difference(keys)} key is required for event"
+                f"{required_keys.difference(keys)} key is required for event, "
+                f"{keys.difference(required_keys)} key is not valid for event"
             )
+        return event
 
+    @staticmethod
+    def check_chapter_page_name(data, event):
+        """Check that the `chapter` is an valid url
+        the `name` should be equal to browser event field `name`
+        and `page` should be an integer > 0"""
         if not isinstance(event["page"], int) or not event["page"] > 0:
             raise ValidationError("Event page should a positive integer")
 
@@ -249,17 +318,13 @@ class BrowserEventSchema(BaseEventSchema):
 
         URL(relative=True)(event["chapter"])
 
-        # FIXME course-key parser
-        course_key = data["context"]["course_id"][10:]
-        chapter_begin = f"/asset-v1:{course_key}+type@asset+block/"
-        if event["chapter"][: len(chapter_begin)] != chapter_begin:
-            raise ValidationError(f"Event chapter should begin with {chapter_begin}")
+        block_id = BaseEventSchema.get_block_id(
+            data, prefix="/asset-v1", block_type="asset", suffix="/"
+        )
+        if event["chapter"][: len(block_id)] != block_id:
+            raise ValidationError(
+                f"Event chapter should begin with {block_id} , not "
+                f"{event['chapter'][:len(block_id)]}"
+            )
         if event["chapter"][-4:] != ".pdf":
             raise ValidationError("Event chapter should end with the .pdf extension")
-
-    # pylint: no-self-use
-    @validates("session")
-    def validate_session(self, value):
-        """"check session field empty or 32 chars long"""
-        if value != "" and len(value) != 32:
-            raise ValidationError("Session should be empty or 32 chars long (md5 key)")

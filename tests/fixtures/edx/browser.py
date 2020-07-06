@@ -9,6 +9,7 @@ from faker import Faker
 
 from ralph.schemas.edx.browser import (
     BROWSER_EVENT_TYPE_FIELD,
+    BROWSER_EVENT_VALID_AMAUNT,
     BROWSER_NAME_FIELD,
     BrowserEventSchema,
 )
@@ -71,18 +72,33 @@ class _BrowserEventFactory(_BaseEventFactory):
     @staticmethod
     def handle_pdf_event(obj, course_key):
         """group logic for pdf related events"""
+        event = {}
         if obj.name in [
-            "textbook.pdf.thumbnails.toggled",
             "textbook.pdf.outline.toggled",
+            "textbook.pdf.thumbnail.navigated",
+            "textbook.pdf.thumbnails.toggled",
             "textbook.pdf.page.navigated",
+            "textbook.pdf.page.scrolled",
+            "textbook.pdf.zoom.buttons.changed",
+            "textbook.pdf.zoom.menu.changed",
         ]:
-            event_json = {"page": FAKE.random_int(0, 1000)}
-            event_json[
-                "chapter"
-            ] = f"/asset-v1:{course_key}+type@asset+block/{FAKE.slug()}.pdf"
-            event_json["name"] = obj.name
-            return json.dumps(event_json)
-        return "{}"
+            event["page"] = FAKE.random_int(0, 1000)
+        if obj.name == "textbook.pdf.thumbnail.navigated":
+            event["thumbnail_title"] = f"Page {event['page']}"
+        if obj.name in [
+            "textbook.pdf.zoom.buttons.changed",
+            "textbook.pdf.page.scrolled",
+        ]:
+            scroll_or_zoom = (
+                ["in", "out"] if obj.name[-7:] == "changed" else ["up", "down"]
+            )
+            event["direction"] = FAKE.random_element(scroll_or_zoom)
+        if obj.name == "textbook.pdf.zoom.menu.changed":
+            event["amaunt"] = FAKE.random_element(BROWSER_EVENT_VALID_AMAUNT)
+
+        event["chapter"] = f"/asset-v1:{course_key}+type@asset+block/{FAKE.slug()}.pdf"
+        event["name"] = obj.name
+        return json.dumps(event)
 
     # pylint: disable=no-member
     @factory.lazy_attribute

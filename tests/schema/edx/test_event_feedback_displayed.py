@@ -8,7 +8,7 @@ from marshmallow import ValidationError
 
 from ralph.schemas.edx.feedback_displayed import FeedbackDisplayedSchema
 
-from .fixtures.logs import EventType, _event
+from tests.fixtures.logs import EventType, _event
 
 SCHEMA = FeedbackDisplayedSchema()
 BULK_EVENTS = _event(50, EventType.FEEDBACK_DISPLAYED)

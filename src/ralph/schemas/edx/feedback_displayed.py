@@ -6,6 +6,7 @@ from marshmallow import Schema, ValidationError, fields, validates_schema
 from marshmallow.validate import Equal, Length, OneOf
 
 from .base import BaseEventSchema, ContextSchema
+from .browser import MD5_HASH_LEN
 
 
 class FeedbackDisplayedEventSchema(Schema):
@@ -47,7 +48,7 @@ class FeedbackDisplayedEventSchema(Schema):
         """the event.problem_part_id should be contained in the
         event.module_id
         """
-        if data["problem_part_id"][:32] != data["module_id"][-32:]:
+        if data["problem_part_id"][:MD5_HASH_LEN] != data["module_id"][-MD5_HASH_LEN:]:
             raise ValidationError("problem_part_id should be in module_id")
 
     # pylint: disable=no-self-use

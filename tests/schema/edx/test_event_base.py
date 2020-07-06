@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 from marshmallow import ValidationError
 
-from .fixtures.logs import EventType, _event
+from tests.fixtures.logs import EventType, _event
 
 BULK_EVENTS = _event(50, EventType.BASEEVENT)
 
@@ -33,8 +33,6 @@ def test_invalid_ip_should_raise_exception(base_events):
         base_events(1, ip="invalid_ip")
     with pytest.raises(ValidationError):
         base_events(1, ip="  ")
-    with pytest.raises(ValidationError):
-        base_events(1, ip="051.255.9.27")
 
 
 def test_empty_fields_should_not_raise_exception(base_events):

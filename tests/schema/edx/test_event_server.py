@@ -8,7 +8,7 @@ from marshmallow import ValidationError
 
 from ralph.schemas.edx.server import ServerEventSchema
 
-from .fixtures.logs import EventType, _event
+from tests.fixtures.logs import EventType, _event
 
 SCHEMA = ServerEventSchema()
 

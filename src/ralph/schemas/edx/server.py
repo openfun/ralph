@@ -18,13 +18,13 @@ class ServerEventSchema(BaseEventSchema):
     event = fields.Str(required=True)
 
     # pylint: disable=no-self-use
+
     @validates_schema
     def validate_event_type(self, data, **kwargs):
         """the event_type should be equal to context.path"""
         if data["event_type"] != data["context"]["path"]:
             raise ValidationError("event_type should be equal to context.path")
 
-    # pylint: disable=no-self-use
     @validates("event")
     def validate_event(self, value):
         """check that the event field contains a parsable json string with 2

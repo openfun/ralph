@@ -2,7 +2,7 @@
 Logs format pytest fixtures.
 """
 import logging
-from enum import Enum, auto
+from enum import Enum
 from secrets import token_hex
 from tempfile import NamedTemporaryFile
 
@@ -10,10 +10,10 @@ import pandas as pd
 import pytest
 from djehouty.libgelf.formatters import GELFFormatter
 
-from .event.base import BaseEventObjFactory
-from .event.browser import BrowserEventObjFactory
-from .event.feedback_displayed import FeedbackDisplayedObjFactory
-from .event.server import ServerEventObjFactory
+from .edx.base import BaseEventObjFactory
+from .edx.browser import BrowserEventObjFactory
+from .edx.feedback_displayed import FeedbackDisplayedObjFactory
+from .edx.server import ServerEventObjFactory
 
 
 @pytest.fixture
@@ -36,18 +36,10 @@ def gelf_logger():
 class EventType(Enum):
     """Represents a list of defined Event Types"""
 
-    BASEEVENT = auto()
-    SERVER = auto()
-    BROWSER = auto()
-    FEEDBACK_DISPLAYED = auto()
-
-
-EVENT_TYPES = {
-    EventType.BASEEVENT.value: BaseEventObjFactory,
-    EventType.FEEDBACK_DISPLAYED.value: FeedbackDisplayedObjFactory,
-    EventType.SERVER.value: ServerEventObjFactory,
-    EventType.BROWSER.value: BrowserEventObjFactory,
-}
+    BASEEVENT = BaseEventObjFactory
+    SERVER = ServerEventObjFactory
+    BROWSER = BrowserEventObjFactory
+    FEEDBACK_DISPLAYED = FeedbackDisplayedObjFactory
 
 
 def _event(size, event_type_enum, **kwargs):
@@ -61,9 +53,7 @@ def _event(size, event_type_enum, **kwargs):
     Returns:
         DataFrame: With one event per row and size number of rows
     """
-    return pd.DataFrame(
-        EVENT_TYPES.get(event_type_enum.value).create_batch(size, **kwargs)
-    )
+    return pd.DataFrame(event_type_enum.value.create_batch(size, **kwargs))
 
 
 @pytest.fixture
