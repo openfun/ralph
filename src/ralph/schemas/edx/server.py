@@ -3,7 +3,7 @@ Server event schema definitions
 """
 import json
 
-from marshmallow import ValidationError, fields, validates_schema
+from marshmallow import ValidationError, fields, validates, validates_schema
 
 from .base import BaseEventSchema
 
@@ -25,7 +25,7 @@ class ServerEventSchema(BaseEventSchema):
             raise ValidationError("event_type should be equal to context.path")
 
     # pylint: disable=no-self-use
-    @validates_schema
+    @validates("event")
     def validate_event(self, value):
         """check that the event field contains a parsable json string with 2
         keys `POST` and `GET` and dictionaries as values. As the event field
