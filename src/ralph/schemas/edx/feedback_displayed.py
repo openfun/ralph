@@ -29,13 +29,13 @@ class FeedbackDisplayedEventSchema(Schema):
         required=True,
         validate=OneOf(
             choices=[
+                "choiceresponse",
                 "multiplechoiceresponse",
                 "numericalresponse",
-                "stringresponse",
                 "optionresponse",
-                "choiceresponse",
+                "stringresponse",
             ],
-            error="The event question_type field value is not one of the valid values",
+            error="Not allowed value",
         ),
     )
     module_id = fields.Str(required=True)
@@ -48,9 +48,7 @@ class FeedbackDisplayedEventSchema(Schema):
         event.module_id
         """
         if data["problem_part_id"][:32] != data["module_id"][-32:]:
-            raise ValidationError(
-                "event.problem_part_id should be contained in event.module_id"
-            )
+            raise ValidationError("problem_part_id should be in module_id")
 
     # pylint: disable=no-self-use
     @validates_schema
@@ -75,14 +73,12 @@ class FeedbackDisplayedEventSchema(Schema):
         """
         if "choice_all" in data and data["question_type"] != "choiceresponse":
             raise ValidationError(
-                "event.choice_all should be only present "
-                'when event.question_type == "choiceresponse"'
+                "choice_all should be only present when the question_type is `choiceresponse`"
             )
-        # the converse is true
-        if "choice_all" not in data and data["question_type"] == "choiceresponse":
+
+        if data["question_type"] == "choiceresponse" and "choice_all" not in data:
             raise ValidationError(
-                'when event.question_type == "choiceresponse" - '
-                "event.choice_all should be present"
+                "When the question_type is `choiceresponse`, choice_all should be present"
             )
 
 
@@ -97,7 +93,7 @@ class FeedbackDisplayedSchema(BaseEventSchema):
         required=True,
         validate=Equal(
             comparable="edx.problem.hint.feedback_displayed",
-            error='The event event_type field is not "edx.problem.hint.feedback_displayed"',
+            error="The event event_type field is not `edx.problem.hint.feedback_displayed`",
         ),
     )
     event = fields.Nested(FeedbackDisplayedEventSchema(), required=True)

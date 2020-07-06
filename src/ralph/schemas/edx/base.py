@@ -1,7 +1,6 @@
 """
 Base event schema definitions
 """
-import re
 from ipaddress import IPv4Address
 
 from marshmallow import Schema, ValidationError, fields, validates_schema
@@ -11,21 +10,22 @@ from marshmallow.validate import URL, Equal
 class BaseContextSchema(Schema):
     """Represents the Base Context inherited by all event contexts"""
 
-    # pylint: disable=no-self-argument, no-self-use
-    def validate_user_id(value):
+    course_user_tags = fields.Dict(keys=fields.Str(), values=fields.Str())
+    user_id = fields.Field(required=True, allow_none=True)
+    org_id = fields.Str(required=True)
+    course_id = fields.Str(required=True)
+    path = fields.Url(required=True, relative=True)
+
+    # pylint: disable=no-self-use
+    @validates_schema
+    def validate_user_id(self, value):
         """"check user_id field empty or None or an Integer"""
         if value is not None and value != "" and not isinstance(value, int):
             raise ValidationError(
                 "user_id should be None or empty string or an Integer"
             )
 
-    course_user_tags = fields.Dict(keys=fields.Str(), values=fields.Str())
-    user_id = fields.Field(required=True, allow_none=True, validate=validate_user_id)
-    org_id = fields.Str(required=True)
-    course_id = fields.Str(required=True)
-    path = fields.Url(required=True, relative=True)
-
-    # pylint: disable=no-self-use, unused-argument
+    # pylint: disable=no-self-use
     @validates_schema
     def validate_course_id(self, data, **kwargs):
         """the course_id should be equal to
@@ -55,21 +55,6 @@ class BaseContextSchema(Schema):
         if len(course) == 0 or len(session) == 0:
             raise ValidationError("course and session should not be empty")
 
-
-class ContextModuleSchema(Schema):
-    """Represents the context module field"""
-
-    usage_key = fields.Str(required=True)
-    display_name = fields.Str(required=True)
-
-
-class ContextSchema(BaseContextSchema):
-    """Context with module field. Present in Capa problems related
-    events.
-    """
-
-    module = fields.Nested(ContextModuleSchema(), required=True)
-
     # pylint: disable=no-self-use
     @validates_schema
     def validate_path(self, data, **kwargs):
@@ -94,6 +79,21 @@ class ContextSchema(BaseContextSchema):
             )
 
 
+class ContextModuleSchema(Schema):
+    """Represents the context module field"""
+
+    usage_key = fields.Str(required=True)
+    display_name = fields.Str(required=True)
+
+
+class ContextSchema(BaseContextSchema):
+    """Context with module field. Present in Capa problems related
+    events.
+    """
+
+    module = fields.Nested(ContextModuleSchema(), required=True)
+
+
 class IPv4AddressField(fields.Field):
     """IPv4 Address that serializes to a string of numbers and deserializes
     to a IPv4Address object.
@@ -107,13 +107,6 @@ class IPv4AddressField(fields.Field):
     def _deserialize(self, value, attr, data, **kwargs):
         if value == "":
             return ""
-        chunk_ipv4 = r"([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])"
-        patten_ipv4 = re.compile(r"^(" + chunk_ipv4 + r"\.){3}" + chunk_ipv4 + r"$")
-        # 001.001.001.001 is not a valid ip address
-        # IPv4Address("001.001.001.001") => "1.1.1.1"
-        # (no exception thrown)
-        if not patten_ipv4.match(value):
-            raise ValidationError("ip must be empty or a valid IPv4 address")
         try:
             return IPv4Address(value)
         except ValueError as error:
@@ -125,25 +118,11 @@ class BaseEventSchema(Schema):
     Does not define event and event_type fields
     """
 
-    # pylint: disable=no-self-argument, no-self-use
-    def validate_username(value):
-        """"check username field empty or 2-30 chars long"""
-        if len(value) == 1 or len(value) > 30:
-            raise ValidationError(
-                "username should be empty or between 2 and 30 chars long"
-            )
-
-    # pylint: disable=no-self-argument, no-self-use
-    def validate_referer(value):
-        """allow referer be empty"""
-        if value != "":
-            URL(relative=True)(value)
-
-    username = fields.Str(required=True, validate=validate_username)
+    username = fields.Str(required=True)
     ip = IPv4AddressField(required=True)
     agent = fields.Str(required=True)
     host = fields.Str(required=True)
-    referer = fields.Str(required=True, validate=validate_referer)
+    referer = fields.Str(required=True)
     accept_language = fields.Str(required=True)
     event_source = fields.Str(
         required=True,
@@ -158,3 +137,19 @@ class BaseEventSchema(Schema):
         allow_none=True,
         validate=Equal(comparable=None, error="The event page field is not None"),
     )
+
+    # pylint: disable=no-self-use
+    @validates_schema
+    def validate_username(self, value):
+        """"check username field empty or 2-30 chars long"""
+        if len(value) == 1 or len(value) > 30:
+            raise ValidationError(
+                "username should be empty or between 2 and 30 chars long"
+            )
+
+    # pylint: disable=no-self-use
+    @validates_schema
+    def validate_referer(self, value):
+        """allow referer be empty"""
+        if value != "":
+            URL(relative=True)(value)
