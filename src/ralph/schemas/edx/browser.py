@@ -4,7 +4,7 @@ Browser event schema definitions
 import json
 import urllib.parse
 
-from marshmallow import ValidationError, fields, validates_schema
+from marshmallow import ValidationError, fields, validates, validates_schema
 from marshmallow.validate import URL, Equal, OneOf
 
 from .base import BaseEventSchema
@@ -209,7 +209,8 @@ class BrowserEventSchema(BaseEventSchema):
 
         if event["old"] + diff != event["new"]:
             raise ValidationError(
-                f"Event new ({event['new']}) should be equal to old ({event['old']}) + diff ({diff})"
+                f"Event new ({event['new']}) should be equal to old "
+                f"({event['old']}) + diff ({diff})"
             )
 
     # pylint: disable=no-self-use
@@ -257,7 +258,7 @@ class BrowserEventSchema(BaseEventSchema):
             raise ValidationError("Event chapter should end with the .pdf extension")
 
     # pylint: no-self-use
-    @validates_schema
+    @validates("session")
     def validate_session(self, value):
         """"check session field empty or 32 chars long"""
         if value != "" and len(value) != 32:
