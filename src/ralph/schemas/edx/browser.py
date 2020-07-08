@@ -182,7 +182,7 @@ class BrowserEventSchema(BaseEventSchema):
                 f"The id should start with {block_id} , not "
                 f"{event['id'][:block_id_len]}"
             )
-        if len(event["id"][block_id_len:]) != 32:
+        if len(event["id"][block_id_len:]) != MD5_HASH_LEN:
             raise ValidationError(
                 f"The id should end with a {MD5_HASH_LEN} long MD5 hash"
             )
