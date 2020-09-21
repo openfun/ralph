@@ -31,7 +31,7 @@ class BaseContextSchema(Schema):
         """the course_id should be equal to
         "course-v1:{org_id}+{any_string}+{any_string}"
         """
-        if data["org_id"] == "" and data["course_id"] != "":
+        if not data["org_id"] and data["course_id"]:
             raise ValidationError("course_id should be empty if org_id is empty")
         if data["course_id"] == "" and data["org_id"] != "":
             raise ValidationError("org_id should be empty if course_id is empty")
