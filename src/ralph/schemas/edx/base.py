@@ -102,7 +102,7 @@ class IPv4AddressField(fields.Field):
     """
 
     def _serialize(self, value, attr, obj, **kwargs):
-        if value == "":
+        if not value:
             return ""
         return value.exploded
 
