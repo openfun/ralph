@@ -107,7 +107,7 @@ class IPv4AddressField(fields.Field):
         return value.exploded
 
     def _deserialize(self, value, attr, data, **kwargs):
-        if value == "":
+        if not value:
             return ""
         try:
             return IPv4Address(value)
