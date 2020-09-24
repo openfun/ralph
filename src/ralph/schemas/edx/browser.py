@@ -1,6 +1,7 @@
 """
 Browser event schema definitions
 """
+# pylint: disable=no-self-use, unused-argument
 import json
 import urllib.parse
 
@@ -56,11 +57,10 @@ BROWSER_EVENT_VALID_AMOUNT = [
     "page-width",
 ]
 
-
-class BrowserEventSchema(BaseEventSchema):
-    """Represents a common browser event.
-    This type of event is triggered on (XHR) POST/GET request to the
-    `/event` URL
+class BaseBrowserEventSchema(BaseEventSchema):
+    """Represents common fields and functions all BrowserEvents inherit
+    from. This type of event is triggered on (XHR) POST/GET request to
+    the `/event` URL
     """
 
     event_source = fields.Str(
@@ -81,7 +81,13 @@ class BrowserEventSchema(BaseEventSchema):
     session = fields.Str(required=True)
     event = fields.Field(required=True)
 
-    # pylint: disable=no-self-use, unused-argument
+    @validates("session")
+    def validate_session(self, value):
+        """"Check session field empty or MD5_HASH_LEN chars long"""
+        if value != "" and len(value) != MD5_HASH_LEN:
+            raise ValidationError(
+                f"Session should be empty or {MD5_HASH_LEN} chars long (MD5)"
+            )
 
     @validates_schema
     def validate_name(self, data, **kwargs):
@@ -101,203 +107,6 @@ class BrowserEventSchema(BaseEventSchema):
         if data["context"]["path"] != "/event":
             raise ValidationError(
                 f"Path should be `/event`, not `{data['context']['path']}`"
-            )
-
-    @validates_schema
-    def validate_event_page_close(self, data, **kwargs):
-        """Check that event is empty dict when name is `page_close`"""
-        if data["name"] == "page_close" and data["event"] != "{}":
-            raise ValidationError(
-                "Event should be an empty JSON when name is `page_close`"
-            )
-
-    @validates_schema
-    def validate_event_problem_show(self, data, **kwargs):
-        """Check that event is a parsable JSON object when name is `problem_show`"""
-        if data["name"] != "problem_show":
-            return
-
-        if data["context"]["org_id"] == "":
-            raise ValidationError(
-                "Event context.org_id should not be empty for problem_show browser events"
-            )
-        event = self.validate_event_keys(data, {"problem"})
-        block_id = self.get_block_id(data)
-        if event["problem"][:-MD5_HASH_LEN] != block_id:
-            raise ValidationError(
-                f"Event problem should start with `{block_id}`, not "
-                f"{event['problem'][:-MD5_HASH_LEN]}"
-            )
-
-    @validates_schema
-    def validate_event_problem_check(self, data, **kwargs):
-        """Check that event is a standard URL-encoded string or empty"""
-        if data["name"] != "problem_check" or data["event"] == "":
-            return
-
-        try:
-            urllib.parse.parse_qs(data["event"], strict_parsing=True)
-        except (ValueError, AttributeError):
-            raise ValidationError("Event should be a valid URL-encoded string")
-
-    @validates_schema
-    def validate_event_problem_graded_reset_save(self, data, **kwargs):
-        """Check that event is a list of lenght 2 and that the first
-        value is a valid URL-encoded string or empty
-        for event_types `problem_graded`, `problem_reset` and `problem_save`
-        """
-        if data["name"] not in ("problem_graded", "problem_reset", "problem_save"):
-            return
-
-        if not isinstance(data["event"], list) or len(data["event"]) != 2:
-            raise ValidationError("Event should be a two-items list")
-
-        if data["event"][0] == "":
-            return
-
-        try:
-            urllib.parse.parse_qs(data["event"][0], strict_parsing=True)
-        except (ValueError, AttributeError):
-            raise ValidationError(
-                "Event list first item should be a valid URL-encoded string"
-            )
-
-    @validates_schema
-    def validate_event_seq_goto(self, data, **kwargs):
-        """Check that the event is a parsable JSON object with 3 keys:
-        `new`: integer, `old`: integer, `id`: string
-        Same validation applies to `seq_next`, `seq_prev` names
-        """
-        if data["name"] not in ["seq_goto"]:
-            return
-
-        event = self.validate_event_keys(data, {"new", "old", "id"})
-        if not isinstance(event["new"], int) or not isinstance(event["old"], int):
-            raise ValidationError("Event new and old fields should be integer")
-
-        block_id = self.get_block_id(data, block_type="sequential")
-        block_id_len = len(block_id)
-        if event["id"][:block_id_len] != block_id:
-            raise ValidationError(
-                f"The id should start with {block_id} , not "
-                f"{event['id'][:block_id_len]}"
-            )
-        if len(event["id"][block_id_len:]) != MD5_HASH_LEN:
-            raise ValidationError(
-                f"The id should end with a {MD5_HASH_LEN} long MD5 hash"
-            )
-
-    @validates_schema
-    def validate_event_seq_next_seq_prev(self, data, **kwargs):
-        """Check that the event is a parsable JSON object with 3 keys:
-        `new`: integer, `old`: integer, `id`: string
-        and that `new` is equal to (`old` + 1) for seq_next
-        (and the opposite) for seq_prev
-        """
-        if data["name"] not in ("seq_next", "seq_prev"):
-            return
-
-        diff = 1 if data["name"] == "seq_next" else -1
-        event = self.validate_event_keys(data, {"new", "old", "id"})
-        block_id = self.get_block_id(data, block_type="sequential")
-        if event["id"][:-MD5_HASH_LEN] != block_id:
-            raise ValidationError(
-                f"the event.id value should start with {block_id} , not "
-                f"{event['id'][:-MD5_HASH_LEN]}"
-            )
-        if event["old"] + diff != event["new"]:
-            raise ValidationError(
-                f"Event new ({event['new']}) should be equal to old "
-                f"({event['old']}) + diff ({diff})"
-            )
-
-    @validates_schema
-    def validate_event_textbook_pdf(self, data, **kwargs):
-        """Check that the event is a parsable JSON object with 3 keys:
-        `name`: string, `page`: integer > 0, `chapter`: url
-        and `name` should be equal to event `name`
-        """
-        if data["name"] not in (
-            "textbook.pdf.outline.toggled",
-            "textbook.pdf.page.navigated",
-            "textbook.pdf.thumbnails.toggled",
-        ):
-            return
-
-        event = self.validate_event_keys(data, {"chapter", "page", "name"})
-        self.check_chapter_page_name(data, event)
-
-    @validates_schema
-    def validate_event_textbook_pdf_thumbnail_navigated(self, data, **kwargs):
-        """Check that the event is a parsable JSON object with 4 keys:
-         `name`: string, `page`: integer > 0, `chapter`: url
-         `thumbnail_title`: string """
-        if data["name"] != "textbook.pdf.thumbnail.navigated":
-            return
-
-        event = self.validate_event_keys(
-            data, {"chapter", "page", "name", "thumbnail_title"}
-        )
-        self.check_chapter_page_name(data, event)
-        if not isinstance(event["thumbnail_title"], str):
-            raise ValidationError("thumbnail_title should be a string")
-
-    @validates_schema
-    def validate_event_textbook_pdf_zoom_buttons_changed(self, data, **kwargs):
-        """Check that the event is a parsable JSON object with 4 keys:
-        `name`: string, `page`: integer > 0, `chapter`: url,
-        `direction`: string (one of [`in`, `out`] or [`up`, `down`])
-        """
-        if data["name"] not in [
-            "textbook.pdf.zoom.buttons.changed",
-            "textbook.pdf.page.scrolled",
-        ]:
-            return
-
-        event = self.validate_event_keys(data, {"chapter", "page", "name", "direction"})
-        self.check_chapter_page_name(data, event)
-        valid_directions = (
-            ["in", "out"] if data["name"][-7:] == "changed" else ["up", "down"]
-        )
-        if event["direction"] not in valid_directions:
-            raise ValidationError(f"direction should be one of {valid_directions}")
-
-    @validates_schema
-    def validate_event_textbook_pdf_zoom_menu_changed(self, data, **kwargs):
-        """Check that the event is a parsable JSON object with 4 keys:
-        `name`: string, `page`: integer > 0, `chapter`: url,
-        `amount`: string
-        """
-        if data["name"] != "textbook.pdf.zoom.menu.changed":
-            return
-
-        event = self.validate_event_keys(data, {"chapter", "page", "name", "amount"})
-        self.check_chapter_page_name(data, event)
-        if event["amount"] not in BROWSER_EVENT_VALID_AMOUNT:
-            raise ValidationError(
-                f"amount should be one of {BROWSER_EVENT_VALID_AMOUNT}"
-            )
-
-    @validates_schema
-    def validate_event_textbook_pdf_display_scaled(self, data, **kwargs):
-        """Check that the event is a parsable JSON object with 4 keys:
-        `name`: string, `page`: integer > 0, `chapter`: url,
-        `amount`: interger
-        """
-        if data["name"] != "textbook.pdf.display.scaled":
-            return
-
-        event = self.validate_event_keys(data, {"chapter", "page", "name", "amount"})
-        self.check_chapter_page_name(data, event)
-        if not isinstance(event["amount"], float):
-            raise ValidationError("amount should be an integer")
-
-    @validates("session")
-    def validate_session(self, value):  # pylint: no-self-use
-        """"Check session field empty or MD5_HASH_LEN chars long"""
-        if value != "" and len(value) != MD5_HASH_LEN:
-            raise ValidationError(
-                f"Session should be empty or {MD5_HASH_LEN} chars long (MD5)"
             )
 
     @staticmethod
@@ -321,7 +130,8 @@ class BrowserEventSchema(BaseEventSchema):
     def check_chapter_page_name(data, event):
         """Check that the `chapter` is an valid url
         the `name` should be equal to browser event field `name`
-        and `page` should be an integer > 0"""
+        and `page` should be an integer > 0
+        """
         if not isinstance(event["page"], int) or not event["page"] > 0:
             raise ValidationError("Event page should a positive integer")
 
@@ -342,3 +152,316 @@ class BrowserEventSchema(BaseEventSchema):
             )
         if event["chapter"][-4:] != ".pdf":
             raise ValidationError("Event chapter should end with the .pdf extension")
+
+    @staticmethod
+    def check_name(data, name):
+        """Check the name of the event is equal to the `name` argument"""
+        if data["name"] != name:
+            raise ValidationError(f"name field should be `{name}`")
+
+class PageCloseBrowserEventSchema(BaseBrowserEventSchema):
+    """Triggered when the js event window.onunload is triggered"""
+
+    @validates_schema
+    def validate_event_page_close(self, data, **kwargs):
+        """Check that event is empty dict when name is `page_close`"""
+        self.check_name(data, "page_close")
+        if data["event"] != "{}":
+            raise ValidationError("Event should be an empty JSON")
+
+
+class ProblemShowBrowserEventSchema(BaseBrowserEventSchema):
+    """Triggered when user clicks on the button `AFFICHER LA REPONSE`
+    of a CAPA problem
+    """
+
+    @validates_schema
+    def validate_event_problem_show(self, data, **kwargs):
+        """Check that event is a parsable JSON object when name is `problem_show`"""
+        self.check_name(data, "problem_show")
+        if not data["context"]["org_id"]:
+            raise ValidationError("Event context.org_id should not be empty")
+        event = self.validate_event_keys(data, {"problem"})
+        block_id = self.get_block_id(data)
+        if event["problem"][:-MD5_HASH_LEN] != block_id:
+            raise ValidationError(
+                f"Event problem should start with `{block_id}`, not "
+                f"{event['problem'][:-MD5_HASH_LEN]}"
+            )
+
+class ProblemCheckBrowserEventSchema(BaseBrowserEventSchema):
+    """Triggered when user submits a response to a CAPA problem"""
+
+    @validates_schema
+    def validate_event_problem_check(self, data, **kwargs):
+        """Check that event is a standard URL-encoded string or empty"""
+        self.check_name(data, "problem_check")
+        try:
+            urllib.parse.parse_qs(data["event"], strict_parsing=True)
+        except (ValueError, AttributeError) as exception:
+            raise ValidationError("Event should be a valid URL-encoded string") from exception
+
+class BaseProblemBrowserEventSchema(BaseBrowserEventSchema):
+    """Base class for problem_graded, problem_reset and problem_save
+    Browser events
+    """
+
+    @validates_schema
+    def validate_event_problem_graded_reset_save(self, data, **kwargs):
+        """Check that event is a list of lenght 2 and that the first
+        value is a valid URL-encoded string or empty
+        """
+        if not isinstance(data["event"], list) or len(data["event"]) != 2:
+            raise ValidationError("Event should be a two-items list")
+
+        if data["event"][0] == "":
+            return
+
+        try:
+            urllib.parse.parse_qs(data["event"][0], strict_parsing=True)
+        except (ValueError, AttributeError) as exception:
+            raise ValidationError(
+                "Event list first item should be a valid URL-encoded string"
+            ) from exception
+
+class ProblemGradedBrowserEventSchema(BaseProblemBrowserEventSchema):
+    """Triggered when user submits a response to a CAPA problem"""
+
+    @validates_schema
+    def validate_event_problem_graded(self, data, **kwargs):
+        """Check name is `problem_graded`"""
+        self.check_name(data, "problem_graded")
+
+
+class ProblemResetBrowserEventSchema(BaseProblemBrowserEventSchema):
+    """Triggered when user clicks on the button `REINITIALISER`
+    of a CAPA problem
+    """
+
+    @validates_schema
+    def validate_event_problem_graded(self, data, **kwargs):
+        """Check name is `problem_reset`"""
+        self.check_name(data, "problem_reset")
+
+
+class ProblemSaveBrowserEventSchema(BaseProblemBrowserEventSchema):
+    """Triggered when user clicks on the button `ENREGISTRER`
+    of an CAPA problem
+    """
+
+    @validates_schema
+    def validate_event_problem_save(self, data, **kwargs):
+        """Check name is `problem_save`"""
+        self.check_name(data, "problem_save")
+
+
+class SeqGotoBrowserEventSchema(BaseBrowserEventSchema):
+    """Triggered when user clicks on a sequence unit of the sequence
+    navigation bar in a courseware page
+    """
+
+    @validates_schema
+    def validate_event_seq_goto(self, data, **kwargs):
+        """Check that the event is a parsable JSON object with 3 keys:
+        `new`: integer, `old`: integer, `id`: string
+        Same validation applies to `seq_next`, `seq_prev` names
+        """
+        self.check_name(data, "seq_goto")
+        event = self.validate_event_keys(data, {"new", "old", "id"})
+        if not isinstance(event["new"], int) or not isinstance(event["old"], int):
+            raise ValidationError("Event new and old fields should be integer")
+        block_id = self.get_block_id(data, block_type="sequential")
+        block_id_len = len(block_id)
+        if event["id"][:block_id_len] != block_id:
+            raise ValidationError(
+                f"The id should start with {block_id} , not "
+                f"{event['id'][:block_id_len]}"
+            )
+        if len(event["id"][block_id_len:]) != MD5_HASH_LEN:
+            raise ValidationError(
+                f"The id should end with a {MD5_HASH_LEN} long MD5 hash"
+            )
+
+
+class SeqNextBrowserEventSchema(BaseBrowserEventSchema):
+    """Triggered when user clicks on the right arrow of the sequence
+    navigation bar
+    """
+
+    @validates_schema
+    def validate_event_seq_next(self, data, **kwargs):
+        """Check that the event is a parsable JSON object with 3 keys:
+        `new`: integer, `old`: integer, `id`: string
+        and that `new` is equal to (`old` + 1)
+        """
+        self.check_name(data, "seq_next")
+        event = self.validate_event_keys(data, {"new", "old", "id"})
+        block_id = self.get_block_id(data, block_type="sequential")
+        if event["id"][:-MD5_HASH_LEN] != block_id:
+            raise ValidationError(
+                f"the event.id value should start with {block_id} , not "
+                f"{event['id'][:-MD5_HASH_LEN]}"
+            )
+        if event["old"] + 1 != event["new"]:
+            raise ValidationError(
+                f"Event new field ({event['new']}) should be equal to old ({event['old']}) + 1"
+            )
+
+class SeqPrevBrowserEventSchema(BaseBrowserEventSchema):
+    """Triggered when user clicks on the left arrow of the sequence
+    navigation bar
+    """
+
+    @validates_schema
+    def validate_event_seq_prev(self, data, **kwargs):
+        """Check that the event is a parsable JSON object with 3 keys:
+        `new`: integer, `old`: integer, `id`: string
+        and that `new` is equal to (`old` - 1)
+        """
+        self.check_name(data, "seq_prev")
+        event = self.validate_event_keys(data, {"new", "old", "id"})
+        block_id = self.get_block_id(data, block_type="sequential")
+        if event["id"][:-MD5_HASH_LEN] != block_id:
+            raise ValidationError(
+                f"the event.id value should start with {block_id} , not "
+                f"{event['id'][:-MD5_HASH_LEN]}"
+            )
+        if event["old"] - 1 != event["new"]:
+            raise ValidationError(
+                f"Event new field ({event['new']}) should be equal to old ({event['old']}) - 1"
+            )
+
+class BaseTextbookPdfBrowserEventSchema(BaseBrowserEventSchema):
+    """Base class for textbook.pdf.outline.toggled
+    textbook.pdf.page.navigated and textbook.pdf.thumbnails.toggled
+    Browser events
+    """
+
+    @validates_schema
+    def validate_event_textbook_pdf(self, data, **kwargs):
+        """Check that the event is a parsable JSON object with 3 keys:
+        `name`: string, `page`: integer > 0, `chapter`: url
+        and `name` should be equal to event `name`
+        """
+        event = self.validate_event_keys(data, {"chapter", "page", "name"})
+        self.check_chapter_page_name(data, event)
+
+
+class TextbookPdfOutlineToggledBrowserEventSchema(BaseTextbookPdfBrowserEventSchema):
+    """Triggered when user clicks on the outline icon of the sidebar"""
+
+    @validates_schema
+    def validate_event_problem_save(self, data, **kwargs):
+        """Check name is `textbook.pdf.outline.toggled`"""
+        self.check_name(data, "textbook.pdf.outline.toggled")
+
+
+class TextbookPdfPageNavigatedBrowserEventSchema(BaseTextbookPdfBrowserEventSchema):
+    """Triggered when user manually enters a page number"""
+
+    @validates_schema
+    def validate_event_problem_save(self, data, **kwargs):
+        """Check name is `textbook.pdf.page.navigated`"""
+        self.check_name(data, "textbook.pdf.page.navigated")
+
+
+class TextbookPdfThumbnailsToggledBrowserEventSchema(BaseTextbookPdfBrowserEventSchema):
+    """Triggered when user clicks on the `Toggle sidebar` icon of the
+    pdf iframe OR on the `Show thumbnails` icon of the sidebar
+    """
+
+    @validates_schema
+    def validate_event_problem_save(self, data, **kwargs):
+        """Check name is `textbook.pdf.thumbnails.toggled`"""
+        self.check_name(data, "textbook.pdf.thumbnails.toggled")
+
+
+class TextbookPdfThumbnailNavigatedBrowserEventSchema(BaseBrowserEventSchema):
+    """Triggered when user clicks on a thumbnail image to navigate
+    to a page of the pdf
+    """
+
+    @validates_schema
+    def validate_event_textbook_pdf_thumbnail_navigated(self, data, **kwargs):
+        """Check that the event is a parsable JSON object with 4 keys:
+         `name`: string, `page`: integer > 0, `chapter`: url
+         `thumbnail_title`: string
+         """
+        self.check_name(data, "textbook.pdf.thumbnail.navigated")
+
+        event = self.validate_event_keys(
+            data, {"chapter", "page", "name", "thumbnail_title"}
+        )
+        self.check_chapter_page_name(data, event)
+        if not isinstance(event["thumbnail_title"], str):
+            raise ValidationError("thumbnail_title should be a string")
+
+
+class TextbookPdfZoomButtonsChangedBrowserEventSchema(BaseBrowserEventSchema):
+    """Triggered when user clicks on the Zoom In or Zoom Out icon"""
+
+    @validates_schema
+    def validate_event_textbook_pdf_zoom_buttons_changed(self, data, **kwargs):
+        """Check that the event is a parsable JSON object with 4 keys:
+        `name`: string, `page`: integer > 0, `chapter`: url,
+        `direction`: string (one of [`in`, `out`])
+        """
+        self.check_name(data, "textbook.pdf.zoom.buttons.changed")
+        event = self.validate_event_keys(data, {"chapter", "page", "name", "direction"})
+        self.check_chapter_page_name(data, event)
+        valid_directions = ["in", "out"]
+        if event["direction"] not in valid_directions:
+            raise ValidationError(f"direction should be one of {valid_directions}")
+
+
+class TextbookPdfPageScrolledBrowserEventSchema(BaseBrowserEventSchema):
+    """Triggered when user scrolls to the next or previous page using
+    the mousewheel AND the `transition` takes less than 50 milliseconds
+    """
+
+    @validates_schema
+    def validate_event_textbook_pdf_page_scrolled(self, data, **kwargs):
+        """Check that the event is a parsable JSON object with 4 keys:
+        `name`: string, `page`: integer > 0, `chapter`: url,
+        `direction`: string (one of [`up`, `down`])
+        """
+        self.check_name(data, "textbook.pdf.page.scrolled")
+        event = self.validate_event_keys(data, {"chapter", "page", "name", "direction"})
+        self.check_chapter_page_name(data, event)
+        valid_directions = ["up", "down"]
+        if event["direction"] not in valid_directions:
+            raise ValidationError(f"direction should be one of {valid_directions}")
+
+
+class TextbookPdfZoomMenuChangedBrowserEventSchema(BaseBrowserEventSchema):
+    """Triggered when user selects a magnification setting"""
+
+    @validates_schema
+    def validate_event_textbook_pdf_zoom_menu_changed(self, data, **kwargs):
+        """Check that the event is a parsable JSON object with 4 keys:
+        `name`: string, `page`: integer > 0, `chapter`: url,
+        `amount`: string
+        """
+        self.check_name(data, "textbook.pdf.zoom.menu.changed")
+        event = self.validate_event_keys(data, {"chapter", "page", "name", "amount"})
+        self.check_chapter_page_name(data, event)
+        if event["amount"] not in BROWSER_EVENT_VALID_AMOUNT:
+            raise ValidationError(f"amount should be one of {BROWSER_EVENT_VALID_AMOUNT}")
+
+
+class TextbookPdfDisplayScaldedBrowserEventSchema(BaseBrowserEventSchema):
+    """Triggered when the first page is shown and when user selects a
+    magnification setting OR zooms in/out the pdf iframe
+    """
+
+    @validates_schema
+    def validate_event_textbook_pdf_display_scaled(self, data, **kwargs):
+        """Check that the event is a parsable JSON object with 4 keys:
+        `name`: string, `page`: integer > 0, `chapter`: url,
+        `amount`: float (integer)
+        """
+        self.check_name(data, "textbook.pdf.display.scaled")
+        event = self.validate_event_keys(data, {"chapter", "page", "name", "amount"})
+        self.check_chapter_page_name(data, event)
+        if not isinstance(event["amount"], float):
+            raise ValidationError("amount should be a float integer")
