@@ -20,22 +20,23 @@ class BaseContextSchema(Schema):
 
     @validates("user_id")
     def validate_user_id(self, value):
-        """"check user_id field empty or None or an Integer"""
+        """"check user_id field is None or an empty string or an Integer"""
         if value is not None and value != "" and not isinstance(value, int):
             raise ValidationError(
-                "user_id should be None or empty string or an Integer"
+                "user_id should be None or an empty string or an Integer"
             )
 
     @validates_schema
     def validate_course_id(self, data, **kwargs):
         """the course_id should be equal to
         "course-v1:{org_id}+{any_string}+{any_string}"
+        or be an empty string if org_id is an empty string
         """
         if not data["org_id"] and data["course_id"]:
             raise ValidationError("course_id should be empty if org_id is empty")
-        if data["course_id"] == "" and data["org_id"] != "":
+        if not data["course_id"] and data["org_id"]:
             raise ValidationError("org_id should be empty if course_id is empty")
-        if data["org_id"] == "":
+        if not data["org_id"]:
             return
         if not data["course_id"].startswith("course-v1:"):
             raise ValidationError("course_id should starts with 'course-v1'")
@@ -57,10 +58,9 @@ class BaseContextSchema(Schema):
 
     @validates_schema
     def validate_path(self, data, **kwargs):
-        """path should be equal to
-        " /courses/{course_id}/xblock/block-v1:{course_id[10:]}"
-        "+type@problem+block@{usage_key}"
-        "/handler/xmodule_handler/problem_check"
+        """path should start with:
+        "/courses/{course_id}/xblock/block-v1:{course_id[10:]}
+        +type@problem+block@{usage_key}/handler/"
         """
         if "module" not in data:
             return
@@ -71,13 +71,13 @@ class BaseContextSchema(Schema):
             f"{data['course_id']}"
             f"/xblock/"
             f"{data['module']['usage_key']}/"
-            f"handler/xmodule_handler/problem_check"
+            f"handler/"
         )
-        if path != valid_path:
+        if path[: len(valid_path)] != valid_path:
             raise ValidationError(
-                f"path should be equal to"
-                f"{valid_path}"
-                f" and {path} does not match!"
+                f"path should start with: "
+                f"{valid_path} "
+                f"but {path[:len(valid_path)]} does not match!"
             )
 
 
@@ -100,6 +100,8 @@ class IPv4AddressField(fields.Field):
     """IPv4 Address that serializes to a string of numbers and deserializes
     to a IPv4Address object.
     """
+
+    # pylint: disable=no-self-use, unused-argument
 
     def _serialize(self, value, attr, obj, **kwargs):
         if not value:
@@ -129,7 +131,7 @@ class BaseEventSchema(Schema):
     event_source = fields.Str(
         required=True,
         validate=Equal(
-            comparable="server", error='The event event_source field is not "server"'
+            comparable="server", error="The event event_source field is not `server`"
         ),
     )
     context = fields.Nested(BaseContextSchema(), required=True)
@@ -152,13 +154,13 @@ class BaseEventSchema(Schema):
 
     @validates("referer")
     def validate_referer(self, value):
-        """allow referer be empty"""
+        """check referer field empty or a valid URL"""
         if value != "":
             URL(relative=True)(value)
 
     @staticmethod
     def get_course_key(data):
-        """Returns the course key: organisation+course+sesssion"""
+        """Returns the course key: organization+course+sesssion"""
         return data["context"]["course_id"][10:]
 
     @staticmethod

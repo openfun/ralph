@@ -187,7 +187,9 @@ class _FeedbackDisplayedFactory(_BaseEventFactory):
     # pylint: disable=no-member
     def context(self):
         """Returns the context field"""
-        return _ContextFactory(path_tail="/problem_check", **self.context_args)
+        return _ContextFactory(
+            path_tail="xmodule_handler/problem_check", **self.context_args
+        )
 
     @factory.lazy_attribute
     # pylint: disable=no-member

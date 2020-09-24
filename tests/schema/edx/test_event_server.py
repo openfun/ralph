@@ -2,7 +2,6 @@
 Tests for the Server event schema
 """
 # pylint: disable=redefined-outer-name
-import pandas as pd
 import pytest
 from marshmallow import ValidationError
 
@@ -10,75 +9,84 @@ from ralph.schemas.edx.server import ServerEventSchema
 
 from tests.fixtures.logs import EventType, _event
 
-SCHEMA = ServerEventSchema()
+from .test_common import check_error, check_loading_valid_events
 
 
 @pytest.fixture()
 def server_event():
     """Returns a server event generator that generates size number of events"""
-    return lambda size, **kwargs: _event(size, EventType.SERVER, **kwargs)
+    return lambda size=1, **kwargs: _event(size, EventType.SERVER, **kwargs)
 
 
 def test_loading_valid_events_should_not_raise_exceptions():
-    """check that loading valid server events does not raise exceptions"""
-    chunks = pd.read_json("tests/data/server_event.log", lines=True, dtype=False)
-    try:
-        for _, chunk in chunks.iterrows():
-            SCHEMA.load(chunk.to_dict())
-    except ValidationError:
-        pytest.fail("valid server events should not raise exceptions")
+    """check that loading valid events does not raise exceptions"""
+    check_loading_valid_events(ServerEventSchema(), "server_event")
 
 
 def test_valid_event_type_should_not_raise_exception(server_event):
     """Test that a valid event_type does not raise a ValidationError"""
     try:
-        server_event(1)
-        server_event(1, event_type="/", context_args={"path": "/"})
-        server_event(
-            1, event_type="/a/valid/path", context_args={"path": "/a/valid/path"}
-        )
+        server_event()
+        server_event(event_type="/", context_args={"path": "/"})
+        server_event(event_type="/a/valid/path", context_args={"path": "/a/valid/path"})
     except ValidationError:
         pytest.fail("Valid server event event_type should not raise exceptions")
 
 
 def test_invalid_event_type_should_raise_exception(server_event):
     """Test that a invalid event_type raise ValidationError"""
-    with pytest.raises(ValidationError):
-        server_event(1, event_type="/path/not/equal/to/context/path")
-    with pytest.raises(ValidationError):
+    with pytest.raises(ValidationError) as excinfo:
+        server_event(event_type="/path/not/equal/to/context/path")
+    check_error(excinfo, "event_type should be equal to context.path")
+    with pytest.raises(ValidationError) as excinfo:
         server_event(
             1, event_type="invalid/path", context_args={"path": "invalid/path"}
         )
-    with pytest.raises(ValidationError):
-        server_event(1, event_type=123, context_args={"path": 123})
-    with pytest.raises(ValidationError):
-        server_event(1, event_type={}, context_args={"path": {}})
+    check_error(excinfo, "Not a valid URL.")
+    with pytest.raises(ValidationError) as excinfo:
+        server_event(event_type=123, context_args={"path": 123})
+    check_error(excinfo, "Not a valid URL.")
+    with pytest.raises(ValidationError) as excinfo:
+        server_event(event_type={}, context_args={"path": {}})
+    check_error(excinfo, "Not a valid URL.")
 
 
 def test_valid_event_field_should_not_raise_exception(server_event):
     """Test that a valid event field does not raise a ValidationError"""
     try:
-        server_event(1, event='{"POST": {"key": ["value"]}, "GET": {}}')
-        server_event(1, event='{"POST": {}, "GET": {}}')
+        server_event(event='{"POST": {"key": ["value"]}, "GET": {}}')
+        server_event(event='{"POST": {}, "GET": {}}')
     except ValidationError:
         pytest.fail("Valid server event event_type should not raise exceptions")
 
 
 def test_invalid_event_field_should_raise_exception(server_event):
     """Test that a invalid event_type raise ValidationError"""
-    with pytest.raises(ValidationError):
-        server_event(1, event="")
-    with pytest.raises(ValidationError):
-        server_event(1, event='{"POST": {}}')
-    with pytest.raises(ValidationError):
-        server_event(1, event='{"GET": {}}')
-    with pytest.raises(ValidationError):
-        server_event(1, event='{"POST": {}, "GET": {}, "NOT_POST_NOR_GET": {}}')
-    with pytest.raises(ValidationError):
-        server_event(1, event='{"POST": "not_object", "GET": {}}')
-    with pytest.raises(ValidationError):
-        server_event(1, event='{"POST": {}, "GET": "not_object"')
-    with pytest.raises(ValidationError):
-        server_event(1, event='{"POST": 123, "GET": {}}')
-    with pytest.raises(ValidationError):
-        server_event(1, event='{"POST": {}, "GET": 123')
+    with pytest.raises(ValidationError) as excinfo:
+        server_event(event="")
+    check_error(excinfo, "Server event should contain a JSON string")
+    with pytest.raises(ValidationError) as excinfo:
+        server_event(event='{"POST": {}}')
+    check_error(excinfo, "Server event field should exactly have two keys")
+    with pytest.raises(ValidationError) as excinfo:
+        server_event(event='{"GET": {}}')
+    check_error(excinfo, "Server event field should exactly have two keys")
+    with pytest.raises(ValidationError) as excinfo:
+        server_event(event='{"POST": {}, "GET": {}, "NOT_POST_NOR_GET": {}}')
+    check_error(excinfo, "Server event field should exactly have two keys")
+    with pytest.raises(ValidationError) as excinfo:
+        server_event(event='{"POST": "not_object", "GET": {}}')
+    check_error(
+        excinfo, "Server event GET and POST values should be serialized objects"
+    )
+    with pytest.raises(ValidationError) as excinfo:
+        server_event(event='{"POST": {}, "GET": "not_object"')
+    check_error(excinfo, "Server event should contain a JSON string")
+    with pytest.raises(ValidationError) as excinfo:
+        server_event(event='{"POST": 123, "GET": {}}')
+    check_error(
+        excinfo, "Server event GET and POST values should be serialized objects"
+    )
+    with pytest.raises(ValidationError) as excinfo:
+        server_event(event='{"POST": {}, "GET": 123')
+    check_error(excinfo, "Server event should contain a JSON string")

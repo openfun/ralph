@@ -93,7 +93,7 @@ class _ContextFactory(_BaseContextFactory):
         return (
             f"/courses/course-v1:{self.course_id[10:]}"
             f"/xblock/block-v1:{self.course_id[10:]}+type@problem+block"
-            f"@{usage_key}/handler/xmodule_handler{self.path_tail}"
+            f"@{usage_key}/handler/{self.path_tail}"
         )
 
 

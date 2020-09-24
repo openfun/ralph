@@ -89,6 +89,22 @@ class FeedbackDisplayedSchema(BaseEventSchema):
     for a problem that include feedback messages
     """
 
+    # pylint: disable=no-self-use
+    @validates_schema
+    def validate_context_path(self, data, **kwargs):
+        """the event.context.path should end with:
+        "xmodule_hanlder/problem_check"
+        """
+        valid_path = "xmodule_handler/problem_check"
+        path = data["context"]["path"]
+        path_len = len(valid_path)
+        if path[-path_len:] != valid_path:
+            raise ValidationError(
+                f"context.path should end with: "
+                f"{valid_path} "
+                f"but {path[-path_len:]} does not match!"
+            )
+
     username = fields.Str(required=True, validate=Length(min=2, max=30))
     event_type = fields.Str(
         required=True,
@@ -102,6 +118,6 @@ class FeedbackDisplayedSchema(BaseEventSchema):
     page = fields.Str(
         required=True,
         validate=Equal(
-            comparable="x_module", error='The event page field is not "x_module"'
+            comparable="x_module", error="The event page field is not `x_module`"
         ),
     )

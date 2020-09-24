@@ -36,10 +36,10 @@ def gelf_logger():
 class EventType(Enum):
     """Represents a list of defined Event Types"""
 
-    BASEEVENT = BaseEventObjFactory
-    SERVER = ServerEventObjFactory
+    BASE_EVENT = BaseEventObjFactory
     BROWSER = BrowserEventObjFactory
     FEEDBACK_DISPLAYED = FeedbackDisplayedObjFactory
+    SERVER = ServerEventObjFactory
 
 
 def _event(size, event_type_enum, **kwargs):

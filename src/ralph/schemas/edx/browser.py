@@ -41,7 +41,7 @@ BROWSER_NAME_FIELD = [
     "textbook.pdf.searchcasesensitivity.toggled",
 ]
 
-BROWSER_EVENT_VALID_AMAUNT = [
+BROWSER_EVENT_VALID_AMOUNT = [
     "0.5",
     "0.75",
     "1",
@@ -266,17 +266,31 @@ class BrowserEventSchema(BaseEventSchema):
     def validate_event_textbook_pdf_zoom_menu_changed(self, data, **kwargs):
         """Check that the event is a parsable JSON object with 4 keys:
         `name`: string, `page`: integer > 0, `chapter`: url,
-        `amaunt`: string
+        `amount`: string
         """
         if data["name"] != "textbook.pdf.zoom.menu.changed":
             return
 
-        event = self.validate_event_keys(data, {"chapter", "page", "name", "amaunt"})
+        event = self.validate_event_keys(data, {"chapter", "page", "name", "amount"})
         self.check_chapter_page_name(data, event)
-        if event["amaunt"] not in BROWSER_EVENT_VALID_AMAUNT:
+        if event["amount"] not in BROWSER_EVENT_VALID_AMOUNT:
             raise ValidationError(
-                f"amaunt should be one of {BROWSER_EVENT_VALID_AMAUNT}"
+                f"amount should be one of {BROWSER_EVENT_VALID_AMOUNT}"
             )
+
+    @validates_schema
+    def validate_event_textbook_pdf_display_scaled(self, data, **kwargs):
+        """Check that the event is a parsable JSON object with 4 keys:
+        `name`: string, `page`: integer > 0, `chapter`: url,
+        `amount`: interger
+        """
+        if data["name"] != "textbook.pdf.display.scaled":
+            return
+
+        event = self.validate_event_keys(data, {"chapter", "page", "name", "amount"})
+        self.check_chapter_page_name(data, event)
+        if not isinstance(event["amount"], float):
+            raise ValidationError("amount should be an integer")
 
     @validates("session")
     def validate_session(self, value):  # pylint: no-self-use
