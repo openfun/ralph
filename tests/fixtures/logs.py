@@ -11,7 +11,26 @@ import pytest
 from djehouty.libgelf.formatters import GELFFormatter
 
 from .edx.base import BaseEventObjFactory
-from .edx.browser import BrowserEventObjFactory
+from .edx.browser import (
+    BaseBrowserEventObjFactory,
+    PageCloseBrowserEventObjFactory,
+    ProblemCheckBrowserEventObjFactory,
+    ProblemGradedBrowserEventObjFactory,
+    ProblemResetBrowserEventObjFactory,
+    ProblemSaveBrowserEventObjFactory,
+    ProblemShowBrowserEventObjFactory,
+    SeqGotoBrowserEventObjFactory,
+    SeqNextBrowserEventObjFactory,
+    SeqPrevBrowserEventObjFactory,
+    TextbookPdfDisplayScaledBrowserEventObjFactory,
+    TextbookPdfOutlineToggledBrowserEventObjFactory,
+    TextbookPdfPageNavigatedBrowserEventObjFactory,
+    TextbookPdfPageScrolledBrowserEventObjFactory,
+    TextbookPdfThumbnailNavigatedBrowserEventObjFactory,
+    TextbookPdfThumbnailsToggledBrowserEventObjFactory,
+    TextbookPdfZoomButtonsChangedBrowserEventObjFactory,
+    TextbookPdfZoomMenuChangedBrowserEventObjFactory,
+)
 from .edx.feedback_displayed import FeedbackDisplayedObjFactory
 from .edx.server import ServerEventObjFactory
 
@@ -37,7 +56,34 @@ class EventType(Enum):
     """Represents a list of defined Event Types"""
 
     BASE_EVENT = BaseEventObjFactory
-    BROWSER = BrowserEventObjFactory
+    BROWSER_BASE = BaseBrowserEventObjFactory
+    BROWSER_PAGE_CLOSE = PageCloseBrowserEventObjFactory
+    BROWSER_PROBLEM_CHECK = ProblemCheckBrowserEventObjFactory
+    BROWSER_PROBLEM_GRADED = ProblemGradedBrowserEventObjFactory
+    BROWSER_PROBLEM_RESET = ProblemResetBrowserEventObjFactory
+    BROWSER_PROBLEM_SAVE = ProblemSaveBrowserEventObjFactory
+    BROWSER_PROBLEM_SHOW = ProblemShowBrowserEventObjFactory
+    BROWSER_SEQ_GOTO = SeqGotoBrowserEventObjFactory
+    BROWSER_SEQ_NEXT = SeqNextBrowserEventObjFactory
+    BROWSER_SEQ_PREV = SeqPrevBrowserEventObjFactory
+    BROWSER_TEXTBOOK_PDF_DISPLAY_SCALED = TextbookPdfDisplayScaledBrowserEventObjFactory
+    BROWSER_TEXTBOOK_PDF_OUTLINE_TOGGLED = (
+        TextbookPdfOutlineToggledBrowserEventObjFactory
+    )
+    BROWSER_TEXTBOOK_PDF_PAGE_NAVIGATED = TextbookPdfPageNavigatedBrowserEventObjFactory
+    BROWSER_TEXTBOOK_PDF_PAGE_SCROLLED = TextbookPdfPageScrolledBrowserEventObjFactory
+    BROWSER_TEXTBOOK_PDF_THUMBNAIL_NAVIGATED = (
+        TextbookPdfThumbnailNavigatedBrowserEventObjFactory
+    )
+    BROWSER_TEXTBOOK_PDF_THUMBNAILS_TOGGLED = (
+        TextbookPdfThumbnailsToggledBrowserEventObjFactory
+    )
+    BROWSER_TEXTBOOK_PDF_ZOOM_BUTTONS_CHANGED = (
+        TextbookPdfZoomButtonsChangedBrowserEventObjFactory
+    )
+    BROWSER_TEXTBOOK_PDF_ZOOM_MENU_CHANGED = (
+        TextbookPdfZoomMenuChangedBrowserEventObjFactory
+    )
     FEEDBACK_DISPLAYED = FeedbackDisplayedObjFactory
     SERVER = ServerEventObjFactory
 

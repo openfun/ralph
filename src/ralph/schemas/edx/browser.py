@@ -57,6 +57,7 @@ BROWSER_EVENT_VALID_AMOUNT = [
     "page-width",
 ]
 
+
 class BaseBrowserEventSchema(BaseEventSchema):
     """Represents common fields and functions all BrowserEvents inherit
     from. This type of event is triggered on (XHR) POST/GET request to
@@ -159,6 +160,7 @@ class BaseBrowserEventSchema(BaseEventSchema):
         if data["name"] != name:
             raise ValidationError(f"name field should be `{name}`")
 
+
 class PageCloseBrowserEventSchema(BaseBrowserEventSchema):
     """Triggered when the js event window.onunload is triggered"""
 
@@ -189,6 +191,7 @@ class ProblemShowBrowserEventSchema(BaseBrowserEventSchema):
                 f"{event['problem'][:-MD5_HASH_LEN]}"
             )
 
+
 class ProblemCheckBrowserEventSchema(BaseBrowserEventSchema):
     """Triggered when user submits a response to a CAPA problem"""
 
@@ -196,10 +199,15 @@ class ProblemCheckBrowserEventSchema(BaseBrowserEventSchema):
     def validate_event_problem_check(self, data, **kwargs):
         """Check that event is a standard URL-encoded string or empty"""
         self.check_name(data, "problem_check")
+        if not data["event"]:
+            return
         try:
             urllib.parse.parse_qs(data["event"], strict_parsing=True)
         except (ValueError, AttributeError) as exception:
-            raise ValidationError("Event should be a valid URL-encoded string") from exception
+            raise ValidationError(
+                "Event should be a valid URL-encoded string"
+            ) from exception
+
 
 class BaseProblemBrowserEventSchema(BaseBrowserEventSchema):
     """Base class for problem_graded, problem_reset and problem_save
@@ -223,6 +231,7 @@ class BaseProblemBrowserEventSchema(BaseBrowserEventSchema):
             raise ValidationError(
                 "Event list first item should be a valid URL-encoded string"
             ) from exception
+
 
 class ProblemGradedBrowserEventSchema(BaseProblemBrowserEventSchema):
     """Triggered when user submits a response to a CAPA problem"""
@@ -269,7 +278,7 @@ class SeqGotoBrowserEventSchema(BaseBrowserEventSchema):
         self.check_name(data, "seq_goto")
         event = self.validate_event_keys(data, {"new", "old", "id"})
         if not isinstance(event["new"], int) or not isinstance(event["old"], int):
-            raise ValidationError("Event new and old fields should be integer")
+            raise ValidationError("Event new and old fields should be integers")
         block_id = self.get_block_id(data, block_type="sequential")
         block_id_len = len(block_id)
         if event["id"][:block_id_len] != block_id:
@@ -307,6 +316,7 @@ class SeqNextBrowserEventSchema(BaseBrowserEventSchema):
                 f"Event new field ({event['new']}) should be equal to old ({event['old']}) + 1"
             )
 
+
 class SeqPrevBrowserEventSchema(BaseBrowserEventSchema):
     """Triggered when user clicks on the left arrow of the sequence
     navigation bar
@@ -330,6 +340,7 @@ class SeqPrevBrowserEventSchema(BaseBrowserEventSchema):
             raise ValidationError(
                 f"Event new field ({event['new']}) should be equal to old ({event['old']}) - 1"
             )
+
 
 class BaseTextbookPdfBrowserEventSchema(BaseBrowserEventSchema):
     """Base class for textbook.pdf.outline.toggled
@@ -446,10 +457,12 @@ class TextbookPdfZoomMenuChangedBrowserEventSchema(BaseBrowserEventSchema):
         event = self.validate_event_keys(data, {"chapter", "page", "name", "amount"})
         self.check_chapter_page_name(data, event)
         if event["amount"] not in BROWSER_EVENT_VALID_AMOUNT:
-            raise ValidationError(f"amount should be one of {BROWSER_EVENT_VALID_AMOUNT}")
+            raise ValidationError(
+                f"amount should be one of {BROWSER_EVENT_VALID_AMOUNT}"
+            )
 
 
-class TextbookPdfDisplayScaldedBrowserEventSchema(BaseBrowserEventSchema):
+class TextbookPdfDisplayScaledBrowserEventSchema(BaseBrowserEventSchema):
     """Triggered when the first page is shown and when user selects a
     magnification setting OR zooms in/out the pdf iframe
     """
