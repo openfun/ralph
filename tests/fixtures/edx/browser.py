@@ -1,5 +1,5 @@
 """
-Broser event factory definitions
+Browser event factory definitions
 """
 import json
 from urllib.parse import urlencode
