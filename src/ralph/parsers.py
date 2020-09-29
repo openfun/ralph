@@ -14,7 +14,7 @@ class BaseParser:
     """Base tracking logs parser."""
 
     def parse(self, input_file, filters=None, chunksize=1):
-        """Parse GELF formatted logs (one json string event per row).
+        """Parse a log file and convert it to DataFrames.
 
         Args:
             input_file (string): Path to the log file to parse.
@@ -36,7 +36,7 @@ class GELFParser(BaseParser):
     documentation: https://docs.graylog.org/en/latest/pages/gelf.html
     """
 
-    def parse(self, input_file, filters=None, chunksize=50000):
+    def parse(self, input_file, filters=None, chunksize=10000):
         """Parse GELF formatted logs (one json string event per row).
 
         Args:
