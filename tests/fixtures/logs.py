@@ -32,6 +32,9 @@ from .edx.browser import (
     TextbookPdfZoomMenuChangedBrowserEventObjFactory,
 )
 from .edx.feedback_displayed import FeedbackDisplayedObjFactory
+from .edx.ora.base_ora_event import BaseOraEventObjFactory
+from .edx.ora.create_submission import CreateSubmissionObjFactory
+from .edx.ora.save_submission import SaveSubmissionObjFactory
 from .edx.server import ServerEventObjFactory
 
 
@@ -56,6 +59,7 @@ class EventType(Enum):
     """Represents a list of defined Event Types"""
 
     BASE_EVENT = BaseEventObjFactory
+    BASE_ORA_EVENT = BaseOraEventObjFactory
     BROWSER_BASE = BaseBrowserEventObjFactory
     BROWSER_PAGE_CLOSE = PageCloseBrowserEventObjFactory
     BROWSER_PROBLEM_CHECK = ProblemCheckBrowserEventObjFactory
@@ -84,7 +88,9 @@ class EventType(Enum):
     BROWSER_TEXTBOOK_PDF_ZOOM_MENU_CHANGED = (
         TextbookPdfZoomMenuChangedBrowserEventObjFactory
     )
+    CREATE_SUBMISSION = CreateSubmissionObjFactory
     FEEDBACK_DISPLAYED = FeedbackDisplayedObjFactory
+    SAVE_SUBMISSION = SaveSubmissionObjFactory
     SERVER = ServerEventObjFactory
 
 
