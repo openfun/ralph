@@ -10,6 +10,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Support for LDP storage backend
 - Parse (gzipped) tracking logs in GELF format
 
 [unreleased]: https://github.com/openfun/ralph
