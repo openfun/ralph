@@ -2,28 +2,11 @@
 Tests for ralph.parsers module.
 """
 import gzip
-import logging
 import shutil
 
-import pandas as pd
 import pytest
 
-from ralph import filters
-from ralph.parsers import BaseParser, GELFParser
-
-
-def test_baseparser_parse():
-    """Test that calling parse on the BaseParser raises a NotImplementedError."""
-
-    with pytest.raises(NotImplementedError):
-        BaseParser().parse("foo.log")
-
-    # pylint: disable=abstract-method
-    class MyParser(BaseParser):
-        """Dummy parser."""
-
-    with pytest.raises(NotImplementedError):
-        MyParser().parse("foo.log")
+from ralph.parsers import GELFParser
 
 
 def test_gelfparser_parse_non_existing_file():
@@ -58,9 +41,10 @@ def test_gelfparser_parse_raw_file(gelf_logger):
     gelf_logger.info('{"username": "foo"}')
     gelf_logger.info('{"username": ""}')
 
-    events = next(parser.parse(gelf_logger.handlers[0].stream.name))
+    events = list(parser.parse(gelf_logger.handlers[0].stream.name))
     assert len(events) == 2
-    assert events.equals(pd.DataFrame({"username": ["foo", ""]}))
+    assert events[0] == '{"username": "foo"}'
+    assert events[1] == '{"username": ""}'
 
 
 # pylint: disable=invalid-name,unused-argument
@@ -78,9 +62,10 @@ def test_gelfparser_parse_gzipped_file(fs, gelf_logger):
             shutil.copyfileobj(log_file, gzipped_log_file)
 
     parser = GELFParser()
-    events = next(parser.parse(gzipped_log_file_name))
+    events = list(parser.parse(gelf_logger.handlers[0].stream.name))
     assert len(events) == 2
-    assert events.equals(pd.DataFrame({"username": ["foo", "bar"]}))
+    assert events[0] == '{"username": "foo"}'
+    assert events[1] == '{"username": "bar"}'
 
 
 # pylint: disable=invalid-name,unused-argument
@@ -89,68 +74,29 @@ def test_gelfparser_parse_with_various_chunksizes(fs, gelf_logger):
 
     gelf_logger.info('{"username": "foo"}')
     gelf_logger.info('{"username": "bar"}')
+    gelf_logger.info('{"username": "baz"}')
+    gelf_logger.info('{"username": "lol"}')
 
     parser = GELFParser()
-    events = pd.DataFrame()
-    for chunk_events in parser.parse(gelf_logger.handlers[0].stream.name, chunksize=1):
-        events = events.append(chunk_events, ignore_index=True)
-    assert len(events) == 2
-    assert events.equals(pd.DataFrame({"username": ["foo", "bar"]}))
+    events = list(parser.parse(gelf_logger.handlers[0].stream.name, chunksize=1))
+    assert len(events) == 4
+    assert events[0] == '{"username": "foo"}'
+    assert events[1] == '{"username": "bar"}'
+    assert events[2] == '{"username": "baz"}'
+    assert events[3] == '{"username": "lol"}'
 
     parser = GELFParser()
-    events = pd.DataFrame()
-    events = next(parser.parse(gelf_logger.handlers[0].stream.name, chunksize=2))
-    assert len(events) == 2
-    assert events.equals(pd.DataFrame({"username": ["foo", "bar"]}))
+    events = list(parser.parse(gelf_logger.handlers[0].stream.name, chunksize=2))
+    assert len(events) == 4
+    assert events[0] == '{"username": "foo"}'
+    assert events[1] == '{"username": "bar"}'
+    assert events[2] == '{"username": "baz"}'
+    assert events[3] == '{"username": "lol"}'
 
     parser = GELFParser()
-    events = pd.DataFrame()
-    events = next(parser.parse(gelf_logger.handlers[0].stream.name, chunksize=10))
-    assert len(events) == 2
-    assert events.equals(pd.DataFrame({"username": ["foo", "bar"]}))
-
-
-# pylint: disable=invalid-name,unused-argument
-def test_gelfparser_parse_filtering_breaks_when_empty(fs, gelf_logger, caplog):
-    """Test the GELFParser parsing filtering breaks when a chunk record is empty."""
-
-    parser = GELFParser()
-    log_file_name = gelf_logger.handlers[0].stream.name
-
-    # -- Empty filter
-    # Create an anonymous tracking log
-    gelf_logger.info('{"username": ""}')
-    # Reset captured logs so that we can focus on the warning log for empty
-    # filtered records
-    caplog.clear()
-    # Anonymous filter + a lambda filter that should create a warning log
-    # message
-    with caplog.at_level(logging.WARNING, logger="ralph.parsers"):
-        events = next(
-            parser.parse(log_file_name, filters=[filters.anonymous, lambda pd: pd])
-        )
-    assert caplog.record_tuples == [
-        (
-            "ralph.parsers",
-            logging.WARNING,
-            "Current chunk contains no events, will stop filtering.",
-        )
-    ]
-    assert len(events) == 0
-    assert events.empty
-
-
-# pylint: disable=invalid-name,unused-argument
-def test_gelfparser_parse_with_filters(fs, gelf_logger):
-    """Test the GELFParser parsing with filters."""
-
-    parser = GELFParser()
-    log_file_name = gelf_logger.handlers[0].stream.name
-
-    # -- Anonymous filter
-    gelf_logger.info('{"username": "foo"}')
-    gelf_logger.info('{"username": ""}')
-
-    events = next(parser.parse(log_file_name, filters=[filters.anonymous]))
-    assert len(events) == 1
-    assert events.equals(pd.DataFrame({"username": ["foo"]}))
+    events = list(parser.parse(gelf_logger.handlers[0].stream.name, chunksize=10))
+    assert len(events) == 4
+    assert events[0] == '{"username": "foo"}'
+    assert events[1] == '{"username": "bar"}'
+    assert events[2] == '{"username": "baz"}'
+    assert events[3] == '{"username": "lol"}'
