@@ -10,6 +10,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Implement base CLI commands (list, extract & fetch) for supported storage
+  backends
 - Support for LDP storage backend
 - Parse (gzipped) tracking logs in GELF format
 

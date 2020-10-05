@@ -19,18 +19,11 @@ FROM base as core
 
 COPY --from=builder /usr/local /usr/local
 
-# Un-privileged user running the application
-USER ${DOCKER_USER:-1000}
-
 WORKDIR /app
 
-CMD python -m ralph
 
 # -- Development --
 FROM core as development
-
-# Switch back to the root user to install development dependencies
-USER root:root
 
 # Copy all sources, not only runtime-required files
 COPY . /app/
@@ -44,9 +37,14 @@ RUN apt-get update && \
 RUN pip uninstall -y ralph-malph
 RUN pip install -e .[dev]
 
-# Restore the un-privileged user running the application
+# Un-privileged user running the application
 USER ${DOCKER_USER:-1000}
 
 
 # -- Production --
 FROM core as production
+
+# Un-privileged user running the application
+USER ${DOCKER_USER:-1000}
+
+ENTRYPOINT ralph
