@@ -30,5 +30,6 @@ AVAILABLE_PARSERS = (lambda: (import_string(parser.value).name for parser in Par
 AVAILABLE_STORAGE_BACKENDS = (
     lambda: (import_string(backend.value).name for backend in StorageBackends)
 )()
+DEFAULT_GELF_PARSER_CHUNCK_SIZE = 5000
 ENVVAR_PREFIX = "RALPH"
 HISTORY_FILE = Path(environ.get("RALPH_HISTORY_FILE", APP_DIR / "history.json"))

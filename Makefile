@@ -6,7 +6,7 @@ DOCKER_USER          = $(DOCKER_UID):$(DOCKER_GID)
 COMPOSE              = DOCKER_USER=$(DOCKER_USER) docker-compose
 COMPOSE_RUN          = $(COMPOSE) run --rm
 COMPOSE_TEST_RUN     = $(COMPOSE_RUN)
-COMPOSE_TEST_RUN_APP = $(COMPOSE_TEST_RUN) ralph
+COMPOSE_TEST_RUN_APP = $(COMPOSE_TEST_RUN) app
 
 # ==============================================================================
 # RULES
@@ -15,8 +15,12 @@ default: help
 
 # -- Docker/compose
 build: ## build the app container
-	@$(COMPOSE) build ralph
+	@$(COMPOSE) build app
 .PHONY: build
+
+dev: ## perform editable install from mounted project sources
+	DOCKER_USER=0 docker-compose run --rm app pip install -e ".[dev]"
+.PHONY: dev
 
 # Nota bene: Black should come after isort just in case they don't agree...
 lint: ## lint back-end python sources
@@ -54,7 +58,7 @@ lint-bandit: ## lint back-end python sources with bandit
 .PHONY: lint-bandit
 
 logs: ## display app logs (follow mode)
-	@$(COMPOSE) logs -f ralph
+	@$(COMPOSE) logs -f app
 .PHONY: logs
 
 status: ## an alias for "docker-compose ps"

@@ -8,6 +8,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from .defaults import DEFAULT_GELF_PARSER_CHUNCK_SIZE
+
 logger = logging.getLogger(__name__)
 
 
@@ -39,7 +41,7 @@ class GELFParser(BaseParser):
 
     name = "gelf"
 
-    def parse(self, input_file, chunksize=50000):
+    def parse(self, input_file, chunksize=DEFAULT_GELF_PARSER_CHUNCK_SIZE):
         """Parse GELF formatted logs (one json string event per row).
 
         Args:
