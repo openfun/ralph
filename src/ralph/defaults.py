@@ -4,6 +4,8 @@ from enum import Enum
 from os import environ
 from pathlib import Path
 
+from click import get_app_dir
+
 from .utils import import_string
 
 
@@ -25,7 +27,7 @@ class StorageBackends(Enum):
     LDP = "ralph.backends.storage.ldp.LDPStorage"
 
 
-APP_DIR = Path(environ.get("RALPH_APP_DIR", Path(environ.get("HOME")) / ".ralph"))
+APP_DIR = Path(environ.get("RALPH_APP_DIR", get_app_dir("ralph")))
 AVAILABLE_PARSERS = (lambda: (import_string(parser.value).name for parser in Parsers))()
 AVAILABLE_STORAGE_BACKENDS = (
     lambda: (import_string(backend.value).name for backend in StorageBackends)

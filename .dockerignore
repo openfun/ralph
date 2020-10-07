@@ -28,6 +28,7 @@ docs
 .git
 .pylint.d
 .pytest_cache
+.ralph
 
 # Assets
 data
