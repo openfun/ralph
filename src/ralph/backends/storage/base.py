@@ -9,7 +9,7 @@ class BaseStorage(ABC):
     name = "base"
 
     @abstractmethod
-    def list(self):
+    def list(self, details=False):
         """List files in the storage backend"""
 
     @abstractmethod
