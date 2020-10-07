@@ -1,5 +1,6 @@
 """Ralph CLI entrypoint"""
 
+import json
 import logging
 import sys
 from inspect import signature
@@ -109,17 +110,28 @@ def fetch(backend, archive, **options):
 
 
 @backends_options(name="list", backends=STORAGE_BACKENDS)
-def list_(backend, **options):
+@click.option(
+    "-D/-I",
+    "--details/--ids",
+    default=False,
+    help="Get archives detailled output (JSON)",
+)
+def list_(details, backend, **options):
     """List available archives from a configured storage backend"""
 
     logger.info("Listing archives for the configured %s backend", backend)
+    logger.debug("Fetch details: %s", str(details))
     logger.debug("Backend parameters: %s", options)
 
     storage = get_instance_from_class(
         get_class_from_name(backend, StorageBackends), **options
     )
-    archives = storage.list()
-    if len(archives) == 0:
+    archives = storage.list(details=details)
+
+    counter = 0
+    for archive in archives:
+        click.echo(json.dumps(archive) if details else archive)
+        counter += 1
+
+    if counter == 0:
         logger.warning("Configured %s backend contains no archive", backend)
-    else:
-        click.echo("\n".join(archives))

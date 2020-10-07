@@ -1,7 +1,6 @@
 """OVH's LDP storage backend for Ralph"""
 
 import logging
-import re
 import sys
 
 import ovh
@@ -64,16 +63,20 @@ class LDPStorage(HistoryMixin, BaseStorage):
 
         return download_url
 
-    def list(self):
+    def list(self, details=False):
         """List archives for a given stream"""
 
         list_archives_endpoint = self._archive_endpoint
         logger.debug("List archives endpoint: %s", list_archives_endpoint)
+        logger.debug("List archives details: %s", str(details))
 
         archives = self.client.get(list_archives_endpoint)
         logger.debug("Found %d archives", len(archives))
 
-        return archives
+        for archive in archives:
+            yield self.client.get(
+                f"{self._archive_endpoint}/{archive}"
+            ) if details else archive
 
     def read(self, name, chunk_size=4096):
         """Read the `name` archive file and stream its content"""
