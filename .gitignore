@@ -39,6 +39,9 @@ venv.bak/
 # Logs
 *.log
 
+# history
+.ralph
+
 # Test & lint
 .coverage
 .pylint.d

@@ -1,8 +1,11 @@
 """Backend mixins for Ralph"""
 
 import json
+import logging
 
 from ralph.defaults import HISTORY_FILE
+
+logger = logging.getLogger(__name__)
 
 
 class HistoryMixin:
@@ -12,6 +15,9 @@ class HistoryMixin:
     @property
     def history(self):
         """Get backend history"""
+
+        logging.debug("Loading history file: %s", str(HISTORY_FILE))
+
         if not hasattr(self, "_history"):
             try:
                 with HISTORY_FILE.open() as history_file:
@@ -23,6 +29,8 @@ class HistoryMixin:
     # pylint: disable=no-self-use
     def write_history(self, history):
         """Write given history as a JSON file"""
+
+        logging.debug("Writting history file: %s", str(HISTORY_FILE))
 
         if not HISTORY_FILE.parent.exists():
             HISTORY_FILE.parent.mkdir(parents=True)

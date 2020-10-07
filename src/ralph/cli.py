@@ -111,12 +111,15 @@ def fetch(backend, archive, **options):
 
 @backends_options(name="list", backends=STORAGE_BACKENDS)
 @click.option(
+    "-n/-a", "--new/--all", default=False, help="List not fetched (or all) archives",
+)
+@click.option(
     "-D/-I",
     "--details/--ids",
     default=False,
     help="Get archives detailled output (JSON)",
 )
-def list_(details, backend, **options):
+def list_(details, new, backend, **options):
     """List available archives from a configured storage backend"""
 
     logger.info("Listing archives for the configured %s backend", backend)
@@ -126,7 +129,7 @@ def list_(details, backend, **options):
     storage = get_instance_from_class(
         get_class_from_name(backend, StorageBackends), **options
     )
-    archives = storage.list(details=details)
+    archives = storage.list(details=details, new=new)
 
     counter = 0
     for archive in archives:
