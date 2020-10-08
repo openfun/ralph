@@ -1,11 +1,12 @@
 """
 openassessmentblock.self_assess event schema definition
 """
-from marshmallow import Schema, ValidationError, fields, validates_schema
-from marshmallow.validate import Equal, Length
+from marshmallow import ValidationError, fields, validates_schema
+from marshmallow.validate import Equal
 
 from .base_ora_event import BaseOraEventSchema
 from .peer_assess import PeerAssessEventSchema
+
 
 class SelfAssessEventSchema(PeerAssessEventSchema):
     """Represents the event field of an
@@ -13,11 +14,7 @@ class SelfAssessEventSchema(PeerAssessEventSchema):
     """
 
     score_type = fields.Str(
-        required=True,
-        validate=Equal(
-            comparable="SE",
-            error="score_type is not `SE`"
-        )
+        required=True, validate=Equal(comparable="SE", error="score_type is not `SE`")
     )
 
 

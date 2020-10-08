@@ -6,6 +6,7 @@ from marshmallow.validate import Equal, Length
 
 from .base_ora_event import BaseOraEventSchema
 
+
 class PeerAssessEventPartsOptionSchema(Schema):
     """Represents the event.parts.option field"""
 
@@ -23,7 +24,9 @@ class PeerAssessEventPartsCriterionSchema(Schema):
 class PeerAssessEventPartsSchema(Schema):
     """Represents the event.parts field"""
 
-    option = fields.Nested(PeerAssessEventPartsOptionSchema(), required=True, allow_none=True)
+    option = fields.Nested(
+        PeerAssessEventPartsOptionSchema(), required=True, allow_none=True
+    )
     criterion = fields.Nested(PeerAssessEventPartsCriterionSchema(), required=True)
     feedback = fields.Str(required=True)
 
@@ -45,11 +48,7 @@ class PeerAssessEventSchema(Schema):
     scored_at = fields.DateTime(format="iso", required=True)
     scorer_id = fields.Str(required=True, validate=Length(min=32, max=32))
     score_type = fields.Str(
-        required=True,
-        validate=Equal(
-            comparable="PE",
-            error="score_type is not `PE`"
-        )
+        required=True, validate=Equal(comparable="PE", error="score_type is not `PE`")
     )
     submission_uuid = fields.UUID(required=True)
 

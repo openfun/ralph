@@ -13,7 +13,9 @@ class StudentTrainingAssessExampleEventSchema(Schema):
     """
 
     corrections = fields.Dict(keys=fields.Str(), values=fields.Str(), required=True)
-    options_selected = fields.Dict(keys=fields.Str(), values=fields.Str(), required=True)
+    options_selected = fields.Dict(
+        keys=fields.Str(), values=fields.Str(), required=True
+    )
     submission_uuid = fields.UUID(required=True)
 
     # pylint: disable=no-self-use, unused-argument
@@ -24,7 +26,6 @@ class StudentTrainingAssessExampleEventSchema(Schema):
         if value:
             return
         raise ValidationError("options_selected can't be an empty dictionnary")
-
 
     @validates_schema
     def validate_corrections(self, data, **kwargs):
@@ -38,12 +39,15 @@ class StudentTrainingAssessExampleEventSchema(Schema):
         corrections_keys = set(data["corrections"].keys())
         options_selected_keys = set(data["options_selected"].keys())
         if not corrections_keys.issubset(options_selected_keys):
-            raise ValidationError("corrections may only contain keys present in options_selected")
+            raise ValidationError(
+                "corrections may only contain keys present in options_selected"
+            )
         for key in corrections_keys:
             if data["corrections"][key] != data["options_selected"]:
                 continue
             raise ValidationError(
-                f"corrections and options_selected value for key `{key}` should be different")
+                f"corrections and options_selected value for key `{key}` should be different"
+            )
 
 
 class StudentTrainingAssessExampleSchema(BaseOraEventSchema):
@@ -57,8 +61,10 @@ class StudentTrainingAssessExampleSchema(BaseOraEventSchema):
         required=True,
         validate=Equal(
             comparable="openassessment.student_training_assess_example",
-            error=("The event event_type field is not "
-                   "`openassessment.student_training_assess_example`"),
+            error=(
+                "The event event_type field is not "
+                "`openassessment.student_training_assess_example`"
+            ),
         ),
     )
 
