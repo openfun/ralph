@@ -1,8 +1,8 @@
 """OVH's LDP storage backend for Ralph"""
 
+import datetime
 import logging
 import sys
-from datetime import datetime, timezone
 
 import ovh
 import requests
