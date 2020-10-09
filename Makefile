@@ -13,7 +13,16 @@ COMPOSE_TEST_RUN_APP = $(COMPOSE_TEST_RUN) app
 
 default: help
 
+.env:
+	cp .env.dist .env
+
 # -- Docker/compose
+bootstrap: ## bootstrap the project for development
+bootstrap: \
+  .env \
+  build \
+  dev
+.PHONY: bootstrap
 build: ## build the app container
 	@$(COMPOSE) build app
 .PHONY: build
