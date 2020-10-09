@@ -38,6 +38,9 @@ class HistoryMixin:
         with HISTORY_FILE.open("w") as history_file:
             json.dump(history, history_file)
 
+        # Update history
+        self._history = history
+
     def clean_history(self, selector):
         """Clean selected events from the history.
 
