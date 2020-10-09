@@ -1,5 +1,43 @@
 # Ralph, an OpenEdx's tracking logs processor to feed your LRS
 
+## Getting started with development
+
+To start playing with `ralph`, you should build it using the `bootstrap` Make target:
+
+```
+$ make bootstrap
+```
+
+Now you can start playing the CLI:
+
+```
+$ bin/ralph --help
+```
+
+To lint your code, either use the `lint` meta target or one of the linting tools we use:
+
+```bash
+# Run all linters
+$ make lint
+
+# Run pylint
+$ make lint-pylint
+
+# List available linters
+$ make help | grep lint-
+```
+
+To run tests on your code, either use the `test` Make target or the
+`bin/pytest` script to pass specific arguments to the test runner:
+
+```bash
+# Run all tests
+$ make test
+
+# Run pytest with options
+$ bin/pytest -x -k mixins
+```
+
 ## Contributing
 
 This project is intended to be community-driven, so please, do not hesitate to
