@@ -12,6 +12,18 @@ generate-version-file: &generate-version-file
         "$CIRCLE_PROJECT_REPONAME" \
         "$CIRCLE_BUILD_URL" > version.json
 
+docker-login: &docker-login
+    # Login to DockerHub
+    #
+    # Nota bene: you'll need to define the following secrets environment vars
+    # in CircleCI interface:
+    #
+    #   - DOCKER_USER
+    #   - DOCKER_PASS
+    run:
+      name: Login to DockerHub
+      command: echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+
 version: 2
 jobs:
   # Git jobs
@@ -19,6 +31,9 @@ jobs:
   lint-git:
     docker:
       - image: circleci/python:3.8-buster
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
     working_directory: ~/fun
     steps:
       - checkout
@@ -46,6 +61,9 @@ jobs:
   check-changelog:
     docker:
       - image: circleci/buildpack-deps:stretch-scm
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
     working_directory: ~/fun
     steps:
       - checkout
@@ -58,6 +76,9 @@ jobs:
   lint-changelog:
     docker:
       - image: debian:stretch
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
     working_directory: ~/fun
     steps:
       - checkout
@@ -72,12 +93,15 @@ jobs:
   build-docker:
     docker:
       - image: circleci/buildpack-deps:stretch
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
     working_directory: ~/fun
     steps:
       # Checkout repository sources
       - checkout
-      # Generate a version.json file describing app release
-      - <<: *generate-version-file
+      # Generate a version.json file describing app release & login to DockerHub
+      - <<: [*generate-version-file, *docker-login]
       # Activate docker-in-docker (with layers caching enabled)
       - setup_remote_docker:
           docker_layer_caching: true
@@ -95,6 +119,9 @@ jobs:
   build:
     docker:
       - image: circleci/python:3.8-buster
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
     working_directory: ~/fun
     steps:
       - checkout
@@ -112,6 +139,9 @@ jobs:
   lint:
     docker:
       - image: circleci/python:3.8-buster
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
     working_directory: ~/fun
     steps:
       - checkout
@@ -137,6 +167,9 @@ jobs:
   test:
     docker:
       - image: circleci/python:3.8-buster
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
     working_directory: ~/fun
     steps:
       - checkout
@@ -151,6 +184,9 @@ jobs:
   package:
     docker:
       - image: circleci/python:3.8-buster
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
     working_directory: ~/fun
     steps:
       - checkout
@@ -177,6 +213,9 @@ jobs:
   pypi:
     docker:
       - image: circleci/python:3.8-buster
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
     working_directory: ~/fun
     steps:
       - checkout
@@ -197,12 +236,15 @@ jobs:
   hub:
     docker:
       - image: circleci/buildpack-deps:stretch
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
     working_directory: ~/fun
     steps:
       # Checkout repository sources
       - checkout
-      # Generate a version.json file describing app release
-      - <<: *generate-version-file
+      # Generate a version.json file describing app release & login to DockerHub
+      - <<: [*generate-version-file, *docker-login]
       # Activate docker-in-docker (with layers caching enabled)
       - setup_remote_docker:
           docker_layer_caching: true
@@ -212,16 +254,6 @@ jobs:
       - run:
           name: Check built images availability
           command: docker images "ralph:${CIRCLE_SHA1}*"
-      # Login to DockerHub to Publish new images
-      #
-      # Nota bene: you'll need to define the following secrets environment vars
-      # in CircleCI interface:
-      #
-      #   - DOCKER_USER
-      #   - DOCKER_PASS
-      - run:
-          name: Login to DockerHub
-          command: echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
       # Tag docker images with the same pattern used in Git (Semantic Versioning)
       #
       # Git tag: v1.0.1
