@@ -6,7 +6,7 @@ from secrets import token_hex
 from tempfile import NamedTemporaryFile
 
 import pytest
-from djehouty.libgelf.formatters import GELFFormatter
+from logging_gelf.formatters import GELFFormatter
 
 
 @pytest.fixture
