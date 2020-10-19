@@ -400,7 +400,12 @@ def test_read_method(monkeypatch, fs):
             return freezed_now
 
     # Mock stdout stream
-    mock_stdout = BytesIO()
+    class MockStdout:
+        """A simple mock for sys.stdout.buffer"""
+
+        buffer = BytesIO()
+
+    mock_stdout = MockStdout()
 
     storage = LDPStorage(
         endpoint="ovh-eu",
@@ -416,7 +421,7 @@ def test_read_method(monkeypatch, fs):
     monkeypatch.setattr(storage.client, "get", mock_ovh_get)
     monkeypatch.setattr(requests, "get", mock_requests_get)
     monkeypatch.setattr(datetime, "datetime", MockDatetime)
-    monkeypatch.setattr(sys.stdout, "buffer", mock_stdout)
+    monkeypatch.setattr(sys, "stdout", mock_stdout)
 
     fs.create_dir(str(APP_DIR))
     assert not os.path.exists(str(HISTORY_FILE))
@@ -435,8 +440,8 @@ def test_read_method(monkeypatch, fs):
         }
     ]
 
-    mock_stdout.seek(0)
-    with gzip.open(mock_stdout, "rb") as output:
+    mock_stdout.buffer.seek(0)
+    with gzip.open(mock_stdout.buffer, "rb") as output:
         assert json.loads(output.read()) == archive_content
 
 

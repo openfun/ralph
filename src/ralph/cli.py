@@ -111,7 +111,10 @@ def fetch(backend, archive, **options):
 
 @backends_options(name="list", backends=STORAGE_BACKENDS)
 @click.option(
-    "-n/-a", "--new/--all", default=False, help="List not fetched (or all) archives",
+    "-n/-a",
+    "--new/--all",
+    default=False,
+    help="List not fetched (or all) archives",
 )
 @click.option(
     "-D/-I",
