@@ -1,4 +1,4 @@
-# Ralph, an OpenEdx's tracking logs processor to feed your LRS
+# Ralph, a learning analytics processor to feed your LRS
 
 ## Getting started with development
 
