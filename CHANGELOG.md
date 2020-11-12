@@ -11,8 +11,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Implement base CLI commands (list, extract, fetch & push) for supported
-  storage backends
+  backends
+- Support for ElasticSearch database backend
 - Support for LDP storage backend
 - Support for FS storage backend
 - Parse (gzipped) tracking logs in GELF format
+
 [unreleased]: https://github.com/openfun/ralph

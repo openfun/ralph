@@ -9,23 +9,33 @@ import click
 import click_log
 from click_option_group import optgroup
 
+from ralph.backends import BackendTypes
 from ralph.defaults import (
-    AVAILABLE_PARSERS,
-    AVAILABLE_STORAGE_BACKENDS,
+    DEFAULT_BACKEND_CHUNCK_SIZE,
     DEFAULT_GELF_PARSER_CHUNCK_SIZE,
     ENVVAR_PREFIX,
+    DatabaseBackends,
     Parsers,
     StorageBackends,
 )
-from ralph.utils import get_class_from_name, get_instance_from_class, get_root_logger
+from ralph.exceptions import UnsupportedBackendException
+from ralph.utils import (
+    get_backend_type,
+    get_class_from_name,
+    get_class_names,
+    get_instance_from_class,
+    get_root_logger,
+)
 
 # cli module logger
 logger = logging.getLogger(__name__)
 click_log.basic_config(logger)
 
-
-PARSERS = list(AVAILABLE_PARSERS)
-STORAGE_BACKENDS = list(AVAILABLE_STORAGE_BACKENDS)
+# Lazy evaluations
+DATABASE_BACKENDS = (lambda: [backend.value for backend in DatabaseBackends])()
+PARSERS = (lambda: [parser.value for parser in Parsers])()
+STORAGE_BACKENDS = (lambda: [backend.value for backend in StorageBackends])()
+BACKENDS = (lambda: DATABASE_BACKENDS + STORAGE_BACKENDS)()
 
 
 @click.group(name="ralph")
@@ -37,19 +47,21 @@ def cli():
 def backends_options(name=None, backends=None):
     """Backend-related options decorator for Ralph commands"""
 
+    backend_names = get_class_names(backends)
+
     def wrapper(command):
         command = (
             click.option(
                 "-b",
                 "--backend",
-                type=click.Choice(backends),
+                type=click.Choice(backend_names),
                 required=True,
-                help="Storage backend",
+                help="Backend",
             )
         )(command)
 
-        for backend in backends:
-            backend_class = get_class_from_name(backend, StorageBackends)
+        for backend_name in backend_names:
+            backend_class = get_class_from_name(backend_name, backends)
 
             for parameter in signature(backend_class.__init__).parameters.values():
                 if parameter.name == "self":
@@ -61,7 +73,7 @@ def backends_options(name=None, backends=None):
                 command = (
                     optgroup.option(option, envvar=envvar, default=parameter.default)
                 )(command)
-            command = (optgroup.group(f"{backend_class.name} storage backend"))(command)
+            command = (optgroup.group(f"{backend_class.name} backend"))(command)
 
         command = (cli.command(name=name or command.__name__))(command)
         return command
@@ -73,7 +85,7 @@ def backends_options(name=None, backends=None):
 @click.option(
     "-p",
     "--parser",
-    type=click.Choice(PARSERS),
+    type=click.Choice(get_class_names(PARSERS)),
     required=True,
     help="Container format parser used to extract events",
 )
@@ -91,41 +103,76 @@ def extract(parser, chunksize):
         "Extracting events using the %s parser (chunk size: %d)", parser, chunksize
     )
 
-    parser = get_class_from_name(parser, Parsers)()
+    parser = get_class_from_name(parser, PARSERS)()
 
     for event in parser.parse(sys.stdin, chunksize=chunksize):
         click.echo(event)
 
 
-@click.argument("archive")
-@backends_options(backends=STORAGE_BACKENDS)
-def fetch(backend, archive, **options):
-    """Fetch an archive from a configured storage backend"""
+@click.argument("archive", required=False)
+@backends_options(backends=BACKENDS)
+@click.option(
+    "-c",
+    "--chunk-size",
+    type=int,
+    default=DEFAULT_BACKEND_CHUNCK_SIZE,
+    help="Get events by chunks of size #",
+)
+def fetch(backend, archive, chunk_size, **options):
+    """Fetch an archive or records from a configured backend"""
 
-    logger.info("Fetching archive %s from the configured %s backend", archive, backend)
+    logger.info(
+        "Fetching data from the configured %s backend (archive: %s | chunk size: %s)",
+        backend,
+        archive,
+        chunk_size,
+    )
     logger.debug("Backend parameters: %s", options)
 
-    storage = get_instance_from_class(
-        get_class_from_name(backend, StorageBackends), **options
-    )
-    storage.read(archive)
+    backend_class = get_class_from_name(backend, BACKENDS)
+    backend = get_instance_from_class(backend_class, **options)
+    backend_type = get_backend_type(backend_class)
+
+    if backend_type == BackendTypes.STORAGE:
+        backend.read(archive, chunk_size=chunk_size)
+    elif backend_type == BackendTypes.DATABASE:
+        backend.get(chunk_size=chunk_size)
+    elif backend_type is None:
+        msg = "Cannot find an implemented backend type for backend %s"
+        logger.error(msg, backend)
+        raise UnsupportedBackendException(msg, backend)
 
 
-@click.argument("archive")
-@backends_options(backends=STORAGE_BACKENDS)
+@click.argument("archive", required=False)
+@backends_options(backends=BACKENDS)
 @click.option(
-    "-f", "--force", default=False, is_flag=True, help="Overwrite existing file"
+    "-c",
+    "--chunk-size",
+    type=int,
+    default=DEFAULT_BACKEND_CHUNCK_SIZE,
+    help="Get events by chunks of size #",
 )
-def push(backend, archive, force, **options):
-    """Push an archive to a configured storage backend"""
+@click.option(
+    "-f", "--force", default=False, is_flag=True, help="Overwrite existing archives"
+)
+def push(backend, archive, chunk_size, force, **options):
+    """Push an archive to a configured backend"""
 
     logger.info("Pushing archive %s to the configured %s backend", archive, backend)
     logger.debug("Backend parameters: %s", options)
 
-    storage = get_instance_from_class(
-        get_class_from_name(backend, StorageBackends), **options
-    )
-    storage.write(archive, overwrite=force)
+    backend_class = get_class_from_name(backend, BACKENDS)
+    backend = get_instance_from_class(backend_class, **options)
+    backend_type = get_backend_type(backend_class)
+
+    if backend_type == BackendTypes.STORAGE:
+        backend.write(archive, overwrite=force)
+    elif backend_type == BackendTypes.DATABASE:
+        backend.put(chunk_size=chunk_size)
+    elif backend_type is None:
+        msg = "Cannot find an implemented backend type for backend %s"
+        logger.error(msg, backend)
+        raise UnsupportedBackendException(msg, backend)
 
 
 @backends_options(name="list", backends=STORAGE_BACKENDS)
@@ -149,7 +196,7 @@ def list_(details, new, backend, **options):
     logger.debug("Backend parameters: %s", options)
 
     storage = get_instance_from_class(
-        get_class_from_name(backend, StorageBackends), **options
+        get_class_from_name(backend, STORAGE_BACKENDS), **options
     )
     archives = storage.list(details=details, new=new)
 

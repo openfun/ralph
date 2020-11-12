@@ -170,6 +170,12 @@ jobs:
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
+      - image: elasticsearch:7.8.1
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+        environment:
+          discovery.type: single-node
     working_directory: ~/fun
     steps:
       - checkout
@@ -178,7 +184,11 @@ jobs:
             - v1-dependencies-{{ .Revision }}
       - run:
           name: Run tests
-          command: ~/.local/bin/pytest
+          command: |
+            dockerize \
+              -wait tcp://${HOSTNAME}:9200 \
+              -timeout 60s \
+              ~/.local/bin/pytest
 
   # ---- Packaging jobs ----
   package:
