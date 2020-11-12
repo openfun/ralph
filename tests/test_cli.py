@@ -5,11 +5,14 @@ import sys
 from pathlib import Path
 
 from click.testing import CliRunner
+from elasticsearch.helpers import bulk, scan
 
 from ralph.backends.storage.fs import FSStorage
 from ralph.backends.storage.ldp import LDPStorage
 from ralph.cli import cli
 from ralph.defaults import APP_DIR, FS_STORAGE_DEFAULT_PATH
+
+from tests.fixtures.backends import ES_TEST_HOSTS, ES_TEST_INDEX
 
 
 def test_help_option():
@@ -67,21 +70,28 @@ def test_fetch_command_usage():
     assert result.exit_code == 0
     assert (
         "Options:\n"
-        "  fs storage backend: \n"
+        "  fs backend: \n"
         "    --fs-path TEXT\n"
-        "  ldp storage backend: \n"
+        "  ldp backend: \n"
         "    --ldp-stream-id TEXT\n"
         "    --ldp-service-name TEXT\n"
         "    --ldp-consumer-key TEXT\n"
         "    --ldp-application-secret TEXT\n"
         "    --ldp-application-key TEXT\n"
         "    --ldp-endpoint TEXT\n"
-        "  -b, --backend [ldp|fs]          Storage backend  [required]\n"
+        "  es backend: \n"
+        "    --es-index TEXT\n"
+        "    --es-hosts TEXT\n"
+        "  -b, --backend [es|ldp|fs]       Backend  [required]\n"
+        "  -c, --chunk-size INTEGER        Get events by chunks of size #"
     ) in result.output
 
     result = runner.invoke(cli, ["fetch"])
     assert result.exit_code > 0
-    assert "Error: Missing argument 'ARCHIVE'." in result.output
+    assert (
+        "Error: Missing option '-b' / '--backend'.  Choose from:\n\tes,\n\tldp,\n\tfs."
+        in result.output
+    )
 
 
 def test_fetch_command_with_ldp_backend(monkeypatch):
@@ -89,7 +99,7 @@ def test_fetch_command_with_ldp_backend(monkeypatch):
 
     archive_content = {"foo": "bar"}
 
-    def mock_read(this, name):
+    def mock_read(this, name, chunk_size=500):
         """Always return the same archive"""
         # pylint: disable=unused-argument
 
@@ -121,7 +131,7 @@ def test_fetch_command_with_fs_backend(fs, monkeypatch):
 
     archive_content = {"foo": "bar"}
 
-    def mock_read(this, name):
+    def mock_read(this, name, chunk_size):
         """Always return the same archive"""
         # pylint: disable=unused-argument
 
@@ -144,6 +154,31 @@ def test_fetch_command_with_fs_backend(fs, monkeypatch):
     assert '{"foo": "bar"}' in result.output
 
 
+def test_fetch_command_with_es_backend(es):
+    """Test ralph fetch command using the es backend"""
+    # pylint: disable=invalid-name
+
+    # Insert documents
+    bulk(
+        es,
+        (
+            {"_index": ES_TEST_INDEX, "_id": idx, "_source": {"id": idx}}
+            for idx in range(10)
+        ),
+    )
+    # As we bulk insert documents, the index needs to be refreshed before making
+    # queries.
+    es.indices.refresh(index=ES_TEST_INDEX)
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        ["fetch", "-b", "es", "--es-hosts", ES_TEST_HOSTS, "--es-index", ES_TEST_INDEX],
+    )
+    assert result.exit_code == 0
+    assert "\n".join([json.dumps({"id": idx}) for idx in range(10)]) in result.output
+
+
 def test_list_command_usage():
     """Test ralph list command usage"""
 
@@ -153,16 +188,16 @@ def test_list_command_usage():
     assert result.exit_code == 0
     assert (
         "Options:\n"
-        "  fs storage backend: \n"
+        "  fs backend: \n"
         "    --fs-path TEXT\n"
-        "  ldp storage backend: \n"
+        "  ldp backend: \n"
         "    --ldp-stream-id TEXT\n"
         "    --ldp-service-name TEXT\n"
         "    --ldp-consumer-key TEXT\n"
         "    --ldp-application-secret TEXT\n"
         "    --ldp-application-key TEXT\n"
         "    --ldp-endpoint TEXT\n"
-        "  -b, --backend [ldp|fs]          Storage backend  [required]\n"
+        "  -b, --backend [ldp|fs]          Backend  [required]\n"
         "  -n, --new / -a, --all           List not fetched (or all) archives\n"
         "  -D, --details / -I, --ids       Get archives detailled output (JSON)\n"
     ) in result.output
@@ -313,9 +348,10 @@ def test_list_command_with_fs_backend(fs, monkeypatch):
 def test_push_command_with_fs_backend(fs):
     """Test the push command using the FS backend"""
 
+    fs.create_dir(str(APP_DIR))
+
     filename = Path("file1")
     file_path = FS_STORAGE_DEFAULT_PATH / filename
-    fs.create_dir(str(APP_DIR))
 
     # Create a file
     runner = CliRunner()
@@ -372,3 +408,28 @@ def test_push_command_with_fs_backend(fs):
         content = test_file.read()
 
     assert "different content" in content
+
+
+def test_push_command_with_es_backend(es):
+    """Test ralph push command using the es backend"""
+    # pylint: disable=invalid-name
+
+    # Documents
+    records = [{"id": idx} for idx in range(10)]
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        ["push", "-b", "es", "--es-hosts", ES_TEST_HOSTS, "--es-index", ES_TEST_INDEX],
+        input="\n".join(json.dumps(record) for record in records),
+    )
+
+    assert result.exit_code == 0
+
+    # As we bulk insert documents, the index needs to be refreshed before making
+    # queries.
+    es.indices.refresh(index=ES_TEST_INDEX)
+    documents = list(scan(es, index=ES_TEST_INDEX, size=10))
+
+    assert len(documents) == 10
+    assert [document.get("_source") for document in documents] == records

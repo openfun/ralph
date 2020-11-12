@@ -4,6 +4,9 @@
 import pytest
 
 from ralph import utils as ralph_utils
+from ralph.backends import BackendTypes
+from ralph.backends.database import ESDatabase
+from ralph.backends.storage import LDPStorage
 
 from .fixtures.backends import NamedClassEnum
 
@@ -23,13 +26,48 @@ def test_import_string():
     assert http_status.OK == 200
 
 
+def test_get_backend_type():
+    """Test get_backend_type utility"""
+
+    class TestBackend:
+        """Dumb test backend that does not inherit from a supported backend type"""
+
+    assert ralph_utils.get_backend_type(ESDatabase) == BackendTypes.DATABASE
+    assert ralph_utils.get_backend_type(LDPStorage) == BackendTypes.STORAGE
+    assert ralph_utils.get_backend_type(TestBackend) is None
+
+
+def test_get_class_names():
+    """Test get_class_names utility"""
+
+    assert ralph_utils.get_class_names([module.value for module in NamedClassEnum]) == [
+        "A",
+        "B",
+    ]
+
+
 def test_get_class_from_name():
     """Test get_class_from_name utility"""
 
-    assert ralph_utils.get_class_from_name("A", NamedClassEnum).name == "A"
-    assert ralph_utils.get_class_from_name("B", NamedClassEnum).name == "B"
+    assert (
+        ralph_utils.get_class_from_name(
+            "A", [module.value for module in NamedClassEnum]
+        ).name
+        == "A"
+    )
+    assert (
+        ralph_utils.get_class_from_name(
+            "B", [module.value for module in NamedClassEnum]
+        ).name
+        == "B"
+    )
     with pytest.raises(ImportError, match="C class is not available"):
-        assert ralph_utils.get_class_from_name("C", NamedClassEnum).name == "B"
+        assert (
+            ralph_utils.get_class_from_name(
+                "C", [module.value for module in NamedClassEnum]
+            ).name
+            == "B"
+        )
 
 
 def test_get_instance_from_class():

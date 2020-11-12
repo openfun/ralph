@@ -5,6 +5,10 @@ from importlib import import_module
 
 import click_log
 
+from ralph.backends import BackendTypes
+from ralph.backends.database import BaseDatabase as BaseDatabaseBackend
+from ralph.backends.storage import BaseStorage as BaseStorageBackend
+
 
 # Taken from Django utilities
 # https://docs.djangoproject.com/en/3.1/_modules/django/utils/module_loading/#import_string
@@ -29,11 +33,27 @@ def import_string(dotted_path):
         ) from err
 
 
+def get_backend_type(backend_class):
+    """Get backend type from a backend class"""
+
+    if BaseStorageBackend in backend_class.__mro__:
+        return BackendTypes.STORAGE
+    if BaseDatabaseBackend in backend_class.__mro__:
+        return BackendTypes.DATABASE
+    return None
+
+
+def get_class_names(modules):
+    """Get class name attributes from class modules list"""
+
+    return [import_string(module).name for module in modules]
+
+
 def get_class_from_name(name, modules):
-    """Get class given its name in a module enum"""
+    """Get class given its name in a modules list"""
 
     for module in modules:
-        klass = import_string(module.value)
+        klass = import_string(module)
         if klass.name == name:
             return klass
     raise ImportError(f"{name} class is not available")

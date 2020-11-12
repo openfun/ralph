@@ -15,3 +15,15 @@ services:
       PYLINTHOME: /app/.pylint.d
     volumes:
       - .:/app
+    depends_on:
+      - elasticsearch
+
+  elasticsearch:
+    image: elasticsearch:7.8.1
+    environment:
+      discovery.type: single-node
+    ports:
+      - "9200:9200"
+
+  dockerize:
+    image: jwilder/dockerize
