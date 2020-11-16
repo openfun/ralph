@@ -30,7 +30,7 @@ class HistoryMixin:
     def write_history(self, history):
         """Write given history as a JSON file"""
 
-        logging.debug("Writting history file: %s", str(HISTORY_FILE))
+        logging.debug("Writing history file: %s", str(HISTORY_FILE))
 
         if not HISTORY_FILE.parent.exists():
             HISTORY_FILE.parent.mkdir(parents=True)

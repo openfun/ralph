@@ -25,6 +25,7 @@ class StorageBackends(Enum):
     """
 
     LDP = "ralph.backends.storage.ldp.LDPStorage"
+    FS = "ralph.backends.storage.fs.FSStorage"
 
 
 APP_DIR = Path(environ.get("RALPH_APP_DIR", get_app_dir("ralph")))
@@ -35,3 +36,4 @@ AVAILABLE_STORAGE_BACKENDS = (
 DEFAULT_GELF_PARSER_CHUNCK_SIZE = 5000
 ENVVAR_PREFIX = "RALPH"
 HISTORY_FILE = Path(environ.get("RALPH_HISTORY_FILE", APP_DIR / "history.json"))
+FS_STORAGE_DEFAULT_PATH = Path("./archives")
