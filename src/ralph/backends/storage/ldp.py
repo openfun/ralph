@@ -140,7 +140,7 @@ class LDPStorage(HistoryMixin, BaseStorage):
             }
         )
 
-    def write(self, name, content):
+    def write(self, name, chunk_size=4096, overwrite=False):
         """LDP storage backend is read-only, calling this method will raise an error"""
 
         msg = "LDP storage backend is read-only, cannot write to %s"

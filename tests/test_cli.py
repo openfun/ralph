@@ -6,8 +6,10 @@ from pathlib import Path
 
 from click.testing import CliRunner
 
+from ralph.backends.storage.fs import FSStorage
 from ralph.backends.storage.ldp import LDPStorage
 from ralph.cli import cli
+from ralph.defaults import APP_DIR, FS_STORAGE_DEFAULT_PATH
 
 
 def test_help_option():
@@ -65,6 +67,8 @@ def test_fetch_command_usage():
     assert result.exit_code == 0
     assert (
         "Options:\n"
+        "  fs storage backend: \n"
+        "    --fs-path TEXT\n"
         "  ldp storage backend: \n"
         "    --ldp-stream-id TEXT\n"
         "    --ldp-service-name TEXT\n"
@@ -72,7 +76,7 @@ def test_fetch_command_usage():
         "    --ldp-application-secret TEXT\n"
         "    --ldp-application-key TEXT\n"
         "    --ldp-endpoint TEXT\n"
-        "  -b, --backend [ldp]             Storage backend  [required]\n"
+        "  -b, --backend [ldp|fs]          Storage backend  [required]\n"
     ) in result.output
 
     result = runner.invoke(cli, ["fetch"])
@@ -110,6 +114,36 @@ def test_fetch_command_with_ldp_backend(monkeypatch):
     assert '{"foo": "bar"}' in result.output
 
 
+# pylint: disable=invalid-name
+# pylint: disable=unused-argument
+def test_fetch_command_with_fs_backend(fs, monkeypatch):
+    """Test the fetch command using the FS backend"""
+
+    archive_content = {"foo": "bar"}
+
+    def mock_read(this, name):
+        """Always return the same archive"""
+        # pylint: disable=unused-argument
+
+        sys.stdout.buffer.write(bytes(json.dumps(archive_content), encoding="utf-8"))
+
+    monkeypatch.setattr(FSStorage, "read", mock_read)
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        [
+            "fetch",
+            "-b",
+            "fs",
+            "foo",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert '{"foo": "bar"}' in result.output
+
+
 def test_list_command_usage():
     """Test ralph list command usage"""
 
@@ -119,6 +153,8 @@ def test_list_command_usage():
     assert result.exit_code == 0
     assert (
         "Options:\n"
+        "  fs storage backend: \n"
+        "    --fs-path TEXT\n"
         "  ldp storage backend: \n"
         "    --ldp-stream-id TEXT\n"
         "    --ldp-service-name TEXT\n"
@@ -126,7 +162,7 @@ def test_list_command_usage():
         "    --ldp-application-secret TEXT\n"
         "    --ldp-application-key TEXT\n"
         "    --ldp-endpoint TEXT\n"
-        "  -b, --backend [ldp]             Storage backend  [required]\n"
+        "  -b, --backend [ldp|fs]          Storage backend  [required]\n"
         "  -n, --new / -a, --all           List not fetched (or all) archives\n"
         "  -D, --details / -I, --ids       Get archives detailled output (JSON)\n"
     ) in result.output
@@ -134,7 +170,7 @@ def test_list_command_usage():
     result = runner.invoke(cli, ["list"])
     assert result.exit_code > 0
     assert (
-        "Error: Missing option '-b' / '--backend'.  Choose from:\n\tldp."
+        "Error: Missing option '-b' / '--backend'.  Choose from:\n\tldp,\n\tfs."
         in result.output
     )
 
@@ -208,3 +244,131 @@ def test_list_command_with_ldp_backend(monkeypatch):
     result = runner.invoke(cli, ["list", "-b", "ldp", "--ldp-endpoint", "ovh-eu"])
     assert result.exit_code == 0
     assert "Configured ldp backend contains no archive" in result.output
+
+
+# pylint: disable=invalid-name
+# pylint: disable=unused-argument
+def test_list_command_with_fs_backend(fs, monkeypatch):
+    """Test the list command using the LDP backend"""
+
+    archive_list = [
+        "file1",
+        "file2",
+    ]
+    archive_list_details = [
+        {
+            "filename": "file1",
+            "modified_at": "1604661859",
+            "size": 350,
+        },
+        {
+            "filename": "file2",
+            "created_at": "1604935848",
+            "size": 25000,
+        },
+    ]
+
+    def mock_list(this, details=False, new=False):
+        """Mock LDP backend list method"""
+        # pylint: disable=unused-argument
+
+        response = archive_list
+        if details:
+            response = archive_list_details
+        if new:
+            response = response[1:]
+        return response
+
+    monkeypatch.setattr(FSStorage, "list", mock_list)
+
+    runner = CliRunner()
+
+    # List archives with default options
+    result = runner.invoke(cli, ["list", "-b", "fs"])
+    assert result.exit_code == 0
+    assert "\n".join(archive_list) in result.output
+
+    # List archives with detailled output
+    result = runner.invoke(cli, ["list", "-b", "fs", "-D"])
+    assert result.exit_code == 0
+    assert (
+        "\n".join(json.dumps(detail) for detail in archive_list_details)
+        in result.output
+    )
+
+    # List new archives only
+    result = runner.invoke(cli, ["list", "-b", "fs", "-n"])
+    assert result.exit_code == 0
+    assert "file2" in result.output
+    assert "file1" not in result.output
+
+    # Edge case: stream contains no archive
+    monkeypatch.setattr(FSStorage, "list", lambda this, details, new: ())
+    result = runner.invoke(cli, ["list", "-b", "fs"])
+    assert result.exit_code == 0
+    assert "Configured fs backend contains no archive" in result.output
+
+
+# pylint: disable=invalid-name
+def test_push_command_with_fs_backend(fs):
+    """Test the push command using the FS backend"""
+
+    filename = Path("file1")
+    file_path = FS_STORAGE_DEFAULT_PATH / filename
+    fs.create_dir(str(APP_DIR))
+
+    # Create a file
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        [
+            "push",
+            "-b",
+            "fs",
+            "file1",
+        ],
+        input="test content",
+    )
+
+    assert result.exit_code == 0
+
+    with file_path.open("r") as test_file:
+        content = test_file.read()
+
+    assert "test content" in content
+
+    # Trying to create the same file without -f should raise an error
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        [
+            "push",
+            "-b",
+            "fs",
+            "file1",
+        ],
+        input="different content",
+    )
+    assert result.exit_code == 1
+    assert "file1 already exists and overwrite is not allowed" in result.output
+
+    # Try to create the same file with -f
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        [
+            "push",
+            "-b",
+            "fs",
+            "-f",
+            "file1",
+        ],
+        input="different content",
+    )
+
+    assert result.exit_code == 0
+
+    with file_path.open("r") as test_file:
+        content = test_file.read()
+
+    assert "different content" in content

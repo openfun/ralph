@@ -20,7 +20,7 @@ def test_abstract_interface_with_implemented_abstract_method():
         def read(self, name, chunk_size=0):
             """Fake read"""
 
-        def write(self, name, content):
+        def write(self, name, chunk_size=4096, overwrite=False):
             """Fake write"""
 
     GoodStorage()

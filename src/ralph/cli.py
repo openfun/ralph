@@ -58,7 +58,9 @@ def backends_options(name=None, backends=None):
                 envvar = (
                     f"{ENVVAR_PREFIX}_{backend_class.name}_{parameter.name}".upper()
                 )
-                command = (optgroup.option(option, envvar=envvar))(command)
+                command = (
+                    optgroup.option(option, envvar=envvar, default=parameter.default)
+                )(command)
             command = (optgroup.group(f"{backend_class.name} storage backend"))(command)
 
         command = (cli.command(name=name or command.__name__))(command)
@@ -107,6 +109,23 @@ def fetch(backend, archive, **options):
         get_class_from_name(backend, StorageBackends), **options
     )
     storage.read(archive)
+
+
+@click.argument("archive")
+@backends_options(backends=STORAGE_BACKENDS)
+@click.option(
+    "-f", "--force", default=False, is_flag=True, help="Overwrite existing file"
+)
+def push(backend, archive, force, **options):
+    """Push an archive to a configured storage backend"""
+
+    logger.info("Pushing archive %s to the configured %s backend", archive, backend)
+    logger.debug("Backend parameters: %s", options)
+
+    storage = get_instance_from_class(
+        get_class_from_name(backend, StorageBackends), **options
+    )
+    storage.write(archive, overwrite=force)
 
 
 @backends_options(name="list", backends=STORAGE_BACKENDS)

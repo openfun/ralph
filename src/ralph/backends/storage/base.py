@@ -21,5 +21,5 @@ class BaseStorage(ABC):
         """Read `name` file and stream its content by chunks of a given size"""
 
     @abstractmethod
-    def write(self, name, content):
+    def write(self, name, chunk_size=4096, overwrite=False):
         """Write content to the `name` target"""
