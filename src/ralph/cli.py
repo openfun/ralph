@@ -19,6 +19,7 @@ from ralph.defaults import (
     StorageBackends,
 )
 from ralph.exceptions import UnsupportedBackendException
+from ralph.logger import configure_logging
 from ralph.utils import (
     get_backend_type,
     get_class_from_name,
@@ -42,6 +43,8 @@ BACKENDS = (lambda: DATABASE_BACKENDS + STORAGE_BACKENDS)()
 @click_log.simple_verbosity_option(get_root_logger())
 def cli():
     """Ralph is a stream-based tool to play with your logs"""
+
+    configure_logging()
 
 
 def backends_options(name=None, backends=None):
