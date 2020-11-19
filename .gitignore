@@ -39,7 +39,7 @@ venv.bak/
 # Logs
 *.log
 
-# history
+# History
 .ralph
 
 # Test & lint
