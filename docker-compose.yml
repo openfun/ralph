@@ -8,7 +8,7 @@ services:
       args:
         DOCKER_USER: ${DOCKER_USER:-1000}
     user: ${DOCKER_USER:-1000}
-    image: ralph:development
+    image: fundocker/ralph:development
     env_file:
       - .env
     environment:
