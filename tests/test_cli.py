@@ -80,6 +80,7 @@ def test_fetch_command_usage():
         "    --ldp-application-key TEXT\n"
         "    --ldp-endpoint TEXT\n"
         "  es backend: \n"
+        "    --es-verify-certs / --no-es-verify-certs\n"
         "    --es-index TEXT\n"
         "    --es-hosts TEXT\n"
         "  -b, --backend [es|ldp|fs]       Backend  [required]\n"

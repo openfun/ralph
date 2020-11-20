@@ -17,7 +17,7 @@ class ESDatabase(BaseDatabase):
 
     name = "es"
 
-    def __init__(self, hosts, index):
+    def __init__(self, hosts, index, verify_certs=True):
         """Instantiate the Elasticsearch client.
 
         hosts is supposed to be a list
@@ -26,7 +26,7 @@ class ESDatabase(BaseDatabase):
 
         self._hosts = hosts
         self.index = index
-        self.client = Elasticsearch(self._hosts)
+        self.client = Elasticsearch(self._hosts, verify_certs=verify_certs)
 
     def get(self, chunk_size=500):
         """Get index documents and stream them"""
