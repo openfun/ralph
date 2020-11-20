@@ -73,8 +73,22 @@ def backends_options(name=None, backends=None):
                 envvar = (
                     f"{ENVVAR_PREFIX}_{backend_class.name}_{parameter.name}".upper()
                 )
+                option_kwargs = {}
+                # If the parameter is a boolean, convert it to a flag option
+                if isinstance(parameter.default, bool):
+                    option = (
+                        f"{option}/--no-{backend_class.name}-{parameter.name}".replace(
+                            "_", "-"
+                        )
+                    )
+                    option_kwargs["is_flag"] = True
                 command = (
-                    optgroup.option(option, envvar=envvar, default=parameter.default)
+                    optgroup.option(
+                        option,
+                        envvar=envvar,
+                        default=parameter.default,
+                        **option_kwargs,
+                    )
                 )(command)
             command = (optgroup.group(f"{backend_class.name} backend"))(command)
 
