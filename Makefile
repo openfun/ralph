@@ -39,6 +39,11 @@ dev: ## perform editable install from mounted project sources
 	DOCKER_USER=0 docker-compose run --rm app pip install -e ".[dev]"
 .PHONY: dev
 
+docker-hub:  ## Publish locally built image
+docker-hub: build
+	@$(COMPOSE) push
+.PHONY: docker-hub
+
 down: ## stop and remove backend containers
 	@$(COMPOSE) down
 .PHONY: down
