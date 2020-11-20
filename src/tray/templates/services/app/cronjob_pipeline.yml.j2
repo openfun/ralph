@@ -1,0 +1,50 @@
+apiVersion: batch/v1beta1
+kind: CronJobList
+items:
+{% for cronjob in ralph_cronjobs %}
+  - apiVersion: batch/v1beta1
+    kind: CronJob
+    metadata:
+      name: "ralph-{{ cronjob.name }}"
+      namespace: "{{ project_name }}"
+      labels:
+        app: ralph
+        service: app
+        version: "{{ ralph_image_tag }}"
+    spec:
+      schedule: "{{ cronjob.schedule }}"
+      successfulJobsHistoryLimit: 2
+      failedJobsHistoryLimit: 1
+      concurrencyPolicy: Forbid
+      suspend: false
+      jobTemplate:
+        spec:
+          template:
+            metadata:
+              name: "ralph-{{ cronjob.name }}"
+              labels:
+                app: ralph
+                service: app
+                version: "{{ ralph_image_tag }}"
+            spec:
+              containers:
+                - name: "ralph-{{ cronjob.name }}"
+                  image: "{{ ralph_image_name }}:{{ ralph_image_tag }}"
+                  imagePullPolicy: Always
+                  # cronjob.command should be a list!
+                  command: {{ cronjob.command }}
+                  env:
+                    - name: RALPH_APP_DIR
+                      value: "/app/.ralph"
+                  envFrom:
+                    - secretRef:
+                        name: "{{ ralph_secret_name }}"
+                  volumeMounts:
+                    - name: ralph-v-history
+                      mountPath: /app/.ralph
+              volumes:
+                - name: ralph-v-history
+                  persistentVolumeClaim:
+                    claimName: ralph-pvc-history
+              restartPolicy: Never
+{% endfor %}

@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app: ralph
+    service: app
+    version: "{{ ralph_image_tag }}"
+  name: "ralph-app"
+  namespace: "{{ project_name }}"
+spec:
+  replicas: {{ ralph_app_replicas }}
+  template:
+    metadata:
+      labels:
+        app: ralph
+        service: app
+        version: "{{ ralph_image_tag }}"
+        deploymentconfig: "ralph-app"
+    spec:
+      # Prefer running pods on different nodes for redundancy
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: deploymentconfig
+                      operator: In
+                      values:
+                        - "ralph-app-{{ deployment_stamp }}"
+                topologyKey: kubernetes.io/hostname
+{% set image_pull_secret_name = ralph_image_pull_secret_name | default(default_image_pull_secret_name) %}
+{% if image_pull_secret_name | length %}
+      imagePullSecrets:
+        - name: "{{ image_pull_secret_name }}"
+{% endif %}
+      containers:
+        - name: ralph
+          image: "{{ ralph_image_name }}:{{ ralph_image_tag }}"
+          imagePullPolicy: Always
+          command: ["/bin/sh"]
+          args: ["-c", "while true; do echo -n '.'; sleep 3600; done"]
+          livenessProbe:
+            exec:
+              command: ["ralph", "--help"]
+            initialDelaySeconds: 3
+            periodSeconds: 1
+          readinessProbe:
+            exec:
+              command: ["ralph", "--help"]
+          env:
+            - name: RALPH_APP_DIR
+              value: "/app/.ralph"
+          envFrom:
+            - secretRef:
+                name: "{{ ralph_secret_name }}"
+          volumeMounts:
+            - name: ralph-v-history
+              mountPath: /app/.ralph
+      volumes:
+        - name: ralph-v-history
+          persistentVolumeClaim:
+            claimName: ralph-pvc-history
