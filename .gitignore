@@ -49,3 +49,8 @@ venv.bak/
 
 # Test fixtures
 data/
+
+# Arnold environment
+bin/vault_password
+.team
+group_vars/

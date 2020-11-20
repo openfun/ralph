@@ -1,0 +1,5 @@
+metadata:
+  name: ralph
+  version: 0.1.0
+source:
+  path: src/tray

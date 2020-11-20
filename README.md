@@ -2,6 +2,8 @@
 
 ## Getting started with development
 
+### Core development
+
 To start playing with `ralph`, you should build it using the `bootstrap` Make target:
 
 ```
@@ -37,6 +39,12 @@ $ make test
 # Run pytest with options
 $ bin/pytest -x -k mixins
 ```
+
+### Tray development
+
+Ralph is distributed along with its tray (a deployable package for Kubernetes
+clusters using [Arnold](https://github.com/openfun/arnold)). If you intend to
+work on this tray, please refer to Arnold's documentation.
 
 ## Contributing
 

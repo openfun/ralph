@@ -14,6 +14,8 @@ venv
 **/.DS_Store
 
 # Docker
+.dockerignore
+Dockerfile
 docker-compose.*
 
 # Docs
@@ -21,14 +23,29 @@ docs
 *.md
 *.log
 
+# Build
+bin/
+Makefile
+
 # Development/test cache & configurations
 .cache
 .circleci
 .coverage
+.env
+.env.dist
 .git
+.gitignore
 .pylint.d
+.pylintrc
 .pytest_cache
+.pyup.yml
 .ralph
+.vscode
 
 # Assets
 data
+
+# Arnold environment / objects
+.team
+group_vars
+src/tray
