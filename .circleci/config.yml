@@ -172,7 +172,7 @@ jobs:
           password: $DOCKER_PASS
         environment:
           RALPH_APP_DIR: ~/fun/.ralph
-      - image: elasticsearch:7.8.1
+      - image: elasticsearch:7.10.1
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
