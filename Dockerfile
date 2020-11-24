@@ -47,4 +47,4 @@ FROM core as production
 # Un-privileged user running the application
 USER ${DOCKER_USER:-1000}
 
-ENTRYPOINT ralph
+CMD ["ralph"]
