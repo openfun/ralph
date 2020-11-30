@@ -19,7 +19,7 @@ services:
       - elasticsearch
 
   elasticsearch:
-    image: elasticsearch:7.8.1
+    image: elasticsearch:7.9.3
     environment:
       discovery.type: single-node
     ports:
