@@ -18,11 +18,11 @@ docker-login: &docker-login
     # Nota bene: you'll need to define the following secrets environment vars
     # in CircleCI interface:
     #
-    #   - DOCKER_USER
-    #   - DOCKER_PASS
+    #   - DOCKER_HUB_USER
+    #   - DOCKER_HUB_PASSWORD
     run:
       name: Login to DockerHub
-      command: echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+      command: echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USER" --password-stdin
 
 version: 2
 jobs:
@@ -32,8 +32,8 @@ jobs:
     docker:
       - image: circleci/python:3.8-buster
         auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
     working_directory: ~/fun
     steps:
       - checkout
@@ -62,8 +62,8 @@ jobs:
     docker:
       - image: circleci/buildpack-deps:stretch-scm
         auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
     working_directory: ~/fun
     steps:
       - checkout
@@ -77,8 +77,8 @@ jobs:
     docker:
       - image: debian:stretch
         auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
     working_directory: ~/fun
     steps:
       - checkout
@@ -94,8 +94,8 @@ jobs:
     docker:
       - image: circleci/buildpack-deps:stretch
         auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
     working_directory: ~/fun
     steps:
       # Checkout repository sources
@@ -120,8 +120,8 @@ jobs:
     docker:
       - image: circleci/python:3.8-buster
         auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
     working_directory: ~/fun
     steps:
       - checkout
@@ -140,8 +140,8 @@ jobs:
     docker:
       - image: circleci/python:3.8-buster
         auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
     working_directory: ~/fun
     steps:
       - checkout
@@ -168,14 +168,14 @@ jobs:
     docker:
       - image: circleci/python:3.8-buster
         auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
         environment:
           RALPH_APP_DIR: ~/fun/.ralph
       - image: elasticsearch:7.10.1
         auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
         environment:
           discovery.type: single-node
     working_directory: ~/fun
@@ -192,13 +192,105 @@ jobs:
               -timeout 60s \
               ~/.local/bin/pytest
 
+  # ---- Tray jobs (k8s) ----
+  tray:
+    machine:
+      # Prevent cache-related issues
+      docker_layer_caching: false
+    working_directory: ~/fun
+    steps:
+      - checkout
+      - <<: [*generate-version-file, *docker-login]
+
+      - run:
+          name: Build production image
+          command: docker build -t "ralph:${CIRCLE_SHA1}" --target production .
+
+      - run:
+          name: Check built images availability
+          command: docker images "ralph:${CIRCLE_SHA1}*"
+
+      - run:
+          name: Install the OC client
+          command: |
+            mkdir /tmp/openshift/
+            wget https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz -O /tmp/openshift/openshift.tar.gz
+            tar xzf /tmp/openshift/openshift.tar.gz --strip-components=1 -C /tmp/openshift/
+            cp /tmp/openshift/oc $HOME/bin/
+
+      - run:
+          name: Configure Docker for OpenShift cluster
+          command: |
+            # Elasticsearch requires to increase this setting's default value
+            sudo sysctl -w vm/max_map_count=262144
+            sudo bash -c "echo '{\"insecure-registries\": [\"172.30.0.0/16\"]}' > /etc/docker/daemon.json"
+            sudo service docker restart
+
+      - run:
+          name: Run local OpenShift cluster & configure environment
+          command: |
+            K8S_DOMAIN=$(hostname -I | awk '{print $1}')
+            export K8S_DOMAIN
+            oc cluster up --server-loglevel=5 --public-hostname=${K8S_DOMAIN}
+            oc login https://${K8S_DOMAIN}:8443 -u developer -p developer --insecure-skip-tls-verify=true
+            # Set environment variables for the CI
+            echo "export K8S_DOMAIN=${K8S_DOMAIN}" >> $BASH_ENV
+            echo "export ARNOLD_DEFAULT_VAULT_PASSWORD=arnold" >> $BASH_ENV
+            echo 'export ANSIBLE_VAULT_PASSWORD="${ARNOLD_DEFAULT_VAULT_PASSWORD}"' >> $BASH_ENV
+            echo "export K8S_AUTH_VERIFY_SSL=no" >> $BASH_ENV
+            echo "export INTERNAL_DOCKER_REGISTRY=172.30.1.1:5000" >> $BASH_ENV
+            source $BASH_ENV
+
+      - run:
+          name: Install arnold CLI
+          command: |
+            wget https://raw.githubusercontent.com/openfun/arnold/master/bin/arnold -O "${HOME}/bin/arnold"
+            chmod +x "${HOME}/bin/arnold"
+
+      - run:
+          name: Setup a new Arnold project
+          command: |
+            arnold -c ralph -e ci setup
+            arnold -d -c ralph -e ci -a ralph create_app_vaults
+            arnold -d -c ralph -e ci -- vault -a ralph decrypt
+            sed -i 's/^# RALPH_/RALPH_/g' group_vars/customer/ralph/ci/secrets/ralph.vault.yml
+            arnold -d -c ralph -e ci -- vault -a ralph encrypt
+            VARS_FILE="group_vars/customer/ralph/ci/main.yml"
+            echo "skip_verification: True" > ${VARS_FILE}
+            echo "apps:" >> ${VARS_FILE}
+            echo "  - name: ralph" >> ${VARS_FILE}
+            echo "ralph_image_name: ${INTERNAL_DOCKER_REGISTRY}/ci-ralph/ralph" >> ${VARS_FILE}
+            echo "ralph_image_tag: ${CIRCLE_SHA1}" >> ${VARS_FILE}
+            echo "ralph_app_replicas: 1" >> ${VARS_FILE}
+            echo "ralph_cronjobs:" >> ${VARS_FILE}
+            echo "  - name: ci-test" >> ${VARS_FILE}
+            echo "    schedule: '* * * * *'" >> ${VARS_FILE}
+            echo "    command: ['date']" >> ${VARS_FILE}
+
+      - run:
+          name: Push ralph image to the k8s cluster docker registry
+          command: |
+            docker login -u developer -p "$(oc whoami -t)" "${INTERNAL_DOCKER_REGISTRY}"
+            docker tag ralph:${CIRCLE_SHA1} "${INTERNAL_DOCKER_REGISTRY}/ci-ralph/ralph:${CIRCLE_SHA1}"
+            arnold -d -c ralph -e ci create_project
+            docker push "${INTERNAL_DOCKER_REGISTRY}/ci-ralph/ralph:${CIRCLE_SHA1}"
+
+      - run:
+          name: Bootstrap ralph application
+          command: |
+            arnold -d -c ralph -e ci -a ralph init
+            arnold -d -c ralph -e ci -a ralph deploy
+            oc project ci-ralph
+            oc get pods -l app=ralph | grep Running
+            test $(oc get cj -o name ralph-ci-test | wc -l) -eq 1
+
   # ---- Packaging jobs ----
   package:
     docker:
       - image: circleci/python:3.8-buster
         auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
     working_directory: ~/fun
     steps:
       - checkout
@@ -226,8 +318,8 @@ jobs:
     docker:
       - image: circleci/python:3.8-buster
         auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
     working_directory: ~/fun
     steps:
       - checkout
@@ -249,8 +341,8 @@ jobs:
     docker:
       - image: circleci/buildpack-deps:stretch
         auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
     working_directory: ~/fun
     steps:
       # Checkout repository sources
@@ -362,6 +454,16 @@ workflows:
             tags:
               only: /.*/
 
+      # Tray
+      #
+      # Deploy ralph in a k8s cluster using arnold
+      - tray:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /.*/
+
       # Packaging: python
       #
       # Build the python package
@@ -381,6 +483,7 @@ workflows:
           requires:
             - build-docker
             - test
+            - tray
           filters:
             branches:
               only: master
