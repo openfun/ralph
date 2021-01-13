@@ -8,6 +8,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.0.0] - 2021-01-13
+
 ### Added
 
 - Implement base CLI commands (list, extract, fetch & push) for supported
@@ -20,4 +22,5 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Add optional sentry integration
 - Distribute Arnold's tray to deploy Ralph in a k8s cluster as cronjobs
 
-[unreleased]: https://github.com/openfun/ralph
+[unreleased]: https://github.com/openfun/v1.0.0...master
+[1.0.0]: https://github.com/openfun/ashley/compare/3d03d85...v1.0.0
