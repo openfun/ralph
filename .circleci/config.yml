@@ -13,16 +13,16 @@ generate-version-file: &generate-version-file
         "$CIRCLE_BUILD_URL" > version.json
 
 docker-login: &docker-login
-    # Login to DockerHub
-    #
-    # Nota bene: you'll need to define the following secrets environment vars
-    # in CircleCI interface:
-    #
-    #   - DOCKER_HUB_USER
-    #   - DOCKER_HUB_PASSWORD
-    run:
-      name: Login to DockerHub
-      command: echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USER" --password-stdin
+  # Login to DockerHub
+  #
+  # Nota bene: you'll need to define the following secrets environment vars
+  # in CircleCI interface:
+  #
+  #   - DOCKER_HUB_USER
+  #   - DOCKER_HUB_PASSWORD
+  run:
+    name: Login to DockerHub
+    command: echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USER" --password-stdin
 
 version: 2
 jobs:
@@ -101,7 +101,8 @@ jobs:
       # Checkout repository sources
       - checkout
       # Generate a version.json file describing app release & login to DockerHub
-      - <<: [*generate-version-file, *docker-login]
+      - *generate-version-file
+      - *docker-login
       # Activate docker-in-docker (with layers caching enabled)
       - setup_remote_docker:
           docker_layer_caching: true
@@ -200,7 +201,8 @@ jobs:
     working_directory: ~/fun
     steps:
       - checkout
-      - <<: [*generate-version-file, *docker-login]
+      - *generate-version-file
+      - *docker-login
 
       - run:
           name: Build production image
@@ -348,7 +350,8 @@ jobs:
       # Checkout repository sources
       - checkout
       # Generate a version.json file describing app release & login to DockerHub
-      - <<: [*generate-version-file, *docker-login]
+      - *generate-version-file
+      - *docker-login
       # Activate docker-in-docker (with layers caching enabled)
       - setup_remote_docker:
           docker_layer_caching: true
