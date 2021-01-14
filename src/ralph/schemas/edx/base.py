@@ -20,7 +20,6 @@ class BaseContextSchema(Schema):
     @validates("user_id")
     def validate_user_id(self, value):
         """"Check user_id field is None, an empty string or an integer"""
-
         if value is None or value == "" or isinstance(value, int):
             return
         raise ValidationError("user_id should be None, an empty string or an integer")
@@ -31,7 +30,6 @@ class BaseContextSchema(Schema):
         "course-v1:{org_id}+{any_string}+{any_string}"
         or be an empty string if org_id is an empty string
         """
-
         org_id = data["org_id"]
         course_id = data["course_id"]
         if not org_id and course_id:

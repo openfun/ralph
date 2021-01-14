@@ -25,7 +25,6 @@ class BaseFactory(factory.Factory):
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
         """Override the default ``_create`` with our custom call."""
-
         schema = model_class()
         kwargs_json = json.dumps(kwargs)
         event = schema.loads(kwargs_json)

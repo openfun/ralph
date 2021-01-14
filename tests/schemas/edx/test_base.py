@@ -1,6 +1,4 @@
-"""
-Tests for the base event schema
-"""
+"""Tests for the base event schema"""
 
 # pylint: disable=redefined-outer-name
 import operator

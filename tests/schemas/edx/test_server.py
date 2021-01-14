@@ -1,6 +1,4 @@
-"""
-Tests for the Server event schema
-"""
+"""Tests for the Server event schema"""
 
 # pylint: disable=redefined-outer-name
 import pytest
