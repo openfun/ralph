@@ -3,33 +3,22 @@ Tests for ralph.parsers module.
 """
 import gzip
 import shutil
+from io import StringIO
 
 import pytest
 
 from ralph.parsers import GELFParser
 
 
-def test_gelfparser_parse_non_existing_file():
-    """Test the GELFParser with a file path that does not exist."""
-
-    parser = GELFParser()
-
-    # Input log file does not exists
-    with pytest.raises(OSError):
-        next(parser.parse("/i/do/not/exist"))
-
-
 # pylint: disable=invalid-name
-def test_gelfparser_parse_empty_file(fs):
+def test_gelfparser_parse_empty_file():
     """Test the GELFParser parsing with an empty file."""
 
     parser = GELFParser()
 
-    # Input log file is empty
-    empty_file_path = "/var/log/empty"
-    fs.create_file(empty_file_path)
+    empty_file = StringIO()
     with pytest.raises(StopIteration):
-        next(parser.parse(empty_file_path))
+        next(parser.parse(empty_file))
 
 
 def test_gelfparser_parse_raw_file(gelf_logger):
@@ -41,7 +30,7 @@ def test_gelfparser_parse_raw_file(gelf_logger):
     gelf_logger.info('{"username": "foo"}')
     gelf_logger.info('{"username": ""}')
 
-    events = list(parser.parse(gelf_logger.handlers[0].stream.name))
+    events = list(parser.parse(open(gelf_logger.handlers[0].stream.name)))
     assert len(events) == 2
     assert events[0] == '{"username": "foo"}'
     assert events[1] == '{"username": ""}'
@@ -62,41 +51,36 @@ def test_gelfparser_parse_gzipped_file(fs, gelf_logger):
             shutil.copyfileobj(log_file, gzipped_log_file)
 
     parser = GELFParser()
-    events = list(parser.parse(gelf_logger.handlers[0].stream.name))
+    events = list(parser.parse(open(gelf_logger.handlers[0].stream.name)))
     assert len(events) == 2
     assert events[0] == '{"username": "foo"}'
     assert events[1] == '{"username": "bar"}'
 
 
-# pylint: disable=invalid-name,unused-argument
-def test_gelfparser_parse_with_various_chunksizes(fs, gelf_logger):
-    """Test the GELFParser parsing using different chunksizes."""
+def test_gelfparser_parse_partially_invalid_file():
+    """Test GELFParser parsing a file containing invalid lines"""
 
-    gelf_logger.info('{"username": "foo"}')
-    gelf_logger.info('{"username": "bar"}')
-    gelf_logger.info('{"username": "baz"}')
-    gelf_logger.info('{"username": "lol"}')
+    with StringIO() as file:
+        file.writelines(
+            [
+                # This is invalid gelf but we assume it's valid in our case
+                '{"short_message": "This seems valid."}\n',
+                # Invalid json
+                "{ This is not valid json and raises json.decoder.JSONDecodeError\n",
+                # Valid json but invalid gelf - raises KeyError: key "short_message" not found
+                "{}\n",
+                # As above but raises TypeError: list indices must be integers or slices, not str
+                "[]\n",
+                # Another assumed valid gelf
+                '{"short_message": {"username": "This seems valid too."}}\n',
+            ]
+        )
+        file.seek(0)
 
-    parser = GELFParser()
-    events = list(parser.parse(gelf_logger.handlers[0].stream.name, chunksize=1))
-    assert len(events) == 4
-    assert events[0] == '{"username": "foo"}'
-    assert events[1] == '{"username": "bar"}'
-    assert events[2] == '{"username": "baz"}'
-    assert events[3] == '{"username": "lol"}'
+        parser = GELFParser()
 
-    parser = GELFParser()
-    events = list(parser.parse(gelf_logger.handlers[0].stream.name, chunksize=2))
-    assert len(events) == 4
-    assert events[0] == '{"username": "foo"}'
-    assert events[1] == '{"username": "bar"}'
-    assert events[2] == '{"username": "baz"}'
-    assert events[3] == '{"username": "lol"}'
+        events = list(parser.parse(file))
 
-    parser = GELFParser()
-    events = list(parser.parse(gelf_logger.handlers[0].stream.name, chunksize=10))
-    assert len(events) == 4
-    assert events[0] == '{"username": "foo"}'
-    assert events[1] == '{"username": "bar"}'
-    assert events[2] == '{"username": "baz"}'
-    assert events[3] == '{"username": "lol"}'
+        assert len(events) == 2
+        assert events[0] == "This seems valid."
+        assert events[1] == {"username": "This seems valid too."}

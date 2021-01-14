@@ -85,7 +85,7 @@ class LDPStorage(HistoryMixin, BaseStorage):
     def list(self, details=False, new=False):
         """List archives for a given stream.
 
-        details: get detailled information about archives instead of their ids
+        details: get detailed information about archives instead of their ids
 
         new: given the history, list only not already fetched archives
 
@@ -116,7 +116,7 @@ class LDPStorage(HistoryMixin, BaseStorage):
 
         logger.debug("Getting archive: %s", name)
 
-        # Get detailled information about the archive to fetch
+        # Get detailed information about the archive to fetch
         details = self._details(name)
 
         # Stream response (archive content)

@@ -12,7 +12,6 @@ from click_option_group import optgroup
 from ralph.backends import BackendTypes
 from ralph.defaults import (
     DEFAULT_BACKEND_CHUNCK_SIZE,
-    DEFAULT_GELF_PARSER_CHUNCK_SIZE,
     ENVVAR_PREFIX,
     DatabaseBackends,
     Parsers,
@@ -20,6 +19,7 @@ from ralph.defaults import (
 )
 from ralph.exceptions import UnsupportedBackendException
 from ralph.logger import configure_logging
+from ralph.schemas.edx.converters.xapi_converter_selector import XapiConverterSelector
 from ralph.utils import (
     get_backend_type,
     get_class_from_name,
@@ -106,23 +106,33 @@ def backends_options(name=None, backends=None):
     required=True,
     help="Container format parser used to extract events",
 )
-@click.option(
-    "-c",
-    "--chunksize",
-    type=int,
-    default=DEFAULT_GELF_PARSER_CHUNCK_SIZE,
-    help="Parse events by chunks of size #",
-)
-def extract(parser, chunksize):
+def extract(parser):
     """Extract input events from a container format using a dedicated parser"""
 
-    logger.info(
-        "Extracting events using the %s parser (chunk size: %d)", parser, chunksize
-    )
+    logger.info("Extracting events using the %s parser", parser)
 
     parser = get_class_from_name(parser, PARSERS)()
 
-    for event in parser.parse(sys.stdin, chunksize=chunksize):
+    for event in parser.parse(sys.stdin):
+        click.echo(event)
+
+
+@cli.command()
+@click.option(
+    "-p",
+    "--platform",
+    type=str,
+    required=True,
+    help="The 'context>platform' and 'actor>account>homePage' to use in the xAPI statements",
+)
+def convert(platform):
+    """Convert extracted events to xAPI"""
+
+    logger.info("Converting events to xAPI")
+
+    converter_selector = XapiConverterSelector(platform)
+
+    for event in converter_selector.convert(sys.stdin):
         click.echo(event)
 
 
@@ -203,7 +213,7 @@ def push(backend, archive, chunk_size, force, **options):
     "-D/-I",
     "--details/--ids",
     default=False,
-    help="Get archives detailled output (JSON)",
+    help="Get archives detailed output (JSON)",
 )
 def list_(details, new, backend, **options):
     """List available archives from a configured storage backend"""

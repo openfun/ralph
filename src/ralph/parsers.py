@@ -2,13 +2,9 @@
 Ralph tracking logs parsers.
 """
 
+import json
 import logging
 from abc import ABC, abstractmethod
-from pathlib import Path
-
-import pandas as pd
-
-from .defaults import DEFAULT_GELF_PARSER_CHUNCK_SIZE
 
 logger = logging.getLogger(__name__)
 
@@ -19,12 +15,11 @@ class BaseParser(ABC):
     name = "base"
 
     @abstractmethod
-    def parse(self, input_file, chunksize=1):
-        """Parse GELF formatted logs (one json string event per row).
+    def parse(self, input_file):
+        """Parse GELF formatted logs (one JSON string event per row).
 
         Args:
             input_file (string): Path to the log file to parse.
-            chunksize (int): The amount of log records to process at a time.
 
         Yields:
             event: raw event as extracted from its container
@@ -41,16 +36,11 @@ class GELFParser(BaseParser):
 
     name = "gelf"
 
-    def parse(self, input_file, chunksize=DEFAULT_GELF_PARSER_CHUNCK_SIZE):
-        """Parse GELF formatted logs (one json string event per row).
+    def parse(self, input_file):
+        """Parse GELF formatted logs (one JSON string event per row).
 
         Args:
-            input_file (string): Path to the log file to parse (could be
-                gunzipped).
-            chunksize (int): The amount of log records to process at a time. A
-                value between 3.000 and 10.000 seems to be a reasonnable choice
-                to parse 1.5M records in a few minutes (typically 2 or 3
-                minutes on a modern computer).
+            input_file (file): log file to parse
 
         Yields:
             event: events raw short_message string
@@ -58,12 +48,11 @@ class GELFParser(BaseParser):
         """
         logger.info("Parsing: %s", input_file)
 
-        if isinstance(input_file, str) and not Path(input_file).exists():
-            msg = "Input GELF log file '%s' does not exist"
-            logger.error(msg, input_file)
-            raise OSError(msg % (input_file))
-
-        chunks = pd.read_json(input_file, lines=True, chunksize=chunksize)
-        for chunk in chunks:
-            for event in chunk["short_message"].values:
-                yield event
+        for event in input_file:
+            try:
+                yield json.loads(event)["short_message"]
+            except (json.JSONDecodeError, TypeError, KeyError) as err:
+                logger.error(
+                    "Invalid event! Not JSON parsable or short_message missing!"
+                )
+                logger.debug("%s%s", type(err), err)

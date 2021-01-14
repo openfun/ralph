@@ -21,6 +21,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Support for application's configuration file
 - Add optional sentry integration
 - Distribute Arnold's tray to deploy Ralph in a k8s cluster as cronjobs
+- Add edX tracking logs (de)serializers for server events
 
 [unreleased]: https://github.com/openfun/v1.0.0...master
 [1.0.0]: https://github.com/openfun/ashley/compare/3d03d85...v1.0.0
