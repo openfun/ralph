@@ -15,8 +15,62 @@ from ralph.schemas.edx.converters.xapi_converter_selector import (
 from tests.fixtures.logs import EventType, event_generator
 
 PLATFORM = "https://fun-mooc.fr"
-EVENT_COUNT = 200
-CONVERTER_EVENTS = [(Converters.SERVER, event_generator(EventType.SERVER, EVENT_COUNT))]
+EVENT_COUNT = 50
+CONVERTER_EVENTS = [
+    (Converters.SERVER, event_generator(EventType.SERVER, EVENT_COUNT)),
+    (
+        Converters.BROWSER_PAGE_CLOSE,
+        event_generator(EventType.BROWSER_PAGE_CLOSE, EVENT_COUNT),
+    ),
+    (
+        Converters.BROWSER_SEQ_GOTO,
+        event_generator(EventType.BROWSER_SEQ_GOTO, EVENT_COUNT),
+    ),
+    (
+        Converters.BROWSER_SEQ_NEXT,
+        event_generator(EventType.BROWSER_SEQ_NEXT, EVENT_COUNT),
+    ),
+    (
+        Converters.BROWSER_SEQ_PREV,
+        event_generator(EventType.BROWSER_SEQ_PREV, EVENT_COUNT),
+    ),
+    (
+        Converters.BROWSER_TEXTBOOK_PDF_DISPLAY_SCALED,
+        event_generator(EventType.BROWSER_TEXTBOOK_PDF_DISPLAY_SCALED, EVENT_COUNT),
+    ),
+    (
+        Converters.BROWSER_TEXTBOOK_PDF_OUTLINE_TOGGLED,
+        event_generator(EventType.BROWSER_TEXTBOOK_PDF_OUTLINE_TOGGLED, EVENT_COUNT),
+    ),
+    (
+        Converters.BROWSER_TEXTBOOK_PDF_PAGE_NAVIGATED,
+        event_generator(EventType.BROWSER_TEXTBOOK_PDF_PAGE_NAVIGATED, EVENT_COUNT),
+    ),
+    (
+        Converters.BROWSER_TEXTBOOK_PDF_PAGE_SCROLLED,
+        event_generator(EventType.BROWSER_TEXTBOOK_PDF_PAGE_SCROLLED, EVENT_COUNT),
+    ),
+    (
+        Converters.BROWSER_TEXTBOOK_PDF_THUMBNAIL_NAVIGATED,
+        event_generator(
+            EventType.BROWSER_TEXTBOOK_PDF_THUMBNAIL_NAVIGATED, EVENT_COUNT
+        ),
+    ),
+    (
+        Converters.BROWSER_TEXTBOOK_PDF_THUMBNAILS_TOGGLED,
+        event_generator(EventType.BROWSER_TEXTBOOK_PDF_THUMBNAILS_TOGGLED, EVENT_COUNT),
+    ),
+    (
+        Converters.BROWSER_TEXTBOOK_PDF_ZOOM_BUTTONS_CHANGED,
+        event_generator(
+            EventType.BROWSER_TEXTBOOK_PDF_ZOOM_BUTTONS_CHANGED, EVENT_COUNT
+        ),
+    ),
+    (
+        Converters.BROWSER_TEXTBOOK_PDF_ZOOM_MENU_CHANGED,
+        event_generator(EventType.BROWSER_TEXTBOOK_PDF_ZOOM_MENU_CHANGED, EVENT_COUNT),
+    ),
+]
 CONVERTER_EVENTS = [(x[0], x) for x in CONVERTER_EVENTS]
 CONVERTER_STATEMENTS = {}
 

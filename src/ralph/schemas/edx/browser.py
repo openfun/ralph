@@ -166,7 +166,7 @@ class BaseBrowserEventSchema(BaseEventSchema):
 
 
 class PageCloseBrowserEventSchema(BaseBrowserEventSchema):
-    """Triggered when the js event window.onunload is triggered"""
+    """Triggered when the JS event window.onunload is triggered"""
 
     @validates_schema
     def validate_event_page_close(self, data, **kwargs):
@@ -220,7 +220,7 @@ class BaseProblemBrowserEventSchema(BaseBrowserEventSchema):
 
     @validates_schema
     def validate_event_problem_graded_reset_save(self, data, **kwargs):
-        """Check that event is a list of lenght 2 and that the first
+        """Check that event is a list of length 2 and that the first
         value is a valid URL-encoded string or empty
         """
         if not isinstance(data["event"], list) or len(data["event"]) != 2:

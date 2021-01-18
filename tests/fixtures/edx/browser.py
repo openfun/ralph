@@ -146,7 +146,7 @@ class BrowserEventFactory(BaseEventFactory):
             "textbook.pdf.zoom.menu.changed",
             "textbook.pdf.display.scaled",
         ]:
-            event["page"] = FAKE.random_int(0, 1000)
+            event["page"] = FAKE.random_int(1, 1000)
         if obj.name == "textbook.pdf.thumbnail.navigated":
             event["thumbnail_title"] = f"Page {event['page']}"
         if obj.name in [

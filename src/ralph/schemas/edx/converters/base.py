@@ -101,7 +101,7 @@ class BaseConverter(ABC):
         try:
             self._schema.load(event)
         except ValidationError as err:
-            logger.error("Invalid event!")
+            logger.error("%s: Invalid event!", self.__class__.__name__)
             logger.debug("Error: %s \nFor Event %s", err, event)
             return None
 
