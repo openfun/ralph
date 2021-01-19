@@ -3,8 +3,6 @@
 import logging
 from importlib import import_module
 
-import click_log
-
 from ralph.backends import BackendTypes
 from ralph.backends.database import BaseDatabase as BaseDatabaseBackend
 from ralph.backends.storage import BaseStorage as BaseStorageBackend
@@ -76,7 +74,6 @@ def get_root_logger():
     """Get main Ralph logger"""
 
     ralph_logger = logging.getLogger("ralph")
-    click_log.basic_config(ralph_logger)
     ralph_logger.propagate = True
 
     return ralph_logger

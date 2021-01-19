@@ -1,9 +1,11 @@
 """Tests for Ralph cli"""
 
 import json
+import logging
 import sys
 from pathlib import Path
 
+import pytest
 from click.testing import CliRunner
 from elasticsearch.helpers import bulk, scan
 
@@ -14,6 +16,8 @@ from ralph.defaults import APP_DIR, FS_STORAGE_DEFAULT_PATH
 
 from tests.fixtures.backends import ES_TEST_HOSTS, ES_TEST_INDEX
 
+test_logger = logging.getLogger("ralph")
+
 
 def test_help_option():
     """Test ralph --help command"""
@@ -23,7 +27,7 @@ def test_help_option():
 
     assert result.exit_code == 0
     assert (
-        "-v, --verbosity LVL  Either CRITICAL, ERROR, WARNING, INFO or DEBUG"
+        "-v, --verbosity LVL  Either CRITICAL, ERROR, WARNING, INFO (default) or DEBUG"
         in result.output
     )
 
@@ -59,6 +63,26 @@ def test_extract_command_with_gelf_parser(gelf_logger):
         gelf_content = log_file.read()
         result = runner.invoke(cli, ["extract", "-p", "gelf"], input=gelf_content)
         assert '{"username": "foo"}' in result.output
+
+
+@cli.command()
+def dummy_verbosity_check():
+    """Adding a dummy command to the cli with all logging levels"""
+
+    test_logger.critical("CRITICAL")
+    test_logger.error("ERROR")
+    test_logger.warning("WARNING")
+    test_logger.info("INFO")
+    test_logger.debug("DEBUG")
+
+
+@pytest.mark.parametrize("verbosity", ["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"])
+def test_verbosity_option_should_impact_logging_behaviour(verbosity):
+    """Test that the verbosity option impacts logging output"""
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["-v", verbosity, "dummy-verbosity-check"])
+    assert verbosity in result.output
 
 
 def test_fetch_command_usage():
