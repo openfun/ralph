@@ -8,6 +8,11 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+
+### Changed
+
+- Remove click_log package dependency
+
 ## [1.0.0] - 2021-01-13
 
 ### Added

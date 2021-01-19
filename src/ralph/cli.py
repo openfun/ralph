@@ -6,7 +6,6 @@ import sys
 from inspect import signature
 
 import click
-import click_log
 from click_option_group import optgroup
 
 from ralph.backends import BackendTypes
@@ -30,7 +29,6 @@ from ralph.utils import (
 
 # cli module logger
 logger = logging.getLogger(__name__)
-click_log.basic_config(logger)
 
 # Lazy evaluations
 DATABASE_BACKENDS = (lambda: [backend.value for backend in DatabaseBackends])()
@@ -40,11 +38,23 @@ BACKENDS = (lambda: DATABASE_BACKENDS + STORAGE_BACKENDS)()
 
 
 @click.group(name="ralph")
-@click_log.simple_verbosity_option(get_root_logger())
-def cli():
+@click.option(
+    "-v",
+    "--verbosity",
+    type=click.Choice(["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"]),
+    metavar="LVL",
+    required=False,
+    help="Either CRITICAL, ERROR, WARNING, INFO (default) or DEBUG",
+)
+def cli(verbosity=None):
     """Ralph is a stream-based tool to play with your logs"""
 
     configure_logging()
+    if verbosity is not None:
+        level = getattr(logging, verbosity, None)
+        get_root_logger().setLevel(level)
+        for handler in get_root_logger().handlers:
+            handler.setLevel(level)
 
 
 def backends_options(name=None, backends=None):
