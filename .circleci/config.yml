@@ -33,7 +33,7 @@ jobs:
   # Check that the git history is clean and complies with our expectations
   lint-git:
     docker:
-      - image: circleci/python:3.8-buster
+      - image: circleci/python:3.9-buster
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -122,7 +122,7 @@ jobs:
   # Build backend development environment
   build:
     docker:
-      - image: circleci/python:3.8-buster
+      - image: circleci/python:3.9-buster
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -142,7 +142,7 @@ jobs:
 
   lint:
     docker:
-      - image: circleci/python:3.8-buster
+      - image: circleci/python:3.9-buster
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -170,7 +170,7 @@ jobs:
 
   test:
     docker:
-      - image: circleci/python:3.8-buster
+      - image: circleci/python:3.9-buster
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -292,7 +292,7 @@ jobs:
   # ---- Packaging jobs ----
   package:
     docker:
-      - image: circleci/python:3.8-buster
+      - image: circleci/python:3.9-buster
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -321,7 +321,7 @@ jobs:
   #     environment variables in CircleCI UI (with your PyPI credentials)
   pypi:
     docker:
-      - image: circleci/python:3.8-buster
+      - image: circleci/python:3.9-buster
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
