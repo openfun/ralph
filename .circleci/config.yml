@@ -22,7 +22,10 @@ docker-login: &docker-login
   #   - DOCKER_HUB_PASSWORD
   run:
     name: Login to DockerHub
-    command: echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USER" --password-stdin
+    command: >
+      test -n "$DOCKER_HUB_USER" &&
+        echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USER" --password-stdin ||
+        echo "Docker Hub anonymous mode"
 
 version: 2
 jobs:
