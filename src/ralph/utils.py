@@ -1,11 +1,12 @@
 """Utilities for Ralph"""
 
+import datetime
 import logging
 from importlib import import_module
 
 from ralph.backends import BackendTypes
-from ralph.backends.database import BaseDatabase as BaseDatabaseBackend
-from ralph.backends.storage import BaseStorage as BaseStorageBackend
+from ralph.backends.database.base import BaseDatabase as BaseDatabaseBackend
+from ralph.backends.storage.base import BaseStorage as BaseStorageBackend
 
 
 # Taken from Django utilities
@@ -77,3 +78,9 @@ def get_root_logger():
     ralph_logger.propagate = True
 
     return ralph_logger
+
+
+def now():
+    """Return the current UTC time in ISO format"""
+
+    return datetime.datetime.now(tz=datetime.timezone.utc).isoformat()

@@ -1,6 +1,5 @@
 """OVH's LDP storage backend for Ralph"""
 
-import datetime
 import logging
 import sys
 
@@ -8,6 +7,7 @@ import ovh
 import requests
 
 from ralph.exceptions import BackendParameterException
+from ralph.utils import now
 
 from ..mixins import HistoryMixin
 from .base import BaseStorage
@@ -99,13 +99,7 @@ class LDPStorage(HistoryMixin, BaseStorage):
         logger.debug("Found %d archives", len(archives))
 
         if new:
-            archives = set(archives) - set(
-                entry.get("id")
-                for entry in filter(
-                    lambda e: e["backend"] == self.name and e["command"] == "fetch",
-                    self.history,
-                )
-            )
+            archives = set(archives) - set(self.get_command_history(self.name, "fetch"))
             logger.debug("New archives: %d", len(archives))
 
         for archive in archives:
@@ -134,9 +128,7 @@ class LDPStorage(HistoryMixin, BaseStorage):
                 "id": name,
                 "filename": details.get("filename"),
                 "size": details.get("size"),
-                "fetched_at": datetime.datetime.now(
-                    tz=datetime.timezone.utc
-                ).isoformat(),
+                "fetched_at": now(),
             }
         )
 

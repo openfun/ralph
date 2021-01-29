@@ -24,6 +24,14 @@ services:
       discovery.type: single-node
     ports:
       - "9200:9200"
+  
+  swift:
+    image: kklopfenstein/openstack-swift-keystone-docker
+    ports:
+      - "49177:8080"
+      - "49178:35357"
+    environment:
+      KS_SWIFT_PUBLIC_URL: http://127.0.0.1:49177
 
   dockerize:
     image: jwilder/dockerize

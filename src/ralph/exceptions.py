@@ -3,6 +3,10 @@ Ralph exceptions.
 """
 
 
+class BackendException(Exception):
+    """Raised when a backend has a failure"""
+
+
 class BackendParameterException(Exception):
     """Raised when a backend parameter value is not valid"""
 

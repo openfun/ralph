@@ -6,6 +6,8 @@ from enum import Enum
 import pytest
 from elasticsearch import Elasticsearch
 
+from ralph.backends.storage.swift import SwiftStorage
+
 # Elasticsearch backend defaults
 ES_TEST_INDEX = os.environ.get("RALPH_ES_TEST_INDEX", "test-index")
 ES_TEST_HOSTS = os.environ.get("RALPH_ES_TEST_HOSTS", "http://localhost:9200").split(
@@ -41,3 +43,21 @@ def es():
     client.indices.create(index=ES_TEST_INDEX, ignore=400)
     yield client
     client.indices.delete(index=ES_TEST_INDEX)
+
+
+@pytest.fixture
+def swift():
+    """Returns get_swift_storage function"""
+
+    def get_swift_storage():
+        """Returns an instance of SwiftStorage"""
+        return SwiftStorage(
+            os_tenant_id="os_tenant_id",
+            os_tenant_name="os_tenant_name",
+            os_username="os_username",
+            os_password="os_password",
+            os_region_name="os_region_name",
+            os_storage_url="os_storage_url/ralph_logs_container",
+        )
+
+    return get_swift_storage
