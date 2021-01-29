@@ -6,7 +6,7 @@ import pytest
 from ralph import utils as ralph_utils
 from ralph.backends import BackendTypes
 from ralph.backends.database import ESDatabase
-from ralph.backends.storage import LDPStorage
+from ralph.backends.storage.ldp import LDPStorage
 
 from .fixtures.backends import NamedClassEnum
 

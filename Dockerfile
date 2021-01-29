@@ -11,6 +11,10 @@ WORKDIR /build
 
 COPY . /build/
 
+RUN apt-get update && \
+    apt-get install -y gcc libc6-dev && \
+    rm -rf /var/lib/apt/lists/*
+    
 RUN python setup.py install
 
 
@@ -27,10 +31,6 @@ FROM core as development
 
 # Copy all sources, not only runtime-required files
 COPY . /app/
-
-RUN apt-get update && \
-    apt-get install -y gcc && \
-    rm -rf /var/lib/apt/lists/*
 
 # Uninstall ralph and re-install it in editable mode along with development
 # dependencies

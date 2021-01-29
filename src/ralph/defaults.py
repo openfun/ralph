@@ -36,6 +36,7 @@ class StorageBackends(Enum):
 
     LDP = "ralph.backends.storage.ldp.LDPStorage"
     FS = "ralph.backends.storage.fs.FSStorage"
+    SWIFT = "ralph.backends.storage.swift.SwiftStorage"
 
 
 def load_config(config_file_path):
@@ -87,6 +88,10 @@ DEFAULT_LOGGING_CONFIG = {
             "handlers": ["console"],
             "level": "INFO",
         },
+        "swiftclient": {
+            "handlers": ["console"],
+            "level": "ERROR",
+        },
     },
 }
 
@@ -102,4 +107,8 @@ FS_STORAGE_DEFAULT_PATH = Path(
 HISTORY_FILE = Path(config("RALPH_HISTORY_FILE", APP_DIR / "history.json"))
 LOGGING_CONFIG = config("RALPH_LOGGING", DEFAULT_LOGGING_CONFIG)
 SENTRY_DSN = config("RALPH_SENTRY_DSN", None)
+SWIFT_OS_AUTH_URL = config("RALPH_SWIFT_OS_AUTH_URL", "https://auth.cloud.ovh.net/")
+SWIFT_OS_IDENTITY_API_VERSION = config("RALPH_SWIFT_OS_IDENTITY_API_VERSION", "3")
+SWIFT_OS_PROJECT_DOMAIN_NAME = config("RALPH_SWIFT_OS_PROJECT_DOMAIN_NAME", "Default")
+SWIFT_OS_USER_DOMAIN_NAME = config("RALPH_SWIFT_OS_USER_DOMAIN_NAME", "Default")
 EXECUTION_ENVIRONMENT = config("RALPH_EXECUTION_ENVIRONMENT", "development")

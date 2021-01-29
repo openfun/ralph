@@ -46,6 +46,33 @@ Ralph is distributed along with its tray (a deployable package for Kubernetes
 clusters using [Arnold](https://github.com/openfun/arnold)). If you intend to
 work on this tray, please refer to Arnold's documentation.
 
+### Local Swift Storage development
+
+To make ralph work with a local instance of Swift:
+
+1) Setup environment variables for demo swift user in .env
+
+```
+RALPH_SWIFT_OS_USERNAME=demo
+RALPH_SWIFT_OS_PASSWORD=demo
+RALPH_SWIFT_OS_USER_DOMAIN_NAME=Default
+RALPH_SWIFT_OS_PROJECT_DOMAIN_NAME=Default
+RALPH_SWIFT_OS_AUTH_URL=http://swift:35357/v3/
+RALPH_SWIFT_OS_IDENTITY_API_VERSION=3
+RALPH_SWIFT_OS_REGION_NAME=RegionOne
+RALPH_SWIFT_OS_TENANT_ID=cd238e84310a46e58af7f1d515887d88
+RALPH_SWIFT_OS_TENANT_NAME=RegionOne
+RALPH_SWIFT_OS_STORAGE_URL=http://swift:8080/v1/KEY_cd238e84310a46e58af7f1d515887d88/test_container
+```
+
+2) Push a first object (forcefully) to create the test container
+
+```
+$ echo "some content" | ./bin/ralph push -b swift -f some_archive_name
+```
+
+Now ralph should be fully functional with the local Swift storage.
+
 ## Contributing
 
 This project is intended to be community-driven, so please, do not hesitate to

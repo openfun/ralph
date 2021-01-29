@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 from ralph.defaults import FS_STORAGE_DEFAULT_PATH
+from ralph.utils import now
 
 from ..mixins import HistoryMixin
 from .base import BaseStorage
@@ -59,14 +60,7 @@ class FSStorage(HistoryMixin, BaseStorage):
         logger.debug("Found %d archives", len(archives))
 
         if new:
-            archives = set(archives) - set(
-                entry.get("id")
-                for entry in filter(
-                    lambda e: e["backend"] == self.name and e["command"] == "fetch",
-                    self.history,
-                )
-            )
-
+            archives = set(archives) - set(self.get_command_history(self.name, "fetch"))
             logger.debug("New archives: %d", len(archives))
 
         for archive in archives:
@@ -96,9 +90,7 @@ class FSStorage(HistoryMixin, BaseStorage):
                 "id": name,
                 "filename": details.get("filename"),
                 "size": details.get("size"),
-                "fetched_at": datetime.datetime.now(
-                    tz=datetime.timezone.utc
-                ).isoformat(),
+                "fetched_at": now(),
             }
         )
 
@@ -127,8 +119,6 @@ class FSStorage(HistoryMixin, BaseStorage):
                 "id": name,
                 "filename": details.get("filename"),
                 "size": details.get("size"),
-                "pushed_at": datetime.datetime.now(
-                    tz=datetime.timezone.utc
-                ).isoformat(),
+                "pushed_at": now(),
             }
         )

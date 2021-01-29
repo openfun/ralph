@@ -94,6 +94,17 @@ def test_fetch_command_usage():
     assert result.exit_code == 0
     assert (
         "Options:\n"
+        "  swift backend: \n"
+        "    --swift-os-identity-api-version TEXT\n"
+        "    --swift-os-auth-url TEXT\n"
+        "    --swift-os-project-domain-name TEXT\n"
+        "    --swift-os-user-domain-name TEXT\n"
+        "    --swift-os-storage-url TEXT\n"
+        "    --swift-os-region-name TEXT\n"
+        "    --swift-os-password TEXT\n"
+        "    --swift-os-username TEXT\n"
+        "    --swift-os-tenant-name TEXT\n"
+        "    --swift-os-tenant-id TEXT\n"
         "  fs backend: \n"
         "    --fs-path TEXT\n"
         "  ldp backend: \n"
@@ -107,14 +118,15 @@ def test_fetch_command_usage():
         "    --es-verify-certs / --no-es-verify-certs\n"
         "    --es-index TEXT\n"
         "    --es-hosts TEXT\n"
-        "  -b, --backend [es|ldp|fs]       Backend  [required]\n"
-        "  -c, --chunk-size INTEGER        Get events by chunks of size #"
+        "  -b, --backend [es|ldp|fs|swift]\n"
+        "                                  Backend  [required]\n"
+        "  -c, --chunk-size INTEGER        Get events by chunks of size #\n"
     ) in result.output
 
     result = runner.invoke(cli, ["fetch"])
     assert result.exit_code > 0
     assert (
-        "Error: Missing option '-b' / '--backend'.  Choose from:\n\tes,\n\tldp,\n\tfs."
+        "Error: Missing option '-b' / '--backend'.  Choose from:\n\tes,\n\tldp,\n\tfs,\n\tswift."
         in result.output
     )
 
@@ -213,6 +225,17 @@ def test_list_command_usage():
     assert result.exit_code == 0
     assert (
         "Options:\n"
+        "  swift backend: \n"
+        "    --swift-os-identity-api-version TEXT\n"
+        "    --swift-os-auth-url TEXT\n"
+        "    --swift-os-project-domain-name TEXT\n"
+        "    --swift-os-user-domain-name TEXT\n"
+        "    --swift-os-storage-url TEXT\n"
+        "    --swift-os-region-name TEXT\n"
+        "    --swift-os-password TEXT\n"
+        "    --swift-os-username TEXT\n"
+        "    --swift-os-tenant-name TEXT\n"
+        "    --swift-os-tenant-id TEXT\n"
         "  fs backend: \n"
         "    --fs-path TEXT\n"
         "  ldp backend: \n"
@@ -222,7 +245,7 @@ def test_list_command_usage():
         "    --ldp-application-secret TEXT\n"
         "    --ldp-application-key TEXT\n"
         "    --ldp-endpoint TEXT\n"
-        "  -b, --backend [ldp|fs]          Backend  [required]\n"
+        "  -b, --backend [ldp|fs|swift]    Backend  [required]\n"
         "  -n, --new / -a, --all           List not fetched (or all) archives\n"
         "  -D, --details / -I, --ids       Get archives detailled output (JSON)\n"
     ) in result.output
@@ -230,7 +253,7 @@ def test_list_command_usage():
     result = runner.invoke(cli, ["list"])
     assert result.exit_code > 0
     assert (
-        "Error: Missing option '-b' / '--backend'.  Choose from:\n\tldp,\n\tfs."
+        "Error: Missing option '-b' / '--backend'.  Choose from:\n\tldp,\n\tfs,\n\tswift."
         in result.output
     )
 
