@@ -16,6 +16,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 - Remove click_log package dependency
+- Upgrade pyyaml to 5.4.1
+- Upgrade pandas to 1.2.1
 
 ## [1.0.0] - 2021-01-13
 
