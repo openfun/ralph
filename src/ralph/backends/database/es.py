@@ -47,7 +47,7 @@ class ESDatabase(BaseDatabase):
                 "_source": item,
             }
 
-    def put(self, chunk_size=500):
+    def put(self, chunk_size=500, ignore_errors=False):
         """Write documents streamed from the standard input to the instance index"""
 
         logger.debug(
@@ -59,6 +59,7 @@ class ESDatabase(BaseDatabase):
             client=self.client,
             actions=self.to_documents(sys.stdin, lambda d: d.get("id", None)),
             chunk_size=chunk_size,
+            raise_on_error=(not ignore_errors),
         ):
             documents += success
             logger.debug(

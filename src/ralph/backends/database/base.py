@@ -13,5 +13,5 @@ class BaseDatabase(ABC):
         """Read chunk_size records and stream them to stdout"""
 
     @abstractmethod
-    def put(self, chunk_size=10):
+    def put(self, chunk_size=10, ignore_errors=False):
         """Write chunk_size records from stdin"""
