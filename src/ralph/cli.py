@@ -180,9 +180,20 @@ def fetch(backend, archive, chunk_size, **options):
     help="Get events by chunks of size #",
 )
 @click.option(
-    "-f", "--force", default=False, is_flag=True, help="Overwrite existing archives"
+    "-f",
+    "--force",
+    default=False,
+    is_flag=True,
+    help="Overwrite existing archives or records",
 )
-def push(backend, archive, chunk_size, force, **options):
+@click.option(
+    "-I",
+    "--ignore-errors",
+    default=False,
+    is_flag=True,
+    help="Continue writing regardless of raised errors",
+)
+def push(backend, archive, chunk_size, force, ignore_errors, **options):
     """Push an archive to a configured backend"""
 
     logger.info("Pushing archive %s to the configured %s backend", archive, backend)
@@ -195,7 +206,7 @@ def push(backend, archive, chunk_size, force, **options):
     if backend_type == BackendTypes.STORAGE:
         backend.write(archive, overwrite=force)
     elif backend_type == BackendTypes.DATABASE:
-        backend.put(chunk_size=chunk_size)
+        backend.put(chunk_size=chunk_size, ignore_errors=ignore_errors)
     elif backend_type is None:
         msg = "Cannot find an implemented backend type for backend %s"
         logger.error(msg, backend)

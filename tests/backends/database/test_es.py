@@ -1,13 +1,15 @@
 """Tests for Ralph es database backend"""
 
 import json
+import random
 import sys
 from collections.abc import Iterable
 from io import BytesIO, StringIO
 from pathlib import Path
 
+import pytest
 from elasticsearch import Elasticsearch
-from elasticsearch.helpers import bulk
+from elasticsearch.helpers import BulkIndexError, bulk
 
 from ralph.backends.database.es import ESDatabase
 from ralph.defaults import APP_DIR, HISTORY_FILE
@@ -97,8 +99,8 @@ def test_get_method(es, monkeypatch):
     assert documents == [{"id": idx} for idx in range(10)]
 
 
-def test_write_method(es, fs, monkeypatch):
-    """Test ES write method"""
+def test_put_method(es, fs, monkeypatch):
+    """Test ES put method"""
     # pylint: disable=invalid-name
 
     # Prepare fake file system
@@ -126,3 +128,62 @@ def test_write_method(es, fs, monkeypatch):
     hits = es.search(index=ES_TEST_INDEX)["hits"]["hits"]
     assert len(hits) == 10
     assert sorted([hit["_source"]["id"] for hit in hits]) == list(range(10))
+
+
+def test_put_with_badly_formatted_data_raises_a_bulkindexerror(es, fs, monkeypatch):
+    """Test ES put method with badly formatted data"""
+    # pylint: disable=invalid-name,unused-argument
+
+    records = [{"id": idx, "count": random.randint(0, 100)} for idx in range(10)]
+    # Patch a record with a non-expected type for the count field (should be
+    # assigned as long)
+    records[4].update({"count": "wrong"})
+
+    monkeypatch.setattr(
+        "sys.stdin", StringIO("\n".join([json.dumps(record) for record in records]))
+    )
+
+    assert len(es.search(index=ES_TEST_INDEX)["hits"]["hits"]) == 0
+
+    database = ESDatabase(
+        hosts=ES_TEST_HOSTS,
+        index=ES_TEST_INDEX,
+    )
+
+    # By default, we sould raise an error and stop the importation
+    with pytest.raises(BulkIndexError):
+        database.put(chunk_size=2)
+    es.indices.refresh(index=ES_TEST_INDEX)
+    hits = es.search(index=ES_TEST_INDEX)["hits"]["hits"]
+    assert len(hits) == 5
+    assert sorted([hit["_source"]["id"] for hit in hits]) == [0, 1, 2, 3, 5]
+
+
+def test_put_with_badly_formatted_data_in_force_mode(es, fs, monkeypatch):
+    """Test ES put method with badly formatted data when the force mode is active"""
+    # pylint: disable=invalid-name,unused-argument
+
+    records = [{"id": idx, "count": random.randint(0, 100)} for idx in range(10)]
+    # Patch a record with a non-expected type for the count field (should be
+    # assigned as long)
+    records[2].update({"count": "wrong"})
+
+    monkeypatch.setattr(
+        "sys.stdin", StringIO("\n".join([json.dumps(record) for record in records]))
+    )
+
+    assert len(es.search(index=ES_TEST_INDEX)["hits"]["hits"]) == 0
+
+    database = ESDatabase(
+        hosts=ES_TEST_HOSTS,
+        index=ES_TEST_INDEX,
+    )
+    # When forcing import, We expect the record with non expected type to have
+    # been dropped
+    database.put(chunk_size=5, ignore_errors=True)
+    es.indices.refresh(index=ES_TEST_INDEX)
+    hits = es.search(index=ES_TEST_INDEX)["hits"]["hits"]
+    assert len(hits) == 9
+    assert sorted([hit["_source"]["id"] for hit in hits]) == [
+        i for i in range(10) if i != 2
+    ]
