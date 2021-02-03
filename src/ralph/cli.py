@@ -2,6 +2,7 @@
 
 import json
 import logging
+import re
 import sys
 from inspect import signature
 
@@ -35,6 +36,40 @@ DATABASE_BACKENDS = (lambda: [backend.value for backend in DatabaseBackends])()
 PARSERS = (lambda: [parser.value for parser in Parsers])()
 STORAGE_BACKENDS = (lambda: [backend.value for backend in StorageBackends])()
 BACKENDS = (lambda: DATABASE_BACKENDS + STORAGE_BACKENDS)()
+
+
+class CommaSeparatedKeyValueParamType(click.ParamType):
+    """Comma separated key=value parameter type"""
+
+    name = "key=value,key=value"
+
+    def convert(self, value, param, ctx):
+        """Split value by comma and equal sign to return a dict build with key/value pairs"""
+
+        # Parse options string
+        try:
+            options = dict(option.split("=") for option in value.split(","))
+        except ValueError:
+            self.fail(
+                "You should provide key=value pairs separated by commas, e.g. foo=bar,bar=2",
+                param,
+                ctx,
+            )
+
+        # Cast simple types
+        for key, value_ in options.items():
+            if value_ == "":
+                options.update({key: None})
+            elif re.match("^true$", value_, re.IGNORECASE):
+                options.update({key: True})
+            elif re.match("^false$", value_, re.IGNORECASE):
+                options.update({key: False})
+            elif re.match(r"^[0-9]+\.[0-9]+$", value_):
+                options.update({key: float(value_)})
+            elif re.match("^[0-9]+$", value_):
+                options.update({key: int(value_)})
+
+        return options
 
 
 @click.group(name="ralph")
@@ -85,13 +120,15 @@ def backends_options(name=None, backends=None):
                 )
                 option_kwargs = {}
                 # If the parameter is a boolean, convert it to a flag option
-                if isinstance(parameter.default, bool):
+                if parameter.annotation is bool:
                     option = (
                         f"{option}/--no-{backend_class.name}-{parameter.name}".replace(
                             "_", "-"
                         )
                     )
                     option_kwargs["is_flag"] = True
+                elif parameter.annotation is dict:
+                    option_kwargs["type"] = CommaSeparatedKeyValueParamType()
                 command = (
                     optgroup.option(
                         option,
