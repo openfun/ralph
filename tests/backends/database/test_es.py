@@ -40,6 +40,26 @@ def test_es_database_instanciation(es):
     assert isinstance(database.client, Elasticsearch)
 
 
+def test_es_client_kwargs(es):
+    """Test the ES backend client instanciation using client_options that must be
+    passed to the http(s) connection pool"""
+    # pylint: disable=invalid-name,unused-argument,protected-access
+
+    database = ESDatabase(
+        hosts=[
+            "https://elasticsearch:9200",
+        ],
+        index=ES_TEST_INDEX,
+        client_options={"ca_certs": "/path/to/ca/bundle"},
+    )
+
+    assert "ca_certs" in database.client.transport.kwargs
+    assert database.client.transport.kwargs.get("ca_certs") == "/path/to/ca/bundle"
+    assert (
+        database.client.transport.get_connection().pool.ca_certs == "/path/to/ca/bundle"
+    )
+
+
 def test_to_documents_method(es):
     """Test to_documents method"""
     # pylint: disable=invalid-name,unused-argument
@@ -150,7 +170,7 @@ def test_put_with_badly_formatted_data_raises_a_bulkindexerror(es, fs, monkeypat
         index=ES_TEST_INDEX,
     )
 
-    # By default, we sould raise an error and stop the importation
+    # By default, we should raise an error and stop the importation
     with pytest.raises(BulkIndexError):
         database.put(chunk_size=2)
     es.indices.refresh(index=ES_TEST_INDEX)

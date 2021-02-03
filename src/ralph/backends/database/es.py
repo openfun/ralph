@@ -17,16 +17,21 @@ class ESDatabase(BaseDatabase):
 
     name = "es"
 
-    def __init__(self, hosts, index, verify_certs=True):
+    def __init__(self, hosts: list, index: str, client_options: dict = None):
         """Instantiate the Elasticsearch client.
 
-        hosts is supposed to be a list
+        hosts: supposed to be a list
+        index: the index name
+        es_client_options: a dict of valid options for the Elasticsearch class
+                           initialization
 
         """
+        if client_options is None:
+            client_options = {}
 
         self._hosts = hosts
         self.index = index
-        self.client = Elasticsearch(self._hosts, verify_certs=verify_certs)
+        self.client = Elasticsearch(self._hosts, **client_options)
 
     def get(self, chunk_size=500):
         """Get index documents and stream them"""

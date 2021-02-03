@@ -12,6 +12,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Support for Swift storage backend
 - Use the `push` command `--force` option to ignore ES bulk import errors
+- The elasticsearch backend now accepts passing all supported client options
 
 ### Changed
 

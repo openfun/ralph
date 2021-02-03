@@ -6,17 +6,79 @@ import sys
 from pathlib import Path
 
 import pytest
+from click.exceptions import BadParameter
 from click.testing import CliRunner
 from elasticsearch.helpers import bulk, scan
 
 from ralph.backends.storage.fs import FSStorage
 from ralph.backends.storage.ldp import LDPStorage
-from ralph.cli import cli
+from ralph.cli import CommaSeparatedKeyValueParamType, cli
 from ralph.defaults import APP_DIR, FS_STORAGE_DEFAULT_PATH
 
 from tests.fixtures.backends import ES_TEST_HOSTS, ES_TEST_INDEX
 
 test_logger = logging.getLogger("ralph")
+
+
+def test_comma_separated_key_value_param_type():
+    """Test the CommaSeparatedKeyValueParamType custom parameter type"""
+
+    param_type = CommaSeparatedKeyValueParamType()
+
+    # Bad options
+    with pytest.raises(
+        BadParameter,
+        match="You should provide key=value pairs separated by commas, e.g. foo=bar,bar=2",
+    ):
+        param_type.convert("foo=bar,baz", None, None)
+    with pytest.raises(
+        BadParameter,
+        match="You should provide key=value pairs separated by commas, e.g. foo=bar,bar=2",
+    ):
+        param_type.convert("foo=bar,", None, None)
+
+    # Simple string parsing
+    assert param_type.convert("foo=bar", None, None) == {
+        "foo": "bar",
+    }
+    assert param_type.convert("foo=bar,baz=spam", None, None) == {
+        "foo": "bar",
+        "baz": "spam",
+    }
+    assert param_type.convert("foo=bar,baz=", None, None) == {
+        "foo": "bar",
+        "baz": None,
+    }
+
+    # Boolean type casting
+    assert param_type.convert("foo=true,bar=false", None, None) == {
+        "foo": True,
+        "bar": False,
+    }
+    assert param_type.convert("foo=True,bar=False", None, None) == {
+        "foo": True,
+        "bar": False,
+    }
+
+    # Integer type casting
+    assert param_type.convert("foo=42,bar=1", None, None) == {
+        "foo": 42,
+        "bar": 1,
+    }
+
+    # Float type casting
+    assert param_type.convert("foo=4.2,bar=12.3", None, None) == {
+        "foo": 4.2,
+        "bar": 12.3,
+    }
+
+    # Mixed types casting
+    assert param_type.convert("foo=lol,bar=12.3,baz=1,spam=True", None, None) == {
+        "foo": "lol",
+        "bar": 12.3,
+        "baz": 1,
+        "spam": True,
+    }
 
 
 def test_help_option():
@@ -115,7 +177,7 @@ def test_fetch_command_usage():
         "    --ldp-application-key TEXT\n"
         "    --ldp-endpoint TEXT\n"
         "  es backend: \n"
-        "    --es-verify-certs / --no-es-verify-certs\n"
+        "    --es-client-options KEY=VALUE,KEY=VALUE\n"
         "    --es-index TEXT\n"
         "    --es-hosts TEXT\n"
         "  -b, --backend [es|ldp|fs|swift]\n"
