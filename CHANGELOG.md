@@ -8,10 +8,13 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.1.0] - 2021-02-04
+
 ### Added
 
 - Support for Swift storage backend
-- Use the `push` command `--force` option to ignore ES bulk import errors
+- Use the `push` command `--ignore-errors` option to ignore ES bulk import
+  errors
 - The elasticsearch backend now accepts passing all supported client options
 
 ### Changed
@@ -34,5 +37,6 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Add optional sentry integration
 - Distribute Arnold's tray to deploy Ralph in a k8s cluster as cronjobs
 
-[unreleased]: https://github.com/openfun/v1.0.0...master
+[unreleased]: https://github.com/openfun/v1.1.0...master
+[1.1.0]: https://github.com/openfun/ashley/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/openfun/ashley/compare/3d03d85...v1.0.0
