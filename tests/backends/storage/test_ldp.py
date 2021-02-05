@@ -21,7 +21,7 @@ from ralph.exceptions import BackendParameterException
 
 
 def test_ldp_storage_instanciation():
-    """Test the LDPStorage backend instanciation"""
+    """Test the LDPStorage backend instantiation"""
     # pylint: disable=protected-access
 
     assert LDPStorage.name == "ldp"
@@ -264,7 +264,7 @@ def test_list_method_history_management(monkeypatch, fs):
 
 
 def test_list_method_with_details(monkeypatch):
-    """Test the LDPStorage list method with detailled output"""
+    """Test the LDPStorage list method with detailed output"""
 
     details_responses = [
         {
@@ -320,7 +320,7 @@ def test_list_method_with_details(monkeypatch):
 
 
 def test_read_method(monkeypatch, fs):
-    """Test the LDPStorage read method with detailled output"""
+    """Test the LDPStorage read method with detailed output"""
     # pylint: disable=invalid-name
 
     # Create fake archive to stream

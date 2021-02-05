@@ -3,6 +3,7 @@
 import json
 import logging
 import sys
+from io import StringIO
 from pathlib import Path
 
 import pytest
@@ -16,6 +17,7 @@ from ralph.cli import CommaSeparatedKeyValueParamType, cli
 from ralph.defaults import APP_DIR, FS_STORAGE_DEFAULT_PATH
 
 from tests.fixtures.backends import ES_TEST_HOSTS, ES_TEST_INDEX
+from tests.fixtures.logs import EventType
 
 test_logger = logging.getLogger("ralph")
 
@@ -103,9 +105,8 @@ def test_extract_command_usage():
     assert result.exit_code == 0
     assert (
         "Options:\n"
-        "  -p, --parser [gelf]      Container format parser used to extract events\n"
-        "                           [required]\n\n"
-        "  -c, --chunksize INTEGER  Parse events by chunks of size #\n"
+        "  -p, --parser [gelf]  Container format parser used to extract events\n"
+        "                       [required]\n\n"
     ) in result.output
 
     result = runner.invoke(cli, ["extract"])
@@ -145,6 +146,53 @@ def test_verbosity_option_should_impact_logging_behaviour(verbosity):
     runner = CliRunner()
     result = runner.invoke(cli, ["-v", verbosity, "dummy-verbosity-check"])
     assert verbosity in result.output
+
+
+def test_convert_command_usage():
+    """Test ralph convert command usage"""
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["convert", "--help"])
+
+    assert result.exit_code == 0
+    assert (
+        "Options:\n"
+        "  -p, --platform TEXT  The 'context>platform' and 'actor>account>homePage' to\n"
+        "                       use in the xAPI statements  [required]\n\n"
+    ) in result.output
+
+    result = runner.invoke(cli, ["convert"])
+    assert result.exit_code > 0
+    assert "Error: Missing option '-p' / '--platform'." in result.output
+
+
+def test_convert_command_with_platform(gelf_logger, event):
+    """Test the extract command using the GELF parser"""
+
+    gelf_logger.info('{"username": "foo"}')
+
+    runner = CliRunner()
+    with StringIO() as file:
+        file.writelines(
+            [
+                # Not parsable JSON
+                "{ This is not valid JSON and raises json.decoder.JSONDecodeError\n",
+                # Missing event_source!
+                "{}\n",
+                # Not a dictionary
+                "[]\n",
+                # valid
+                json.dumps(event(EventType.SERVER, context_args={"user_id": 1})),
+            ]
+        )
+        platform = "https://fun-mooc.fr"
+        result = runner.invoke(cli, ["convert", "-p", platform], input=file.getvalue())
+
+    assert "Invalid event! Not parsable JSON!" in result.output
+    assert "Invalid event! Missing event_source!" in result.output
+    assert "Invalid event! Not a dictionary!" in result.output
+    assert platform in result.output
+    assert '"actor": {"account": {"name": "1"' in result.output
 
 
 def test_fetch_command_usage():
@@ -309,7 +357,7 @@ def test_list_command_usage():
         "    --ldp-endpoint TEXT\n"
         "  -b, --backend [ldp|fs|swift]    Backend  [required]\n"
         "  -n, --new / -a, --all           List not fetched (or all) archives\n"
-        "  -D, --details / -I, --ids       Get archives detailled output (JSON)\n"
+        "  -D, --details / -I, --ids       Get archives detailed output (JSON)\n"
     ) in result.output
 
     result = runner.invoke(cli, ["list"])
@@ -370,7 +418,7 @@ def test_list_command_with_ldp_backend(monkeypatch):
     assert result.exit_code == 0
     assert "\n".join(archive_list) in result.output
 
-    # List archives with detailled output
+    # List archives with detailed output
     result = runner.invoke(cli, ["list", "-b", "ldp", "--ldp-endpoint", "ovh-eu", "-D"])
     assert result.exit_code == 0
     assert (
@@ -433,7 +481,7 @@ def test_list_command_with_fs_backend(fs, monkeypatch):
     assert result.exit_code == 0
     assert "\n".join(archive_list) in result.output
 
-    # List archives with detailled output
+    # List archives with detailed output
     result = runner.invoke(cli, ["list", "-b", "fs", "-D"])
     assert result.exit_code == 0
     assert (

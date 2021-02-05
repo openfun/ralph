@@ -40,7 +40,7 @@ class StorageBackends(Enum):
 
 
 def load_config(config_file_path):
-    """Return a dictionnary representing Ralph's configuration"""
+    """Return a dictionary representing Ralph's configuration"""
 
     try:
         with open(config_file_path) as config_file:
@@ -98,9 +98,9 @@ DEFAULT_LOGGING_CONFIG = {
 APP_DIR = Path(environ.get("RALPH_APP_DIR", get_app_dir("ralph")))
 CONFIG_FILE = APP_DIR / "config.yml"
 CONFIG = load_config(CONFIG_FILE)
-ENVVAR_PREFIX = "RALPH"
-DEFAULT_GELF_PARSER_CHUNCK_SIZE = config("RALPH_DEFAULT_GELF_PARSER_CHUNCK_SIZE", 5000)
 DEFAULT_BACKEND_CHUNCK_SIZE = config("RALPH_DEFAULT_BACKEND_CHUNCK_SIZE", 500)
+ENVVAR_PREFIX = "RALPH"
+EXECUTION_ENVIRONMENT = config("RALPH_EXECUTION_ENVIRONMENT", "development")
 FS_STORAGE_DEFAULT_PATH = Path(
     config("RALPH_FS_STORAGE_DEFAULT_PATH", APP_DIR / "archives")
 )
