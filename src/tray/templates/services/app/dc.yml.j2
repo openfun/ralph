@@ -28,7 +28,7 @@ spec:
                     - key: deploymentconfig
                       operator: In
                       values:
-                        - "ralph-app-{{ deployment_stamp }}"
+                        - "ralph-app"
                 topologyKey: kubernetes.io/hostname
 {% set image_pull_secret_name = ralph_image_pull_secret_name | default(default_image_pull_secret_name) %}
 {% if image_pull_secret_name | length %}
