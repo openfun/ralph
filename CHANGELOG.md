@@ -8,6 +8,11 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- Tray: add missing Swift variables in the secret
+- Tray: fix pods anti-affinity selector
+
 ## [1.1.0] - 2021-02-04
 
 ### Added
