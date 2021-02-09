@@ -15,7 +15,6 @@ from .constants import (
 
 class ServerEventToXapi(BaseXapiConverter):
     """Converts a common edX server event to xAPI
-    See ServerEventSchema for info about the edX server event
     Example Statement: John viewed https://www.fun-mooc.fr/ Web page
     """
 

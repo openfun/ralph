@@ -9,13 +9,71 @@ from marshmallow.validate import URL, Equal
 
 
 class BaseContextSchema(Schema):
-    """Represents the Base Context inherited by all event contexts"""
+    """Represents the Base Context inherited by all event contexts."""
 
     course_user_tags = Dict(keys=Str(), values=Str())
+    """Consists of a dictionary with key value pairs from the `user_api_usercoursetag` table.
+
+    Retrieved with:
+        `dict(
+            UserCourseTag.objects.filter(
+                user=request.user.pk, course_id=course_key
+            ).values_list('key', 'value')
+        )`
+    Note:
+        Is only present when a course page is requested.
+        Is an empty dictionary when the user is not logged in or not found in the
+        `user_api_usercoursetag` table.
+    Source:
+        /openedx/core/djangoapps/user_api/middleware.py#L38-L46
+    """
+
     user_id = Field(required=True, allow_none=True)
+    """Consists of the ID of the authenticated user.
+
+    Retrieved with:
+        `request.user.pk` querying the `auth_user` table.
+    Note:
+        Is an integer when the user is found in the `auth_user` table.
+        Is an empty string when an exception is raised while retrieving the id.
+        Is `None` when the user is not logged in.
+    Source:
+        /common/djangoapps/track/middleware.py#L189
+    """
+
     org_id = Str(required=True)
+    """Consists of the organization name that lists the course.
+
+    Retrieved with:
+        `course_id.org` where `course_id` is an `opaque_keys.edx.locator.CourseLocator`
+        which is created using the URL of the requested page.
+    Note:
+        Is an empty string when the requested page is not a course page.
+    Source:
+        /common/djangoapps/track/contexts.py#L55
+    """
+
     course_id = Str(required=True)
+    """Consists of the unique identifier for the visited course page.
+
+    Retrieved with:
+        `course_id.to_deprecated_string()` where `course_id` is an
+        `opaque_keys.edx.locator.CourseLocator` which is created using the URL
+        of the requested page.
+    Note:
+        Is an empty string when the requested page is not a course page.
+    Source:
+        /common/djangoapps/track/contexts.py#L54
+    """
+
     path = Url(required=True, relative=True)
+    """Consist of the relative URL (without the hostname) of the requested page.
+
+    Retrieved with:
+        `request.META['PATH_INFO']`
+    Source:
+        /common/djangoapps/track/middleware.py#L143
+    """
 
     @validates("user_id")
     def validate_user_id(self, value):
@@ -98,28 +156,125 @@ class ContextSchema(BaseContextSchema):
 
 class BaseEventSchema(Schema):
     """Represents the Base Event Schema all events inherit from.
-    Does not define event and event_type fields
+
+    Does not define event and event_type fields.
     """
 
     username = Str(required=True)
+    """Consists of the unique username identifying the logged in user.
+
+    Retrieved with:
+        `request.user.username` querying the `auth_user` table.
+    Note:
+        Is an empty string when the user is not logged in.
+        If an exception is raised when retrieving the username from the table then
+        the value is `anonymous`.
+        Usernames are made of 2-30 ASCII letters / numbers / underscores (_) / hyphens (-)
+    Source:
+        /common/djangoapps/track/views/__init__.py#L95
+    """
+
     ip = Field(required=True)
+    """Consists of the public IPv4 address of the user.
+
+    Retrieved with:
+        `get_ip(request)` cf. https://github.com/un33k/django-ipware/tree/1.1.0
+    Note:
+        Can be an empty string if the IP address is not found.
+    Source:
+        /common/djangoapps/track/views/__init__.py#L102
+    """
+
     agent = Str(required=True)
+    """Consists of the `User-Agent` HTTP request header.
+
+    Retrieved with:
+        `request.META[HTTP_USER_AGENT]`
+    Note:
+        Can be an empty string if the header is not present in the request.
+        Contains information about:
+            Browser name and version
+            Operating system name and version
+            Default language
+    Source:
+        /common/djangoapps/track/views/__init__.py#L108
+    """
+
     host = Str(required=True)
+    """Consists of the hostname of the server.
+
+    Retrieved with:
+        `request.META[SERVER_NAME]`
+    Source:
+        /common/djangoapps/track/views/__init__.py#L111
+    """
+
     referer = Str(required=True)
+    """Consists of the `Referer` HTTP request header.
+
+    Retrieved with:
+        `request.META[HTTP_REFERER]`
+    Note:
+        Can be an empty string if the header is not present in the request.
+        Contains the referring url (previous url visited by the user).
+    Source:
+        /common/djangoapps/track/views/__init__.py#L103
+    """
+
     accept_language = Str(required=True)
+    """Consists of the `Accept-Language` HTTP request header.
+
+    Retrieved with:
+        `request.META[HTTP_ACCEPT_LANGUAGE]`
+    Note:
+        Can be an empty string if the header is not present in the request.
+        Contains the default language settings of the user.
+    Source:
+        /common/djangoapps/track/views/__init__.py#L104
+    """
+
     event_source = Str(
         required=True,
         validate=Equal(
             comparable="server", error="The event event_source field is not `server`"
         ),
     )
+    """Consists of the value `server`.
+
+    Note:
+        Specifies the source of the interaction that triggered the event.
+    Source:
+        /common/djangoapps/track/views/__init__.py#L105
+    """
+
     context = Nested(BaseContextSchema(), required=True)
+    """Consists of a dictionary holding additional information about the request and user.
+
+    Source:
+        /common/djangoapps/track/middleware.py#L136
+    """
+
     time = DateTime(format="iso", required=True)
+    """Consists of the UTC time in ISO format at which the event was emitted.
+
+    Retrieved with:
+        `datetime.datetime.utcnow()`
+    Source:
+        /common/djangoapps/track/views/__init__.py#L110
+    """
+
     page = Str(
         required=True,
         allow_none=True,
         validate=Equal(comparable=None, error="The event page field is not None"),
     )
+    """Consists of the value `None`.
+
+    Note:
+        In JSON the value is `null` instead of `None`.
+    Source:
+        /common/djangoapps/track/views/__init__.py#L109
+    """
 
     @validates("username")
     def validate_username(self, value):

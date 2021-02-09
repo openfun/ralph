@@ -17,6 +17,7 @@ from ralph.schemas.edx.base import (
 # pylint: disable=comparison-with-callable, unsubscriptable-object
 
 FAKE = Faker()
+Faker.seed(1)
 
 
 class BaseFactory(factory.Factory):

@@ -39,7 +39,7 @@ dev: ## perform editable install from mounted project sources
 	DOCKER_USER=0 docker-compose run --rm app pip install -e ".[dev]"
 .PHONY: dev
 
-docker-hub:  ## Publish locally built image
+docker-hub:  ## publish locally built image
 docker-hub: build
 	@$(COMPOSE) push
 .PHONY: docker-hub
@@ -111,6 +111,10 @@ test: ## run back-end tests
 test: run
 	bin/pytest
 .PHONY: test
+
+docs: ## generate documentation
+	@$(COMPOSE_RUN) app python3 ./scripts/generate_docs.py
+.PHONY: docs
 
 # -- Misc
 help:

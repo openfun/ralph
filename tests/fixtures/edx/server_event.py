@@ -8,6 +8,7 @@ from ralph.schemas.edx.server_event import ServerEventSchema
 from .base import BaseEventFactory
 
 FAKE = Faker()
+Faker.seed(1)
 
 # pylint: disable=no-self-argument, no-self-use, no-member, unsubscriptable-object
 

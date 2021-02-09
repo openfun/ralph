@@ -12,12 +12,32 @@ from .base import BaseEventSchema
 
 class ServerEventSchema(BaseEventSchema):
     """Represents a common server event.
-    This type of event is triggered on each request excluding:
-    `/event`, `login`, `heartbeat`, `/segmentio/event`, `/performance`
+
+    This type of event is triggered from the django middleware on each request excluding:
+    `/event`, `login`, `heartbeat`, `/segmentio/event` and `/performance`.
     """
 
     event_type = Url(required=True, relative=True)
+    """Consist of the relative URL (without the hostname) of the requested page.
+
+    Retrieved with:
+        `request.META['PATH_INFO']`
+    Source:
+        /common/djangoapps/track/views/__init__.py#L106
+    """
+
     event = Str(required=True)
+    """Consist of a JSON encoded string holding the content of the GET or POST request.
+
+    Retrieved with:
+        `json.dumps({'GET': dict(request.GET), 'POST': dict(request.POST)})[:512]`
+    Note:
+        Values for ['password', 'newpassword', 'new_password', 'oldpassword',
+        'old_password', 'new_password1', 'new_password2'] are replaced by `********`.
+        The JSON encoded string is truncated at 512 characters resulting in invalid JSON.
+    Source:
+        /common/djangoapps/track/middleware.py#L75
+    """
 
     @validates_schema
     def validate_event_type(self, data, **kwargs):
@@ -28,9 +48,9 @@ class ServerEventSchema(BaseEventSchema):
 
     @validates("event")
     def validate_event(self, value):
-        """Check that the event field contains a parsable json string with 2
+        """Check that the event field contains a parsable JSON string with 2
         keys `POST` and `GET` and dictionaries as values. As the event field
-        is truncated at 500 characters, it might be common that it would not be
+        is truncated at 512 characters, it might be common that it would not be
         parsable.
         """
 
