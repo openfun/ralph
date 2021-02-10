@@ -261,7 +261,7 @@ def push(backend, archive, chunk_size, force, ignore_errors, **options):
     "-D/-I",
     "--details/--ids",
     default=False,
-    help="Get archives detailled output (JSON)",
+    help="Get archives detailed output (JSON)",
 )
 def list_(details, new, backend, **options):
     """List available archives from a configured storage backend"""

@@ -17,8 +17,8 @@ from ralph.defaults import APP_DIR, HISTORY_FILE
 from tests.fixtures.backends import ES_TEST_HOSTS, ES_TEST_INDEX
 
 
-def test_es_database_instanciation(es):
-    """Test the ES backend instanciation"""
+def test_es_database_instantiation(es):
+    """Test the ES backend instantiation"""
     # pylint: disable=invalid-name,unused-argument,protected-access
 
     assert ESDatabase.name == "es"
@@ -41,7 +41,7 @@ def test_es_database_instanciation(es):
 
 
 def test_es_client_kwargs(es):
-    """Test the ES backend client instanciation using client_options that must be
+    """Test the ES backend client instantiation using client_options that must be
     passed to the http(s) connection pool"""
     # pylint: disable=invalid-name,unused-argument,protected-access
 
@@ -125,7 +125,7 @@ def test_put_method(es, fs, monkeypatch):
 
     # Prepare fake file system
     fs.create_dir(str(APP_DIR))
-    # Force Path instanciation with fake FS
+    # Force Path instantiation with fake FS
     history_file = Path(str(HISTORY_FILE))
     assert not history_file.exists()
 
