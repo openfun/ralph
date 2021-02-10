@@ -309,7 +309,7 @@ def test_list_command_usage():
         "    --ldp-endpoint TEXT\n"
         "  -b, --backend [ldp|fs|swift]    Backend  [required]\n"
         "  -n, --new / -a, --all           List not fetched (or all) archives\n"
-        "  -D, --details / -I, --ids       Get archives detailled output (JSON)\n"
+        "  -D, --details / -I, --ids       Get archives detailed output (JSON)\n"
     ) in result.output
 
     result = runner.invoke(cli, ["list"])
@@ -370,7 +370,7 @@ def test_list_command_with_ldp_backend(monkeypatch):
     assert result.exit_code == 0
     assert "\n".join(archive_list) in result.output
 
-    # List archives with detailled output
+    # List archives with detailed output
     result = runner.invoke(cli, ["list", "-b", "ldp", "--ldp-endpoint", "ovh-eu", "-D"])
     assert result.exit_code == 0
     assert (
@@ -433,7 +433,7 @@ def test_list_command_with_fs_backend(fs, monkeypatch):
     assert result.exit_code == 0
     assert "\n".join(archive_list) in result.output
 
-    # List archives with detailled output
+    # List archives with detailed output
     result = runner.invoke(cli, ["list", "-b", "fs", "-D"])
     assert result.exit_code == 0
     assert (

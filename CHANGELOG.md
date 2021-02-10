@@ -8,6 +8,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- EdX server event pydantic model and factory
+
 ### Fixed
 
 - Tray: add missing Swift variables in the secret

@@ -11,8 +11,8 @@ from ralph.defaults import APP_DIR, FS_STORAGE_DEFAULT_PATH
 
 # pylint: disable=invalid-name
 # pylint: disable=unused-argument
-def test_fs_storage_instanciation(fs):
-    """Test the FSStorage backend instanciation"""
+def test_fs_storage_instantiation(fs):
+    """Test the FSStorage backend instantiation"""
     # pylint: disable=protected-access
 
     assert FSStorage.name == "fs"

@@ -40,7 +40,7 @@ class StorageBackends(Enum):
 
 
 def load_config(config_file_path):
-    """Return a dictionnary representing Ralph's configuration"""
+    """Return a dictionary representing Ralph's configuration"""
 
     try:
         with open(config_file_path) as config_file:
