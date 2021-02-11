@@ -36,11 +36,11 @@ class NamedClassEnum(Enum):
 
 @pytest.fixture
 def es():
-    """Create / delete an ElasticSearch test index and yield an instanciated client"""
+    """Create / delete an ElasticSearch test index and yield an instantiated client"""
     # pylint: disable=invalid-name
 
     client = Elasticsearch(ES_TEST_HOSTS)
-    client.indices.create(index=ES_TEST_INDEX, ignore=400)
+    client.indices.create(index=ES_TEST_INDEX)
     yield client
     client.indices.delete(index=ES_TEST_INDEX)
 

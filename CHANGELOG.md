@@ -11,6 +11,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - EdX server event pydantic model and factory
+- EdX page_close browser event pydantic model and factory
 
 ### Fixed
 
