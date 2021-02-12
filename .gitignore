@@ -50,6 +50,9 @@ venv.bak/
 # Test fixtures
 data/
 
+# Documentation site
+site/
+
 # Arnold environment
 bin/vault_password
 .team

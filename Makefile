@@ -7,6 +7,7 @@ COMPOSE              = DOCKER_USER=$(DOCKER_USER) docker-compose
 COMPOSE_RUN          = $(COMPOSE) run --rm
 COMPOSE_TEST_RUN     = $(COMPOSE_RUN)
 COMPOSE_TEST_RUN_APP = $(COMPOSE_TEST_RUN) app
+MKDOCS               = $(COMPOSE_RUN) --no-deps --publish "8000:8000" app mkdocs
 
 # -- Elasticsearch
 ES_PROTOCOL = http
@@ -44,12 +45,24 @@ docker-hub: build
 	@$(COMPOSE) push
 .PHONY: docker-hub
 
+docs-build: ## build documentation site
+	@$(MKDOCS) build
+.PHONY: docs-build
+
+docs-deploy: ## deploy documentation site
+	@$(MKDOCS) gh-deploy
+.PHONY: docs-deploy
+
+docs-serve: ## run mkdocs live server
+	@$(MKDOCS) serve --dev-addr 0.0.0.0:8000
+.PHONY: docs-serve
+
 down: ## stop and remove backend containers
 	@$(COMPOSE) down
 .PHONY: down
 
 es-index:  ## create elasticsearch index and sample documents
-es-index: run
+es-index: run-es
 	@echo "Creating $(ES_INDEX) index"
 	bin/es index $(ES_INDEX)
 .PHONY: es-index
@@ -93,11 +106,23 @@ logs: ## display app logs (follow mode)
 	@$(COMPOSE) logs -f app
 .PHONY: logs
 
-run: ## starts supported backends servers
-	@$(COMPOSE) up -d
+run-all: ## start all supported local backends
+run-all: \
+	run-es \
+	run-swift
+.PHONY: run-all
+
+run-es: ## start elasticsearch backend
+	@$(COMPOSE) up -d elasticsearch
 	@echo "Waiting for elasticsearch to be up and running..."
 	@$(COMPOSE_RUN) dockerize -wait tcp://elasticsearch:9200 -timeout 60s
-.PHONY: run
+.PHONY: run-es
+
+run-swift: ## start swift backend
+	@$(COMPOSE) up -d swift
+	@echo "Waiting for swift to be up and running..."
+	@$(COMPOSE_RUN) dockerize -wait tcp://swift:8080 -wait tcp://swift:35357 -timeout 60s
+.PHONY: run-swift
 
 status: ## an alias for "docker-compose ps"
 	@$(COMPOSE) ps
@@ -108,7 +133,7 @@ stop: ## stops backend servers
 .PHONY: stop
 
 test: ## run back-end tests
-test: run
+test: run-es
 	bin/pytest
 .PHONY: test
 
