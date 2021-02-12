@@ -405,6 +405,29 @@ jobs:
               docker push fundocker/ralph:latest
             fi
 
+  # Deploy the docs website to GitHub pages.
+  docs:
+    docker:
+      - image: circleci/python:3.9-buster
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    working_directory: ~/fun
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ .Revision }}
+      - add_ssh_keys:
+          fingerprints:
+            - "43:a9:5b:a0:b5:8b:f5:b4:6d:73:66:a0:27:b1:ce:92"
+      - run:
+          name: Deploying to GitHub Pages
+          command: |
+            git config --global user.email "funmoocbot@users.noreply.github.com"
+            git config --global user.name "FUN MOOC Bot"
+            ~/.local/bin/mkdocs gh-deploy
+
 workflows:
   version: 2
 
@@ -508,3 +531,16 @@ workflows:
               ignore: /.*/
             tags:
               only: /^v.*/
+
+      # Publish the documentation website to GitHub Pages.
+      # Only do it for master as tagged releases are supposed to tag their own version of the
+      # documentation in the release commit on master before they go out.
+      - docs:
+          requires:
+            - tray
+            - package
+          filters:
+            branches:
+              only: master
+            tags:
+              only: /.*/

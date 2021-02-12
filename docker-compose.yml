@@ -15,16 +15,15 @@ services:
       PYLINTHOME: /app/.pylint.d
     volumes:
       - .:/app
-    depends_on:
-      - elasticsearch
 
+  # -- backends
   elasticsearch:
     image: elasticsearch:7.10.1
     environment:
       discovery.type: single-node
     ports:
       - "9200:9200"
-  
+
   swift:
     image: kklopfenstein/openstack-swift-keystone-docker
     ports:
@@ -33,5 +32,6 @@ services:
     environment:
       KS_SWIFT_PUBLIC_URL: http://127.0.0.1:49177
 
+  # -- tools
   dockerize:
     image: jwilder/dockerize

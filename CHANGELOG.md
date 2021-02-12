@@ -54,6 +54,6 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Add optional sentry integration
 - Distribute Arnold's tray to deploy Ralph in a k8s cluster as cronjobs
 
-[unreleased]: https://github.com/openfun/v1.1.0...master
-[1.1.0]: https://github.com/openfun/ashley/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/openfun/ashley/compare/3d03d85...v1.0.0
+[unreleased]: https://github.com/openfun/ralph/compare/v1.1.0...master
+[1.1.0]: https://github.com/openfun/ralph/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/openfun/ralph/compare/3d03d85...v1.0.0
