@@ -18,6 +18,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Tray: add missing Swift variables in the secret
 - Tray: fix pods anti-affinity selector
 
+### Removed
+
+- `pandas` is no longer required
+
 ## [1.1.0] - 2021-02-04
 
 ### Added
@@ -29,9 +33,12 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-- Remove click_log package dependency
 - Upgrade pyyaml to 5.4.1
 - Upgrade pandas to 1.2.1
+
+### Removed
+
+- `click_log` is no longer required as we are able to configure logging
 
 ## [1.0.0] - 2021-01-13
 

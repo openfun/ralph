@@ -4,19 +4,24 @@ Ralph tracking logs filters.
 from .exceptions import EventKeyError
 
 
-def anonymous(events):
+def anonymous(event):
     """Remove anonymous events.
 
     Args:
-        events (DataFrame): events to filter
+        event (dict): event to filter
 
     Returns:
-        Filtered pandas DataFrame.
+        event (dict): when event is not anonymous
+        None: otherwise
+
+    Raises:
+        EventKeyError: When the event does not contain the `username` key.
 
     """
 
-    if events.get("username", None) is None:
-        raise EventKeyError(
-            "Cannot filter anonymous filters without 'username' column."
-        )
-    return events.loc[lambda df: df["username"] != "", :]
+    if "username" not in event:
+        raise EventKeyError("Cannot filter anonymous event without 'username' key.")
+    if not event.get("username", ""):
+        return None
+
+    return event
