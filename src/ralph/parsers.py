@@ -2,11 +2,9 @@
 Ralph tracking logs parsers.
 """
 
+import json
 import logging
 from abc import ABC, abstractmethod
-from pathlib import Path
-
-import pandas as pd
 
 from .defaults import DEFAULT_GELF_PARSER_CHUNCK_SIZE
 
@@ -58,12 +56,18 @@ class GELFParser(BaseParser):
         """
         logger.info("Parsing: %s", input_file)
 
-        if isinstance(input_file, str) and not Path(input_file).exists():
-            msg = "Input GELF log file '%s' does not exist"
-            logger.error(msg, input_file)
-            raise OSError(msg % (input_file))
-
-        chunks = pd.read_json(input_file, lines=True, chunksize=chunksize)
-        for chunk in chunks:
-            for event in chunk["short_message"].values:
-                yield event
+        for event in input_file:
+            try:
+                yield json.loads(event)["short_message"]
+            except (json.JSONDecodeError, TypeError) as err:
+                logger.error(
+                    "Input event '%s' is not a valid JSON string! It will be ignored.",
+                    event,
+                )
+                logger.debug("Raised error was: %s", err)
+            except KeyError as err:
+                logger.error(
+                    "Input event '%s' doesn't comply with GELF format! It will be ignored.",
+                    event,
+                )
+                logger.debug("Raised error was: %s", err)

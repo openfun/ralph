@@ -1,7 +1,7 @@
 """
 Tests for the ralph.filters module
 """
-import pandas as pd
+
 import pytest
 
 from ralph import filters
@@ -9,19 +9,19 @@ from ralph.exceptions import EventKeyError
 
 
 def test_anonymous_with_empty_events():
-    """Test the anonymous filter when input DataFrame has not the expected
+    """Test the anonymous filter when input dict has not the expected
     'username' key.
     """
 
-    events = pd.DataFrame()
+    event = {}
     with pytest.raises(EventKeyError):
-        filters.anonymous(events)
+        filters.anonymous(event)
 
 
 def test_anonymous_filtering():
     """Test anonymous filtering reliability."""
 
-    events = pd.DataFrame({"username": ["john", ""]})
-    assert len(events) == 2
-    assert len(filters.anonymous(events)) == 1
-    assert filters.anonymous(events).equals(pd.DataFrame({"username": ["john"]}))
+    event = {"username": "john"}
+    anonymous_event = {"username": ""}
+    assert filters.anonymous(event) == event
+    assert filters.anonymous(anonymous_event) is None
