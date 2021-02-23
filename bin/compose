@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-declare DOCKER_USER
-DOCKER_USER="$(id -u):$(id -g)"
-
-DOCKER_USER=${DOCKER_USER} docker-compose "$@"
