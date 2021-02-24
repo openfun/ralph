@@ -58,7 +58,16 @@ spec:
           volumeMounts:
             - name: ralph-v-history
               mountPath: /app/.ralph
+{% if ralph_mount_es_ca_secret %}
+            - name: es-ca-certificate
+              mountPath: /usr/local/share/ca-certificates/
+{% endif %}
       volumes:
         - name: ralph-v-history
           persistentVolumeClaim:
             claimName: ralph-pvc-history
+{% if ralph_mount_es_ca_secret %}
+        - name: es-ca-certificate
+          secret:
+            secretName: "{{ ralph_es_ca_secret_name }}"
+{% endif %}

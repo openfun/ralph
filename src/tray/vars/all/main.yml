@@ -4,6 +4,8 @@ ralph_image_tag: "latest"
 ralph_app_replicas: 0
 ralph_history_volume_size: 2Gi
 ralph_secret_name: "ralph-backends-{{ ralph_vault_checksum | default('undefined_ralph_vault_checksum') }}"
+ralph_es_ca_secret_name: "ralph-es-ca-{{ ralph_vault_checksum | default('undefined_ralph_vault_checksum') }}"
+ralph_mount_es_ca_secret: false
 
 # Cronjob pipelines
 #
@@ -18,5 +20,7 @@ ralph_secret_name: "ralph-backends-{{ ralph_vault_checksum | default('undefined_
 #             ralph fetch --backend ldp {} |
 #             gunzip |
 #             ralph extract -p gelf |
-#             ralph push --backend es --no-es-verify-certs"
+#             ralph push \
+#               --backend es \
+#               --es-client-options ca_certs=/usr/local/share/ca-certificates/es-cluster.pem"
 ralph_cronjobs: []
