@@ -12,6 +12,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - EdX server event pydantic model and factory
 - EdX page_close browser event pydantic model and factory
+- Ralph tray now allows to specify a self-generated elasticsearch cluster CA
+  certificate
 
 ### Fixed
 

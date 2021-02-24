@@ -31,6 +31,14 @@
 # RALPH_ES_HOSTS: http://elasticsearch:9200
 # RALPH_ES_INDEX: statements
 
+# If you have self-generated a CA certificate for your ES cluster nodes, you may
+# also need this CA certificate to check certificates while requesting the
+# cluster. If defined, this CA certificate will be mounted to
+# /usr/local/share/ca-certificates/es-cluster.pem
+#
+# We expect this certificate to be pasted in PEM format
+# ES_CA_CERTIFICATE:
+
 # Sentry
 
 # RALPH_SENTRY_DSN: https://fake@key.ingest.sentry.io/1234567
