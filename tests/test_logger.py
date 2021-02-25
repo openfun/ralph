@@ -12,7 +12,7 @@ from ralph.exceptions import ConfigurationException
 
 # pylint: disable=invalid-name, unused-argument
 def test_logger_exists(fs, monkeypatch):
-    """Test the logging system when a correct configuration is provided"""
+    """Test the logging system when a correct configuration is provided."""
 
     mock_default_config = {
         "version": 1,
@@ -56,7 +56,7 @@ def test_logger_exists(fs, monkeypatch):
 
 # pylint: disable=invalid-name, unused-argument
 def test_logger_no_config(fs, monkeypatch):
-    """Test that an error occurs when no logging configuration exists"""
+    """Test that an error occurs when no logging configuration exists."""
 
     mock_default_config = None
 
@@ -71,7 +71,7 @@ def test_logger_no_config(fs, monkeypatch):
 
 # pylint: disable=invalid-name, unused-argument
 def test_logger_bad_config(fs, monkeypatch):
-    """Test that an error occurs when a logging is improperly configured"""
+    """Test that an error occurs when a logging is improperly configured."""
 
     mock_default_config = "this is not a valid json"
 

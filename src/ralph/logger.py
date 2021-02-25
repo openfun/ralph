@@ -7,7 +7,7 @@ from ralph.exceptions import ConfigurationException
 
 
 def configure_logging():
-    """Set up Ralph logging configuration"""
+    """Set up Ralph logging configuration."""
 
     try:
         dictConfig(LOGGING_CONFIG)

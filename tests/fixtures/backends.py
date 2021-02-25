@@ -16,19 +16,19 @@ ES_TEST_HOSTS = os.environ.get("RALPH_ES_TEST_HOSTS", "http://localhost:9200").s
 
 
 class NamedClassA:
-    """An example named class"""
+    """An example named class."""
 
     name = "A"
 
 
 class NamedClassB:
-    """A second example named class"""
+    """A second example named class."""
 
     name = "B"
 
 
 class NamedClassEnum(Enum):
-    """A named test classes Enum"""
+    """A named test classes Enum."""
 
     A = "tests.fixtures.backends.NamedClassA"
     B = "tests.fixtures.backends.NamedClassB"
@@ -36,7 +36,7 @@ class NamedClassEnum(Enum):
 
 @pytest.fixture
 def es():
-    """Create / delete an ElasticSearch test index and yield an instantiated client"""
+    """Create / delete an ElasticSearch test index and yield an instantiated client."""
     # pylint: disable=invalid-name
 
     client = Elasticsearch(ES_TEST_HOSTS)
@@ -47,10 +47,10 @@ def es():
 
 @pytest.fixture
 def swift():
-    """Returns get_swift_storage function"""
+    """Returns get_swift_storage function."""
 
     def get_swift_storage():
-        """Returns an instance of SwiftStorage"""
+        """Returns an instance of SwiftStorage."""
         return SwiftStorage(
             os_tenant_id="os_tenant_id",
             os_tenant_name="os_tenant_name",

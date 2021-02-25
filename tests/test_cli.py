@@ -21,7 +21,7 @@ test_logger = logging.getLogger("ralph")
 
 
 def test_comma_separated_key_value_param_type():
-    """Test the CommaSeparatedKeyValueParamType custom parameter type"""
+    """Test the CommaSeparatedKeyValueParamType custom parameter type."""
 
     param_type = CommaSeparatedKeyValueParamType()
 
@@ -82,7 +82,7 @@ def test_comma_separated_key_value_param_type():
 
 
 def test_help_option():
-    """Test ralph --help command"""
+    """Test ralph --help command."""
 
     runner = CliRunner()
     result = runner.invoke(cli, ["--help"])
@@ -95,7 +95,7 @@ def test_help_option():
 
 
 def test_extract_command_usage():
-    """Test ralph extract command usage"""
+    """Test ralph extract command usage."""
 
     runner = CliRunner()
     result = runner.invoke(cli, ["extract", "--help"])
@@ -116,7 +116,7 @@ def test_extract_command_usage():
 
 
 def test_extract_command_with_gelf_parser(gelf_logger):
-    """Test the extract command using the GELF parser"""
+    """Test the extract command using the GELF parser."""
 
     gelf_logger.info('{"username": "foo"}')
 
@@ -129,7 +129,7 @@ def test_extract_command_with_gelf_parser(gelf_logger):
 
 @cli.command()
 def dummy_verbosity_check():
-    """Adding a dummy command to the cli with all logging levels"""
+    """Adding a dummy command to the cli with all logging levels."""
 
     test_logger.critical("CRITICAL")
     test_logger.error("ERROR")
@@ -140,7 +140,7 @@ def dummy_verbosity_check():
 
 @pytest.mark.parametrize("verbosity", ["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"])
 def test_verbosity_option_should_impact_logging_behaviour(verbosity):
-    """Test that the verbosity option impacts logging output"""
+    """Test that the verbosity option impacts logging output."""
 
     runner = CliRunner()
     result = runner.invoke(cli, ["-v", verbosity, "dummy-verbosity-check"])
@@ -148,7 +148,7 @@ def test_verbosity_option_should_impact_logging_behaviour(verbosity):
 
 
 def test_fetch_command_usage():
-    """Test ralph fetch command usage"""
+    """Test ralph fetch command usage."""
 
     runner = CliRunner()
     result = runner.invoke(cli, ["fetch", "--help"])
@@ -194,12 +194,12 @@ def test_fetch_command_usage():
 
 
 def test_fetch_command_with_ldp_backend(monkeypatch):
-    """Test the fetch command using the LDP backend"""
+    """Test the fetch command using the LDP backend."""
 
     archive_content = {"foo": "bar"}
 
     def mock_read(this, name, chunk_size=500):
-        """Always return the same archive"""
+        """Always return the same archive."""
         # pylint: disable=unused-argument
 
         sys.stdout.buffer.write(bytes(json.dumps(archive_content), encoding="utf-8"))
@@ -226,12 +226,12 @@ def test_fetch_command_with_ldp_backend(monkeypatch):
 # pylint: disable=invalid-name
 # pylint: disable=unused-argument
 def test_fetch_command_with_fs_backend(fs, monkeypatch):
-    """Test the fetch command using the FS backend"""
+    """Test the fetch command using the FS backend."""
 
     archive_content = {"foo": "bar"}
 
     def mock_read(this, name, chunk_size):
-        """Always return the same archive"""
+        """Always return the same archive."""
         # pylint: disable=unused-argument
 
         sys.stdout.buffer.write(bytes(json.dumps(archive_content), encoding="utf-8"))
@@ -254,7 +254,7 @@ def test_fetch_command_with_fs_backend(fs, monkeypatch):
 
 
 def test_fetch_command_with_es_backend(es):
-    """Test ralph fetch command using the es backend"""
+    """Test ralph fetch command using the es backend."""
     # pylint: disable=invalid-name
 
     # Insert documents
@@ -279,7 +279,7 @@ def test_fetch_command_with_es_backend(es):
 
 
 def test_list_command_usage():
-    """Test ralph list command usage"""
+    """Test ralph list command usage."""
 
     runner = CliRunner()
     result = runner.invoke(cli, ["list", "--help"])
@@ -321,7 +321,7 @@ def test_list_command_usage():
 
 
 def test_list_command_with_ldp_backend(monkeypatch):
-    """Test the list command using the LDP backend"""
+    """Test the list command using the LDP backend."""
 
     archive_list = [
         "5d5c4c93-04a4-42c5-9860-f51fa4044aa1",
@@ -351,7 +351,7 @@ def test_list_command_with_ldp_backend(monkeypatch):
     ]
 
     def mock_list(this, details=False, new=False):
-        """Mock LDP backend list method"""
+        """Mock LDP backend list method."""
         # pylint: disable=unused-argument
 
         response = archive_list
@@ -394,7 +394,7 @@ def test_list_command_with_ldp_backend(monkeypatch):
 # pylint: disable=invalid-name
 # pylint: disable=unused-argument
 def test_list_command_with_fs_backend(fs, monkeypatch):
-    """Test the list command using the LDP backend"""
+    """Test the list command using the LDP backend."""
 
     archive_list = [
         "file1",
@@ -414,7 +414,7 @@ def test_list_command_with_fs_backend(fs, monkeypatch):
     ]
 
     def mock_list(this, details=False, new=False):
-        """Mock LDP backend list method"""
+        """Mock LDP backend list method."""
         # pylint: disable=unused-argument
 
         response = archive_list
@@ -456,7 +456,7 @@ def test_list_command_with_fs_backend(fs, monkeypatch):
 
 # pylint: disable=invalid-name
 def test_push_command_with_fs_backend(fs):
-    """Test the push command using the FS backend"""
+    """Test the push command using the FS backend."""
 
     fs.create_dir(str(APP_DIR))
 
@@ -521,7 +521,7 @@ def test_push_command_with_fs_backend(fs):
 
 
 def test_push_command_with_es_backend(es):
-    """Test ralph push command using the es backend"""
+    """Test ralph push command using the es backend."""
     # pylint: disable=invalid-name
 
     # Documents
