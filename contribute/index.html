@@ -577,7 +577,7 @@
 </code></pre>
 <p>Once the project has been bootstrapped, you may want to edit generated <code>.env</code>
 file to set up available backends parameters that will be injected in the
-running container as environmnet variables to configure Ralph (see <a href="../backends/">backends
+running container as environment variables to configure Ralph (see <a href="../backends/">backends
 documentation</a>):</p>
 <pre><code class="language-dotenv"># Elasticsearch backend
 RALPH_ES_HOSTS=http://elasticsearch:9200
@@ -632,7 +632,7 @@ $ make run-swift
 $ make run-all
 </code></pre>
 <p>Now that you have started at least the <code>elasticsearch</code> and <code>swift</code> backends,
-it&rsquo;s time to play with those:</p>
+it&rsquo;s time to play with them:</p>
 <pre><code class="language-bash"># Store a JSON file in the Swift backend
 $ echo '{&quot;id&quot;: 1, &quot;foo&quot;: &quot;bar&quot;}' | \
     ./bin/ralph push -b swift -f foo.json

@@ -772,7 +772,7 @@ $ ralph list --backend swift # [...] more options
 </ul>
 <h2 id="storage_backends">Storage backends<a class="headerlink" href="#storage_backends" title="Permanent link">&para;</a></h2>
 <h3 id="ovh_-_log_data_platform_ldp">OVH - Log Data Platform (LDP)<a class="headerlink" href="#ovh_-_log_data_platform_ldp" title="Permanent link">&para;</a></h3>
-<p>LDP is a nice service build by OVH on top of Graylog to follow, analyse and
+<p>LDP is a nice service built by OVH on top of Graylog to follow, analyse and
 store your logs. Learning events (<em>aka</em> tracking logs) can be stored in GELF
 format using this backend.</p>
 <blockquote>
@@ -782,7 +782,7 @@ touch to prove us wrong, or better: submit your proposal for the <code>write</co
 method implementation.</p>
 </blockquote>
 <h4 id="backend_parameters">Backend parameters<a class="headerlink" href="#backend_parameters" title="Permanent link">&para;</a></h4>
-<p>To access to OVH&rsquo;s LDP API, you need to register Ralph as an authorized
+<p>To access OVH&rsquo;s LDP API, you need to register Ralph as an authorized
 application and generate an application key, an application secret and a
 consumer key.</p>
 <p>While filling the registration form available at:
@@ -843,7 +843,7 @@ it can also be used to fetch indexed data from it.</p>
 <ul>
 <li><code>hosts</code>: a list of cluster hosts to connect to (<em>e.g.</em> <code>["http://elasticsearch-node:9200"]</code>)</li>
 <li><code>index</code>: the elasticsearch index where to get/put documents</li>
-<li><code>client_options</code>: all options from the offical client are supported and can
+<li><code>client_options</code>: all options from the official client are supported and can
   be specified as a python <code>dict</code> object (<em>e.g.</em> <code>{'use_ssl': True, 'verify_certs': True}</code>)</li>
 </ul>
 <blockquote>
