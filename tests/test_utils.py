@@ -12,7 +12,7 @@ from .fixtures.backends import NamedClassEnum
 
 
 def test_import_string():
-    """Test import_string utility taken from Django utilities"""
+    """Test import_string utility taken from Django utilities."""
 
     with pytest.raises(ImportError, match="foo doesn't look like a module path"):
         ralph_utils.import_string("foo")
@@ -27,10 +27,10 @@ def test_import_string():
 
 
 def test_get_backend_type():
-    """Test get_backend_type utility"""
+    """Test get_backend_type utility."""
 
     class TestBackend:
-        """Dumb test backend that does not inherit from a supported backend type"""
+        """Dumb test backend that does not inherit from a supported backend type."""
 
     assert ralph_utils.get_backend_type(ESDatabase) == BackendTypes.DATABASE
     assert ralph_utils.get_backend_type(LDPStorage) == BackendTypes.STORAGE
@@ -38,7 +38,7 @@ def test_get_backend_type():
 
 
 def test_get_class_names():
-    """Test get_class_names utility"""
+    """Test get_class_names utility."""
 
     assert ralph_utils.get_class_names([module.value for module in NamedClassEnum]) == [
         "A",
@@ -47,7 +47,7 @@ def test_get_class_names():
 
 
 def test_get_class_from_name():
-    """Test get_class_from_name utility"""
+    """Test get_class_from_name utility."""
 
     assert (
         ralph_utils.get_class_from_name(
@@ -71,10 +71,10 @@ def test_get_class_from_name():
 
 
 def test_get_instance_from_class():
-    """Test get_instance_from_class utility"""
+    """Test get_instance_from_class utility."""
 
     class NamedTestClass:
-        """Named test class"""
+        """Named test class."""
 
         name = "test"
 

@@ -39,12 +39,12 @@ BACKENDS = (lambda: DATABASE_BACKENDS + STORAGE_BACKENDS)()
 
 
 class CommaSeparatedKeyValueParamType(click.ParamType):
-    """Comma separated key=value parameter type"""
+    """Comma separated key=value parameter type."""
 
     name = "key=value,key=value"
 
     def convert(self, value, param, ctx):
-        """Split value by comma and equal sign to return a dict build with key/value pairs"""
+        """Split value by comma and equal sign to return a dict build with key/value pairs."""
 
         # Parse options string
         try:
@@ -82,7 +82,7 @@ class CommaSeparatedKeyValueParamType(click.ParamType):
     help="Either CRITICAL, ERROR, WARNING, INFO (default) or DEBUG",
 )
 def cli(verbosity=None):
-    """Ralph is a stream-based tool to play with your logs"""
+    """Ralph is a stream-based tool to play with your logs."""
 
     configure_logging()
     if verbosity is not None:
@@ -93,7 +93,7 @@ def cli(verbosity=None):
 
 
 def backends_options(name=None, backends=None):
-    """Backend-related options decorator for Ralph commands"""
+    """Backend-related options decorator for Ralph commands."""
 
     backend_names = get_class_names(backends)
 
@@ -161,7 +161,7 @@ def backends_options(name=None, backends=None):
     help="Parse events by chunks of size #",
 )
 def extract(parser, chunksize):
-    """Extract input events from a container format using a dedicated parser"""
+    """Extract input events from a container format using a dedicated parser."""
 
     logger.info(
         "Extracting events using the %s parser (chunk size: %d)", parser, chunksize
@@ -183,7 +183,7 @@ def extract(parser, chunksize):
     help="Get events by chunks of size #",
 )
 def fetch(backend, archive, chunk_size, **options):
-    """Fetch an archive or records from a configured backend"""
+    """Fetch an archive or records from a configured backend."""
 
     logger.info(
         "Fetching data from the configured %s backend (archive: %s | chunk size: %s)",
@@ -231,7 +231,7 @@ def fetch(backend, archive, chunk_size, **options):
     help="Continue writing regardless of raised errors",
 )
 def push(backend, archive, chunk_size, force, ignore_errors, **options):
-    """Push an archive to a configured backend"""
+    """Push an archive to a configured backend."""
 
     logger.info("Pushing archive %s to the configured %s backend", archive, backend)
     logger.debug("Backend parameters: %s", options)
@@ -264,7 +264,7 @@ def push(backend, archive, chunk_size, force, ignore_errors, **options):
     help="Get archives detailed output (JSON)",
 )
 def list_(details, new, backend, **options):
-    """List available archives from a configured storage backend"""
+    """List available archives from a configured storage backend."""
 
     logger.info("Listing archives for the configured %s backend", backend)
     logger.debug("Fetch details: %s", str(details))

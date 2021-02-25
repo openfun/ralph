@@ -4,15 +4,15 @@ Ralph exceptions.
 
 
 class BackendException(Exception):
-    """Raised when a backend has a failure"""
+    """Raised when a backend has a failure."""
 
 
 class BackendParameterException(Exception):
-    """Raised when a backend parameter value is not valid"""
+    """Raised when a backend parameter value is not valid."""
 
 
 class ConfigurationException(Exception):
-    """Raised when the configuration is not valid"""
+    """Raised when the configuration is not valid."""
 
 
 class EventKeyError(Exception):
@@ -20,4 +20,4 @@ class EventKeyError(Exception):
 
 
 class UnsupportedBackendException(Exception):
-    """Raised when trying to use an unsupported backend type"""
+    """Raised when trying to use an unsupported backend type."""

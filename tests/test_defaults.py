@@ -13,7 +13,7 @@ from ralph.exceptions import ConfigurationException
 
 # pylint: disable=invalid-name, unused-argument
 def test_config_default(fs, monkeypatch):
-    """Test that when no value is given, the default parameter is chosen"""
+    """Test that when no value is given, the default parameter is chosen."""
 
     assert environ.get("RALPH_HISTORY_FILE", None) is None
     assert config("RALPH_HISTORY_FILE", "history_default") == "history_default"
@@ -22,7 +22,7 @@ def test_config_default(fs, monkeypatch):
 # pylint: disable=invalid-name, unused-argument
 def test_config_file(fs, monkeypatch):
     """Test that when the environment and command-line arguments don't specify a
-    value, the value from the config file is taken instead"""
+    value, the value from the config file is taken instead."""
 
     config_mock = {"RALPH_HISTORY_FILE": "history_config_file"}
 
@@ -35,7 +35,7 @@ def test_config_file(fs, monkeypatch):
 # pylint: disable=invalid-name, unused-argument
 def test_config_env(fs, monkeypatch):
     """Test that when the environment specifies a value, it is chosen instead of
-    the configuration file's value"""
+    the configuration file's value."""
 
     config_mock = {"RALPH_HISTORY_FILE": "history_config_file"}
 
@@ -48,7 +48,7 @@ def test_config_env(fs, monkeypatch):
 # pylint: disable=invalid-name, unused-argument
 def test_load_config_no_config(fs, monkeypatch):
     """Test that loading when no configuration file is available results in
-    load_config returning None"""
+    load_config returning None."""
 
     config_path = APP_DIR / "config.yml"
 
@@ -57,7 +57,7 @@ def test_load_config_no_config(fs, monkeypatch):
 
 # pylint: disable=invalid-name, unused-argument
 def test_load_config_correct_config(fs, monkeypatch):
-    """Test that loading a correct configuration file works as intended"""
+    """Test that loading a correct configuration file works as intended."""
 
     config_path = APP_DIR / "config.yml"
 
@@ -69,7 +69,7 @@ def test_load_config_correct_config(fs, monkeypatch):
 # pylint: disable=invalid-name, unused-argument
 def test_load_config_incorrect_config(fs, monkeypatch):
     """Test that loading an incorrect configuration file raises a configuration
-    exception"""
+    exception."""
 
     config_path = APP_DIR / "config.yml"
 

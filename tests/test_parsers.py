@@ -63,7 +63,7 @@ def test_gelfparser_parse_gzipped_file(fs, gelf_logger):
 
 
 def test_gelfparser_parse_partially_invalid_file(caplog):
-    """Test the GELFParser with a file containing invalid JSON strings"""
+    """Test the GELFParser with a file containing invalid JSON strings."""
 
     with StringIO() as file:
         file.writelines(

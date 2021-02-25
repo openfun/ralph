@@ -8,11 +8,11 @@ def anonymous(event):
     """Remove anonymous events.
 
     Args:
-        event (dict): event to filter
+        event (dict): Event to filter.
 
     Returns:
-        event (dict): when event is not anonymous
-        None: otherwise
+        event (dict): When event is not anonymous.
+        None: Otherwise.
 
     Raises:
         EventKeyError: When the event does not contain the `username` key.
