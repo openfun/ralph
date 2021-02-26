@@ -8,12 +8,13 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.2.0] - 2021-02-26
+
 ### Added
 
 - EdX server event pydantic model and factory
 - EdX page_close browser event pydantic model and factory
-- Ralph tray now allows to specify a self-generated elasticsearch cluster CA
-  certificate
+- Tray: allow to specify a self-generated elasticsearch cluster CA certificate
 
 ### Fixed
 
@@ -56,6 +57,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Add optional sentry integration
 - Distribute Arnold's tray to deploy Ralph in a k8s cluster as cronjobs
 
-[unreleased]: https://github.com/openfun/ralph/compare/v1.1.0...master
+[unreleased]: https://github.com/openfun/ralph/compare/v1.2.0...master
+[1.2.0]: https://github.com/openfun/ralph/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/openfun/ralph/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/openfun/ralph/compare/3d03d85...v1.0.0
