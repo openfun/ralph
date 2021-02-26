@@ -8,6 +8,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- Tray: remove `version` immutable field in DC selector
+
 ## [1.2.0] - 2021-02-26
 
 ### Added

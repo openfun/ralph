@@ -4,7 +4,6 @@ metadata:
   labels:
     app: ralph
     service: app
-    version: "{{ ralph_image_tag }}"
   name: "ralph-app"
   namespace: "{{ project_name }}"
 spec:
@@ -14,7 +13,6 @@ spec:
       labels:
         app: ralph
         service: app
-        version: "{{ ralph_image_tag }}"
         deploymentconfig: "ralph-app"
     spec:
       # Prefer running pods on different nodes for redundancy
