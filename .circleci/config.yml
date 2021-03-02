@@ -405,8 +405,26 @@ jobs:
               docker push fundocker/ralph:latest
             fi
 
+
+  # ---- Documentation jobs ----
+  build-docs:
+    docker:
+      - image: circleci/python:3.9-buster
+        auth:
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
+    working_directory: ~/fun
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ .Revision }}
+      - run:
+          name: Build documentation
+          command: ~/.local/bin/mkdocs build
+
   # Deploy the docs website to GitHub pages.
-  docs:
+  deploy-docs:
     docker:
       - image: circleci/python:3.9-buster
         auth:
@@ -483,11 +501,23 @@ workflows:
             tags:
               only: /.*/
 
+      # Docs
+      #
+      # Test documentation build
+      - build-docs:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /.*/
+
       # Tray
       #
       # Deploy ralph in a k8s cluster using arnold
       - tray:
           requires:
+            - build-docs
+            - lint
             - test
           filters:
             tags:
@@ -498,6 +528,8 @@ workflows:
       # Build the python package
       - package:
           requires:
+            - build-docs
+            - lint
             - test
           filters:
             tags:
@@ -511,7 +543,6 @@ workflows:
       - hub:
           requires:
             - build-docker
-            - test
             - tray
           filters:
             branches:
@@ -535,7 +566,7 @@ workflows:
       # Publish the documentation website to GitHub Pages.
       # Only do it for master as tagged releases are supposed to tag their own version of the
       # documentation in the release commit on master before they go out.
-      - docs:
+      - deploy-docs:
           requires:
             - tray
             - package
