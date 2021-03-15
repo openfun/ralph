@@ -8,6 +8,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade `python-swiftclient` to `3.11.1`
+
 ### Fixed
 
 - Tray: remove `version` immutable field in DC selector
@@ -40,8 +44,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-- Upgrade pyyaml to 5.4.1
-- Upgrade pandas to 1.2.1
+- Upgrade `pyyaml` to `5.4.1`
+- Upgrade `pandas` to `1.2.1`
 
 ### Removed
 
