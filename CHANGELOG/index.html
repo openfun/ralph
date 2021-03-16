@@ -15,8 +15,8 @@
       
         <link rel="canonical" href="https://openfun.github.io/ralph/CHANGELOG/">
       
-      <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.5">
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.6">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.77f3fd56.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.2c0c5eaf.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.7fa14f5b.min.css">
@@ -75,11 +75,9 @@
       
     </div>
     
-      
-
-<header class="md-header" data-md-component="header">
+      <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="https://openfun.github.io/ralph/" title="Ralph" class="md-header__button md-logo" aria-label="Ralph">
+    <a href=".." title="Ralph" class="md-header__button md-logo" aria-label="Ralph" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -171,11 +169,9 @@
                     
 
 
-
-
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="https://openfun.github.io/ralph/" title="Ralph" class="md-nav__button md-logo" aria-label="Ralph">
+    <a href=".." title="Ralph" class="md-nav__button md-logo" aria-label="Ralph" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -458,6 +454,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#changed" class="md-nav__link">
+    Changed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#fixed" class="md-nav__link">
     Fixed
   </a>
@@ -519,7 +522,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#changed" class="md-nav__link">
+  <a href="#changed_1" class="md-nav__link">
     Changed
   </a>
   
@@ -616,6 +619,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#changed" class="md-nav__link">
+    Changed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#fixed" class="md-nav__link">
     Fixed
   </a>
@@ -677,7 +687,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#changed" class="md-nav__link">
+  <a href="#changed_1" class="md-nav__link">
     Changed
   </a>
   
@@ -738,6 +748,10 @@
 and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic
 Versioning</a>.</p>
 <h2 id="unreleased"><a href="https://github.com/openfun/ralph/compare/v1.2.0...master">Unreleased</a><a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Upgrade <code>python-swiftclient</code> to <code>3.11.1</code></li>
+</ul>
 <h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Tray: remove <code>version</code> immutable field in DC selector</li>
@@ -766,10 +780,10 @@ Versioning</a>.</p>
   errors</li>
 <li>The elasticsearch backend now accepts passing all supported client options</li>
 </ul>
-<h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
+<h3 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Upgrade pyyaml to 5.4.1</li>
-<li>Upgrade pandas to 1.2.1</li>
+<li>Upgrade <code>pyyaml</code> to <code>5.4.1</code></li>
+<li>Upgrade <code>pandas</code> to <code>1.2.1</code></li>
 </ul>
 <h3 id="removed_1">Removed<a class="headerlink" href="#removed_1" title="Permanent link">&para;</a></h3>
 <ul>
@@ -862,7 +876,7 @@ Versioning</a>.</p>
     <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.5cf3e710.min.js"></script>
+      <script src="../assets/javascripts/bundle.a1c7c35e.min.js"></script>
       
     
   </body>
