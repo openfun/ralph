@@ -8,6 +8,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Model selector to retrieve associated pydantic model of a given event
+
 ### Changed
 
 - Upgrade `python-swiftclient` to `3.11.1`

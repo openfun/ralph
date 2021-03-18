@@ -94,3 +94,27 @@ def test_get_instance_from_class():
     )
     assert test.force
     assert test.verbose == 2
+
+
+@pytest.mark.parametrize("path,value", [(["foo", "bar"], "bar_value")])
+def test_get_dict_value_from_path_should_return_given_value(path, value):
+    """The get_dict_value_from_path function should return the value when it's present."""
+
+    dictionary = {"foo": {"bar": "bar_value"}}
+    assert ralph_utils.get_dict_value_from_path(dictionary, path) == value
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        ["foo", "bar", "baz", "qux"],
+        ["foo", "not_bar"],
+        ["not_foo", "bar"],
+        None,
+    ],
+)
+def test_get_dict_value_from_path_should_return_none_when_value_does_not_exists(path):
+    """The get_dict_value_from_path function should return None if the value is not found."""
+
+    dictionary = {"foo": {"bar": "bar_value"}}
+    assert ralph_utils.get_dict_value_from_path(dictionary, path) is None

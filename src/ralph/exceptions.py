@@ -21,3 +21,7 @@ class EventKeyError(Exception):
 
 class UnsupportedBackendException(Exception):
     """Raised when trying to use an unsupported backend type."""
+
+
+class ModelRulesException(Exception):
+    """Raised when a model rules list is a subset or superset of another model rules list"""
