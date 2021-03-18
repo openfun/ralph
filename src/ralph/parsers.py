@@ -6,8 +6,6 @@ import json
 import logging
 from abc import ABC, abstractmethod
 
-from .defaults import DEFAULT_GELF_PARSER_CHUNCK_SIZE
-
 logger = logging.getLogger(__name__)
 
 
@@ -17,12 +15,11 @@ class BaseParser(ABC):
     name = "base"
 
     @abstractmethod
-    def parse(self, input_file, chunksize=1):
-        """Parse GELF formatted logs (one json string event per row).
+    def parse(self, input_file):
+        """Parses GELF formatted logs (one JSON string event per row).
 
         Args:
             input_file (string): Path to the log file to parse.
-            chunksize (int): The amount of log records to process at a time.
 
         Yields:
             event: raw event as extracted from its container
@@ -39,16 +36,11 @@ class GELFParser(BaseParser):
 
     name = "gelf"
 
-    def parse(self, input_file, chunksize=DEFAULT_GELF_PARSER_CHUNCK_SIZE):
-        """Parse GELF formatted logs (one json string event per row).
+    def parse(self, input_file):
+        """Parses GELF formatted logs (one JSON string event per row).
 
         Args:
-            input_file (string): Path to the log file to parse (could be
-                gunzipped).
-            chunksize (int): The amount of log records to process at a time. A
-                value between 3.000 and 10.000 seems to be a reasonnable choice
-                to parse 1.5M records in a few minutes (typically 2 or 3
-                minutes on a modern computer).
+            input_file (string): Path to the log file to parse (could be gunzipped).
 
         Yields:
             event: events raw short_message string
