@@ -20,7 +20,7 @@ class BaseContextModel(BaseModelWithConfig):
     """Represents the base context model inherited by all event contexts.
 
     Attributes:
-        course_user_tags (dict of str: str): Content from `user_api_usercoursetag` table.
+        course_user_tags (dict of str): Content from `user_api_usercoursetag` table.
             Retrieved with:
                 `dict(
                     UserCourseTag.objects.filter(
@@ -122,7 +122,7 @@ class BaseEventModel(BaseModelWithConfig):
         event_source (str): Consists of the value `server`.
             Note:
                 Specifies the source of the interaction that triggered the event.
-        context (BaseContextModel): see BaseContestModel.
+        context (BaseContextModel): see BaseContextModel.
         time (datetime): Consists of the UTC time in ISO format at which the event was emitted.
             Retrieved with:
                 `datetime.datetime.utcnow()`

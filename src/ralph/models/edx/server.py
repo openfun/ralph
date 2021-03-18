@@ -4,6 +4,8 @@ from pathlib import Path
 
 from pydantic import Json, root_validator
 
+from ralph.models.selector import LazyModelField, selector
+
 from .base import BaseEventModel, BaseModelWithConfig
 
 
@@ -32,6 +34,10 @@ class ServerEventModel(BaseEventModel):
                 'old_password', 'new_password1', 'new_password2'] are replaced by `********`.
                 The JSON string is truncated at 512 characters resulting in invalid JSON.
     """
+
+    __selector__ = selector(
+        event_source="server", event_type=LazyModelField("context__path")
+    )
 
     event_type: Path
     event: Json[ServerEventField]  # pylint: disable=unsubscriptable-object

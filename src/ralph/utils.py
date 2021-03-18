@@ -2,6 +2,8 @@
 
 import datetime
 import logging
+import operator
+from functools import reduce
 from importlib import import_module
 
 from ralph.backends import BackendTypes
@@ -84,3 +86,14 @@ def now():
     """Return the current UTC time in ISO format"""
 
     return datetime.datetime.now(tz=datetime.timezone.utc).isoformat()
+
+
+def get_dict_value_from_path(dict_: dict, path: list[str]):
+    """Gets a nested dictionary value using an array of keys representing the path to the value."""
+
+    if path is None:
+        return None
+    try:
+        return reduce(operator.getitem, path, dict_)
+    except (KeyError, TypeError):
+        return None

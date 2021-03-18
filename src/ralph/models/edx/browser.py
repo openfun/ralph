@@ -5,6 +5,8 @@ from typing import Literal, Union
 
 from pydantic import AnyUrl, constr
 
+from ralph.models.selector import selector
+
 from .base import BaseEventModel
 
 
@@ -38,6 +40,8 @@ class PageCloseBrowserEventModel(BaseBrowserEventModel):
         event_type (str): Consists of the value `page_close`
         event (str): Consists of the string value `{}`
     """
+
+    __selector__ = selector(event_source="browser", event_type="page_close")
 
     # pylint: disable=unsubscriptable-object
     name: Literal["page_close"]
