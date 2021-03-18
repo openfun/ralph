@@ -12,7 +12,6 @@ from click_option_group import optgroup
 from ralph.backends import BackendTypes
 from ralph.defaults import (
     DEFAULT_BACKEND_CHUNCK_SIZE,
-    DEFAULT_GELF_PARSER_CHUNCK_SIZE,
     ENVVAR_PREFIX,
     DatabaseBackends,
     Parsers,
@@ -153,23 +152,14 @@ def backends_options(name=None, backends=None):
     required=True,
     help="Container format parser used to extract events",
 )
-@click.option(
-    "-c",
-    "--chunksize",
-    type=int,
-    default=DEFAULT_GELF_PARSER_CHUNCK_SIZE,
-    help="Parse events by chunks of size #",
-)
-def extract(parser, chunksize):
+def extract(parser):
     """Extract input events from a container format using a dedicated parser."""
 
-    logger.info(
-        "Extracting events using the %s parser (chunk size: %d)", parser, chunksize
-    )
+    logger.info("Extracting events using the %s parser", parser)
 
     parser = get_class_from_name(parser, PARSERS)()
 
-    for event in parser.parse(sys.stdin, chunksize=chunksize):
+    for event in parser.parse(sys.stdin):
         click.echo(event)
 
 

@@ -103,9 +103,8 @@ def test_cli_extract_command_usage():
     assert result.exit_code == 0
     assert (
         "Options:\n"
-        "  -p, --parser [gelf]      Container format parser used to extract events\n"
-        "                           [required]\n\n"
-        "  -c, --chunksize INTEGER  Parse events by chunks of size #\n"
+        "  -p, --parser [gelf]  Container format parser used to extract events\n"
+        "                       [required]\n"
     ) in result.output
 
     result = runner.invoke(cli, ["extract"])
