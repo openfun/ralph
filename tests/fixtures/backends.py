@@ -36,7 +36,7 @@ class NamedClassEnum(Enum):
 
 @pytest.fixture
 def es():
-    """Create / delete an ElasticSearch test index and yield an instantiated client."""
+    """Creates / deletes an ElasticSearch test index and yields an instantiated client."""
     # pylint: disable=invalid-name
 
     client = Elasticsearch(ES_TEST_HOSTS)
@@ -51,6 +51,7 @@ def swift():
 
     def get_swift_storage():
         """Returns an instance of SwiftStorage."""
+
         return SwiftStorage(
             os_tenant_id="os_tenant_id",
             os_tenant_name="os_tenant_name",

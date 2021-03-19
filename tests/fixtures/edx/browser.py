@@ -6,7 +6,7 @@ from .base import FAKE, BaseEventFactory
 
 
 class BaseBrowserEventFactory(BaseEventFactory):
-    """Base browser event factory inherited by all browser event factories"""
+    """Base browser event factory inherited by all browser event factories."""
 
     class Meta:  # pylint: disable=missing-class-docstring
         model = BaseBrowserEventModel
@@ -17,7 +17,7 @@ class BaseBrowserEventFactory(BaseEventFactory):
 
 
 class PageCloseBrowserEventFactory(BaseBrowserEventFactory):
-    """Factory for the PageCloseBrowserEventModel"""
+    """Factory for the PageCloseBrowserEventModel."""
 
     class Meta:  # pylint: disable=missing-class-docstring
         model = PageCloseBrowserEventModel

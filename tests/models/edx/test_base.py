@@ -26,7 +26,7 @@ from tests.fixtures.edx.server import BaseEventFactory
     ],
 )
 def test_models_edx_base_event_with_valid_content(kwargs):
-    """Test that a valid base event does not raise a ValidationError."""
+    """Tests that a valid base event does not raise a ValidationError."""
 
     try:
         BaseEventFactory(**kwargs)
@@ -78,7 +78,7 @@ def test_models_edx_base_event_with_valid_content(kwargs):
     ],
 )
 def test_models_edx_base_event_with_invalid_content(kwargs, error):
-    """Test that an invalid base event raises a ValidationError."""
+    """Tests that an invalid base event raises a ValidationError."""
 
     with pytest.raises(ValidationError, match=error):
         BaseEventFactory(**kwargs)

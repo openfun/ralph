@@ -20,8 +20,8 @@ from ralph.defaults import APP_DIR, HISTORY_FILE
 from ralph.exceptions import BackendParameterException
 
 
-def test_ldp_storage_instantiation():
-    """Test the LDPStorage backend instantiation"""
+def test_backends_storage_ldp_storage_instantiation():
+    """Tests the LDPStorage backend instantiation."""
     # pylint: disable=protected-access
 
     assert LDPStorage.name == "ldp"
@@ -42,8 +42,8 @@ def test_ldp_storage_instantiation():
     assert isinstance(storage.client, ovh.Client)
 
 
-def test_archive_endpoint_property():
-    """Test the LDPStorage _archive_endpoint property"""
+def test_backends_storage_ldp_archive_endpoint_property():
+    """Tests the LDPStorage _archive_endpoint property."""
     # pylint: disable=protected-access, pointless-statement
 
     storage = LDPStorage(
@@ -81,12 +81,12 @@ def test_archive_endpoint_property():
         storage._archive_endpoint
 
 
-def test_details_method(monkeypatch):
-    """Test the LDPStorage _details method"""
+def test_backends_storage_ldp_details_method(monkeypatch):
+    """Tests the LDPStorage _details method."""
     # pylint: disable=protected-access
 
     def mock_get(url):
-        """Mock OVH client get request"""
+        """Mocks the OVH client get request."""
 
         name = PurePath(urlparse(url).path).name
         return {
@@ -116,11 +116,11 @@ def test_details_method(monkeypatch):
     assert details.get("archiveId") == "5d49d1b3-a3eb-498c-9039-6a482166f888"
 
 
-def test_url_method(monkeypatch):
-    """Test the LDPStorage url method"""
+def test_backends_storage_ldp_url_method(monkeypatch):
+    """Tests the LDPStorage url method."""
 
     def mock_post(url):
-        """Mock OVH Client post request"""
+        """Mocks the OVH Client post request."""
         # pylint: disable=unused-argument
         return {
             "expirationDate": "2020-10-13T12:59:37.326131+00:00",
@@ -156,11 +156,11 @@ def test_url_method(monkeypatch):
     )
 
 
-def test_list_method(monkeypatch):
-    """Test the LDPStorage list method with a blank history"""
+def test_backends_storage_ldp_list_method(monkeypatch):
+    """Tests the LDPStorage list method with a blank history."""
 
     def mock_list(url):
-        """Mock OVH client list stream archives get request"""
+        """Mocks OVH client list stream archives get request."""
         # pylint: disable=unused-argument
         return [
             "5d5c4c93-04a4-42c5-9860-f51fa4044aa1",
@@ -193,12 +193,12 @@ def test_list_method(monkeypatch):
     ]
 
 
-def test_list_method_history_management(monkeypatch, fs):
-    """Test the LDPStorage list method with an history"""
+def test_backends_storage_ldp_list_method_history_management(monkeypatch, fs):
+    """Tests the LDPStorage list method with an history."""
     # pylint: disable=invalid-name
 
     def mock_list(url):
-        """Mock OVH client list stream archives get request"""
+        """Mocks the OVH client list stream archives get request."""
         # pylint: disable=unused-argument
         return [
             "5d5c4c93-04a4-42c5-9860-f51fa4044aa1",
@@ -263,8 +263,8 @@ def test_list_method_history_management(monkeypatch, fs):
     )
 
 
-def test_list_method_with_details(monkeypatch):
-    """Test the LDPStorage list method with detailed output"""
+def test_backends_storage_ldp_list_method_with_details(monkeypatch):
+    """Tests the LDPStorage list method with detailed output."""
 
     details_responses = [
         {
@@ -291,7 +291,7 @@ def test_list_method_with_details(monkeypatch):
     get_details_response = (response for response in details_responses)
 
     def mock_get(url):
-        """Mock OVH client get requests"""
+        """Mocks OVH client get requests."""
 
         # list request
         if url.endswith("archive"):
@@ -319,8 +319,8 @@ def test_list_method_with_details(monkeypatch):
     assert list(archives) == details_responses
 
 
-def test_read_method(monkeypatch, fs):
-    """Test the LDPStorage read method with detailed output"""
+def test_backends_storage_ldp_read_method(monkeypatch, fs):
+    """Tests the LDPStorage read method with detailed output."""
     # pylint: disable=invalid-name
 
     # Create fake archive to stream
@@ -330,7 +330,7 @@ def test_read_method(monkeypatch, fs):
         archive_file.write(bytes(json.dumps(archive_content), encoding="utf-8"))
 
     def mock_ovh_post(url):
-        """Mock OVH Client post request"""
+        """Mocks the OVH Client post request."""
         # pylint: disable=unused-argument
 
         return {
@@ -346,7 +346,7 @@ def test_read_method(monkeypatch, fs):
         }
 
     def mock_ovh_get(url):
-        """Mock OVH client get requests"""
+        """Mocks the OVH client get requests."""
         # pylint: disable=unused-argument
 
         return {
@@ -361,7 +361,7 @@ def test_read_method(monkeypatch, fs):
         }
 
     class MockRequestsResponse:
-        """A basic mock for a requests response"""
+        """A basic mock for a requests response."""
 
         def __enter__(self):
             return self
@@ -370,7 +370,7 @@ def test_read_method(monkeypatch, fs):
             pass
 
         def iter_content(self, chunk_size):
-            """Fake content file iteration"""
+            """Fakes content file iteration."""
             # pylint: disable=no-self-use
 
             with archive_path.open("rb") as archive:
@@ -378,10 +378,10 @@ def test_read_method(monkeypatch, fs):
                     yield chunk
 
         def raise_for_status(self):
-            """Do nothing for now"""
+            """Does nothing for now."""
 
     def mock_requests_get(url, stream=True):
-        """Mock requests get requests"""
+        """Mocks the requests get method."""
         # pylint: disable=unused-argument
 
         return MockRequestsResponse()
@@ -390,18 +390,18 @@ def test_read_method(monkeypatch, fs):
     freezed_now = datetime.datetime.now(tz=datetime.timezone.utc)
 
     class MockDatetime:
-        """A mock class for a fixed datetime.now() value"""
+        """A mock class for a fixed datetime.now() value."""
 
         @classmethod
         def now(cls, **kwargs):
-            """Always return the same testable now value"""
+            """Always returns the same testable now value."""
             # pylint: disable=unused-argument
 
             return freezed_now
 
     # Mock stdout stream
     class MockStdout:
-        """A simple mock for sys.stdout.buffer"""
+        """A simple mock for sys.stdout.buffer."""
 
         buffer = BytesIO()
 
@@ -445,8 +445,8 @@ def test_read_method(monkeypatch, fs):
         assert json.loads(output.read()) == archive_content
 
 
-def test_write_method_with_details():
-    """Test the LDPStorage write method"""
+def test_backends_storage_ldp_write_method_with_details():
+    """Tests the LDPStorage write method."""
 
     storage = LDPStorage(
         endpoint="ovh-eu",

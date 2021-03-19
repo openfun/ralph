@@ -11,8 +11,8 @@ from ralph.backends.storage.ldp import LDPStorage
 from .fixtures.backends import NamedClassEnum
 
 
-def test_import_string():
-    """Test import_string utility taken from Django utilities."""
+def test_utils_import_string():
+    """Tests import_string utility taken from Django utilities."""
 
     with pytest.raises(ImportError, match="foo doesn't look like a module path"):
         ralph_utils.import_string("foo")
@@ -26,8 +26,8 @@ def test_import_string():
     assert http_status.OK == 200
 
 
-def test_get_backend_type():
-    """Test get_backend_type utility."""
+def test_utils_get_backend_type():
+    """Tests get_backend_type utility."""
 
     class TestBackend:
         """Dumb test backend that does not inherit from a supported backend type."""
@@ -37,8 +37,8 @@ def test_get_backend_type():
     assert ralph_utils.get_backend_type(TestBackend) is None
 
 
-def test_get_class_names():
-    """Test get_class_names utility."""
+def test_utils_get_class_names():
+    """Tests get_class_names utility."""
 
     assert ralph_utils.get_class_names([module.value for module in NamedClassEnum]) == [
         "A",
@@ -46,8 +46,8 @@ def test_get_class_names():
     ]
 
 
-def test_get_class_from_name():
-    """Test get_class_from_name utility."""
+def test_utils_get_class_from_name():
+    """Tests get_class_from_name utility."""
 
     assert (
         ralph_utils.get_class_from_name(
@@ -70,8 +70,8 @@ def test_get_class_from_name():
         )
 
 
-def test_get_instance_from_class():
-    """Test get_instance_from_class utility."""
+def test_utils_get_instance_from_class():
+    """Tests get_instance_from_class utility."""
 
     class NamedTestClass:
         """Named test class."""
@@ -97,7 +97,7 @@ def test_get_instance_from_class():
 
 
 @pytest.mark.parametrize("path,value", [(["foo", "bar"], "bar_value")])
-def test_get_dict_value_from_path_should_return_given_value(path, value):
+def test_utils_get_dict_value_from_path_should_return_given_value(path, value):
     """The get_dict_value_from_path function should return the value when it's present."""
 
     dictionary = {"foo": {"bar": "bar_value"}}
@@ -113,7 +113,9 @@ def test_get_dict_value_from_path_should_return_given_value(path, value):
         None,
     ],
 )
-def test_get_dict_value_from_path_should_return_none_when_value_does_not_exists(path):
+def test_utils_get_dict_value_from_path_should_return_none_when_value_does_not_exists(
+    path,
+):
     """The get_dict_value_from_path function should return None if the value is not found."""
 
     dictionary = {"foo": {"bar": "bar_value"}}

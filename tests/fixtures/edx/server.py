@@ -8,7 +8,7 @@ from .base import BaseEventFactory
 
 
 class ServerEventFactory(BaseEventFactory):
-    """Factory for the ServerEventModel"""
+    """Factory for the ServerEventModel."""
 
     class Meta:  # pylint: disable=missing-class-docstring
         model = ServerEventModel

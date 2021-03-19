@@ -1,6 +1,4 @@
-"""
-Tests for the ralph.filters module
-"""
+"""Tests for the ralph.filters module"""
 
 import pytest
 
@@ -8,8 +6,8 @@ from ralph import filters
 from ralph.exceptions import EventKeyError
 
 
-def test_anonymous_with_empty_events():
-    """Test the anonymous filter when input dict has not the expected
+def test_filters_anonymous_with_empty_events():
+    """Tests the anonymous filter when input dict has not the expected
     'username' key.
     """
 
@@ -18,8 +16,8 @@ def test_anonymous_with_empty_events():
         filters.anonymous(event)
 
 
-def test_anonymous_filtering():
-    """Test anonymous filtering reliability."""
+def test_filters_anonymous_filtering():
+    """Tests anonymous filtering reliability."""
 
     event = {"username": "john"}
     anonymous_event = {"username": ""}
