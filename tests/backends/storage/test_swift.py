@@ -11,10 +11,10 @@ from ralph.defaults import HISTORY_FILE
 from ralph.exceptions import BackendException, BackendParameterException
 
 
-def test_swift_storage_instantiation_failure_should_raise_exception(
+def test_backends_storage_swift_storage_instantiation_failure_should_raise_exception(
     monkeypatch, swift, caplog
 ):
-    """Check that SwiftStorage raises BackendParameterException on failure"""
+    """Checks that SwiftStorage raises BackendParameterException on failure."""
 
     error = "Unauthorized. Check username/id"
 
@@ -31,8 +31,10 @@ def test_swift_storage_instantiation_failure_should_raise_exception(
     assert caplog.record_tuples == [(logger_name, logging.ERROR, msg)]
 
 
-def test_swift_storage_instantiation_should_not_raise_exception(monkeypatch, swift):
-    """Check that SwiftStorage don't raise exceptions when the connection is successful"""
+def test_backends_storage_swift_storage_instantiation_should_not_raise_exception(
+    monkeypatch, swift
+):
+    """Checks that SwiftStorage doesn't raise exceptions when the connection is successful."""
 
     def mock_successful_stat(*args, **kwargs):  # pylint:disable=unused-argument
         return {"success": True}
@@ -45,11 +47,11 @@ def test_swift_storage_instantiation_should_not_raise_exception(monkeypatch, swi
 
 
 @pytest.mark.parametrize("pages_count", [1, 2])
-def test_swift_list_should_yield_archive_names(
+def test_backends_storage_swift_list_should_yield_archive_names(
     pages_count, swift, monkeypatch, fs
 ):  # pylint:disable=invalid-name
-    """Given SwiftService.list method successfully connects to the Swift storage
-    The SwiftStorage list method should yield the archives
+    """Tests that given SwiftService.list method successfully connects to the Swift storage,
+    the SwiftStorage list method should yield the archives.
     """
 
     listing = [
@@ -78,11 +80,11 @@ def test_swift_list_should_yield_archive_names(
 
 
 @pytest.mark.parametrize("pages_count", [1, 2])
-def test_swift_list_with_failed_connection_should_log_the_error(
+def test_backends_storage_swift_list_with_failed_connection_should_log_the_error(
     pages_count, swift, monkeypatch, fs, caplog
 ):  # pylint:disable=invalid-name
-    """Given SwiftService.list method fails to retrieve the list of archives
-    The SwiftStorage list method should log the error and raise a BackenException
+    """Tests that given SwiftService.list method fails to retrieve the list of archives,
+    the SwiftStorage list method should log the error and raise a BackendException.
     """
 
     def mock_list_with_pages(*args, **kwargs):  # pylint:disable=unused-argument
@@ -113,12 +115,12 @@ def test_swift_list_with_failed_connection_should_log_the_error(
     assert caplog.record_tuples == [(logger_name, logging.ERROR, msg)] * 3
 
 
-def test_swift_read_with_valid_name_should_write_to_history(
+def test_backends_storage_swift_read_with_valid_name_should_write_to_history(
     swift, monkeypatch, fs
 ):  # pylint:disable=invalid-name
-    """Given SwiftService.download method successfully retrieves from the Swift storage the object
-    with the provided name (the object exists)
-    The SwiftStorage read method should write the entry to the history
+    """Tests that given SwiftService.download method successfully retrieves from the Swift storage
+    the object with the provided name (the object exists),
+    the SwiftStorage read method should write the entry to the history.
     """
 
     def mock_successful_download(*args, **kwargs):  # pylint:disable=unused-argument
@@ -146,13 +148,13 @@ def test_swift_read_with_valid_name_should_write_to_history(
     ]
 
 
-def test_swift_read_with_invalid_name_should_log_the_error_and_not_write_to_history(
+def test_backends_storage_swift_read_with_invalid_name_should_log_the_error(
     swift, monkeypatch, fs, caplog
 ):  # pylint:disable=invalid-name
-    """Given SwiftService.download method fails to retrieve from the Swift storage the object
-    with the provided name (the object does not exists on Swift)
-    The SwiftStorage read method should log the error, not write to history and raise a
-    BackendException
+    """Tests that given SwiftService.download method fails to retrieve from the Swift storage
+    the object with the provided name (the object does not exists on Swift),
+    the SwiftStorage read method should log the error, not write to history and raise a
+    BackendException.
     """
 
     error = "ClientException Object GET failed"
@@ -179,14 +181,14 @@ def test_swift_read_with_invalid_name_should_log_the_error_and_not_write_to_hist
 
 @pytest.mark.parametrize("overwrite", [False, True])
 @pytest.mark.parametrize("new_archive", [False, True])
-def test_swift_write_should_write_to_history_new_or_overwriten_archives(
+def test_backends_storage_swift_write_should_write_to_history_new_or_overwriten_archives(
     overwrite, new_archive, swift, monkeypatch, fs, caplog
 ):  # pylint:disable=invalid-name, too-many-arguments, too-many-locals
-    """Given SwiftService.(list/upload) method successfully connects to the Swift storage
-    The SwiftStorage write method should update the history file when overwrite is True
+    """Tests that given SwiftService list/upload method successfully connects to the Swift storage,
+    the SwiftStorage write method should update the history file when overwrite is True
     or when the name of the archive is not in the history.
     In case overwrite is False and the archive is in the history, the write method should
-    raise a FileExistsError
+    raise a FileExistsError.
     """
 
     history = [
@@ -238,12 +240,12 @@ def test_swift_write_should_write_to_history_new_or_overwriten_archives(
     assert swift.history == history + new_history_entry
 
 
-def test_swift_write_should_log_the_error(
+def test_backends_storage_swift_write_should_log_the_error(
     swift, monkeypatch, fs, caplog
 ):  # pylint:disable=invalid-name
-    """Given SwiftService.upload method fails to write the archive
-    The SwiftStorage write method should log the error, raise a BackendException
-    and not write to history
+    """Tests that given SwiftService.upload method fails to write the archive,
+    the SwiftStorage write method should log the error, raise a BackendException
+    and not write to history.
     """
 
     error = "Unauthorized. Check username/id, password"
@@ -280,8 +282,10 @@ def test_swift_write_should_log_the_error(
     assert swift.history == history
 
 
-def test_url_should_concatenate_the_storage_url_and_name(swift, monkeypatch):
-    """Check the url method returns `os_storage_url/name`"""
+def test_backends_storage_url_should_concatenate_the_storage_url_and_name(
+    swift, monkeypatch
+):
+    """Checks the url method returns `os_storage_url/name`."""
 
     def mock_successful_stat(*args, **kwargs):  # pylint:disable=unused-argument
         return {"success": True}

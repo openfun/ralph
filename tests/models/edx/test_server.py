@@ -16,7 +16,7 @@ from tests.fixtures.edx.server import ServerEventFactory
     ],
 )
 def test_models_edx_server_event_with_valid_content(kwargs):
-    """Test that a valid server event does not raise a ValidationError."""
+    """Tests that a valid server event does not raise a ValidationError."""
 
     try:
         ServerEventFactory(**kwargs)
@@ -43,7 +43,7 @@ def test_models_edx_server_event_with_valid_content(kwargs):
     ],
 )
 def test_models_edx_server_event_with_invalid_content(kwargs, error):
-    """Test that an invalid server event raises a ValidationError."""
+    """Tests that an invalid server event raises a ValidationError."""
 
     with pytest.raises(ValidationError, match=error):
         ServerEventFactory(**kwargs)

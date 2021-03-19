@@ -20,8 +20,8 @@ from tests.fixtures.backends import ES_TEST_HOSTS, ES_TEST_INDEX
 test_logger = logging.getLogger("ralph")
 
 
-def test_comma_separated_key_value_param_type():
-    """Test the CommaSeparatedKeyValueParamType custom parameter type."""
+def test_cli_comma_separated_key_value_param_type():
+    """Tests the CommaSeparatedKeyValueParamType custom parameter type."""
 
     param_type = CommaSeparatedKeyValueParamType()
 
@@ -81,8 +81,8 @@ def test_comma_separated_key_value_param_type():
     }
 
 
-def test_help_option():
-    """Test ralph --help command."""
+def test_cli_help_option():
+    """Tests ralph --help command."""
 
     runner = CliRunner()
     result = runner.invoke(cli, ["--help"])
@@ -94,8 +94,8 @@ def test_help_option():
     )
 
 
-def test_extract_command_usage():
-    """Test ralph extract command usage."""
+def test_cli_extract_command_usage():
+    """Tests ralph extract command usage."""
 
     runner = CliRunner()
     result = runner.invoke(cli, ["extract", "--help"])
@@ -115,8 +115,8 @@ def test_extract_command_usage():
     ) in result.output
 
 
-def test_extract_command_with_gelf_parser(gelf_logger):
-    """Test the extract command using the GELF parser."""
+def test_cli_extract_command_with_gelf_parser(gelf_logger):
+    """Tests the extract command using the GELF parser."""
 
     gelf_logger.info('{"username": "foo"}')
 
@@ -139,16 +139,16 @@ def dummy_verbosity_check():
 
 
 @pytest.mark.parametrize("verbosity", ["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"])
-def test_verbosity_option_should_impact_logging_behaviour(verbosity):
-    """Test that the verbosity option impacts logging output."""
+def test_cli_verbosity_option_should_impact_logging_behaviour(verbosity):
+    """Tests that the verbosity option impacts logging output."""
 
     runner = CliRunner()
     result = runner.invoke(cli, ["-v", verbosity, "dummy-verbosity-check"])
     assert verbosity in result.output
 
 
-def test_fetch_command_usage():
-    """Test ralph fetch command usage."""
+def test_cli_fetch_command_usage():
+    """Tests ralph fetch command usage."""
 
     runner = CliRunner()
     result = runner.invoke(cli, ["fetch", "--help"])
@@ -193,8 +193,8 @@ def test_fetch_command_usage():
     )
 
 
-def test_fetch_command_with_ldp_backend(monkeypatch):
-    """Test the fetch command using the LDP backend."""
+def test_cli_fetch_command_with_ldp_backend(monkeypatch):
+    """Tests the fetch command using the LDP backend."""
 
     archive_content = {"foo": "bar"}
 
@@ -225,8 +225,8 @@ def test_fetch_command_with_ldp_backend(monkeypatch):
 
 # pylint: disable=invalid-name
 # pylint: disable=unused-argument
-def test_fetch_command_with_fs_backend(fs, monkeypatch):
-    """Test the fetch command using the FS backend."""
+def test_cli_fetch_command_with_fs_backend(fs, monkeypatch):
+    """Tests the fetch command using the FS backend."""
 
     archive_content = {"foo": "bar"}
 
@@ -253,8 +253,8 @@ def test_fetch_command_with_fs_backend(fs, monkeypatch):
     assert '{"foo": "bar"}' in result.output
 
 
-def test_fetch_command_with_es_backend(es):
-    """Test ralph fetch command using the es backend."""
+def test_cli_fetch_command_with_es_backend(es):
+    """Tests ralph fetch command using the es backend."""
     # pylint: disable=invalid-name
 
     # Insert documents
@@ -278,8 +278,8 @@ def test_fetch_command_with_es_backend(es):
     assert "\n".join([json.dumps({"id": idx}) for idx in range(10)]) in result.output
 
 
-def test_list_command_usage():
-    """Test ralph list command usage."""
+def test_cli_list_command_usage():
+    """Tests ralph list command usage."""
 
     runner = CliRunner()
     result = runner.invoke(cli, ["list", "--help"])
@@ -320,8 +320,8 @@ def test_list_command_usage():
     )
 
 
-def test_list_command_with_ldp_backend(monkeypatch):
-    """Test the list command using the LDP backend."""
+def test_cli_list_command_with_ldp_backend(monkeypatch):
+    """Tests the list command using the LDP backend."""
 
     archive_list = [
         "5d5c4c93-04a4-42c5-9860-f51fa4044aa1",
@@ -393,8 +393,8 @@ def test_list_command_with_ldp_backend(monkeypatch):
 
 # pylint: disable=invalid-name
 # pylint: disable=unused-argument
-def test_list_command_with_fs_backend(fs, monkeypatch):
-    """Test the list command using the LDP backend."""
+def test_cli_list_command_with_fs_backend(fs, monkeypatch):
+    """Tests the list command using the LDP backend."""
 
     archive_list = [
         "file1",
@@ -455,8 +455,8 @@ def test_list_command_with_fs_backend(fs, monkeypatch):
 
 
 # pylint: disable=invalid-name
-def test_push_command_with_fs_backend(fs):
-    """Test the push command using the FS backend."""
+def test_cli_push_command_with_fs_backend(fs):
+    """Tests the push command using the FS backend."""
 
     fs.create_dir(str(APP_DIR))
 
@@ -520,8 +520,8 @@ def test_push_command_with_fs_backend(fs):
     assert "different content" in content
 
 
-def test_push_command_with_es_backend(es):
-    """Test ralph push command using the es backend."""
+def test_cli_push_command_with_es_backend(es):
+    """Tests ralph push command using the es backend."""
     # pylint: disable=invalid-name
 
     # Documents

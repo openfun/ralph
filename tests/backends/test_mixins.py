@@ -7,8 +7,8 @@ from ralph.backends.mixins import HistoryMixin
 from ralph.defaults import APP_DIR, HISTORY_FILE
 
 
-def test_history_mixin_empty_history(fs):
-    """Test the history method of the HistoryMixin when history is empty"""
+def test_backends_mixins_history_mixin_empty_history(fs):
+    """Tests the history method of the HistoryMixin when history is empty."""
     # pylint: disable=unused-argument, invalid-name, protected-access
 
     history = HistoryMixin()
@@ -32,8 +32,8 @@ def test_history_mixin_empty_history(fs):
     assert history._history == history.history
 
 
-def test_history_mixin_with_history(fs):
-    """Test the history method of the HistoryMixin when history is filled"""
+def test_backends_mixins_history_mixin_with_history(fs):
+    """Tests the history method of the HistoryMixin when history is filled."""
     # pylint: disable=invalid-name
 
     history = HistoryMixin()
@@ -45,8 +45,8 @@ def test_history_mixin_with_history(fs):
     assert history.history == events
 
 
-def test_history_mixin_write_history(fs):
-    """Test the write_history method of the HistoryMixin"""
+def test_backends_mixins_history_mixin_write_history(fs):
+    """Tests the write_history method of the HistoryMixin."""
     # pylint: disable=invalid-name, protected-access
 
     history = HistoryMixin()
@@ -70,8 +70,8 @@ def test_history_mixin_write_history(fs):
     assert history.history == events
 
 
-def test_history_mixin_clean_history(fs):
-    """Test the clean_history method of the HistoryMixin"""
+def test_backends_mixins_history_mixin_clean_history(fs):
+    """Tests the clean_history method of the HistoryMixin."""
     # pylint: disable=invalid-name
 
     history = HistoryMixin()
@@ -94,8 +94,8 @@ def test_history_mixin_clean_history(fs):
     ]
 
 
-def test_history_mixin_append_to_history(fs):
-    """Test the append_to_history method of the HistoryMixin"""
+def test_backends_mixins_history_mixin_append_to_history(fs):
+    """Tests the append_to_history method of the HistoryMixin."""
     # pylint: disable=invalid-name, protected-access
 
     history = HistoryMixin()

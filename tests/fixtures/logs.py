@@ -1,6 +1,5 @@
-"""
-Logs format pytest fixtures.
-"""
+"""Logs format pytest fixtures"""
+
 import logging
 from secrets import token_hex
 from tempfile import NamedTemporaryFile

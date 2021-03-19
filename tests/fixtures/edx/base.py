@@ -12,7 +12,7 @@ FAKE = Faker()
 
 
 class BaseContextFactory(Factory):
-    """Base context factory inherited by all context factories"""
+    """Base context factory inherited by all context factories."""
 
     class Meta:  # pylint: disable=missing-class-docstring
         model = BaseContextModel
@@ -27,7 +27,7 @@ class BaseContextFactory(Factory):
 
 
 class BaseEventFactory(Factory):
-    """Base event factory inherited by all event factories"""
+    """Base event factory inherited by all event factories."""
 
     class Meta:  # pylint: disable=missing-class-docstring
         model = BaseEventModel

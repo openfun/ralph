@@ -1,6 +1,5 @@
-"""
-Tests for ralph.parsers module.
-"""
+"""Tests for ralph.parsers module."""
+
 import gzip
 import logging
 import shutil
@@ -12,8 +11,8 @@ from ralph.parsers import GELFParser
 
 
 # pylint: disable=invalid-name
-def test_gelfparser_parse_empty_file():
-    """Test the GELFParser parsing with an empty file."""
+def test_parsers_gelfparser_parse_empty_file():
+    """Tests the GELFParser parsing with an empty file."""
 
     parser = GELFParser()
 
@@ -22,8 +21,8 @@ def test_gelfparser_parse_empty_file():
         next(parser.parse(empty_file))
 
 
-def test_gelfparser_parse_raw_file(gelf_logger):
-    """Test the GELFParser parsing using a flat GELF file."""
+def test_parsers_gelfparser_parse_raw_file(gelf_logger):
+    """Tests the GELFParser parsing using a flat GELF file."""
 
     parser = GELFParser()
 
@@ -40,8 +39,8 @@ def test_gelfparser_parse_raw_file(gelf_logger):
 
 
 # pylint: disable=invalid-name,unused-argument
-def test_gelfparser_parse_gzipped_file(fs, gelf_logger):
-    """Test the GELFParser parsing using a gzipped GELF file."""
+def test_parsers_gelfparser_parse_gzipped_file(fs, gelf_logger):
+    """Tests the GELFParser parsing using a gzipped GELF file."""
 
     gelf_logger.info('{"username": "foo"}')
     gelf_logger.info('{"username": "bar"}')
@@ -62,8 +61,8 @@ def test_gelfparser_parse_gzipped_file(fs, gelf_logger):
     assert events[1] == '{"username": "bar"}'
 
 
-def test_gelfparser_parse_partially_invalid_file(caplog):
-    """Test the GELFParser with a file containing invalid JSON strings."""
+def test_parsers_gelfparser_parse_partially_invalid_file(caplog):
+    """Tests the GELFParser with a file containing invalid JSON strings."""
 
     with StringIO() as file:
         file.writelines(

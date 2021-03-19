@@ -21,7 +21,7 @@ from tests.fixtures.edx.browser import (
     ],
 )
 def test_models_edx_browser_base_browser_event_with_valid_content(kwargs):
-    """Test that a valid base browser event does not raise a ValidationError."""
+    """Tests that a valid base browser event does not raise a ValidationError."""
 
     try:
         BaseBrowserEventFactory(**kwargs)
@@ -45,14 +45,14 @@ def test_models_edx_browser_base_browser_event_with_valid_content(kwargs):
     ],
 )
 def test_models_edx_browser_base_browser_event_with_invalid_content(kwargs, error):
-    """Test that an invalid base browser event raises a ValidationError."""
+    """Tests that an invalid base browser event raises a ValidationError."""
 
     with pytest.raises(ValidationError, match=error):
         BaseBrowserEventFactory(**kwargs)
 
 
 def test_models_edx_browser_page_close_browser_event_with_valid_content():
-    """Test that a valid page_close browser event does not raise a ValidationError."""
+    """Tests that a valid page_close browser event does not raise a ValidationError."""
 
     try:
         PageCloseBrowserEventFactory()
@@ -71,7 +71,7 @@ def test_models_edx_browser_page_close_browser_event_with_valid_content():
 def test_models_edx_browser_page_close_browser_event_with_invalid_content(
     kwargs, error
 ):
-    """Test that an invalid page_close browser event raises a ValidationError."""
+    """Tests that an invalid page_close browser event raises a ValidationError."""
 
     with pytest.raises(ValidationError, match=error):
         PageCloseBrowserEventFactory(**kwargs)

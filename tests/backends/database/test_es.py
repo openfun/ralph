@@ -17,8 +17,8 @@ from ralph.defaults import APP_DIR, HISTORY_FILE
 from tests.fixtures.backends import ES_TEST_HOSTS, ES_TEST_INDEX
 
 
-def test_es_database_instantiation(es):
-    """Test the ES backend instantiation"""
+def test_backends_database_es_database_instantiation(es):
+    """Tests the ES backend instantiation."""
     # pylint: disable=invalid-name,unused-argument,protected-access
 
     assert ESDatabase.name == "es"
@@ -40,9 +40,9 @@ def test_es_database_instantiation(es):
     assert isinstance(database.client, Elasticsearch)
 
 
-def test_es_client_kwargs(es):
-    """Test the ES backend client instantiation using client_options that must be
-    passed to the http(s) connection pool"""
+def test_backends_database_es_client_kwargs(es):
+    """Tests the ES backend client instantiation using client_options that must be
+    passed to the http(s) connection pool."""
     # pylint: disable=invalid-name,unused-argument,protected-access
 
     database = ESDatabase(
@@ -60,8 +60,8 @@ def test_es_client_kwargs(es):
     )
 
 
-def test_to_documents_method(es):
-    """Test to_documents method"""
+def test_backends_database_es_to_documents_method(es):
+    """Tests to_documents method."""
     # pylint: disable=invalid-name,unused-argument
 
     # Create stream data
@@ -83,8 +83,8 @@ def test_to_documents_method(es):
     ]
 
 
-def test_get_method(es, monkeypatch):
-    """Test ES get method"""
+def test_backends_database_es_get_method(es, monkeypatch):
+    """Tests ES get method."""
     # pylint: disable=invalid-name
 
     # Insert documents
@@ -101,7 +101,7 @@ def test_get_method(es, monkeypatch):
 
     # Mock stdout stream
     class MockStdout:
-        """A simple mock for sys.stdout.buffer"""
+        """A simple mock for sys.stdout.buffer."""
 
         buffer = BytesIO()
 
@@ -119,8 +119,8 @@ def test_get_method(es, monkeypatch):
     assert documents == [{"id": idx} for idx in range(10)]
 
 
-def test_put_method(es, fs, monkeypatch):
-    """Test ES put method"""
+def test_backends_database_es_put_method(es, fs, monkeypatch):
+    """Tests ES put method."""
     # pylint: disable=invalid-name
 
     # Prepare fake file system
@@ -150,8 +150,10 @@ def test_put_method(es, fs, monkeypatch):
     assert sorted([hit["_source"]["id"] for hit in hits]) == list(range(10))
 
 
-def test_put_with_badly_formatted_data_raises_a_bulkindexerror(es, fs, monkeypatch):
-    """Test ES put method with badly formatted data"""
+def test_backends_database_es_put_with_badly_formatted_data_raises_a_bulkindexerror(
+    es, fs, monkeypatch
+):
+    """Tests ES put method with badly formatted data."""
     # pylint: disable=invalid-name,unused-argument
 
     records = [{"id": idx, "count": random.randint(0, 100)} for idx in range(10)]
@@ -179,8 +181,10 @@ def test_put_with_badly_formatted_data_raises_a_bulkindexerror(es, fs, monkeypat
     assert sorted([hit["_source"]["id"] for hit in hits]) == [0, 1, 2, 3, 5]
 
 
-def test_put_with_badly_formatted_data_in_force_mode(es, fs, monkeypatch):
-    """Test ES put method with badly formatted data when the force mode is active"""
+def test_backends_database_es_put_with_badly_formatted_data_in_force_mode(
+    es, fs, monkeypatch
+):
+    """Tests ES put method with badly formatted data when the force mode is active."""
     # pylint: disable=invalid-name,unused-argument
 
     records = [{"id": idx, "count": random.randint(0, 100)} for idx in range(10)]

@@ -3,25 +3,25 @@
 from ralph.backends.storage.base import BaseStorage
 
 
-def test_abstract_interface_with_implemented_abstract_method():
-    """Test interface mechanism with properly implemented abstract methods"""
+def test_backends_storage_base_abstract_interface_with_implemented_abstract_method():
+    """Tests the interface mechanism with properly implemented abstract methods."""
 
     class GoodStorage(BaseStorage):
-        """Correct implementation with required abstract methods"""
+        """Correct implementation with required abstract methods."""
 
         name = "good"
 
         def list(self, details=False, new=False):
-            """Fake list"""
+            """Fakes the list method."""
 
         def url(self, name):
-            """Fake url"""
+            """Fakes the url method."""
 
         def read(self, name, chunk_size=0):
-            """Fake read"""
+            """Fakes the read method."""
 
         def write(self, name, chunk_size=4096, overwrite=False):
-            """Fake write"""
+            """Fakes the write method."""
 
     GoodStorage()
 
