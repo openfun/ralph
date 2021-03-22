@@ -59,9 +59,9 @@ def test_defaults_load_config_correct_config(fs, monkeypatch):
 
     config_path = APP_DIR / "config.yml"
 
-    fs.create_file(config_path, contents="DEFAULT_BACKEND_CHUNCK_SIZE: 5678")
+    fs.create_file(config_path, contents="DEFAULT_BACKEND_CHUNK_SIZE: 5678")
 
-    assert load_config(config_path)["DEFAULT_BACKEND_CHUNCK_SIZE"] == 5678
+    assert load_config(config_path)["DEFAULT_BACKEND_CHUNK_SIZE"] == 5678
 
 
 # pylint: disable=invalid-name, unused-argument

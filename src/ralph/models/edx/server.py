@@ -1,19 +1,13 @@
 """Server event model definitions"""
 
+import json
 from pathlib import Path
 
-from pydantic import Json, root_validator
+from pydantic import root_validator, validator
 
 from ralph.models.selector import LazyModelField, selector
 
-from .base import BaseEventModel, BaseModelWithConfig
-
-
-class ServerEventField(BaseModelWithConfig):
-    """Represents the `event` field of the ServerEventModel"""
-
-    GET: dict
-    POST: dict
+from .base import BaseEventModel
 
 
 class ServerEventModel(BaseEventModel):
@@ -40,7 +34,25 @@ class ServerEventModel(BaseEventModel):
     )
 
     event_type: Path
-    event: Json[ServerEventField]  # pylint: disable=unsubscriptable-object
+    event: str
+
+    @validator("event")
+    def validate_event(cls, event_str):  # pylint: disable=no-self-argument, no-self-use
+        """Checks that the `event` field is a JSON string object containing GET and POST keys."""
+
+        try:
+            event = json.loads(event_str)
+        except (json.JSONDecodeError, TypeError) as err:
+            raise ValueError("must be a JSON string") from err
+        keys = {"POST", "GET"}
+        for key in keys:
+            if not isinstance(event.get(key, None), dict):
+                raise ValueError(
+                    f"{key} field should exist and its value must be a dictionary"
+                )
+        if not set(event.keys()) == keys:
+            raise ValueError("extra fields not permitted")
+        return event_str
 
     @root_validator
     def validate_event_type(

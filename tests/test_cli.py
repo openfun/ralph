@@ -16,6 +16,7 @@ from ralph.cli import CommaSeparatedKeyValueParamType, cli
 from ralph.defaults import APP_DIR, FS_STORAGE_DEFAULT_PATH
 
 from tests.fixtures.backends import ES_TEST_HOSTS, ES_TEST_INDEX
+from tests.fixtures.edx.browser import PageCloseBrowserEventFactory
 
 test_logger = logging.getLogger("ralph")
 
@@ -124,6 +125,36 @@ def test_cli_extract_command_with_gelf_parser(gelf_logger):
         gelf_content = log_file.read()
         result = runner.invoke(cli, ["extract", "-p", "gelf"], input=gelf_content)
         assert '{"username": "foo"}' in result.output
+
+
+def test_validate_command_usage():
+    """Tests ralph validate command usage."""
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["validate", "--help"])
+
+    assert result.exit_code == 0
+    assert (
+        "Options:\n"
+        "  -f, --format [edx]     Input events format to validate  [required]\n"
+        "  -I, --ignore-errors    Continue validating regardless of raised errors\n"
+        "  -F, --fail-on-unknown  Stop validating at first unknown event\n"
+    ) in result.output
+
+    result = runner.invoke(cli, ["validate"])
+    assert result.exit_code > 0
+    assert (
+        "Error: Missing option '-f' / '--format'.  Choose from:\n\tedx."
+    ) in result.output
+
+
+def test_validate_command_with_edx_format():
+    """Tests the validate command using the edx format."""
+
+    event_str = PageCloseBrowserEventFactory().json()
+    runner = CliRunner()
+    result = runner.invoke(cli, ["validate", "-f", "edx"], input=event_str)
+    assert event_str in result.output
 
 
 @cli.command()
