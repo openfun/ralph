@@ -11,7 +11,7 @@ from typing import Any, Type, Union
 from pydantic import BaseModel
 
 from ralph.defaults import MODEL_PATH_SEPARATOR
-from ralph.exceptions import ModelRulesException
+from ralph.exceptions import ModelRulesException, UnknownEventException
 from ralph.utils import get_dict_value_from_path
 
 
@@ -111,8 +111,10 @@ class ModelSelector:
             tree (dict): The (sub) decision tree, `None` stands for the whole decision tree.
 
         Returns:
-            model (BaseModel): When event matches all rules of the model.
-            None: Otherwise.
+            model (BaseModel): When the event matches all rules of the model.
+
+        Raises:
+            UnknownEventException: When the event does not match any model.
         """
 
         if tree is None:
@@ -121,7 +123,11 @@ class ModelSelector:
         is_valid = rule.check(event)
         subtree = tree[rule][is_valid]
         if not isinstance(subtree, dict):
-            # Here we have found the model or know that the event does not match any model.
+            if subtree is None:
+                raise UnknownEventException(
+                    "No matching pydantic model found for input event"
+                )
+            # Here we have found the model.
             return subtree
         return self.get_model(event, subtree)
 

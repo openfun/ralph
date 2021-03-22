@@ -11,7 +11,7 @@ from click_option_group import optgroup
 
 from ralph.backends import BackendTypes
 from ralph.defaults import (
-    DEFAULT_BACKEND_CHUNCK_SIZE,
+    DEFAULT_BACKEND_CHUNK_SIZE,
     ENVVAR_PREFIX,
     DatabaseBackends,
     Parsers,
@@ -19,6 +19,8 @@ from ralph.defaults import (
 )
 from ralph.exceptions import UnsupportedBackendException
 from ralph.logger import configure_logging
+from ralph.models.selector import ModelSelector
+from ralph.models.validator import Validator
 from ralph.utils import (
     get_backend_type,
     get_class_from_name,
@@ -153,7 +155,7 @@ def backends_options(name=None, backends=None):
     help="Container format parser used to extract events",
 )
 def extract(parser):
-    """Extract input events from a container format using a dedicated parser."""
+    """Extracts input events from a container format using a dedicated parser."""
 
     logger.info("Extracting events using the %s parser", parser)
 
@@ -163,13 +165,52 @@ def extract(parser):
         click.echo(event)
 
 
+@cli.command()
+@click.option(
+    "-f",
+    "--format",
+    "format_",
+    type=click.Choice(["edx"]),
+    required=True,
+    help="Input events format to validate",
+)
+@click.option(
+    "-I",
+    "--ignore-errors",
+    default=False,
+    is_flag=True,
+    help="Continue validating regardless of raised errors",
+)
+@click.option(
+    "-F",
+    "--fail-on-unknown",
+    default=False,
+    is_flag=True,
+    help="Stop validating at first unknown event",
+)
+def validate(format_, ignore_errors, fail_on_unknown):
+    """Validates input events of given format."""
+
+    logger.info(
+        "Validating %s events (ignore_errors=%s | fail-on-unknown=%s)",
+        format_,
+        ignore_errors,
+        fail_on_unknown,
+    )
+
+    validator = Validator(ModelSelector(f"ralph.models.{format_}"))
+
+    for event in validator.validate(sys.stdin, ignore_errors, fail_on_unknown):
+        click.echo(event)
+
+
 @click.argument("archive", required=False)
 @backends_options(backends=BACKENDS)
 @click.option(
     "-c",
     "--chunk-size",
     type=int,
-    default=DEFAULT_BACKEND_CHUNCK_SIZE,
+    default=DEFAULT_BACKEND_CHUNK_SIZE,
     help="Get events by chunks of size #",
 )
 def fetch(backend, archive, chunk_size, **options):
@@ -203,7 +244,7 @@ def fetch(backend, archive, chunk_size, **options):
     "-c",
     "--chunk-size",
     type=int,
-    default=DEFAULT_BACKEND_CHUNCK_SIZE,
+    default=DEFAULT_BACKEND_CHUNK_SIZE,
     help="Get events by chunks of size #",
 )
 @click.option(

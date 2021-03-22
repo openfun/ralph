@@ -5,7 +5,7 @@ import json
 import pytest
 from pydantic.main import BaseModel
 
-from ralph.exceptions import ModelRulesException
+from ralph.exceptions import ModelRulesException, UnknownEventException
 from ralph.models.edx.browser import PageCloseBrowserEventModel
 from ralph.models.edx.server import ServerEventModel
 from ralph.models.selector import (
@@ -138,7 +138,7 @@ from tests.fixtures.edx.server import ServerEventFactory
 def test_models_selector_model_selector_decision_tree(model_rules, decision_tree):
     """Given `model_rules` the ModelSelector should create the expected decision tree."""
 
-    model_selector = ModelSelector()
+    model_selector = ModelSelector(module="ralph.models.edx")
     assert model_selector.get_decision_tree(model_rules) == decision_tree
 
 
@@ -168,14 +168,21 @@ def test_models_selector_model_selector_model_rules(model_rules, rules):
     [
         (ServerEventFactory(), ServerEventModel),
         (PageCloseBrowserEventFactory(), PageCloseBrowserEventModel),
-        ({"invalid": "event"}, None),
     ],
 )
-def test_models_selector_model_selector_get_model(event, model):
-    """Given an event the ModelSelector.get_model method should return the corresponding model."""
+def test_models_selector_model_selector_get_model_with_valid_event(event, model):
+    """Tests given a valid event the get_model method should return the corresponding model."""
 
-    event = json.loads(event.json()) if not isinstance(event, dict) else event
-    assert ModelSelector().get_model(event) is model
+    event = json.loads(event.json())
+    assert ModelSelector(module="ralph.models.edx").get_model(event) is model
+
+
+@pytest.mark.parametrize("event", [{"invalid": "event"}])
+def test_models_selector_model_selector_get_model_with_invalid_event(event):
+    """Tests given an invalid event the get_model method should raise UnknownEventException."""
+
+    with pytest.raises(UnknownEventException):
+        ModelSelector(module="ralph.models.edx").get_model(event)
 
 
 @pytest.mark.parametrize(
