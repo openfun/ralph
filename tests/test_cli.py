@@ -16,7 +16,7 @@ from ralph.backends.storage.fs import FSStorage
 from ralph.backends.storage.ldp import LDPStorage
 from ralph.cli import CommaSeparatedKeyValueParamType, cli
 from ralph.defaults import APP_DIR, FS_STORAGE_DEFAULT_PATH
-from ralph.models.edx.browser import PageClose
+from ralph.models.edx.navigational import UIPageClose
 
 from tests.fixtures.backends import ES_TEST_HOSTS, ES_TEST_INDEX
 
@@ -152,7 +152,7 @@ def test_validate_command_usage():
 
 @settings(max_examples=1)
 @given(
-    st.builds(PageClose, referer=provisional.urls(), page=provisional.urls()),
+    st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()),
 )
 def test_validate_command_with_edx_format(event):
     """Tests the validate command using the edx format."""

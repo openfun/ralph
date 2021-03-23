@@ -46,8 +46,6 @@ class ServerEvent(BaseServerEvent):
         event_source="server", event_type=LazyModelField("context__path")
     )
 
+    # pylint: disable=unsubscriptable-object
     event_type: Path
-    event: Union[
-        Json[ServerEventField],  # pylint: disable=unsubscriptable-object
-        ServerEventField,
-    ]
+    event: Union[Json[ServerEventField], ServerEventField]
