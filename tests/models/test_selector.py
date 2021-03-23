@@ -4,8 +4,8 @@
 import pytest
 from pydantic.main import BaseModel
 
-from ralph.exceptions import ModelRulesException
-from ralph.models.edx.browser import PageClose
+from ralph.exceptions import ModelRulesException, UnknownEventException
+from ralph.models.edx.navigational import UIPageClose
 from ralph.models.edx.server import ServerEvent
 from ralph.models.selector import (
     LazyModelField,
@@ -56,7 +56,7 @@ from ralph.models.selector import (
         # Two models, multiple rules case, each rule occurs only once.
         (
             {
-                PageClose: selector(event_source="browser", event_type="page_close"),
+                UIPageClose: selector(event_source="browser", event_type="page_close"),
                 ServerEvent: selector(
                     event_source="server", event_type=LazyModelField("context__path")
                 ),
@@ -65,7 +65,7 @@ from ralph.models.selector import (
                 Rule(LazyModelField("event_source"), "browser"): {
                     True: {
                         Rule(LazyModelField("event_type"), "page_close"): {
-                            True: PageClose,
+                            True: UIPageClose,
                             False: None,
                         }
                     },
@@ -89,7 +89,7 @@ from ralph.models.selector import (
         # Tree models, multiple rules, event_source="server" occurs twice.
         (
             {
-                PageClose: selector(event_source="browser", event_type="page_close"),
+                UIPageClose: selector(event_source="browser", event_type="page_close"),
                 ServerEvent: selector(
                     event_source="server", event_type=LazyModelField("context__path")
                 ),
@@ -115,7 +115,7 @@ from ralph.models.selector import (
                         Rule(LazyModelField("event_source"), "browser"): {
                             True: {
                                 Rule(LazyModelField("event_type"), "page_close"): {
-                                    True: PageClose,
+                                    True: UIPageClose,
                                     False: None,
                                 }
                             },
@@ -132,6 +132,13 @@ def test_models_selector_model_selector_decision_tree(model_rules, decision_tree
 
     model_selector = ModelSelector(module="ralph.models.edx")
     assert model_selector.get_decision_tree(model_rules) == decision_tree
+
+
+def test_models_selector_model_selector_get_model_with_invalid_event():
+    """Tests given an invalid event the get_model method should raise UnknownEventException."""
+
+    with pytest.raises(UnknownEventException):
+        ModelSelector(module="ralph.models.edx").get_model({"invalid": "event"})
 
 
 @pytest.mark.parametrize(
@@ -169,8 +176,8 @@ def test_models_selector_model_selector_model_rules(model_rules, rules):
             {},
         ),
         (
-            type("one_valid_base_model", (), {"page_close": PageClose}),
-            {PageClose: PageClose.__selector__},
+            type("one_valid_base_model", (), {"page_close": UIPageClose}),
+            {UIPageClose: UIPageClose.__selector__},
         ),
         (
             type(
@@ -178,7 +185,7 @@ def test_models_selector_model_selector_model_rules(model_rules, rules):
                 (),
                 {
                     "int_member": 1,
-                    "page_close": PageClose,
+                    "page_close": UIPageClose,
                     "no_selector": BaseModel,
                     "not_base_model": ModelRules,
                     "server": ServerEvent,
@@ -186,7 +193,7 @@ def test_models_selector_model_selector_model_rules(model_rules, rules):
                 },
             ),
             {
-                PageClose: PageClose.__selector__,
+                UIPageClose: UIPageClose.__selector__,
                 ServerEvent: ServerEvent.__selector__,
             },
         ),

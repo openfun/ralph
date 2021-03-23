@@ -9,7 +9,7 @@ from hypothesis import HealthCheck, given, provisional, settings
 from hypothesis import strategies as st
 
 from ralph.exceptions import BadFormatException, UnknownEventException
-from ralph.models.edx.browser import PageClose
+from ralph.models.edx.navigational import UIPageClose
 from ralph.models.edx.server import ServerEvent, ServerEventField
 from ralph.models.selector import ModelSelector
 from ralph.models.validator import Validator
@@ -116,7 +116,7 @@ def test_models_validator_validate_with_an_invalid_page_close_event_writes_an_er
     )
     with caplog.at_level(logging.ERROR):
         assert list(result) == []
-    errors = ["Input event is not a valid PageClose event."]
+    errors = ["Input event is not a valid UIPageClose event."]
     assert errors == [message for _, _, message in caplog.record_tuples]
 
 
@@ -140,7 +140,7 @@ def test_models_validator_validate_with_invalid_page_close_event_raises_an_excep
 @settings(max_examples=1)
 @pytest.mark.parametrize("ignore_errors", [True, False])
 @pytest.mark.parametrize("fail_on_unknown", [True, False])
-@given(st.builds(PageClose, referer=provisional.urls(), page=provisional.urls()))
+@given(st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()))
 def test_models_validator_validate_with_valid_events(
     ignore_errors, fail_on_unknown, event
 ):
@@ -154,7 +154,7 @@ def test_models_validator_validate_with_valid_events(
 
 
 @settings(max_examples=1, suppress_health_check=(HealthCheck.function_scoped_fixture,))
-@given(st.builds(PageClose, referer=provisional.urls(), page=provisional.urls()))
+@given(st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()))
 def test_models_validator_validate_counter(caplog, event):
     """Tests given multiple events the validate method
     should log the total and invalid events."""

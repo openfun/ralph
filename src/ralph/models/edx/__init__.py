@@ -2,5 +2,5 @@
 
 # flake8: noqa
 
-from .browser import PageClose
+from .navigational import UIPageClose, UISeqGoto, UISeqNext, UISeqPrev
 from .server import ServerEvent

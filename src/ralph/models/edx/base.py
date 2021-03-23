@@ -9,7 +9,7 @@ from pydantic import BaseModel, HttpUrl, constr
 
 
 class BaseModelWithConfig(BaseModel):
-    """Base model defining configuration shared among all models"""
+    """Base model defining configuration shared among all models."""
 
     class Config:  # pylint: disable=missing-class-docstring
         extra = "forbid"
@@ -72,7 +72,7 @@ class AbstractBaseEventField(BaseModelWithConfig):
 class BaseEvent(BaseModelWithConfig):
     """Represents the base event model all events inherit from.
 
-    WARNING: it does not define the event, event_source and event_type fields.
+    WARNING: it does not define the `event`, `event_type` and `event_source` fields.
 
     Attributes:
         username (str): Consists of the unique username identifying the logged in user.
