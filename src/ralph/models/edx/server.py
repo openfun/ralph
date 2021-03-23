@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+from typing import Literal
 
 from pydantic import root_validator, validator
 
@@ -10,7 +11,13 @@ from ralph.models.selector import LazyModelField, selector
 from .base import BaseEventModel
 
 
-class ServerEventModel(BaseEventModel):
+class BaseServerEventModel(BaseEventModel):
+    """Represents the base server event model all server events inherit from."""
+
+    event_source: Literal["server"]
+
+
+class ServerEventModel(BaseServerEventModel):
     """Represents a common server event.
 
     This type of event is triggered from the django middleware on each request excluding:
@@ -33,6 +40,7 @@ class ServerEventModel(BaseEventModel):
         event_source="server", event_type=LazyModelField("context__path")
     )
 
+    # pylint: disable=unsubscriptable-object
     event_type: Path
     event: str
 
@@ -58,7 +66,7 @@ class ServerEventModel(BaseEventModel):
     def validate_event_type(
         cls, values
     ):  # pylint: disable=no-self-argument, no-self-use
-        """Check that the event_type and context.path values are equal"""
+        """Check that the event_type and context.path values are equal."""
 
         if values.get("event_type") != values.get("context").path:
             raise ValueError("event_type should be equal to context.path")

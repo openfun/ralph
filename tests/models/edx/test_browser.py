@@ -3,16 +3,12 @@
 import pytest
 from pydantic.error_wrappers import ValidationError
 
-from tests.fixtures.edx.browser import (
-    BaseBrowserEventFactory,
-    PageCloseBrowserEventFactory,
-)
+from tests.fixtures.edx.browser import BaseBrowserEventFactory
 
 
 @pytest.mark.parametrize(
     "kwargs",
     [
-        {"event_source": "browser"},
         {"session": ""},
         {"session": "cc7ee04f8e4eb7e84f8c4c441cc78f40"},
         {"page": "https://www.fun-mooc.fr/"},
@@ -49,29 +45,3 @@ def test_models_edx_browser_base_browser_event_with_invalid_content(kwargs, erro
 
     with pytest.raises(ValidationError, match=error):
         BaseBrowserEventFactory(**kwargs)
-
-
-def test_models_edx_browser_page_close_browser_event_with_valid_content():
-    """Tests that a valid page_close browser event does not raise a ValidationError."""
-
-    try:
-        PageCloseBrowserEventFactory()
-    except ValidationError:
-        pytest.fail("Valid page_close browser event should not raise exceptions")
-
-
-@pytest.mark.parametrize(
-    "kwargs,error",
-    [
-        ({"name": "close"}, "unexpected value; permitted: 'page_close'"),
-        ({"event_type": "close"}, "unexpected value; permitted: 'page_close'"),
-        ({"event": ""}, "unexpected value; permitted: '{}'"),
-    ],
-)
-def test_models_edx_browser_page_close_browser_event_with_invalid_content(
-    kwargs, error
-):
-    """Tests that an invalid page_close browser event raises a ValidationError."""
-
-    with pytest.raises(ValidationError, match=error):
-        PageCloseBrowserEventFactory(**kwargs)

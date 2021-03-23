@@ -10,7 +10,7 @@ from ralph.exceptions import BadFormatException, UnknownEventException
 from ralph.models.selector import ModelSelector
 from ralph.models.validator import Validator
 
-from tests.fixtures.edx.browser import PageCloseBrowserEventFactory
+from tests.fixtures.edx.navigational import PageCloseBrowserEventFactory
 from tests.fixtures.edx.server import ServerEventFactory
 
 

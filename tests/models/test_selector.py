@@ -6,7 +6,7 @@ import pytest
 from pydantic.main import BaseModel
 
 from ralph.exceptions import ModelRulesException, UnknownEventException
-from ralph.models.edx.browser import PageCloseBrowserEventModel
+from ralph.models.edx.navigational import PageCloseBrowserEventModel
 from ralph.models.edx.server import ServerEventModel
 from ralph.models.selector import (
     LazyModelField,
@@ -16,7 +16,7 @@ from ralph.models.selector import (
     selector,
 )
 
-from tests.fixtures.edx.browser import PageCloseBrowserEventFactory
+from tests.fixtures.edx.navigational import PageCloseBrowserEventFactory
 from tests.fixtures.edx.server import ServerEventFactory
 
 

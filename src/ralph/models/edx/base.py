@@ -10,7 +10,7 @@ from pydantic import AnyUrl, BaseModel, constr, root_validator
 
 
 class BaseModelWithConfig(BaseModel):
-    """Base model defining configuration shared among all models"""
+    """Base model defining configuration shared among all models."""
 
     class Config:  # pylint: disable=missing-class-docstring
         extra = "forbid"
@@ -76,10 +76,17 @@ class BaseContextModel(BaseModelWithConfig):
         return values
 
 
+class BaseEventFieldModel(BaseModelWithConfig):
+    """Represents the base event model inherited by specific event event fiels.
+
+    The base model does not have any attributes as event field does not have common sub-fields.
+    """
+
+
 class BaseEventModel(BaseModelWithConfig):
     """Represents the base event model all events inherit from.
 
-    WARNING: it does not define the event and event_type fields.
+    WARNING: it does not define the `event`, `event_type` and `event_source` fields.
 
     Attributes:
         username (str): Consists of the unique username identifying the logged in user.
@@ -137,7 +144,6 @@ class BaseEventModel(BaseModelWithConfig):
     host: str
     referer: Union[AnyUrl, Literal[""]]
     accept_language: str
-    event_source: Literal["server"]
     context: BaseContextModel
     time: datetime
     page: Union[Literal[None], None]

@@ -16,7 +16,7 @@ from ralph.cli import CommaSeparatedKeyValueParamType, cli
 from ralph.defaults import APP_DIR, FS_STORAGE_DEFAULT_PATH
 
 from tests.fixtures.backends import ES_TEST_HOSTS, ES_TEST_INDEX
-from tests.fixtures.edx.browser import PageCloseBrowserEventFactory
+from tests.fixtures.edx.navigational import PageCloseBrowserEventFactory
 
 test_logger = logging.getLogger("ralph")
 

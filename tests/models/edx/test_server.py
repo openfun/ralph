@@ -3,7 +3,16 @@
 import pytest
 from pydantic.error_wrappers import ValidationError
 
-from tests.fixtures.edx.server import ServerEventFactory
+from tests.fixtures.edx.server import BaseServerEventFactory, ServerEventFactory
+
+
+def test_models_edx_server_base_server_event_with_valid_content():
+    """Tests that a valid base browser event does not raise a ValidationError."""
+
+    try:
+        BaseServerEventFactory()
+    except ValidationError:
+        pytest.fail("Valid base server event should not raise exceptions")
 
 
 @pytest.mark.parametrize(
