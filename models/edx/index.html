@@ -443,19 +443,19 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ralph.models.edx.server.ServerEventField" class="md-nav__link">
-    ServerEventField
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ralph.models.edx.server.ServerEventModel" class="md-nav__link">
     ServerEventModel
   </a>
   
     <nav class="md-nav" aria-label="ServerEventModel">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.models.edx.server.ServerEventModel.validate_event" class="md-nav__link">
+    validate_event()
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#ralph.models.edx.server.ServerEventModel.validate_event_type" class="md-nav__link">
@@ -702,19 +702,19 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ralph.models.edx.server.ServerEventField" class="md-nav__link">
-    ServerEventField
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ralph.models.edx.server.ServerEventModel" class="md-nav__link">
     ServerEventModel
   </a>
   
     <nav class="md-nav" aria-label="ServerEventModel">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.models.edx.server.ServerEventModel.validate_event" class="md-nav__link">
+    validate_event()
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#ralph.models.edx.server.ServerEventModel.validate_event_type" class="md-nav__link">
@@ -1376,51 +1376,6 @@ is called).</p>
 
 
 
-<h3 id="ralph.models.edx.server.ServerEventField" class="doc doc-heading">
-        <code>ServerEventField</code>
-
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-pydantic-model"><code>pydantic-model</code></small>
-  </span>
-
-<a href="#ralph.models.edx.server.ServerEventField" class="headerlink" title="Permanent link">&para;</a></h3>
-
-    <div class="doc doc-contents ">
-
-      <p>Represents the <code>event</code> field of the ServerEventModel</p>
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  </div>
-
-    </div>
-
-  </div>
-
-
-
-  <div class="doc doc-object doc-class">
-
-
-
 <h3 id="ralph.models.edx.server.ServerEventModel" class="doc doc-heading">
         <code>ServerEventModel</code>
 
@@ -1482,6 +1437,50 @@ Note:
 
 
 
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h4 id="ralph.models.edx.server.ServerEventModel.validate_event" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">validate_event</span><span class="p">(</span><span class="n">event_str</span><span class="p">)</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#ralph.models.edx.server.ServerEventModel.validate_event" class="headerlink" title="Permanent link">&para;</a></h4>
+
+    <div class="doc doc-contents ">
+
+      <p>Checks that the <code>event</code> field is a JSON string object containing GET and POST keys.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>ralph/models/edx/server.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;event&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">validate_event</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">event_str</span><span class="p">):</span>  <span class="c1"># pylint: disable=no-self-argument, no-self-use</span>
+    <span class="sd">&quot;&quot;&quot;Checks that the `event` field is a JSON string object containing GET and POST keys.&quot;&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">event</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">event_str</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must be a JSON string&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;GET&quot;</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> field should exist and its value must be a dictionary&quot;</span>
+            <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">==</span> <span class="n">keys</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;extra fields not permitted&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">event_str</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
 
 
 

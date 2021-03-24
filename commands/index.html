@@ -334,6 +334,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ralph-validate" class="md-nav__link">
+    validate
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -572,6 +579,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ralph-validate" class="md-nav__link">
+    validate
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -608,21 +622,16 @@
   --help               Show this message and exit.
 </code></pre>
 <h3 id="ralph-extract">ralph extract<a class="headerlink" href="#ralph-extract" title="Permanent link">&para;</a></h3>
-<p>Extract input events from a container format using a dedicated parser.</p>
+<p>Extracts input events from a container format using a dedicated parser.</p>
 <p><strong>Usage:</strong></p>
 <pre><code>ralph extract [OPTIONS]
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  -p, --parser [gelf]      Container format parser
-                           used to extract events
-                           [required]
+<pre><code>  -p, --parser [gelf]  Container format parser
+                       used to extract events
+                       [required]
 
-  -c, --chunksize INTEGER  Parse events by chunks
-                           of size #
-
-  --help                   Show this message and
-                           exit.
-
+  --help               Show this message and exit.
 </code></pre>
 <h3 id="ralph-fetch">ralph fetch<a class="headerlink" href="#ralph-fetch" title="Permanent link">&para;</a></h3>
 <p>Fetch an archive or records from a configured backend.</p>
@@ -757,6 +766,26 @@
   --help                          Show this
                                   message and
                                   exit.
+
+</code></pre>
+<h3 id="ralph-validate">ralph validate<a class="headerlink" href="#ralph-validate" title="Permanent link">&para;</a></h3>
+<p>Validates input events of given format.</p>
+<p><strong>Usage:</strong></p>
+<pre><code>ralph validate [OPTIONS]
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  -f, --format [edx]     Input events format to
+                         validate  [required]
+
+  -I, --ignore-errors    Continue validating
+                         regardless of raised
+                         errors
+
+  -F, --fail-on-unknown  Stop validating at first
+                         unknown event
+
+  --help                 Show this message and
+                         exit.
 
 </code></pre>
                 
