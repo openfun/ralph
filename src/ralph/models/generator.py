@@ -13,13 +13,15 @@ from ralph.models.selector import ModelSelector
 logger = logging.getLogger(__name__)
 
 
-def replace_pattern_properties(event):
+def replace_pattern_properties_and_jsons(event):
     """Replaces pattern properties matching regex with a single pattern.
+    And replaces JSON strings with dictionaries (adding _JSON suffix to the keys).
 
     This reduces the JSON schema size, genson treats each pattern property as an optional property.
 
     Example:
         Replaces `cc2a00e69f7a4dd8b560f4e48911206f_3_1` with `MD5HASH_int_int_0`.
+        Replaces `"key": "{\"foo\": {}}"` with `"key_JSON": { "foo": {}}`
     """
 
     count = 0
@@ -29,8 +31,19 @@ def replace_pattern_properties(event):
             key = f"MD5HASH_int_int_{count}"
             count += 1
         if isinstance(item, dict):
-            result[key] = replace_pattern_properties(item)
+            result[key] = replace_pattern_properties_and_jsons(item)
             continue
+        if isinstance(item, str):
+            # Try to parse JSON:
+            try:
+                parsed_item = json.loads(item)
+                if isinstance(parsed_item, dict):
+                    result[key + "_JSON"] = replace_pattern_properties_and_jsons(
+                        parsed_item
+                    )
+                    continue
+            except (json.JSONDecodeError, TypeError):
+                pass
         result[key] = item
     return result
 
@@ -51,7 +64,7 @@ def generate_json_schemas(input_file: TextIO, model_selector: ModelSelector):
             # Event is unknown.
             if "event_source" not in event or "event_type" not in event:
                 continue
-            event = replace_pattern_properties(event)
+            event = replace_pattern_properties_and_jsons(event)
             # The title of browser event `seq_goto` should be `SeqGotoBrowserEventModel`.
             title = f"{event['event_type']}.{event['event_source']}.event.model"
             title = "".join(x.capitalize() for x in title.replace("_", ".").split("."))
