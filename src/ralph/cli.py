@@ -19,6 +19,7 @@ from ralph.defaults import (
 )
 from ralph.exceptions import UnsupportedBackendException
 from ralph.logger import configure_logging
+from ralph.models.generator import generate_json_schemas
 from ralph.models.selector import ModelSelector
 from ralph.models.validator import Validator
 from ralph.utils import (
@@ -163,6 +164,26 @@ def extract(parser):
 
     for event in parser.parse(sys.stdin):
         click.echo(event)
+
+
+@cli.command()
+@click.option(
+    "-f",
+    "--format",
+    "format_",
+    type=click.Choice(["edx"]),
+    required=True,
+    help="Input events format to validate",
+)
+def genson(format_):
+    """Generates JSON schemas from input events that are not covered by validate."""
+
+    logger.info("Generating %s JSON schemas using genson", format_)
+
+    model_selector = ModelSelector(f"ralph.models.{format_}")
+
+    for schema in generate_json_schemas(sys.stdin, model_selector):
+        click.echo(schema)
 
 
 @cli.command()
