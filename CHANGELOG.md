@@ -16,6 +16,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- Rename edx models
+- Migrate model tests from factories to hypothesis strategies
 - Upgrade `python-swiftclient` to `3.11.1`
 
 ### Fixed

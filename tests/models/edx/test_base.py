@@ -38,7 +38,6 @@ def test_models_edx_base_event_with_valid_content(kwargs):
     [
         ({"ip": "invalid_ip"}, "not a valid IPv4 address"),
         ({"ip": "  "}, "not a valid IPv4 address"),
-        ({"event_source": "not_server"}, "unexpected value; permitted: 'server'"),
         ({"page": "not_None"}, "value is not None"),
         ({"page": 0}, "value is not None"),
         ({"page": ""}, "value is not None"),
