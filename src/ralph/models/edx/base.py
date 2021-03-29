@@ -16,8 +16,8 @@ class BaseModelWithConfig(BaseModel):
         extra = "forbid"
 
 
-class BaseContextModel(BaseModelWithConfig):
-    """Represents the base context model inherited by all event contexts.
+class BaseContextField(BaseModelWithConfig):
+    """Represents the base context field model inherited by all event `context` fields.
 
     Attributes:
         course_user_tags (dict of str): Content from `user_api_usercoursetag` table.
@@ -76,7 +76,14 @@ class BaseContextModel(BaseModelWithConfig):
         return values
 
 
-class BaseEventModel(BaseModelWithConfig):
+class BaseEventField(BaseModelWithConfig):
+    """Represents the base event field model inherited by all event `event` fields.
+
+    The base model does not have any attributes as event field does not have common sub-fields.
+    """
+
+
+class BaseEvent(BaseModelWithConfig):
     """Represents the base event model all events inherit from.
 
     WARNING: it does not define the event and event_type fields.
@@ -119,9 +126,6 @@ class BaseEventModel(BaseModelWithConfig):
             Note:
                 Can be an empty string if the header is not present in the request.
                 Contains the default language settings of the user.
-        event_source (str): Consists of the value `server`.
-            Note:
-                Specifies the source of the interaction that triggered the event.
         context (BaseContextModel): see BaseContextModel.
         time (datetime): Consists of the UTC time in ISO format at which the event was emitted.
             Retrieved with:
@@ -137,7 +141,6 @@ class BaseEventModel(BaseModelWithConfig):
     host: str
     referer: Union[AnyUrl, Literal[""]]
     accept_language: str
-    event_source: Literal["server"]
-    context: BaseContextModel
+    context: BaseContextField
     time: datetime
     page: Union[Literal[None], None]

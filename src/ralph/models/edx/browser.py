@@ -7,10 +7,10 @@ from pydantic import AnyUrl, constr
 
 from ralph.models.selector import selector
 
-from .base import BaseEventModel
+from .base import BaseEvent
 
 
-class BaseBrowserEventModel(BaseEventModel):
+class BaseBrowserEvent(BaseEvent):
     """Represents the base browser event model all browser events inherit from.
 
     This type of event is triggered on (XHR) POST/GET requests to the `/event` URL.
@@ -28,7 +28,7 @@ class BaseBrowserEventModel(BaseEventModel):
     session: Union[constr(regex=r"^[a-f0-9]{32}$"), Literal[""]]  # noqa: F722
 
 
-class PageCloseBrowserEventModel(BaseBrowserEventModel):
+class PageClose(BaseBrowserEvent):
     """Represents the page_close browser event.
 
     This type of event is triggered when the user navigates to the next page
