@@ -76,7 +76,7 @@ class BaseContextField(BaseModelWithConfig):
         return values
 
 
-class BaseEventField(BaseModelWithConfig):
+class AbstractBaseEventField(BaseModelWithConfig):
     """Represents the base event field model inherited by all event `event` fields.
 
     The base model does not have any attributes as event field does not have common sub-fields.

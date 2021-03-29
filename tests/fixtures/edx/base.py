@@ -5,7 +5,7 @@ from datetime import timezone
 from factory import Factory, LazyAttribute, SubFactory
 from faker import Faker
 
-from ralph.models.edx.base import BaseContextField, BaseEvent, BaseEventField
+from ralph.models.edx.base import AbstractBaseEventField, BaseContextField, BaseEvent
 
 Faker.seed(1)
 FAKE = Faker()
@@ -30,7 +30,7 @@ class BaseEventFieldFactory(Factory):
     """Base event field factory inherited by all event field factories."""
 
     class Meta:  # pylint: disable=missing-class-docstring
-        model = BaseEventField
+        model = AbstractBaseEventField
 
 
 class BaseEventFactory(Factory):
