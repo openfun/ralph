@@ -2,5 +2,5 @@
 
 # flake8: noqa
 
-from .browser import PageCloseBrowserEventModel
-from .server import ServerEventModel
+from .browser import PageClose
+from .server import ServerEvent

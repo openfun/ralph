@@ -41,7 +41,7 @@ class Validator:
                 if fail_on_unknown:
                     raise err
             except ValidationError as err:
-                message = f"Input event is not a valid {err.model.__name__}"
+                message = f"Input event is not a valid {err.model.__name__} event."
                 self._log_error(message, event_str, err)
                 if not ignore_errors:
                     raise BadFormatException(message) from err

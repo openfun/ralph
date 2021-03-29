@@ -2,15 +2,22 @@
 
 import json
 from pathlib import Path
+from typing import Literal
 
 from pydantic import root_validator, validator
 
 from ralph.models.selector import LazyModelField, selector
 
-from .base import BaseEventModel
+from .base import BaseEvent
 
 
-class ServerEventModel(BaseEventModel):
+class BaseServerEvent(BaseEvent):
+    """Represents the base server event model all server events inherit from."""
+
+    event_source: Literal["server"]
+
+
+class ServerEvent(BaseServerEvent):
     """Represents a common server event.
 
     This type of event is triggered from the django middleware on each request excluding:

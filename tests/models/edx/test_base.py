@@ -12,7 +12,6 @@ from tests.fixtures.edx.server import BaseEventFactory
         {"ip": "51.255.9.27"},
         {"ip": "8.8.8.8"},
         {"ip": ""},
-        {"event_source": "server"},
         {"agent": ""},
         {"host": ""},
         {"referer": ""},

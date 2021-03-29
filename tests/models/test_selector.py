@@ -6,8 +6,8 @@ import pytest
 from pydantic.main import BaseModel
 
 from ralph.exceptions import ModelRulesException, UnknownEventException
-from ralph.models.edx.browser import PageCloseBrowserEventModel
-from ralph.models.edx.server import ServerEventModel
+from ralph.models.edx.browser import PageClose
+from ralph.models.edx.server import ServerEvent
 from ralph.models.selector import (
     LazyModelField,
     ModelRules,
@@ -27,10 +27,10 @@ from tests.fixtures.edx.server import ServerEventFactory
         ({}, {}),
         # Single model, single rule case.
         (
-            {ServerEventModel: selector(event_source="server")},
+            {ServerEvent: selector(event_source="server")},
             {
                 Rule(LazyModelField("event_source"), "server"): {
-                    True: ServerEventModel,
+                    True: ServerEvent,
                     False: None,
                 }
             },
@@ -38,7 +38,7 @@ from tests.fixtures.edx.server import ServerEventFactory
         # Single model, multiple rules case.
         (
             {
-                ServerEventModel: selector(
+                ServerEvent: selector(
                     event_source="server", event_type=LazyModelField("context__path")
                 )
             },
@@ -49,7 +49,7 @@ from tests.fixtures.edx.server import ServerEventFactory
                             LazyModelField("event_type"),
                             LazyModelField("context__path"),
                         ): {
-                            True: ServerEventModel,
+                            True: ServerEvent,
                             False: None,
                         },
                     },
@@ -60,10 +60,8 @@ from tests.fixtures.edx.server import ServerEventFactory
         # Two models, multiple rules case, each rule occurs only once.
         (
             {
-                PageCloseBrowserEventModel: selector(
-                    event_source="browser", event_type="page_close"
-                ),
-                ServerEventModel: selector(
+                PageClose: selector(event_source="browser", event_type="page_close"),
+                ServerEvent: selector(
                     event_source="server", event_type=LazyModelField("context__path")
                 ),
             },
@@ -71,7 +69,7 @@ from tests.fixtures.edx.server import ServerEventFactory
                 Rule(LazyModelField("event_source"), "browser"): {
                     True: {
                         Rule(LazyModelField("event_type"), "page_close"): {
-                            True: PageCloseBrowserEventModel,
+                            True: PageClose,
                             False: None,
                         }
                     },
@@ -82,7 +80,7 @@ from tests.fixtures.edx.server import ServerEventFactory
                                     LazyModelField("event_type"),
                                     LazyModelField("context__path"),
                                 ): {
-                                    True: ServerEventModel,
+                                    True: ServerEvent,
                                     False: None,
                                 }
                             },
@@ -95,10 +93,8 @@ from tests.fixtures.edx.server import ServerEventFactory
         # Tree models, multiple rules, event_source="server" occurs twice.
         (
             {
-                PageCloseBrowserEventModel: selector(
-                    event_source="browser", event_type="page_close"
-                ),
-                ServerEventModel: selector(
+                PageClose: selector(event_source="browser", event_type="page_close"),
+                ServerEvent: selector(
                     event_source="server", event_type=LazyModelField("context__path")
                 ),
                 BaseModel: selector(event_source="server", event_type="base"),
@@ -110,7 +106,7 @@ from tests.fixtures.edx.server import ServerEventFactory
                             LazyModelField("event_type"),
                             LazyModelField("context__path"),
                         ): {
-                            True: ServerEventModel,
+                            True: ServerEvent,
                             False: {
                                 Rule(LazyModelField("event_type"), "base"): {
                                     True: BaseModel,
@@ -123,7 +119,7 @@ from tests.fixtures.edx.server import ServerEventFactory
                         Rule(LazyModelField("event_source"), "browser"): {
                             True: {
                                 Rule(LazyModelField("event_type"), "page_close"): {
-                                    True: PageCloseBrowserEventModel,
+                                    True: PageClose,
                                     False: None,
                                 }
                             },
@@ -146,11 +142,11 @@ def test_models_selector_model_selector_decision_tree(model_rules, decision_tree
     "model_rules,rules",
     [
         # rules are equal to ServerEventModel rules.
-        ({ServerEventModel: selector(foo="foo")}, selector(foo="foo")),
+        ({ServerEvent: selector(foo="foo")}, selector(foo="foo")),
         # rules are a subset of ServerEventModel rules.
-        ({ServerEventModel: selector(foo="foo", bar="bar")}, selector(bar="bar")),
+        ({ServerEvent: selector(foo="foo", bar="bar")}, selector(bar="bar")),
         # rules are a superset of ServerEventModel rules.
-        ({ServerEventModel: selector(bar="bar")}, selector(foo="foo", bar="bar")),
+        ({ServerEvent: selector(bar="bar")}, selector(foo="foo", bar="bar")),
     ],
 )
 def test_models_selector_model_selector_model_rules(model_rules, rules):
@@ -166,8 +162,8 @@ def test_models_selector_model_selector_model_rules(model_rules, rules):
 @pytest.mark.parametrize(
     "event,model",
     [
-        (ServerEventFactory(), ServerEventModel),
-        (PageCloseBrowserEventFactory(), PageCloseBrowserEventModel),
+        (ServerEventFactory(), ServerEvent),
+        (PageCloseBrowserEventFactory(), PageClose),
     ],
 )
 def test_models_selector_model_selector_get_model_with_valid_event(event, model):
@@ -199,10 +195,8 @@ def test_models_selector_model_selector_get_model_with_invalid_event(event):
             {},
         ),
         (
-            type(
-                "one_valid_base_model", (), {"page_close": PageCloseBrowserEventModel}
-            ),
-            {PageCloseBrowserEventModel: PageCloseBrowserEventModel.__selector__},
+            type("one_valid_base_model", (), {"page_close": PageClose}),
+            {PageClose: PageClose.__selector__},
         ),
         (
             type(
@@ -210,16 +204,16 @@ def test_models_selector_model_selector_get_model_with_invalid_event(event):
                 (),
                 {
                     "int_member": 1,
-                    "page_close": PageCloseBrowserEventModel,
+                    "page_close": PageClose,
                     "no_selector": BaseModel,
                     "not_base_model": ModelRules,
-                    "server": ServerEventModel,
+                    "server": ServerEvent,
                     "str_member": "foo",
                 },
             ),
             {
-                PageCloseBrowserEventModel: PageCloseBrowserEventModel.__selector__,
-                ServerEventModel: ServerEventModel.__selector__,
+                PageClose: PageClose.__selector__,
+                ServerEvent: ServerEvent.__selector__,
             },
         ),
     ],
