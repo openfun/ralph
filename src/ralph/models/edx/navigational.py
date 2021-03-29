@@ -6,11 +6,11 @@ from pydantic import Json, constr, validator
 
 from ralph.models.selector import selector
 
-from .base import BaseEventFieldModel
-from .browser import BaseBrowserEventModel
+from .base import BaseEventField
+from .browser import BaseBrowserEvent
 
 
-class PageCloseBrowserEventModel(BaseBrowserEventModel):
+class PageClose(BaseBrowserEvent):
     """Represents the `page_close` browser event.
 
     This type of event is triggered when the user navigates to the next page
@@ -31,7 +31,7 @@ class PageCloseBrowserEventModel(BaseBrowserEventModel):
     name: Literal["page_close"]
 
 
-class NavigationalBrowserEventEventFieldModel(BaseEventFieldModel):
+class NavigationalEventField(BaseEventField):
     """Represents the event field of navigational events.
 
     Note: All navigational events are `browser` events.
@@ -55,7 +55,7 @@ class NavigationalBrowserEventEventFieldModel(BaseEventFieldModel):
     old: int
 
 
-class SeqGotoBrowserEventModel(BaseBrowserEventModel):
+class SeqGoto(BaseBrowserEvent):
     """Represents the `seq_goto` browser event.
 
     The browser emits such event when a user selects a navigational control.
@@ -71,14 +71,14 @@ class SeqGotoBrowserEventModel(BaseBrowserEventModel):
 
     # pylint: disable=unsubscriptable-object
     event: Union[
-        Json[NavigationalBrowserEventEventFieldModel],
-        NavigationalBrowserEventEventFieldModel,
+        Json[NavigationalEventField],
+        NavigationalEventField,
     ]
     event_type: Literal["seq_goto"]
     name: Literal["seq_goto"]
 
 
-class SeqNextBrowserEventModel(BaseBrowserEventModel):
+class SeqNext(BaseBrowserEvent):
     """Represents the `seq_next` browser event.
 
     The browser emits such event when a user selects a navigational control.
@@ -94,8 +94,8 @@ class SeqNextBrowserEventModel(BaseBrowserEventModel):
 
     # pylint: disable=unsubscriptable-object
     event: Union[
-        Json[NavigationalBrowserEventEventFieldModel],
-        NavigationalBrowserEventEventFieldModel,
+        Json[NavigationalEventField],
+        NavigationalEventField,
     ]
     event_type: Literal["seq_next"]
     name: Literal["seq_next"]
@@ -112,7 +112,7 @@ class SeqNextBrowserEventModel(BaseBrowserEventModel):
         return value
 
 
-class SeqPrevBrowserEventModel(BaseBrowserEventModel):
+class SeqPrev(BaseBrowserEvent):
     """Represents the `seq_prev` browser event.
 
     The browser emits such event when a user selects a navigational control.
@@ -129,8 +129,8 @@ class SeqPrevBrowserEventModel(BaseBrowserEventModel):
 
     # pylint: disable=unsubscriptable-object
     event: Union[
-        Json[NavigationalBrowserEventEventFieldModel],
-        NavigationalBrowserEventEventFieldModel,
+        Json[NavigationalEventField],
+        NavigationalEventField,
     ]
     event_type: Literal["seq_prev"]
     name: Literal["seq_prev"]

@@ -115,7 +115,7 @@ def test_models_validator_validate_with_an_invalid_page_close_event_writes_an_er
     )
     with caplog.at_level(logging.ERROR):
         assert list(result) == []
-    errors = ["Input event is not a valid PageCloseBrowserEventModel"]
+    errors = ["Input event is not a valid PageClose event."]
     assert errors == [message for _, _, message in caplog.record_tuples]
 
 

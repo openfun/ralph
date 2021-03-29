@@ -3,11 +3,11 @@
 from factory import SubFactory
 
 from ralph.models.edx.navigational import (
-    NavigationalBrowserEventEventFieldModel,
-    PageCloseBrowserEventModel,
-    SeqGotoBrowserEventModel,
-    SeqNextBrowserEventModel,
-    SeqPrevBrowserEventModel,
+    NavigationalEventField,
+    PageClose,
+    SeqGoto,
+    SeqNext,
+    SeqPrev,
 )
 
 from .base import FAKE, BaseEventFieldFactory
@@ -18,7 +18,7 @@ class PageCloseBrowserEventFactory(BaseBrowserEventFactory):
     """Factory for the PageCloseBrowserEventModel."""
 
     class Meta:  # pylint: disable=missing-class-docstring
-        model = PageCloseBrowserEventModel
+        model = PageClose
 
     name = "page_close"
     event_type = "page_close"
@@ -29,7 +29,7 @@ class SeqGotoBrowserEventEventFieldFactory(BaseEventFieldFactory):
     """Factory for the SeqGotoBrowserEventEventFieldModel."""
 
     class Meta:  # pylint: disable=missing-class-docstring
-        model = NavigationalBrowserEventEventFieldModel
+        model = NavigationalEventField
 
     id = (
         "block-v1:universityX+CS111+2020_T1"
@@ -43,7 +43,7 @@ class SeqGotoBrowserEventFactory(BaseBrowserEventFactory):
     """Factory for the SeqGotoBrowserEventModel."""
 
     class Meta:  # pylint: disable=missing-class-docstring
-        model = SeqGotoBrowserEventModel
+        model = SeqGoto
 
     name = "seq_goto"
     event_type = "seq_goto"
@@ -54,7 +54,7 @@ class SeqNextBrowserEventEventFieldFactory(BaseEventFieldFactory):
     """Factory for the SeqGotoBrowserEventEventFieldModel."""
 
     class Meta:  # pylint: disable=missing-class-docstring
-        model = NavigationalBrowserEventEventFieldModel
+        model = NavigationalEventField
 
     id = (
         "block-v1:universityX+CS111+2020_T1"
@@ -68,7 +68,7 @@ class SeqNextBrowserEventFactory(BaseBrowserEventFactory):
     """Factory for the SeqNextBrowserEventModel."""
 
     class Meta:  # pylint: disable=missing-class-docstring
-        model = SeqNextBrowserEventModel
+        model = SeqNext
 
     name = "seq_next"
     event_type = "seq_next"
@@ -79,7 +79,7 @@ class SeqPrevBrowserEventEventFieldFactory(BaseEventFieldFactory):
     """Factory for the SeqPrevBrowserEventEventFieldModel."""
 
     class Meta:  # pylint: disable=missing-class-docstring
-        model = NavigationalBrowserEventEventFieldModel
+        model = NavigationalEventField
 
     id = (
         "block-v1:universityX+CS111+2020_T1"
@@ -93,7 +93,7 @@ class SeqPrevBrowserEventFactory(BaseBrowserEventFactory):
     """Factory for the SeqPrevBrowserEventModel."""
 
     class Meta:  # pylint: disable=missing-class-docstring
-        model = SeqPrevBrowserEventModel
+        model = SeqPrev
 
     name = "seq_prev"
     event_type = "seq_prev"

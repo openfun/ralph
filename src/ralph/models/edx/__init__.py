@@ -2,10 +2,5 @@
 
 # flake8: noqa
 
-from .navigational import (
-    PageCloseBrowserEventModel,
-    SeqGotoBrowserEventModel,
-    SeqNextBrowserEventModel,
-    SeqPrevBrowserEventModel,
-)
-from .server import ServerEventModel
+from .navigational import PageClose, SeqGoto, SeqNext, SeqPrev
+from .server import ServerEvent

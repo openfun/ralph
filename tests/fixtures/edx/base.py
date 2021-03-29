@@ -5,7 +5,7 @@ from datetime import timezone
 from factory import Factory, LazyAttribute, SubFactory
 from faker import Faker
 
-from ralph.models.edx.base import BaseContextModel, BaseEventFieldModel, BaseEventModel
+from ralph.models.edx.base import BaseContextField, BaseEvent, BaseEventField
 
 Faker.seed(1)
 FAKE = Faker()
@@ -15,7 +15,7 @@ class BaseContextFactory(Factory):
     """Base context factory inherited by all context factories."""
 
     class Meta:  # pylint: disable=missing-class-docstring
-        model = BaseContextModel
+        model = BaseContextField
 
     course_user_tags = FAKE.pydict(value_types=str)
     path = f"/{FAKE.uri_path()}"
@@ -30,14 +30,14 @@ class BaseEventFieldFactory(Factory):
     """Base event field factory inherited by all event field factories."""
 
     class Meta:  # pylint: disable=missing-class-docstring
-        model = BaseEventFieldModel
+        model = BaseEventField
 
 
 class BaseEventFactory(Factory):
     """Base event factory inherited by all event factories."""
 
     class Meta:  # pylint: disable=missing-class-docstring
-        model = BaseEventModel
+        model = BaseEvent
 
     username = FAKE.user_name() if FAKE.boolean() else ""
     ip = FAKE.ipv4_public()
