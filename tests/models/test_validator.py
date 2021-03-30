@@ -5,13 +5,14 @@ import json
 import logging
 
 import pytest
+from hypothesis import HealthCheck, given, provisional, settings
+from hypothesis import strategies as st
 
 from ralph.exceptions import BadFormatException, UnknownEventException
+from ralph.models.edx.browser import PageClose
+from ralph.models.edx.server import ServerEvent, ServerEventField
 from ralph.models.selector import ModelSelector
 from ralph.models.validator import Validator
-
-from tests.fixtures.edx.browser import PageCloseBrowserEventFactory
-from tests.fixtures.edx.server import ServerEventFactory
 
 
 def test_models_validator_validate_with_no_events(caplog):
@@ -136,13 +137,12 @@ def test_models_validator_validate_with_invalid_page_close_event_raises_an_excep
             list(result)
 
 
-@pytest.mark.parametrize(
-    "event", [ServerEventFactory(), PageCloseBrowserEventFactory()]
-)
+@settings(max_examples=1)
 @pytest.mark.parametrize("ignore_errors", [True, False])
 @pytest.mark.parametrize("fail_on_unknown", [True, False])
+@given(st.builds(PageClose, referer=provisional.urls(), page=provisional.urls()))
 def test_models_validator_validate_with_valid_events(
-    event, ignore_errors, fail_on_unknown
+    ignore_errors, fail_on_unknown, event
 ):
     """Tests given a valid event the validate method should yield it."""
 
@@ -153,10 +153,13 @@ def test_models_validator_validate_with_valid_events(
     assert json.loads(next(result)) == event_dict
 
 
-def test_models_validator_validate_counter(caplog):
-    """Tests given multiple events the validate method should log the total and invalid events."""
+@settings(max_examples=1, suppress_health_check=(HealthCheck.function_scoped_fixture,))
+@given(st.builds(PageClose, referer=provisional.urls(), page=provisional.urls()))
+def test_models_validator_validate_counter(caplog, event):
+    """Tests given multiple events the validate method
+    should log the total and invalid events."""
 
-    valid_event = PageCloseBrowserEventFactory().json()
+    valid_event = event.json()
     invalid_event_1 = 1
     invalid_event_2 = ""
     events = [invalid_event_1, valid_event, invalid_event_2]
@@ -172,10 +175,16 @@ def test_models_validator_validate_counter(caplog):
     ) in caplog.record_tuples
 
 
-def test_models_validator_validate_typing_cleanup():
+@settings(max_examples=1)
+@given(
+    st.builds(
+        ServerEvent, referer=provisional.urls(), event=st.builds(ServerEventField)
+    )
+)
+def test_models_validator_validate_typing_cleanup(event):
     """Tests given a valid event with wrong field types, the validate method should fix them."""
 
-    valid_event_str = ServerEventFactory().json()
+    valid_event_str = event.json()
     valid_event = json.loads(valid_event_str)
     valid_event["host"] = "1"
     valid_event["accept_language"] = "False"

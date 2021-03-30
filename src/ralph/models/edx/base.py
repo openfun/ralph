@@ -1,12 +1,11 @@
 """Base event model definitions"""
 
-import re
 from datetime import datetime
 from ipaddress import IPv4Address
 from pathlib import Path
-from typing import Literal, Optional, Union
+from typing import Dict, Literal, Optional, Union
 
-from pydantic import AnyUrl, BaseModel, constr, root_validator
+from pydantic import BaseModel, HttpUrl, constr
 
 
 class BaseModelWithConfig(BaseModel):
@@ -56,24 +55,11 @@ class BaseContextField(BaseModelWithConfig):
                 `request.META['PATH_INFO']`
     """
 
-    course_user_tags: Optional[dict[str, str]]
+    course_user_tags: Optional[Dict[str, str]]
     user_id: Union[int, Literal[""], None]
     org_id: str
-    course_id: str
+    course_id: constr(regex=r"^$|^course-v1:.+\+.+\+.+$")  # noqa:F722
     path: Path
-
-    @root_validator
-    def validate_course_id(
-        cls, values
-    ):  # pylint: disable=no-self-argument, no-self-use
-        """The course_id must match for example `course-v1:org+course+any` or an empty string."""
-
-        org_id = values.get("org_id")
-        course_id = values.get("course_id")
-        regex = f"course-v1:{org_id}\\+.+\\+.+"
-        if (org_id or course_id) and not re.match(regex, course_id):
-            raise ValueError(f"course_id must match regex `{regex}`")
-        return values
 
 
 class AbstractBaseEventField(BaseModelWithConfig):
@@ -86,7 +72,7 @@ class AbstractBaseEventField(BaseModelWithConfig):
 class BaseEvent(BaseModelWithConfig):
     """Represents the base event model all events inherit from.
 
-    WARNING: it does not define the event and event_type fields.
+    WARNING: it does not define the event, event_source and event_type fields.
 
     Attributes:
         username (str): Consists of the unique username identifying the logged in user.
@@ -139,7 +125,7 @@ class BaseEvent(BaseModelWithConfig):
     ip: Union[IPv4Address, Literal[""]]
     agent: str
     host: str
-    referer: Union[AnyUrl, Literal[""]]
+    referer: Union[HttpUrl, Literal[""]]
     accept_language: str
     context: BaseContextField
     time: datetime

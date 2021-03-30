@@ -1,11 +1,10 @@
 """Tests for the models selector"""
 
-import json
 
 import pytest
 from pydantic.main import BaseModel
 
-from ralph.exceptions import ModelRulesException, UnknownEventException
+from ralph.exceptions import ModelRulesException
 from ralph.models.edx.browser import PageClose
 from ralph.models.edx.server import ServerEvent
 from ralph.models.selector import (
@@ -15,9 +14,6 @@ from ralph.models.selector import (
     Rule,
     selector,
 )
-
-from tests.fixtures.edx.browser import PageCloseBrowserEventFactory
-from tests.fixtures.edx.server import ServerEventFactory
 
 
 @pytest.mark.parametrize(
@@ -157,28 +153,6 @@ def test_models_selector_model_selector_model_rules(model_rules, rules):
     model_rules = ModelRules(model_rules)
     with pytest.raises(ModelRulesException):
         model_rules[BaseModel] = rules
-
-
-@pytest.mark.parametrize(
-    "event,model",
-    [
-        (ServerEventFactory(), ServerEvent),
-        (PageCloseBrowserEventFactory(), PageClose),
-    ],
-)
-def test_models_selector_model_selector_get_model_with_valid_event(event, model):
-    """Tests given a valid event the get_model method should return the corresponding model."""
-
-    event = json.loads(event.json())
-    assert ModelSelector(module="ralph.models.edx").get_model(event) is model
-
-
-@pytest.mark.parametrize("event", [{"invalid": "event"}])
-def test_models_selector_model_selector_get_model_with_invalid_event(event):
-    """Tests given an invalid event the get_model method should raise UnknownEventException."""
-
-    with pytest.raises(UnknownEventException):
-        ModelSelector(module="ralph.models.edx").get_model(event)
 
 
 @pytest.mark.parametrize(

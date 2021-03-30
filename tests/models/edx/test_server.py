@@ -1,50 +1,31 @@
-"""Tests for the server event model"""
+"""Tests for the server event models"""
+
+import json
 
 import pytest
-from pydantic.error_wrappers import ValidationError
+from hypothesis import given, provisional, settings
+from hypothesis import strategies as st
 
-from tests.fixtures.edx.server import ServerEventFactory
+from ralph.exceptions import UnknownEventException
+from ralph.models.edx.server import ServerEvent, ServerEventField
+from ralph.models.selector import ModelSelector
 
 
-@pytest.mark.parametrize(
-    "kwargs",
-    [
-        {"context__path": "/", "event_type": "/"},
-        {"context__path": "/a/valid/path", "event_type": "/a/valid/path"},
-        {"event": '{"POST": {"key": ["value"]}, "GET": {}}'},
-        {"event": '{"POST": {}, "GET": {}}'},
-    ],
+@settings(max_examples=1)
+@given(
+    st.builds(
+        ServerEvent, referer=provisional.urls(), event=st.builds(ServerEventField)
+    )
 )
-def test_models_edx_server_event_with_valid_content(kwargs):
-    """Tests that a valid server event does not raise a ValidationError."""
+def test_model_selector_server_event_get_model_with_valid_event(event):
+    """Tests given a server event, the get_model method should return the corresponding model."""
 
-    try:
-        ServerEventFactory(**kwargs)
-    except ValidationError:
-        pytest.fail(f"Valid server event with {kwargs} should not raise exceptions")
+    event = json.loads(event.json())
+    assert ModelSelector(module="ralph.models.edx").get_model(event) is ServerEvent
 
 
-@pytest.mark.parametrize(
-    "kwargs,error",
-    [
-        ({"event_type": 123}, "value is not a valid path"),
-        ({"event_type": {}}, "value is not a valid path"),
-        ({"context__path": 123}, "value is not a valid path"),
-        ({"context__path": {}}, "value is not a valid path"),
-        ({"event_type": "/not/context"}, "event_type should be equal to context.path"),
-        ({"event": "not JSON"}, "must be a JSON string"),
-        ({"event": '{"POST": {}}'}, "GET field should exist"),
-        ({"event": '{"GET": {}}'}, "POST field should exist"),
-        ({"event": '{"GET": {}, "NOT_POST": {}}'}, "POST field should exist"),
-        ({"event": '{"POST": {}, "GET": {}, "NOR": {}}'}, "extra fields not permitted"),
-        ({"event": '{"POST": "not_object", "GET": {}}'}, "value must be a dict"),
-        ({"event": '{"POST": {}, "GET": "not_object"}'}, "value must be a dict"),
-        ({"event": '{"POST": 123, "GET": {}}'}, "value must be a dict"),
-        ({"event": '{"POST": {}, "GET": 123}'}, "value must be a dict"),
-    ],
-)
-def test_models_edx_server_event_with_invalid_content(kwargs, error):
-    """Tests that an invalid server event raises a ValidationError."""
+def test_model_selector_server_event_get_model_with_invalid_event():
+    """Tests given a server event, the get_model method should raise UnknownEventException."""
 
-    with pytest.raises(ValidationError, match=error):
-        ServerEventFactory(**kwargs)
+    with pytest.raises(UnknownEventException):
+        ModelSelector(module="ralph.models.edx").get_model({"invalid": "event"})

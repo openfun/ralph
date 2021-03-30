@@ -57,3 +57,6 @@ site/
 bin/vault_password
 .team
 group_vars/
+
+# hypothesis
+.hypothesis/

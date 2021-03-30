@@ -1,82 +1,64 @@
 """Tests for the base event model"""
 
+import json
+import re
+
 import pytest
+from hypothesis import given, provisional, settings
+from hypothesis import strategies as st
 from pydantic.error_wrappers import ValidationError
 
-from tests.fixtures.edx.server import BaseEventFactory
+from ralph.models.edx.base import BaseContextField, BaseEvent
 
 
-@pytest.mark.parametrize(
-    "kwargs",
-    [
-        {"ip": "51.255.9.27"},
-        {"ip": "8.8.8.8"},
-        {"ip": ""},
-        {"agent": ""},
-        {"host": ""},
-        {"referer": ""},
-        {"referer": "https://www.fun-mooc.fr/"},
-        {"referer": "https://www.fun-mooc.fr/event?event_type=page_close"},
-        {"context__user_id": ""},
-        {"context__user_id": None},
-        {"context__user_id": 213456},
-        {"context__org_id": "", "context__course_id": ""},
-        {"context__org_id": "org", "context__course_id": "course-v1:org+any+any"},
-    ],
+@settings(max_examples=1)
+@given(
+    st.builds(
+        BaseEvent, context=st.builds(BaseContextField), referer=provisional.urls()
+    )
 )
-def test_models_edx_base_event_with_valid_content(kwargs):
+def test_models_edx_base_event_with_valid_content(event):
     """Tests that a valid base event does not raise a ValidationError."""
 
-    try:
-        BaseEventFactory(**kwargs)
-    except ValidationError:
-        pytest.fail(f"Valid base event with {kwargs} should not raise exceptions")
+    assert len(event.username) == 0 or (len(event.username) in range(2, 31, 1))
+    assert (
+        re.match(r"^course-v1:.+\+.+\+.+$", event.context.course_id)
+        or event.context.course_id == ""
+    )
 
 
 @pytest.mark.parametrize(
-    "kwargs,error",
+    "course_id,error",
     [
-        ({"ip": "invalid_ip"}, "not a valid IPv4 address"),
-        ({"ip": "  "}, "not a valid IPv4 address"),
-        ({"page": "not_None"}, "value is not None"),
-        ({"page": 0}, "value is not None"),
-        ({"page": ""}, "value is not None"),
-        ({"page": {}}, "value is not None"),
-        ({"referer": 1}, "invalid or missing URL scheme"),
-        ({"referer": "this/is/not/a/valid/url"}, "invalid or missing URL scheme"),
-        ({"context__user_id": "invalid"}, "value is not a valid integer"),
-        ({"context__user_id": {}}, "value is not a valid integer"),
-        ({"context__org_id": None}, "org_id\n  none is not an allowed value"),
-        ({"context__org_id": {}}, "org_id\n  str type expected"),
-        ({"context__course_id": "+org+any"}, "course_id must match regex"),
         (
-            {"context__course_id": "course-v1:+course+not_empty"},
-            "course_id must match regex",
+            "course-v1:+course+not_empty",
+            "course_id\n  string does not match regex",
         ),
         (
-            {"context__course_id": "course-v1:NOT_org+course+session"},
-            "course_id must match regex",
+            "course-v1:org",
+            "course_id\n  string does not match regex",
         ),
         (
-            {"context__org_id": "org", "context__course_id": ""},
-            "course_id must match regex",
+            "course-v1:org+course",
+            "course_id\n  string does not match regex",
         ),
         (
-            {"context__org_id": "org", "context__course_id": "course-v1:org"},
-            "course_id must match regex",
-        ),
-        (
-            {"context__org_id": "org", "context__course_id": "course-v1:org+course"},
-            "course_id must match regex",
-        ),
-        (
-            {"context__org_id": "org", "context__course_id": "course-v1:org+course+"},
-            "course_id must match regex",
+            "course-v1:org+course+",
+            "course_id\n  string does not match regex",
         ),
     ],
 )
-def test_models_edx_base_event_with_invalid_content(kwargs, error):
-    """Tests that an invalid base event raises a ValidationError."""
+@settings(max_examples=1)
+@given(
+    st.builds(
+        BaseEvent, context=st.builds(BaseContextField), referer=provisional.urls()
+    )
+)
+def test_models_edx_base_event_with_invalid_content(course_id, error, event):
+    """Tests that a valid base event raises a ValidationError."""
+
+    invalid_event = json.loads(event.json())
+    invalid_event["context"]["course_id"] = course_id
 
     with pytest.raises(ValidationError, match=error):
-        BaseEventFactory(**kwargs)
+        BaseEvent(**invalid_event)

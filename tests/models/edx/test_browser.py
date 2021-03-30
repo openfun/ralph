@@ -1,77 +1,62 @@
 """Tests for the browser event models"""
 
+import json
+import re
+
 import pytest
+from hypothesis import given, provisional, settings
+from hypothesis import strategies as st
 from pydantic.error_wrappers import ValidationError
 
-from tests.fixtures.edx.browser import (
-    BaseBrowserEventFactory,
-    PageCloseBrowserEventFactory,
-)
+from ralph.exceptions import UnknownEventException
+from ralph.models.edx.browser import BaseBrowserEvent, PageClose
+from ralph.models.selector import ModelSelector
 
 
-@pytest.mark.parametrize(
-    "kwargs",
-    [
-        {"event_source": "browser"},
-        {"session": ""},
-        {"session": "cc7ee04f8e4eb7e84f8c4c441cc78f40"},
-        {"page": "https://www.fun-mooc.fr/"},
-        {"page": "/this/is/a/valid/relative/url"},
-        {"page": "/"},
-    ],
-)
-def test_models_edx_browser_base_browser_event_with_valid_content(kwargs):
+@settings(max_examples=1)
+@given(st.builds(BaseBrowserEvent, referer=provisional.urls(), page=provisional.urls()))
+def test_models_edx_browser_base_browser_event_with_valid_content(event):
     """Tests that a valid base browser event does not raise a ValidationError."""
 
-    try:
-        BaseBrowserEventFactory(**kwargs)
-    except ValidationError:
-        pytest.fail(
-            f"Valid base browser event with {kwargs} should not raise exceptions"
-        )
+    assert re.match(r"^[a-f0-9]{32}$", event.session) or event.session == ""
 
 
 @pytest.mark.parametrize(
-    "kwargs,error",
+    "session,error",
     [
-        ({"event_source": "not_browser"}, "unexpected value; permitted: 'browser'"),
-        ({"session": "less_than_32_characters"}, "string does not match regex"),
-        (
-            {"session": "session_more_than_32_character_long"},
-            "string does not match regex",
-        ),
-        ({"session": None}, "not an allowed value"),
-        ({"page": None}, "not an allowed value"),
+        # less than 32 characters
+        ("abcdef0123456789", "session\n  string does not match regex"),
+        # more than 32 characters
+        ("abcdef0123456789abcdef0123456789abcdef", "string does not match regex"),
+        # with excluded characters
+        ("abcdef0123456789_abcdef012345678", "string does not match regex"),
     ],
 )
-def test_models_edx_browser_base_browser_event_with_invalid_content(kwargs, error):
-    """Tests that an invalid base browser event raises a ValidationError."""
-
-    with pytest.raises(ValidationError, match=error):
-        BaseBrowserEventFactory(**kwargs)
-
-
-def test_models_edx_browser_page_close_browser_event_with_valid_content():
-    """Tests that a valid page_close browser event does not raise a ValidationError."""
-
-    try:
-        PageCloseBrowserEventFactory()
-    except ValidationError:
-        pytest.fail("Valid page_close browser event should not raise exceptions")
-
-
-@pytest.mark.parametrize(
-    "kwargs,error",
-    [
-        ({"name": "close"}, "unexpected value; permitted: 'page_close'"),
-        ({"event_type": "close"}, "unexpected value; permitted: 'page_close'"),
-        ({"event": ""}, "unexpected value; permitted: '{}'"),
-    ],
-)
-def test_models_edx_browser_page_close_browser_event_with_invalid_content(
-    kwargs, error
+@settings(max_examples=1)
+@given(st.builds(BaseBrowserEvent, referer=provisional.urls(), page=provisional.urls()))
+def test_models_edx_browser_base_browser_event_with_invalid_content(
+    session, error, event
 ):
-    """Tests that an invalid page_close browser event raises a ValidationError."""
+    """Tests that a valid base browser event raises a ValidationError."""
+
+    invalid_event = json.loads(event.json())
+    invalid_event["session"] = session
 
     with pytest.raises(ValidationError, match=error):
-        PageCloseBrowserEventFactory(**kwargs)
+        BaseBrowserEvent(**invalid_event)
+
+
+@settings(max_examples=1)
+@given(st.builds(PageClose, referer=provisional.urls(), page=provisional.urls()))
+def test_models_selector_model_selector_get_model_with_valid_event(event):
+    """Tests given a page_close event the get_model method should return PageClose model."""
+
+    event = json.loads(event.json())
+    assert ModelSelector(module="ralph.models.edx").get_model(event) is PageClose
+
+
+def test_models_selector_model_selector_get_model_with_invalid_event():
+    """Tests given a page_close event the get_model method should raise UnknownEventException."""
+
+    with pytest.raises(UnknownEventException):
+        ModelSelector(module="ralph.models.edx").get_model({"invalid": "event"})
