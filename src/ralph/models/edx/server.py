@@ -1,20 +1,26 @@
 """Server event model definitions"""
 
-import json
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Union
 
-from pydantic import root_validator, validator
+from pydantic import Json
 
 from ralph.models.selector import LazyModelField, selector
 
-from .base import BaseEvent
+from .base import AbstractBaseEventField, BaseEvent
 
 
 class BaseServerEvent(BaseEvent):
     """Represents the base server event model all server events inherit from."""
 
     event_source: Literal["server"]
+
+
+class ServerEventField(AbstractBaseEventField):
+    """Represents the `event` field of the ServerEventModel"""
+
+    GET: dict
+    POST: dict
 
 
 class ServerEvent(BaseServerEvent):
@@ -41,32 +47,7 @@ class ServerEvent(BaseServerEvent):
     )
 
     event_type: Path
-    event: str
-
-    @validator("event")
-    def validate_event(cls, event_str):  # pylint: disable=no-self-argument, no-self-use
-        """Checks that the `event` field is a JSON string object containing GET and POST keys."""
-
-        try:
-            event = json.loads(event_str)
-        except (json.JSONDecodeError, TypeError) as err:
-            raise ValueError("must be a JSON string") from err
-        keys = {"POST", "GET"}
-        for key in keys:
-            if not isinstance(event.get(key, None), dict):
-                raise ValueError(
-                    f"{key} field should exist and its value must be a dictionary"
-                )
-        if not set(event.keys()) == keys:
-            raise ValueError("extra fields not permitted")
-        return event_str
-
-    @root_validator
-    def validate_event_type(
-        cls, values
-    ):  # pylint: disable=no-self-argument, no-self-use
-        """Check that the event_type and context.path values are equal"""
-
-        if values.get("event_type") != values.get("context").path:
-            raise ValueError("event_type should be equal to context.path")
-        return values
+    event: Union[
+        Json[ServerEventField],  # pylint: disable=unsubscriptable-object
+        ServerEventField,
+    ]

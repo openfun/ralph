@@ -9,14 +9,16 @@ import pytest
 from click.exceptions import BadParameter
 from click.testing import CliRunner
 from elasticsearch.helpers import bulk, scan
+from hypothesis import given, provisional, settings
+from hypothesis import strategies as st
 
 from ralph.backends.storage.fs import FSStorage
 from ralph.backends.storage.ldp import LDPStorage
 from ralph.cli import CommaSeparatedKeyValueParamType, cli
 from ralph.defaults import APP_DIR, FS_STORAGE_DEFAULT_PATH
+from ralph.models.edx.browser import PageClose
 
 from tests.fixtures.backends import ES_TEST_HOSTS, ES_TEST_INDEX
-from tests.fixtures.edx.browser import PageCloseBrowserEventFactory
 
 test_logger = logging.getLogger("ralph")
 
@@ -148,10 +150,14 @@ def test_validate_command_usage():
     ) in result.output
 
 
-def test_validate_command_with_edx_format():
+@settings(max_examples=1)
+@given(
+    st.builds(PageClose, referer=provisional.urls(), page=provisional.urls()),
+)
+def test_validate_command_with_edx_format(event):
     """Tests the validate command using the edx format."""
 
-    event_str = PageCloseBrowserEventFactory().json()
+    event_str = event.json()
     runner = CliRunner()
     result = runner.invoke(cli, ["validate", "-f", "edx"], input=event_str)
     assert event_str in result.output

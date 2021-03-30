@@ -25,7 +25,7 @@ class BaseBrowserEvent(BaseEvent):
 
     event_source: Literal["browser"]
     page: Union[AnyUrl, Path]
-    session: Union[constr(regex=r"^[a-f0-9]{32}$"), Literal[""]]  # noqa: F722
+    session: constr(regex=r"^$|^[a-f0-9]{32}$")  # noqa: F722
 
 
 class PageClose(BaseBrowserEvent):
