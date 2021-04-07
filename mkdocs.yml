@@ -10,8 +10,9 @@ copyright: 2020-present GIP FUN MOOC
 
 theme:
     name: material
-    highlightjs: true
-
+    palette:
+        primary: deep purple
+        
 markdown_extensions:
     - attr_list
     - mkdocs_click
@@ -19,6 +20,8 @@ markdown_extensions:
     - toc:
         permalink: True
         separator: "_"
+    - pymdownx.highlight
+    - pymdownx.superfences
 
 nav:
     - 'Getting started':
