@@ -29,6 +29,10 @@
         
         <link rel="stylesheet" href="assets/stylesheets/palette.ef6f36e2.min.css">
         
+          
+          
+          <meta name="theme-color" content="#7e56c2">
+        
       
     
     
@@ -56,7 +60,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="deep-purple" data-md-color-accent="">
   
     
     <script>function __prefix(e){return new URL(".",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
@@ -576,10 +580,10 @@ other compatible storage or database backend.</p>
 <p>Ralph has been designed to batch process your logs using base commands and UNIX
 standard streams (<code>stdin</code>, <code>stdout</code>) to connect them in a pipeline that fits
 your needs. A base example pipeline may be:</p>
-<pre><code class="language-sh">$ ralph fetch --backend swift my_archive.gzip | \
-    gunzip | \
+<div class="highlight"><pre><span></span><code>$ ralph fetch --backend swift my_archive.gzip <span class="p">|</span> <span class="se">\</span>
+    gunzip <span class="p">|</span> <span class="se">\</span>
     ralph push --backend es
-</code></pre>
+</code></pre></div>
 <p>In this small pipeline, we stream <code>my_archive.gzip</code> content from a Swift
 container to the standard output (using the <code>fetch</code> command), uncompress the
 content (using the <code>gunzip</code> command), and bulk insert logs in an ElasticSearch
@@ -594,24 +598,24 @@ Docker), please make sure that <strong>Python 3.9</strong> is installed (and you
 python distribution).</p>
 </blockquote>
 <p>Ralph package can be installed from PyPI using the <code>pip</code> tool:</p>
-<pre><code class="language-sh"># Create a new virtualenv (optional)
+<div class="highlight"><pre><span></span><code><span class="c1"># Create a new virtualenv (optional)</span>
 $ python3.9 -m venv venv
-$ source venv/bin/activate
+$ <span class="nb">source</span> venv/bin/activate
 
-# Install the package (in a virtualenv)
-(venv) $ pip install ralph-malph
+<span class="c1"># Install the package (in a virtualenv)</span>
+<span class="o">(</span>venv<span class="o">)</span> $ pip install ralph-malph
 
-# Test the ralph command (it should be in your PATH)
-(venv) $ ralph --help
-</code></pre>
+<span class="c1"># Test the ralph command (it should be in your PATH)</span>
+<span class="o">(</span>venv<span class="o">)</span> $ ralph --help
+</code></pre></div>
 <p>Alternatively, Docker users can pull the latest ralph image and start playing
 with it:</p>
-<pre><code class="language-sh"># Pull latest docker image and get usage
+<div class="highlight"><pre><span></span><code><span class="c1"># Pull latest docker image and get usage</span>
 $ docker run --rm -i fundocker/ralph:latest ralph --help
 
-# Pro tip: define an alias to ease your life
-$ alias ralph=&quot;docker run --rm -i fundocker/ralph:latest ralph&quot;
-</code></pre>
+<span class="c1"># Pro tip: define an alias to ease your life</span>
+$ <span class="nb">alias</span> <span class="nv">ralph</span><span class="o">=</span><span class="s2">&quot;docker run --rm -i fundocker/ralph:latest ralph&quot;</span>
+</code></pre></div>
 <p>Now that <code>ralph</code> can be run from your system, we invite you to explore
 <a href="commands/">available commands</a>.</p>
 <h2 id="contributing">Contributing<a class="headerlink" href="#contributing" title="Permanent link">&para;</a></h2>

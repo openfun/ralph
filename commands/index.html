@@ -29,6 +29,10 @@
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ef6f36e2.min.css">
         
+          
+          
+          <meta name="theme-color" content="#7e56c2">
+        
       
     
     
@@ -56,7 +60,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="deep-purple" data-md-color-accent="">
   
     
     <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
@@ -612,34 +616,34 @@
 <h2 id="ralph">ralph<a class="headerlink" href="#ralph" title="Permanent link">&para;</a></h2>
 <p>Ralph is a stream-based tool to play with your logs.</p>
 <p><strong>Usage:</strong></p>
-<pre><code>ralph [OPTIONS] COMMAND [ARGS]...
-</code></pre>
+<div class="highlight"><pre><span></span><code>ralph [OPTIONS] COMMAND [ARGS]...
+</code></pre></div>
 <p><strong>Options:</strong></p>
-<pre><code>  -v, --verbosity LVL  Either CRITICAL, ERROR,
+<div class="highlight"><pre><span></span><code>  -v, --verbosity LVL  Either CRITICAL, ERROR,
                        WARNING, INFO (default) or
                        DEBUG
 
   --help               Show this message and exit.
-</code></pre>
+</code></pre></div>
 <h3 id="ralph-extract">ralph extract<a class="headerlink" href="#ralph-extract" title="Permanent link">&para;</a></h3>
 <p>Extracts input events from a container format using a dedicated parser.</p>
 <p><strong>Usage:</strong></p>
-<pre><code>ralph extract [OPTIONS]
-</code></pre>
+<div class="highlight"><pre><span></span><code>ralph extract [OPTIONS]
+</code></pre></div>
 <p><strong>Options:</strong></p>
-<pre><code>  -p, --parser [gelf]  Container format parser
+<div class="highlight"><pre><span></span><code>  -p, --parser [gelf]  Container format parser
                        used to extract events
                        [required]
 
   --help               Show this message and exit.
-</code></pre>
+</code></pre></div>
 <h3 id="ralph-fetch">ralph fetch<a class="headerlink" href="#ralph-fetch" title="Permanent link">&para;</a></h3>
 <p>Fetch an archive or records from a configured backend.</p>
 <p><strong>Usage:</strong></p>
-<pre><code>ralph fetch [OPTIONS] [ARCHIVE]
-</code></pre>
+<div class="highlight"><pre><span></span><code>ralph fetch [OPTIONS] [ARCHIVE]
+</code></pre></div>
 <p><strong>Options:</strong></p>
-<pre><code>  swift backend: 
+<div class="highlight"><pre><span></span><code>  swift backend: 
     --swift-os-identity-api-version TEXT
     --swift-os-auth-url TEXT
     --swift-os-project-domain-name TEXT
@@ -673,15 +677,14 @@
   --help                          Show this
                                   message and
                                   exit.
-
-</code></pre>
+</code></pre></div>
 <h3 id="ralph-list">ralph list<a class="headerlink" href="#ralph-list" title="Permanent link">&para;</a></h3>
 <p>List available archives from a configured storage backend.</p>
 <p><strong>Usage:</strong></p>
-<pre><code>ralph list [OPTIONS]
-</code></pre>
+<div class="highlight"><pre><span></span><code>ralph list [OPTIONS]
+</code></pre></div>
 <p><strong>Options:</strong></p>
-<pre><code>  swift backend: 
+<div class="highlight"><pre><span></span><code>  swift backend: 
     --swift-os-identity-api-version TEXT
     --swift-os-auth-url TEXT
     --swift-os-project-domain-name TEXT
@@ -715,15 +718,14 @@
   --help                          Show this
                                   message and
                                   exit.
-
-</code></pre>
+</code></pre></div>
 <h3 id="ralph-push">ralph push<a class="headerlink" href="#ralph-push" title="Permanent link">&para;</a></h3>
 <p>Push an archive to a configured backend.</p>
 <p><strong>Usage:</strong></p>
-<pre><code>ralph push [OPTIONS] [ARCHIVE]
-</code></pre>
+<div class="highlight"><pre><span></span><code>ralph push [OPTIONS] [ARCHIVE]
+</code></pre></div>
 <p><strong>Options:</strong></p>
-<pre><code>  swift backend: 
+<div class="highlight"><pre><span></span><code>  swift backend: 
     --swift-os-identity-api-version TEXT
     --swift-os-auth-url TEXT
     --swift-os-project-domain-name TEXT
@@ -766,15 +768,14 @@
   --help                          Show this
                                   message and
                                   exit.
-
-</code></pre>
+</code></pre></div>
 <h3 id="ralph-validate">ralph validate<a class="headerlink" href="#ralph-validate" title="Permanent link">&para;</a></h3>
 <p>Validates input events of given format.</p>
 <p><strong>Usage:</strong></p>
-<pre><code>ralph validate [OPTIONS]
-</code></pre>
+<div class="highlight"><pre><span></span><code>ralph validate [OPTIONS]
+</code></pre></div>
 <p><strong>Options:</strong></p>
-<pre><code>  -f, --format [edx]     Input events format to
+<div class="highlight"><pre><span></span><code>  -f, --format [edx]     Input events format to
                          validate  [required]
 
   -I, --ignore-errors    Continue validating
@@ -786,8 +787,7 @@
 
   --help                 Show this message and
                          exit.
-
-</code></pre>
+</code></pre></div>
                 
               
               

@@ -29,6 +29,10 @@
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ef6f36e2.min.css">
         
+          
+          
+          <meta name="theme-color" content="#7e56c2">
+        
       
     
     
@@ -56,7 +60,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="deep-purple" data-md-color-accent="">
   
     
     <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
@@ -754,13 +758,13 @@ later is the <strong>recommended solution</strong> for sensible data such as ser
 credentials. If we consider the <code>os_username</code> (OpenStack user name) parameter
 of the OpenStack Swift backend, it can be set as a command line option using
 <code>swift</code> as the option prefix (and replacing underscores in its name by dashes):</p>
-<pre><code class="language-bash">$ ralph list --backend swift --swift-os-username johndoe # [...] more options
-</code></pre>
+<div class="highlight"><pre><span></span><code>$ ralph list --backend swift --swift-os-username johndoe <span class="c1"># [...] more options</span>
+</code></pre></div>
 <p>Alternatively, this parameter can be set as an environment variable (in upper
 case, prefixed by the program name, <em>e.g.</em> <code>RALPH_</code>):</p>
-<pre><code class="language-bash">$ export RALPH_SWIFT_OS_USERNAME=&quot;johndoe&quot;
-$ ralph list --backend swift # [...] more options
-</code></pre>
+<div class="highlight"><pre><span></span><code>$ <span class="nb">export</span> <span class="nv">RALPH_SWIFT_OS_USERNAME</span><span class="o">=</span><span class="s2">&quot;johndoe&quot;</span>
+$ ralph list --backend swift <span class="c1"># [...] more options</span>
+</code></pre></div>
 <p>The general patterns for backend parameters are:</p>
 <ul>
 <li><code>--{{ backend_name }}-{{ parameter | underscore_to_dash }}</code> for command options, and,</li>

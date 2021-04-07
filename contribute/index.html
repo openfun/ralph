@@ -29,6 +29,10 @@
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ef6f36e2.min.css">
         
+          
+          
+          <meta name="theme-color" content="#7e56c2">
+        
       
     
     
@@ -56,7 +60,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="deep-purple" data-md-color-accent="">
   
     
     <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
@@ -569,45 +573,45 @@
                 <h1 id="contribute">Contribute<a class="headerlink" href="#contribute" title="Permanent link">&para;</a></h1>
 <h2 id="ralphs_core">Ralph&rsquo;s core<a class="headerlink" href="#ralphs_core" title="Permanent link">&para;</a></h2>
 <p>To start playing with <code>ralph</code>, you should build it using the <code>bootstrap</code> Make target:</p>
-<pre><code>$ make bootstrap
-</code></pre>
+<div class="highlight"><pre><span></span><code>$ make bootstrap
+</code></pre></div>
 <p>Once the project has been bootstrapped, you may want to edit generated <code>.env</code>
 file to set up available backends parameters that will be injected in the
 running container as environment variables to configure Ralph (see <a href="../backends/">backends
 documentation</a>):</p>
-<pre><code class="language-dotenv"># Elasticsearch backend
+<div class="highlight"><pre><span></span><code># Elasticsearch backend
 RALPH_ES_HOSTS=http://elasticsearch:9200
 RALPH_ES_INDEX=statements
 RALPH_ES_TEST_HOSTS=http://elasticsearch:9200
 RALPH_ES_TEST_INDEX=test-index
 
 # [...]
-</code></pre>
+</code></pre></div>
 <blockquote>
 <p>Note that lines starting with a <code>#</code> are considered as commented and thus will
 have no effect while running Ralph.</p>
 </blockquote>
 <p>Now you can start playing the CLI:</p>
-<pre><code>$ bin/ralph --help
-</code></pre>
+<div class="highlight"><pre><span></span><code>$ bin/ralph --help
+</code></pre></div>
 <p>To lint your code, either use the <code>lint</code> meta target or one of the linting tools we use:</p>
-<pre><code class="language-bash"># Run all linters
+<div class="highlight"><pre><span></span><code><span class="c1"># Run all linters</span>
 $ make lint
 
-# Run pylint
+<span class="c1"># Run pylint</span>
 $ make lint-pylint
 
-# List available linters
-$ make help | grep lint-
-</code></pre>
+<span class="c1"># List available linters</span>
+$ make <span class="nb">help</span> <span class="p">|</span> grep lint-
+</code></pre></div>
 <p>To run tests on your code, either use the <code>test</code> Make target or the
 <code>bin/pytest</code> script to pass specific arguments to the test runner:</p>
-<pre><code class="language-bash"># Run all tests
-$ make test
+<div class="highlight"><pre><span></span><code><span class="c1"># Run all tests</span>
+$ make <span class="nb">test</span>
 
-# Run pytest with options
+<span class="c1"># Run pytest with options</span>
 $ bin/pytest -x -k mixins
-</code></pre>
+</code></pre></div>
 <h3 id="working_with_local_backends">Working with local backends<a class="headerlink" href="#working_with_local_backends" title="Permanent link">&para;</a></h3>
 <p>Not all backends are accessible in a local environment development; for now
 only <code>elasticsearch</code> and <code>swift</code> services are accessible as docker containers
@@ -616,35 +620,35 @@ only <code>elasticsearch</code> and <code>swift</code> services are accessible a
 template, you can copy/paste them in your <code>.env</code> file (and uncomment them so
 that they are properly injected in running containers).</p>
 <p>Once configured, start available backends using:</p>
-<pre><code class="language-bash">$ make run-[BACKEND]
-</code></pre>
+<div class="highlight"><pre><span></span><code>$ make run-<span class="o">[</span>BACKEND<span class="o">]</span>
+</code></pre></div>
 <p>Substitute <code>[BACKEND]</code> by the backend name, <em>e.g.</em> <code>es</code> for Elasticsearch or
 <code>swift</code> for OpenStack Swift:</p>
-<pre><code class="language-bash"># Start Elasticsearch local backend
+<div class="highlight"><pre><span></span><code><span class="c1"># Start Elasticsearch local backend</span>
 $ make run-es
-# Start Swift local backend
+<span class="c1"># Start Swift local backend</span>
 $ make run-swift
-# Start all local backends
+<span class="c1"># Start all local backends</span>
 $ make run-all
-</code></pre>
+</code></pre></div>
 <p>Now that you have started at least the <code>elasticsearch</code> and <code>swift</code> backends,
 it&rsquo;s time to play with them:</p>
-<pre><code class="language-bash"># Store a JSON file in the Swift backend
-$ echo '{&quot;id&quot;: 1, &quot;foo&quot;: &quot;bar&quot;}' | \
+<div class="highlight"><pre><span></span><code><span class="c1"># Store a JSON file in the Swift backend</span>
+$ <span class="nb">echo</span> <span class="s1">&#39;{&quot;id&quot;: 1, &quot;foo&quot;: &quot;bar&quot;}&#39;</span> <span class="p">|</span> <span class="se">\</span>
     ./bin/ralph push -b swift -f foo.json
 
-# Check that we have created a new JSON file in the Swift backend
+<span class="c1"># Check that we have created a new JSON file in the Swift backend</span>
 $ bin/ralph list -b swift
 foo.json
 
-# Fetch the content of the JSON file and index it in Elasticsearch
-$ bin/ralph fetch -b swift foo.json | \
+<span class="c1"># Fetch the content of the JSON file and index it in Elasticsearch</span>
+$ bin/ralph fetch -b swift foo.json <span class="p">|</span> <span class="se">\</span>
     bin/ralph push -b es
 
-# Check that we have properly indexed the JSON file in Elasticsearch
+<span class="c1"># Check that we have properly indexed the JSON file in Elasticsearch</span>
 $ bin/ralph fetch -b es
-{&quot;id&quot;: 1, &quot;foo&quot;: &quot;bar&quot;}
-</code></pre>
+<span class="o">{</span><span class="s2">&quot;id&quot;</span>: <span class="m">1</span>, <span class="s2">&quot;foo&quot;</span>: <span class="s2">&quot;bar&quot;</span><span class="o">}</span>
+</code></pre></div>
 <h2 id="ralphs_tray">Ralph&rsquo;s tray<a class="headerlink" href="#ralphs_tray" title="Permanent link">&para;</a></h2>
 <p>Ralph is distributed along with its tray (a deployable package for Kubernetes
 clusters using <a href="https://github.com/openfun/arnold">Arnold</a>). If you intend to
