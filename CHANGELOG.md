@@ -11,6 +11,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Implement edx navigational events pydantic models
+- Implement edx enrollment events pydantic models
 - Install security updates in project Docker images
 - Model selector to retrieve associated pydantic model of a given event
 - `validate` command to lint edx events using pydantic models

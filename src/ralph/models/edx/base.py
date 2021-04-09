@@ -112,7 +112,7 @@ class BaseEvent(BaseModelWithConfig):
             Note:
                 Can be an empty string if the header is not present in the request.
                 Contains the default language settings of the user.
-        context (BaseContextModel): see BaseContextModel.
+        context (BaseContextField): see BaseContextField.
         time (datetime): Consists of the UTC time in ISO format at which the event was emitted.
             Retrieved with:
                 `datetime.datetime.utcnow()`
