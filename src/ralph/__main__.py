@@ -13,7 +13,7 @@ from ralph.defaults import EXECUTION_ENVIRONMENT, SENTRY_DSN
 from . import __version__, cli
 
 if SENTRY_DSN is not None:
-    sentry_sdk.init(
+    sentry_sdk.init(  # pylint: disable=abstract-class-instantiated
         dsn=SENTRY_DSN,
         traces_sample_rate=1.0,
         release=__version__,
