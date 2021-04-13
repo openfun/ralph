@@ -420,10 +420,77 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ralph.models.edx.browser.PageClose" class="md-nav__link">
-    PageClose
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ralph.models.edx.navigational" class="md-nav__link">
+    navigational
   </a>
+  
+    <nav class="md-nav" aria-label="navigational">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.models.edx.navigational.NavigationalEventField" class="md-nav__link">
+    NavigationalEventField
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ralph.models.edx.navigational.UIPageClose" class="md-nav__link">
+    UIPageClose
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ralph.models.edx.navigational.UISeqGoto" class="md-nav__link">
+    UISeqGoto
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ralph.models.edx.navigational.UISeqNext" class="md-nav__link">
+    UISeqNext
+  </a>
+  
+    <nav class="md-nav" aria-label="UISeqNext">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.models.edx.navigational.UISeqNext.validate_next_jump_event_field" class="md-nav__link">
+    validate_next_jump_event_field()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ralph.models.edx.navigational.UISeqPrev" class="md-nav__link">
+    UISeqPrev
+  </a>
+  
+    <nav class="md-nav" aria-label="UISeqPrev">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.models.edx.navigational.UISeqPrev.validate_prev_jump_event_field" class="md-nav__link">
+    validate_prev_jump_event_field()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -667,10 +734,77 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ralph.models.edx.browser.PageClose" class="md-nav__link">
-    PageClose
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ralph.models.edx.navigational" class="md-nav__link">
+    navigational
   </a>
+  
+    <nav class="md-nav" aria-label="navigational">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.models.edx.navigational.NavigationalEventField" class="md-nav__link">
+    NavigationalEventField
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ralph.models.edx.navigational.UIPageClose" class="md-nav__link">
+    UIPageClose
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ralph.models.edx.navigational.UISeqGoto" class="md-nav__link">
+    UISeqGoto
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ralph.models.edx.navigational.UISeqNext" class="md-nav__link">
+    UISeqNext
+  </a>
+  
+    <nav class="md-nav" aria-label="UISeqNext">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.models.edx.navigational.UISeqNext.validate_next_jump_event_field" class="md-nav__link">
+    validate_next_jump_event_field()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ralph.models.edx.navigational.UISeqPrev" class="md-nav__link">
+    UISeqPrev
+  </a>
+  
+    <nav class="md-nav" aria-label="UISeqPrev">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.models.edx.navigational.UISeqPrev.validate_prev_jump_event_field" class="md-nav__link">
+    validate_prev_jump_event_field()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -952,7 +1086,7 @@ Retrieved with:
     <div class="doc doc-contents ">
 
       <p>Represents the base event model all events inherit from.</p>
-<p>WARNING: it does not define the event, event_source and event_type fields.</p>
+<p>WARNING: it does not define the <code>event</code>, <code>event_type</code> and <code>event_source</code> fields.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -1096,7 +1230,7 @@ Note:
 
     <div class="doc doc-contents ">
 
-      <p>Base model defining configuration shared among all models</p>
+      <p>Base model defining configuration shared among all models.</p>
 
 
 
@@ -1205,7 +1339,7 @@ Retrieved with:
       <tr>
         <td><code>session</code></td>
         <td><code>str</code></td>
-        <td><p>Consists of the md5 encrypted Django session key or an empty string</p></td>
+        <td><p>Consists of the md5 encrypted Django session key or an empty string.</p></td>
       </tr>
   </tbody>
 </table>
@@ -1236,26 +1370,61 @@ Retrieved with:
 
 
 
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-module">
+
+
+
+<h2 id="ralph.models.edx.navigational" class="doc doc-heading">
+        <code>navigational</code>
+
+
+
+<a href="#ralph.models.edx.navigational" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Navigational event model definitions</p>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
   <div class="doc doc-object doc-class">
 
 
 
-<h3 id="ralph.models.edx.browser.PageClose" class="doc doc-heading">
-        <code>PageClose</code>
+<h3 id="ralph.models.edx.navigational.NavigationalEventField" class="doc doc-heading">
+        <code>NavigationalEventField</code>
 
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-pydantic-model"><code>pydantic-model</code></small>
   </span>
 
-<a href="#ralph.models.edx.browser.PageClose" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#ralph.models.edx.navigational.NavigationalEventField" class="headerlink" title="Permanent link">&para;</a></h3>
 
     <div class="doc doc-contents ">
 
-      <p>Represents the page_close browser event.</p>
-<p>This type of event is triggered when the user navigates to the next page
-or closes the browser window (when the JavaScript <code>window.onunload</code> event
-is called).</p>
+      <p>Represents the event field of navigational events.</p>
+<p>Note: All navigational events are <code>browser</code> events.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -1268,19 +1437,22 @@ is called).</p>
   </thead>
   <tbody>
       <tr>
-        <td><code>name</code></td>
+        <td><code>id</code></td>
         <td><code>str</code></td>
-        <td><p>Consists of the value <code>page_close</code></p></td>
+        <td><p>Consists of the edX ID of the sequence.</p></td>
       </tr>
       <tr>
-        <td><code>event_type</code></td>
-        <td><code>str</code></td>
-        <td><p>Consists of the value <code>page_close</code></p></td>
+        <td><code>old</code></td>
+        <td><code>int</code></td>
+        <td><p>For <code>seq_goto</code>, it consists of the index of the unit being jumped to.
+For <code>seq_next</code> and <code>seq_prev</code>, it consists of the index of the unit being navigated to.</p></td>
       </tr>
       <tr>
-        <td><code>event</code></td>
-        <td><code>str</code></td>
-        <td><p>Consists of the string value <code>{}</code></p></td>
+        <td><code>new</code></td>
+        <td><code>int</code></td>
+        <td><p>For <code>seq_goto</code>, it consists of the index of the unit being jumped from.
+For <code>seq_next</code> and <code>seq_prev</code>, it consists of the index of the unit being navigated
+away from.</p></td>
       </tr>
   </tbody>
 </table>
@@ -1300,6 +1472,384 @@ is called).</p>
 
 
 
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h3 id="ralph.models.edx.navigational.UIPageClose" class="doc doc-heading">
+        <code>UIPageClose</code>
+
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-model"><code>pydantic-model</code></small>
+  </span>
+
+<a href="#ralph.models.edx.navigational.UIPageClose" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Represents the <code>page_close</code> browser event.</p>
+<p>This type of event is triggered when the user navigates to the next page
+or closes the browser window (when the JavaScript <code>window.onunload</code> event
+is called).</p>
+
+<p><strong>Attributes:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>event</code></td>
+        <td><code>str</code></td>
+        <td><p>Consists of the string value <code>{}</code>.</p></td>
+      </tr>
+      <tr>
+        <td><code>event_type</code></td>
+        <td><code>str</code></td>
+        <td><p>Consists of the value <code>page_close</code>.</p></td>
+      </tr>
+      <tr>
+        <td><code>name</code></td>
+        <td><code>str</code></td>
+        <td><p>Consists of the value <code>page_close</code>.</p></td>
+      </tr>
+  </tbody>
+</table>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h3 id="ralph.models.edx.navigational.UISeqGoto" class="doc doc-heading">
+        <code>UISeqGoto</code>
+
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-model"><code>pydantic-model</code></small>
+  </span>
+
+<a href="#ralph.models.edx.navigational.UISeqGoto" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Represents the <code>seq_goto</code> browser event.</p>
+<p>The browser emits such event when a user selects a navigational control.
+<code>seq_goto</code> is emitted when a user jumps between units in a sequence.</p>
+
+<p><strong>Attributes:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>event</code></td>
+        <td><code>obj</code></td>
+        <td><p>Consists of member fields that identify specifics triggered event.</p></td>
+      </tr>
+      <tr>
+        <td><code>event_type</code></td>
+        <td><code>str</code></td>
+        <td><p>Consists of the value <code>seq_goto</code>.</p></td>
+      </tr>
+      <tr>
+        <td><code>name</code></td>
+        <td><code>str</code></td>
+        <td><p>Consists of the value <code>seq_goto</code>.</p></td>
+      </tr>
+  </tbody>
+</table>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h3 id="ralph.models.edx.navigational.UISeqNext" class="doc doc-heading">
+        <code>UISeqNext</code>
+
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-model"><code>pydantic-model</code></small>
+  </span>
+
+<a href="#ralph.models.edx.navigational.UISeqNext" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Represents the <code>seq_next</code> browser event.</p>
+<p>The browser emits such event when a user selects a navigational control.
+<code>seq_next</code> is emitted when a user navigates to the next unit in a sequence.</p>
+
+<p><strong>Attributes:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>event</code></td>
+        <td><code>obj</code></td>
+        <td><p>Consists of member fields that identify specifics triggered event.</p></td>
+      </tr>
+      <tr>
+        <td><code>event_type</code></td>
+        <td><code>str</code></td>
+        <td><p>Consists of the value <code>seq_next</code>.</p></td>
+      </tr>
+      <tr>
+        <td><code>name</code></td>
+        <td><code>str</code></td>
+        <td><p>Consists of the value <code>seq_next</code>.</p></td>
+      </tr>
+  </tbody>
+</table>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h4 id="ralph.models.edx.navigational.UISeqNext.validate_next_jump_event_field" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">validate_next_jump_event_field</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#ralph.models.edx.navigational.UISeqNext.validate_next_jump_event_field" class="headerlink" title="Permanent link">&para;</a></h4>
+
+    <div class="doc doc-contents ">
+
+      <p>Checks that event.new is equal to event.old + 1.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>ralph/models/edx/navigational.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;event&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">validate_next_jump_event_field</span><span class="p">(</span>
+    <span class="bp">cls</span><span class="p">,</span> <span class="n">value</span>
+<span class="p">):</span>  <span class="c1"># pylint: disable=no-self-argument, no-self-use</span>
+    <span class="sd">&quot;&quot;&quot;Checks that event.new is equal to event.old + 1.&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">new</span> <span class="o">!=</span> <span class="n">value</span><span class="o">.</span><span class="n">old</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;event.new - event.old should be equal to 1&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">value</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h3 id="ralph.models.edx.navigational.UISeqPrev" class="doc doc-heading">
+        <code>UISeqPrev</code>
+
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-model"><code>pydantic-model</code></small>
+  </span>
+
+<a href="#ralph.models.edx.navigational.UISeqPrev" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Represents the <code>seq_prev</code> browser event.</p>
+<p>The browser emits such event when a user selects a navigational control.
+<code>seq_prev</code> is emitted when a user navigates to the previous unit in a sequence.</p>
+
+<p><strong>Attributes:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>event</code></td>
+        <td><code>obj</code></td>
+        <td><p>Consists of member fields that identify specifics triggered event.</p></td>
+      </tr>
+      <tr>
+        <td><code>event_type</code></td>
+        <td><code>str</code></td>
+        <td><p>Consists of the value <code>seq_prev</code>.</p></td>
+      </tr>
+      <tr>
+        <td><code>name</code></td>
+        <td><code>str</code></td>
+        <td><p>Consists of the value <code>seq_prev</code>.</p></td>
+      </tr>
+  </tbody>
+</table>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h4 id="ralph.models.edx.navigational.UISeqPrev.validate_prev_jump_event_field" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">validate_prev_jump_event_field</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#ralph.models.edx.navigational.UISeqPrev.validate_prev_jump_event_field" class="headerlink" title="Permanent link">&para;</a></h4>
+
+    <div class="doc doc-contents ">
+
+      <p>Checks that event.new is equal to event.old - 1.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>ralph/models/edx/navigational.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;event&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">validate_prev_jump_event_field</span><span class="p">(</span>
+    <span class="bp">cls</span><span class="p">,</span> <span class="n">value</span>
+<span class="p">):</span>  <span class="c1"># pylint: disable=no-self-argument, no-self-use</span>
+    <span class="sd">&quot;&quot;&quot;Checks that event.new is equal to event.old - 1.&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">new</span> <span class="o">!=</span> <span class="n">value</span><span class="o">.</span><span class="n">old</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;event.old - event.new should be equal to 1&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">value</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
 
 
 
