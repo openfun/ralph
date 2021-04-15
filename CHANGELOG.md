@@ -10,6 +10,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Implement edx textbook interaction events pydantic models
 - Implement edx navigational events pydantic models
 - Install security updates in project Docker images
 - Model selector to retrieve associated pydantic model of a given event

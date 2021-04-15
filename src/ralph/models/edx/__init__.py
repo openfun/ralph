@@ -4,3 +4,20 @@
 
 from .navigational import UIPageClose, UISeqGoto, UISeqNext, UISeqPrev
 from .server import ServerEvent
+from .textbook_interaction import (
+    BookEventField,
+    UIBook,
+    UITextbookPdfChapterNavigated,
+    UITextbookPdfDisplayScaled,
+    UITextbookPdfOutlineToggled,
+    UITextbookPdfPageNavigated,
+    UITextbookPdfPageScrolled,
+    UITextbookPdfSearchCaseSensitivityToggled,
+    UITextbookPdfSearchExecuted,
+    UITextbookPdfSearchHighlightToggled,
+    UITextbookPdfSearchNavigatedNext,
+    UITextbookPdfThumbnailNavigated,
+    UITextbookPdfThumbnailsToggled,
+    UITextbookPdfZoomButtonsChanged,
+    UITextbookPdfZoomMenuChanged,
+)
