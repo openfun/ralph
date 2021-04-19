@@ -236,7 +236,7 @@ class BookEventField(AbstractBaseEventField):
     Attributes:
         chapter (str): Consists of the name of the PDF file.
         name (str): Consists of `textbook.pdf.page.loaded` if type is set to `gotopage`,
-            `textbook.pdf.page.navigatedprevious` if type is set to `prevpage`,
+            `textbook.pdf.page.navigatednext` if type is set to `prevpage`,
             `textbook.pdf.page.navigatednext` if type is set to `nextpage`.
         new (int): Consists of the destination page number.
         old (int): Consists of the original page number. It applies to `gotopage` event types only.
@@ -250,11 +250,7 @@ class BookEventField(AbstractBaseEventField):
             r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"  # noqa: F722
         )
     )
-    name: Union[
-        Literal["textbook.pdf.page.loaded"],
-        Literal["textbook.pdf.page.navigatedprevious"],
-        Literal["textbook.pdf.page.navigatednext"],
-    ]
+    name: Union[Literal["textbook.pdf.page.loaded"], Literal["textbook.pdf.page.navigatednext"]]
     new: int
     old: Optional[int]
     type: Union[Literal["gotopage"], Literal["prevpage"], Literal["nextpage"]] = Field(
