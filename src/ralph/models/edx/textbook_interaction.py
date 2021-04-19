@@ -12,7 +12,7 @@ from .browser import BaseBrowserEvent
 
 class TextbookInteractionBaseEventField(AbstractBaseEventField):
     """Represents the event field which attributes are common to most of the textbook
-    interactions events.
+    interaction events.
 
     Attributes:
         chapter (str): Consists of the name of the PDF file.
@@ -23,14 +23,13 @@ class TextbookInteractionBaseEventField(AbstractBaseEventField):
     page: int
     chapter: constr(
         regex=(
-            r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type"  # noqa : F722
-            r"@sequential\+block@[a-f0-9]{32}.+\.pdf$"  # noqa : F722
+            r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"  # noqa: F722
         )
     )
 
 
 class TextbookPdfThumbnailsToggledEventField(TextbookInteractionBaseEventField):
-    """Representents the `textbook.pdf.thumbnails.toggled` event field.
+    """Represents the `textbook.pdf.thumbnails.toggled` event field.
 
     Attribute:
         name (str): Consists of the value `textbook.pdf.thumbnails.toggled`.
@@ -40,7 +39,7 @@ class TextbookPdfThumbnailsToggledEventField(TextbookInteractionBaseEventField):
 
 
 class TextbookPdfThumbnailNavigatedEventField(TextbookInteractionBaseEventField):
-    """Representents the `textbook.pdf.thumbnail.navigated` event field.
+    """Represents the `textbook.pdf.thumbnail.navigated` event field.
 
     Attribute:
         name (str): Consists of the value `textbook.pdf.thumbnail.navigated`.
@@ -50,7 +49,7 @@ class TextbookPdfThumbnailNavigatedEventField(TextbookInteractionBaseEventField)
 
 
 class TextbookPdfOutlineToggledEventField(TextbookInteractionBaseEventField):
-    """Representents the `textbook.pdf.outline.toggled` event field.
+    """Represents the `textbook.pdf.outline.toggled` event field.
 
     Attribute:
         name (str): Consists of the value `textbook.pdf.outline.toggled`.
@@ -60,7 +59,7 @@ class TextbookPdfOutlineToggledEventField(TextbookInteractionBaseEventField):
 
 
 class TextbookPdfChapterNavigatedEventField(AbstractBaseEventField):
-    """Representents the `textbook.pdf.chapter.navigated` event field.
+    """Represents the `textbook.pdf.chapter.navigated` event field.
 
     Attributes:
         name (str): Consists of the value `textbook.pdf.chapter.navigated`.
@@ -71,15 +70,14 @@ class TextbookPdfChapterNavigatedEventField(AbstractBaseEventField):
     name: Literal["textbook.pdf.chapter.navigated"]
     chapter: constr(
         regex=(
-            r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type"  # noqa : F722
-            r"@sequential\+block@[a-f0-9]{32}.+\.pdf$"  # noqa : F722
+            r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"  # noqa: F722
         )
     )
     chapter_title: str
 
 
 class TextbookPdfPageNavigatedEventField(TextbookInteractionBaseEventField):
-    """Representents the `textbook.pdf.page.navigated` event field.
+    """Represents the `textbook.pdf.page.navigated` event field.
 
     Attribute:
         name (str): Consists of the value `textbook.pdf.page.navigated`.
@@ -89,7 +87,7 @@ class TextbookPdfPageNavigatedEventField(TextbookInteractionBaseEventField):
 
 
 class TextbookPdfZoomButtonsChangedEventField(TextbookInteractionBaseEventField):
-    """Representents the `textbook.pdf.zoom.buttons.changed` event field.
+    """Represents the `textbook.pdf.zoom.buttons.changed` event field.
 
     Attributes:
         name (str): Consists of the value `textbook.pdf.zoom.buttons.changed`.
@@ -101,7 +99,7 @@ class TextbookPdfZoomButtonsChangedEventField(TextbookInteractionBaseEventField)
 
 
 class TextbookPdfZoomMenuChangedEventField(TextbookInteractionBaseEventField):
-    """Representents the `textbook.pdf.zoom.menu.changed` event field.
+    """Represents the `textbook.pdf.zoom.menu.changed` event field.
 
     Attributes:
         name (str): Consists of the value `textbook.pdf.zoom.menu.changed`.
@@ -112,18 +110,15 @@ class TextbookPdfZoomMenuChangedEventField(TextbookInteractionBaseEventField):
     name: Literal["textbook.pdf.zoom.menu.changed"]
     amount: Union[
         Literal["1"],
-        Literal["0.75"],
-        Literal["1.5"],
-        Literal["custom"],
-        Literal["page_actual"],
-        Literal["auto"],
-        Literal["page_width"],
-        Literal["page_fit"],
+        Literal["0.5"],
+        Literal["2"],
+        Literal["3"],
+        Literal["4"],
     ]
 
 
 class TextbookPdfDisplayScaledEventField(TextbookInteractionBaseEventField):
-    """Representents the `textbook.pdf.display.scaled` event field.
+    """Represents the `textbook.pdf.display.scaled` event field.
 
     Attributes:
         name (str): Consists of the value `textbook.pdf.display.scaled`.
@@ -131,11 +126,11 @@ class TextbookPdfDisplayScaledEventField(TextbookInteractionBaseEventField):
     """
 
     name: Literal["textbook.pdf.display.scaled"]
-    amount: constr(regex=r"^[+-]?([0-9]*[.])?[0-9]+$")  # noqa: F722
+    amount: float
 
 
 class TextbookPdfPageScrolledEventField(TextbookInteractionBaseEventField):
-    """Representents the `textbook.pdf.page.scrolled` event field.
+    """Represents the `textbook.pdf.page.scrolled` event field.
 
     Attributes:
         name (str): Consists of the value `textbook.pdf.page.scrolled`.
@@ -147,7 +142,7 @@ class TextbookPdfPageScrolledEventField(TextbookInteractionBaseEventField):
 
 
 class TextbookPdfSearchExecutedEventField(TextbookInteractionBaseEventField):
-    """Representents the `textbook.pdf.search.executed` event field.
+    """Represents the `textbook.pdf.search.executed` event field.
 
     Attributes:
         name (str): Consists of the value `textbook.pdf.search.executed`.
@@ -164,11 +159,11 @@ class TextbookPdfSearchExecutedEventField(TextbookInteractionBaseEventField):
     caseSensitive: bool
     highlightAll: bool
     query: str
-    status: Union[Literal[""], Literal["not found"]]
+    status: str
 
 
 class TextbookPdfSearchNavigatedNextEventField(TextbookInteractionBaseEventField):
-    """Representents the `textbook.pdf.search.navigatednext` event field.
+    """Represents the `textbook.pdf.search.navigatednext` event field.
 
     Attributes:
         name (str): Consists of the value `textbook.pdf.search.navigatednext`.
@@ -188,11 +183,11 @@ class TextbookPdfSearchNavigatedNextEventField(TextbookInteractionBaseEventField
     findPrevious: bool
     highlightAll: bool
     query: str
-    status: Union[Literal[""], Literal["not found"]]
+    status: str
 
 
 class TextbookPdfSearchHighlightToggledEventField(TextbookInteractionBaseEventField):
-    """Representents the `textbook.pdf.search.highlight.toggled` event field.
+    """Represents the `textbook.pdf.search.highlight.toggled` event field.
 
     Attributes:
         name (str): Consists of the value `textbook.pdf.search.highlight.toggled`.
@@ -209,13 +204,13 @@ class TextbookPdfSearchHighlightToggledEventField(TextbookInteractionBaseEventFi
     caseSensitive: bool
     highlightAll: bool
     query: str
-    status: Union[Literal[""], Literal["not found"]]
+    status: str
 
 
 class TextbookPdfSearchCaseSensitivityToggledEventField(
     TextbookInteractionBaseEventField
 ):
-    """Representents the `textbook.pdf.searchcasesensitivity.toggled` event field.
+    """Represents the `textbook.pdf.searchcasesensitivity.toggled` event field.
 
     Attributes:
         name (str): Consists of the value `textbook.pdf.searchcasesensitivity.toggled`.
@@ -232,11 +227,11 @@ class TextbookPdfSearchCaseSensitivityToggledEventField(
     caseSensitive: bool
     highlightAll: bool
     query: str
-    status: Union[Literal[""], Literal["not found"]]
+    status: str
 
 
 class BookEventField(AbstractBaseEventField):
-    """Representents the `book` event field.
+    """Represents the `book` event field.
 
     Attributes:
         chapter (str): Consists of the name of the PDF file.
@@ -252,8 +247,7 @@ class BookEventField(AbstractBaseEventField):
 
     chapter: constr(
         regex=(
-            r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type"  # noqa : F722
-            r"@sequential\+block@[a-f0-9]{32}.+\.pdf$"  # noqa : F722
+            r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"  # noqa: F722
         )
     )
     name: Union[
@@ -322,8 +316,8 @@ class UITextbookPdfThumbnailNavigated(BaseBrowserEvent):
     Attributes:
         event (TextbookPdfThumbnailNavigatedEventField):
             See TextbookPdfThumbnailNavigatedEventField.
-        event_type (str): Consists of the value `textbook.pdf.thumbnails.navigated`.
-        name (str): Consists of the value `textbook.pdf.thumbnails.navigated`.
+        event_type (str): Consists of the value `textbook.pdf.thumbnail.navigated`.
+        name (str): Consists of the value `textbook.pdf.thumbnail.navigated`.
     """
 
     __selector__ = selector(
@@ -422,7 +416,7 @@ class UITextbookPdfPageNavigated(BaseBrowserEvent):
 class UITextbookPdfZoomButtonsChanged(BaseBrowserEvent):
     """Represents the `textbook.pdf.zoom.buttons.changed` browser event model.
 
-    The browser emits ths event when a user clicks either the <kbd>Zoom In</kbd>
+    The browser emits this event when a user clicks either the <kbd>Zoom In</kbd>
     or <kbd>Zoom Out</kbd> icon.
 
     Attributes:
@@ -475,7 +469,8 @@ class UITextbookPdfZoomMenuChanged(BaseBrowserEvent):
 class UITextbookPdfDisplayScaled(BaseBrowserEvent):
     """Represents the `textbook.pdf.display.scaled` browser event model.
 
-    The browser emits this event when the display magnification changes.
+    The browser emits this event when the display magnification changes or the first page
+    is shown.
 
     Attributes:
         event (TextbookPdfDisplayScaledEventField): See TextbookPdfDisplayScaledEventField.
@@ -500,8 +495,8 @@ class UITextbookPdfDisplayScaled(BaseBrowserEvent):
 class UITextbookPdfPageScrolled(BaseBrowserEvent):
     """Represents the `textbook.pdf.page.scrolled` browser event model.
 
-    The browser emits this event each time the displayed page changes while a user
-    scrolls up or down.
+    The browser emits this event when the user scrolls to the next or previous page and
+    the transition takes less than 50 milliseconds.
 
     Attributes:
         event (TextbookPdfPageScrolledEventField): See TextbookPdfPageScrolledEventField.

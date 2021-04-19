@@ -49,10 +49,7 @@ def test_fields_edx_textbook_interaction_base_event_field_with_valid_content(eve
     a ValidationError."""
 
     assert re.match(
-        (
-            r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"
-            r"type@sequential\+block@[a-f0-9]{32}.+\.pdf$"
-        ),
+        (r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"),
         event.chapter,
     )
 
@@ -95,10 +92,7 @@ def test_fields_edx_textbook_pdf_chapter_navigated_event_field_with_valid_conten
     a ValidationError."""
 
     assert re.match(
-        (
-            r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"
-            r"type@sequential\+block@[a-f0-9]{32}.+\.pdf$"
-        ),
+        (r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"),
         event.chapter,
     )
 
@@ -106,15 +100,14 @@ def test_fields_edx_textbook_pdf_chapter_navigated_event_field_with_valid_conten
 @pytest.mark.parametrize(
     "chapter",
     (
-        "block-v2:orgX=CS11+20_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea1file.pdf",
-        "block-v1:orgX=CS1120_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea1file.pdf",
-        "block-v1:orgX=CS11=20_T1+tipe@sequential+block@d0d4a647742943e3951b45d9db8a0ea1file.pdf",
-        "block-v1:orgX=CS11+20_T1+",
-        "type@sequentialblock@d0d4a647742943e3951b45d9db8a0ea1file.pdf",
-        "block-v1:orgX=CS11+20_T1+type@sequential+block@d0d4a647742943z3951b45d9db8a0ea1file.pdf",
-        "block-v1:orgX=CS11+20_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea13file.pdf",
-        "block-v1:orgX=CS11+20_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea1file",
-        "block-v1:orgX=CS11+20_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea1file.jpg",
+        "asset-v2:orgX=CS11+20_T1+type@asset+block@d0d4a647742943e3951b45d9db8a0ea1file.pdf",
+        "asset-v1:orgX=CS1120_T1+type@asset+block@d0d4a647742943e3951b45d9db8a0ea1file.pdf",
+        "asset-v1:orgX=CS11=20_T1+tipe@asset+block@d0d4a647742943e3951b45d9db8a0ea1file.pdf",
+        "asset-v1:orgX=CS11+20_T1+",
+        "type@assetblock@d0d4a647742943e3951b45d9db8a0ea1file.pdf",
+        "asset-v1:orgX=CS11+20_T1+type@asset+block@d0d4a647742943z3951b45d9db8a0ea1file.pdf",
+        "asset-v1:orgX=CS11+20_T1+type@asset+block@d0d4a647742943e3951b45d9db8a0ea13file.pdf",
+        "asset-v1:orgX=CS11+20_T1+type@asset+block@d0d4a647742943e3951b45d9db8a0ea1file",
     ),
 )
 @settings(max_examples=1)
@@ -130,31 +123,6 @@ def test_fields_edx_textbook_pdf_chapter_navigated_event_field_with_invalid_cont
 
     with pytest.raises(ValidationError, match="chapter\n  string does not match regex"):
         TextbookPdfChapterNavigatedEventField(**invalid_event)
-
-
-@settings(max_examples=1)
-@given(st.builds(TextbookPdfDisplayScaledEventField))
-def test_fields_edx_textbook_pdf_display_scaled_event_field_with_valid_content(event):
-    """Tests that a valid TextbookPdfDisplayScaledEventField field does not raise
-    a ValidationError."""
-
-    assert re.match(r"^[+-]?([0-9]*[.])?[0-9]+$", event.amount)
-
-
-@pytest.mark.parametrize("amount", ("0,95", ",95", "foo"))
-@settings(max_examples=1)
-@given(st.builds(TextbookPdfDisplayScaledEventField))
-def test_fields_edx_textbook_pdf_display_scaled_event_field_with_invalid_content(
-    amount, event
-):
-    """Tests that an invalid TextbookPdfDisplayScaledEventField field does not raise
-    a ValidationError."""
-
-    invalid_event = json.loads(event.json())
-    invalid_event["amount"] = amount
-
-    with pytest.raises(ValidationError, match="amount\n  string does not match regex"):
-        TextbookPdfDisplayScaledEventField(**invalid_event)
 
 
 @settings(max_examples=1)
