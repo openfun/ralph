@@ -250,7 +250,9 @@ class BookEventField(AbstractBaseEventField):
             r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"  # noqa: F722
         )
     )
-    name: Union[Literal["textbook.pdf.page.loaded"], Literal["textbook.pdf.page.navigatednext"]]
+    name: Union[
+        Literal["textbook.pdf.page.loaded"], Literal["textbook.pdf.page.navigatednext"]
+    ]
     new: int
     old: Optional[int]
     type: Union[Literal["gotopage"], Literal["prevpage"], Literal["nextpage"]] = Field(
