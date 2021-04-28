@@ -216,40 +216,63 @@ jobs:
           command: docker images "ralph:${CIRCLE_SHA1}*"
 
       - run:
-          name: Install the OC client
+          name: Install the kubectl client and k3d
           command: |
-            mkdir /tmp/openshift/
-            wget https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz -O /tmp/openshift/openshift.tar.gz
-            tar xzf /tmp/openshift/openshift.tar.gz --strip-components=1 -C /tmp/openshift/
-            cp /tmp/openshift/oc $HOME/bin/
+            export KUBECTL_RELEASE="v1.20.2"
+            curl -Lo "${HOME}/bin/kubectl" "https://dl.k8s.io/release/${KUBECTL_RELEASE}/bin/linux/amd64/kubectl"
+            curl -Lo /tmp/kubectl.sha256 "https://dl.k8s.io/${KUBECTL_RELEASE}/bin/linux/amd64/kubectl.sha256"
+            echo "$(</tmp/kubectl.sha256) ${HOME}/bin/kubectl" | sha256sum --check
+            chmod 755 "${HOME}/bin/kubectl"
+
+            export K3D_RELEASE="v4.2.0"
+            curl -Lo "${HOME}/bin/k3d" "https://github.com/rancher/k3d/releases/download/${K3D_RELEASE}/k3d-linux-amd64"
+            curl -sL https://github.com/rancher/k3d/releases/download/${K3D_RELEASE}/sha256sum.txt | \
+              grep _dist/k3d-linux-amd64 | \
+              sed "s|_dist/k3d-linux-amd64|${HOME}/bin/k3d|" | \
+              sha256sum --check
+            chmod 755 "${HOME}/bin/k3d"
 
       - run:
-          name: Configure Docker for OpenShift cluster
+          name: Configure sysctl limits for Elasticsearch
           command: |
             # Elasticsearch requires to increase this setting's default value
             sudo sysctl -w vm/max_map_count=262144
-            sudo bash -c "echo '{\"insecure-registries\": [\"172.30.0.0/16\"]}' > /etc/docker/daemon.json"
-            sudo service docker restart
 
       - run:
-          name: Run local OpenShift cluster & configure environment
+          name: Run local k3d cluster & configure environment
           command: |
-            K8S_DOMAIN=$(hostname -I | awk '{print $1}')
-            export K8S_DOMAIN
-            oc cluster up --server-loglevel=5 --public-hostname=${K8S_DOMAIN}
-            oc login https://${K8S_DOMAIN}:8443 -u developer -p developer --insecure-skip-tls-verify=true
+            # FIXME
+            # This should be fixed once the new arnold CLI has been merged to master
+            curl -Lo "${HOME}/bin/init-cluster" "https://raw.githubusercontent.com/openfun/arnold/migration-to-k8s/bin/init-cluster"
+            # curl -Lo "${HOME}/bin/init-cluster" "https://raw.githubusercontent.com/openfun/arnold/master/bin/init-cluster"
+            chmod +x "${HOME}/bin/init-cluster"
+            # Bootstrap the k3d cluster with the following specific settings :
+            # - use standard HTTP and HTTPS ports
+            # - pre-provision 15 volumes instead of 100
+            MINIMUM_AVAILABLE_RWX_VOLUME=15 \
+            K3D_BIND_HOST_PORT_HTTP=80 \
+            K3D_BIND_HOST_PORT_HTTPS=443 \
+            K3D_REGISTRY_HOST=registry.127.0.0.1.nip.io \
+            K3D_ENABLE_REGISTRY=1 \
+              init-cluster arnold
             # Set environment variables for the CI
-            echo "export K8S_DOMAIN=${K8S_DOMAIN}" >> $BASH_ENV
-            echo "export ARNOLD_DEFAULT_VAULT_PASSWORD=arnold" >> $BASH_ENV
+            echo "export K8S_DOMAIN=$(hostname -I | awk '{print $1}')" >> $BASH_ENV
+            echo 'export ARNOLD_DEFAULT_VAULT_PASSWORD="arnold"' >> $BASH_ENV
             echo 'export ANSIBLE_VAULT_PASSWORD="${ARNOLD_DEFAULT_VAULT_PASSWORD}"' >> $BASH_ENV
-            echo "export K8S_AUTH_VERIFY_SSL=no" >> $BASH_ENV
-            echo "export INTERNAL_DOCKER_REGISTRY=172.30.1.1:5000" >> $BASH_ENV
+            # FIXME
+            # arnold image tag should point to the default value (the following line should be removed)
+            echo "export ARNOLD_IMAGE_TAG=migration-to-k8s" >> $BASH_ENV
+            echo "export K3D_REGISTRY_NAME=k3d-registry.127.0.0.1.nip.io" >> $BASH_ENV
+            echo "export K3D_REGISTRY_PORT=5000" >> $BASH_ENV
             source $BASH_ENV
 
       - run:
           name: Install arnold CLI
           command: |
-            wget https://raw.githubusercontent.com/openfun/arnold/master/bin/arnold -O "${HOME}/bin/arnold"
+            # FIXME
+            # This should be fixed once the new arnold CLI has been merged to master
+            curl -Lo"${HOME}/bin/arnold" "https://raw.githubusercontent.com/openfun/arnold/migration-to-k8s/bin/arnold"
+            # curl -Lo"${HOME}/bin/arnold" "https://raw.githubusercontent.com/openfun/arnold/master/bin/arnold"
             chmod +x "${HOME}/bin/arnold"
 
       - run:
@@ -264,7 +287,7 @@ jobs:
             echo "skip_verification: True" > ${VARS_FILE}
             echo "apps:" >> ${VARS_FILE}
             echo "  - name: ralph" >> ${VARS_FILE}
-            echo "ralph_image_name: ${INTERNAL_DOCKER_REGISTRY}/ci-ralph/ralph" >> ${VARS_FILE}
+            echo "ralph_image_name: ${K3D_REGISTRY_NAME}:${K3D_REGISTRY_PORT}/ci-ralph/ralph" >> ${VARS_FILE}
             echo "ralph_image_tag: ${CIRCLE_SHA1}" >> ${VARS_FILE}
             echo "ralph_app_replicas: 1" >> ${VARS_FILE}
             echo "ralph_cronjobs:" >> ${VARS_FILE}
@@ -275,19 +298,16 @@ jobs:
       - run:
           name: Push ralph image to the k8s cluster docker registry
           command: |
-            docker login -u developer -p "$(oc whoami -t)" "${INTERNAL_DOCKER_REGISTRY}"
-            docker tag ralph:${CIRCLE_SHA1} "${INTERNAL_DOCKER_REGISTRY}/ci-ralph/ralph:${CIRCLE_SHA1}"
-            arnold -d -c ralph -e ci create_project
-            docker push "${INTERNAL_DOCKER_REGISTRY}/ci-ralph/ralph:${CIRCLE_SHA1}"
+            docker tag ralph:${CIRCLE_SHA1} "${K3D_REGISTRY_NAME}:${K3D_REGISTRY_PORT}/ci-ralph/ralph:${CIRCLE_SHA1}"
+            docker push "${K3D_REGISTRY_NAME}:${K3D_REGISTRY_PORT}/ci-ralph/ralph:${CIRCLE_SHA1}"
 
       - run:
           name: Bootstrap ralph application
           command: |
             arnold -d -c ralph -e ci -a ralph init
             arnold -d -c ralph -e ci -a ralph deploy
-            oc project ci-ralph
-            oc get pods -l app=ralph | grep Running
-            test $(oc get cj -o name ralph-ci-test | wc -l) -eq 1
+            kubectl -n ci-ralph get pods -l app=ralph | grep Running
+            test $(kubectl -n ci-ralph get cj -o name ralph-ci-test | wc -l) -eq 1
 
   # ---- Packaging jobs ----
   package:
@@ -515,10 +535,6 @@ workflows:
       #
       # Deploy ralph in a k8s cluster using arnold
       - tray:
-          requires:
-            - build-docs
-            - lint
-            - test
           filters:
             tags:
               only: /.*/
