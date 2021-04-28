@@ -6,7 +6,7 @@ items:
     kind: CronJob
     metadata:
       name: "ralph-{{ cronjob.name }}"
-      namespace: "{{ project_name }}"
+      namespace: "{{ namespace_name }}"
       labels:
         app: ralph
         service: app
@@ -55,5 +55,8 @@ items:
                   secret:
                     secretName: "{{ ralph_es_ca_secret_name }}"
 {% endif %}
+              securityContext:
+                runAsUser: {{ container_uid }}
+                runAsGroup: {{ container_gid }}
               restartPolicy: Never
 {% endfor %}

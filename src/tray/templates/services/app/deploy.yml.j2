@@ -1,19 +1,24 @@
 apiVersion: v1
-kind: DeploymentConfig
+kind: Deployment
 metadata:
   labels:
     app: ralph
     service: app
   name: "ralph-app"
-  namespace: "{{ project_name }}"
+  namespace: "{{ namespace_name }}"
 spec:
   replicas: {{ ralph_app_replicas }}
+  selector:
+    matchLabels:
+      app: ralph
+      service: app
+      deployment: "ralph-app"
   template:
     metadata:
       labels:
         app: ralph
         service: app
-        deploymentconfig: "ralph-app"
+        deployment: "ralph-app"
     spec:
       # Prefer running pods on different nodes for redundancy
       affinity:
@@ -23,7 +28,7 @@ spec:
               podAffinityTerm:
                 labelSelector:
                   matchExpressions:
-                    - key: deploymentconfig
+                    - key: deployment
                       operator: In
                       values:
                         - "ralph-app"
@@ -43,10 +48,13 @@ spec:
             exec:
               command: ["ralph", "--help"]
             initialDelaySeconds: 3
-            periodSeconds: 1
+            # ralph can be slow to boot
+            timeoutSeconds: 10
           readinessProbe:
             exec:
               command: ["ralph", "--help"]
+            # ralph can be slow to boot
+            timeoutSeconds: 10
           env:
             - name: RALPH_APP_DIR
               value: "/app/.ralph"
@@ -69,3 +77,6 @@ spec:
           secret:
             secretName: "{{ ralph_es_ca_secret_name }}"
 {% endif %}
+      securityContext:
+        runAsUser: {{ container_uid }}
+        runAsGroup: {{ container_gid }}
