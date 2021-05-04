@@ -44,17 +44,6 @@ spec:
           imagePullPolicy: Always
           command: ["/bin/sh"]
           args: ["-c", "while true; do echo -n '.'; sleep 3600; done"]
-          livenessProbe:
-            exec:
-              command: ["ralph", "--help"]
-            initialDelaySeconds: 3
-            # ralph can be slow to boot
-            timeoutSeconds: 10
-          readinessProbe:
-            exec:
-              command: ["ralph", "--help"]
-            # ralph can be slow to boot
-            timeoutSeconds: 10
           env:
             - name: RALPH_APP_DIR
               value: "/app/.ralph"

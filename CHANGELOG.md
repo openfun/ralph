@@ -22,6 +22,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Migrate model tests from factories to hypothesis strategies
 - Upgrade `python-swiftclient` to `3.11.1`
 - Tray: switch from openshift to k8s (BC)
+- Tray: remove useless deployment probes
 
 ### Fixed
 
