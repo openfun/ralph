@@ -10,6 +10,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- xAPI page viewed and page terminated pydantic models
 - Implement edx navigational events pydantic models
 - Implement edx enrollment events pydantic models
 - Install security updates in project Docker images
