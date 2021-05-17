@@ -113,7 +113,7 @@ def test_cli_extract_command_usage():
     result = runner.invoke(cli, ["extract"])
     assert result.exit_code > 0
     assert (
-        "Error: Missing option '-p' / '--parser'.  Choose from:\n\tgelf."
+        "Error: Missing option '-p' / '--parser'. Choose from:\n\tgelf\n"
     ) in result.output
 
 
@@ -146,7 +146,7 @@ def test_validate_command_usage():
     result = runner.invoke(cli, ["validate"])
     assert result.exit_code > 0
     assert (
-        "Error: Missing option '-f' / '--format'.  Choose from:\n\tedx."
+        "Error: Missing option '-f' / '--format'. Choose from:\n\tedx\n"
     ) in result.output
 
 
@@ -224,7 +224,7 @@ def test_cli_fetch_command_usage():
     result = runner.invoke(cli, ["fetch"])
     assert result.exit_code > 0
     assert (
-        "Error: Missing option '-b' / '--backend'.  Choose from:\n\tes,\n\tldp,\n\tfs,\n\tswift."
+        "Error: Missing option '-b' / '--backend'. Choose from:\n\tes,\n\tldp,\n\tfs,\n\tswift\n"
         in result.output
     )
 
@@ -308,7 +308,15 @@ def test_cli_fetch_command_with_es_backend(es):
     runner = CliRunner()
     result = runner.invoke(
         cli,
-        ["fetch", "-b", "es", "--es-hosts", ES_TEST_HOSTS, "--es-index", ES_TEST_INDEX],
+        [
+            "fetch",
+            "-b",
+            "es",
+            "--es-hosts",
+            ",".join(ES_TEST_HOSTS),
+            "--es-index",
+            ES_TEST_INDEX,
+        ],
     )
     assert result.exit_code == 0
     assert "\n".join([json.dumps({"id": idx}) for idx in range(10)]) in result.output
@@ -351,7 +359,7 @@ def test_cli_list_command_usage():
     result = runner.invoke(cli, ["list"])
     assert result.exit_code > 0
     assert (
-        "Error: Missing option '-b' / '--backend'.  Choose from:\n\tldp,\n\tfs,\n\tswift."
+        "Error: Missing option '-b' / '--backend'. Choose from:\n\tldp,\n\tfs,\n\tswift\n"
         in result.output
     )
 
@@ -566,10 +574,17 @@ def test_cli_push_command_with_es_backend(es):
     runner = CliRunner()
     result = runner.invoke(
         cli,
-        ["push", "-b", "es", "--es-hosts", ES_TEST_HOSTS, "--es-index", ES_TEST_INDEX],
+        [
+            "push",
+            "-b",
+            "es",
+            "--es-hosts",
+            ",".join(ES_TEST_HOSTS),
+            "--es-index",
+            ES_TEST_INDEX,
+        ],
         input="\n".join(json.dumps(record) for record in records),
     )
-
     assert result.exit_code == 0
 
     # As we bulk insert documents, the index needs to be refreshed before making
