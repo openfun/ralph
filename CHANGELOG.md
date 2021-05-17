@@ -10,7 +10,8 @@ and this project adheres to
 
 ### Added
 
-- xAPI page viewed and page terminated pydantic models
+- xAPI video `played` pydantic models
+- xAPI page `viewed` and page `terminated` pydantic models
 - Implement edx navigational events pydantic models
 - Implement edx enrollment events pydantic models
 - Install security updates in project Docker images
