@@ -1,5 +1,7 @@
 """Common xAPI actor field definitions"""
 
+from typing import Literal, Optional
+
 from pydantic import AnyUrl
 
 from ..config import BaseModelWithConfig
@@ -26,4 +28,5 @@ class ActorField(BaseModelWithConfig):
         account (ActorAccountField): See ActorAccountField.
     """
 
+    objectType: Optional[Literal["Agent"]]
     account: ActorAccountField

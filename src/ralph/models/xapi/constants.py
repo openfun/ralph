@@ -4,6 +4,7 @@ from typing import Literal
 
 # Languages
 LANG_EN_DISPLAY = Literal["en"]  # pylint:disable=invalid-name
+LANG_EN_US_DISPLAY = Literal["en-US"]  # pylint:disable=invalid-name
 
 # xAPI activities
 ACTIVITY_PAGE_DISPLAY = Literal["page"]  # pylint:disable=invalid-name
@@ -20,6 +21,8 @@ VERB_VIEWED_DISPLAY = Literal["viewed"]  # pylint:disable=invalid-name
 VERB_VIEWED_ID = Literal[  # pylint:disable=invalid-name
     "http://id.tincanapi.com/verb/viewed"
 ]
+
+VERB_PLAYED_DISPLAY = Literal["played"]  # pylint:disable=invalid-name
 
 # xAPI extensions
 EXTENSION_SCHOOL_ID = "https://w3id.org/xapi/acrossx/extensions/school"
