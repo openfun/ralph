@@ -19,6 +19,11 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- Upgrade `click` to `8.0.0`
+- Upgrade `click-option-group` to `0.5.3`
+- Upgrade `elasticsearch` to `7.12.1`
+- Upgrade `pydantic` to `1.8.2`
+- Upgrade `sentry_sdk` to `1.1.0`
 - Rename edx models
 - Migrate model tests from factories to hypothesis strategies
 - Upgrade `python-swiftclient` to `3.11.1`
