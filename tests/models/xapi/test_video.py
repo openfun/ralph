@@ -4,7 +4,6 @@ from hypothesis import given, provisional, settings
 from hypothesis import strategies as st
 
 from ralph.models.xapi.fields.actors import ActorAccountField, ActorField
-from ralph.models.xapi.video.events import VideoPlayed
 from ralph.models.xapi.video.fields.contexts import VideoPlayedContextField
 from ralph.models.xapi.video.fields.objects import (
     VideoObjectDefinitionField,
@@ -12,6 +11,7 @@ from ralph.models.xapi.video.fields.objects import (
 )
 from ralph.models.xapi.video.fields.results import VideoPlayedResultField
 from ralph.models.xapi.video.fields.verbs import VideoPlayedVerbField
+from ralph.models.xapi.video.statements import VideoPlayed
 
 
 @settings(max_examples=1)

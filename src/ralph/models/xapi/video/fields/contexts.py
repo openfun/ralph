@@ -5,7 +5,7 @@ from typing import List, Literal, Optional
 from pydantic import UUID5, Field
 
 from ...base import BaseModelWithConfig
-from ..constants import VIDEO_CONTEXT_CATEGORY, VIDEO_CONTEXT_EXTENSION_SESSION_ID
+from ..constants import VIDEO_CONTEXT_CATEGORY, VIDEO_EXTENSION_SESSION_ID
 
 
 class VideoPlayedContextExtensionsField(BaseModelWithConfig):
@@ -15,7 +15,7 @@ class VideoPlayedContextExtensionsField(BaseModelWithConfig):
         session(uuid5): Consists of the ID of the active session.
     """
 
-    session: Optional[UUID5] = Field(alias=VIDEO_CONTEXT_EXTENSION_SESSION_ID)
+    session: Optional[UUID5] = Field(alias=VIDEO_EXTENSION_SESSION_ID)
 
 
 class VideoPlayedContextActivitiesField(BaseModelWithConfig):

@@ -3,8 +3,8 @@
 from typing import Literal
 
 # xAPI video extensions
-VIDEO_CONTEXT_EXTENSION_SESSION_ID = "https://w3id.org/xapi/video/extensions/session-id"
-VIDEO_RESULT_EXTENSION_TIME = "https://w3id.org/xapi/video/extensions/time"
+VIDEO_EXTENSION_SESSION_ID = "https://w3id.org/xapi/video/extensions/session-id"
+VIDEO_EXTENSION_TIME = "https://w3id.org/xapi/video/extensions/time"
 
 
 # xAPI video ID
