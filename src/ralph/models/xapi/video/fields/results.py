@@ -5,7 +5,7 @@ from typing import Optional
 from pydantic import Field
 
 from ...base import BaseModelWithConfig
-from ..constants import VIDEO_RESULT_EXTENSION_TIME
+from ..constants import VIDEO_EXTENSION_TIME
 
 
 class VideoPlayedResultExtensionsField(BaseModelWithConfig):
@@ -15,7 +15,7 @@ class VideoPlayedResultExtensionsField(BaseModelWithConfig):
         time (float): Consists of the spent time on the video when the event was emitted.
     """
 
-    time: Optional[float] = Field(alias=VIDEO_RESULT_EXTENSION_TIME)
+    time: Optional[float] = Field(alias=VIDEO_EXTENSION_TIME)
 
 
 class VideoPlayedResultField(BaseModelWithConfig):

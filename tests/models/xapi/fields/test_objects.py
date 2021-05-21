@@ -3,7 +3,7 @@
 from hypothesis import given, provisional, settings
 from hypothesis import strategies as st
 
-from ralph.models.xapi.fields.objects import PageObjectField
+from ralph.models.xapi.navigation.fields.objects import PageObjectField
 
 
 @settings(max_examples=1)
