@@ -22,7 +22,7 @@ and this project adheres to
 
 - Upgrade `click` to `8.0.1`
 - Upgrade `click-option-group` to `0.5.3`
-- Upgrade `elasticsearch` to `7.12.1`
+- Upgrade `elasticsearch` to `7.13.0`
 - Upgrade `pydantic` to `1.8.2`
 - Upgrade `sentry_sdk` to `1.1.0`
 - Rename edx models
