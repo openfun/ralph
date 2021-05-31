@@ -27,6 +27,10 @@ class EventKeyError(Exception):
     """Raised when an expected event key has not been found."""
 
 
+class MissingConversionSetException(Exception):
+    """Raised when an expected conversion set has not been found."""
+
+
 class UnknownEventException(Exception):
     """Raised when no pydantic model is found for a given event."""
 

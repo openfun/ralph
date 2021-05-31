@@ -24,10 +24,10 @@ class BaseXapiConverter(BaseConversionSet):
     `agent`, `accept_language:`, `context.course_user_tags`.
     """
 
-    def __init__(self, uuid_namespace: str, home_page: str):
+    def __init__(self, uuid_namespace: str, platform_url: str):
         """Initializes BaseXapiConverter."""
 
-        self.home_page = home_page
+        self.platform_url = platform_url
         try:
             self.uuid_namespace = UUID(uuid_namespace)
         except (TypeError, ValueError, AttributeError) as err:
@@ -45,7 +45,7 @@ class BaseXapiConverter(BaseConversionSet):
                 True,
             ),
             ConversionItem(
-                "actor__account__homePage", transformers=lambda _: self.home_page
+                "actor__account__homePage", transformers=lambda _: self.platform_url
             ),
             ConversionItem(
                 "actor__account__name",

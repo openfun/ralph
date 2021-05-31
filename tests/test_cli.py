@@ -11,12 +11,15 @@ from click.testing import CliRunner
 from elasticsearch.helpers import bulk, scan
 from hypothesis import given, provisional, settings
 from hypothesis import strategies as st
+from pydantic import ValidationError
 
 from ralph.backends.storage.fs import FSStorage
 from ralph.backends.storage.ldp import LDPStorage
 from ralph.cli import CommaSeparatedKeyValueParamType, cli
 from ralph.defaults import APP_DIR, FS_STORAGE_DEFAULT_PATH
+from ralph.exceptions import ConfigurationException
 from ralph.models.edx.navigational import UIPageClose
+from ralph.models.xapi.navigation.statements import PageTerminated
 
 from tests.fixtures.backends import ES_TEST_HOSTS, ES_TEST_INDEX
 
@@ -129,7 +132,7 @@ def test_cli_extract_command_with_gelf_parser(gelf_logger):
         assert '{"username": "foo"}' in result.output
 
 
-def test_validate_command_usage():
+def test_cli_validate_command_usage():
     """Tests ralph validate command usage."""
 
     runner = CliRunner()
@@ -154,13 +157,96 @@ def test_validate_command_usage():
 @given(
     st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()),
 )
-def test_validate_command_with_edx_format(event):
+def test_cli_validate_command_with_edx_format(event):
     """Tests the validate command using the edx format."""
 
     event_str = event.json()
     runner = CliRunner()
     result = runner.invoke(cli, ["validate", "-f", "edx"], input=event_str)
     assert event_str in result.output
+
+
+def test_cli_convert_command_usage():
+    """Tests ralph convert command usage."""
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["convert", "--help"])
+
+    assert result.exit_code == 0
+    assert (
+        "Options:\n"
+        "  From edX to xAPI converter options: \n"
+        "    -u, --uuid-namespace TEXT     The UUID namespace to use for the `ID` field\n"
+        "                                  generation\n"
+        "    -p, --platform-url TEXT       The `actor.account.homePage` to use in the\n"
+        "                                  xAPI statements  [required]\n"
+        "  -f, --from [edx]                Input events format to convert  [required]\n"
+        "  -t, --to [xapi]                 Output events format  [required]\n"
+        "  -I, --ignore-errors             Continue writing regardless of raised errors\n"
+        "  -F, --fail-on-unknown           Stop converting at first unknown event\n"
+    ) in result.output
+
+    result = runner.invoke(cli, ["convert"])
+    assert result.exit_code > 0
+    assert "Error: Missing option '-p' / '--platform-url'" in result.output
+
+
+@settings(max_examples=1)
+@given(
+    st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()),
+)
+@pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
+def test_cli_convert_command_from_edx_to_xapi_format(valid_uuid, event):
+    """Tests the convert command from edx to xapi format."""
+
+    event_str = event.json()
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        [
+            "-v",
+            "ERROR",
+            "convert",
+            "-f",
+            "edx",
+            "-t",
+            "xapi",
+            "-u",
+            valid_uuid,
+            "-p",
+            "https://fun-mooc.fr",
+        ],
+        input=event_str,
+    )
+    assert result.exit_code == 0
+    try:
+        PageTerminated(**json.loads(result.output))
+    except ValidationError as err:
+        pytest.fail(f"Converted event is invalid: {err}")
+
+
+@pytest.mark.parametrize("invalid_uuid", ["", None, 1, {}])
+def test_cli_convert_command_with_invalid_uuid(invalid_uuid):
+    """Tests that the convert command raises an exception when the uuid namespace is invalid."""
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        [
+            "convert",
+            "-f",
+            "edx",
+            "-t",
+            "xapi",
+            "-u",
+            invalid_uuid,
+            "-p",
+            "https://fun-mooc.fr",
+        ],
+    )
+    assert result.exit_code > 0
+    assert isinstance(result.exception, ConfigurationException)
+    assert str(result.exception) == "Invalid UUID namespace"
 
 
 @cli.command()
