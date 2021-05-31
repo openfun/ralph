@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Added
 
+- `convert` command to transform edx events to xAPI format
 - EdX to xAPI converters for page `viewed` and`page_close` events
 - Implement core event format converter
 - xAPI video `played` pydantic models

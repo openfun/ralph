@@ -25,7 +25,7 @@ class ServerEventToPageViewed(BaseXapiConverter):
                 ConversionItem(
                     "object__id",
                     "event_type",
-                    lambda event_type: self.home_page + event_type,
+                    lambda event_type: self.platform_url + event_type,
                 ),
             }
         )
