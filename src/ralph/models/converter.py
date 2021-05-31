@@ -1,15 +1,27 @@
 """Converter methods definition"""
 
 import json
+import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, Callable, Union
+from importlib import import_module
+from inspect import getmembers, isclass
+from types import ModuleType
+from typing import Any, Callable, TextIO, Union
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from ralph.defaults import MODEL_PATH_SEPARATOR
-from ralph.exceptions import BadFormatException, ConversionException
+from ralph.exceptions import (
+    BadFormatException,
+    ConversionException,
+    UnknownEventException,
+)
 from ralph.utils import get_dict_value_from_path, set_dict_value_from_path
+
+from .selector import ModelSelector
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -135,3 +147,91 @@ def convert_str_event(event_str: str, conversion_set: BaseConversionSet) -> Base
         msg = "Failed to parse the event, invalid JSON string"
         raise BadFormatException(msg) from err
     return convert_dict_event(event, event_str, conversion_set)
+
+
+class Converter:
+    """Converts events using pydantic models."""
+
+    def __init__(
+        self,
+        model_selector=ModelSelector(),
+        module="ralph.models.edx.converters.xapi",
+        **conversion_set_kwargs,
+    ):
+        """Initializes the Converter."""
+
+        self.model_selector = model_selector
+        self.src_conversion_set = self.get_src_conversion_set(
+            import_module(module), **conversion_set_kwargs
+        )
+
+    @staticmethod
+    def get_src_conversion_set(module: ModuleType, **conversion_set_kwargs):
+        """Returns a dictionary of initialized conversion_sets defined in the module."""
+
+        src_conversion_set = {}
+        for _, class_ in getmembers(module, isclass):
+            if issubclass(class_, BaseConversionSet):
+                src_conversion_set[class_.__src__] = class_(**conversion_set_kwargs)
+        return src_conversion_set
+
+    def convert(self, input_file: TextIO, ignore_errors: bool, fail_on_unknown: bool):
+        """Converts JSON event strings line by line."""
+
+        total = 0
+        success = 0
+        for event_str in input_file:
+            try:
+                total += 1
+                yield self._convert_event(event_str).json(
+                    exclude_none=True, by_alias=True
+                )
+                success += 1
+            except (TypeError, json.JSONDecodeError) as err:
+                message = "Input event is not a valid JSON string"
+                self._log_error(message, event_str, err)
+                if not ignore_errors:
+                    raise BadFormatException(message) from err
+            except UnknownEventException as err:
+                self._log_error(err, event_str)
+                if fail_on_unknown:
+                    raise err
+            except ConversionException as err:
+                self._log_error(err, event_str)
+                if not ignore_errors:
+                    raise err
+            except ValidationError as err:
+                message = f"Converted event is not a valid {err.model.__name__} event"
+                self._log_error(message, event_str, err)
+                if not ignore_errors:
+                    raise err
+        logger.info("Total events: %d, Invalid events: %d", total, total - success)
+
+    def _convert_event(self, event_str: str):
+        """Converts a single JSON string event.
+
+        Args:
+            event_str (str): The event to convert.
+
+        Returns:
+            event (BaseModel): The converted event pydantic model.
+
+        Raises:
+            TypeError: When the event_str is not of type string.
+            JSONDecodeError: When the event_str is not a valid JSON string.
+            UnknownEventException: When no matching model or conversion set is found for the event.
+            ConversionException: When a field transformation fails.
+            ValidationError: When the final converted event is invalid.
+        """
+
+        event = json.loads(event_str)
+        model = self.model_selector.get_model(event)
+        conversion_set = self.src_conversion_set.get(model, None)
+        if not conversion_set:
+            raise UnknownEventException("No conversion set found for input event")
+        return convert_dict_event(event, event_str, conversion_set)
+
+    @staticmethod
+    def _log_error(message, event_str, error=None):
+        logger.error(message)
+        logger.debug("Raised error: %s, for event : %s", error, event_str)

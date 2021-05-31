@@ -1,13 +1,29 @@
 """Tests for converter method"""
 
+import json
+import logging
 from typing import Any, Optional
 
 import pytest
+from hypothesis import HealthCheck, given, provisional, settings
+from hypothesis import strategies as st
 from pydantic import BaseModel
+from pydantic.error_wrappers import ValidationError
 
-from ralph.exceptions import BadFormatException, ConversionException
-from ralph.models.converter import ConversionItem, convert_dict_event, convert_str_event
+from ralph.exceptions import (
+    BadFormatException,
+    ConversionException,
+    UnknownEventException,
+)
+from ralph.models.converter import (
+    ConversionItem,
+    Converter,
+    convert_dict_event,
+    convert_str_event,
+)
 from ralph.models.edx.converters.xapi.base import BaseConversionSet
+from ralph.models.edx.navigational import UIPageClose
+from ralph.models.xapi.constants import VERB_TERMINATED_ID
 
 
 @pytest.mark.parametrize(
@@ -178,3 +194,255 @@ def test_converter_convert_str_event_with_invalid_json_string(invalid_json):
     msg = "Failed to parse the event, invalid JSON string"
     with pytest.raises(BadFormatException, match=msg):
         convert_str_event(invalid_json, DummyBaseConversionSet())
+
+
+@pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
+def test_converter_converter_convert_with_no_events(caplog, valid_uuid):
+    """Tests given no events the convert method does not write error messages."""
+
+    result = Converter(home_page="", uuid_namespace=valid_uuid).convert(
+        [], ignore_errors=False, fail_on_unknown=True
+    )
+    with caplog.at_level(logging.ERROR):
+        assert list(result) == []
+    assert [] == [message for _, _, message in caplog.record_tuples]
+
+
+@pytest.mark.parametrize("event", ["", 1, None, {}])
+@pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
+def test_converter_convert_with_a_non_json_event_writes_an_error_message(
+    event, valid_uuid, caplog
+):
+    """Tests given a non JSON event, the convert method should write an error message."""
+
+    result = Converter(home_page="", uuid_namespace=valid_uuid).convert(
+        [event], ignore_errors=True, fail_on_unknown=True
+    )
+    with caplog.at_level(logging.ERROR):
+        assert list(result) == []
+    errors = ["Input event is not a valid JSON string"]
+    assert errors == [message for _, _, message in caplog.record_tuples]
+
+
+@pytest.mark.parametrize("event", ["", 1, None, {}])
+@pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
+def test_converter_convert_with_a_non_json_event_raises_an_exception(
+    event, valid_uuid, caplog
+):
+    """Tests given a non JSON event, the convert method should raise a BadFormatException."""
+
+    result = Converter(home_page="", uuid_namespace=valid_uuid).convert(
+        [event], ignore_errors=False, fail_on_unknown=True
+    )
+    with caplog.at_level(logging.ERROR):
+        with pytest.raises(BadFormatException):
+            list(result)
+
+
+@pytest.mark.parametrize(
+    "event",
+    [
+        json.dumps({}),
+        json.dumps({"event_source": "browser"}),
+        json.dumps({"event_source": "browser", "event_type": None}),
+    ],
+)
+@pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
+def test_converter_convert_with_an_unknown_event_writes_an_error_message(
+    event, valid_uuid, caplog
+):
+    """Tests given an unknown event the convert method should write an error message."""
+
+    result = Converter(home_page="", uuid_namespace=valid_uuid).convert(
+        [event], ignore_errors=False, fail_on_unknown=False
+    )
+    with caplog.at_level(logging.ERROR):
+        assert list(result) == []
+    errors = ["No matching pydantic model found for input event"]
+    assert errors == [message for _, _, message in caplog.record_tuples]
+
+
+@pytest.mark.parametrize(
+    "event",
+    [
+        json.dumps({}),
+        json.dumps({"event_source": "browser"}),
+        json.dumps({"event_source": "browser", "event_type": None}),
+    ],
+)
+@pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
+def test_converter_convert_with_an_unknown_event_raises_an_exception(
+    event, valid_uuid, caplog
+):
+    """Tests given an unknown event the convert method should raise an UnknownEventException."""
+
+    result = Converter(home_page="", uuid_namespace=valid_uuid).convert(
+        [event], ignore_errors=False, fail_on_unknown=True
+    )
+    with caplog.at_level(logging.ERROR):
+        with pytest.raises(UnknownEventException):
+            list(result)
+
+
+@pytest.mark.parametrize(
+    "event",
+    [json.dumps({"event_source": "browser", "event_type": "page_close"})],
+)
+@pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
+def test_converter_convert_with_an_event_missing_a_conversion_set_writes_an_error_message(
+    event, valid_uuid, caplog
+):
+    """Tests given an event that doesn't have a corresponding conversion_set, the convert method
+    should write an error message.
+    """
+
+    result = Converter(module="os", home_page="", uuid_namespace=valid_uuid).convert(
+        [event], ignore_errors=False, fail_on_unknown=False
+    )
+    with caplog.at_level(logging.ERROR):
+        assert list(result) == []
+    errors = ["No conversion set found for input event"]
+    assert errors == [message for _, _, message in caplog.record_tuples]
+
+
+@pytest.mark.parametrize(
+    "event",
+    [json.dumps({"event_source": "browser", "event_type": "page_close"})],
+)
+@pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
+def test_converter_convert_with_an_event_missing_a_conversion_set_raises_an_exception(
+    event, valid_uuid, caplog
+):
+    """Tests given an event that doesn't have a corresponding conversion_set, the convert method
+    should raise an UnknownEventException.
+    """
+
+    result = Converter(module="os", home_page="", uuid_namespace=valid_uuid).convert(
+        [event], ignore_errors=False, fail_on_unknown=True
+    )
+    with caplog.at_level(logging.ERROR):
+        with pytest.raises(UnknownEventException):
+            list(result)
+
+
+@pytest.mark.parametrize(
+    "event",
+    [json.dumps({"event_source": "browser", "event_type": "page_close"})],
+)
+@pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
+def test_converter_convert_with_an_invalid_page_close_event_writes_an_error_message(
+    event,
+    valid_uuid,
+    caplog,
+):
+    """Tests given an event that match a pydantic model but fail at the conversion step,
+    the convert method should write an error message.
+    """
+
+    result = Converter(home_page="", uuid_namespace=valid_uuid).convert(
+        [event], ignore_errors=True, fail_on_unknown=True
+    )
+    with caplog.at_level(logging.ERROR):
+        assert list(result) == []
+    errors = ["Failed to get the transformed value for field: ('context', 'course_id')"]
+    assert errors == [message for _, _, message in caplog.record_tuples]
+
+
+@pytest.mark.parametrize(
+    "event",
+    [json.dumps({"event_source": "browser", "event_type": "page_close"})],
+)
+@pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
+def test_converter_convert_with_invalid_page_close_event_raises_an_exception(
+    event, valid_uuid, caplog
+):
+    """Tests given an event that match a pydantic model but fail at the conversion step,
+    the convert method should raise a ConversionException.
+    """
+
+    result = Converter(home_page="", uuid_namespace=valid_uuid).convert(
+        [event], ignore_errors=False, fail_on_unknown=True
+    )
+    with caplog.at_level(logging.ERROR):
+        with pytest.raises(ConversionException):
+            list(result)
+
+
+@settings(max_examples=1, suppress_health_check=(HealthCheck.function_scoped_fixture,))
+@pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
+@pytest.mark.parametrize("invalid_home_page", ["", "not an URL"])
+@given(st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()))
+def test_converter_convert_with_invalid_arguments_writes_an_error_message(
+    valid_uuid, invalid_home_page, caplog, event
+):
+    """Tests given invalid arguments causing the conversion to fail at the validation step,
+    the convert method should write an error message.
+    """
+
+    event_str = event.json()
+    result = Converter(home_page=invalid_home_page, uuid_namespace=valid_uuid).convert(
+        [event_str], ignore_errors=True, fail_on_unknown=True
+    )
+    with caplog.at_level(logging.ERROR):
+        assert list(result) == []
+    errors = ["Converted event is not a valid PageTerminated event"]
+    assert errors == [message for _, _, message in caplog.record_tuples]
+
+
+@settings(max_examples=1, suppress_health_check=(HealthCheck.function_scoped_fixture,))
+@pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
+@pytest.mark.parametrize("invalid_home_page", ["", "not an URL"])
+@given(st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()))
+def test_converter_convert_with_invalid_arguments_raises_an_exception(
+    valid_uuid, invalid_home_page, caplog, event
+):
+    """Tests given invalid arguments causing the conversion to fail at the validation step,
+    the convert method should raise a ValidationError.
+    """
+
+    event_str = event.json()
+    result = Converter(home_page=invalid_home_page, uuid_namespace=valid_uuid).convert(
+        [event_str], ignore_errors=False, fail_on_unknown=True
+    )
+    with caplog.at_level(logging.ERROR):
+        with pytest.raises(ValidationError):
+            list(result)
+
+
+@settings(max_examples=1)
+@pytest.mark.parametrize("ignore_errors", [True, False])
+@pytest.mark.parametrize("fail_on_unknown", [True, False])
+@pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
+@given(st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()))
+def test_converter_convert_with_valid_events(
+    ignore_errors, fail_on_unknown, valid_uuid, event
+):
+    """Tests given a valid event the convert method should yield it."""
+
+    event_str = event.json()
+    result = Converter(
+        home_page="https://fun-mooc.fr", uuid_namespace=valid_uuid
+    ).convert([event_str], ignore_errors, fail_on_unknown)
+    assert json.loads(next(result))["verb"]["id"] == VERB_TERMINATED_ID.__args__[0]
+
+
+@settings(max_examples=1, suppress_health_check=(HealthCheck.function_scoped_fixture,))
+@given(st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()))
+@pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
+def test_converter_convert_counter(valid_uuid, caplog, event):
+    """Tests given multiple events the convert method should log the total and invalid events."""
+
+    valid_event = event.json()
+    invalid_event_1 = 1
+    invalid_event_2 = ""
+    events = [invalid_event_1, valid_event, invalid_event_2]
+    result = Converter(
+        home_page="https://fun-mooc.fr", uuid_namespace=valid_uuid
+    ).convert(events, ignore_errors=True, fail_on_unknown=False)
+    with caplog.at_level(logging.INFO):
+        assert len(list(result)) == 1
+    assert (
+        "ralph.models.converter",
+        logging.INFO,
+        "Total events: 3, Invalid events: 2",
+    ) in caplog.record_tuples

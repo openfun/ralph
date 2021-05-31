@@ -11,6 +11,7 @@ from click_option_group import optgroup
 
 from ralph.backends import BackendTypes
 from ralph.defaults import (
+    CONVERTER_EDX_XAPI_UUID_NAMESPACE,
     DEFAULT_BACKEND_CHUNK_SIZE,
     ENVVAR_PREFIX,
     DatabaseBackends,
@@ -19,6 +20,7 @@ from ralph.defaults import (
 )
 from ralph.exceptions import UnsupportedBackendException
 from ralph.logger import configure_logging
+from ralph.models.converter import Converter
 from ralph.models.selector import ModelSelector
 from ralph.models.validator import Validator
 from ralph.utils import (
@@ -201,6 +203,76 @@ def validate(format_, ignore_errors, fail_on_unknown):
     validator = Validator(ModelSelector(f"ralph.models.{format_}"))
 
     for event in validator.validate(sys.stdin, ignore_errors, fail_on_unknown):
+        click.echo(event)
+
+
+@cli.command()
+@optgroup.group("From edX to xAPI converter options")
+@optgroup.option(
+    "-u",
+    "--uuid-namespace",
+    type=str,
+    required=False,
+    default=CONVERTER_EDX_XAPI_UUID_NAMESPACE,
+    help="The UUID namespace to use for the `ID` field generation",
+)
+@optgroup.option(
+    "-h",
+    "--home_page",
+    type=str,
+    required=False,
+    default="https://fun-mooc.fr",
+    help="The `actor.account.homePage` to use in the xAPI statements",
+)
+@click.option(
+    "-f",
+    "--from",
+    "from_",
+    type=click.Choice(["edx"]),
+    required=True,
+    help="Input events format to convert",
+)
+@click.option(
+    "-t",
+    "--to",
+    "to_",
+    type=click.Choice(["xapi"]),
+    required=True,
+    help="Output events format",
+)
+@click.option(
+    "-I",
+    "--ignore-errors",
+    default=False,
+    is_flag=True,
+    help="Continue writing regardless of raised errors",
+)
+@click.option(
+    "-F",
+    "--fail-on-unknown",
+    default=False,
+    is_flag=True,
+    help="Stop converting at first unknown event",
+)
+def convert(from_, to_, ignore_errors, fail_on_unknown, **conversion_set_kwargs):
+    """Converts input events to a given format."""
+
+    logger.info(
+        "Converting %s events to %s format (ignore_errors=%s | fail-on-unknown=%s)",
+        from_,
+        to_,
+        ignore_errors,
+        fail_on_unknown,
+    )
+    logger.debug("Converter parameters: %s", conversion_set_kwargs)
+
+    converter = Converter(
+        model_selector=ModelSelector(f"ralph.models.{from_}"),
+        module=f"ralph.models.{from_}.converters.{to_}",
+        **conversion_set_kwargs,
+    )
+
+    for event in converter.convert(sys.stdin, ignore_errors, fail_on_unknown):
         click.echo(event)
 
 
