@@ -19,6 +19,10 @@ class ConfigurationException(Exception):
     """Raised when the configuration is not valid."""
 
 
+class ConversionException(Exception):
+    """Raised when a converter has a failure."""
+
+
 class EventKeyError(Exception):
     """Raised when an expected event key has not been found."""
 
