@@ -10,6 +10,8 @@ and this project adheres to
 
 ### Added
 
+- EdX to xAPI converters for page `viewed` and`page_close` events
+- Implement core event format converter
 - xAPI video `played` pydantic models
 - xAPI page `viewed` and page `terminated` pydantic models
 - Implement edx navigational events pydantic models

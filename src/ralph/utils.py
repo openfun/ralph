@@ -97,3 +97,11 @@ def get_dict_value_from_path(dict_: dict, path: list[str]):
         return reduce(operator.getitem, path, dict_)
     except (KeyError, TypeError):
         return None
+
+
+def set_dict_value_from_path(dict_: dict, path: list[str], value: any):
+    """Sets a nested dictionary value using an array of keys representing the path to the value."""
+
+    for key in path[:-1]:
+        dict_ = dict_.setdefault(key, {})
+    dict_[path[-1]] = value

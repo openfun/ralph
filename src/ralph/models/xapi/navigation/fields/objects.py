@@ -35,4 +35,4 @@ class PageObjectField(ObjectField):
         definition (PageObjectDefinitionField): See PageObjectDefinitionField.
     """
 
-    definition: PageObjectDefinitionField
+    definition: PageObjectDefinitionField = PageObjectDefinitionField()
