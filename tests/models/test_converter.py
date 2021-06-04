@@ -335,7 +335,7 @@ def test_converter_convert_with_an_invalid_page_close_event_writes_an_error_mess
     valid_uuid,
     caplog,
 ):
-    """Tests given an event that match a pydantic model but fail at the conversion step,
+    """Tests given an event that matches a pydantic model but fails at the conversion step,
     the convert method should write an error message.
     """
 
