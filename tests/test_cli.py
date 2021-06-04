@@ -11,6 +11,7 @@ from click.testing import CliRunner
 from elasticsearch.helpers import bulk, scan
 from hypothesis import given, provisional, settings
 from hypothesis import strategies as st
+from pydantic import ValidationError
 
 from ralph.backends.storage.fs import FSStorage
 from ralph.backends.storage.ldp import LDPStorage
@@ -18,6 +19,7 @@ from ralph.cli import CommaSeparatedKeyValueParamType, cli
 from ralph.defaults import APP_DIR, FS_STORAGE_DEFAULT_PATH
 from ralph.exceptions import ConfigurationException
 from ralph.models.edx.navigational import UIPageClose
+from ralph.models.xapi.navigation.statements import PageTerminated
 
 from tests.fixtures.backends import ES_TEST_HOSTS, ES_TEST_INDEX
 
@@ -202,10 +204,15 @@ def test_cli_convert_command_from_edx_to_xapi_format(valid_uuid, event):
     event_str = event.json()
     runner = CliRunner()
     result = runner.invoke(
-        cli, ["convert", "-f", "edx", "-t", "xapi", "-u", valid_uuid], input=event_str
+        cli,
+        ["-v", "ERROR", "convert", "-f", "edx", "-t", "xapi", "-u", valid_uuid],
+        input=event_str,
     )
     assert result.exit_code == 0
-    assert "http://adlnet.gov/expapi/verbs/terminated" in result.output
+    try:
+        PageTerminated(**json.loads(result.output))
+    except ValidationError as err:
+        pytest.fail(f"Converted event is invalid: {err}")
 
 
 @pytest.mark.parametrize("invalid_uuid", ["", None, 1, {}])
