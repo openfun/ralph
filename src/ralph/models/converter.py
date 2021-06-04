@@ -230,9 +230,8 @@ class Converter:
         model = self.model_selector.get_model(event)
         conversion_set = self.src_conversion_set.get(model, None)
         if not conversion_set:
-            raise MissingConversionSetException(
-                "No conversion set found for input event"
-            )
+            message = "No conversion set found for input event"
+            raise MissingConversionSetException(message)
         return convert_dict_event(event, event_str, conversion_set)
 
     @staticmethod
