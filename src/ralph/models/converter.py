@@ -15,6 +15,7 @@ from ralph.defaults import MODEL_PATH_SEPARATOR
 from ralph.exceptions import (
     BadFormatException,
     ConversionException,
+    MissingConversionSetException,
     UnknownEventException,
 )
 from ralph.utils import get_dict_value_from_path, set_dict_value_from_path
@@ -192,7 +193,7 @@ class Converter:
                 self._log_error(message, event_str, err)
                 if not ignore_errors:
                     raise BadFormatException(message) from err
-            except UnknownEventException as err:
+            except (UnknownEventException, MissingConversionSetException) as err:
                 self._log_error(err, event_str)
                 if fail_on_unknown:
                     raise err
@@ -219,7 +220,8 @@ class Converter:
         Raises:
             TypeError: When the event_str is not of type string.
             JSONDecodeError: When the event_str is not a valid JSON string.
-            UnknownEventException: When no matching model or conversion set is found for the event.
+            UnknownEventException: When no matching model is found for the event.
+            MissingConversionSetException: When no matching conversion set is found for the event.
             ConversionException: When a field transformation fails.
             ValidationError: When the final converted event is invalid.
         """
@@ -228,7 +230,9 @@ class Converter:
         model = self.model_selector.get_model(event)
         conversion_set = self.src_conversion_set.get(model, None)
         if not conversion_set:
-            raise UnknownEventException("No conversion set found for input event")
+            raise MissingConversionSetException(
+                "No conversion set found for input event"
+            )
         return convert_dict_event(event, event_str, conversion_set)
 
     @staticmethod

@@ -13,6 +13,7 @@ from pydantic.error_wrappers import ValidationError
 from ralph.exceptions import (
     BadFormatException,
     ConversionException,
+    MissingConversionSetException,
     UnknownEventException,
 )
 from ralph.models.converter import (
@@ -314,14 +315,14 @@ def test_converter_convert_with_an_event_missing_a_conversion_set_raises_an_exce
     event, valid_uuid, caplog
 ):
     """Tests given an event that doesn't have a corresponding conversion_set, the convert method
-    should raise an UnknownEventException.
+    should raise a MissingConversionSetException.
     """
 
     result = Converter(module="os", platform_url="", uuid_namespace=valid_uuid).convert(
         [event], ignore_errors=False, fail_on_unknown=True
     )
     with caplog.at_level(logging.ERROR):
-        with pytest.raises(UnknownEventException):
+        with pytest.raises(MissingConversionSetException):
             list(result)
 
 
