@@ -176,7 +176,7 @@ def test_cli_convert_command_usage():
         "  From edX to xAPI converter options: \n"
         "    -u, --uuid-namespace TEXT     The UUID namespace to use for the `ID` field\n"
         "                                  generation\n"
-        "    -h, --home_page TEXT          The `actor.account.homePage` to use in the\n"
+        "    -p, --platform-url TEXT       The `actor.account.homePage` to use in the\n"
         "                                  xAPI statements\n"
         "  -f, --from [edx]                Input events format to convert  [required]\n"
         "  -t, --to [xapi]                 Output events format  [required]\n"

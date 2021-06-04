@@ -217,8 +217,8 @@ def validate(format_, ignore_errors, fail_on_unknown):
     help="The UUID namespace to use for the `ID` field generation",
 )
 @optgroup.option(
-    "-h",
-    "--home_page",
+    "-p",
+    "--platform-url",
     type=str,
     required=False,
     default="https://fun-mooc.fr",

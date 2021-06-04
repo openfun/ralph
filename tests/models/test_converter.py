@@ -200,7 +200,7 @@ def test_converter_convert_str_event_with_invalid_json_string(invalid_json):
 def test_converter_converter_convert_with_no_events(caplog, valid_uuid):
     """Tests given no events the convert method does not write error messages."""
 
-    result = Converter(home_page="", uuid_namespace=valid_uuid).convert(
+    result = Converter(platform_url="", uuid_namespace=valid_uuid).convert(
         [], ignore_errors=False, fail_on_unknown=True
     )
     with caplog.at_level(logging.ERROR):
@@ -215,7 +215,7 @@ def test_converter_convert_with_a_non_json_event_writes_an_error_message(
 ):
     """Tests given a non JSON event, the convert method should write an error message."""
 
-    result = Converter(home_page="", uuid_namespace=valid_uuid).convert(
+    result = Converter(platform_url="", uuid_namespace=valid_uuid).convert(
         [event], ignore_errors=True, fail_on_unknown=True
     )
     with caplog.at_level(logging.ERROR):
@@ -231,7 +231,7 @@ def test_converter_convert_with_a_non_json_event_raises_an_exception(
 ):
     """Tests given a non JSON event, the convert method should raise a BadFormatException."""
 
-    result = Converter(home_page="", uuid_namespace=valid_uuid).convert(
+    result = Converter(platform_url="", uuid_namespace=valid_uuid).convert(
         [event], ignore_errors=False, fail_on_unknown=True
     )
     with caplog.at_level(logging.ERROR):
@@ -253,7 +253,7 @@ def test_converter_convert_with_an_unknown_event_writes_an_error_message(
 ):
     """Tests given an unknown event the convert method should write an error message."""
 
-    result = Converter(home_page="", uuid_namespace=valid_uuid).convert(
+    result = Converter(platform_url="", uuid_namespace=valid_uuid).convert(
         [event], ignore_errors=False, fail_on_unknown=False
     )
     with caplog.at_level(logging.ERROR):
@@ -276,7 +276,7 @@ def test_converter_convert_with_an_unknown_event_raises_an_exception(
 ):
     """Tests given an unknown event the convert method should raise an UnknownEventException."""
 
-    result = Converter(home_page="", uuid_namespace=valid_uuid).convert(
+    result = Converter(platform_url="", uuid_namespace=valid_uuid).convert(
         [event], ignore_errors=False, fail_on_unknown=True
     )
     with caplog.at_level(logging.ERROR):
@@ -296,7 +296,7 @@ def test_converter_convert_with_an_event_missing_a_conversion_set_writes_an_erro
     should write an error message.
     """
 
-    result = Converter(module="os", home_page="", uuid_namespace=valid_uuid).convert(
+    result = Converter(module="os", platform_url="", uuid_namespace=valid_uuid).convert(
         [event], ignore_errors=False, fail_on_unknown=False
     )
     with caplog.at_level(logging.ERROR):
@@ -317,7 +317,7 @@ def test_converter_convert_with_an_event_missing_a_conversion_set_raises_an_exce
     should raise an UnknownEventException.
     """
 
-    result = Converter(module="os", home_page="", uuid_namespace=valid_uuid).convert(
+    result = Converter(module="os", platform_url="", uuid_namespace=valid_uuid).convert(
         [event], ignore_errors=False, fail_on_unknown=True
     )
     with caplog.at_level(logging.ERROR):
@@ -339,7 +339,7 @@ def test_converter_convert_with_an_invalid_page_close_event_writes_an_error_mess
     the convert method should write an error message.
     """
 
-    result = Converter(home_page="", uuid_namespace=valid_uuid).convert(
+    result = Converter(platform_url="", uuid_namespace=valid_uuid).convert(
         [event], ignore_errors=True, fail_on_unknown=True
     )
     with caplog.at_level(logging.ERROR):
@@ -360,7 +360,7 @@ def test_converter_convert_with_invalid_page_close_event_raises_an_exception(
     the convert method should raise a ConversionException.
     """
 
-    result = Converter(home_page="", uuid_namespace=valid_uuid).convert(
+    result = Converter(platform_url="", uuid_namespace=valid_uuid).convert(
         [event], ignore_errors=False, fail_on_unknown=True
     )
     with caplog.at_level(logging.ERROR):
@@ -370,19 +370,19 @@ def test_converter_convert_with_invalid_page_close_event_raises_an_exception(
 
 @settings(max_examples=1, suppress_health_check=(HealthCheck.function_scoped_fixture,))
 @pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
-@pytest.mark.parametrize("invalid_home_page", ["", "not an URL"])
+@pytest.mark.parametrize("invalid_platform_url", ["", "not an URL"])
 @given(st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()))
 def test_converter_convert_with_invalid_arguments_writes_an_error_message(
-    valid_uuid, invalid_home_page, caplog, event
+    valid_uuid, invalid_platform_url, caplog, event
 ):
     """Tests given invalid arguments causing the conversion to fail at the validation step,
     the convert method should write an error message.
     """
 
     event_str = event.json()
-    result = Converter(home_page=invalid_home_page, uuid_namespace=valid_uuid).convert(
-        [event_str], ignore_errors=True, fail_on_unknown=True
-    )
+    result = Converter(
+        platform_url=invalid_platform_url, uuid_namespace=valid_uuid
+    ).convert([event_str], ignore_errors=True, fail_on_unknown=True)
     with caplog.at_level(logging.ERROR):
         assert list(result) == []
     errors = ["Converted event is not a valid PageTerminated event"]
@@ -391,19 +391,19 @@ def test_converter_convert_with_invalid_arguments_writes_an_error_message(
 
 @settings(max_examples=1, suppress_health_check=(HealthCheck.function_scoped_fixture,))
 @pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
-@pytest.mark.parametrize("invalid_home_page", ["", "not an URL"])
+@pytest.mark.parametrize("invalid_platform_url", ["", "not an URL"])
 @given(st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()))
 def test_converter_convert_with_invalid_arguments_raises_an_exception(
-    valid_uuid, invalid_home_page, caplog, event
+    valid_uuid, invalid_platform_url, caplog, event
 ):
     """Tests given invalid arguments causing the conversion to fail at the validation step,
     the convert method should raise a ValidationError.
     """
 
     event_str = event.json()
-    result = Converter(home_page=invalid_home_page, uuid_namespace=valid_uuid).convert(
-        [event_str], ignore_errors=False, fail_on_unknown=True
-    )
+    result = Converter(
+        platform_url=invalid_platform_url, uuid_namespace=valid_uuid
+    ).convert([event_str], ignore_errors=False, fail_on_unknown=True)
     with caplog.at_level(logging.ERROR):
         with pytest.raises(ValidationError):
             list(result)
@@ -421,7 +421,7 @@ def test_converter_convert_with_valid_events(
 
     event_str = event.json()
     result = Converter(
-        home_page="https://fun-mooc.fr", uuid_namespace=valid_uuid
+        platform_url="https://fun-mooc.fr", uuid_namespace=valid_uuid
     ).convert([event_str], ignore_errors, fail_on_unknown)
     assert json.loads(next(result))["verb"]["id"] == VERB_TERMINATED_ID.__args__[0]
 
@@ -437,7 +437,7 @@ def test_converter_convert_counter(valid_uuid, caplog, event):
     invalid_event_2 = ""
     events = [invalid_event_1, valid_event, invalid_event_2]
     result = Converter(
-        home_page="https://fun-mooc.fr", uuid_namespace=valid_uuid
+        platform_url="https://fun-mooc.fr", uuid_namespace=valid_uuid
     ).convert(events, ignore_errors=True, fail_on_unknown=False)
     with caplog.at_level(logging.INFO):
         assert len(list(result)) == 1

@@ -27,20 +27,20 @@ from ralph.models.edx.navigational import UIPageClose
 )
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_navigational_ui_page_close_to_page_terminated(
-    uuid_namespace, event, home_page
+    uuid_namespace, event, platform_url
 ):
     """Tests that ServerEventToPageViewed.convert returns a JSON string with a constant UUID."""
 
     event_str = event.json()
     event = json.loads(event_str)
     xapi_event = convert_dict_event(
-        event, event_str, UIPageCloseToPageTerminated(uuid_namespace, home_page)
+        event, event_str, UIPageCloseToPageTerminated(uuid_namespace, platform_url)
     )
     xapi_event_dict = json.loads(xapi_event.json(exclude_none=True, by_alias=True))
     assert xapi_event_dict == {
         "id": str(uuid5(UUID(uuid_namespace), event_str)),
         "actor": {
-            "account": {"homePage": home_page, "name": "1"},
+            "account": {"homePage": platform_url, "name": "1"},
         },
         "object": {
             "definition": {
