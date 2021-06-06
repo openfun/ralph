@@ -1,0 +1,112 @@
+[
+    {
+        "__comment__": "page_close event with logged-in user",
+        "username": "user",
+        "event_source": "browser",
+        "name": "page_close",
+        "accept_language": "en-US,en;q=0.5",
+        "time": "2020-04-18T13:23:04.198240+00:00",
+        "agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:75.0) Gecko/20100101 Firefox/75.0",
+        "page": "http://localhost:8072/courses/course-v1:organisationCourse+numeroCours+sessiondCours/courseware/b5722732abed4eb7ba823f0b4239d50d/e2fa42fa1ca645389ee4618c86e982ff/",
+        "host": "7a4a1c08e030",
+        "session": "cc7ee04f8e4eb7e84f8c4c441cc78f40",
+        "referer": "http://localhost:8072/courses/course-v1:organisationCourse+numeroCours+sessiondCours/courseware/b5722732abed4eb7ba823f0b4239d50d/e2fa42fa1ca645389ee4618c86e982ff/",
+        "context": {
+            "user_id": 2,
+            "org_id": "organisationCourse",
+            "course_id": "course-v1:organisationCourse+numeroCours+sessiondCours",
+            "path": "/event"
+        },
+        "ip": "172.20.0.1",
+        "event": "{}",
+        "event_type": "page_close"
+    },
+    {
+        "__comment__": "page_close event with anonymous user",
+        "username": "",
+        "event_source": "browser",
+        "name": "page_close",
+        "accept_language": "en-US,en;q=0.5",
+        "time": "2020-04-20T11:38:52.037467+00:00",
+        "agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:75.0) Gecko/20100101 Firefox/75.0",
+        "page": "http://localhost:8072/courses/course-v1:organisationCourse+numeroCours+sessiondCours/courseware/b5722732abed4eb7ba823f0b4239d50d/e2fa42fa1ca645389ee4618c86e982ff/",
+        "host": "7a4a1c08e030",
+        "session": "694d2b38c5a017822b25e3a671ac4615",
+        "referer": "http://localhost:8072/courses/course-v1:organisationCourse+numeroCours+sessiondCours/courseware/b5722732abed4eb7ba823f0b4239d50d/e2fa42fa1ca645389ee4618c86e982ff/",
+        "context": {
+            "user_id": null,
+            "org_id": "organisationCourse",
+            "course_id": "course-v1:organisationCourse+numeroCours+sessiondCours",
+            "path": "/event"
+        },
+        "ip": "172.20.0.1",
+        "event": "{}",
+        "event_type": "page_close"
+    },
+    {
+        "__comment__": "seq_goto event",
+        "username": "user",
+        "event_source": "browser",
+        "name": "seq_goto",
+        "accept_language": "en-US,en;q=0.5",
+        "time": "2020-05-06T20:40:19.866511+00:00",
+        "agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:75.0) Gecko/20100101 Firefox/75.0",
+        "page": "http://localhost:8072/courses/course-v1:organisationCourse+numeroCours+sessiondCours/courseware/b5722732abed4eb7ba823f0b4239d50d/e2fa42fa1ca645389ee4618c86e982ff/",
+        "host": "7a4a1c08e030",
+        "session": "12303cedee495a1be10f399ac3ccf66b",
+        "referer": "http://localhost:8072/courses/course-v1:organisationCourse+numeroCours+sessiondCours/courseware/b5722732abed4eb7ba823f0b4239d50d/e2fa42fa1ca645389ee4618c86e982ff/",
+        "context": {
+            "user_id": 2,
+            "org_id": "organisationCourse",
+            "course_id": "course-v1:organisationCourse+numeroCours+sessiondCours",
+            "path": "/event"
+        },
+        "ip": "172.20.0.1",
+        "event": "{\"new\": 1, \"old\": 1, \"id\": \"block-v1:organisationCourse+numeroCours+sessiondCours+type@sequential+block@e2fa42fa1ca645389ee4618c86e982ff\"}",
+        "event_type": "seq_goto"
+    },
+    {
+        "__comment__": "seq_next event",
+        "username": "sergios",
+        "event_source": "browser",
+        "name": "seq_next",
+        "accept_language": "en-US,en;q=0.5",
+        "time": "2020-05-06T20:41:52.622072+00:00",
+        "agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:75.0) Gecko/20100101 Firefox/75.0",
+        "page": "http://localhost:8072/courses/course-v1:organisationCourse+numeroCours+sessiondCours/courseware/b5722732abed4eb7ba823f0b4239d50d/e2fa42fa1ca645389ee4618c86e982ff/",
+        "host": "7a4a1c08e030",
+        "session": "2c154864575c527ad87863148f05072e",
+        "referer": "http://localhost:8072/courses/course-v1:organisationCourse+numeroCours+sessiondCours/courseware/b5722732abed4eb7ba823f0b4239d50d/e2fa42fa1ca645389ee4618c86e982ff/",
+        "context": {
+            "user_id": 2,
+            "org_id": "organisationCourse",
+            "course_id": "course-v1:organisationCourse+numeroCours+sessiondCours",
+            "path": "/event"
+        },
+        "ip": "172.20.0.1",
+        "event": "{\"new\": 2, \"old\": 1, \"id\": \"block-v1:organisationCourse+numeroCours+sessiondCours+type@sequential+block@e2fa42fa1ca645389ee4618c86e982ff\"}",
+        "event_type": "seq_next"
+    },
+    {
+        "__comment__": "seq_prev event",
+        "username": "sergios",
+        "event_source": "browser",
+        "name": "seq_prev",
+        "accept_language": "en-US,en;q=0.5",
+        "time": "2020-05-06T20:41:53.986326+00:00",
+        "agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:75.0) Gecko/20100101 Firefox/75.0",
+        "page": "http://localhost:8072/courses/course-v1:organisationCourse+numeroCours+sessiondCours/courseware/b5722732abed4eb7ba823f0b4239d50d/e2fa42fa1ca645389ee4618c86e982ff/",
+        "host": "7a4a1c08e030",
+        "session": "2c154864575c527ad87863148f05072e",
+        "referer": "http://localhost:8072/courses/course-v1:organisationCourse+numeroCours+sessiondCours/courseware/b5722732abed4eb7ba823f0b4239d50d/e2fa42fa1ca645389ee4618c86e982ff/",
+        "context": {
+            "user_id": 2,
+            "org_id": "organisationCourse",
+            "course_id": "course-v1:organisationCourse+numeroCours+sessiondCours",
+            "path": "/event"
+        },
+        "ip": "172.20.0.1",
+        "event": "{\"new\": 1, \"old\": 2, \"id\": \"block-v1:organisationCourse+numeroCours+sessiondCours+type@sequential+block@e2fa42fa1ca645389ee4618c86e982ff\"}",
+        "event_type": "seq_prev"
+    }
+]
