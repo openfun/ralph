@@ -22,14 +22,14 @@ and this project adheres to
 
 ### Changed
 
+- Upgrade `elasticsearch` to `7.13.1`
+- Upgrade `python-swiftclient` to `3.12.0`
 - Upgrade `click` to `8.0.1`
 - Upgrade `click-option-group` to `0.5.3`
-- Upgrade `elasticsearch` to `7.13.0`
 - Upgrade `pydantic` to `1.8.2`
 - Upgrade `sentry_sdk` to `1.1.0`
 - Rename edx models
 - Migrate model tests from factories to hypothesis strategies
-- Upgrade `python-swiftclient` to `3.11.1`
 - Tray: switch from openshift to k8s (BC)
 - Tray: remove useless deployment probes
 
