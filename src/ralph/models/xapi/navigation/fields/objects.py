@@ -1,9 +1,9 @@
 """Navigation xAPI events object fields definitions"""
 
-from typing import Optional
+from typing import Literal, Optional
 
 from ...base import BaseModelWithConfig
-from ...constants import ACTIVITY_PAGE_DISPLAY, ACTIVITY_PAGE_ID, LANG_EN_DISPLAY
+from ...constants import ACTIVITY_PAGE_DISPLAY, ACTIVITY_PAGE_ID, LANG_EN_US_DISPLAY
 from ...fields.objects import ObjectDefinitionExtensionsField, ObjectField
 
 
@@ -15,14 +15,14 @@ class PageObjectDefinitionField(BaseModelWithConfig):
 
     Attributes:
        type (str): Consists of the value `http://activitystrea.ms/schema/1.0/page`.
-       name (dict): Consists of the dictionary `{"en": "page"}`.
+       name (dict): Consists of the dictionary `{"en-US": "page"}`.
        extensions (dict): See ObjectDefinitionExtensionsField.
     """
 
-    name: dict[LANG_EN_DISPLAY, ACTIVITY_PAGE_DISPLAY] = {
-        LANG_EN_DISPLAY.__args__[0]: ACTIVITY_PAGE_DISPLAY.__args__[0]
+    name: dict[Literal[LANG_EN_US_DISPLAY], Literal[ACTIVITY_PAGE_DISPLAY]] = {
+        LANG_EN_US_DISPLAY: ACTIVITY_PAGE_DISPLAY
     }
-    type: ACTIVITY_PAGE_ID = ACTIVITY_PAGE_ID.__args__[0]
+    type: Literal[ACTIVITY_PAGE_ID] = ACTIVITY_PAGE_ID
     extensions: Optional[ObjectDefinitionExtensionsField]
 
 

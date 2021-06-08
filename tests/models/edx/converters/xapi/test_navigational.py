@@ -44,14 +44,14 @@ def test_navigational_ui_page_close_to_page_terminated(
         },
         "object": {
             "definition": {
-                "name": {"en": "page"},
+                "name": {"en-US": "page"},
                 "type": "http://activitystrea.ms/schema/1.0/page",
             },
             "id": event["page"],
         },
         "timestamp": event["time"],
         "verb": {
-            "display": {"en": "terminated"},
+            "display": {"en-US": "terminated"},
             "id": "http://adlnet.gov/expapi/verbs/terminated",
         },
     }

@@ -25,8 +25,8 @@ class VideoPlayedContextActivitiesField(BaseModelWithConfig):
         category(dict): Consists of the dictionary {"id": "https://w3id.org/xapi/video"}.
     """
 
-    category: List[dict[Literal["id"], VIDEO_CONTEXT_CATEGORY]] = [
-        {Literal["id"]: VIDEO_CONTEXT_CATEGORY.__args__[0]}
+    category: List[dict[Literal["id"], Literal[VIDEO_CONTEXT_CATEGORY]]] = [
+        {"id": VIDEO_CONTEXT_CATEGORY}
     ]
 
 

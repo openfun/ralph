@@ -10,7 +10,7 @@ def test_models_xapi_fields_verb_page_viewed_verb_field():
 
     assert json.loads(ViewedVerbField().json()) == {
         "id": "http://id.tincanapi.com/verb/viewed",
-        "display": {"en": "viewed"},
+        "display": {"en-US": "viewed"},
     }
 
 
@@ -19,5 +19,5 @@ def test_models_xapi_fields_verb_page_terminated_verb_field():
 
     assert json.loads(TerminatedVerbField().json()) == {
         "id": "http://adlnet.gov/expapi/verbs/terminated",
-        "display": {"en": "terminated"},
+        "display": {"en-US": "terminated"},
     }

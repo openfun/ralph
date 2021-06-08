@@ -1,28 +1,25 @@
 """Constants for xAPI specifications"""
 
-from typing import Literal
-
 # Languages
-LANG_EN_DISPLAY = Literal["en"]  # pylint:disable=invalid-name
-LANG_EN_US_DISPLAY = Literal["en-US"]  # pylint:disable=invalid-name
+LANG_EN_US_DISPLAY = "en-US"
 
-# xAPI activities
-ACTIVITY_PAGE_DISPLAY = Literal["page"]  # pylint:disable=invalid-name
-ACTIVITY_PAGE_ID = Literal[  # pylint:disable=invalid-name
-    "http://activitystrea.ms/schema/1.0/page"
-]
+# xAPI activity IDs
+ACTIVITY_PAGE_ID = "http://activitystrea.ms/schema/1.0/page"
 
-# xAPI verbs
-VERB_TERMINATED_DISPLAY = Literal["terminated"]  # pylint:disable=invalid-name
-VERB_TERMINATED_ID = Literal[  # pylint:disable=invalid-name
-    "http://adlnet.gov/expapi/verbs/terminated"
-]
-VERB_VIEWED_DISPLAY = Literal["viewed"]  # pylint:disable=invalid-name
-VERB_VIEWED_ID = Literal[  # pylint:disable=invalid-name
-    "http://id.tincanapi.com/verb/viewed"
-]
+# xAPI activity display names
+ACTIVITY_PAGE_DISPLAY = "page"
+ACTIVITY_QUESTION_DISPLAY = "question"
 
-VERB_PLAYED_DISPLAY = Literal["played"]  # pylint:disable=invalid-name
+# xAPI verb IDs
+VERB_SAVED_ID = "https://w3id.org/xapi/dod-isd/verbs/saved"
+VERB_TERMINATED_ID = "http://adlnet.gov/expapi/verbs/terminated"
+VERB_VIEWED_ID = "http://id.tincanapi.com/verb/viewed"
+
+# xAPI verb display names
+VERB_SAVED_DISPLAY = "saved"
+VERB_TERMINATED_DISPLAY = "terminated"
+VERB_VIEWED_DISPLAY = "viewed"
+VERB_PLAYED_DISPLAY = "played"
 
 # xAPI extensions
 EXTENSION_SCHOOL_ID = "https://w3id.org/xapi/acrossx/extensions/school"

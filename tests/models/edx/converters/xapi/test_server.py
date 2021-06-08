@@ -69,14 +69,14 @@ def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_with_val
         },
         "object": {
             "definition": {
-                "name": {"en": "page"},
+                "name": {"en-US": "page"},
                 "type": "http://activitystrea.ms/schema/1.0/page",
             },
             "id": home_page + "/main/blog",
         },
         "timestamp": event["time"],
         "verb": {
-            "display": {"en": "viewed"},
+            "display": {"en-US": "viewed"},
             "id": "http://id.tincanapi.com/verb/viewed",
         },
     }
