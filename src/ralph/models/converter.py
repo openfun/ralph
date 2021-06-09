@@ -123,7 +123,17 @@ def convert_dict_event(
         value = conversion_item.get_value(data)
         if value not in [None, "", {}]:
             set_dict_value_from_path(converted_event, conversion_item.dest, value)
-    return conversion_set.__dest__(**converted_event)
+    try:
+        converted_event_model_instance = conversion_set.__dest__(**converted_event)
+    except ValidationError as err:
+        logger.error(
+            "The following model (%s) does not validate: %s || original event: %s",
+            conversion_set.__dest__,
+            converted_event,
+            event_str,
+        )
+        raise err
+    return converted_event_model_instance
 
 
 def convert_str_event(event_str: str, conversion_set: BaseConversionSet) -> BaseModel:
