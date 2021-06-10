@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from pydantic import UUID5
+from pydantic import UUID4
 
 from .config import BaseModelWithConfig
 from .fields.actors import ActorField
@@ -15,11 +15,11 @@ class BaseXapiModel(BaseModelWithConfig):
     `context`, `result`, `stored`, `authority`, `version` and `attachments` fields.
 
     Attributes:
-        id (UUID5): Consists of a generated UUID5 from the source event string.
+        id (UUID4): Consists of a generated UUID4 from the source event string.
         actor (ActorField): See ActorField.
         timestamp (datetime): Consists of the UTC time in ISO format when the event was emitted.
     """
 
-    id: UUID5
+    id: UUID4
     actor: ActorField
     timestamp: datetime

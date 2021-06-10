@@ -10,6 +10,12 @@ and this project adheres to
 
 ### Added
 
+- xAPI video `interacted` pydantic models
+- xAPI video `terminated` pydantic models
+- xAPI video `completed` pydantic models
+- xAPI video `seeked` pydantic models
+- xAPI video `initialized` pydantic models
+- xAPI video `paused` pydantic models
 - `convert` command to transform edx events to xAPI format
 - EdX to xAPI converters for page `viewed` and`page_close` events
 - Implement core event format converter

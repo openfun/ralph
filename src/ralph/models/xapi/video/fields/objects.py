@@ -4,8 +4,8 @@ from typing import Literal, Optional
 
 from ralph.models.xapi.config import BaseModelWithConfig
 
-from ...constants import ACTIVITY_PAGE_DISPLAY, LANG_EN_US_DISPLAY
-from ...fields.objects import ObjectField
+from ...constants import LANG_EN_US_DISPLAY
+from ...fields.objects import ObjectDefinitionExtensionsField, ObjectField
 from ..constants import VIDEO_OBJECT_DEFINITION_TYPE
 
 
@@ -16,14 +16,13 @@ class VideoObjectDefinitionField(BaseModelWithConfig):
     `Interaction properties` and `extensions` fields.
 
     Attributes:
-       name (dict): Consists of the dictionary `{"en-US": "page"}`.
+       name (dict): Consists of the dictionary `{"en-US": <name of the video>}`.
        type (str): Consists of the value `https://w3id.org/xapi/video/activity-type/video`.
     """
 
-    name: dict[LANG_EN_US_DISPLAY, ACTIVITY_PAGE_DISPLAY] = {
-        LANG_EN_US_DISPLAY.__args__[0]: ACTIVITY_PAGE_DISPLAY.__args__[0]
-    }
+    name: dict[LANG_EN_US_DISPLAY, str] = {LANG_EN_US_DISPLAY.__args__[0]: None}
     type: VIDEO_OBJECT_DEFINITION_TYPE = VIDEO_OBJECT_DEFINITION_TYPE.__args__[0]
+    extensions: Optional[ObjectDefinitionExtensionsField]
 
 
 class VideoObjectField(ObjectField):
@@ -34,5 +33,5 @@ class VideoObjectField(ObjectField):
         objectType: Consists of the value "Activity".
     """
 
-    definitions: VideoObjectDefinitionField
+    definition: VideoObjectDefinitionField
     objectType: Optional[Literal["Activity"]]
