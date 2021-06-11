@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Added
 
+- Edx to xAPI converter for `openassessmentblock.save_submission` event
 - EdX to xAPI converters for page `viewed` and`page_close` events
 - Implement core event format converter
 - xAPI video `played` pydantic models

@@ -5,6 +5,7 @@ LANG_EN_US_DISPLAY = "en-US"
 
 # xAPI activity IDs
 ACTIVITY_PAGE_ID = "http://activitystrea.ms/schema/1.0/page"
+ACTIVITY_QUESTION_ID = "http://adlnet.gov/expapi/activities/question"
 
 # xAPI activity display names
 ACTIVITY_PAGE_DISPLAY = "page"
@@ -25,3 +26,4 @@ VERB_PLAYED_DISPLAY = "played"
 EXTENSION_SCHOOL_ID = "https://w3id.org/xapi/acrossx/extensions/school"
 EXTENSION_COURSE_ID = "http://adlnet.gov/expapi/activities/course"
 EXTENSION_MODULE_ID = "http://adlnet.gov/expapi/activities/module"
+EXTENSION_RESPONSES_ID = "http://vocab.xapi.fr/extensions/responses"

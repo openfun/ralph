@@ -5,6 +5,8 @@ from typing import Literal
 from ..config import BaseModelWithConfig
 from ..constants import (
     LANG_EN_US_DISPLAY,
+    VERB_SAVED_DISPLAY,
+    VERB_SAVED_ID,
     VERB_TERMINATED_DISPLAY,
     VERB_TERMINATED_ID,
     VERB_VIEWED_DISPLAY,
@@ -37,4 +39,18 @@ class TerminatedVerbField(BaseModelWithConfig):
     id: Literal[VERB_TERMINATED_ID] = VERB_TERMINATED_ID
     display: dict[Literal[LANG_EN_US_DISPLAY], Literal[VERB_TERMINATED_DISPLAY]] = {
         LANG_EN_US_DISPLAY: VERB_TERMINATED_DISPLAY
+    }
+
+
+class SavedVerbField(BaseModelWithConfig):
+    """Represents the `verb` xAPI Field for the action `saved`.
+
+    Attributes:
+       id (str): Consists of the value `http://activitystrea.ms/schema/1.0/save`.
+       display (dict): Consists of the dictionary `{"en": "saved"}`.
+    """
+
+    id: Literal[VERB_SAVED_ID] = VERB_SAVED_ID
+    display: dict[Literal[LANG_EN_US_DISPLAY], Literal[VERB_SAVED_DISPLAY]] = {
+        LANG_EN_US_DISPLAY: VERB_SAVED_DISPLAY
     }
