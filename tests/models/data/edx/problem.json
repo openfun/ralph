@@ -28,5 +28,32 @@
         },
         "time": "2020-05-14T12:56:15.813912+00:00",
         "page": "x_module"
+    },
+    {
+        "__comment__": "showanswer server event of a Checkbox problem",
+        "username": "admin",
+        "event_type": "showanswer",
+        "ip": "172.19.0.1",
+        "agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0",
+        "host": "fcf907156c2f",
+        "referer": "http://localhost:8072/courses/course-v1:FUN+Demo+course/courseware/3dab5213382241f1954cbc9d193a0098/72bc587d439d4a53aac65286fbc21209/",
+        "accept_language": "",
+        "event": {
+            "problem_id": "block-v1:FUN+Demo+course+type@problem+block@28cf090c941a44a2b41f01e30320c0c2"
+        },
+        "event_source": "server",
+        "context": {
+            "course_user_tags": {},
+            "user_id": 3,
+            "org_id": "FUN",
+            "module": {
+                "usage_key": "block-v1:FUN+Demo+course+type@problem+block@28cf090c941a44a2b41f01e30320c0c2",
+                "display_name": "Checkboxes with Hints and Feedback"
+            },
+            "course_id": "course-v1:FUN+Demo+course",
+            "path": "/courses/course-v1:FUN+Demo+course/xblock/block-v1:FUN+Demo+course+type@problem+block@28cf090c941a44a2b41f01e30320c0c2/handler/xmodule_handler/problem_show"
+        },
+        "time": "2021-06-12T11:48:21.501348+00:00",
+        "page": "x_module"
     }
 ]

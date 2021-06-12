@@ -2,6 +2,8 @@
 
 from typing import Literal
 
+from pydantic import constr
+
 from ralph.models.edx.base import AbstractBaseEventField
 from ralph.models.edx.x_block import BaseXBlockEvent
 from ralph.models.selector import selector
@@ -44,3 +46,24 @@ class DemandhintDisplayed(BaseXBlockEvent):
 
     event_type: Literal["edx.problem.hint.demandhint_displayed"]
     event: DemandhintDisplayedEventField
+
+
+class Showanswer(BaseXBlockEvent):
+    """Represents the `showanswer` event.
+
+    This event is triggered when the user requests the answer for a problem.
+
+    Attributes:
+        event_type (str): Consists of the value `showanswer`.
+        event (dict): Consists of a dictionary holding the block ID of the current problem.
+            Note:
+                The `problem_id` is equal to the `context.module.usage_key` of the event.
+    """
+
+    __selector__ = selector(event_source="server", event_type="showanswer")
+
+    event_type: Literal["showanswer"]
+    event: dict[
+        Literal["problem_id"],
+        constr(regex=r"^block-v1:.+\+.+\+.+type@.+@[a-f0-9]{32}$"),  # noqa:F722
+    ]

@@ -14,12 +14,14 @@ ACTIVITY_PAGE_DISPLAY = "page"
 ACTIVITY_QUESTION_DISPLAY = "question"
 
 # xAPI verb IDs
+VERB_ASKED_ID = "http://adlnet.gov/expapi/verbs/asked"
 VERB_INTERACTED_ID = "http://adlnet.gov/expapi/verbs/interacted"
 VERB_SAVED_ID = "https://w3id.org/xapi/dod-isd/verbs/saved"
 VERB_TERMINATED_ID = "http://adlnet.gov/expapi/verbs/terminated"
 VERB_VIEWED_ID = "http://id.tincanapi.com/verb/viewed"
 
 # xAPI verb display names
+VERB_ASKED_DISPLAY = "asked"
 VERB_INTERACTED_DISPLAY = "interacted"
 VERB_SAVED_DISPLAY = "saved"
 VERB_TERMINATED_DISPLAY = "terminated"

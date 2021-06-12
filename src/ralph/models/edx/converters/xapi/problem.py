@@ -1,12 +1,12 @@
 """Problem interaction event xAPI Converter"""
 
 from ralph.models.converter import ConversionItem
-from ralph.models.edx.problem import DemandhintDisplayed
+from ralph.models.edx.problem import DemandhintDisplayed, Showanswer
 from ralph.models.xapi.problem.constants import (
     EXTENSION_SUPPLEMENTAL_INFO_ID,
     EXTENSION_TOTAL_ITEMS_ID,
 )
-from ralph.models.xapi.problem.statements import InteractionInteracted
+from ralph.models.xapi.problem.statements import InteractionAsked, InteractionInteracted
 
 from .base import BaseXapiConverter
 
@@ -40,5 +40,29 @@ class DemandhintDisplayedToInteractionInteracted(BaseXapiConverter):
                     "event__hint_len",
                 ),
                 ConversionItem("result__response", "event__hint_text"),
+            }
+        )
+
+
+class ShowanswerToInteractionAsked(BaseXapiConverter):
+    """Converts a `showanswer` event to xAPI.
+
+    Example: John asked for the response of an interaction.
+    """
+
+    __src__ = Showanswer
+    __dest__ = InteractionAsked
+
+    def _get_conversion_items(self):
+        """Returns a set of ConversionItems used for conversion."""
+
+        conversion_items = super()._get_conversion_items()
+        return conversion_items.union(
+            {
+                ConversionItem(
+                    "object__id",
+                    "context__module__usage_key",
+                    lambda usage_key: f"{self.home_page}/{usage_key}",
+                )
             }
         )

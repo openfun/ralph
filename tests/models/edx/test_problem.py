@@ -5,7 +5,11 @@ import json
 from hypothesis import given, provisional, settings
 from hypothesis import strategies as st
 
-from ralph.models.edx.problem import DemandhintDisplayed, DemandhintDisplayedEventField
+from ralph.models.edx.problem import (
+    DemandhintDisplayed,
+    DemandhintDisplayedEventField,
+    Showanswer,
+)
 from ralph.models.edx.x_block import ContextField
 from ralph.models.selector import ModelSelector
 
@@ -28,3 +32,18 @@ def test_models_edx_demandhint_displayed_with_valid_event(event):
     assert (
         ModelSelector(module="ralph.models.edx").get_model(event) is DemandhintDisplayed
     )
+
+
+@settings(max_examples=1)
+@given(
+    st.builds(
+        Showanswer,
+        context=st.builds(ContextField),
+        referer=provisional.urls(),
+    )
+)
+def test_models_edx_showanswer_with_valid_event(event):
+    """Tests given an `showanswer` event the get_model method should return a Showanswer model."""
+
+    event = json.loads(event.json())
+    assert ModelSelector(module="ralph.models.edx").get_model(event) is Showanswer

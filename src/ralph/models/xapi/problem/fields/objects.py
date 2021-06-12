@@ -60,4 +60,4 @@ class InteractionObjectField(ObjectField):
         definition (InteractionObjectDefinitionField): See InteractionObjectDefinitionField.
     """
 
-    definition: InteractionObjectDefinitionField
+    definition: InteractionObjectDefinitionField = InteractionObjectDefinitionField()
