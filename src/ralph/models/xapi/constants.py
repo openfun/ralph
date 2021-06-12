@@ -4,19 +4,23 @@
 LANG_EN_US_DISPLAY = "en-US"
 
 # xAPI activity IDs
+ACTIVITY_INTERACTION_ID = "http://adlnet.gov/expapi/activities/interaction"
 ACTIVITY_PAGE_ID = "http://activitystrea.ms/schema/1.0/page"
 ACTIVITY_QUESTION_ID = "http://adlnet.gov/expapi/activities/question"
 
 # xAPI activity display names
+ACTIVITY_INTERACTION_DISPLAY = "interaction"
 ACTIVITY_PAGE_DISPLAY = "page"
 ACTIVITY_QUESTION_DISPLAY = "question"
 
 # xAPI verb IDs
+VERB_INTERACTED_ID = "http://adlnet.gov/expapi/verbs/interacted"
 VERB_SAVED_ID = "https://w3id.org/xapi/dod-isd/verbs/saved"
 VERB_TERMINATED_ID = "http://adlnet.gov/expapi/verbs/terminated"
 VERB_VIEWED_ID = "http://id.tincanapi.com/verb/viewed"
 
 # xAPI verb display names
+VERB_INTERACTED_DISPLAY = "interacted"
 VERB_SAVED_DISPLAY = "saved"
 VERB_TERMINATED_DISPLAY = "terminated"
 VERB_VIEWED_DISPLAY = "viewed"

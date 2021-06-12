@@ -11,4 +11,5 @@ from .enrollment import (
 )
 from .navigational import UIPageClose, UISeqGoto, UISeqNext, UISeqPrev
 from .open_response_assessment import ORASaveSubmission
+from .problem import DemandhintDisplayed
 from .server import ServerEvent

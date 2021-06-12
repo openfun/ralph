@@ -5,6 +5,8 @@ from typing import Literal
 from ..config import BaseModelWithConfig
 from ..constants import (
     LANG_EN_US_DISPLAY,
+    VERB_INTERACTED_DISPLAY,
+    VERB_INTERACTED_ID,
     VERB_SAVED_DISPLAY,
     VERB_SAVED_ID,
     VERB_TERMINATED_DISPLAY,
@@ -53,4 +55,18 @@ class SavedVerbField(BaseModelWithConfig):
     id: Literal[VERB_SAVED_ID] = VERB_SAVED_ID
     display: dict[Literal[LANG_EN_US_DISPLAY], Literal[VERB_SAVED_DISPLAY]] = {
         LANG_EN_US_DISPLAY: VERB_SAVED_DISPLAY
+    }
+
+
+class InteractedVerbField(BaseModelWithConfig):
+    """Represents the `verb` xAPI Field for the action `interacted`.
+
+    Attributes:
+       id (str): Consists of the value `http://adlnet.gov/expapi/verbs/interacted`.
+       display (dict): Consists of the dictionary `{"en-US": "interacted"}`.
+    """
+
+    id: Literal[VERB_INTERACTED_ID] = VERB_INTERACTED_ID
+    display: dict[Literal[LANG_EN_US_DISPLAY], Literal[VERB_INTERACTED_DISPLAY]] = {
+        LANG_EN_US_DISPLAY: VERB_INTERACTED_DISPLAY
     }
