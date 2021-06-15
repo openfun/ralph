@@ -313,6 +313,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ralph-convert" class="md-nav__link">
+    convert
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ralph-extract" class="md-nav__link">
     extract
   </a>
@@ -559,6 +566,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ralph-convert" class="md-nav__link">
+    convert
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ralph-extract" class="md-nav__link">
     extract
   </a>
@@ -626,6 +640,39 @@
                        WARNING, INFO (default) or
                        DEBUG
   --help               Show this message and exit.
+</code></pre></div>
+<h3 id="ralph-convert">ralph convert<a class="headerlink" href="#ralph-convert" title="Permanent link">&para;</a></h3>
+<p>Converts input events to a given format.</p>
+<p><strong>Usage:</strong></p>
+<div class="highlight"><pre><span></span><code>ralph convert [OPTIONS]
+</code></pre></div>
+<p><strong>Options:</strong></p>
+<div class="highlight"><pre><span></span><code>  From edX to xAPI converter options: 
+    -u, --uuid-namespace TEXT     The UUID
+                                  namespace to use
+                                  for the `ID`
+                                  field generation
+    -p, --platform-url TEXT       The `actor.accou
+                                  nt.homePage` to
+                                  use in the xAPI
+                                  statements
+                                  [required]
+  -f, --from [edx]                Input events
+                                  format to
+                                  convert
+                                  [required]
+  -t, --to [xapi]                 Output events
+                                  format
+                                  [required]
+  -I, --ignore-errors             Continue writing
+                                  regardless of
+                                  raised errors
+  -F, --fail-on-unknown           Stop converting
+                                  at first unknown
+                                  event
+  --help                          Show this
+                                  message and
+                                  exit.
 </code></pre></div>
 <h3 id="ralph-extract">ralph extract<a class="headerlink" href="#ralph-extract" title="Permanent link">&para;</a></h3>
 <p>Extracts input events from a container format using a dedicated parser.</p>

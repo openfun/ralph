@@ -1940,7 +1940,7 @@ contain sensitive data: <code>username</code>, <code>referer</code>, <code>event
 
 
 <h6 id="ralph.models.edx.converters.xapi.base.BaseXapiConverter.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid_namespace</span><span class="p">,</span> <span class="n">home_page</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid_namespace</span><span class="p">,</span> <span class="n">platform_url</span><span class="p">)</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -1954,10 +1954,10 @@ contain sensitive data: <code>username</code>, <code>referer</code>, <code>event
 
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/base.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid_namespace</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">home_page</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid_namespace</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">platform_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Initializes BaseXapiConverter.&quot;&quot;&quot;</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">home_page</span> <span class="o">=</span> <span class="n">home_page</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">platform_url</span> <span class="o">=</span> <span class="n">platform_url</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">uuid_namespace</span> <span class="o">=</span> <span class="n">UUID</span><span class="p">(</span><span class="n">uuid_namespace</span><span class="p">)</span>
     <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
@@ -2068,7 +2068,7 @@ contain sensitive data: <code>username</code>, <code>referer</code>, <code>event
 
       <p>Converts a common edX <code>page_close</code> event to xAPI.</p>
 <p>Example Statement: John terminated https://www.fun-mooc.fr/ page.</p>
-<p>WARNING: The converter does not use the <code>self.home_page</code> in the <code>object__id</code>.</p>
+<p>WARNING: The converter does not use the <code>self.platform_url</code> in the <code>object__id</code>.</p>
 
 
 
