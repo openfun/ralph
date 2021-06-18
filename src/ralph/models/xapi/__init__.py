@@ -2,6 +2,7 @@
 
 # flake8: noqa
 
+from .navigation.statements import PageTerminated, PageViewed
 from .video.statements import (
     VideoCompleted,
     VideoInitialized,
@@ -11,5 +12,3 @@ from .video.statements import (
     VideoSeeked,
     VideoTerminated,
 )
-
-from .navigation.statements import PageTerminated, PageViewed

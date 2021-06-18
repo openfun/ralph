@@ -2,7 +2,6 @@
 
 from ...selector import selector
 from ..base import BaseXapiModel
-from ..constants import ACTIVITY_PAGE_ID, VERB_TERMINATED_ID, VERB_VIEWED_ID
 from ..fields.verbs import TerminatedVerbField, ViewedVerbField
 from .fields.objects import PageObjectField
 
