@@ -51,7 +51,7 @@ class VideoContextExtensionsField(BaseModelWithConfig):
     """Represents the common context.extensions field for video xAPI statement.
 
     Attributes:
-        session (uuid5): Consists of the ID of the active session.
+        session (uuid4): Consists of the ID of the active session.
     """
 
     session: Optional[UUID4] = Field(alias=VIDEO_EXTENSION_SESSION_ID)
