@@ -23,7 +23,7 @@ and this project adheres to
 
 ### Changed
 
-- Upgrade `elasticsearch` to `7.13.1`
+- Upgrade `elasticsearch` to `7.13.2`
 - Upgrade `python-swiftclient` to `3.12.0`
 - Upgrade `click` to `8.0.1`
 - Upgrade `click-option-group` to `0.5.3`
