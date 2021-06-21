@@ -1,7 +1,6 @@
 """Base xAPI model definition"""
 
 from datetime import datetime
-
 from uuid import UUID
 
 from .config import BaseModelWithConfig
