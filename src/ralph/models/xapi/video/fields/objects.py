@@ -20,7 +20,7 @@ class VideoObjectDefinitionField(BaseModelWithConfig):
        type (str): Consists of the value `https://w3id.org/xapi/video/activity-type/video`.
     """
 
-    name: dict[LANG_EN_US_DISPLAY, str] = {LANG_EN_US_DISPLAY.__args__[0]: None}
+    name: Optional[dict[LANG_EN_US_DISPLAY, str]]
     type: VIDEO_OBJECT_DEFINITION_TYPE = VIDEO_OBJECT_DEFINITION_TYPE.__args__[0]
     extensions: Optional[ObjectDefinitionExtensionsField]
 
@@ -33,5 +33,6 @@ class VideoObjectField(ObjectField):
         objectType: Consists of the value "Activity".
     """
 
+    name: Optional[dict[LANG_EN_US_DISPLAY, str]]
     definition: VideoObjectDefinitionField
     objectType: Optional[Literal["Activity"]]
