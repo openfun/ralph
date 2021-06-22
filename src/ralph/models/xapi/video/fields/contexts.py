@@ -33,7 +33,7 @@ class VideoContextActivitiesField(BaseModelWithConfig):
     """
 
     category: List[dict[Literal["id"], VIDEO_CONTEXT_CATEGORY]] = [
-        {Literal["id"]: VIDEO_CONTEXT_CATEGORY.__args__[0]}
+        {"id": VIDEO_CONTEXT_CATEGORY.__args__[0]}
     ]
 
 
@@ -85,7 +85,7 @@ class VideoInitializedContextExtensionsField(VideoContextExtensionsField):
     ccSubtitleLanguage: Optional[str] = Field(alias=VIDEO_EXTENSION_CC_SUBTITLE_LANG)
     frameRate: Optional[float] = Field(alias=VIDEO_EXTENSION_FRAME_RATE)
     fullScreen: Optional[bool] = Field(alias=VIDEO_EXTENSION_FULL_SCREEN)
-    quality: Optional[str] = Field(alias=VIDEO_EXTENSION_QUALITY)
+    quality: Optional[Literal[144, 240, 480, 720, 1080]] = Field(alias=VIDEO_EXTENSION_QUALITY)
     screenSize: Optional[str] = Field(alias=VIDEO_EXTENSION_SCREEN_SIZE)
     videoPlaybackSize: Optional[str] = Field(alias=VIDEO_EXTENSION_VIDEO_PLAYBACK_SIZE)
     speed: Optional[str] = Field(alias=VIDEO_EXTENSION_SPEED)
@@ -135,7 +135,7 @@ class VideoInteractedContextExtensionsField(VideoContextExtensionsField):
     ccSubtitleLanguage: Optional[str] = Field(alias=VIDEO_EXTENSION_CC_SUBTITLE_LANG)
     frameRate: Optional[float] = Field(alias=VIDEO_EXTENSION_FRAME_RATE)
     fullScreen: Optional[bool] = Field(alias=VIDEO_EXTENSION_FULL_SCREEN)
-    quality: Optional[str] = Field(alias=VIDEO_EXTENSION_QUALITY)
+    quality: Optional[Literal[144, 240, 480, 720, 1080]] = Field(alias=VIDEO_EXTENSION_QUALITY)
     videoPlaybackSize: Optional[str] = Field(alias=VIDEO_EXTENSION_VIDEO_PLAYBACK_SIZE)
     speed: Optional[str] = Field(alias=VIDEO_EXTENSION_SPEED)
     track: Optional[str] = Field(alias=VIDEO_EXTENSION_TRACK)

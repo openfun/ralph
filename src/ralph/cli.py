@@ -1,10 +1,14 @@
 """Ralph CLI entrypoint"""
 
+import datetime
 import json
 import logging
+import pytz
+import random
 import re
 import sys
 from inspect import signature
+import warnings
 
 import click
 from click_option_group import optgroup
@@ -21,6 +25,7 @@ from ralph.defaults import (
 from ralph.exceptions import UnsupportedBackendException
 from ralph.logger import configure_logging
 from ralph.models.converter import Converter
+from ralph.models.generator import hypothesis_model_factory
 from ralph.models.selector import ModelSelector
 from ralph.models.validator import Validator
 from ralph.utils import (
@@ -204,6 +209,60 @@ def validate(format_, ignore_errors, fail_on_unknown):
 
     for event in validator.validate(sys.stdin, ignore_errors, fail_on_unknown):
         click.echo(event)
+
+@cli.command()
+@click.option(
+    "-f",
+    "--format",
+    "format_",
+    type=click.Choice(["edx", "xapi"]),
+    required=True,
+    help="Event format to generate",
+)
+@click.option(
+    "-c",
+    "--count",
+    type=click.INT,
+    default=1,
+    help="Number of events to generate"
+)
+@click.option(
+    "-p",
+    "--pattern",
+    type=click.STRING,
+    default=".*",
+    help="Model name pattern to filter models"
+)
+@click.option(
+    "-o",
+    "--options",
+    type=CommaSeparatedKeyValueParamType(),
+    help="Model related options",
+)
+def generate(format_, count, pattern, options):
+    """Generates input events of given format."""
+
+    logger.info(
+        "Generating %s %s events (pattern: %s options: %s)",
+        count,
+        format_,
+        pattern,
+        options
+    )
+
+    # This is really bad, but hypothesis writes a lot of warnings about the `example` method usage
+    # which we cannot silence from the command line.
+
+    warnings.filterwarnings('ignore')
+
+    options = options if options else {}
+    json_options = {"by_alias": True, "exclude_none": format_ == "xapi"}
+    models = list(filter(lambda x: re.search(pattern, x.__name__) is not None, ModelSelector(f"ralph.models.{format_}").model_rules.keys()))
+    for _ in range(count):
+        selected_model = models[random.randint(0, len(models) - 1)] 
+        local_time = pytz.timezone('Europe/Paris').localize(datetime.datetime.now())
+        options["timestamp"] = local_time.isoformat()
+        click.echo(hypothesis_model_factory(selected_model, **options).json(**json_options))
 
 
 @cli.command()
