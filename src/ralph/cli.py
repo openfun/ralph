@@ -23,6 +23,7 @@ from ralph.logger import configure_logging
 from ralph.models.converter import Converter
 from ralph.models.selector import ModelSelector
 from ralph.models.validator import Validator
+from ralph.models.xapi.generator.video import generate_video
 from ralph.utils import (
     get_backend_type,
     get_class_from_name,
@@ -204,6 +205,13 @@ def validate(format_, ignore_errors, fail_on_unknown):
 
     for event in validator.validate(sys.stdin, ignore_errors, fail_on_unknown):
         click.echo(event)
+
+
+@cli.command()
+def generate():
+    """Generates learnings logs given the string name of an implement event model in ralph."""
+
+    generate_video()
 
 
 @cli.command()
