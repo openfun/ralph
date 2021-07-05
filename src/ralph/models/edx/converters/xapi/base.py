@@ -41,7 +41,7 @@ class BaseXapiConverter(BaseConversionSet):
             ConversionItem(
                 "id",
                 None,
-                lambda event_str: uuid5(self.uuid_namespace, event_str),
+                lambda event_str: str(uuid5(self.uuid_namespace, event_str)),
                 True,
             ),
             ConversionItem(

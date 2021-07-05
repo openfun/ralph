@@ -141,15 +141,15 @@ def test_cli_validate_command_usage():
     assert result.exit_code == 0
     assert (
         "Options:\n"
-        "  -f, --format [edx]     Input events format to validate  [required]\n"
-        "  -I, --ignore-errors    Continue validating regardless of raised errors\n"
-        "  -F, --fail-on-unknown  Stop validating at first unknown event\n"
+        "  -f, --format [edx|xapi]  Input events format to validate  [required]\n"
+        "  -I, --ignore-errors      Continue validating regardless of raised errors\n"
+        "  -F, --fail-on-unknown    Stop validating at first unknown event\n"
     ) in result.output
 
     result = runner.invoke(cli, ["validate"])
     assert result.exit_code > 0
     assert (
-        "Error: Missing option '-f' / '--format'. Choose from:\n\tedx\n"
+        "Error: Missing option '-f' / '--format'. Choose from:\n\tedx,\n\txapi\n"
     ) in result.output
 
 
