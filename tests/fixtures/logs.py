@@ -12,6 +12,7 @@ from logging_gelf.formatters import GELFFormatter
 def gelf_logger():
     """Generate a GELF logger to generate wrapped tracking log fixtures."""
 
+    # pylint: disable=consider-using-with
     handler = logging.StreamHandler(NamedTemporaryFile(mode="w+", delete=False))
     handler.setLevel(logging.INFO)
     handler.setFormatter(GELFFormatter(null_character=False))
