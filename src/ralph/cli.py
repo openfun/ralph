@@ -172,7 +172,7 @@ def extract(parser):
     "-f",
     "--format",
     "format_",
-    type=click.Choice(["edx"]),
+    type=click.Choice(["edx", "xapi"]),
     required=True,
     help="Input events format to validate",
 )

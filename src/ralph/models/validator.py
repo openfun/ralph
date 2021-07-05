@@ -17,7 +17,7 @@ class Validator:
     """Validates events using pydantic models."""
 
     def __init__(self, model_selector: ModelSelector):
-        """Initializes Validator"""
+        """Initializes Validator."""
 
         self.model_selector = model_selector
 
