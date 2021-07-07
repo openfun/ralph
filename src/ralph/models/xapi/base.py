@@ -14,7 +14,7 @@ class BaseXapiModel(BaseModelWithConfig):
     `context`, `result`, `stored`, `authority`, `version` and `attachments` fields.
 
     Attributes:
-        id (UUID): Consists of a generated UUID4 from the source event string.
+        id (UUID): Consists of a generated UUID string from the source event string.
         actor (ActorField): See ActorField.
         timestamp (datetime): Consists of the UTC time in ISO format when the event was emitted.
     """
