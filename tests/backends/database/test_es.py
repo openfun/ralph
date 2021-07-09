@@ -13,6 +13,7 @@ from elasticsearch.helpers import BulkIndexError, bulk
 
 from ralph.backends.database.es import ESDatabase
 from ralph.defaults import APP_DIR, HISTORY_FILE
+from ralph.exceptions import BackendParameterException
 
 from tests.fixtures.backends import ES_TEST_HOSTS, ES_TEST_INDEX
 
@@ -38,6 +39,19 @@ def test_backends_database_es_database_instantiation(es):
     )
     assert database.index == ES_TEST_INDEX
     assert isinstance(database.client, Elasticsearch)
+    assert database.op_type == "index"
+
+    for op_type in ("index", "create", "delete", "update"):
+        database = ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX, op_type=op_type)
+        assert database.op_type == op_type
+
+
+def test_backends_database_es_database_instantiation_with_forbidden_op_type(es):
+    """Tests the ES backend instantiation with an op_type that is not allowed."""
+    # pylint: disable=invalid-name,unused-argument,protected-access
+
+    with pytest.raises(BackendParameterException):
+        ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX, op_type="foo")
 
 
 def test_backends_database_es_client_kwargs(es):
@@ -78,7 +92,39 @@ def test_backends_database_es_to_documents_method(es):
     documents = list(documents)
     assert len(documents) == 10
     assert documents == [
-        {"_index": database.index, "_id": idx, "_source": {"id": idx}}
+        {
+            "_index": database.index,
+            "_id": idx,
+            "_op_type": "index",
+            "_type": "document",
+            "_source": {"id": idx},
+        }
+        for idx in range(10)
+    ]
+
+
+def test_backends_database_es_to_documents_method_with_create_op_type(es):
+    """Tests to_documents method using the create op_type."""
+    # pylint: disable=invalid-name,unused-argument
+
+    # Create stream data
+    stream = StringIO("\n".join([json.dumps({"id": idx}) for idx in range(10)]))
+    stream.seek(0)
+
+    database = ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX, op_type="create")
+    documents = database.to_documents(stream, lambda item: item.get("id"))
+    assert isinstance(documents, Iterable)
+
+    documents = list(documents)
+    assert len(documents) == 10
+    assert documents == [
+        {
+            "_index": database.index,
+            "_id": idx,
+            "_op_type": "create",
+            "_type": "document",
+            "_source": {"id": idx},
+        }
         for idx in range(10)
     ]
 
@@ -148,6 +194,63 @@ def test_backends_database_es_put_method(es, fs, monkeypatch):
     hits = es.search(index=ES_TEST_INDEX)["hits"]["hits"]
     assert len(hits) == 10
     assert sorted([hit["_source"]["id"] for hit in hits]) == list(range(10))
+
+
+def test_backends_database_es_put_method_with_update_op_type(es, fs, monkeypatch):
+    """Tests ES put method using the update op_type."""
+    # pylint: disable=invalid-name
+
+    # Prepare fake file system
+    fs.create_dir(str(APP_DIR))
+    # Force Path instantiation with fake FS
+    history_file = Path(str(HISTORY_FILE))
+    assert not history_file.exists()
+
+    monkeypatch.setattr(
+        "sys.stdin",
+        StringIO(
+            "\n".join([json.dumps({"id": idx, "value": str(idx)}) for idx in range(10)])
+        ),
+    )
+
+    assert len(es.search(index=ES_TEST_INDEX)["hits"]["hits"]) == 0
+
+    database = ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX)
+    database.put(chunk_size=5)
+
+    # As we bulk insert documents, the index needs to be refreshed before making
+    # queries.
+    es.indices.refresh(index=ES_TEST_INDEX)
+
+    hits = es.search(index=ES_TEST_INDEX)["hits"]["hits"]
+    assert len(hits) == 10
+    assert sorted([hit["_source"]["id"] for hit in hits]) == list(range(10))
+    assert sorted([hit["_source"]["value"] for hit in hits]) == list(
+        map(str, range(10))
+    )
+
+    monkeypatch.setattr(
+        "sys.stdin",
+        StringIO(
+            "\n".join(
+                [json.dumps({"id": idx, "value": str(10 + idx)}) for idx in range(10)]
+            )
+        ),
+    )
+
+    database = ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX, op_type="update")
+    database.put(chunk_size=5)
+
+    # As we bulk insert documents, the index needs to be refreshed before making
+    # queries.
+    es.indices.refresh(index=ES_TEST_INDEX)
+
+    hits = es.search(index=ES_TEST_INDEX)["hits"]["hits"]
+    assert len(hits) == 10
+    assert sorted([hit["_source"]["id"] for hit in hits]) == list(range(10))
+    assert sorted([hit["_source"]["value"] for hit in hits]) == list(
+        map(lambda x: str(x + 10), range(10))
+    )
 
 
 def test_backends_database_es_put_with_badly_formatted_data_raises_a_bulkindexerror(
