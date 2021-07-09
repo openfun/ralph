@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.3.0] - 2021-07-09
+
 ### Added
 
 - xAPI video `interacted` pydantic models
@@ -95,7 +97,8 @@ and this project adheres to
 - Add optional sentry integration
 - Distribute Arnold's tray to deploy Ralph in a k8s cluster as cronjobs
 
-[unreleased]: https://github.com/openfun/ralph/compare/v1.2.0...master
+[unreleased]: https://github.com/openfun/ralph/compare/v1.3.0...master
+[1.3.0]: https://github.com/openfun/ralph/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/openfun/ralph/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/openfun/ralph/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/openfun/ralph/compare/3d03d85...v1.0.0
