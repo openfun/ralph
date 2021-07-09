@@ -299,6 +299,7 @@ def test_cli_fetch_command_usage():
         "    --ldp-application-key TEXT\n"
         "    --ldp-endpoint TEXT\n"
         "  es backend: \n"
+        "    --es-op-type TEXT\n"
         "    --es-client-options KEY=VALUE,KEY=VALUE\n"
         "    --es-index TEXT\n"
         "    --es-hosts TEXT\n"

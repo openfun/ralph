@@ -26,6 +26,8 @@ and this project adheres to
 - Install security updates in project Docker images
 - Model selector to retrieve associated pydantic model of a given event
 - `validate` command to lint edx events using pydantic models
+- Support all available bulk operation types for the elasticsearch backend
+  (create, index, update, delete) using the `--es-op-type` option
 
 ### Changed
 

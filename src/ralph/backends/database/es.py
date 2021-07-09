@@ -3,13 +3,28 @@
 import json
 import logging
 import sys
+from enum import Enum
 
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import scan, streaming_bulk
 
+from ralph.exceptions import BackendParameterException
+
 from .base import BaseDatabase
 
 logger = logging.getLogger(__name__)
+
+
+class OpType(Enum):
+    """Elasticsearch operation types"""
+
+    INDEX = "index"
+    CREATE = "create"
+    DELETE = "delete"
+    UPDATE = "update"
+
+
+DEFAULT_OP_TYPE = OpType.INDEX.value
 
 
 class ESDatabase(BaseDatabase):
@@ -17,13 +32,21 @@ class ESDatabase(BaseDatabase):
 
     name = "es"
 
-    def __init__(self, hosts: list, index: str, client_options: dict = None):
+    def __init__(
+        self,
+        hosts: list,
+        index: str,
+        client_options: dict = None,
+        op_type: str = DEFAULT_OP_TYPE,
+    ):
         """Instantiate the Elasticsearch client.
 
         hosts: supposed to be a list
         index: the index name
         es_client_options: a dict of valid options for the Elasticsearch class
                            initialization
+        op_type: elasticsearch operation type for every document sent to ES
+                (should be one of: index, create, delete, update)
 
         """
         if client_options is None:
@@ -32,6 +55,11 @@ class ESDatabase(BaseDatabase):
         self._hosts = hosts
         self.index = index
         self.client = Elasticsearch(self._hosts, **client_options)
+        if op_type not in [op.value for op in OpType]:
+            raise BackendParameterException(
+                "%s is not an allowed operation type" % op_type
+            )
+        self.op_type = op_type
 
     def get(self, chunk_size=500):
         """Get index documents and stream them"""
@@ -46,11 +74,25 @@ class ESDatabase(BaseDatabase):
 
         for line in stream:
             item = json.loads(line)
-            yield {
+            action = {
                 "_index": self.index,
                 "_id": get_id(item),
-                "_source": item,
+                "_op_type": self.op_type,
+                "_type": "document",
             }
+            if self.op_type == "update":
+                action.update(
+                    {
+                        "doc": item,
+                    }
+                )
+            elif self.op_type in ("create", "index"):
+                action.update(
+                    {
+                        "_source": item,
+                    }
+                )
+            yield action
 
     def put(self, chunk_size=500, ignore_errors=False):
         """Write documents streamed from the standard input to the instance index"""
