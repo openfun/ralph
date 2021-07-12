@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade `elasticsearch` to `7.13.3`
+
 ## [2.0.0] - 2021-07-09
 
 ### Added
