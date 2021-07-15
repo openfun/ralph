@@ -4,6 +4,7 @@ import json
 import random
 import sys
 from collections.abc import Iterable
+from datetime import datetime
 from io import BytesIO, StringIO
 from pathlib import Path
 
@@ -96,7 +97,6 @@ def test_backends_database_es_to_documents_method(es):
             "_index": database.index,
             "_id": idx,
             "_op_type": "index",
-            "_type": "document",
             "_source": {"id": idx},
         }
         for idx in range(10)
@@ -122,7 +122,6 @@ def test_backends_database_es_to_documents_method_with_create_op_type(es):
             "_index": database.index,
             "_id": idx,
             "_op_type": "create",
-            "_type": "document",
             "_source": {"id": idx},
         }
         for idx in range(10)
@@ -314,3 +313,33 @@ def test_backends_database_es_put_with_badly_formatted_data_in_force_mode(
     assert sorted([hit["_source"]["id"] for hit in hits]) == [
         i for i in range(10) if i != 2
     ]
+
+
+def test_backends_database_es_put_with_datastream(es_data_stream, fs, monkeypatch):
+    """Tests ES put method when using a configured data stream."""
+    # pylint: disable=invalid-name,unused-argument
+
+    monkeypatch.setattr(
+        "sys.stdin",
+        StringIO(
+            "\n".join(
+                [
+                    json.dumps({"id": idx, "@timestamp": datetime.now().isoformat()})
+                    for idx in range(10)
+                ]
+            )
+        ),
+    )
+
+    assert len(es_data_stream.search(index=ES_TEST_INDEX)["hits"]["hits"]) == 0
+
+    database = ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX, op_type="create")
+    database.put(chunk_size=5)
+
+    # As we bulk insert documents, the index needs to be refreshed before making
+    # queries.
+    es_data_stream.indices.refresh(index=ES_TEST_INDEX)
+
+    hits = es_data_stream.search(index=ES_TEST_INDEX)["hits"]["hits"]
+    assert len(hits) == 10
+    assert sorted([hit["_source"]["id"] for hit in hits]) == list(range(10))

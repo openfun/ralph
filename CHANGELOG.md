@@ -12,6 +12,10 @@ and this project adheres to
 
 - Upgrade `elasticsearch` to `7.13.3`
 
+### Fixed
+
+- Restore elasticsearch backend datastream compatibility for bulk operations
+
 ## [2.0.0] - 2021-07-09
 
 ### Added

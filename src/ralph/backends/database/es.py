@@ -78,7 +78,6 @@ class ESDatabase(BaseDatabase):
                 "_index": self.index,
                 "_id": get_id(item),
                 "_op_type": self.op_type,
-                "_type": "document",
             }
             if self.op_type == "update":
                 action.update(
