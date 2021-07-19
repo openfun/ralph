@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade `requests` to `2.26.0`
+
 ## [2.0.1] - 2021-07-15
 
 ### Changed
