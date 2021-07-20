@@ -8,7 +8,7 @@ RUN pip install --upgrade pip
 RUN apt-get update && \
     apt-get -y upgrade && \
     rm -rf /var/lib/apt/lists/*
-    
+
 
 # -- Builder --
 FROM base as builder
@@ -20,12 +20,16 @@ COPY . /build/
 RUN apt-get update && \
     apt-get install -y gcc libc6-dev && \
     rm -rf /var/lib/apt/lists/*
-    
+
 RUN python setup.py install
 
 
 # -- Core --
 FROM base as core
+
+RUN apt-get update && \
+    apt-get install -y jq && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/local /usr/local
 
