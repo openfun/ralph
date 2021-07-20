@@ -12,6 +12,7 @@ and this project adheres to
 
 - `ws` websocket stream backend (compatible with the `fetch` command)
 - bundle `jq` in the `fundocker/ralph` Docker image
+- Tray: enable ralph app deployment command configuration
 
 ### Changed
 
