@@ -11,6 +11,7 @@ and this project adheres to
 ### Added
 
 - `ws` websocket stream backend (compatible with the `fetch` command)
+- bundle `jq` in the `fundocker/ralph` Docker image
 
 ### Changed
 
