@@ -39,6 +39,15 @@ class StorageBackends(Enum):
     SWIFT = "ralph.backends.storage.swift.SwiftStorage"
 
 
+class StreamBackends(Enum):
+    """Enumerate streaming backend modules.
+
+    Adding an entry to this enum will make it available to the CLI.
+    """
+
+    WS = "ralph.backends.stream.ws.WSStream"
+
+
 def load_config(config_file_path):
     """Return a dictionary representing Ralph's configuration."""
 

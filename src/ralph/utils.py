@@ -9,6 +9,7 @@ from importlib import import_module
 from ralph.backends import BackendTypes
 from ralph.backends.database.base import BaseDatabase as BaseDatabaseBackend
 from ralph.backends.storage.base import BaseStorage as BaseStorageBackend
+from ralph.backends.stream.base import BaseStream as BaseStreamBackend
 
 
 # Taken from Django utilities
@@ -41,6 +42,8 @@ def get_backend_type(backend_class):
         return BackendTypes.STORAGE
     if BaseDatabaseBackend in backend_class.__mro__:
         return BackendTypes.DATABASE
+    if BaseStreamBackend in backend_class.__mro__:
+        return BackendTypes.STREAM
     return None
 
 

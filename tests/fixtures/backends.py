@@ -1,9 +1,14 @@
 """Test fixtures for backends"""
 
+import asyncio
+import json
 import os
+import random
+import time
 from enum import Enum
 
 import pytest
+import websockets
 from elasticsearch import Elasticsearch
 
 from ralph.backends.storage.swift import SwiftStorage
@@ -15,6 +20,10 @@ ES_TEST_INDEX_PATTERN = os.environ.get("RALPH_ES_TEST_INDEX_PATTERN", "test-inde
 ES_TEST_HOSTS = os.environ.get("RALPH_ES_TEST_HOSTS", "http://localhost:9200").split(
     ","
 )
+
+# Websocket test backend defaults
+WS_TEST_HOST = "localhost"
+WS_TEST_PORT = 8765
 
 
 class NamedClassA:
@@ -108,3 +117,30 @@ def swift():
         )
 
     return get_swift_storage
+
+
+@pytest.fixture
+def events():
+    """Returns test events fixture."""
+    return [{"id": idx} for idx in range(10)]
+
+
+@pytest.fixture
+def ws(events):
+    """Returns a websocket server instance."""
+    # pylint: disable=invalid-name,redefined-outer-name
+
+    async def forward(websocket, path):
+        """Stupid test server that sends events."""
+        # pylint: disable=unused-argument
+
+        for event in events:
+            await websocket.send(json.dumps(event))
+            time.sleep(random.randrange(0, 500) / 10000.0)
+
+    # pylint: disable=no-member
+    server = websockets.serve(forward, "0.0.0.0", WS_TEST_PORT)
+    asyncio.get_event_loop().run_until_complete(server)
+    yield server
+
+    server.ws_server.close()

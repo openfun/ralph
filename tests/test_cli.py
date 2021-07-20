@@ -21,7 +21,12 @@ from ralph.exceptions import ConfigurationException
 from ralph.models.edx.navigational import UIPageClose
 from ralph.models.xapi.navigation.statements import PageTerminated
 
-from tests.fixtures.backends import ES_TEST_HOSTS, ES_TEST_INDEX
+from tests.fixtures.backends import (
+    ES_TEST_HOSTS,
+    ES_TEST_INDEX,
+    WS_TEST_HOST,
+    WS_TEST_PORT,
+)
 
 test_logger = logging.getLogger("ralph")
 
@@ -278,6 +283,8 @@ def test_cli_fetch_command_usage():
     assert result.exit_code == 0
     assert (
         "Options:\n"
+        "  ws backend: \n"
+        "    --ws-uri TEXT\n"
         "  swift backend: \n"
         "    --swift-os-identity-api-version TEXT\n"
         "    --swift-os-auth-url TEXT\n"
@@ -303,7 +310,7 @@ def test_cli_fetch_command_usage():
         "    --es-client-options KEY=VALUE,KEY=VALUE\n"
         "    --es-index TEXT\n"
         "    --es-hosts TEXT\n"
-        "  -b, --backend [es|ldp|fs|swift]\n"
+        "  -b, --backend [es|ldp|fs|swift|ws]\n"
         "                                  Backend  [required]\n"
         "  -c, --chunk-size INTEGER        Get events by chunks of size #\n"
     ) in result.output
@@ -311,9 +318,9 @@ def test_cli_fetch_command_usage():
     result = runner.invoke(cli, ["fetch"])
     assert result.exit_code > 0
     assert (
-        "Error: Missing option '-b' / '--backend'. Choose from:\n\tes,\n\tldp,\n\tfs,\n\tswift\n"
-        in result.output
-    )
+        "Error: Missing option '-b' / '--backend'. "
+        "Choose from:\n\tes,\n\tldp,\n\tfs,\n\tswift,\n\tws\n"
+    ) in result.output
 
 
 def test_cli_fetch_command_with_ldp_backend(monkeypatch):
@@ -407,6 +414,17 @@ def test_cli_fetch_command_with_es_backend(es):
     )
     assert result.exit_code == 0
     assert "\n".join([json.dumps({"id": idx}) for idx in range(10)]) in result.output
+
+
+def test_cli_fetch_command_with_ws_backend(events, ws):
+    """Tests ralph fetch command using the ws backend."""
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        ["fetch", "-b", "ws", "--ws-uri", f"ws://{WS_TEST_HOST}:{WS_TEST_PORT}"],
+    )
+    assert "\n".join([json.dumps(event) for event in events]) in result.output
 
 
 def test_cli_list_command_usage():

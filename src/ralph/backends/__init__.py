@@ -8,3 +8,4 @@ class BackendTypes(Enum):
 
     DATABASE = auto()
     STORAGE = auto()
+    STREAM = auto()
