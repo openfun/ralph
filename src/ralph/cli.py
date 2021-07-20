@@ -17,6 +17,7 @@ from ralph.defaults import (
     DatabaseBackends,
     Parsers,
     StorageBackends,
+    StreamBackends,
 )
 from ralph.exceptions import UnsupportedBackendException
 from ralph.logger import configure_logging
@@ -38,7 +39,8 @@ logger = logging.getLogger(__name__)
 DATABASE_BACKENDS = (lambda: [backend.value for backend in DatabaseBackends])()
 PARSERS = (lambda: [parser.value for parser in Parsers])()
 STORAGE_BACKENDS = (lambda: [backend.value for backend in StorageBackends])()
-BACKENDS = (lambda: DATABASE_BACKENDS + STORAGE_BACKENDS)()
+STREAM_BACKENDS = (lambda: [backend.value for backend in StreamBackends])()
+BACKENDS = (lambda: DATABASE_BACKENDS + STORAGE_BACKENDS + STREAM_BACKENDS)()
 
 
 class CommaSeparatedKeyValueParamType(click.ParamType):
@@ -303,6 +305,8 @@ def fetch(backend, archive, chunk_size, **options):
         backend.read(archive, chunk_size=chunk_size)
     elif backend_type == BackendTypes.DATABASE:
         backend.get(chunk_size=chunk_size)
+    elif backend_type == BackendTypes.STREAM:
+        backend.stream()
     elif backend_type is None:
         msg = "Cannot find an implemented backend type for backend %s"
         logger.error(msg, backend)
@@ -310,7 +314,7 @@ def fetch(backend, archive, chunk_size, **options):
 
 
 @click.argument("archive", required=False)
-@backends_options(backends=BACKENDS)
+@backends_options(backends=(lambda: DATABASE_BACKENDS + STORAGE_BACKENDS)())
 @click.option(
     "-c",
     "--chunk-size",

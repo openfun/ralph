@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- `ws` websocket stream backend (compatible with the `fetch` command)
+
 ### Changed
 
 - Upgrade `requests` to `2.26.0`
