@@ -2,6 +2,10 @@
 ralph_image_name: "fundocker/ralph"
 ralph_image_tag: "latest"
 ralph_app_replicas: 0
+ralph_app_command:
+  - bash
+  - "-c"
+  - while true; do echo -n '.'; sleep 3600; done
 ralph_history_volume_size: 2Gi
 ralph_secret_name: "ralph-backends-{{ ralph_vault_checksum | default('undefined_ralph_vault_checksum') }}"
 ralph_es_ca_secret_name: "ralph-es-ca-{{ ralph_vault_checksum | default('undefined_ralph_vault_checksum') }}"

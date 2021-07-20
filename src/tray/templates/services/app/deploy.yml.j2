@@ -42,8 +42,7 @@ spec:
         - name: ralph
           image: "{{ ralph_image_name }}:{{ ralph_image_tag }}"
           imagePullPolicy: Always
-          command: ["/bin/sh"]
-          args: ["-c", "while true; do echo -n '.'; sleep 3600; done"]
+          command: {{ ralph_app_command }}
           env:
             - name: RALPH_APP_DIR
               value: "/app/.ralph"
