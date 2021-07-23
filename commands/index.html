@@ -693,7 +693,9 @@
 <div class="highlight"><pre><span></span><code>ralph fetch [OPTIONS] [ARCHIVE]
 </code></pre></div>
 <p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  swift backend: 
+<div class="highlight"><pre><span></span><code>  ws backend: 
+    --ws-uri TEXT
+  swift backend: 
     --swift-os-identity-api-version TEXT
     --swift-os-auth-url TEXT
     --swift-os-project-domain-name TEXT
@@ -718,7 +720,7 @@
     --es-client-options KEY=VALUE,KEY=VALUE
     --es-index TEXT
     --es-hosts TEXT
-  -b, --backend [es|ldp|fs|swift]
+  -b, --backend [es|ldp|fs|swift|ws]
                                   Backend
                                   [required]
   -c, --chunk-size INTEGER        Get events by
