@@ -16,6 +16,7 @@ and this project adheres to
 
 ### Changed
 
+- Upgrade `elasticsearch` to `7.13.4`
 - Upgrade `requests` to `2.26.0`
 
 ## [2.0.1] - 2021-07-15
