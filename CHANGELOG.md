@@ -16,6 +16,7 @@ and this project adheres to
 
 ### Changed
 
+- Upgrade `sentry_sdk` to `1.3.1`
 - Upgrade `elasticsearch` to `7.13.4`
 - Upgrade `requests` to `2.26.0`
 
