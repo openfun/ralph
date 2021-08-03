@@ -10,7 +10,7 @@ from hypothesis import strategies as st
 from ralph.models.converter import convert_dict_event
 from ralph.models.edx.base import BaseContextField
 from ralph.models.edx.converters.xapi.navigational import UIPageCloseToPageTerminated
-from ralph.models.edx.navigational import UIPageClose
+from ralph.models.edx.navigational.statements import UIPageClose
 
 
 @settings(max_examples=1)

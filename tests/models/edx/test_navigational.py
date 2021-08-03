@@ -9,8 +9,8 @@ from hypothesis import strategies as st
 from pydantic.error_wrappers import ValidationError
 
 from ralph.models.edx.base import BaseContextField
-from ralph.models.edx.navigational import (
-    NavigationalEventField,
+from ralph.models.edx.navigational.fields.events import NavigationalEventField
+from ralph.models.edx.navigational.statements import (
     UIPageClose,
     UISeqGoto,
     UISeqNext,
@@ -20,18 +20,9 @@ from ralph.models.selector import ModelSelector
 
 
 @settings(max_examples=1)
-@given(st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()))
-def test_models_edx_ui_page_close_selector_with_valid_event(event):
-    """Tests given a page_close event the get_model method should return UIPageClose model."""
-
-    event = json.loads(event.json())
-    assert ModelSelector(module="ralph.models.edx").get_model(event) is UIPageClose
-
-
-@settings(max_examples=1)
 @given(st.builds(NavigationalEventField))
 def test_fields_edx_navigational_events_event_field_with_valid_content(field):
-    """Tests that a valid NavigationalEventField field does not raise a ValidationError."""
+    """Tests that a valid `NavigationalEventField` does not raise a `ValidationError`."""
 
     assert re.match(
         r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@sequential\+block@[a-f0-9]{32}$",
@@ -54,15 +45,36 @@ def test_fields_edx_navigational_events_event_field_with_valid_content(field):
 @settings(max_examples=1)
 @given(st.builds(NavigationalEventField))
 def test_fields_edx_navigational_events_event_field_with_invalid_content(
-    id, event  # pylint: disable=redefined-builtin
+    id, field  # pylint: disable=redefined-builtin
 ):
-    """Tests that an invalid NavigationalEventField field raises a ValidationError."""
+    """Tests that an invalid `NavigationalEventField` raises a `ValidationError`."""
 
-    invalid_event = json.loads(event.json())
-    invalid_event["id"] = id
+    invalid_field = json.loads(field.json())
+    invalid_field["id"] = id
 
     with pytest.raises(ValidationError, match="id\n  string does not match regex"):
-        NavigationalEventField(**invalid_event)
+        NavigationalEventField(**invalid_field)
+
+
+@settings(max_examples=1)
+@given(st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()))
+def test_models_edx_ui_page_close_with_valid_statement(statement):
+    """Tests that a `page_close` statement has the expected `event`, `event_type` and `name`."""
+
+    assert statement.event == "{}"
+    assert statement.event_type == "page_close"
+    assert statement.name == "page_close"
+
+
+@settings(max_examples=1)
+@given(st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()))
+def test_models_edx_ui_page_close_selector_with_valid_statement(statement):
+    """Tests given a `page_close` statement the selector `get_model` method should return
+    `UIPageClose` model.
+    """
+
+    statement = json.loads(statement.json())
+    assert ModelSelector(module="ralph.models.edx").get_model(statement) is UIPageClose
 
 
 @settings(max_examples=1)
@@ -75,11 +87,30 @@ def test_fields_edx_navigational_events_event_field_with_invalid_content(
         event=st.builds(NavigationalEventField),
     )
 )
-def test_models_edx_ui_seq_goto_selector_with_valid_event(event):
-    """Tests given a seq_goto event the get_model method should return UISeqGoto model."""
+def test_models_edx_ui_seq_goto_with_valid_statement(statement):
+    """Tests that a `seq_goto` statement has the expected `event_type` and `name`."""
 
-    event = json.loads(event.json())
-    assert ModelSelector(module="ralph.models.edx").get_model(event) is UISeqGoto
+    assert statement.event_type == "seq_goto"
+    assert statement.name == "seq_goto"
+
+
+@settings(max_examples=1)
+@given(
+    st.builds(
+        UISeqGoto,
+        context=st.builds(BaseContextField),
+        referer=provisional.urls(),
+        page=provisional.urls(),
+        event=st.builds(NavigationalEventField),
+    )
+)
+def test_models_edx_ui_seq_goto_selector_with_valid_statement(statement):
+    """Tests given a `seq_goto` statement the selector `get_model` method should return `UISeqGoto`
+    model.
+    """
+
+    statement = json.loads(statement.json())
+    assert ModelSelector(module="ralph.models.edx").get_model(statement) is UISeqGoto
 
 
 @settings(max_examples=1)
@@ -94,11 +125,32 @@ def test_models_edx_ui_seq_goto_selector_with_valid_event(event):
         ),
     )
 )
-def test_models_edx_ui_seq_next_selector_with_valid_event(event):
-    """Tests given a seq_next event the get_model method should return UISeqNext model."""
+def test_models_edx_ui_seq_next_with_valid_statement(statement):
+    """Tests that a `seq_next` statement has the expected `event_type` and `name`."""
 
-    event = json.loads(event.json())
-    assert ModelSelector(module="ralph.models.edx").get_model(event) is UISeqNext
+    assert statement.event_type == "seq_next"
+    assert statement.name == "seq_next"
+
+
+@settings(max_examples=1)
+@given(
+    st.builds(
+        UISeqNext,
+        context=st.builds(BaseContextField),
+        referer=provisional.urls(),
+        page=provisional.urls(),
+        event=st.builds(
+            NavigationalEventField, old=st.integers(0, 0), new=st.integers(1, 1)
+        ),
+    )
+)
+def test_models_edx_ui_seq_next_selector_with_valid_statement(statement):
+    """Tests given a `seq_next` event the selector `get_model` method should return `UISeqNext`
+    model.
+    """
+
+    statement = json.loads(statement.json())
+    assert ModelSelector(module="ralph.models.edx").get_model(statement) is UISeqNext
 
 
 @pytest.mark.parametrize("old,new", [("0", "10"), ("10", "0")])
@@ -114,8 +166,8 @@ def test_models_edx_ui_seq_next_selector_with_valid_event(event):
         ),
     )
 )
-def test_models_edx_ui_seq_next_event_with_invalid_content(old, new, event):
-    """Tests that an invalid seq_next event raises a ValidationError."""
+def test_models_edx_ui_seq_next_with_invalid_statement(old, new, event):
+    """Tests that an invalid `seq_next` event raises a ValidationError."""
 
     invalid_event = json.loads(event.json())
     invalid_event["event"]["old"] = old
@@ -140,11 +192,11 @@ def test_models_edx_ui_seq_next_event_with_invalid_content(old, new, event):
         ),
     )
 )
-def test_models_edx_ui_seq_prev_selector_with_valid_event(event):
-    """Tests given a seq_prev event the get_model method should return UISeqPrev model."""
+def test_models_edx_ui_seq_prev_with_valid_statement(statement):
+    """Tests that a `seq_prev` statement has the expected `event_type` and `name`."""
 
-    event = json.loads(event.json())
-    assert ModelSelector(module="ralph.models.edx").get_model(event) is UISeqPrev
+    assert statement.event_type == "seq_prev"
+    assert statement.name == "seq_prev"
 
 
 @pytest.mark.parametrize("old,new", [("0", "10"), ("10", "0")])
@@ -160,8 +212,8 @@ def test_models_edx_ui_seq_prev_selector_with_valid_event(event):
         ),
     )
 )
-def test_models_edx_ui_seq_prev_event_with_invalid_content(old, new, event):
-    """Tests that an invalid seq_prev event raises a ValidationError."""
+def test_models_edx_ui_seq_prev_with_invalid_statement(old, new, event):
+    """Tests that an invalid `seq_prev` event raises a ValidationError."""
 
     invalid_event = json.loads(event.json())
     invalid_event["event"]["old"] = old
@@ -171,3 +223,24 @@ def test_models_edx_ui_seq_prev_event_with_invalid_content(old, new, event):
         ValidationError, match="event\n  event.old - event.new should be equal to 1"
     ):
         UISeqPrev(**invalid_event)
+
+
+@settings(max_examples=1)
+@given(
+    st.builds(
+        UISeqPrev,
+        context=st.builds(BaseContextField),
+        referer=provisional.urls(),
+        page=provisional.urls(),
+        event=st.builds(
+            NavigationalEventField, old=st.integers(1, 1), new=st.integers(0, 0)
+        ),
+    )
+)
+def test_models_edx_ui_seq_prev_selector_with_valid_statement(statement):
+    """Tests given a `seq_prev` statement the selector `get_model` method should return `UISeqPrev`
+    model.
+    """
+
+    statement = json.loads(statement.json())
+    assert ModelSelector(module="ralph.models.edx").get_model(statement) is UISeqPrev

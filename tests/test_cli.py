@@ -18,7 +18,7 @@ from ralph.backends.storage.ldp import LDPStorage
 from ralph.cli import CommaSeparatedKeyValueParamType, cli
 from ralph.defaults import APP_DIR, FS_STORAGE_DEFAULT_PATH
 from ralph.exceptions import ConfigurationException
-from ralph.models.edx.navigational import UIPageClose
+from ralph.models.edx.navigational.statements import UIPageClose
 from ralph.models.xapi.navigation.statements import PageTerminated
 
 from tests.fixtures.backends import (
