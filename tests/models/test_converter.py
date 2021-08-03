@@ -23,7 +23,7 @@ from ralph.models.converter import (
     convert_str_event,
 )
 from ralph.models.edx.converters.xapi.base import BaseConversionSet
-from ralph.models.edx.navigational import UIPageClose
+from ralph.models.edx.navigational.statements import UIPageClose
 from ralph.models.xapi.constants import VERB_TERMINATED_ID
 
 

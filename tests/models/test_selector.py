@@ -5,7 +5,7 @@ import pytest
 from pydantic.main import BaseModel
 
 from ralph.exceptions import ModelRulesException, UnknownEventException
-from ralph.models.edx.navigational import UIPageClose
+from ralph.models.edx.navigational.statements import UIPageClose
 from ralph.models.edx.server import ServerEvent
 from ralph.models.selector import (
     LazyModelField,

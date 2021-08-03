@@ -2,12 +2,12 @@
 
 from typing import Literal, Union
 
-from pydantic import Json, constr, validator
+from pydantic import Json, validator
 
 from ralph.models.selector import selector
 
-from .base import AbstractBaseEventField
-from .browser import BaseBrowserEvent
+from ..browser import BaseBrowserEvent
+from .fields.events import NavigationalEventField
 
 
 class UIPageClose(BaseBrowserEvent):
@@ -29,30 +29,6 @@ class UIPageClose(BaseBrowserEvent):
     event: Literal["{}"]
     event_type: Literal["page_close"]
     name: Literal["page_close"]
-
-
-class NavigationalEventField(AbstractBaseEventField):
-    """Represents the event field of navigational events.
-
-    Note: All navigational events are `browser` events.
-
-    Attributes:
-        id (str): Consists of the edX ID of the sequence.
-        old (int): For `seq_goto`, it consists of the index of the unit being jumped to.
-            For `seq_next` and `seq_prev`, it consists of the index of the unit being navigated to.
-        new (int): For `seq_goto`, it consists of the index of the unit being jumped from.
-            For `seq_next` and `seq_prev`, it consists of the index of the unit being navigated
-            away from.
-    """
-
-    id: constr(
-        regex=(
-            r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type"  # noqa : F722
-            r"@sequential\+block@[a-f0-9]{32}$"  # noqa : F722
-        )
-    )
-    new: int
-    old: int
 
 
 class UISeqGoto(BaseBrowserEvent):

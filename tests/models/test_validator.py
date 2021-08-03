@@ -9,7 +9,7 @@ from hypothesis import HealthCheck, given, provisional, settings
 from hypothesis import strategies as st
 
 from ralph.exceptions import BadFormatException, UnknownEventException
-from ralph.models.edx.navigational import UIPageClose
+from ralph.models.edx.navigational.statements import UIPageClose
 from ralph.models.edx.server import ServerEvent, ServerEventField
 from ralph.models.selector import ModelSelector
 from ralph.models.validator import Validator

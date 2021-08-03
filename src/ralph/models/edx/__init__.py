@@ -2,6 +2,7 @@
 
 # flake8: noqa
 
+from ralph.models.edx.navigational import statements
 from .enrollment import (
     EdxCourseEnrollmentActivated,
     EdxCourseEnrollmentDeactivated,
@@ -9,7 +10,7 @@ from .enrollment import (
     EdxCourseEnrollmentUpgradeSucceeded,
     UIEdxCourseEnrollmentUpgradeClicked,
 )
-from .navigational import UIPageClose, UISeqGoto, UISeqNext, UISeqPrev
+from .navigational.statements import UIPageClose, UISeqGoto, UISeqNext, UISeqPrev
 from .server import ServerEvent
 from .textbook_interaction.statements import (
     UIBook,
