@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Added
 
+- Implement edx problem interaction events pydantic models
 - Implement edx textbook interaction events pydantic models
 - `ws` websocket stream backend (compatible with the `fetch` command)
 - bundle `jq` in the `fundocker/ralph` Docker image

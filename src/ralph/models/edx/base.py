@@ -15,6 +15,24 @@ class BaseModelWithConfig(BaseModel):
         extra = "forbid"
 
 
+class ContextModuleField(BaseModelWithConfig):
+    """Represents the context `module` field.
+
+    Attributes:
+        usage_key (str): Consists of a block ID of the current component.
+        display_name (str): Consists of a short description or title of the component.
+    """
+
+    usage_key: constr(regex=r"^block-v1:.+\+.+\+.+type@.+@[a-f0-9]{32}$")  # noqa:F722
+    display_name: str
+    original_usage_key: Optional[
+        constr(
+            regex=r"^block-v1:.+\+.+\+.+type@problem\+block@[a-f0-9]{32}$"  # noqa:F722
+        )
+    ]
+    original_usage_version: Optional[str]
+
+
 class BaseContextField(BaseModelWithConfig):
     """Represents the base model inherited by all event `context` fields.
 
@@ -55,11 +73,12 @@ class BaseContextField(BaseModelWithConfig):
                 `request.META['PATH_INFO']`
     """
 
-    course_user_tags: Optional[Dict[str, str]]
-    user_id: Union[int, Literal[""], None]
-    org_id: str
     course_id: constr(regex=r"^$|^course-v1:.+\+.+\+.+$")  # noqa:F722
+    course_user_tags: Optional[Dict[str, str]]
+    module: Optional[ContextModuleField]
+    org_id: str
     path: Path
+    user_id: Union[int, Literal[""], None]
 
 
 class AbstractBaseEventField(BaseModelWithConfig):

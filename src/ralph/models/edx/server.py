@@ -17,7 +17,7 @@ class BaseServerModel(BaseEdxModel):
 
 
 class ServerEventField(AbstractBaseEventField):
-    """Represents the `event` field of the ServerEventModel"""
+    """Represents the `event` field of the ServerEventModel."""
 
     GET: dict
     POST: dict
