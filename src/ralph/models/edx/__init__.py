@@ -3,7 +3,8 @@
 # flake8: noqa
 
 from ralph.models.edx.navigational import statements
-from .enrollment import (
+
+from .enrollment.statements import (
     EdxCourseEnrollmentActivated,
     EdxCourseEnrollmentDeactivated,
     EdxCourseEnrollmentModeChanged,
