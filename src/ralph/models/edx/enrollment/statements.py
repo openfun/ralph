@@ -6,55 +6,13 @@ from pydantic import Json
 
 from ralph.models.selector import selector
 
-from .base import AbstractBaseEventField, BaseContextField
-from .browser import BaseBrowserEvent
-from .server import BaseServerEvent
-
-
-class EnrollmentEventField(AbstractBaseEventField):
-    """Represents the `event` field for enrollment events.
-
-    Note: Only server enrollment events require an `event` field.
-
-    Attributes:
-        course_id (str): Consists in the course in which the student was enrolled or unenrolled.
-        mode (str): Takes either `audit`, `honor`, `professional` or `verified` value.
-            It identifies the student’s enrollment mode.
-        user_id (int): Identifies the student who was enrolled or unenrolled.
-    """
-
-    course_id: str
-    mode: Union[
-        Literal["audit"], Literal["honor"], Literal["professional"], Literal["verified"]
-    ]
-    user_id: Union[int, Literal[""], None]
-
-
-class EdxCourseEnrollmentUpgradeClickedContextField(BaseContextField):
-    """Represents the `context` field of the `edx.course.enrollment.upgrade_clicked` server event.
-
-    In addition to the common context member fields, this event also includes
-    the `mode` context member field.
-
-    Attribute:
-        mode (str): Consists of either the `audit` or `honor` value.
-            It identifies the enrollment mode when the user clicked <kbd>Challenge Yourself</kbd>:
-    """
-
-    mode: Union[Literal["audit"], Literal["honor"]]
-
-
-class EdxCourseEnrollmentUpgradeSucceededContextField(BaseContextField):
-    """Represents the `context` field of the `edx.course.enrollment.upgrade.succeeded` server event.
-
-    In addition to the common context member fields, this event also includes
-    the `mode` context member field.
-
-    Attribute:
-        mode (str): Consists of the `verified` value.
-    """
-
-    mode: Literal["verified"]
+from ..browser import BaseBrowserEvent
+from ..server import BaseServerEvent
+from .fields.contexts import (
+    EdxCourseEnrollmentUpgradeClickedContextField,
+    EdxCourseEnrollmentUpgradeSucceededContextField,
+)
+from .fields.events import EnrollmentEventField
 
 
 class EdxCourseEnrollmentActivated(BaseServerEvent):
