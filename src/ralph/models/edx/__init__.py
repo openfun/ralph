@@ -12,6 +12,24 @@ from .enrollment.statements import (
     UIEdxCourseEnrollmentUpgradeClicked,
 )
 from .navigational.statements import UIPageClose, UISeqGoto, UISeqNext, UISeqPrev
+from .problem_interaction.statements import (
+    EdxProblemHintDemandhintDisplayed,
+    EdxProblemHintFeedbackDisplayed,
+    ProblemCheck,
+    ProblemCheckFail,
+    ProblemRescore,
+    ProblemRescoreFail,
+    ResetProblem,
+    ResetProblemFail,
+    SaveProblemFail,
+    SaveProblemSuccess,
+    ShowAnswer,
+    UIProblemCheck,
+    UIProblemGraded,
+    UIProblemReset,
+    UIProblemSave,
+    UIProblemShow,
+)
 from .server import Server
 from .textbook_interaction.statements import (
     UIBook,
