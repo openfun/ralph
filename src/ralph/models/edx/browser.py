@@ -5,11 +5,11 @@ from typing import Literal, Union
 
 from pydantic import AnyUrl, constr
 
-from .base import BaseEvent
+from .base import BaseEdxModel
 
 
-class BaseBrowserEvent(BaseEvent):
-    """Represents the base browser event model all browser events inherit from.
+class BaseBrowserModel(BaseEdxModel):
+    """Represents the base model all browser statements inherit from.
 
     This type of event is triggered on (XHR) POST/GET requests to the `/event` URL.
 

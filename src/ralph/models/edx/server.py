@@ -7,11 +7,11 @@ from pydantic import Json
 
 from ralph.models.selector import LazyModelField, selector
 
-from .base import AbstractBaseEventField, BaseEvent
+from .base import AbstractBaseEventField, BaseEdxModel
 
 
-class BaseServerEvent(BaseEvent):
-    """Represents the base server event model all server events inherit from."""
+class BaseServerModel(BaseEdxModel):
+    """Represents the base model all server statements inherit from."""
 
     event_source: Literal["server"]
 
@@ -23,8 +23,8 @@ class ServerEventField(AbstractBaseEventField):
     POST: dict
 
 
-class ServerEvent(BaseServerEvent):
-    """Represents a common server event.
+class Server(BaseServerModel):
+    """Represents a common server statement.
 
     This type of event is triggered from the django middleware on each request excluding:
     `/event`, `login`, `heartbeat`, `/segmentio/event` and `/performance`.

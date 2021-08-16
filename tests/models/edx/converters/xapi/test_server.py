@@ -10,14 +10,12 @@ from hypothesis import strategies as st
 from ralph.models.converter import convert_dict_event, convert_str_event
 from ralph.models.edx.base import BaseContextField
 from ralph.models.edx.converters.xapi.server import ServerEventToPageViewed
-from ralph.models.edx.server import ServerEvent, ServerEventField
+from ralph.models.edx.server import Server, ServerEventField
 
 
 @settings(max_examples=1)
 @given(
-    st.builds(
-        ServerEvent, event=st.builds(ServerEventField), referer=provisional.urls()
-    ),
+    st.builds(Server, event=st.builds(ServerEventField), referer=provisional.urls()),
     provisional.urls(),
 )
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
@@ -40,7 +38,7 @@ def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_constant
 @settings(max_examples=1)
 @given(
     st.builds(
-        ServerEvent,
+        Server,
         event=st.builds(ServerEventField),
         referer=provisional.urls(),
         event_type=st.just("/main/blog"),
@@ -85,7 +83,7 @@ def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_with_val
 @settings(max_examples=1)
 @given(
     st.builds(
-        ServerEvent,
+        Server,
         event=st.builds(ServerEventField),
         referer=provisional.urls(),
         context=st.builds(BaseContextField, user_id=st.just("")),

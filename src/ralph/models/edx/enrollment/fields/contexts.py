@@ -6,10 +6,11 @@ from ...base import BaseContextField
 
 
 class EdxCourseEnrollmentUpgradeClickedContextField(BaseContextField):
-    """Represents the `context` field of the `edx.course.enrollment.upgrade_clicked` server event.
+    """Represents the `context` field of the `edx.course.enrollment.upgrade_clicked` server
+    statement.
 
-    In addition to the common context member fields, this event also includes
-    the `mode` context member field.
+    In addition to the common context member fields, this statement also comprises the `mode`
+    context member field.
 
     Attributes:
         mode (str): Consists of either the `audit` or `honor` value. It identifies the enrollment
@@ -20,10 +21,11 @@ class EdxCourseEnrollmentUpgradeClickedContextField(BaseContextField):
 
 
 class EdxCourseEnrollmentUpgradeSucceededContextField(BaseContextField):
-    """Represents the `context` field of the `edx.course.enrollment.upgrade.succeeded` server event.
+    """Represents the `context` field of the `edx.course.enrollment.upgrade.succeeded` server
+    statement.
 
-    In addition to the common context member fields, this event also includes
-    the `mode` context member field.
+    In addition to the common context member fields, this statement also comprises the `mode`
+    context member field.
 
     Attributes:
         mode (str): Consists of the `verified` value.

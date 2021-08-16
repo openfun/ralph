@@ -8,15 +8,15 @@ from hypothesis import given, provisional, settings
 from hypothesis import strategies as st
 from pydantic.error_wrappers import ValidationError
 
-from ralph.models.edx.browser import BaseBrowserEvent
+from ralph.models.edx.browser import BaseBrowserModel
 
 
 @settings(max_examples=1)
-@given(st.builds(BaseBrowserEvent, referer=provisional.urls(), page=provisional.urls()))
-def test_models_edx_browser_base_browser_event_with_valid_content(event):
-    """Tests that a valid base browser event does not raise a ValidationError."""
+@given(st.builds(BaseBrowserModel, referer=provisional.urls(), page=provisional.urls()))
+def test_models_edx_base_browser_model_with_valid_statement(statement):
+    """Tests that a valid base browser statement does not raise a `ValidationError`."""
 
-    assert re.match(r"^[a-f0-9]{32}$", event.session) or event.session == ""
+    assert re.match(r"^[a-f0-9]{32}$", statement.session) or statement.session == ""
 
 
 @pytest.mark.parametrize(
@@ -31,14 +31,14 @@ def test_models_edx_browser_base_browser_event_with_valid_content(event):
     ],
 )
 @settings(max_examples=1)
-@given(st.builds(BaseBrowserEvent, referer=provisional.urls(), page=provisional.urls()))
-def test_models_edx_browser_base_browser_event_with_invalid_content(
-    session, error, event
+@given(st.builds(BaseBrowserModel, referer=provisional.urls(), page=provisional.urls()))
+def test_models_edx_base_browser_model_with_invalid_statement(
+    session, error, statement
 ):
-    """Tests that a valid base browser event raises a ValidationError."""
+    """Tests that a invalid base browser statement raises a `ValidationError`."""
 
-    invalid_event = json.loads(event.json())
-    invalid_event["session"] = session
+    invalid_statement = json.loads(statement.json())
+    invalid_statement["session"] = session
 
     with pytest.raises(ValidationError, match=error):
-        BaseBrowserEvent(**invalid_event)
+        BaseBrowserModel(**invalid_statement)

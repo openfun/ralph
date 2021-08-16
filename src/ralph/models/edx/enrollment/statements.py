@@ -6,8 +6,8 @@ from pydantic import Json
 
 from ralph.models.selector import selector
 
-from ..browser import BaseBrowserEvent
-from ..server import BaseServerEvent
+from ..browser import BaseBrowserModel
+from ..server import BaseServerModel
 from .fields.contexts import (
     EdxCourseEnrollmentUpgradeClickedContextField,
     EdxCourseEnrollmentUpgradeSucceededContextField,
@@ -15,10 +15,10 @@ from .fields.contexts import (
 from .fields.events import EnrollmentEventField
 
 
-class EdxCourseEnrollmentActivated(BaseServerEvent):
-    """Represents the `edx.course.enrollment.activated` server event.
+class EdxCourseEnrollmentActivated(BaseServerModel):
+    """Represents the `edx.course.enrollment.activated` server statement.
 
-    When a student enrolls in a course, the server emits this event.
+    The server emits it when a student enrolls in a course.
 
     Attributes:
         event (EnrollmentEventField): See EnrollmentEventField.
@@ -38,10 +38,10 @@ class EdxCourseEnrollmentActivated(BaseServerEvent):
     name: Literal["edx.course.enrollment.activated"]
 
 
-class EdxCourseEnrollmentDeactivated(BaseServerEvent):
-    """Represents the `edx.course.enrollment.deactivated` server event.
+class EdxCourseEnrollmentDeactivated(BaseServerModel):
+    """Represents the `edx.course.enrollment.deactivated` server statement.
 
-    When a student unenrolls from a course, the server emits this event.
+    The server emits it when a student unenrolls from a course.
 
     Attributes:
         event (EnrollmentEventField): See EnrollmentEventField.
@@ -61,10 +61,10 @@ class EdxCourseEnrollmentDeactivated(BaseServerEvent):
     name: Literal["edx.course.enrollment.deactivated"]
 
 
-class EdxCourseEnrollmentModeChanged(BaseServerEvent):
-    """Represents the `edx.course.enrollment.mode_changed` server event.
+class EdxCourseEnrollmentModeChanged(BaseServerModel):
+    """Represents the `edx.course.enrollment.mode_changed` server statement.
 
-    The server emits this event when the process of changing a student’s
+    The server emits it when the process of changing a student’s
     student_courseenrollment.mode to a different mode is complete.
 
     Attributes:
@@ -85,10 +85,10 @@ class EdxCourseEnrollmentModeChanged(BaseServerEvent):
     name: Literal["edx.course.enrollment.mode_changed"]
 
 
-class UIEdxCourseEnrollmentUpgradeClicked(BaseBrowserEvent):
-    """Represents the `edx.course.enrollment.upgrade_clicked` browser event.
+class UIEdxCourseEnrollmentUpgradeClicked(BaseBrowserModel):
+    """Represents the `edx.course.enrollment.upgrade_clicked` browser statement.
 
-    The browser emits this event when a student clicks <kbd>ChallengeYourself</kbd> option,
+    The browser emits it when a student clicks <kbd>ChallengeYourself</kbd> option,
     and the process of upgrading the student_courseenrollment.mode for the student
     to `verified` begins.
 
@@ -108,10 +108,10 @@ class UIEdxCourseEnrollmentUpgradeClicked(BaseBrowserEvent):
     name: Literal["edx.course.enrollment.upgrade_clicked"]
 
 
-class EdxCourseEnrollmentUpgradeSucceeded(BaseServerEvent):
-    """Represents the `edx.course.enrollment.upgrade.succeeded` server event.
+class EdxCourseEnrollmentUpgradeSucceeded(BaseServerModel):
+    """Represents the `edx.course.enrollment.upgrade.succeeded` server statement.
 
-    The server emits this event when the process of upgrading a student’s
+    The server emits it when the process of upgrading a student’s
     student_courseenrollment.mode from `audit` or `honor` to `verified` is complete.
 
     Attributes:

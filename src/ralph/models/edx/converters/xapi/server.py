@@ -1,7 +1,7 @@
 """Server event xAPI Converter"""
 
 from ralph.models.converter import ConversionItem
-from ralph.models.edx.server import ServerEvent
+from ralph.models.edx.server import Server
 from ralph.models.xapi.navigation.statements import PageViewed
 
 from .base import BaseXapiConverter
@@ -13,7 +13,7 @@ class ServerEventToPageViewed(BaseXapiConverter):
     Example Statement: John viewed https://www.fun-mooc.fr/ page.
     """
 
-    __src__ = ServerEvent
+    __src__ = Server
     __dest__ = PageViewed
 
     def _get_conversion_items(self):

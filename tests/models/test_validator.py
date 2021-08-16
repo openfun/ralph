@@ -10,7 +10,7 @@ from hypothesis import strategies as st
 
 from ralph.exceptions import BadFormatException, UnknownEventException
 from ralph.models.edx.navigational.statements import UIPageClose
-from ralph.models.edx.server import ServerEvent, ServerEventField
+from ralph.models.edx.server import Server, ServerEventField
 from ralph.models.selector import ModelSelector
 from ralph.models.validator import Validator
 
@@ -176,11 +176,7 @@ def test_models_validator_validate_counter(caplog, event):
 
 
 @settings(max_examples=1)
-@given(
-    st.builds(
-        ServerEvent, referer=provisional.urls(), event=st.builds(ServerEventField)
-    )
-)
+@given(st.builds(Server, referer=provisional.urls(), event=st.builds(ServerEventField)))
 def test_models_validator_validate_typing_cleanup(event):
     """Tests given a valid event with wrong field types, the validate method should fix them."""
 

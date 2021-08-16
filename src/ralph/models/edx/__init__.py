@@ -12,7 +12,7 @@ from .enrollment.statements import (
     UIEdxCourseEnrollmentUpgradeClicked,
 )
 from .navigational.statements import UIPageClose, UISeqGoto, UISeqNext, UISeqPrev
-from .server import ServerEvent
+from .server import Server
 from .textbook_interaction.statements import (
     UIBook,
     UITextbookPdfChapterNavigated,
