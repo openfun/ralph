@@ -6,9 +6,9 @@ from ...base import AbstractBaseEventField
 
 
 class NavigationalEventField(AbstractBaseEventField):
-    """Represents the event field of navigational events.
+    """Represents the `event` field of navigational statements.
 
-    Note: All navigational events are `browser` events.
+    Note: All navigational statements are emitted from the browser.
 
     Attributes:
         id (str): Consists of the edX ID of the sequence.

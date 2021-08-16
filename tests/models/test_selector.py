@@ -6,7 +6,7 @@ from pydantic.main import BaseModel
 
 from ralph.exceptions import ModelRulesException, UnknownEventException
 from ralph.models.edx.navigational.statements import UIPageClose
-from ralph.models.edx.server import ServerEvent
+from ralph.models.edx.server import Server
 from ralph.models.selector import (
     LazyModelField,
     ModelRules,
@@ -23,10 +23,10 @@ from ralph.models.selector import (
         ({}, {}),
         # Single model, single rule case.
         (
-            {ServerEvent: selector(event_source="server")},
+            {Server: selector(event_source="server")},
             {
                 Rule(LazyModelField("event_source"), "server"): {
-                    True: ServerEvent,
+                    True: Server,
                     False: None,
                 }
             },
@@ -34,7 +34,7 @@ from ralph.models.selector import (
         # Single model, multiple rules case.
         (
             {
-                ServerEvent: selector(
+                Server: selector(
                     event_source="server", event_type=LazyModelField("context__path")
                 )
             },
@@ -45,7 +45,7 @@ from ralph.models.selector import (
                             LazyModelField("event_type"),
                             LazyModelField("context__path"),
                         ): {
-                            True: ServerEvent,
+                            True: Server,
                             False: None,
                         },
                     },
@@ -57,7 +57,7 @@ from ralph.models.selector import (
         (
             {
                 UIPageClose: selector(event_source="browser", event_type="page_close"),
-                ServerEvent: selector(
+                Server: selector(
                     event_source="server", event_type=LazyModelField("context__path")
                 ),
             },
@@ -76,7 +76,7 @@ from ralph.models.selector import (
                                     LazyModelField("event_type"),
                                     LazyModelField("context__path"),
                                 ): {
-                                    True: ServerEvent,
+                                    True: Server,
                                     False: None,
                                 }
                             },
@@ -90,7 +90,7 @@ from ralph.models.selector import (
         (
             {
                 UIPageClose: selector(event_source="browser", event_type="page_close"),
-                ServerEvent: selector(
+                Server: selector(
                     event_source="server", event_type=LazyModelField("context__path")
                 ),
                 BaseModel: selector(event_source="server", event_type="base"),
@@ -102,7 +102,7 @@ from ralph.models.selector import (
                             LazyModelField("event_type"),
                             LazyModelField("context__path"),
                         ): {
-                            True: ServerEvent,
+                            True: Server,
                             False: {
                                 Rule(LazyModelField("event_type"), "base"): {
                                     True: BaseModel,
@@ -144,12 +144,12 @@ def test_models_selector_model_selector_get_model_with_invalid_event():
 @pytest.mark.parametrize(
     "model_rules,rules",
     [
-        # rules are equal to ServerEventModel rules.
-        ({ServerEvent: selector(foo="foo")}, selector(foo="foo")),
-        # rules are a subset of ServerEventModel rules.
-        ({ServerEvent: selector(foo="foo", bar="bar")}, selector(bar="bar")),
-        # rules are a superset of ServerEventModel rules.
-        ({ServerEvent: selector(bar="bar")}, selector(foo="foo", bar="bar")),
+        # rules are equal to Server model rules.
+        ({Server: selector(foo="foo")}, selector(foo="foo")),
+        # rules are a subset of Server model rules.
+        ({Server: selector(foo="foo", bar="bar")}, selector(bar="bar")),
+        # rules are a superset of Server model rules.
+        ({Server: selector(bar="bar")}, selector(foo="foo", bar="bar")),
     ],
 )
 def test_models_selector_model_selector_model_rules(model_rules, rules):
@@ -188,13 +188,13 @@ def test_models_selector_model_selector_model_rules(model_rules, rules):
                     "page_close": UIPageClose,
                     "no_selector": BaseModel,
                     "not_base_model": ModelRules,
-                    "server": ServerEvent,
+                    "server": Server,
                     "str_member": "foo",
                 },
             ),
             {
                 UIPageClose: UIPageClose.__selector__,
-                ServerEvent: ServerEvent.__selector__,
+                Server: Server.__selector__,
             },
         ),
     ],

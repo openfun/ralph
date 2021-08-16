@@ -6,9 +6,9 @@ from ...base import AbstractBaseEventField
 
 
 class EnrollmentEventField(AbstractBaseEventField):
-    """Represents the `event` field for enrollment events.
+    """Represents the `event` field for enrollment statements.
 
-    Note: Only server enrollment events require an `event` field.
+    Note: Only server enrollment statements require an `event` field.
 
     Attributes:
         course_id (str): Consists in the course in which the student was enrolled or unenrolled.

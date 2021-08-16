@@ -16,7 +16,7 @@ class BaseModelWithConfig(BaseModel):
 
 
 class BaseContextField(BaseModelWithConfig):
-    """Represents the base context field model inherited by all event `context` fields.
+    """Represents the base model inherited by all event `context` fields.
 
     Attributes:
         course_user_tags (dict of str): Content from `user_api_usercoursetag` table.
@@ -63,14 +63,14 @@ class BaseContextField(BaseModelWithConfig):
 
 
 class AbstractBaseEventField(BaseModelWithConfig):
-    """Represents the base event field model inherited by all event `event` fields.
+    """Represents the base model inherited by all `event` fields.
 
     The base model does not have any attributes as event field does not have common sub-fields.
     """
 
 
-class BaseEvent(BaseModelWithConfig):
-    """Represents the base event model all events inherit from.
+class BaseEdxModel(BaseModelWithConfig):
+    """Represents the base model all statements inherit from.
 
     WARNING: it does not define the `event`, `event_type` and `event_source` fields.
 

@@ -6,7 +6,7 @@ from pydantic import Json
 
 from ralph.models.selector import selector
 
-from ..browser import BaseBrowserEvent
+from ..browser import BaseBrowserModel
 from .fields.events import (
     BookEventField,
     TextbookPdfChapterNavigatedEventField,
@@ -25,7 +25,7 @@ from .fields.events import (
 )
 
 
-class UIBook(BaseBrowserEvent):
+class UIBook(BaseBrowserModel):
     """Represents the `book` browser event model.
 
     The browser emits this event when a user navigates within the PDF Viewer or the PNG Viewer.
@@ -45,7 +45,7 @@ class UIBook(BaseBrowserEvent):
     name: Literal["book"]
 
 
-class UITextbookPdfThumbnailsToggled(BaseBrowserEvent):
+class UITextbookPdfThumbnailsToggled(BaseBrowserModel):
     """Represents the `textbook.pdf.thumbnails.toggled` browser event model.
 
     The browser emits this event when a user clicks on the icon to show or hide page thumbnails.
@@ -70,7 +70,7 @@ class UITextbookPdfThumbnailsToggled(BaseBrowserEvent):
     name: Literal["textbook.pdf.thumbnails.toggled"]
 
 
-class UITextbookPdfThumbnailNavigated(BaseBrowserEvent):
+class UITextbookPdfThumbnailNavigated(BaseBrowserModel):
     """Represents the `textbook.pdf.thumbnail.navigated` browser event model.
 
     The browser emits this event when a user clicks on a thumbnail image to navigate to a page.
@@ -95,7 +95,7 @@ class UITextbookPdfThumbnailNavigated(BaseBrowserEvent):
     name: Literal["textbook.pdf.thumbnail.navigated"]
 
 
-class UITextbookPdfOutlineToggled(BaseBrowserEvent):
+class UITextbookPdfOutlineToggled(BaseBrowserModel):
     """Represents the `textbook.pdf.outline.toggled` browser event model.
 
     The browser emits this event when a user clicks the outline icon to show or hide
@@ -121,7 +121,7 @@ class UITextbookPdfOutlineToggled(BaseBrowserEvent):
     name: Literal["textbook.pdf.outline.toggled"]
 
 
-class UITextbookPdfChapterNavigated(BaseBrowserEvent):
+class UITextbookPdfChapterNavigated(BaseBrowserModel):
     """Represents the `textbook.pdf.chapter.navigated` browser event model.
 
     The browser emits this event when a user clicks on a link in the outline to navigate
@@ -147,7 +147,7 @@ class UITextbookPdfChapterNavigated(BaseBrowserEvent):
     name: Literal["textbook.pdf.chapter.navigated"]
 
 
-class UITextbookPdfPageNavigated(BaseBrowserEvent):
+class UITextbookPdfPageNavigated(BaseBrowserModel):
     """Represents the `textbook.pdf.page.navigated` browser event model.
 
     The browser emits this event when a user manually enters a page number.
@@ -172,7 +172,7 @@ class UITextbookPdfPageNavigated(BaseBrowserEvent):
     name: Literal["textbook.pdf.page.navigated"]
 
 
-class UITextbookPdfZoomButtonsChanged(BaseBrowserEvent):
+class UITextbookPdfZoomButtonsChanged(BaseBrowserModel):
     """Represents the `textbook.pdf.zoom.buttons.changed` browser event model.
 
     The browser emits this event when a user clicks either the <kbd>Zoom In</kbd>
@@ -198,7 +198,7 @@ class UITextbookPdfZoomButtonsChanged(BaseBrowserEvent):
     name: Literal["textbook.pdf.zoom.buttons.changed"]
 
 
-class UITextbookPdfZoomMenuChanged(BaseBrowserEvent):
+class UITextbookPdfZoomMenuChanged(BaseBrowserModel):
     """Represents the `textbook.pdf.zoom.menu.changed` browser event model.
 
     The browser emits this event when a user selects a magnification setting.
@@ -223,7 +223,7 @@ class UITextbookPdfZoomMenuChanged(BaseBrowserEvent):
     name: Literal["textbook.pdf.zoom.menu.changed"]
 
 
-class UITextbookPdfDisplayScaled(BaseBrowserEvent):
+class UITextbookPdfDisplayScaled(BaseBrowserModel):
     """Represents the `textbook.pdf.display.scaled` browser event model.
 
     The browser emits this event when the display magnification changes or the first page
@@ -249,7 +249,7 @@ class UITextbookPdfDisplayScaled(BaseBrowserEvent):
     name: Literal["textbook.pdf.display.scaled"]
 
 
-class UITextbookPdfPageScrolled(BaseBrowserEvent):
+class UITextbookPdfPageScrolled(BaseBrowserModel):
     """Represents the `textbook.pdf.page.scrolled` browser event model.
 
     The browser emits this event when the user scrolls to the next or previous page and
@@ -275,7 +275,7 @@ class UITextbookPdfPageScrolled(BaseBrowserEvent):
     name: Literal["textbook.pdf.page.scrolled"]
 
 
-class UITextbookPdfSearchExecuted(BaseBrowserEvent):
+class UITextbookPdfSearchExecuted(BaseBrowserModel):
     """Represents the `textbook.pdf.search.executed` browser event model.
 
     The browser emits this event when a user searches for a text value in the file.
@@ -300,7 +300,7 @@ class UITextbookPdfSearchExecuted(BaseBrowserEvent):
     name: Literal["textbook.pdf.search.executed"]
 
 
-class UITextbookPdfSearchNavigatedNext(BaseBrowserEvent):
+class UITextbookPdfSearchNavigatedNext(BaseBrowserModel):
     """Represents the `textbook.pdf.search.navigatednext` browser event model.
 
     The browser emits this event when a user clicks on the <kbd>Find Next</kbd> or
@@ -326,7 +326,7 @@ class UITextbookPdfSearchNavigatedNext(BaseBrowserEvent):
     name: Literal["textbook.pdf.search.navigatednext"]
 
 
-class UITextbookPdfSearchHighlightToggled(BaseBrowserEvent):
+class UITextbookPdfSearchHighlightToggled(BaseBrowserModel):
     """Represents the `textbook.pdf.search.highlight.toggled` browser event model.
 
     The browser emits this event when a user selects or clears the <kbd>Highlight All</kbd> option.
@@ -351,7 +351,7 @@ class UITextbookPdfSearchHighlightToggled(BaseBrowserEvent):
     name: Literal["textbook.pdf.search.highlight.toggled"]
 
 
-class UITextbookPdfSearchCaseSensitivityToggled(BaseBrowserEvent):
+class UITextbookPdfSearchCaseSensitivityToggled(BaseBrowserModel):
     """Represents the `textbook.pdf.searchcasesensitivity.toggled` browser event model.
 
     The browser emits this event when a user selects or clears the <kbd>Match Case</kbd> option.
