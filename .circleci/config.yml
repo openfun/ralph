@@ -241,10 +241,7 @@ jobs:
       - run:
           name: Run local k3d cluster & configure environment
           command: |
-            # FIXME
-            # This should be fixed once the new arnold CLI has been merged to master
-            curl -Lo "${HOME}/bin/init-cluster" "https://raw.githubusercontent.com/openfun/arnold/migration-to-k8s/bin/init-cluster"
-            # curl -Lo "${HOME}/bin/init-cluster" "https://raw.githubusercontent.com/openfun/arnold/master/bin/init-cluster"
+            curl -Lo "${HOME}/bin/init-cluster" "https://raw.githubusercontent.com/openfun/arnold/master/bin/init-cluster"
             chmod +x "${HOME}/bin/init-cluster"
             # Bootstrap the k3d cluster with the following specific settings :
             # - use standard HTTP and HTTPS ports
@@ -269,10 +266,7 @@ jobs:
       - run:
           name: Install arnold CLI
           command: |
-            # FIXME
-            # This should be fixed once the new arnold CLI has been merged to master
-            curl -Lo"${HOME}/bin/arnold" "https://raw.githubusercontent.com/openfun/arnold/migration-to-k8s/bin/arnold"
-            # curl -Lo"${HOME}/bin/arnold" "https://raw.githubusercontent.com/openfun/arnold/master/bin/arnold"
+            curl -Lo"${HOME}/bin/arnold" "https://raw.githubusercontent.com/openfun/arnold/master/bin/arnold"
             chmod +x "${HOME}/bin/arnold"
 
       - run:
@@ -424,7 +418,6 @@ jobs:
             if [[ -n "$CIRCLE_TAG" ]]; then
               docker push fundocker/ralph:latest
             fi
-
 
   # ---- Documentation jobs ----
   build-docs:
