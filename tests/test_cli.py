@@ -16,7 +16,7 @@ from pydantic import ValidationError
 from ralph.backends.storage.fs import FSStorage
 from ralph.backends.storage.ldp import LDPStorage
 from ralph.cli import CommaSeparatedKeyValueParamType, cli
-from ralph.defaults import APP_DIR, FS_STORAGE_DEFAULT_PATH
+from ralph.defaults import APP_DIR, FS_STORAGE_DEFAULT_PATH, LOCALE_ENCODING
 from ralph.exceptions import ConfigurationException
 from ralph.models.edx.navigational.statements import UIPageClose
 from ralph.models.xapi.navigation.statements import PageTerminated
@@ -131,7 +131,9 @@ def test_cli_extract_command_with_gelf_parser(gelf_logger):
     gelf_logger.info('{"username": "foo"}')
 
     runner = CliRunner()
-    with Path(gelf_logger.handlers[0].stream.name).open() as log_file:
+    with Path(gelf_logger.handlers[0].stream.name).open(
+        encoding=LOCALE_ENCODING
+    ) as log_file:
         gelf_content = log_file.read()
         result = runner.invoke(cli, ["extract", "-p", "gelf"], input=gelf_content)
         assert '{"username": "foo"}' in result.output
@@ -627,7 +629,7 @@ def test_cli_push_command_with_fs_backend(fs):
 
     assert result.exit_code == 0
 
-    with file_path.open("r") as test_file:
+    with file_path.open("r", encoding=LOCALE_ENCODING) as test_file:
         content = test_file.read()
 
     assert "test content" in content
@@ -663,7 +665,7 @@ def test_cli_push_command_with_fs_backend(fs):
 
     assert result.exit_code == 0
 
-    with file_path.open("r") as test_file:
+    with file_path.open("r", encoding=LOCALE_ENCODING) as test_file:
         content = test_file.read()
 
     assert "different content" in content

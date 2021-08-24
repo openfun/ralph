@@ -1,5 +1,6 @@
 """Default configurations for Ralph"""
 
+import io
 from enum import Enum
 from os import environ
 from pathlib import Path
@@ -48,18 +49,6 @@ class StreamBackends(Enum):
     WS = "ralph.backends.stream.ws.WSStream"
 
 
-def load_config(config_file_path):
-    """Return a dictionary representing Ralph's configuration."""
-
-    try:
-        with open(config_file_path) as config_file:
-            return yaml.safe_load(config_file)
-    except yaml.scanner.ScannerError as exc:
-        raise ConfigurationException("Configuration could not be loaded") from exc
-    except FileNotFoundError:
-        return None
-
-
 def config(key, default_value):
     """
     Get a value based on its key returning the first of (in order):
@@ -76,6 +65,18 @@ def config(key, default_value):
         return CONFIG[key]
 
     return default_value
+
+
+def load_config(config_file_path):
+    """Return a dictionary representing Ralph's configuration."""
+
+    try:
+        with open(config_file_path, encoding=DEFAULT_ENCODING) as config_file:
+            return yaml.safe_load(config_file)
+    except yaml.scanner.ScannerError as exc:
+        raise ConfigurationException("Configuration could not be loaded") from exc
+    except FileNotFoundError:
+        return None
 
 
 DEFAULT_LOGGING_CONFIG = {
@@ -105,8 +106,10 @@ DEFAULT_LOGGING_CONFIG = {
 }
 
 APP_DIR = Path(environ.get("RALPH_APP_DIR", get_app_dir("ralph")))
+DEFAULT_ENCODING = getattr(io, "LOCALE_ENCODING", "utf8")
 CONFIG_FILE = APP_DIR / "config.yml"
 CONFIG = load_config(CONFIG_FILE)
+LOCALE_ENCODING = config("RALPH_LOCALE_ENCODING", DEFAULT_ENCODING)
 ENVVAR_PREFIX = "RALPH"
 DEFAULT_BACKEND_CHUNK_SIZE = config("RALPH_DEFAULT_BACKEND_CHUNK_SIZE", 500)
 FS_STORAGE_DEFAULT_PATH = Path(
