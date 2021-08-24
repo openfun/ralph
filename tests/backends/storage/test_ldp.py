@@ -16,7 +16,7 @@ import pytest
 import requests
 
 from ralph.backends.storage.ldp import LDPStorage
-from ralph.defaults import APP_DIR, HISTORY_FILE
+from ralph.defaults import APP_DIR, HISTORY_FILE, LOCALE_ENCODING
 from ralph.exceptions import BackendParameterException
 
 
@@ -373,7 +373,7 @@ def test_backends_storage_ldp_read_method(monkeypatch, fs):
             """Fakes content file iteration."""
             # pylint: disable=no-self-use
 
-            with archive_path.open("rb") as archive:
+            with archive_path.open("rb", encoding=LOCALE_ENCODING) as archive:
                 while chunk := archive.read(chunk_size):
                     yield chunk
 

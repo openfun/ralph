@@ -7,6 +7,7 @@ from io import StringIO
 
 import pytest
 
+from ralph.defaults import LOCALE_ENCODING
 from ralph.parsers import GELFParser
 
 
@@ -30,7 +31,7 @@ def test_parsers_gelfparser_parse_raw_file(gelf_logger):
     gelf_logger.info('{"username": "foo"}')
     gelf_logger.info('{"username": ""}')
 
-    with open(gelf_logger.handlers[0].stream.name) as stream:
+    with open(gelf_logger.handlers[0].stream.name, encoding=LOCALE_ENCODING) as stream:
         events = list(parser.parse(stream))
 
     assert len(events) == 2
@@ -48,12 +49,12 @@ def test_parsers_gelfparser_parse_gzipped_file(fs, gelf_logger):
     # Compress the log file
     log_file_name = gelf_logger.handlers[0].stream.name
     gzipped_log_file_name = f"{log_file_name}.gz"
-    with open(log_file_name, "rb") as log_file:
+    with open(log_file_name, "rb", encoding=LOCALE_ENCODING) as log_file:
         with gzip.open(gzipped_log_file_name, "wb") as gzipped_log_file:
             shutil.copyfileobj(log_file, gzipped_log_file)
 
     parser = GELFParser()
-    with open(gelf_logger.handlers[0].stream.name) as stream:
+    with open(gelf_logger.handlers[0].stream.name, encoding=LOCALE_ENCODING) as stream:
         events = list(parser.parse(stream))
 
     assert len(events) == 2

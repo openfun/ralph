@@ -5,7 +5,7 @@ import logging
 import sys
 from pathlib import Path
 
-from ralph.defaults import FS_STORAGE_DEFAULT_PATH
+from ralph.defaults import FS_STORAGE_DEFAULT_PATH, LOCALE_ENCODING
 from ralph.utils import now
 
 from ..mixins import HistoryMixin
@@ -76,7 +76,7 @@ class FSStorage(HistoryMixin, BaseStorage):
 
         logger.debug("Getting archive: %s", name)
 
-        with self._get_filepath(name).open("rb") as file:
+        with self._get_filepath(name).open("rb", encoding=LOCALE_ENCODING) as file:
             while chunk := file.read(chunk_size):
                 sys.stdout.buffer.write(chunk)
 
@@ -105,7 +105,7 @@ class FSStorage(HistoryMixin, BaseStorage):
             logger.error(msg, name)
             raise FileExistsError(msg, name)
 
-        with file_path.open("w") as file:
+        with file_path.open("w", encoding=LOCALE_ENCODING) as file:
             while chunk := sys.stdin.read(chunk_size):
                 file.write(chunk)
 

@@ -3,7 +3,7 @@
 import json
 import logging
 
-from ralph.defaults import HISTORY_FILE
+from ralph.defaults import HISTORY_FILE, LOCALE_ENCODING
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ class HistoryMixin:
 
         if not hasattr(self, "_history"):
             try:
-                with HISTORY_FILE.open() as history_file:
+                with HISTORY_FILE.open(encoding=LOCALE_ENCODING) as history_file:
                     self._history = json.load(history_file)
             except FileNotFoundError:
                 self._history = []
@@ -35,7 +35,7 @@ class HistoryMixin:
         if not HISTORY_FILE.parent.exists():
             HISTORY_FILE.parent.mkdir(parents=True)
 
-        with HISTORY_FILE.open("w") as history_file:
+        with HISTORY_FILE.open("w", encoding=LOCALE_ENCODING) as history_file:
             json.dump(history, history_file)
 
         # Update history
