@@ -58,7 +58,7 @@ $ alias ralph="docker run --rm -i fundocker/ralph:latest ralph"
 ```
 
 Now that `ralph` can be run from your system, we invite you to explore
-[available commands](./commands.md).
+[available commands](./commands.md) or follow the [first-use tutorial](./tutorial.md).
 
 ## Contributing
 
