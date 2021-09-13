@@ -17,6 +17,7 @@ and this project adheres to
 
 ### Changed
 
+- Upgrade `websockets` to `10.0`
 - Upgrade `elasticsearch` to `7.14.1`
 - Upgrade `sentry_sdk` to `1.3.1`
 - Upgrade `requests` to `2.26.0`
