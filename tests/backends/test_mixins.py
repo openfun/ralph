@@ -4,7 +4,7 @@ import json
 import os.path
 
 from ralph.backends.mixins import HistoryMixin
-from ralph.defaults import APP_DIR, HISTORY_FILE
+from ralph.defaults import APP_DIR, HISTORY_FILE, LOCALE_ENCODING
 
 
 def test_backends_mixins_history_mixin_empty_history(fs):
@@ -65,7 +65,7 @@ def test_backends_mixins_history_mixin_write_history(fs):
     history.write_history(events)
     assert os.path.exists(str(APP_DIR))
     assert os.path.exists(str(HISTORY_FILE))
-    assert HISTORY_FILE.read_text() == json.dumps(events)
+    assert HISTORY_FILE.read_text(encoding=LOCALE_ENCODING) == json.dumps(events)
     assert history._history == events
     assert history.history == events
 
@@ -111,6 +111,6 @@ def test_backends_mixins_history_mixin_append_to_history(fs):
     # Append new event
     history.append_to_history({"event": "bar"})
     expected = [{"event": "foo"}, {"event": "bar"}]
-    assert HISTORY_FILE.read_text() == json.dumps(expected)
+    assert HISTORY_FILE.read_text(encoding=LOCALE_ENCODING) == json.dumps(expected)
     assert history._history == expected
     assert history.history == expected

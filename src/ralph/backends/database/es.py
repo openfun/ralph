@@ -57,7 +57,7 @@ class ESDatabase(BaseDatabase):
         self.client = Elasticsearch(self._hosts, **client_options)
         if op_type not in [op.value for op in OpType]:
             raise BackendParameterException(
-                "%s is not an allowed operation type" % op_type
+                f"{op_type} is not an allowed operation type"
             )
         self.op_type = op_type
 
