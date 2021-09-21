@@ -106,6 +106,11 @@ logs: ## display app logs (follow mode)
 	@$(COMPOSE) logs -f app
 .PHONY: logs
 
+run: ## alias for run-es
+run: \
+	run-es
+.PHONY: run
+
 run-all: ## start all supported local backends
 run-all: \
 	run-es \
