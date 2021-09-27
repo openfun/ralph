@@ -17,11 +17,11 @@ and this project adheres to
 
 ### Changed
 
+- Upgrade `elasticsearch` to `7.15.0`
 - Upgrade `python-keystoneclient` to `4.3.0`
-- Upgrade `websockets` to `10.0`
-- Upgrade `elasticsearch` to `7.14.1`
-- Upgrade `sentry_sdk` to `1.3.1`
+- Upgrade `sentry_sdk` to `1.4.1`
 - Upgrade `requests` to `2.26.0`
+- Upgrade `websockets` to `10.0`
 
 ## [2.0.1] - 2021-07-15
 
