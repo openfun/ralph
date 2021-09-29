@@ -3,5 +3,6 @@
         "github>openfun/renovate-configuration"
     ],
     "commitMessagePrefix": "⬆️(project)",
-    "commitMessageAction": "upgrade"
+    "commitMessageAction": "upgrade",
+    "commitBodyTable": true
 }
