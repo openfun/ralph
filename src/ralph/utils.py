@@ -91,7 +91,9 @@ def now():
 
 
 def get_dict_value_from_path(dict_: dict, path: list[str]):
-    """Gets a nested dictionary value using an array of keys representing the path to the value."""
+    """Gets a nested dictionary value using an array of keys representing the path
+    to the value.
+    """
 
     if path is None:
         return None
@@ -102,7 +104,9 @@ def get_dict_value_from_path(dict_: dict, path: list[str]):
 
 
 def set_dict_value_from_path(dict_: dict, path: list[str], value: any):
-    """Sets a nested dictionary value using an array of keys representing the path to the value."""
+    """Sets a nested dictionary value using an array of keys representing the path
+    to the value.
+    """
 
     for key in path[:-1]:
         dict_ = dict_.setdefault(key, {})

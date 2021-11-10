@@ -40,4 +40,6 @@ class UnsupportedBackendException(Exception):
 
 
 class ModelRulesException(Exception):
-    """Raised when a model rules list is a subset or superset of another model rules list"""
+    """Raised when a model rules list is a subset or superset of another model rules
+    list.
+    """

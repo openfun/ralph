@@ -7,6 +7,7 @@ from pydantic import Field, constr
 from ...base import AbstractBaseEventField
 
 
+# pylint: disable=line-too-long
 class TextbookInteractionBaseEventField(AbstractBaseEventField):
     """Represents the event field which attributes are common to most of the textbook
     interaction events.
@@ -20,7 +21,7 @@ class TextbookInteractionBaseEventField(AbstractBaseEventField):
     page: int
     chapter: constr(
         regex=(
-            r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"  # noqa: F722
+            r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"  # noqa
         )
     )
 
@@ -57,6 +58,7 @@ class TextbookPdfOutlineToggledEventField(TextbookInteractionBaseEventField):
     name: Literal["textbook.pdf.outline.toggled"]
 
 
+# pylint: disable=line-too-long
 class TextbookPdfChapterNavigatedEventField(AbstractBaseEventField):
     """Represents the `textbook.pdf.chapter.navigated` event field.
 
@@ -69,7 +71,7 @@ class TextbookPdfChapterNavigatedEventField(AbstractBaseEventField):
     name: Literal["textbook.pdf.chapter.navigated"]
     chapter: constr(
         regex=(
-            r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"  # noqa: F722
+            r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"  # noqa
         )
     )
     chapter_title: str
@@ -102,8 +104,8 @@ class TextbookPdfZoomMenuChangedEventField(TextbookInteractionBaseEventField):
 
     Attributes:
         name (str): Consists of the value `textbook.pdf.zoom.menu.changed`.
-        amount (str): Consists either of the `0.5`, `0.75`, `1`, `1.25`, `1.5`, `2`, `3`, `4`,
-            `auto`, `custom`, `page-actual`, `page-fit`, `page-width` value.
+        amount (str): Consists either of the `0.5`, `0.75`, `1`, `1.25`, `1.5`, `2`,
+            `3`, `4`, `auto`, `custom`, `page-actual`, `page-fit`, `page-width` value.
     """
 
     name: Literal["textbook.pdf.zoom.menu.changed"]
@@ -153,13 +155,13 @@ class TextbookPdfSearchExecutedEventField(TextbookInteractionBaseEventField):
 
     Attributes:
         name (str): Consists of the value `textbook.pdf.search.executed`.
-        caseSensitive (bool): Consists either of the `true` value if the case sensitive option
-            is selected or `false` if this option is not selected.
-        highlightAll (bool): Consists either of the `true` value if the option to highlight
-            all matches is selected or `false` if this option is not selected.
+        caseSensitive (bool): Consists either of the `true` value if the case sensitive
+            option is selected or `false` if this option is not selected.
+        highlightAll (bool): Consists either of the `true` value if the option to
+            highlight all matches is selected or `false` if this option is not selected.
         query (str): Consists of the value in the search field.
-        status (str): Consists either of the value `not found` for a search string that is
-            unsuccessful or blank for successful search strings.
+        status (str): Consists either of the value `not found` for a search string that
+            is unsuccessful or blank for successful search strings.
     """
 
     name: Literal["textbook.pdf.search.executed"]
@@ -174,15 +176,16 @@ class TextbookPdfSearchNavigatedNextEventField(TextbookInteractionBaseEventField
 
     Attributes:
         name (str): Consists of the value `textbook.pdf.search.navigatednext`.
-        caseSensitive (bool): Consists either of the `true` value if the case sensitive option
-            is selected or `false` if this option is not selected.
+        caseSensitive (bool): Consists either of the `true` value if the case sensitive
+            option is selected or `false` if this option is not selected.
         findPrevious(bool): Consists either of the ‘true’ value if the user clicks the
-            Find Previous icon or ‘false’ if the user clicks the <kbd>Find Next</kbd> icon.
-        highlightAll (bool): Consists either of the `true` value if the option to highlight
-            all matches is selected or `false` if this option is not selected.
+            Find Previous icon or ‘false’ if the user clicks the <kbd>Find Next</kbd>
+            icon.
+        highlightAll (bool): Consists either of the `true` value if the option to
+            highlight all matches is selected or `false` if this option is not selected.
         query (str): Consists of the value in the search field.
-        status (str): Consists either of the value `not found` for a search string that is
-            unsuccessful or blank for successful search strings.
+        status (str): Consists either of the value `not found` for a search string that
+            is unsuccessful or blank for successful search strings.
     """
 
     name: Literal["textbook.pdf.search.navigatednext"]
@@ -200,11 +203,11 @@ class TextbookPdfSearchHighlightToggledEventField(TextbookInteractionBaseEventFi
         name (str): Consists of the value `textbook.pdf.search.highlight.toggled`.
         caseSensitive (bool): Consists either of the `true` value if the case sensitive
             option is selected or `false` if this option is not selected.
-        highlightAll (bool): Consists either of the `true` value if the option to highlight
-            all matches is selected or `false` if this option is not selected.
+        highlightAll (bool): Consists either of the `true` value if the option to
+            highlight all matches is selected or `false` if this option is not selected.
         query (str): Consists of the value in the search field.
-        status (str): Consists either of the value `not found` for a search string that is
-            unsuccessful or blank for successful search strings.
+        status (str): Consists either of the value `not found` for a search string that
+            is unsuccessful or blank for successful search strings.
     """
 
     name: Literal["textbook.pdf.search.highlight.toggled"]
@@ -223,11 +226,11 @@ class TextbookPdfSearchCaseSensitivityToggledEventField(
         name (str): Consists of the value `textbook.pdf.searchcasesensitivity.toggled`.
         caseSensitive (bool): Consists either of the `true` value if the case sensitive
             option is selected or `false` if this option is not selected.
-        highlightAll (bool): Consists either of the `true` value if the option to highlight
-            all matches is selected or `false` if this option is not selected.
+        highlightAll (bool): Consists either of the `true` value if the option to
+            highlight all matches is selected or `false` if this option is not selected.
         query (str): Consists of the value in the search field.
-        status (str): Consists either of the value `not found` for a search string that is
-            unsuccessful or blank for successful search strings.
+        status (str): Consists either of the value `not found` for a search string that
+            is unsuccessful or blank for successful search strings.
     """
 
     name: Literal["textbook.pdf.searchcasesensitivity.toggled"]
@@ -237,24 +240,27 @@ class TextbookPdfSearchCaseSensitivityToggledEventField(
     status: str
 
 
+# pylint: disable=line-too-long
 class BookEventField(AbstractBaseEventField):
     """Represents the `book` event field.
 
     Attributes:
         chapter (str): Consists of the name of the PDF file.
-        name (str): Consists of `textbook.pdf.page.loaded` if type is set to `gotopage`,
+        name (str): Consists of `textbook.pdf.page.loaded` if type is set to
+            `gotopage`,
             `textbook.pdf.page.navigatednext` if type is set to `prevpage`,
             `textbook.pdf.page.navigatednext` if type is set to `nextpage`.
         new (int): Consists of the destination page number.
-        old (int): Consists of the original page number. It applies to `gotopage` event types only.
-        type (str): Consists of `gotopage` value when a page loads after the student manually
-            enters its number, `prevpage` value when the next page button is clicked or `nextpage`
-            value when the previous page button is clicked.
+        old (int): Consists of the original page number. It applies to `gotopage` event
+            types only.
+        type (str): Consists of `gotopage` value when a page loads after the student
+            manually enters its number, `prevpage` value when the next page button is
+            clicked or `nextpage` value when the previous page button is clicked.
     """
 
     chapter: constr(
         regex=(
-            r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"  # noqa: F722
+            r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"  # noqa
         )
     )
     name: Union[

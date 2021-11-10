@@ -13,10 +13,11 @@ class NavigationalEventField(AbstractBaseEventField):
     Attributes:
         id (str): Consists of the edX ID of the sequence.
         old (int): For `seq_goto`, it consists of the index of the unit being jumped to.
-            For `seq_next` and `seq_prev`, it consists of the index of the unit being navigated to.
-        new (int): For `seq_goto`, it consists of the index of the unit being jumped from.
-            For `seq_next` and `seq_prev`, it consists of the index of the unit being navigated
-            away from.
+            For `seq_next` and `seq_prev`, it consists of the index of the unit being
+            navigated to.
+        new (int): For `seq_goto`, it consists of the index of the unit being jumped
+            from. For `seq_next` and `seq_prev`, it consists of the index of the unit
+            being navigated away from.
     """
 
     id: constr(

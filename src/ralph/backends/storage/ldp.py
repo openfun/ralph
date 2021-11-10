@@ -48,10 +48,16 @@ class LDPStorage(HistoryMixin, BaseStorage):
     @property
     def _archive_endpoint(self):
         if None in (self.service_name, self.stream_id):
-            msg = "LDPStorage backend instance requires to set both service_name and stream_id"
+            msg = (
+                "LDPStorage backend instance requires to set both "
+                "service_name and stream_id"
+            )
             logger.error(msg)
             raise BackendParameterException(msg)
-        return f"/dbaas/logs/{self.service_name}/output/graylog/stream/{self.stream_id}/archive"
+        return (
+            f"/dbaas/logs/{self.service_name}/"
+            f"output/graylog/stream/{self.stream_id}/archive"
+        )
 
     def _details(self, name):
         """Get name archive details
@@ -65,7 +71,7 @@ class LDPStorage(HistoryMixin, BaseStorage):
                 "md5": "01585b394be0495e38dbb60b20cb40a9",
                 "retrievalDelay": 0,
                 "retrievalState": "sealed",
-                "sha256": "645d8e21e6fdb8aa7ffc507acf091ada39dbdc9ce612d06df8dcf67cb29a45ca",
+                "sha256": "645d8e21e6fdb8aa7ffc5c[...]9ce612d06df8dcf67cb29a45ca",
                 "size": 67906662,
             }
         """

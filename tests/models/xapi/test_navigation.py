@@ -25,7 +25,9 @@ from ralph.models.xapi.navigation.statements import PageTerminated, PageViewed
     )
 )
 def test_models_xapi_page_terminated_statement(statement):
-    """Tests that a page_terminated statement has the expected verb.id and object.definition."""
+    """Tests that a page_terminated statement has the expected verb.id and
+    object.definition.
+    """
 
     assert statement.verb.id == "http://adlnet.gov/expapi/verbs/terminated"
     assert statement.object.definition.type == "http://activitystrea.ms/schema/1.0/page"
@@ -45,8 +47,9 @@ def test_models_xapi_page_terminated_statement(statement):
     )
 )
 def test_models_xapi_page_terminated_selector_with_valid_statement(statement):
-    """Tests given a page terminated statement, the get_model method should return PageTerminated
-    model."""
+    """Tests given a page terminated statement, the get_model method should return
+    PageTerminated model.
+    """
 
     statement = json.loads(statement.json())
     assert (
@@ -68,7 +71,9 @@ def test_models_xapi_page_terminated_selector_with_valid_statement(statement):
     )
 )
 def test_models_xapi_page_viewed_statement(statement):
-    """Tests that a page_viewed statement has the expected verb.id and object.definition."""
+    """Tests that a page_viewed statement has the expected verb.id and
+    object.definition.
+    """
 
     assert statement.verb.id == "http://id.tincanapi.com/verb/viewed"
     assert statement.object.definition.type == "http://activitystrea.ms/schema/1.0/page"
@@ -88,7 +93,9 @@ def test_models_xapi_page_viewed_statement(statement):
     )
 )
 def test_models_xapi_page_viewed_selector_with_valid_statement(statement):
-    """Tests given a page viewed statement, the get_model method should return PageViewed model."""
+    """Tests given a page viewed statement, the get_model method should return
+    PageViewed model.
+    """
 
     statement = json.loads(statement.json())
     assert ModelSelector(module="ralph.models.xapi").get_model(statement) is PageViewed

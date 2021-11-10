@@ -28,7 +28,8 @@ from .fields.events import (
 class UIBook(BaseBrowserModel):
     """Represents the `book` browser event model.
 
-    The browser emits this event when a user navigates within the PDF Viewer or the PNG Viewer.
+    The browser emits this event when a user navigates within the PDF Viewer or the
+    PNG Viewer.
 
     Attributes:
         event (BookEventField): See BookEventField.
@@ -48,7 +49,8 @@ class UIBook(BaseBrowserModel):
 class UITextbookPdfThumbnailsToggled(BaseBrowserModel):
     """Represents the `textbook.pdf.thumbnails.toggled` browser event model.
 
-    The browser emits this event when a user clicks on the icon to show or hide page thumbnails.
+    The browser emits this event when a user clicks on the icon to show or hide page
+    thumbnails.
 
     Attributes:
         event (json): See TextbookPdfThumbnailsToggledEventField.
@@ -73,7 +75,8 @@ class UITextbookPdfThumbnailsToggled(BaseBrowserModel):
 class UITextbookPdfThumbnailNavigated(BaseBrowserModel):
     """Represents the `textbook.pdf.thumbnail.navigated` browser event model.
 
-    The browser emits this event when a user clicks on a thumbnail image to navigate to a page.
+    The browser emits this event when a user clicks on a thumbnail image to navigate
+    to a page.
 
     Attributes:
         event (json): See TextbookPdfThumbnailNavigatedEventField.
@@ -226,8 +229,8 @@ class UITextbookPdfZoomMenuChanged(BaseBrowserModel):
 class UITextbookPdfDisplayScaled(BaseBrowserModel):
     """Represents the `textbook.pdf.display.scaled` browser event model.
 
-    The browser emits this event when the display magnification changes or the first page
-    is shown.
+    The browser emits this event when the display magnification changes or the first
+    page is shown.
 
     Attributes:
         event (json): See TextbookPdfDisplayScaledEventField.
@@ -329,7 +332,8 @@ class UITextbookPdfSearchNavigatedNext(BaseBrowserModel):
 class UITextbookPdfSearchHighlightToggled(BaseBrowserModel):
     """Represents the `textbook.pdf.search.highlight.toggled` browser event model.
 
-    The browser emits this event when a user selects or clears the <kbd>Highlight All</kbd> option.
+    The browser emits this event when a user selects or clears the
+    <kbd>Highlight All</kbd> option.
 
     Attributes:
         event (json): See TextbookPdfSearchHighlightToggledEventField.
@@ -354,11 +358,13 @@ class UITextbookPdfSearchHighlightToggled(BaseBrowserModel):
 class UITextbookPdfSearchCaseSensitivityToggled(BaseBrowserModel):
     """Represents the `textbook.pdf.searchcasesensitivity.toggled` browser event model.
 
-    The browser emits this event when a user selects or clears the <kbd>Match Case</kbd> option.
+    The browser emits this event when a user selects or clears the
+    <kbd>Match Case</kbd> option.
 
     Attributes:
         event (json): See TextbookPdfSearchCaseSensitivityToggledEventField.
-        event_type (str): Consists of the value `textbook.pdf.searchcasesensitivity.toggled`.
+        event_type (str): Consists of the value
+            `textbook.pdf.searchcasesensitivity.toggled`.
         name (str): Consists of the value `textbook.pdf.searchcasesensitivity.toggled`.
     """
 

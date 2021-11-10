@@ -22,7 +22,9 @@ from ralph.models.edx.server import Server, ServerEventField
 def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_constant_uuid(
     uuid_namespace, event, platform_url
 ):
-    """Tests that ServerEventToPageViewed.convert returns a JSON string with a constant UUID."""
+    """Tests that ServerEventToPageViewed.convert returns a JSON string with a
+    constant UUID.
+    """
 
     event_str = event.json()
     event = json.loads(event_str)
@@ -35,6 +37,7 @@ def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_constant
     assert xapi_event1.id == xapi_event2.id
 
 
+# pylint: disable=line-too-long
 @settings(max_examples=1)
 @given(
     st.builds(
@@ -49,10 +52,12 @@ def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_constant
     provisional.urls(),
 )
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
-def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_with_valid_event(
+def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_with_valid_event(  # noqa
     uuid_namespace, event, platform_url
 ):
-    """Tests that converting with ServerEventToPageViewed returns the expected xAPI statement."""
+    """Tests that converting with ServerEventToPageViewed returns the expected xAPI
+    statement.
+    """
 
     event_str = event.json()
     event = json.loads(event_str)
@@ -80,6 +85,7 @@ def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_with_val
     }
 
 
+# pylint: disable=line-too-long
 @settings(max_examples=1)
 @given(
     st.builds(
@@ -91,7 +97,7 @@ def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_with_val
     provisional.urls(),
 )
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
-def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_with_anonymous_user(
+def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_with_anonymous_user(  # noqa
     uuid_namespace, event, platform_url
 ):
     """Tests that anonymous usernames are replaced with with `anonymous`."""

@@ -72,9 +72,11 @@ def test_parsers_gelfparser_parse_partially_invalid_file(caplog):
                 '{"short_message": "This seems valid."}\n',
                 # Invalid json
                 "{ This is not valid json and raises json.decoder.JSONDecodeError\n",
-                # Valid json but invalid gelf - raises KeyError: key "short_message" not found
+                # Valid json but invalid gelf raises KeyError:
+                # key "short_message" not found
                 "{}\n",
-                # As above but raises TypeError: list indices must be integers or slices, not str
+                # As above but raises TypeError:
+                # list indices must be integers or slices, not str
                 "[]\n",
                 # Another assumed valid gelf
                 '{"short_message": {"username": "This seems valid too."}}\n',
@@ -101,7 +103,8 @@ def test_parsers_gelfparser_parse_partially_invalid_file(caplog):
     assert (
         "ralph.parsers",
         logging.ERROR,
-        "Input event '{ This is not valid json and raises json.decoder.JSONDecodeError\n' "
+        "Input event '{ This is not valid json and raises "
+        "json.decoder.JSONDecodeError\n' "
         "is not a valid JSON string! It will be ignored.",
     ) in caplog.record_tuples
     assert (

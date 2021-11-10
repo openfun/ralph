@@ -10,8 +10,8 @@ from ...fields.objects import ObjectDefinitionExtensionsField, ObjectField
 class PageObjectDefinitionField(BaseModelWithConfig):
     """Represents the `object.definition` xAPI field for page viewed xAPI statement.
 
-    WARNING: It doesn't include the recommended `description` field nor the optional `moreInfo`,
-    `Interaction properties` and `extensions` fields.
+    WARNING: It doesn't include the recommended `description` field nor the optional
+        `moreInfo`, `Interaction properties` and `extensions` fields.
 
     Attributes:
        type (str): Consists of the value `http://activitystrea.ms/schema/1.0/page`.

@@ -12,12 +12,13 @@ from ..constants import VIDEO_OBJECT_DEFINITION_TYPE
 class VideoObjectDefinitionField(BaseModelWithConfig):
     """Represents the `object.definition` xAPI field for page viewed xAPI statement.
 
-    WARNING: It doesn't include the recommended `description` field nor the optional `moreInfo`,
-    `Interaction properties` and `extensions` fields.
+    WARNING: It doesn't include the recommended `description` field nor the optional
+    `moreInfo`, `Interaction properties` and `extensions` fields.
 
     Attributes:
        name (dict): Consists of the dictionary `{"en-US": <name of the video>}`.
-       type (str): Consists of the value `https://w3id.org/xapi/video/activity-type/video`.
+       type (str): Consists of the value
+        `https://w3id.org/xapi/video/activity-type/video`.
     """
 
     name: Optional[dict[LANG_EN_US_DISPLAY, str]]

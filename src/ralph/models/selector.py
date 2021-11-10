@@ -53,7 +53,8 @@ class ModelRules(dict):
         """Inserts a new model with it's associated list of rules.
 
         Raises:
-            ModelRulesException: When new_rules list is a subset or superset of another rules list.
+            ModelRulesException: When new_rules list is a subset or superset of
+            another rules list.
         """
 
         rules_set = set(new_rules)
@@ -95,7 +96,9 @@ class ModelSelector:
 
     @staticmethod
     def build_model_rules(module: ModuleType):
-        """Builds the model_rules dictionary from BaseModel classes defined in the module."""
+        """Builds the model_rules dictionary from BaseModel classes defined
+        in the module.
+        """
 
         model_rules = ModelRules()
         for _, class_ in getmembers(module, isclass):
@@ -104,11 +107,13 @@ class ModelSelector:
         return model_rules
 
     def get_model(self, event: dict, tree=None):
-        """Recursively walks through the decision tree to return the matching model for the event.
+        """Recursively walks through the decision tree to return the matching model
+        for the event.
 
         Args:
             event (dict): Event to retrieve the corresponding model.
-            tree (dict): The (sub) decision tree, `None` stands for the whole decision tree.
+            tree (dict): The (sub) decision tree, `None` stands for the whole decision
+                         tree.
 
         Returns:
             model (BaseModel): When the event matches all rules of the model.
@@ -138,10 +143,12 @@ class ModelSelector:
         if not rule_counter:
             return {}
 
-        # We retrieve the rule with the highest occurrence and use it to split the decision tree
-        # in two subtrees:
-        # 1 - true_subtree: a subtree of models that require the most occurred rule to be true.
-        # 2 - false_subtree: a subtree of models that don't use the most occurred rule.
+        # We retrieve the rule with the highest occurrence and use it to split
+        # the decision tree in two subtrees:
+        # 1 - true_subtree: a subtree of models that require the most occurred
+        #     rule to be true.
+        # 2 - false_subtree: a subtree of models that don't use the most
+        #     occurred rule.
         root_rule = rule_counter.most_common(1)[0][0]
         true_subtree = {}
         false_subtree = {}

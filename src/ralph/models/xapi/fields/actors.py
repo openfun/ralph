@@ -12,7 +12,8 @@ class ActorAccountField(BaseModelWithConfig):
 
     Attributes:
         name (str): Consists of the unique id or name used to log in to this account.
-        homePage (URL): Consists of the canonical home page for the system the account is on.
+        homePage (URL): Consists of the canonical home page for the system the account
+            is on.
     """
 
     name: str

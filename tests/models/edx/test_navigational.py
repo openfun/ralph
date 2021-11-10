@@ -22,10 +22,15 @@ from ralph.models.selector import ModelSelector
 @settings(max_examples=1)
 @given(st.builds(NavigationalEventField))
 def test_fields_edx_navigational_events_event_field_with_valid_content(field):
-    """Tests that a valid `NavigationalEventField` does not raise a `ValidationError`."""
+    """Tests that a valid `NavigationalEventField` does not raise a
+    `ValidationError`.
+    """
 
     assert re.match(
-        r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@sequential\+block@[a-f0-9]{32}$",
+        (
+            r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"
+            r"type@sequential\+block@[a-f0-9]{32}$"
+        ),
         field.id,
     )
 
@@ -33,13 +38,28 @@ def test_fields_edx_navigational_events_event_field_with_valid_content(field):
 @pytest.mark.parametrize(
     "id",
     [
-        "block-v2:orgX=CS111+20_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS11120_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+tipe@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
+        (
+            "block-v2:orgX=CS111+20_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS11120_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS111=20_T1+tipe@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
         "block-v1:orgX=CS111=20_T1+",
         "type@sequentialblock@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+type@sequential+block@d0d4a647742943z3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea13",
+        (
+            "block-v1:orgX=CS111=20_T1+type@sequential"
+            "+block@d0d4a647742943z3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS111=20_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea13"
+        ),
     ],  # pylint: disable=invalid-name
 )
 @settings(max_examples=1)
@@ -59,7 +79,9 @@ def test_fields_edx_navigational_events_event_field_with_invalid_content(
 @settings(max_examples=1)
 @given(st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()))
 def test_models_edx_ui_page_close_with_valid_statement(statement):
-    """Tests that a `page_close` statement has the expected `event`, `event_type` and `name`."""
+    """Tests that a `page_close` statement has the expected `event`, `event_type` and
+    `name`.
+    """
 
     assert statement.event == "{}"
     assert statement.event_type == "page_close"
@@ -69,8 +91,8 @@ def test_models_edx_ui_page_close_with_valid_statement(statement):
 @settings(max_examples=1)
 @given(st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()))
 def test_models_edx_ui_page_close_selector_with_valid_statement(statement):
-    """Tests given a `page_close` statement the selector `get_model` method should return
-    `UIPageClose` model.
+    """Tests given a `page_close` statement the selector `get_model` method should
+    return `UIPageClose` model.
     """
 
     statement = json.loads(statement.json())
@@ -105,8 +127,8 @@ def test_models_edx_ui_seq_goto_with_valid_statement(statement):
     )
 )
 def test_models_edx_ui_seq_goto_selector_with_valid_statement(statement):
-    """Tests given a `seq_goto` statement the selector `get_model` method should return `UISeqGoto`
-    model.
+    """Tests given a `seq_goto` statement the selector `get_model` method should return
+    `UISeqGoto` model.
     """
 
     statement = json.loads(statement.json())
@@ -145,8 +167,8 @@ def test_models_edx_ui_seq_next_with_valid_statement(statement):
     )
 )
 def test_models_edx_ui_seq_next_selector_with_valid_statement(statement):
-    """Tests given a `seq_next` event the selector `get_model` method should return `UISeqNext`
-    model.
+    """Tests given a `seq_next` event the selector `get_model` method should return
+    `UISeqNext` model.
     """
 
     statement = json.loads(statement.json())
@@ -238,8 +260,8 @@ def test_models_edx_ui_seq_prev_with_invalid_statement(old, new, event):
     )
 )
 def test_models_edx_ui_seq_prev_selector_with_valid_statement(statement):
-    """Tests given a `seq_prev` statement the selector `get_model` method should return `UISeqPrev`
-    model.
+    """Tests given a `seq_prev` statement the selector `get_model` method should return
+    `UISeqPrev` model.
     """
 
     statement = json.loads(statement.json())

@@ -35,7 +35,9 @@ def test_backends_storage_fs_storage_instantiation(fs):
 # pylint: disable=invalid-name
 # pylint: disable=unused-argument
 def test_backends_storage_fs_getfile(fs):
-    """Tests that an existing path can be returned, and throws an exception otherwise."""
+    """Tests that an existing path can be returned, and throws an exception
+    otherwise.
+    """
     # pylint: disable=protected-access
 
     path = "test_fs/"

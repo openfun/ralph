@@ -39,12 +39,18 @@ def test_cli_comma_separated_key_value_param_type():
     # Bad options
     with pytest.raises(
         BadParameter,
-        match="You should provide key=value pairs separated by commas, e.g. foo=bar,bar=2",
+        match=(
+            "You should provide key=value pairs separated by commas, "
+            "e.g. foo=bar,bar=2"
+        ),
     ):
         param_type.convert("foo=bar,baz", None, None)
     with pytest.raises(
         BadParameter,
-        match="You should provide key=value pairs separated by commas, e.g. foo=bar,bar=2",
+        match=(
+            "You should provide key=value pairs separated by commas, "
+            "e.g. foo=bar,bar=2"
+        ),
     ):
         param_type.convert("foo=bar,", None, None)
 
@@ -100,9 +106,11 @@ def test_cli_help_option():
 
     assert result.exit_code == 0
     assert (
-        "-v, --verbosity LVL  Either CRITICAL, ERROR, WARNING, INFO (default) or DEBUG"
-        in result.output
-    )
+        (
+            "-v, --verbosity LVL  Either CRITICAL, ERROR, WARNING, INFO (default) or "
+            "DEBUG"
+        )
+    ) in result.output
 
 
 def test_cli_extract_command_usage():
@@ -183,13 +191,15 @@ def test_cli_convert_command_usage():
     assert (
         "Options:\n"
         "  From edX to xAPI converter options: \n"
-        "    -u, --uuid-namespace TEXT     The UUID namespace to use for the `ID` field\n"
+        "    -u, --uuid-namespace TEXT     The UUID namespace to use for the `ID` "
+        "field\n"
         "                                  generation\n"
         "    -p, --platform-url TEXT       The `actor.account.homePage` to use in the\n"
         "                                  xAPI statements  [required]\n"
         "  -f, --from [edx]                Input events format to convert  [required]\n"
         "  -t, --to [xapi]                 Output events format  [required]\n"
-        "  -I, --ignore-errors             Continue writing regardless of raised errors\n"
+        "  -I, --ignore-errors             Continue writing regardless of raised "
+        "errors\n"
         "  -F, --fail-on-unknown           Stop converting at first unknown event\n"
     ) in result.output
 
@@ -234,7 +244,9 @@ def test_cli_convert_command_from_edx_to_xapi_format(valid_uuid, event):
 
 @pytest.mark.parametrize("invalid_uuid", ["", None, 1, {}])
 def test_cli_convert_command_with_invalid_uuid(invalid_uuid):
-    """Tests that the convert command raises an exception when the uuid namespace is invalid."""
+    """Tests that the convert command raises an exception when the uuid namespace is
+    invalid.
+    """
 
     runner = CliRunner()
     result = runner.invoke(
@@ -466,9 +478,9 @@ def test_cli_list_command_usage():
     result = runner.invoke(cli, ["list"])
     assert result.exit_code > 0
     assert (
-        "Error: Missing option '-b' / '--backend'. Choose from:\n\tldp,\n\tfs,\n\tswift\n"
-        in result.output
-    )
+        "Error: Missing option '-b' / '--backend'. Choose from:\n\tldp,\n\tfs,\n\t"
+        "swift\n"
+    ) in result.output
 
 
 def test_cli_list_command_with_ldp_backend(monkeypatch):
@@ -486,7 +498,7 @@ def test_cli_list_command_with_ldp_backend(monkeypatch):
             "md5": "01585b394be0495e38dbb60b20cb40a9",
             "retrievalDelay": 0,
             "retrievalState": "sealed",
-            "sha256": "645d8e21e6fdb8aa7ffc507acf091ada39dbdc9ce612d06df8dcf67cb29a45ca",
+            "sha256": "645d8e21e6fdb8aa7ffc5c[...]9ce612d06df8dcf67cb29a45ca",
             "size": 67906662,
         },
         {
@@ -496,7 +508,7 @@ def test_cli_list_command_with_ldp_backend(monkeypatch):
             "md5": "01585b394be0495e38dbb60b20cb40a9",
             "retrievalDelay": 0,
             "retrievalState": "sealed",
-            "sha256": "645d8e21e6fdb8aa7ffc507acf091ada39dbdc9ce612d06df8dcf67cb29a45ca",
+            "sha256": "645d8e21e6fdb8aa7ffc5c[...]9ce612d06df8dcf67cb29a45ca",
             "size": 67906662,
         },
     ]
