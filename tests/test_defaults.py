@@ -19,8 +19,9 @@ def test_defaults_config_default(fs, monkeypatch):
 
 # pylint: disable=invalid-name, unused-argument
 def test_defaults_config_file(fs, monkeypatch):
-    """Tests that when the environment and command-line arguments don't specify a
-    value, the value from the config file is taken instead."""
+    """Tests that when the environment and command-line arguments don't specify a value,
+    the value from the config file is taken instead.
+    """
 
     config_mock = {"RALPH_HISTORY_FILE": "history_config_file"}
 
@@ -32,8 +33,9 @@ def test_defaults_config_file(fs, monkeypatch):
 
 # pylint: disable=invalid-name, unused-argument
 def test_defaults_config_env(fs, monkeypatch):
-    """Tests that when the environment specifies a value, it is chosen instead of
-    the configuration file's value."""
+    """Tests that when the environment specifies a value, it is chosen instead of the
+    configuration file's value.
+    """
 
     config_mock = {"RALPH_HISTORY_FILE": "history_config_file"}
 
@@ -45,8 +47,9 @@ def test_defaults_config_env(fs, monkeypatch):
 
 # pylint: disable=invalid-name, unused-argument
 def test_defaults_load_config_no_config(fs, monkeypatch):
-    """Tests that loading when no configuration file is available results in
-    load_config returning None."""
+    """Tests that loading when no configuration file is available results in load_config
+    returning None.
+    """
 
     config_path = APP_DIR / "config.yml"
 

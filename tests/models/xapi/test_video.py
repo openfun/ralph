@@ -93,8 +93,8 @@ def test_models_xapi_video_initialized_with_valid_statement(statement):
     )
 )
 def test_models_xapi_video_initialized_selector_with_valid_statement(statement):
-    """Tests given a video initialized event, the get_model method should return VideoInitialized
-    model."""
+    """Tests given a video initialized event, the get_model method should return
+    VideoInitialized model."""
 
     statement = json.loads(statement.json())
     assert (
@@ -150,7 +150,9 @@ def test_models_xapi_video_played_with_valid_statement(statement):
     )
 )
 def test_models_xapi_video_played_selector_with_valid_statement(statement):
-    """Tests given a video played event, the get_model method should return VideoPlayed model."""
+    """Tests given a video played event, the get_model method should return
+    VideoPlayed model.
+    """
 
     event = json.loads(statement.json())
     assert ModelSelector(module="ralph.models.xapi").get_model(event) is VideoPlayed
@@ -203,7 +205,9 @@ def test_models_xapi_video_paused_with_valid_statement(statement):
     )
 )
 def test_models_xapi_video_paused_selector_with_valid_statement(statement):
-    """Tests given a video paused event, the get_model method should return VideoPaused model."""
+    """Tests given a video paused event, the get_model method should return VideoPaused
+    model.
+    """
 
     event = json.loads(statement.json())
     assert ModelSelector(module="ralph.models.xapi").get_model(event) is VideoPaused
@@ -256,7 +260,9 @@ def test_models_xapi_video_seeked_with_valid_statement(statement):
     )
 )
 def test_models_xapi_video_seeked_selector_with_valid_statement(statement):
-    """Tests given a video seeked event, the get_model method should return VideoSeeked model."""
+    """Tests given a video seeked event, the get_model method should return VideoSeeked
+    model.
+    """
 
     event = json.loads(statement.json())
     assert ModelSelector(module="ralph.models.xapi").get_model(event) is VideoSeeked
@@ -309,8 +315,9 @@ def test_models_xapi_video_completed_with_valid_statement(statement):
     )
 )
 def test_models_xapi_video_completed_selector_with_valid_statement(statement):
-    """Tests given a video completed event, the get_model method should return VideoCompleted
-    model."""
+    """Tests given a video completed event, the get_model method should return
+    VideoCompleted model.
+    """
 
     event = json.loads(statement.json())
     assert ModelSelector(module="ralph.models.xapi").get_model(event) is VideoCompleted
@@ -363,8 +370,8 @@ def test_models_xapi_video_terminated_with_valid_statement(statement):
     )
 )
 def test_models_xapi_video_terminated_selector_with_valid_statement(statement):
-    """Tests given a video terminated event, the get_model method should return VideoTerminated
-    model."""
+    """Tests given a video terminated event, the get_model method should return
+    VideoTerminated model."""
 
     event = json.loads(statement.json())
     assert ModelSelector(module="ralph.models.xapi").get_model(event) is VideoTerminated
@@ -417,8 +424,8 @@ def test_models_xapi_video_interacted_with_valid_statement(statement):
     )
 )
 def test_models_xapi_video_interacted_selector_with_valid_statement(statement):
-    """Tests given a video interacted event, the get_model method should return VideoInteracted
-    model."""
+    """Tests given a video interacted event, the get_model method should return
+    VideoInteracted model."""
 
     event = json.loads(statement.json())
     assert ModelSelector(module="ralph.models.xapi").get_model(event) is VideoInteracted

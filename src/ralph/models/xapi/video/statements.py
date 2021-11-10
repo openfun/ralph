@@ -105,7 +105,8 @@ class VideoPaused(BaseVideoStatement):
 class VideoSeeked(BaseVideoStatement):
     """Represents a video seeked xAPI statement.
 
-    Example: John moved the progress bar forward or backward to a specific time in the video.
+    Example: John moved the progress bar forward or backward to a specific time in the
+        video.
 
     Attributes:
         verb (dict): See VideoSeekedVerbField.
@@ -168,8 +169,8 @@ class VideoTerminated(BaseVideoStatement):
 class VideoInteracted(BaseVideoStatement):
     """Represents a video terminated xAPI statement.
 
-    Example: John interacted with the player (except play, pause, seek). e.g. mute, unmute, change
-        resolution, change player size, etc.
+    Example: John interacted with the player (except play, pause, seek). e.g. mute,
+        unmute, change resolution, change player size, etc.
 
     Attributes:
         verb (dict): See VideoInteractedVerbField.

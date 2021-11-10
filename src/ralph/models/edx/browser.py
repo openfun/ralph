@@ -18,7 +18,8 @@ class BaseBrowserModel(BaseEdxModel):
         page (Path): Consists of the URL (with hostname) of the visited page.
             Retrieved with:
                 `window.location.href` from the JavaScript front-end.
-        session (str): Consists of the md5 encrypted Django session key or an empty string.
+        session (str): Consists of the md5 encrypted Django session key or an empty
+            string.
     """
 
     event_source: Literal["browser"]

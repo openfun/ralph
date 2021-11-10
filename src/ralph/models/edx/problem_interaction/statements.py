@@ -71,7 +71,8 @@ class UIProblemCheck(BaseBrowserModel):
     The browser emits this event when a user checks a problem.
 
     Attributes:
-        event (str): Consists of values of problem being checked, styled as `GET` parameters.
+        event (str): Consists of values of problem being checked, styled as `GET`
+        parameters.
         event_type (str): Consists of the value `problem_check`.
         name (str): Consists of the value `problem_check`.
     """
@@ -104,8 +105,8 @@ class ProblemCheck(BaseServerModel):
 class ProblemCheckFail(BaseServerModel):
     """Represents the `problem_check_fail` server event.
 
-    This event is triggered when a user checks a problem and a failure prevents the problem
-    from being checked successfully.
+    This event is triggered when a user checks a problem and a failure prevents the
+    problem from being checked successfully.
 
     Attributes:
         event (dict): See ProblemCheckFailEventField.

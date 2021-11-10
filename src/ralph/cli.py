@@ -49,14 +49,19 @@ class CommaSeparatedKeyValueParamType(click.ParamType):
     name = "key=value,key=value"
 
     def convert(self, value, param, ctx):
-        """Split value by comma and equal sign to return a dict build with key/value pairs."""
+        """Split value by comma and equal sign to return a dict build with key/value
+        pairs.
+        """
 
         # Parse options string
         try:
             options = dict(option.split("=") for option in value.split(","))
         except ValueError:
             self.fail(
-                "You should provide key=value pairs separated by commas, e.g. foo=bar,bar=2",
+                (
+                    "You should provide key=value pairs separated by commas, "
+                    "e.g. foo=bar,bar=2"
+                ),
                 param,
                 ctx,
             )

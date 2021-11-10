@@ -71,7 +71,9 @@ class BaseXapiConverter(BaseConversionSet):
 
     @staticmethod
     def parse_course_id(course_id: str):
-        """Returns a dictionary with `course` and `module` of edX event's `context.course_id`."""
+        """Returns a dictionary with `course` and `module` of edX event's
+        `context.course_id`.
+        """
 
         match = re.match(r"^course-v1:.+\+(.+)\+(.+)$", course_id)
         if not match:

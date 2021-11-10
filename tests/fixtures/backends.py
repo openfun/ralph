@@ -47,7 +47,9 @@ class NamedClassEnum(Enum):
 
 @pytest.fixture
 def es():
-    """Creates / deletes an ElasticSearch test index and yields an instantiated client."""
+    """Creates / deletes an ElasticSearch test index and yields an instantiated
+    client.
+    """
     # pylint: disable=invalid-name
 
     client = Elasticsearch(ES_TEST_HOSTS)
@@ -58,7 +60,9 @@ def es():
 
 @pytest.fixture
 def es_data_stream():
-    """Creates / deletes an ElasticSearch test datastream and yields an instantiated client."""
+    """Creates / deletes an ElasticSearch test datastream and yields an instantiated
+    client.
+    """
 
     client = Elasticsearch(ES_TEST_HOSTS)
 

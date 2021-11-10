@@ -62,22 +62,24 @@ class VideoInitializedContextExtensionsField(VideoContextExtensionsField):
 
     Attributes:
         length (float): Consists of the length of the video.
-        ccSubtitleEnabled (bool): Indicates whether subtitle or closed captioning is enabled.
-        ccSubtitleLanguage (str): Consists of the language of subtitle or closed captioning.
+        ccSubtitleEnabled (bool): Indicates whether subtitle or closed captioning is
+            enabled.
+        ccSubtitleLanguage (str): Consists of the language of subtitle or closed
+            captioning.
         frameRate (float): Consists of the frame rate or frames per second of a video.
         fullScreen (bool): Indicates whether the video is played in full screen mode.
         quality (str): Consists of the video resolution or quality.
-        screenSize (str): Consists of the device playback screen size or the maximum available
-            screen size for Video playback.
-        videoPlaybackSize (str): Consists of the size in Width x Height of the video as viewed
-            by the user.
+        screenSize (str): Consists of the device playback screen size or the maximum
+            available screen size for Video playback.
+        videoPlaybackSize (str): Consists of the size in Width x Height of the video as
+            viewed by the user.
         speed (str): Consists of the play back speed.
         track (str): Consists of the name of the audio track in a media object.
         userAgent (str): Consists of the User Agent string of the browser,
             if the video is launched in browser.
         volume (int): Consists of the volume of the video.
-        completionThreshold (float): Consists of the percentage of media that should be consumed to
-            trigger a completion.
+        completionThreshold (float): Consists of the percentage of media that should be
+            consumed to trigger a completion.
     """
 
     length: Optional[float] = Field(alias=VIDEO_EXTENSION_LENGTH)
@@ -103,8 +105,8 @@ class VideoBrowsingContextExtensionsField(VideoContextExtensionsField):
     Such field is used in `paused`, `completed` and `terminated` events.
 
     Attributes:
-        completionThreshold (float): Consists of the percentage of media that should be consumed to
-            trigger a completion.
+        completionThreshold (float): Consists of the percentage of media that should
+            be consumed to trigger a completion.
         length (float): Consists of the length of the video.
     """
 
@@ -119,13 +121,15 @@ class VideoInteractedContextExtensionsField(VideoContextExtensionsField):
 
     Attributes:
         length (float): Consists of the length of the video.
-        ccSubtitleEnabled (bool): Indicates whether subtitle or closed captioning is enabled.
-        ccSubtitleLanguage (str): Consists of the language of subtitle or closed captioning.
+        ccSubtitleEnabled (bool): Indicates whether subtitle or closed captioning is
+            enabled.
+        ccSubtitleLanguage (str): Consists of the language of subtitle or closed
+            captioning.
         frameRate (float): Consists of the frame rate or frames per second of a video.
         fullScreen (bool): Indicates whether the video is played in full screen mode.
         quality (str): Consists of the video resolution or quality.
-        videoPlaybackSize (str): Consists of the size in Width x Height of the video as viewed
-            by the user.
+        videoPlaybackSize (str): Consists of the size in Width x Height of the video as
+            viewed by the user.
         speed (str): Consists of the play back speed.
         track (str): Consists of the name of the audio track in a media object.
         volume (int): Consists of the volume of the video.

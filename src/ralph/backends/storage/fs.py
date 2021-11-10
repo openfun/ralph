@@ -30,7 +30,9 @@ class FSStorage(HistoryMixin, BaseStorage):
         logger.debug("File system storage path: %s", self._path)
 
     def _get_filepath(self, name, strict=False):
-        """Return path of the archive in the FS storage, or throws an exception if not found"""
+        """Return path of the archive in the FS storage, or throws an exception if
+        not found.
+        """
 
         file_path = self._path / Path(name)
         if strict and not file_path.exists():

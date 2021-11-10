@@ -31,8 +31,8 @@ from ralph.models.selector import ModelSelector
 def test_models_edx_edx_course_enrollment_activated_with_valid_statement(
     statement,
 ):
-    """Tests that a `edx.course.enrollment.activated` statement has the expected `event_type` and
-    `name`.
+    """Tests that a `edx.course.enrollment.activated` statement has the expected
+    `event_type` and `name`.
     """
 
     assert statement.event_type == "edx.course.enrollment.activated"
@@ -50,8 +50,8 @@ def test_models_edx_edx_course_enrollment_activated_with_valid_statement(
 def test_models_edx_edx_course_enrollment_activated_selector_with_valid_statement(
     statement,
 ):
-    """Tests given a `edx.course.enrollment.activated` statement the `get_model` selector method
-    should return `EdxCourseEnrollmentActivated` model.
+    """Tests given a `edx.course.enrollment.activated` statement the `get_model`
+    selector method should return `EdxCourseEnrollmentActivated` model.
     """
 
     statement = json.loads(statement.json())
@@ -72,8 +72,8 @@ def test_models_edx_edx_course_enrollment_activated_selector_with_valid_statemen
 def test_models_edx_edx_course_enrollment_deactivated_with_valid_statement(
     statement,
 ):
-    """Tests that a `edx.course.enrollment.deactivated` statement has the expected `event_type` and
-    `name`.
+    """Tests that a `edx.course.enrollment.deactivated` statement has the expected
+    `event_type` and `name`.
     """
 
     assert statement.event_type == "edx.course.enrollment.deactivated"
@@ -91,8 +91,8 @@ def test_models_edx_edx_course_enrollment_deactivated_with_valid_statement(
 def test_models_edx_edx_course_enrollment_deactivated_selector_with_valid_statement(
     statement,
 ):
-    """Tests given a `edx.course.enrollment.deactivated` statement the `get_model` selector method
-    should return `EdxCourseEnrollmentDeactivated` model.
+    """Tests given a `edx.course.enrollment.deactivated` statement the `get_model`
+    selector method should return `EdxCourseEnrollmentDeactivated` model.
     """
 
     statement = json.loads(statement.json())
@@ -113,8 +113,8 @@ def test_models_edx_edx_course_enrollment_deactivated_selector_with_valid_statem
 def test_models_edx_edx_course_enrollment_mode_changed_with_valid_statement(
     statement,
 ):
-    """Tests that a `edx.course.enrollment.mode_changed` statement has the expected `event_type`
-    and `name`.
+    """Tests that a `edx.course.enrollment.mode_changed` statement has the expected
+    `event_type` and `name`.
     """
 
     assert statement.event_type == "edx.course.enrollment.mode_changed"
@@ -132,8 +132,8 @@ def test_models_edx_edx_course_enrollment_mode_changed_with_valid_statement(
 def test_models_edx_edx_course_enrollment_mode_changed_selector_with_valid_statement(
     statement,
 ):
-    """Tests given a `edx.course.enrollment.mode_changed` statement the `get_model` selector method
-    should return `EdxCourseEnrollmentModeChanged` model.
+    """Tests given a `edx.course.enrollment.mode_changed` statement the `get_model`
+    selector method should return `EdxCourseEnrollmentModeChanged` model.
     """
 
     statement = json.loads(statement.json())
@@ -155,14 +155,15 @@ def test_models_edx_edx_course_enrollment_mode_changed_selector_with_valid_state
 def test_models_edx_ui_edx_course_enrollment_upgrade_clicked_with_valid_statement(
     statement,
 ):
-    """Tests that a `edx.course.enrollment.upgrade_clicked` statement has the expected `event_type`
-    and `name`.
+    """Tests that a `edx.course.enrollment.upgrade_clicked` statement has the expected
+    `event_type` and `name`.
     """
 
     assert statement.event_type == "edx.course.enrollment.upgrade_clicked"
     assert statement.name == "edx.course.enrollment.upgrade_clicked"
 
 
+# pylint: disable=line-too-long
 @settings(max_examples=1)
 @given(
     st.builds(
@@ -172,11 +173,11 @@ def test_models_edx_ui_edx_course_enrollment_upgrade_clicked_with_valid_statemen
         context=st.builds(EdxCourseEnrollmentUpgradeClickedContextField),
     )
 )
-def test_models_edx_ui_edx_course_enrollment_upgrade_clicked_selector_with_valid_statement(
+def test_models_edx_ui_edx_course_enrollment_upgrade_clicked_selector_with_valid_statement(  # noqa
     statement,
 ):
-    """Tests given a `edx.course.enrollment.upgrade_clicked` statement the `get_model` selector
-    method should return `UIEdxCourseEnrollmentUpgradeClicked` model.
+    """Tests given a `edx.course.enrollment.upgrade_clicked` statement the `get_model`
+    selector method should return `UIEdxCourseEnrollmentUpgradeClicked` model.
     """
 
     statement = json.loads(statement.json())
@@ -205,6 +206,7 @@ def test_models_edx_edx_course_enrollment_upgrade_succeeded_with_valid_statement
     assert statement.name == "edx.course.enrollment.upgrade.succeeded"
 
 
+# pylint: disable=line-too-long
 @settings(max_examples=1)
 @given(
     st.builds(
@@ -213,11 +215,11 @@ def test_models_edx_edx_course_enrollment_upgrade_succeeded_with_valid_statement
         context=st.builds(EdxCourseEnrollmentUpgradeSucceededContextField),
     )
 )
-def test_models_edx_edx_course_enrollment_upgrade_succeeded_selector_with_valid_statement(
+def test_models_edx_edx_course_enrollment_upgrade_succeeded_selector_with_valid_statement(  # noqa
     statement,
 ):
-    """Tests given a `edx.course.enrollment.upgrade.succeeded` statement the `get_model` selector
-    method should return `EdxCourseEnrollmentUpgradeSucceeded` model.
+    """Tests given a `edx.course.enrollment.upgrade.succeeded` statement the `get_model`
+    selector method should return `EdxCourseEnrollmentUpgradeSucceeded` model.
     """
 
     statement = json.loads(statement.json())

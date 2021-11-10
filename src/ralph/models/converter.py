@@ -43,10 +43,10 @@ class ConversionItem:
                 - When `src` is a path (ex. `context__user_id`) - the value is the item
                     of the event at the path.
                 - When `src` is `None` - the value is the whole event.
-            transformers (function or tuple of functions): The function(s) to apply on the source
-                value.
-            raw_input (bool): Flag indicating whether `get_value` will receive a raw event string
-                or a parsed event dictionary.
+            transformers (function or tuple of functions): The function(s) to apply on
+                the source value.
+            raw_input (bool): Flag indicating whether `get_value` will receive a raw
+                event string or a parsed event dictionary.
         """
 
         object.__setattr__(self, "dest", tuple(dest.split(MODEL_PATH_SEPARATOR)))
@@ -102,7 +102,8 @@ class BaseConversionSet(ABC):
 def convert_dict_event(
     event: dict, event_str: str, conversion_set: BaseConversionSet
 ) -> BaseModel:
-    """Converts the event dictionary using the provided original event string and conversion_set.
+    """Converts the event dictionary using the provided original event string and
+    conversion_set.
 
     Args:
         event (dict): The event to convert.
@@ -222,7 +223,8 @@ class Converter:
             TypeError: When the event_str is not of type string.
             JSONDecodeError: When the event_str is not a valid JSON string.
             UnknownEventException: When no matching model is found for the event.
-            MissingConversionSetException: When no matching conversion set is found for the event.
+            MissingConversionSetException: When no matching conversion set is found for
+                the event.
             ConversionException: When a field transformation fails.
             ValidationError: When the final converted event is invalid.
         """

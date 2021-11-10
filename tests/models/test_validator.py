@@ -30,7 +30,9 @@ def test_models_validator_validate_with_no_events(caplog):
 def test_models_validator_validate_with_a_non_json_event_writes_an_error_message(
     event, caplog
 ):
-    """Tests given a non JSON event, the validate method should write an error message."""
+    """Tests given a non JSON event, the validate method should write an error
+    message.
+    """
 
     result = Validator(ModelSelector(module="ralph.models.edx")).validate(
         [event], ignore_errors=True, fail_on_unknown=True
@@ -45,7 +47,9 @@ def test_models_validator_validate_with_a_non_json_event_writes_an_error_message
 def test_models_validator_validate_with_a_non_json_event_raises_an_exception(
     event, caplog
 ):
-    """Tests given a non JSON event, the validate method should raise a BadFormatException."""
+    """Tests given a non JSON event, the validate method should raise a
+    BadFormatException.
+    """
 
     result = Validator(ModelSelector(module="ralph.models.edx")).validate(
         [event], ignore_errors=False, fail_on_unknown=True
@@ -66,7 +70,9 @@ def test_models_validator_validate_with_a_non_json_event_raises_an_exception(
 def test_models_validator_validate_with_an_unknown_event_writes_an_error_message(
     event, caplog
 ):
-    """Tests given an unknown event the validate method should write an error message."""
+    """Tests given an unknown event the validate method should write an error
+    message.
+    """
 
     result = Validator(ModelSelector(module="ralph.models.edx")).validate(
         [event],
@@ -90,7 +96,9 @@ def test_models_validator_validate_with_an_unknown_event_writes_an_error_message
 def test_models_validator_validate_with_an_unknown_event_raises_an_exception(
     event, caplog
 ):
-    """Tests given an unknown event the validate method should raise an UnknownEventException."""
+    """Tests given an unknown event the validate method should raise an
+    UnknownEventException.
+    """
 
     result = Validator(ModelSelector(module="ralph.models.edx")).validate(
         [event],
@@ -102,11 +110,12 @@ def test_models_validator_validate_with_an_unknown_event_raises_an_exception(
             list(result)
 
 
-def test_models_validator_validate_with_an_invalid_page_close_event_writes_an_error_message(
+# pylint: disable=line-too-long
+def test_models_validator_validate_with_an_invalid_page_close_event_writes_an_error_message(  # noqa
     caplog,
 ):
-    """Tests given an event that match a pydantic model but fail at the model validation step,
-    the validate method should write an error message.
+    """Tests given an event that match a pydantic model but fail at the model validation
+    step, the validate method should write an error message.
     """
 
     result = Validator(ModelSelector(module="ralph.models.edx")).validate(
@@ -123,8 +132,8 @@ def test_models_validator_validate_with_an_invalid_page_close_event_writes_an_er
 def test_models_validator_validate_with_invalid_page_close_event_raises_an_exception(
     caplog,
 ):
-    """Tests given an event that match a pydantic model but fail at the model validation step,
-    the validate method should raise a BadFormatException.
+    """Tests given an event that match a pydantic model but fail at the model validation
+    step, the validate method should raise a BadFormatException.
     """
 
     result = Validator(ModelSelector(module="ralph.models.edx")).validate(
@@ -178,7 +187,9 @@ def test_models_validator_validate_counter(caplog, event):
 @settings(max_examples=1)
 @given(st.builds(Server, referer=provisional.urls(), event=st.builds(ServerEventField)))
 def test_models_validator_validate_typing_cleanup(event):
-    """Tests given a valid event with wrong field types, the validate method should fix them."""
+    """Tests given a valid event with wrong field types, the validate method should fix
+    them.
+    """
 
     valid_event_str = event.json()
     valid_event = json.loads(valid_event_str)

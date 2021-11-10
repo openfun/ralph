@@ -61,7 +61,10 @@ def test_backends_storage_ldp_archive_endpoint_property():
     storage.service_name = None
     with pytest.raises(
         BackendParameterException,
-        match="LDPStorage backend instance requires to set both service_name and stream_id",
+        match=(
+            "LDPStorage backend instance requires to set "
+            "both service_name and stream_id"
+        ),
     ):
         storage._archive_endpoint
 
@@ -69,14 +72,20 @@ def test_backends_storage_ldp_archive_endpoint_property():
     storage.stream_id = None
     with pytest.raises(
         BackendParameterException,
-        match="LDPStorage backend instance requires to set both service_name and stream_id",
+        match=(
+            "LDPStorage backend instance requires to set "
+            "both service_name and stream_id"
+        ),
     ):
         storage._archive_endpoint
 
     storage.service_name = None
     with pytest.raises(
         BackendParameterException,
-        match="LDPStorage backend instance requires to set both service_name and stream_id",
+        match=(
+            "LDPStorage backend instance requires to set "
+            "both service_name and stream_id"
+        ),
     ):
         storage._archive_endpoint
 
@@ -96,7 +105,7 @@ def test_backends_storage_ldp_details_method(monkeypatch):
             "md5": "01585b394be0495e38dbb60b20cb40a9",
             "retrievalDelay": 0,
             "retrievalState": "sealed",
-            "sha256": "645d8e21e6fdb8aa7ffc507acf091ada39dbdc9ce612d06df8dcf67cb29a45ca",
+            "sha256": "645d8e21e6fdb8aa7ffc5c[...]9ce612d06df8dcf67cb29a45ca",
             "size": 67906662,
         }
 
@@ -274,7 +283,7 @@ def test_backends_storage_ldp_list_method_with_details(monkeypatch):
             "md5": "01585b394be0495e38dbb60b20cb40a9",
             "retrievalDelay": 0,
             "retrievalState": "sealed",
-            "sha256": "645d8e21e6fdb8aa7ffc507acf091ada39dbdc9ce612d06df8dcf67cb29a45ca",
+            "sha256": "645d8e21e6fdb8aa7ffc5c[...]9ce612d06df8dcf67cb29a45ca",
             "size": 67906662,
         },
         {
@@ -284,7 +293,7 @@ def test_backends_storage_ldp_list_method_with_details(monkeypatch):
             "md5": "01585b394be0495e38dbb60b20cb40a9",
             "retrievalDelay": 0,
             "retrievalState": "sealed",
-            "sha256": "645d8e21e6fdb8aa7ffc507acf091ada39dbdc9ce612d06df8dcf67cb29a45ca",
+            "sha256": "645d8e21e6fdb8aa7ffc5c[...]9ce612d06df8dcf67cb29a45ca",
             "size": 67906662,
         },
     ]
@@ -356,7 +365,7 @@ def test_backends_storage_ldp_read_method(monkeypatch, fs):
             "md5": "01585b394be0495e38dbb60b20cb40a9",
             "retrievalDelay": 0,
             "retrievalState": "sealed",
-            "sha256": "645d8e21e6fdb8aa7ffc507acf091ada39dbdc9ce612d06df8dcf67cb29a45ca",
+            "sha256": "645d8e21e6fdb8aa7ffc5c[...]9ce612d06df8dcf67cb29a45ca",
             "size": 67906662,
         }
 

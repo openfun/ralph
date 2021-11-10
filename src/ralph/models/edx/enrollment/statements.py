@@ -117,7 +117,8 @@ class EdxCourseEnrollmentUpgradeSucceeded(BaseServerModel):
     Attributes:
         context (EdxCourseEnrollmentUpgradeSucceededContextField):
             See EdxCourseEnrollmentUpgradeSucceededContextField.
-        event_type (str): Consists of the value `edx.course.enrollment.upgrade.succeeded`.
+        event_type (str): Consists of the value
+            `edx.course.enrollment.upgrade.succeeded`.
         name (str): Consists of the value `edx.course.enrollment.upgrade.succeeded`.
     """
 

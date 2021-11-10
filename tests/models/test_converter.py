@@ -28,7 +28,10 @@ from ralph.models.xapi.constants import VERB_TERMINATED_ID
 
 
 @pytest.mark.parametrize(
-    "conversion_item,expected_dest,expected_src,expected_transfomers,expected_raw_input",
+    (
+        "conversion_item,expected_dest,expected_src,expected_transfomers,"
+        "expected_raw_input"
+    ),
     [
         (
             ConversionItem("destination", "source"),
@@ -102,7 +105,9 @@ def test_converter_conversion_item_get_value_with_successful_transformers(
 
 @pytest.mark.parametrize("event", [{}, {"foo": "bar"}])
 def test_converter_convert_dict_event_with_empty_conversion_set(event):
-    """Tests when the conversion_set is empty, convert_dict_event should return an empty model."""
+    """Tests when the conversion_set is empty, convert_dict_event should return an empty
+    model.
+    """
 
     class DummyBaseConversionSet(BaseConversionSet):
         """Dummy implementation of abstract BaseConversionSet."""
@@ -136,7 +141,9 @@ def test_converter_convert_dict_event_with_empty_conversion_set(event):
 def test_converter_convert_dict_event_with_one_conversion_item(
     event, source, transformer, expected
 ):
-    """Tests the convert_dict_event method with a conversion_set containing one conversion item."""
+    """Tests the convert_dict_event method with a conversion_set containing one
+    conversion item.
+    """
 
     class DummyBaseModel(BaseModel):
         """Dummy base model with one field."""
@@ -214,7 +221,9 @@ def test_converter_converter_convert_with_no_events(caplog, valid_uuid):
 def test_converter_convert_with_a_non_json_event_writes_an_error_message(
     event, valid_uuid, caplog
 ):
-    """Tests given a non JSON event, the convert method should write an error message."""
+    """Tests given a non JSON event, the convert method should write an error
+    message.
+    """
 
     result = Converter(platform_url="", uuid_namespace=valid_uuid).convert(
         [event], ignore_errors=True, fail_on_unknown=True
@@ -230,7 +239,9 @@ def test_converter_convert_with_a_non_json_event_writes_an_error_message(
 def test_converter_convert_with_a_non_json_event_raises_an_exception(
     event, valid_uuid, caplog
 ):
-    """Tests given a non JSON event, the convert method should raise a BadFormatException."""
+    """Tests given a non JSON event, the convert method should raise a
+    BadFormatException.
+    """
 
     result = Converter(platform_url="", uuid_namespace=valid_uuid).convert(
         [event], ignore_errors=False, fail_on_unknown=True
@@ -252,7 +263,9 @@ def test_converter_convert_with_a_non_json_event_raises_an_exception(
 def test_converter_convert_with_an_unknown_event_writes_an_error_message(
     event, valid_uuid, caplog
 ):
-    """Tests given an unknown event the convert method should write an error message."""
+    """Tests given an unknown event the convert method should write an error
+    message.
+    """
 
     result = Converter(platform_url="", uuid_namespace=valid_uuid).convert(
         [event], ignore_errors=False, fail_on_unknown=False
@@ -275,7 +288,9 @@ def test_converter_convert_with_an_unknown_event_writes_an_error_message(
 def test_converter_convert_with_an_unknown_event_raises_an_exception(
     event, valid_uuid, caplog
 ):
-    """Tests given an unknown event the convert method should raise an UnknownEventException."""
+    """Tests given an unknown event the convert method should raise an
+    UnknownEventException.
+    """
 
     result = Converter(platform_url="", uuid_namespace=valid_uuid).convert(
         [event], ignore_errors=False, fail_on_unknown=True
@@ -285,16 +300,17 @@ def test_converter_convert_with_an_unknown_event_raises_an_exception(
             list(result)
 
 
+# pylint: disable=line-too-long
 @pytest.mark.parametrize(
     "event",
     [json.dumps({"event_source": "browser", "event_type": "page_close"})],
 )
 @pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
-def test_converter_convert_with_an_event_missing_a_conversion_set_writes_an_error_message(
+def test_converter_convert_with_an_event_missing_a_conversion_set_writes_an_error_message(  # noqa
     event, valid_uuid, caplog
 ):
-    """Tests given an event that doesn't have a corresponding conversion_set, the convert method
-    should write an error message.
+    """Tests given an event that doesn't have a corresponding conversion_set, the
+    convert method should write an error message.
     """
 
     result = Converter(module="os", platform_url="", uuid_namespace=valid_uuid).convert(
@@ -314,8 +330,8 @@ def test_converter_convert_with_an_event_missing_a_conversion_set_writes_an_erro
 def test_converter_convert_with_an_event_missing_a_conversion_set_raises_an_exception(
     event, valid_uuid, caplog
 ):
-    """Tests given an event that doesn't have a corresponding conversion_set, the convert method
-    should raise a MissingConversionSetException.
+    """Tests given an event that doesn't have a corresponding conversion_set, the
+    convert method should raise a MissingConversionSetException.
     """
 
     result = Converter(module="os", platform_url="", uuid_namespace=valid_uuid).convert(
@@ -326,18 +342,19 @@ def test_converter_convert_with_an_event_missing_a_conversion_set_raises_an_exce
             list(result)
 
 
+# pylint: disable=line-too-long
 @pytest.mark.parametrize(
     "event",
     [json.dumps({"event_source": "browser", "event_type": "page_close"})],
 )
 @pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
-def test_converter_convert_with_an_invalid_page_close_event_writes_an_error_message(
+def test_converter_convert_with_an_invalid_page_close_event_writes_an_error_message(  # noqa
     event,
     valid_uuid,
     caplog,
 ):
-    """Tests given an event that matches a pydantic model but fails at the conversion step,
-    the convert method should write an error message.
+    """Tests given an event that matches a pydantic model but fails at the conversion
+    step, the convert method should write an error message.
     """
 
     result = Converter(platform_url="", uuid_namespace=valid_uuid).convert(
@@ -357,8 +374,8 @@ def test_converter_convert_with_an_invalid_page_close_event_writes_an_error_mess
 def test_converter_convert_with_invalid_page_close_event_raises_an_exception(
     event, valid_uuid, caplog
 ):
-    """Tests given an event that matches a pydantic model but fails at the conversion step,
-    the convert method should raise a ConversionException.
+    """Tests given an event that matches a pydantic model but fails at the conversion
+    step, the convert method should raise a ConversionException.
     """
 
     result = Converter(platform_url="", uuid_namespace=valid_uuid).convert(
@@ -376,8 +393,8 @@ def test_converter_convert_with_invalid_page_close_event_raises_an_exception(
 def test_converter_convert_with_invalid_arguments_writes_an_error_message(
     valid_uuid, invalid_platform_url, caplog, event
 ):
-    """Tests given invalid arguments causing the conversion to fail at the validation step,
-    the convert method should write an error message.
+    """Tests given invalid arguments causing the conversion to fail at the validation
+    step, the convert method should write an error message.
     """
 
     event_str = event.json()
@@ -398,8 +415,8 @@ def test_converter_convert_with_invalid_arguments_writes_an_error_message(
 def test_converter_convert_with_invalid_arguments_raises_an_exception(
     valid_uuid, invalid_platform_url, caplog, event
 ):
-    """Tests given invalid arguments causing the conversion to fail at the validation step,
-    the convert method should raise a ValidationError.
+    """Tests given invalid arguments causing the conversion to fail at the validation
+    step, the convert method should raise a ValidationError.
     """
 
     event_str = event.json()
@@ -432,7 +449,9 @@ def test_converter_convert_with_valid_events(
 @given(st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()))
 @pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_converter_convert_counter(valid_uuid, caplog, event):
-    """Tests given multiple events the convert method should log the total and invalid events."""
+    """Tests given multiple events the convert method should log the total and invalid
+    events.
+    """
 
     valid_event = event.json()
     invalid_event_1 = 1

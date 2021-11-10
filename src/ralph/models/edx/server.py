@@ -26,20 +26,29 @@ class ServerEventField(AbstractBaseEventField):
 class Server(BaseServerModel):
     """Represents a common server statement.
 
-    This type of event is triggered from the django middleware on each request excluding:
-    `/event`, `login`, `heartbeat`, `/segmentio/event` and `/performance`.
+    This type of event is triggered from the django middleware on each request
+    excluding: `/event`, `login`, `heartbeat`, `/segmentio/event` and `/performance`.
 
     Attributes:
-        event_type (str): Consist of the relative URL (without the hostname) of the requested page.
+        event_type (str): Consist of the relative URL (without the hostname) of the
+            requested page.
             Retrieved with:
                 `request.META['PATH_INFO']`
-        event (str): Consist of a JSON string holding the content of the GET or POST request.
+        event (str): Consist of a JSON string holding the content of the GET or POST
+            request.
             Retrieved with:
-                `json.dumps({'GET': dict(request.GET), 'POST': dict(request.POST)})[:512]`
+                ```json.dumps(
+                    {
+                        'GET': dict(request.GET),
+                        'POST': dict(request.POST)
+                    }
+                )[:512]```
             Note:
                 Values for ['password', 'newpassword', 'new_password', 'oldpassword',
-                'old_password', 'new_password1', 'new_password2'] are replaced by `********`.
-                The JSON string is truncated at 512 characters resulting in invalid JSON.
+                'old_password', 'new_password1', 'new_password2'] are replaced by
+                `********`.
+                The JSON string is truncated at 512 characters resulting in invalid
+                JSON.
     """
 
     __selector__ = selector(

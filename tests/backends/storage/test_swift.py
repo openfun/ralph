@@ -34,7 +34,9 @@ def test_backends_storage_swift_storage_instantiation_failure_should_raise_excep
 def test_backends_storage_swift_storage_instantiation_should_not_raise_exception(
     monkeypatch, swift
 ):
-    """Checks that SwiftStorage doesn't raise exceptions when the connection is successful."""
+    """Checks that SwiftStorage doesn't raise exceptions when the connection is
+    successful.
+    """
 
     def mock_successful_stat(*args, **kwargs):  # pylint:disable=unused-argument
         return {"success": True}
@@ -50,8 +52,8 @@ def test_backends_storage_swift_storage_instantiation_should_not_raise_exception
 def test_backends_storage_swift_list_should_yield_archive_names(
     pages_count, swift, monkeypatch, fs
 ):  # pylint:disable=invalid-name
-    """Tests that given SwiftService.list method successfully connects to the Swift storage,
-    the SwiftStorage list method should yield the archives.
+    """Tests that given SwiftService.list method successfully connects to the Swift
+    storage, the SwiftStorage list method should yield the archives.
     """
 
     listing = [
@@ -118,8 +120,8 @@ def test_backends_storage_swift_list_with_failed_connection_should_log_the_error
 def test_backends_storage_swift_read_with_valid_name_should_write_to_history(
     swift, monkeypatch, fs
 ):  # pylint:disable=invalid-name
-    """Tests that given SwiftService.download method successfully retrieves from the Swift storage
-    the object with the provided name (the object exists),
+    """Tests that given SwiftService.download method successfully retrieves from the
+    Swift storage the object with the provided name (the object exists),
     the SwiftStorage read method should write the entry to the history.
     """
 
@@ -151,8 +153,8 @@ def test_backends_storage_swift_read_with_valid_name_should_write_to_history(
 def test_backends_storage_swift_read_with_invalid_name_should_log_the_error(
     swift, monkeypatch, fs, caplog
 ):  # pylint:disable=invalid-name
-    """Tests that given SwiftService.download method fails to retrieve from the Swift storage
-    the object with the provided name (the object does not exists on Swift),
+    """Tests that given SwiftService.download method fails to retrieve from the Swift
+    storage the object with the provided name (the object does not exists on Swift),
     the SwiftStorage read method should log the error, not write to history and raise a
     BackendException.
     """
@@ -179,16 +181,17 @@ def test_backends_storage_swift_read_with_invalid_name_should_log_the_error(
     assert swift.history == []
 
 
+# pylint: disable=line-too-long
 @pytest.mark.parametrize("overwrite", [False, True])
 @pytest.mark.parametrize("new_archive", [False, True])
-def test_backends_storage_swift_write_should_write_to_history_new_or_overwriten_archives(
+def test_backends_storage_swift_write_should_write_to_history_new_or_overwriten_archives(  # noqa
     overwrite, new_archive, swift, monkeypatch, fs, caplog
 ):  # pylint:disable=invalid-name, too-many-arguments, too-many-locals
-    """Tests that given SwiftService list/upload method successfully connects to the Swift storage,
-    the SwiftStorage write method should update the history file when overwrite is True
-    or when the name of the archive is not in the history.
-    In case overwrite is False and the archive is in the history, the write method should
-    raise a FileExistsError.
+    """Tests that given SwiftService list/upload method successfully connects to the
+    Swift storage, the SwiftStorage write method should update the history file when
+    overwrite is True or when the name of the archive is not in the history.
+    In case overwrite is False and the archive is in the history, the write method
+    should raise a FileExistsError.
     """
 
     history = [

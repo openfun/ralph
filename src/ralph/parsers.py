@@ -59,7 +59,10 @@ class GELFParser(BaseParser):
                 logger.debug("Raised error was: %s", err)
             except KeyError as err:
                 logger.error(
-                    "Input event '%s' doesn't comply with GELF format! It will be ignored.",
+                    (
+                        "Input event '%s' doesn't comply with GELF format! It will be "
+                        "ignored."
+                    ),
                     event,
                 )
                 logger.debug("Raised error was: %s", err)

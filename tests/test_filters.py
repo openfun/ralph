@@ -7,8 +7,8 @@ from ralph.exceptions import EventKeyError
 
 
 def test_filters_anonymous_with_empty_events():
-    """Tests the anonymous filter when input dict has not the expected
-    'username' key.
+    """Tests the anonymous filter when input dict has not the expected `username`
+    key.
     """
 
     event = {}

@@ -36,7 +36,9 @@ def test_models_edx_correct_map_with_valid_content(subfield):
 @settings(max_examples=1)
 @given(st.builds(CorrectMap))
 def test_models_edx_correct_map_with_invalid_correctness_value(correctness, subfield):
-    """Tests that an invalid `correctness` value in `CorrectMap` raises a `ValidationError`."""
+    """Tests that an invalid `correctness` value in `CorrectMap` raises a
+    `ValidationError`.
+    """
 
     invalid_subfield = json.loads(subfield.json())
     invalid_subfield["correctness"] = correctness
@@ -49,7 +51,9 @@ def test_models_edx_correct_map_with_invalid_correctness_value(correctness, subf
 @settings(max_examples=1)
 @given(st.builds(CorrectMap))
 def test_models_edx_correct_map_with_invalid_hintmode_value(hintmode, subfield):
-    """Tests that an invalid `hintmode` value in `CorrectMap` raises a `ValidationError`."""
+    """Tests that an invalid `hintmode` value in `CorrectMap` raises a
+    `ValidationError`.
+    """
 
     invalid_subfield = json.loads(subfield.json())
     invalid_subfield["hintmode"] = hintmode
@@ -75,6 +79,7 @@ def test_models_edx_problem_hint_feedback_displayed_event_field_with_valid_field
     assert field.trigger_type in ("single", "compound")
 
 
+# pylint: disable=line-too-long
 @pytest.mark.parametrize(
     "question_type",
     [
@@ -87,11 +92,11 @@ def test_models_edx_problem_hint_feedback_displayed_event_field_with_valid_field
 )
 @settings(max_examples=1)
 @given(st.builds(EdxProblemHintFeedbackDisplayedEventField))
-def test_models_edx_problem_hint_feedback_displayed_event_field_with_invalid_question_type_value(
+def test_models_edx_problem_hint_feedback_displayed_event_field_with_invalid_question_type_value(  # noqa
     question_type, field
 ):
-    """Tests that an invalid `question_type` value in `EdxProblemHintFeedbackDisplayedEventField`
-    raises a `ValidationError`.
+    """Tests that an invalid `question_type` value in
+    `EdxProblemHintFeedbackDisplayedEventField` raises a `ValidationError`.
     """
 
     invalid_field = json.loads(field.json())
@@ -101,14 +106,15 @@ def test_models_edx_problem_hint_feedback_displayed_event_field_with_invalid_que
         EdxProblemHintFeedbackDisplayedEventField(**invalid_field)
 
 
+# pylint: disable=line-too-long
 @pytest.mark.parametrize("trigger_type", ["jingle", "compund"])
 @settings(max_examples=1)
 @given(st.builds(EdxProblemHintFeedbackDisplayedEventField))
-def test_models_edx_problem_hint_feedback_displayed_event_field_with_invalid_trigger_type_value(
+def test_models_edx_problem_hint_feedback_displayed_event_field_with_invalid_trigger_type_value(  # noqa
     trigger_type, field
 ):
-    """Tests that an invalid `question_type` value in `EdxProblemHintFeedbackDisplayedEventField`
-    raises a `ValidationError`.
+    """Tests that an invalid `question_type` value in
+    `EdxProblemHintFeedbackDisplayedEventField` raises a `ValidationError`.
     """
 
     invalid_field = json.loads(field.json())
@@ -121,10 +127,15 @@ def test_models_edx_problem_hint_feedback_displayed_event_field_with_invalid_tri
 @settings(max_examples=1)
 @given(st.builds(ProblemCheckEventField, state=st.builds(State)))
 def test_models_edx_problem_check_event_field_with_valid_field(field):
-    """Tests that a valid `ProblemCheckEventField` does not raise a `ValidationError`."""
+    """Tests that a valid `ProblemCheckEventField` does not raise a
+    `ValidationError`.
+    """
 
     assert re.match(
-        r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@problem\+block@[a-f0-9]{32}$",
+        (
+            r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]"
+            r"+type@problem\+block@[a-f0-9]{32}$"
+        ),
         field.problem_id,
     )
     assert field.success in ("correct", "incorrect")
@@ -133,13 +144,28 @@ def test_models_edx_problem_check_event_field_with_valid_field(field):
 @pytest.mark.parametrize(
     "problem_id",
     [
-        "block-v2:orgX=CS111+20_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS11120_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+tipe@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
+        (
+            "block-v2:orgX=CS111+20_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS11120_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS111=20_T1+tipe@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
         "block-v1:orgX=CS111=20_T1+",
         "type@sequentialblock@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+type@sequential+block@d0d4a647742943z3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea13",
+        (
+            "block-v1:orgX=CS111=20_T1+type@sequential"
+            "+block@d0d4a647742943z3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS111=20_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea13"
+        ),
     ],
 )
 @settings(max_examples=1)
@@ -180,10 +206,15 @@ def test_models_edx_problem_check_event_field_with_invalid_success_value(
 @settings(max_examples=1)
 @given(st.builds(ProblemCheckFailEventField, state=st.builds(State)))
 def test_models_edx_problem_check_fail_event_field_with_valid_field(field):
-    """Tests that a valid `ProblemCheckFailEventField` does not raise a `ValidationError`."""
+    """Tests that a valid `ProblemCheckFailEventField` does not raise a
+    `ValidationError`.
+    """
 
     assert re.match(
-        r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@problem\+block@[a-f0-9]{32}$",
+        (
+            r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]"
+            r"+type@problem\+block@[a-f0-9]{32}$"
+        ),
         field.problem_id,
     )
     assert field.failure in ("closed", "unreset")
@@ -192,13 +223,28 @@ def test_models_edx_problem_check_fail_event_field_with_valid_field(field):
 @pytest.mark.parametrize(
     "problem_id",
     [
-        "block-v2:orgX=CS111+20_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS11120_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+tipe@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
+        (
+            "block-v2:orgX=CS111+20_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS11120_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS111=20_T1+tipe@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
         "block-v1:orgX=CS111=20_T1+",
         "type@sequentialblock@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+type@sequential+block@d0d4a647742943z3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea13",
+        (
+            "block-v1:orgX=CS111=20_T1+type@sequential"
+            "+block@d0d4a647742943z3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS111=20_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea13"
+        ),
     ],
 )
 @settings(max_examples=1)
@@ -245,10 +291,15 @@ def test_models_edx_problem_check_fail_event_field_with_invalid_failure_value(
     )
 )
 def test_models_edx_problem_rescore_event_field_with_valid_field(field):
-    """Tests that a valid `ProblemRescoreEventField` does not raise a `ValidationError`."""
+    """Tests that a valid `ProblemRescoreEventField` does not raise a
+    `ValidationError`.
+    """
 
     assert re.match(
-        r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@problem\+block@[a-f0-9]{32}$",
+        (
+            r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]"
+            r"+type@problem\+block@[a-f0-9]{32}$"
+        ),
         field.problem_id,
     )
     assert field.success in ("correct", "incorrect")
@@ -257,13 +308,28 @@ def test_models_edx_problem_rescore_event_field_with_valid_field(field):
 @pytest.mark.parametrize(
     "problem_id",
     [
-        "block-v2:orgX=CS111+20_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS11120_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+tipe@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
+        (
+            "block-v2:orgX=CS111+20_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS11120_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS111=20_T1+tipe@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
         "block-v1:orgX=CS111=20_T1+",
         "type@sequentialblock@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+type@sequential+block@d0d4a647742943z3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea13",
+        (
+            "block-v1:orgX=CS111=20_T1+type@sequential"
+            "+block@d0d4a647742943z3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS111=20_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea13"
+        ),
     ],
 )
 @settings(max_examples=1)
@@ -316,10 +382,15 @@ def test_models_edx_problem_rescore_event_field_with_invalid_success_value(
 @settings(max_examples=1)
 @given(st.builds(ProblemRescoreFailEventField, state=st.builds(State)))
 def test_models_edx_problem_rescore_fail_event_field_with_valid_field(field):
-    """Tests that a valid `ProblemRescoreFailEventField` does not raise a `ValidationError`."""
+    """Tests that a valid `ProblemRescoreFailEventField` does not raise a
+    `ValidationError`.
+    """
 
     assert re.match(
-        r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@problem\+block@[a-f0-9]{32}$",
+        (
+            r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]"
+            r"+type@problem\+block@[a-f0-9]{32}$"
+        ),
         field.problem_id,
     )
     assert field.failure in ("closed", "unreset")
@@ -328,13 +399,28 @@ def test_models_edx_problem_rescore_fail_event_field_with_valid_field(field):
 @pytest.mark.parametrize(
     "problem_id",
     [
-        "block-v2:orgX=CS111+20_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS11120_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+tipe@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
+        (
+            "block-v2:orgX=CS111+20_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS11120_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS111=20_T1+tipe@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
         "block-v1:orgX=CS111=20_T1+",
         "type@sequentialblock@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+type@sequential+block@d0d4a647742943z3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea13",
+        (
+            "block-v1:orgX=CS111=20_T1+type@sequential"
+            "+block@d0d4a647742943z3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS111=20_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea13"
+        ),
     ],
 )
 @settings(max_examples=1)
@@ -342,8 +428,8 @@ def test_models_edx_problem_rescore_fail_event_field_with_valid_field(field):
 def test_models_edx_problem_rescore_fail_event_field_with_invalid_problem_id_value(
     problem_id, field
 ):
-    """Tests that an invalid `problem_id` value in `ProblemRescoreFailEventField` raises a
-    `ValidationError`.
+    """Tests that an invalid `problem_id` value in `ProblemRescoreFailEventField` raises
+    a `ValidationError`.
     """
 
     invalid_field = json.loads(field.json())
@@ -379,10 +465,15 @@ def test_models_edx_problem_rescore_fail_event_field_with_invalid_failure_value(
     )
 )
 def test_models_edx_reset_problem_event_field_with_valid_field(field):
-    """Tests that a valid `ResetProblemEventField` does not raise a `ValidationError`."""
+    """Tests that a valid `ResetProblemEventField` does not raise a
+    `ValidationError`.
+    """
 
     assert re.match(
-        r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@problem\+block@[a-f0-9]{32}$",
+        (
+            r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]"
+            r"+type@problem\+block@[a-f0-9]{32}$"
+        ),
         field.problem_id,
     )
 
@@ -390,13 +481,28 @@ def test_models_edx_reset_problem_event_field_with_valid_field(field):
 @pytest.mark.parametrize(
     "problem_id",
     [
-        "block-v2:orgX=CS111+20_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS11120_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+tipe@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
+        (
+            "block-v2:orgX=CS111+20_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS11120_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS111=20_T1+tipe@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
         "block-v1:orgX=CS111=20_T1+",
         "type@sequentialblock@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+type@sequential+block@d0d4a647742943z3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea13",
+        (
+            "block-v1:orgX=CS111=20_T1+type@sequential"
+            "+block@d0d4a647742943z3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS111=20_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea13"
+        ),
     ],
 )
 @settings(max_examples=1)
@@ -424,10 +530,15 @@ def test_models_edx_reset_problem_event_field_with_invalid_problem_id_value(
 @settings(max_examples=1)
 @given(st.builds(ResetProblemFailEventField, old_state=st.builds(State)))
 def test_models_edx_reset_problem_fail_event_field_with_valid_field(field):
-    """Tests that a valid `ResetProblemFailEventField` does not raise a `ValidationError`."""
+    """Tests that a valid `ResetProblemFailEventField` does not raise a
+    `ValidationError`.
+    """
 
     assert re.match(
-        r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@problem\+block@[a-f0-9]{32}$",
+        (
+            r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]"
+            r"+type@problem\+block@[a-f0-9]{32}$"
+        ),
         field.problem_id,
     )
     assert field.failure in ("closed", "not_closed")
@@ -436,13 +547,28 @@ def test_models_edx_reset_problem_fail_event_field_with_valid_field(field):
 @pytest.mark.parametrize(
     "problem_id",
     [
-        "block-v2:orgX=CS111+20_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS11120_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+tipe@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
+        (
+            "block-v2:orgX=CS111+20_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS11120_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS111=20_T1+tipe@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
         "block-v1:orgX=CS111=20_T1+",
         "type@sequentialblock@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+type@sequential+block@d0d4a647742943z3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea13",
+        (
+            "block-v1:orgX=CS111=20_T1+type@sequential"
+            "+block@d0d4a647742943z3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS111=20_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea13"
+        ),
     ],
 )
 @settings(max_examples=1)
@@ -450,8 +576,8 @@ def test_models_edx_reset_problem_fail_event_field_with_valid_field(field):
 def test_models_edx_reset_problem_fail_event_field_with_invalid_problem_id_value(
     problem_id, field
 ):
-    """Tests that an invalid `problem_id` value in `ResetProblemFailEventField` raises a
-    `ValidationError`.
+    """Tests that an invalid `problem_id` value in `ResetProblemFailEventField` raises
+    a `ValidationError`.
     """
 
     invalid_field = json.loads(field.json())
@@ -483,10 +609,15 @@ def test_models_edx_reset_problem_fail_event_field_with_invalid_failure_value(
 @settings(max_examples=1)
 @given(st.builds(SaveProblemFailEventField, state=st.builds(State)))
 def test_models_edx_save_problem_fail_event_field_with_valid_field(field):
-    """Tests that a valid `SaveProblemFailEventField` does not raise a `ValidationError`."""
+    """Tests that a valid `SaveProblemFailEventField` does not raise a
+    `ValidationError`.
+    """
 
     assert re.match(
-        r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@problem\+block@[a-f0-9]{32}$",
+        (
+            r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]"
+            r"+type@problem\+block@[a-f0-9]{32}$"
+        ),
         field.problem_id,
     )
     assert field.failure in ("closed", "done")
@@ -495,13 +626,28 @@ def test_models_edx_save_problem_fail_event_field_with_valid_field(field):
 @pytest.mark.parametrize(
     "problem_id",
     [
-        "block-v2:orgX=CS111+20_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS11120_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+tipe@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
+        (
+            "block-v2:orgX=CS111+20_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS11120_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS111=20_T1+tipe@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
         "block-v1:orgX=CS111=20_T1+",
         "type@sequentialblock@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+type@sequential+block@d0d4a647742943z3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea13",
+        (
+            "block-v1:orgX=CS111=20_T1+type@sequential"
+            "+block@d0d4a647742943z3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS111=20_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea13"
+        ),
     ],
 )
 @settings(max_examples=1)
@@ -542,10 +688,15 @@ def test_models_edx_save_problem_fail_event_field_with_invalid_failure_value(
 @settings(max_examples=1)
 @given(st.builds(SaveProblemSuccessEventField, state=st.builds(State)))
 def test_models_edx_save_problem_success_event_field_with_valid_field(field):
-    """Tests that a valid `SaveProblemFailEventField` does not raise a `ValidationError`."""
+    """Tests that a valid `SaveProblemFailEventField` does not raise a
+    `ValidationError`.
+    """
 
     assert re.match(
-        r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@problem\+block@[a-f0-9]{32}$",
+        (
+            r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]"
+            r"+type@problem\+block@[a-f0-9]{32}$"
+        ),
         field.problem_id,
     )
 
@@ -553,13 +704,28 @@ def test_models_edx_save_problem_success_event_field_with_valid_field(field):
 @pytest.mark.parametrize(
     "problem_id",
     [
-        "block-v2:orgX=CS111+20_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS11120_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+tipe@sequential+block@d0d4a647742943e3951b45d9db8a0ea1",
+        (
+            "block-v2:orgX=CS111+20_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS11120_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS111=20_T1+tipe@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea1"
+        ),
         "block-v1:orgX=CS111=20_T1+",
         "type@sequentialblock@d0d4a647742943e3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+type@sequential+block@d0d4a647742943z3951b45d9db8a0ea1",
-        "block-v1:orgX=CS111=20_T1+type@sequential+block@d0d4a647742943e3951b45d9db8a0ea13",
+        (
+            "block-v1:orgX=CS111=20_T1+type@sequential"
+            "+block@d0d4a647742943z3951b45d9db8a0ea1"
+        ),
+        (
+            "block-v1:orgX=CS111=20_T1+type@sequential"
+            "+block@d0d4a647742943e3951b45d9db8a0ea13"
+        ),
     ],
 )
 @settings(max_examples=1)
@@ -567,8 +733,8 @@ def test_models_edx_save_problem_success_event_field_with_valid_field(field):
 def test_models_edx_save_problem_success_event_field_with_invalid_problem_id_value(
     problem_id, field
 ):
-    """Tests that an invalid `problem_id` value in `SaveProblemSuccessEventField` raises a
-    `ValidationError`.
+    """Tests that an invalid `problem_id` value in `SaveProblemSuccessEventField`
+    raises a `ValidationError`.
     """
 
     invalid_field = json.loads(field.json())

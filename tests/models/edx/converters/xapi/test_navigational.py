@@ -29,7 +29,9 @@ from ralph.models.edx.navigational.statements import UIPageClose
 def test_navigational_ui_page_close_to_page_terminated(
     uuid_namespace, event, platform_url
 ):
-    """Tests that ServerEventToPageViewed.convert returns a JSON string with a constant UUID."""
+    """Tests that ServerEventToPageViewed.convert returns a JSON string with a
+    constant UUID.
+    """
 
     event_str = event.json()
     event = json.loads(event_str)
