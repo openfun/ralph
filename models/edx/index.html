@@ -2688,7 +2688,8 @@ AbstractBaseEventField            (<a title="ralph.models.edx.base.BaseModelWith
     <div class="doc doc-contents ">
 
       <p>Represents the base model inherited by all <code>event</code> fields.</p>
-<p>The base model does not have any attributes as event field does not have common sub-fields.</p>
+<p>The base model does not have any attributes as event field does not have common
+sub-fields.</p>
 
 
 
@@ -2757,8 +2758,8 @@ Retrieved with:
     )</code>
 Note:
     Is only present when a course page is requested.
-    Is an empty dictionary when the user is not logged in or not found in the
-    <code>user_api_usercoursetag</code> table.</p></td>
+    Is an empty dictionary when the user is not logged in or not found in
+    the <code>user_api_usercoursetag</code> table.</p></td>
       </tr>
       <tr>
         <td><code>user_id</code></td>
@@ -2776,8 +2777,9 @@ Note:
         <td><code>str</code></td>
         <td><p>Consists of the organization name that lists the course.
 Retrieved with:
-    <code>course_id.org</code> where <code>course_id</code> is an <code>opaque_keys.edx.locator.CourseLocator</code>
-    which is created using the URL of the requested page.
+    <code>course_id.org</code> where <code>course_id</code> is an
+    <code>opaque_keys.edx.locator.CourseLocator</code> which is created using the URL
+    of the requested page.
 Note:
     Is an empty string when the requested page is not a course page.</p></td>
       </tr>
@@ -2795,7 +2797,8 @@ Note:
       <tr>
         <td><code>path</code></td>
         <td><code>Path</code></td>
-        <td><p>Consist of the relative URL (without the hostname) of the requested page.
+        <td><p>Consist of the relative URL (without the hostname) of the
+requested page.
 Retrieved with:
     <code>request.META['PATH_INFO']</code></p></td>
       </tr>
@@ -2871,9 +2874,10 @@ Retrieved with:
     <code>request.user.username</code> querying the <code>auth_user</code> table.
 Note:
     Is an empty string when the user is not logged in.
-    If an exception is raised when retrieving the username from the table then
-    the value is <code>anonymous</code>.
-    Usernames are made of 2-30 ASCII letters / numbers / underscores (_) / hyphens (-)</p></td>
+    If an exception is raised when retrieving the username from the table
+    then the value is <code>anonymous</code>.
+    Usernames are made of 2-30 ASCII letters / numbers / underscores (_) /
+    hyphens (-)</p></td>
       </tr>
       <tr>
         <td><code>ip</code></td>
@@ -2932,7 +2936,8 @@ Note:
       <tr>
         <td><code>time</code></td>
         <td><code>datetime</code></td>
-        <td><p>Consists of the UTC time in ISO format at which the event was emitted.
+        <td><p>Consists of the UTC time in ISO format at which the event was
+emitted.
 Retrieved with:
     <code>datetime.datetime.utcnow()</code></p></td>
       </tr>
@@ -3179,7 +3184,8 @@ Retrieved with:
       <tr>
         <td><code>session</code></td>
         <td><code>str</code></td>
-        <td><p>Consists of the md5 encrypted Django session key or an empty string.</p></td>
+        <td><p>Consists of the md5 encrypted Django session key or an empty
+string.</p></td>
       </tr>
   </tbody>
 </table>
@@ -3395,13 +3401,16 @@ contain sensitive data: <code>username</code>, <code>referer</code>, <code>event
 
     <div class="doc doc-contents ">
 
-      <p>Returns a dictionary with <code>course</code> and <code>module</code> of edX event&rsquo;s <code>context.course_id</code>.</p>
+      <p>Returns a dictionary with <code>course</code> and <code>module</code> of edX event&rsquo;s
+<code>context.course_id</code>.</p>
 
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/base.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@staticmethod</span>
 <span class="k">def</span> <span class="nf">parse_course_id</span><span class="p">(</span><span class="n">course_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns a dictionary with `course` and `module` of edX event&#39;s `context.course_id`.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Returns a dictionary with `course` and `module` of edX event&#39;s</span>
+<span class="sd">    `context.course_id`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^course-v1:.+\+(.+)\+(.+)$&quot;</span><span class="p">,</span> <span class="n">course_id</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
@@ -3810,8 +3819,8 @@ __src__            (<a title="ralph.models.edx.server.BaseServerModel" href="#ra
     <div class="doc doc-contents ">
 
       <p>Represents a common server statement.</p>
-<p>This type of event is triggered from the django middleware on each request excluding:
-<code>/event</code>, <code>login</code>, <code>heartbeat</code>, <code>/segmentio/event</code> and <code>/performance</code>.</p>
+<p>This type of event is triggered from the django middleware on each request
+excluding: <code>/event</code>, <code>login</code>, <code>heartbeat</code>, <code>/segmentio/event</code> and <code>/performance</code>.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -3826,20 +3835,29 @@ __src__            (<a title="ralph.models.edx.server.BaseServerModel" href="#ra
       <tr>
         <td><code>event_type</code></td>
         <td><code>str</code></td>
-        <td><p>Consist of the relative URL (without the hostname) of the requested page.
+        <td><p>Consist of the relative URL (without the hostname) of the
+requested page.
 Retrieved with:
     <code>request.META['PATH_INFO']</code></p></td>
       </tr>
       <tr>
         <td><code>event</code></td>
         <td><code>str</code></td>
-        <td><p>Consist of a JSON string holding the content of the GET or POST request.
+        <td><p>Consist of a JSON string holding the content of the GET or POST
+request.
 Retrieved with:
-    <code>json.dumps({'GET': dict(request.GET), 'POST': dict(request.POST)})[:512]</code>
+    <code>json.dumps(
+        {
+            'GET': dict(request.GET),
+            'POST': dict(request.POST)
+        }
+    )[:512]</code>
 Note:
     Values for [&lsquo;password&rsquo;, &lsquo;newpassword&rsquo;, &lsquo;new_password&rsquo;, &lsquo;oldpassword&rsquo;,
-    &lsquo;old_password&rsquo;, &lsquo;new_password1&rsquo;, &lsquo;new_password2&rsquo;] are replaced by <code>********</code>.
-    The JSON string is truncated at 512 characters resulting in invalid JSON.</p></td>
+    &lsquo;old_password&rsquo;, &lsquo;new_password1&rsquo;, &lsquo;new_password2&rsquo;] are replaced by
+    <code>********</code>.
+    The JSON string is truncated at 512 characters resulting in invalid
+    JSON.</p></td>
       </tr>
   </tbody>
 </table>
@@ -4016,10 +4034,10 @@ EdxCourseEnrollmentUpgradeClickedContextField            (<a title="ralph.models
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>context</code> field of the <code>edx.course.enrollment.upgrade_clicked</code> server
-statement.</p>
-<p>In addition to the common context member fields, this statement also comprises the <code>mode</code>
-context member field.</p>
+      <p>Represents the <code>context</code> field of the <code>edx.course.enrollment.upgrade_clicked</code>
+server statement.</p>
+<p>In addition to the common context member fields, this statement also comprises the
+<code>mode</code> context member field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -4034,7 +4052,7 @@ context member field.</p>
       <tr>
         <td><code>mode</code></td>
         <td><code>str</code></td>
-        <td><p>Consists of either the <code>audit</code> or <code>honor</code> value. It identifies the enrollment</p></td>
+        <td><p>Consists of either the <code>audit</code> or <code>honor</code> value. It identifies the</p></td>
       </tr>
   </tbody>
 </table>
@@ -4082,10 +4100,10 @@ EdxCourseEnrollmentUpgradeSucceededContextField            (<a title="ralph.mode
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>context</code> field of the <code>edx.course.enrollment.upgrade.succeeded</code> server
-statement.</p>
-<p>In addition to the common context member fields, this statement also comprises the <code>mode</code>
-context member field.</p>
+      <p>Represents the <code>context</code> field of the <code>edx.course.enrollment.upgrade.succeeded</code>
+server statement.</p>
+<p>In addition to the common context member fields, this statement also comprises the
+<code>mode</code> context member field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -4201,7 +4219,8 @@ EnrollmentEventField            (<a title="ralph.models.edx.base.AbstractBaseEve
       <tr>
         <td><code>course_id</code></td>
         <td><code>str</code></td>
-        <td><p>Consists in the course in which the student was enrolled or unenrolled.</p></td>
+        <td><p>Consists in the course in which the student was enrolled or
+unenrolled.</p></td>
       </tr>
       <tr>
         <td><code>mode</code></td>
@@ -4562,7 +4581,8 @@ student_courseenrollment.mode from <code>audit</code> or <code>honor</code> to <
       <tr>
         <td><code>event_type</code></td>
         <td><code>str</code></td>
-        <td><p>Consists of the value <code>edx.course.enrollment.upgrade.succeeded</code>.</p></td>
+        <td><p>Consists of the value
+<code>edx.course.enrollment.upgrade.succeeded</code>.</p></td>
       </tr>
       <tr>
         <td><code>name</code></td>
@@ -4823,14 +4843,15 @@ NavigationalEventField            (<a title="ralph.models.edx.base.AbstractBaseE
         <td><code>old</code></td>
         <td><code>int</code></td>
         <td><p>For <code>seq_goto</code>, it consists of the index of the unit being jumped to.
-For <code>seq_next</code> and <code>seq_prev</code>, it consists of the index of the unit being navigated to.</p></td>
+For <code>seq_next</code> and <code>seq_prev</code>, it consists of the index of the unit being
+navigated to.</p></td>
       </tr>
       <tr>
         <td><code>new</code></td>
         <td><code>int</code></td>
-        <td><p>For <code>seq_goto</code>, it consists of the index of the unit being jumped from.
-For <code>seq_next</code> and <code>seq_prev</code>, it consists of the index of the unit being navigated
-away from.</p></td>
+        <td><p>For <code>seq_goto</code>, it consists of the index of the unit being jumped
+from. For <code>seq_next</code> and <code>seq_prev</code>, it consists of the index of the unit
+being navigated away from.</p></td>
       </tr>
   </tbody>
 </table>
@@ -5534,7 +5555,8 @@ EdxProblemHintDemandhintDisplayedEventField            (<a title="ralph.models.e
       <tr>
         <td><code>hint_index</code></td>
         <td><code>int</code></td>
-        <td><p>Consists of the identifier for the hint that was displayed to the user.</p></td>
+        <td><p>Consists of the identifier for the hint that was displayed to
+the user.</p></td>
       </tr>
       <tr>
         <td><code>hint_len</code></td>
@@ -5544,13 +5566,14 @@ EdxProblemHintDemandhintDisplayedEventField            (<a title="ralph.models.e
       <tr>
         <td><code>hint_text</code></td>
         <td><code>str</code></td>
-        <td><p>Consists of the text of the hint that was displayed to the user.</p></td>
+        <td><p>Consists of the text of the hint that was displayed to the
+user.</p></td>
       </tr>
       <tr>
         <td><code>module_id</code></td>
         <td><code>str</code></td>
-        <td><p>Consists of the identifier for the problem component for which the user
-requested the hint.</p></td>
+        <td><p>Consists of the identifier for the problem component for which
+the user requested the hint.</p></td>
       </tr>
   </tbody>
 </table>
@@ -5616,18 +5639,20 @@ EdxProblemHintFeedbackDisplayedEventField            (<a title="ralph.models.edx
       <tr>
         <td><code>choice_all</code></td>
         <td><code>list</code></td>
-        <td><p>Lists all of the answer choices for problems with multiple possible
-answers defined.</p></td>
+        <td><p>Lists all of the answer choices for problems with multiple
+possible answers defined.</p></td>
       </tr>
       <tr>
         <td><code>correctness</code></td>
         <td><code>bool</code></td>
-        <td><p><code>True</code> if the <code>student_answer</code> value is correct, else <code>False</code>.</p></td>
+        <td><p><code>True</code> if the <code>student_answer</code> value is correct, else
+<code>False</code>.</p></td>
       </tr>
       <tr>
         <td><code>hint_label</code></td>
         <td><code>str</code></td>
-        <td><p>Consists of the feedback message given for the answer correctness.</p></td>
+        <td><p>Consists of the feedback message given for the answer
+correctness.</p></td>
       </tr>
       <tr>
         <td><code>hints</code></td>
@@ -5637,14 +5662,14 @@ answers defined.</p></td>
       <tr>
         <td><code>module_id</code></td>
         <td><code>str</code></td>
-        <td><p>Consists of the identifier for the problem component for which the user
-received the feedback.</p></td>
+        <td><p>Consists of the identifier for the problem component for which
+the user received the feedback.</p></td>
       </tr>
       <tr>
         <td><code>problem_part_id</code></td>
         <td><code>str</code></td>
-        <td><p>Consists of the specific problem for which the user received
-feedback.</p></td>
+        <td><p>Consists of the specific problem for which the user
+received feedback.</p></td>
       </tr>
       <tr>
         <td><code>question_type</code></td>
@@ -5654,13 +5679,14 @@ feedback.</p></td>
       <tr>
         <td><code>student_answer</code></td>
         <td><code>list</code></td>
-        <td><p>Consists of the answer value(s) selected or supplied by the user.</p></td>
+        <td><p>Consists of the answer value(s) selected or supplied by
+the user.</p></td>
       </tr>
       <tr>
         <td><code>trigger_type</code></td>
         <td><code>str</code></td>
-        <td><p>Identifies the type of feedback obtained by the <code>student_answer</code>
-response. Consists either of <code>single</code> or <code>compound</code> value.</p></td>
+        <td><p>Identifies the type of feedback obtained by the
+<code>student_answer</code> response. Consists either of <code>single</code> or <code>compound</code> value.</p></td>
       </tr>
   </tbody>
 </table>
@@ -5731,13 +5757,14 @@ ProblemCheckEventField            (<a title="ralph.models.edx.base.AbstractBaseE
       <tr>
         <td><code>answers</code></td>
         <td><code>dict</code></td>
-        <td><p>Consists of a dictionary of problem ID and the corresponding internal
-answer identifier for each problem.</p></td>
+        <td><p>Consists of a dictionary of problem ID and the corresponding
+internal answer identifier for each problem.</p></td>
       </tr>
       <tr>
         <td><code>attempts</code></td>
         <td><code>int</code></td>
-        <td><p>Consists of the number of times the user attempted to answer the problem.</p></td>
+        <td><p>Consists of the number of times the user attempted to answer
+the problem.</p></td>
       </tr>
       <tr>
         <td><code>correct_map</code></td>
@@ -5843,8 +5870,8 @@ ProblemCheckFailEventField            (<a title="ralph.models.edx.base.AbstractB
       <tr>
         <td><code>answers</code></td>
         <td><code>dict</code></td>
-        <td><p>Consists of a dictionary of problem ID and the internal answer identifier
-for each problem.</p></td>
+        <td><p>Consists of a dictionary of problem ID and the internal answer
+identifier for each problem.</p></td>
       </tr>
       <tr>
         <td><code>failure</code></td>
@@ -6111,7 +6138,8 @@ QueueState            (<a title="ralph.models.edx.base.BaseModelWithConfig" href
       <tr>
         <td><code>time</code></td>
         <td><code>str</code></td>
-        <td><p>Consists of a string dump of a DateTime object in the format &lsquo;%Y%m%d%H%M%S&rsquo;.</p></td>
+        <td><p>Consists of a string dump of a DateTime object in the format
+&lsquo;%Y%m%d%H%M%S&rsquo;.</p></td>
       </tr>
   </tbody>
 </table>
@@ -6325,8 +6353,8 @@ SaveProblemFailEventField            (<a title="ralph.models.edx.base.AbstractBa
       <tr>
         <td><code>answers</code></td>
         <td><code>dict</code></td>
-        <td><p>Consists of a dict of the answer string or a list or a dict of the answer
-strings if multiple choices are allowed.</p></td>
+        <td><p>Consists of a dict of the answer string or a list or a dict of
+the answer strings if multiple choices are allowed.</p></td>
       </tr>
       <tr>
         <td><code>failure</code></td>
@@ -6407,8 +6435,8 @@ SaveProblemSuccessEventField            (<a title="ralph.models.edx.base.Abstrac
       <tr>
         <td><code>answers</code></td>
         <td><code>dict</code></td>
-        <td><p>Consists of a dict of the answer string or a list or a dict of the answer
-strings if multiple choices are allowed.</p></td>
+        <td><p>Consists of a dict of the answer string or a list or a dict of
+the answer strings if multiple choices are allowed.</p></td>
       </tr>
       <tr>
         <td><code>problem_id</code></td>
@@ -6633,8 +6661,8 @@ SubmissionAnswerField            (<a title="ralph.models.edx.base.BaseModelWithC
       <tr>
         <td><code>answer</code></td>
         <td><code>str, list</code></td>
-        <td><p>Consists of the answer string or a list of the answer strings if
-multiple choices are allorwed.</p></td>
+        <td><p>Consists of the answer string or a list of the answer
+strings if multiple choices are allorwed.</p></td>
       </tr>
       <tr>
         <td><code>correct</code></td>
@@ -6644,8 +6672,8 @@ multiple choices are allorwed.</p></td>
       <tr>
         <td><code>input_type</code></td>
         <td><code>str</code></td>
-        <td><p>Consists of the type of value that the student supplies for the
-<code>response_type</code>.</p></td>
+        <td><p>Consists of the type of value that the student supplies for
+the <code>response_type</code>.</p></td>
       </tr>
       <tr>
         <td><code>question</code></td>
@@ -6660,7 +6688,8 @@ multiple choices are allorwed.</p></td>
       <tr>
         <td><code>variant</code></td>
         <td><code>str</code></td>
-        <td><p>Consists of the unique ID of the variant that was presented to this user.</p></td>
+        <td><p>Consists of the unique ID of the variant that was presented to
+this user.</p></td>
       </tr>
   </tbody>
 </table>
@@ -6728,8 +6757,8 @@ UIProblemResetEventField            (<a title="ralph.models.edx.base.AbstractBas
       <tr>
         <td><code>answers</code></td>
         <td><code>str, list</code></td>
-        <td><p>Consists of the answer string or a list of the answer strings if
-multiple choices are allowed.</p></td>
+        <td><p>Consists of the answer string or a list of the answer
+strings if multiple choices are allowed.</p></td>
       </tr>
   </tbody>
 </table>
@@ -6792,8 +6821,8 @@ UIProblemShowEventField            (<a title="ralph.models.edx.base.AbstractBase
       <tr>
         <td><code>problem</code></td>
         <td><code>str</code></td>
-        <td><p>Consists of the optional name value that the course creators supply or
-the system-generated hash code for the problem being shown.</p></td>
+        <td><p>Consists of the optional name value that the course creators
+supply or the system-generated hash code for the problem being shown.</p></td>
       </tr>
   </tbody>
 </table>
@@ -7116,8 +7145,8 @@ ProblemCheckFail            (<a title="ralph.models.edx.server.BaseServerModel" 
     <div class="doc doc-contents ">
 
       <p>Represents the <code>problem_check_fail</code> server event.</p>
-<p>This event is triggered when a user checks a problem and a failure prevents the problem
-from being checked successfully.</p>
+<p>This event is triggered when a user checks a problem and a failure prevents the
+problem from being checked successfully.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -7733,7 +7762,7 @@ UIProblemCheck            (<a title="ralph.models.edx.browser.BaseBrowserModel" 
       <tr>
         <td><code>event</code></td>
         <td><code>str</code></td>
-        <td><p>Consists of values of problem being checked, styled as <code>GET</code> parameters.</p></td>
+        <td><p>Consists of values of problem being checked, styled as <code>GET</code></p></td>
       </tr>
       <tr>
         <td><code>event_type</code></td>
@@ -8191,8 +8220,8 @@ Server            (<a title="ralph.models.edx.server.BaseServerModel" href="#ral
     <div class="doc doc-contents ">
 
       <p>Represents a common server statement.</p>
-<p>This type of event is triggered from the django middleware on each request excluding:
-<code>/event</code>, <code>login</code>, <code>heartbeat</code>, <code>/segmentio/event</code> and <code>/performance</code>.</p>
+<p>This type of event is triggered from the django middleware on each request
+excluding: <code>/event</code>, <code>login</code>, <code>heartbeat</code>, <code>/segmentio/event</code> and <code>/performance</code>.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -8207,20 +8236,29 @@ Server            (<a title="ralph.models.edx.server.BaseServerModel" href="#ral
       <tr>
         <td><code>event_type</code></td>
         <td><code>str</code></td>
-        <td><p>Consist of the relative URL (without the hostname) of the requested page.
+        <td><p>Consist of the relative URL (without the hostname) of the
+requested page.
 Retrieved with:
     <code>request.META['PATH_INFO']</code></p></td>
       </tr>
       <tr>
         <td><code>event</code></td>
         <td><code>str</code></td>
-        <td><p>Consist of a JSON string holding the content of the GET or POST request.
+        <td><p>Consist of a JSON string holding the content of the GET or POST
+request.
 Retrieved with:
-    <code>json.dumps({'GET': dict(request.GET), 'POST': dict(request.POST)})[:512]</code>
+    <code>json.dumps(
+        {
+            'GET': dict(request.GET),
+            'POST': dict(request.POST)
+        }
+    )[:512]</code>
 Note:
     Values for [&lsquo;password&rsquo;, &lsquo;newpassword&rsquo;, &lsquo;new_password&rsquo;, &lsquo;oldpassword&rsquo;,
-    &lsquo;old_password&rsquo;, &lsquo;new_password1&rsquo;, &lsquo;new_password2&rsquo;] are replaced by <code>********</code>.
-    The JSON string is truncated at 512 characters resulting in invalid JSON.</p></td>
+    &lsquo;old_password&rsquo;, &lsquo;new_password1&rsquo;, &lsquo;new_password2&rsquo;] are replaced by
+    <code>********</code>.
+    The JSON string is truncated at 512 characters resulting in invalid
+    JSON.</p></td>
       </tr>
   </tbody>
 </table>
@@ -8434,7 +8472,8 @@ BookEventField            (<a title="ralph.models.edx.base.AbstractBaseEventFiel
       <tr>
         <td><code>name</code></td>
         <td><code>str</code></td>
-        <td><p>Consists of <code>textbook.pdf.page.loaded</code> if type is set to <code>gotopage</code>,
+        <td><p>Consists of <code>textbook.pdf.page.loaded</code> if type is set to
+<code>gotopage</code>,
 <code>textbook.pdf.page.navigatednext</code> if type is set to <code>prevpage</code>,
 <code>textbook.pdf.page.navigatednext</code> if type is set to <code>nextpage</code>.</p></td>
       </tr>
@@ -8446,14 +8485,15 @@ BookEventField            (<a title="ralph.models.edx.base.AbstractBaseEventFiel
       <tr>
         <td><code>old</code></td>
         <td><code>int</code></td>
-        <td><p>Consists of the original page number. It applies to <code>gotopage</code> event types only.</p></td>
+        <td><p>Consists of the original page number. It applies to <code>gotopage</code> event
+types only.</p></td>
       </tr>
       <tr>
         <td><code>type</code></td>
         <td><code>str</code></td>
-        <td><p>Consists of <code>gotopage</code> value when a page loads after the student manually
-enters its number, <code>prevpage</code> value when the next page button is clicked or <code>nextpage</code>
-value when the previous page button is clicked.</p></td>
+        <td><p>Consists of <code>gotopage</code> value when a page loads after the student
+manually enters its number, <code>prevpage</code> value when the next page button is
+clicked or <code>nextpage</code> value when the previous page button is clicked.</p></td>
       </tr>
   </tbody>
 </table>
@@ -8937,8 +8977,8 @@ option is selected or <code>false</code> if this option is not selected.</p></td
       <tr>
         <td><code>highlightAll</code></td>
         <td><code>bool</code></td>
-        <td><p>Consists either of the <code>true</code> value if the option to highlight
-all matches is selected or <code>false</code> if this option is not selected.</p></td>
+        <td><p>Consists either of the <code>true</code> value if the option to
+highlight all matches is selected or <code>false</code> if this option is not selected.</p></td>
       </tr>
       <tr>
         <td><code>query</code></td>
@@ -8948,8 +8988,8 @@ all matches is selected or <code>false</code> if this option is not selected.</p
       <tr>
         <td><code>status</code></td>
         <td><code>str</code></td>
-        <td><p>Consists either of the value <code>not found</code> for a search string that is
-unsuccessful or blank for successful search strings.</p></td>
+        <td><p>Consists either of the value <code>not found</code> for a search string that
+is unsuccessful or blank for successful search strings.</p></td>
       </tr>
   </tbody>
 </table>
@@ -9021,14 +9061,14 @@ TextbookPdfSearchExecutedEventField            (<a title="ralph.models.edx.textb
       <tr>
         <td><code>caseSensitive</code></td>
         <td><code>bool</code></td>
-        <td><p>Consists either of the <code>true</code> value if the case sensitive option
-is selected or <code>false</code> if this option is not selected.</p></td>
+        <td><p>Consists either of the <code>true</code> value if the case sensitive
+option is selected or <code>false</code> if this option is not selected.</p></td>
       </tr>
       <tr>
         <td><code>highlightAll</code></td>
         <td><code>bool</code></td>
-        <td><p>Consists either of the <code>true</code> value if the option to highlight
-all matches is selected or <code>false</code> if this option is not selected.</p></td>
+        <td><p>Consists either of the <code>true</code> value if the option to
+highlight all matches is selected or <code>false</code> if this option is not selected.</p></td>
       </tr>
       <tr>
         <td><code>query</code></td>
@@ -9038,8 +9078,8 @@ all matches is selected or <code>false</code> if this option is not selected.</p
       <tr>
         <td><code>status</code></td>
         <td><code>str</code></td>
-        <td><p>Consists either of the value <code>not found</code> for a search string that is
-unsuccessful or blank for successful search strings.</p></td>
+        <td><p>Consists either of the value <code>not found</code> for a search string that
+is unsuccessful or blank for successful search strings.</p></td>
       </tr>
   </tbody>
 </table>
@@ -9117,8 +9157,8 @@ option is selected or <code>false</code> if this option is not selected.</p></td
       <tr>
         <td><code>highlightAll</code></td>
         <td><code>bool</code></td>
-        <td><p>Consists either of the <code>true</code> value if the option to highlight
-all matches is selected or <code>false</code> if this option is not selected.</p></td>
+        <td><p>Consists either of the <code>true</code> value if the option to
+highlight all matches is selected or <code>false</code> if this option is not selected.</p></td>
       </tr>
       <tr>
         <td><code>query</code></td>
@@ -9128,8 +9168,8 @@ all matches is selected or <code>false</code> if this option is not selected.</p
       <tr>
         <td><code>status</code></td>
         <td><code>str</code></td>
-        <td><p>Consists either of the value <code>not found</code> for a search string that is
-unsuccessful or blank for successful search strings.</p></td>
+        <td><p>Consists either of the value <code>not found</code> for a search string that
+is unsuccessful or blank for successful search strings.</p></td>
       </tr>
   </tbody>
 </table>
@@ -9201,20 +9241,21 @@ TextbookPdfSearchNavigatedNextEventField            (<a title="ralph.models.edx.
       <tr>
         <td><code>caseSensitive</code></td>
         <td><code>bool</code></td>
-        <td><p>Consists either of the <code>true</code> value if the case sensitive option
-is selected or <code>false</code> if this option is not selected.</p></td>
+        <td><p>Consists either of the <code>true</code> value if the case sensitive
+option is selected or <code>false</code> if this option is not selected.</p></td>
       </tr>
       <tr>
         <td><code>findPrevious(bool)</code></td>
         <td></td>
         <td><p>Consists either of the ‘true’ value if the user clicks the
-Find Previous icon or ‘false’ if the user clicks the <kbd>Find Next</kbd> icon.</p></td>
+Find Previous icon or ‘false’ if the user clicks the <kbd>Find Next</kbd>
+icon.</p></td>
       </tr>
       <tr>
         <td><code>highlightAll</code></td>
         <td><code>bool</code></td>
-        <td><p>Consists either of the <code>true</code> value if the option to highlight
-all matches is selected or <code>false</code> if this option is not selected.</p></td>
+        <td><p>Consists either of the <code>true</code> value if the option to
+highlight all matches is selected or <code>false</code> if this option is not selected.</p></td>
       </tr>
       <tr>
         <td><code>query</code></td>
@@ -9224,8 +9265,8 @@ all matches is selected or <code>false</code> if this option is not selected.</p
       <tr>
         <td><code>status</code></td>
         <td><code>str</code></td>
-        <td><p>Consists either of the value <code>not found</code> for a search string that is
-unsuccessful or blank for successful search strings.</p></td>
+        <td><p>Consists either of the value <code>not found</code> for a search string that
+is unsuccessful or blank for successful search strings.</p></td>
       </tr>
   </tbody>
 </table>
@@ -9499,8 +9540,8 @@ TextbookPdfZoomMenuChangedEventField            (<a title="ralph.models.edx.text
       <tr>
         <td><code>amount</code></td>
         <td><code>str</code></td>
-        <td><p>Consists either of the <code>0.5</code>, <code>0.75</code>, <code>1</code>, <code>1.25</code>, <code>1.5</code>, <code>2</code>, <code>3</code>, <code>4</code>,
-<code>auto</code>, <code>custom</code>, <code>page-actual</code>, <code>page-fit</code>, <code>page-width</code> value.</p></td>
+        <td><p>Consists either of the <code>0.5</code>, <code>0.75</code>, <code>1</code>, <code>1.25</code>, <code>1.5</code>, <code>2</code>,
+<code>3</code>, <code>4</code>, <code>auto</code>, <code>custom</code>, <code>page-actual</code>, <code>page-fit</code>, <code>page-width</code> value.</p></td>
       </tr>
   </tbody>
 </table>
@@ -9596,7 +9637,8 @@ UIBook            (<a title="ralph.models.edx.browser.BaseBrowserModel" href="#r
     <div class="doc doc-contents ">
 
       <p>Represents the <code>book</code> browser event model.</p>
-<p>The browser emits this event when a user navigates within the PDF Viewer or the PNG Viewer.</p>
+<p>The browser emits this event when a user navigates within the PDF Viewer or the
+PNG Viewer.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -9751,8 +9793,8 @@ UITextbookPdfDisplayScaled            (<a title="ralph.models.edx.browser.BaseBr
     <div class="doc doc-contents ">
 
       <p>Represents the <code>textbook.pdf.display.scaled</code> browser event model.</p>
-<p>The browser emits this event when the display magnification changes or the first page
-is shown.</p>
+<p>The browser emits this event when the display magnification changes or the first
+page is shown.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -10062,7 +10104,8 @@ UITextbookPdfSearchCaseSensitivityToggled            (<a title="ralph.models.edx
     <div class="doc doc-contents ">
 
       <p>Represents the <code>textbook.pdf.searchcasesensitivity.toggled</code> browser event model.</p>
-<p>The browser emits this event when a user selects or clears the <kbd>Match Case</kbd> option.</p>
+<p>The browser emits this event when a user selects or clears the
+<kbd>Match Case</kbd> option.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -10082,7 +10125,8 @@ UITextbookPdfSearchCaseSensitivityToggled            (<a title="ralph.models.edx
       <tr>
         <td><code>event_type</code></td>
         <td><code>str</code></td>
-        <td><p>Consists of the value <code>textbook.pdf.searchcasesensitivity.toggled</code>.</p></td>
+        <td><p>Consists of the value
+<code>textbook.pdf.searchcasesensitivity.toggled</code>.</p></td>
       </tr>
       <tr>
         <td><code>name</code></td>
@@ -10216,7 +10260,8 @@ UITextbookPdfSearchHighlightToggled            (<a title="ralph.models.edx.brows
     <div class="doc doc-contents ">
 
       <p>Represents the <code>textbook.pdf.search.highlight.toggled</code> browser event model.</p>
-<p>The browser emits this event when a user selects or clears the <kbd>Highlight All</kbd> option.</p>
+<p>The browser emits this event when a user selects or clears the
+<kbd>Highlight All</kbd> option.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -10371,7 +10416,8 @@ UITextbookPdfThumbnailNavigated            (<a title="ralph.models.edx.browser.B
     <div class="doc doc-contents ">
 
       <p>Represents the <code>textbook.pdf.thumbnail.navigated</code> browser event model.</p>
-<p>The browser emits this event when a user clicks on a thumbnail image to navigate to a page.</p>
+<p>The browser emits this event when a user clicks on a thumbnail image to navigate
+to a page.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -10448,7 +10494,8 @@ UITextbookPdfThumbnailsToggled            (<a title="ralph.models.edx.browser.Ba
     <div class="doc doc-contents ">
 
       <p>Represents the <code>textbook.pdf.thumbnails.toggled</code> browser event model.</p>
-<p>The browser emits this event when a user clicks on the icon to show or hide page thumbnails.</p>
+<p>The browser emits this event when a user clicks on the icon to show or hide page
+thumbnails.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
