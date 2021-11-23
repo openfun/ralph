@@ -112,6 +112,18 @@ better job.
 The only required parameter is the `path` we want to list or stream content
 from.
 
+### WebSocket
+
+The webSocket backend is **read-only** and can be used to get real-time events.
+
+> If you use OVH's Logs Data Platform (LDP), you can retrieve a WebSocket URI to test your
+> data stream by following instructions from the
+> [official documentation](https://docs.ovh.com/gb/en/logs-data-platform/ldp-tail/#retrieve-your-websocket-address).
+
+#### Backend parameters
+
+- `ws_uri`: the WebSocket uri (_e.g._ `wss://example.com/websocket`)
+
 ## Database backends
 
 ### Elasticsearch
