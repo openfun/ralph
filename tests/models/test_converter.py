@@ -212,7 +212,7 @@ def test_converter_converter_convert_with_no_events(caplog, valid_uuid):
         [], ignore_errors=False, fail_on_unknown=True
     )
     with caplog.at_level(logging.ERROR):
-        assert list(result) == []
+        assert not list(result)
     assert [] == [message for _, _, message in caplog.record_tuples]
 
 
@@ -229,7 +229,7 @@ def test_converter_convert_with_a_non_json_event_writes_an_error_message(
         [event], ignore_errors=True, fail_on_unknown=True
     )
     with caplog.at_level(logging.ERROR):
-        assert list(result) == []
+        assert not list(result)
     errors = ["Input event is not a valid JSON string"]
     assert errors == [message for _, _, message in caplog.record_tuples]
 
@@ -271,7 +271,7 @@ def test_converter_convert_with_an_unknown_event_writes_an_error_message(
         [event], ignore_errors=False, fail_on_unknown=False
     )
     with caplog.at_level(logging.ERROR):
-        assert list(result) == []
+        assert not list(result)
     errors = ["No matching pydantic model found for input event"]
     assert errors == [message for _, _, message in caplog.record_tuples]
 
@@ -317,7 +317,7 @@ def test_converter_convert_with_an_event_missing_a_conversion_set_writes_an_erro
         [event], ignore_errors=False, fail_on_unknown=False
     )
     with caplog.at_level(logging.ERROR):
-        assert list(result) == []
+        assert not list(result)
     errors = ["No conversion set found for input event"]
     assert errors == [message for _, _, message in caplog.record_tuples]
 
@@ -361,7 +361,7 @@ def test_converter_convert_with_an_invalid_page_close_event_writes_an_error_mess
         [event], ignore_errors=True, fail_on_unknown=True
     )
     with caplog.at_level(logging.ERROR):
-        assert list(result) == []
+        assert not list(result)
     errors = ["Failed to get the transformed value for field: ('context', 'course_id')"]
     assert errors == [message for _, _, message in caplog.record_tuples]
 
@@ -402,7 +402,7 @@ def test_converter_convert_with_invalid_arguments_writes_an_error_message(
         platform_url=invalid_platform_url, uuid_namespace=valid_uuid
     ).convert([event_str], ignore_errors=True, fail_on_unknown=True)
     with caplog.at_level(logging.ERROR):
-        assert list(result) == []
+        assert not list(result)
     model_name = "<class 'ralph.models.xapi.navigation.statements.PageTerminated'>"
     errors = [f"Converted event is not a valid ({model_name}) model"]
     assert errors == [message for _, _, message in caplog.record_tuples]
