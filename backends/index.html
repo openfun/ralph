@@ -412,6 +412,26 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#websocket" class="md-nav__link">
+    WebSocket
+  </a>
+  
+    <nav class="md-nav" aria-label="WebSocket">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend_parameters_3" class="md-nav__link">
+    Backend parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -434,7 +454,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#backend_parameters_3" class="md-nav__link">
+  <a href="#backend_parameters_4" class="md-nav__link">
     Backend parameters
   </a>
   
@@ -737,6 +757,26 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#websocket" class="md-nav__link">
+    WebSocket
+  </a>
+  
+    <nav class="md-nav" aria-label="WebSocket">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend_parameters_3" class="md-nav__link">
+    Backend parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -759,7 +799,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#backend_parameters_3" class="md-nav__link">
+  <a href="#backend_parameters_4" class="md-nav__link">
     Backend parameters
   </a>
   
@@ -884,11 +924,22 @@ better job.</p>
 <h4 id="backend_parameters_2">Backend parameters<a class="headerlink" href="#backend_parameters_2" title="Permanent link">&para;</a></h4>
 <p>The only required parameter is the <code>path</code> we want to list or stream content
 from.</p>
+<h3 id="websocket">WebSocket<a class="headerlink" href="#websocket" title="Permanent link">&para;</a></h3>
+<p>The webSocket backend is <strong>read-only</strong> and can be used to get real-time events.</p>
+<blockquote>
+<p>If you use OVH&rsquo;s Logs Data Platform (LDP), you can retrieve a WebSocket URI to test your
+data stream by following instructions from the
+<a href="https://docs.ovh.com/gb/en/logs-data-platform/ldp-tail/#retrieve-your-websocket-address">official documentation</a>.</p>
+</blockquote>
+<h4 id="backend_parameters_3">Backend parameters<a class="headerlink" href="#backend_parameters_3" title="Permanent link">&para;</a></h4>
+<ul>
+<li><code>ws_uri</code>: the WebSocket uri (<em>e.g.</em> <code>wss://example.com/websocket</code>)</li>
+</ul>
 <h2 id="database_backends">Database backends<a class="headerlink" href="#database_backends" title="Permanent link">&para;</a></h2>
 <h3 id="elasticsearch">Elasticsearch<a class="headerlink" href="#elasticsearch" title="Permanent link">&para;</a></h3>
 <p>Elasticsearch backend is mostly used for indexation purpose (as a datalake) but
 it can also be used to fetch indexed data from it.</p>
-<h4 id="backend_parameters_3">Backend parameters<a class="headerlink" href="#backend_parameters_3" title="Permanent link">&para;</a></h4>
+<h4 id="backend_parameters_4">Backend parameters<a class="headerlink" href="#backend_parameters_4" title="Permanent link">&para;</a></h4>
 <p>Elasticsearch backend parameters required to connect to a cluster are:</p>
 <ul>
 <li><code>hosts</code>: a list of cluster hosts to connect to (<em>e.g.</em> <code>["http://elasticsearch-node:9200"]</code>)</li>
