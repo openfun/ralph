@@ -22,7 +22,7 @@ def test_models_validator_validate_with_no_events(caplog):
         [], ignore_errors=False, fail_on_unknown=True
     )
     with caplog.at_level(logging.ERROR):
-        assert list(result) == []
+        assert not list(result)
     assert [] == [message for _, _, message in caplog.record_tuples]
 
 
@@ -38,7 +38,7 @@ def test_models_validator_validate_with_a_non_json_event_writes_an_error_message
         [event], ignore_errors=True, fail_on_unknown=True
     )
     with caplog.at_level(logging.ERROR):
-        assert list(result) == []
+        assert not list(result)
     errors = ["Input event is not a valid JSON string"]
     assert errors == [message for _, _, message in caplog.record_tuples]
 
@@ -80,7 +80,7 @@ def test_models_validator_validate_with_an_unknown_event_writes_an_error_message
         fail_on_unknown=False,
     )
     with caplog.at_level(logging.ERROR):
-        assert list(result) == []
+        assert not list(result)
     errors = ["No matching pydantic model found for input event"]
     assert errors == [message for _, _, message in caplog.record_tuples]
 
@@ -124,7 +124,7 @@ def test_models_validator_validate_with_an_invalid_page_close_event_writes_an_er
         fail_on_unknown=True,
     )
     with caplog.at_level(logging.ERROR):
-        assert list(result) == []
+        assert not list(result)
     errors = ["Input event is not a valid UIPageClose event."]
     assert errors == [message for _, _, message in caplog.record_tuples]
 

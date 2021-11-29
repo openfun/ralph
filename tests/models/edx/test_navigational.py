@@ -65,7 +65,7 @@ def test_fields_edx_navigational_events_event_field_with_valid_content(field):
 @settings(max_examples=1)
 @given(st.builds(NavigationalEventField))
 def test_fields_edx_navigational_events_event_field_with_invalid_content(
-    id, field  # pylint: disable=redefined-builtin
+    id, field  # pylint: disable=redefined-builtin, invalid-name
 ):
     """Tests that an invalid `NavigationalEventField` raises a `ValidationError`."""
 
