@@ -3,6 +3,8 @@
 from ..config import BaseModelWithConfig
 from ..constants import (
     LANG_EN_US_DISPLAY,
+    VERB_SAVED_DISPLAY,
+    VERB_SAVED_ID,
     VERB_TERMINATED_DISPLAY,
     VERB_TERMINATED_ID,
     VERB_VIEWED_DISPLAY,
@@ -35,4 +37,18 @@ class TerminatedVerbField(BaseModelWithConfig):
     id: VERB_TERMINATED_ID = VERB_TERMINATED_ID.__args__[0]
     display: dict[LANG_EN_US_DISPLAY, VERB_TERMINATED_DISPLAY] = {
         LANG_EN_US_DISPLAY.__args__[0]: VERB_TERMINATED_DISPLAY.__args__[0]
+    }
+
+
+class SavedVerbField(BaseModelWithConfig):
+    """Represents the `verb` xAPI Field for the action `saved`.
+
+    Attributes:
+       id (str): Consists of the value `http://activitystrea.ms/schema/1.0/save`.
+       display (dict): Consists of the dictionary `{"en-US": "saved"}`.
+    """
+
+    id: VERB_SAVED_ID = VERB_SAVED_ID.__args__[0]
+    display: dict[LANG_EN_US_DISPLAY, VERB_SAVED_DISPLAY] = {
+        LANG_EN_US_DISPLAY.__args__[0]: VERB_SAVED_DISPLAY.__args__[0]
     }
