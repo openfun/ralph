@@ -5,7 +5,7 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from typing import Dict, Literal, Optional, Union
 
-from pydantic import BaseModel, HttpUrl, constr
+from pydantic import AnyHttpUrl, BaseModel, constr
 
 
 class BaseModelWithConfig(BaseModel):
@@ -149,7 +149,7 @@ class BaseEdxModel(BaseModelWithConfig):
     ip: Union[IPv4Address, Literal[""]]
     agent: str
     host: str
-    referer: Union[HttpUrl, Literal[""]]
+    referer: Union[AnyHttpUrl, Literal[""]]
     accept_language: str
     context: BaseContextField
     time: datetime

@@ -23,11 +23,12 @@ class ActorAccountField(BaseModelWithConfig):
 class ActorField(BaseModelWithConfig):
     """Represents the `actor` xAPI Field.
 
-    WARNING: It doesn't include the optional `objectType` and `name` fields.
-
     Attributes:
-        account (ActorAccountField): See ActorAccountField.
+        account (dict): See ActorAccountField.
+        name (str): Consists of the full name of the Agent.
+        objectType (str): Consists of the value `Agent`.
     """
 
+    name: Optional[str]
     objectType: Optional[Literal["Agent"]]
     account: ActorAccountField
