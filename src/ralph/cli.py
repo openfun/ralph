@@ -7,6 +7,7 @@ import sys
 from inspect import signature
 
 import click
+import uvicorn
 from click_option_group import optgroup
 
 from ralph.backends import BackendTypes
@@ -14,6 +15,8 @@ from ralph.defaults import (
     CONVERTER_EDX_XAPI_UUID_NAMESPACE,
     DEFAULT_BACKEND_CHUNK_SIZE,
     ENVVAR_PREFIX,
+    RUNSERVER_HOST,
+    RUNSERVER_PORT,
     DatabaseBackends,
     Parsers,
     StorageBackends,
@@ -393,3 +396,26 @@ def list_(details, new, backend, **options):
 
     if counter == 0:
         logger.warning("Configured %s backend contains no archive", backend)
+
+
+@cli.command()
+def runserver():
+    """
+    Run the API server for the development environment. Starting uvicorn
+    programmatically for convenience and documentation.
+    """
+    logger.info("Running API server on %s:%s.", RUNSERVER_HOST, RUNSERVER_PORT)
+    logger.info(
+        (
+            "Do not use runserver in production - start production servers "
+            "through a process manager such as gunicorn/supervisor/circus."
+        )
+    )
+    uvicorn.run(
+        "ralph.api:app",
+        host=RUNSERVER_HOST,
+        port=RUNSERVER_PORT,
+        log_level="debug",
+        reload=True,
+    )
+    logger.info("Shutting down uvicorn server.")
