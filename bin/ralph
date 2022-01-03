@@ -9,4 +9,4 @@ if [ "$1" == "--no-deps" ]; then
     shift
 fi
 
-DOCKER_USER=${DOCKER_USER} docker-compose run --rm -T ${NO_DEPS} app ralph ${@}
+DOCKER_USER=${DOCKER_USER} docker-compose run --service-ports --rm -T ${NO_DEPS} app ralph ${@}
