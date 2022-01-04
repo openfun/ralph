@@ -18,7 +18,12 @@ WORKDIR /build
 COPY . /build/
 
 RUN apt-get update && \
-    apt-get install -y gcc libc6-dev && \
+    apt-get install -y \
+        build-essential \
+        gcc \
+        libc6-dev \
+        libffi-dev \
+        python-dev && \
     rm -rf /var/lib/apt/lists/*
 
 RUN python setup.py install
