@@ -18,7 +18,7 @@ and this project adheres to
 
 ### Changed
 
-- Upgrade `elasticsearch` to `7.15.2`
+- Upgrade `elasticsearch` to `7.16.2`
 - Upgrade `python-keystoneclient` to `4.3.0`
 - Upgrade `python-swiftclient` to `3.13.0`
 - Upgrade `pyyaml` to `6.0`
