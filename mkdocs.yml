@@ -32,6 +32,7 @@ nav:
         - 'Learning event models':
             - 'Rationale': models/index.md
             - 'Open edX events': models/edx.md
+        - 'API': api.md
     - 'Developer guide':
         - 'Contribute': contribute.md
     - 'About the project':
