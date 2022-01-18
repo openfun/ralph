@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
 
+# docker-compose run extra arguments can be set via environment variables
+declare -i NO_DEPS="${NO_DEPS:-0}"
+declare -i SERVICE_PORTS="${SERVICE_PORTS:-0}"
 declare DOCKER_USER
 DOCKER_USER="$(id -u):$(id -g)"
 
-NO_DEPS=""
-if [ "$1" == "--no-deps" ]; then
-    NO_DEPS="--no-deps"
-    shift
+declare -a RUN_EXTRA_OPTS
+if [[ NO_DEPS -eq 1 ]]; then
+    RUN_EXTRA_OPTS+=("--no-deps")
+fi
+if [[ SERVICE_PORTS -eq 1 ]] || [[ "${@}" == *"runserver"* ]]; then
+    RUN_EXTRA_OPTS+=("--service-ports")
 fi
 
-DOCKER_USER=${DOCKER_USER} docker-compose run --service-ports --rm -T ${NO_DEPS} app ralph ${@}
+DOCKER_USER=${DOCKER_USER} docker-compose run --rm -T "${RUN_EXTRA_OPTS[@]}" app ralph "${@}"
