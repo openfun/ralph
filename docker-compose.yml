@@ -20,7 +20,7 @@ services:
 
   # -- backends
   elasticsearch:
-    image: elasticsearch:7.16.2
+    image: elasticsearch:7.16.3
     environment:
       discovery.type: single-node
     ports:

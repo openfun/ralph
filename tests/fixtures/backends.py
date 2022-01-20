@@ -89,9 +89,7 @@ def es_data_stream():
             },
         },
     }
-    client.transport.perform_request(
-        "PUT", f"/_index_template/{ES_TEST_INDEX_TEMPLATE}", body=index_template
-    )
+    client.indices.put_index_template(name=ES_TEST_INDEX_TEMPLATE, body=index_template)
 
     # Create a datastream matching the index template
     client.indices.create_data_stream(ES_TEST_INDEX)
@@ -99,9 +97,7 @@ def es_data_stream():
     yield client
 
     client.indices.delete_data_stream(ES_TEST_INDEX)
-    client.transport.perform_request(
-        "DELETE", f"/_index_template/{ES_TEST_INDEX_TEMPLATE}"
-    )
+    client.indices.delete_index_template(ES_TEST_INDEX_TEMPLATE)
 
 
 @pytest.fixture
