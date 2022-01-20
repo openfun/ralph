@@ -153,4 +153,4 @@ class BaseEdxModel(BaseModelWithConfig):
     accept_language: str
     context: BaseContextField
     time: datetime
-    page: Union[Literal[None], None]
+    page: None
