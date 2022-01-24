@@ -19,12 +19,14 @@ and this project adheres to
 
 ### Changed
 
+- Upgrade `fastapi` to `0.73.0`
+- Upgrade `pyparsing` to `3.0.7`
+- Upgrade `sentry_sdk` to `1.5.3`
 - Upgrade `elasticsearch` to `7.16.3`
 - Upgrade `pydantic` to `1.9.0`
 - Upgrade `python-keystoneclient` to `4.4.0`
 - Upgrade `python-swiftclient` to `3.13.0`
 - Upgrade `pyyaml` to `6.0`
-- Upgrade `sentry_sdk` to `1.5.2`
 - Upgrade `requests` to `2.27.1`
 - Upgrade `websockets` to `10.1`
 
