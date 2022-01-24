@@ -26,35 +26,38 @@ STORED_CREDENTIALS = json.dumps(
 
 def test_get_whoami_no_credentials():
     """
-    whoami route returns a 400 error when no credentials are sent.
+    whoami route returns a 401 error when no credentials are sent.
     """
     response = client.get("/whoami")
-    assert response.status_code == 400
-    assert response.json() == {"error": "Missing authentication credentials."}
+    assert response.status_code == 401
+    assert response.headers["www-authenticate"] == "Basic"
+    assert response.json() == {"detail": "Not authenticated"}
 
 
 def test_get_whoami_credentials_wrong_scheme():
     """
-    whoami route returns a 400 error when the wrong scheme is used for authorization.
+    whoami route returns a 401 error when the wrong scheme is used for authorization.
     """
     response = client.get("/whoami", headers={"Authorization": "Bearer sometoken"})
-    assert response.status_code == 400
-    assert response.json() == {"error": "Missing authentication credentials."}
+    assert response.status_code == 401
+    assert response.headers["www-authenticate"] == "Basic"
+    assert response.json() == {"detail": "Not authenticated"}
 
 
 def test_get_whoami_credentials_encoding_error():
     """
-    whoami route returns a 400 error when the credentials' encoding is broken.
+    whoami route returns a 401 error when the credentials' encoding is broken.
     """
     response = client.get("/whoami", headers={"Authorization": "Basic not-base64"})
-    assert response.status_code == 400
-    assert response.json() == {"error": "Invalid authentication credentials."}
+    assert response.status_code == 401
+    assert response.headers["www-authenticate"] == "Basic"
+    assert response.json() == {"detail": "Invalid authentication credentials"}
 
 
 # pylint: disable=invalid-name
 def test_get_whoami_credentials_username_not_found(fs):
     """
-    whoami route returns a 400 error when the credentials' username cannot be found.
+    whoami route returns a 401 error when the credentials' username cannot be found.
     """
     credential_bytes = base64.b64encode("john:admin".encode("utf-8"))
     credentials = str(credential_bytes, "utf-8")
@@ -64,14 +67,15 @@ def test_get_whoami_credentials_username_not_found(fs):
 
     response = client.get("/whoami", headers={"Authorization": f"Basic {credentials}"})
 
-    assert response.status_code == 400
-    assert response.json() == {"error": "Invalid authentication credentials."}
+    assert response.status_code == 401
+    assert response.headers["www-authenticate"] == "Basic"
+    assert response.json() == {"detail": "Invalid authentication credentials"}
 
 
 # pylint: disable=invalid-name
 def test_get_whoami_wrong_password(fs):
     """
-    whoami route returns a 400 error when the credentials' password is wrong.
+    whoami route returns a 401 error when the credentials' password is wrong.
     """
     credential_bytes = base64.b64encode("john:not-admin".encode("utf-8"))
     credentials = str(credential_bytes, "utf-8")
@@ -81,8 +85,9 @@ def test_get_whoami_wrong_password(fs):
 
     response = client.get("/whoami", headers={"Authorization": f"Basic {credentials}"})
 
-    assert response.status_code == 400
-    assert response.json() == {"error": "Invalid authentication credentials."}
+    assert response.status_code == 401
+    assert response.headers["www-authenticate"] == "Basic"
+    assert response.json() == {"detail": "Invalid authentication credentials"}
 
 
 # pylint: disable=invalid-name
@@ -102,5 +107,5 @@ def test_get_whoami_correct_credentials(fs):
     assert response.status_code == 200
     assert response.json() == {
         "username": "ralph",
-        "scopes": ["authenticated", "ralph_test_scope"],
+        "scopes": ["ralph_test_scope"],
     }

@@ -1,20 +1,16 @@
 """
 Main module for Ralph's LRS API.
 """
-from fastapi import FastAPI, Request
-from starlette.middleware.authentication import AuthenticationMiddleware
+from fastapi import Depends, FastAPI
 
-from .auth import BasicAuthBackend, on_auth_error
+from .auth import AuthenticatedUser, authenticated_user
 
 app = FastAPI()
-app.add_middleware(
-    AuthenticationMiddleware, backend=BasicAuthBackend(), on_error=on_auth_error
-)
 
 
 @app.get("/whoami")
-async def whoami(request: Request):
+async def whoami(user: AuthenticatedUser = Depends(authenticated_user)):
     """
     Return the current user's username along with their scopes.
     """
-    return {"username": request.user.username, "scopes": request.auth.scopes}
+    return {"username": user.username, "scopes": user.scopes}
