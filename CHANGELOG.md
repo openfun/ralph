@@ -19,11 +19,11 @@ and this project adheres to
 
 ### Changed
 
-- Upgrade `uvicorn` to `0.17.1`
+- Upgrade `uvicorn` to `0.17.4`
+- Upgrade `elasticsearch` to `7.17.0`
 - Upgrade `sentry_sdk` to `1.5.4`
 - Upgrade `fastapi` to `0.73.0`
 - Upgrade `pyparsing` to `3.0.7`
-- Upgrade `elasticsearch` to `7.16.3`
 - Upgrade `pydantic` to `1.9.0`
 - Upgrade `python-keystoneclient` to `4.4.0`
 - Upgrade `python-swiftclient` to `3.13.0`
