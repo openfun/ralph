@@ -16,6 +16,7 @@ and this project adheres to
 - bundle `jq` in the `fundocker/ralph` Docker image
 - Tray: enable ralph app deployment command configuration
 - Add a `runserver` command with basic auth and a `whoami` route
+- Create a `get` endpoint for statements implementing the LRS spec
 
 ### Changed
 
