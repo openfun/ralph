@@ -199,6 +199,7 @@ jobs:
   # ---- Tray jobs (k8s) ----
   tray:
     machine:
+      image: ubuntu-2004:202201-02
       # Prevent cache-related issues
       docker_layer_caching: false
     working_directory: ~/fun
