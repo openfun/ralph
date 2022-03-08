@@ -1,6 +1,7 @@
 """
 Tests for authentication for the Ralph API.
 """
+import asyncio
 import base64
 import json
 import os
@@ -14,7 +15,7 @@ import pytest
 from elasticsearch import Elasticsearch
 from elasticsearch.client import IndicesClient
 from elasticsearch.helpers import bulk
-from fastapi.testclient import TestClient
+from httpx import AsyncClient
 
 from ralph.api import app
 from ralph.defaults import APP_DIR
@@ -26,7 +27,7 @@ ES_TEST_INDEX = "statements"
 ES_CLIENT = Elasticsearch(ES_TEST_HOSTS)
 ES_INDICES_CLIENT = IndicesClient(ES_CLIENT)
 
-client = TestClient(app)
+
 
 
 # pylint: disable=invalid-name
@@ -84,8 +85,9 @@ def teardown_es_index():
     ES_INDICES_CLIENT.delete(ES_TEST_INDEX)
 
 
+@pytest.mark.asyncio
 # pylint: disable=invalid-name
-def test_get_statements(fs):
+async def test_get_statements(fs):
     """
     Get statements without any filters set up.
     """
@@ -102,16 +104,18 @@ def test_get_statements(fs):
     ]
     setup_es_index(statements)
 
-    response = client.get(
-        "/xAPI/statements/", headers={"Authorization": f"Basic {credentials}"}
-    )
+    async with AsyncClient(app=app, base_url="http://localhost") as client:
+        response = await client.get(
+            "/xAPI/statements/", headers={"Authorization": f"Basic {credentials}"}
+        )
 
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[1], statements[0]]}
 
 
+@pytest.mark.asyncio
 # pylint: disable=invalid-name
-def test_get_statements_ascending(fs):
+async def test_get_statements_ascending(fs):
     """
     Get statements without any filters set up, with a query parameter to
     order them by ascending timestamp.
@@ -129,17 +133,19 @@ def test_get_statements_ascending(fs):
     ]
     setup_es_index(statements)
 
-    response = client.get(
-        "/xAPI/statements/?ascending=true",
-        headers={"Authorization": f"Basic {credentials}"},
-    )
+    async with AsyncClient(app=app, base_url="http://localhost") as client:
+        response = await client.get(
+            "/xAPI/statements/?ascending=true",
+            headers={"Authorization": f"Basic {credentials}"},
+        )
 
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[0], statements[1]]}
 
 
+@pytest.mark.asyncio
 # pylint: disable=invalid-name
-def test_get_statements_by_statement_id(fs):
+async def test_get_statements_by_statement_id(fs):
     """
     Filter statements by statement id. Still return a list format response
     to avoid having a polymorphic response type.
@@ -157,17 +163,19 @@ def test_get_statements_by_statement_id(fs):
     ]
     setup_es_index(statements)
 
-    response = client.get(
-        f"/xAPI/statements/?statementId={statements[1]['id']}",
-        headers={"Authorization": f"Basic {credentials}"},
-    )
+    async with AsyncClient(app=app, base_url="http://localhost") as client:
+        response = await client.get(
+            f"/xAPI/statements/?statementId={statements[1]['id']}",
+            headers={"Authorization": f"Basic {credentials}"},
+        )
 
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[1]]}
 
 
+@pytest.mark.asyncio
 # pylint: disable=invalid-name
-def test_get_statements_by_agent(fs):
+async def test_get_statements_by_agent(fs):
     """
     Filter statements by agent.
     """
@@ -186,17 +194,19 @@ def test_get_statements_by_agent(fs):
     ]
     setup_es_index(statements)
 
-    response = client.get(
-        "/xAPI/statements/?agent=96d61e6c-9cdb-4926-9cff-d3a15c662999",
-        headers={"Authorization": f"Basic {credentials}"},
-    )
+    async with AsyncClient(app=app, base_url="http://localhost") as client:
+        response = await client.get(
+            "/xAPI/statements/?agent=96d61e6c-9cdb-4926-9cff-d3a15c662999",
+            headers={"Authorization": f"Basic {credentials}"},
+        )
 
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[0]]}
 
 
+@pytest.mark.asyncio
 # pylint: disable=invalid-name
-def test_get_statements_by_verb(fs):
+async def test_get_statements_by_verb(fs):
     """
     Filter statements by verb.
     """
@@ -215,17 +225,20 @@ def test_get_statements_by_verb(fs):
     ]
     setup_es_index(statements)
 
-    response = client.get(
-        "/xAPI/statements/?verb=" + quote_plus("http://adlnet.gov/expapi/verbs/played"),
-        headers={"Authorization": f"Basic {credentials}"},
-    )
+    async with AsyncClient(app=app, base_url="http://localhost") as client:
+        response = await client.get(
+            "/xAPI/statements/?verb="
+            + quote_plus("http://adlnet.gov/expapi/verbs/played"),
+            headers={"Authorization": f"Basic {credentials}"},
+        )
 
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[1]]}
 
 
+@pytest.mark.asyncio
 # pylint: disable=invalid-name
-def test_get_statements_by_activity(fs):
+async def test_get_statements_by_activity(fs):
     """
     Filter statements by activity.
     """
@@ -250,17 +263,19 @@ def test_get_statements_by_activity(fs):
     ]
     setup_es_index(statements)
 
-    response = client.get(
-        "/xAPI/statements/?activity=a2956991-200b-40a7-9548-293cdcc06c4b",
-        headers={"Authorization": f"Basic {credentials}"},
-    )
+    async with AsyncClient(app=app, base_url="http://localhost") as client:
+        response = await client.get(
+            "/xAPI/statements/?activity=a2956991-200b-40a7-9548-293cdcc06c4b",
+            headers={"Authorization": f"Basic {credentials}"},
+        )
 
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[1]]}
 
 
+@pytest.mark.asyncio
 # pylint: disable=invalid-name
-def test_get_statements_since_timestamp(fs):
+async def test_get_statements_since_timestamp(fs):
     """
     Get statements filter by timestamp "since" (or "after") a given timestamp.
     """
@@ -278,17 +293,19 @@ def test_get_statements_since_timestamp(fs):
     setup_es_index(statements)
 
     since = (datetime.now() - timedelta(minutes=30)).isoformat()
-    response = client.get(
-        f"/xAPI/statements/?since={since}",
-        headers={"Authorization": f"Basic {credentials}"},
-    )
+    async with AsyncClient(app=app, base_url="http://localhost") as client:
+        response = await client.get(
+            f"/xAPI/statements/?since={since}",
+            headers={"Authorization": f"Basic {credentials}"},
+        )
 
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[1]]}
 
 
+@pytest.mark.asyncio
 # pylint: disable=invalid-name
-def test_get_statements_until_timestamp(fs):
+async def test_get_statements_until_timestamp(fs):
     """
     Get statements filter by timestamp "until" (or "before") a given timestamp.
     """
@@ -306,22 +323,21 @@ def test_get_statements_until_timestamp(fs):
     setup_es_index(statements)
 
     until = (datetime.now() - timedelta(minutes=30)).isoformat()
-    response = client.get(
-        f"/xAPI/statements/?until={until}",
-        headers={"Authorization": f"Basic {credentials}"},
-    )
+    async with AsyncClient(app=app, base_url="http://localhost") as client:
+        response = await client.get(
+            f"/xAPI/statements/?until={until}",
+            headers={"Authorization": f"Basic {credentials}"},
+        )
 
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[0]]}
 
 
+@pytest.mark.asyncio
 @mock.patch("ralph.api.routers.statements.ES_MAX_SEARCH_HITS_COUNT", 2)
 # pylint: disable=invalid-name
-def test_get_statements_with_pagination(fs):
-    """
-    When the first page does not contain all possible results, it includes
-    a "more" property with a link to get the next page of results.
-    """
+async def test_get_statements_with_pagination(fs):
+    """ """
     credentials = setup_auth(fs)
     statements = [
         {
@@ -341,18 +357,20 @@ def test_get_statements_with_pagination(fs):
 
     # First response gets the first two results, with a "more" entry as
     # we have more results to return on a later page.
-    first_response = client.get(
-        "/xAPI/statements/", headers={"Authorization": f"Basic {credentials}"}
-    )
+    async with AsyncClient(app=app, base_url="http://localhost") as client:
+        first_response = await client.get(
+            "/xAPI/statements/", headers={"Authorization": f"Basic {credentials}"}
+        )
     assert first_response.status_code == 200
     assert first_response.json()["statements"] == [statements[2], statements[1]]
-    more_regex = re.compile(r"^/xAPI/statements/\?pit_id=.*&search_after=.*$")
+    more_regex = re.compile(r"^/xAPI/statements//\?pit_id=.*&search_after=.*$")
     assert more_regex.match(first_response.json()["more"])
 
     # Second response gets the missing result from the first response.
-    second_response = client.get(
-        first_response.json()["more"],
-        headers={"Authorization": f"Basic {credentials}"},
-    )
+    async with AsyncClient(app=app, base_url="http://localhost") as client:
+        second_response = await client.get(
+            first_response.json()["more"],
+            headers={"Authorization": f"Basic {credentials}"},
+        )
     assert second_response.status_code == 200
     assert second_response.json() == {"statements": [statements[0]]}

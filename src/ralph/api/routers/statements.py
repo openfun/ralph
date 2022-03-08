@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Literal, Optional
 from uuid import UUID
 
-from elasticsearch import Elasticsearch
+from elasticsearch import AsyncElasticsearch
 from fastapi import APIRouter, Depends, Query, Request
 
 from ...defaults import ES_HOSTS, ES_MAX_SEARCH_HITS_COUNT, ES_POINT_IN_TIME_KEEP_ALIVE
@@ -16,7 +16,7 @@ router = APIRouter(
 )
 
 
-ES_CLIENT = Elasticsearch(ES_HOSTS)
+ES_CLIENT = AsyncElasticsearch(ES_HOSTS)
 
 
 @router.get("/")
@@ -199,7 +199,7 @@ async def get(
     # results over multiple pages.
     if not pit_id:
         # pylint: disable=unexpected-keyword-arg
-        pit_response = ES_CLIENT.open_point_in_time(
+        pit_response = await ES_CLIENT.open_point_in_time(
             index="statements", keep_alive=ES_POINT_IN_TIME_KEEP_ALIVE
         )
         pit_id = pit_response["id"]
@@ -223,7 +223,7 @@ async def get(
     limit = min(limit, ES_MAX_SEARCH_HITS_COUNT)
 
     # pylint: disable=unexpected-keyword-arg
-    es_response = ES_CLIENT.search(
+    es_response = await ES_CLIENT.search(
         body=es_query,
         size=limit,
     )
