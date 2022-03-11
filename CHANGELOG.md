@@ -21,7 +21,7 @@ and this project adheres to
 
 - Upgrade `uvicorn` to `0.17.4`
 - Upgrade `elasticsearch` to `7.17.0`
-- Upgrade `sentry_sdk` to `1.5.4`
+- Upgrade `sentry_sdk` to `1.5.5`
 - Upgrade `fastapi` to `0.73.0`
 - Upgrade `pyparsing` to `3.0.7`
 - Upgrade `pydantic` to `1.9.0`
