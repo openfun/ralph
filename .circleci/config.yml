@@ -176,12 +176,13 @@ jobs:
           password: $DOCKER_HUB_PASSWORD
         environment:
           RALPH_APP_DIR: ~/fun/.ralph
-      - image: elasticsearch:7.10.1
+      - image: elasticsearch:8.1.0
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
         environment:
           discovery.type: single-node
+          xpack.security.enabled: "false"
     working_directory: ~/fun
     steps:
       - checkout
