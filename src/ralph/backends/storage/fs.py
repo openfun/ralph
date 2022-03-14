@@ -78,7 +78,7 @@ class FSStorage(HistoryMixin, BaseStorage):
 
         logger.debug("Getting archive: %s", name)
 
-        with self._get_filepath(name).open("rb", encoding=LOCALE_ENCODING) as file:
+        with self._get_filepath(name).open("rb") as file:
             while chunk := file.read(chunk_size):
                 sys.stdout.buffer.write(chunk)
 

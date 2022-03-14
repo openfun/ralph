@@ -81,7 +81,7 @@ def teardown_es_index():
     Clean up Elasticsearch after each test.
     """
     yield
-    ES_INDICES_CLIENT.delete(ES_TEST_INDEX)
+    ES_INDICES_CLIENT.delete(index=ES_TEST_INDEX)
 
 
 # pylint: disable=invalid-name

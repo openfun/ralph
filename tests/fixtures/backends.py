@@ -67,37 +67,40 @@ def es_data_stream():
     client = Elasticsearch(ES_TEST_HOSTS)
 
     # Create statements index template with enabled data stream
-    index_template = {
-        "index_patterns": [ES_TEST_INDEX_PATTERN],
-        "data_stream": {},
-        "template": {
-            "mappings": {
-                "dynamic": True,
-                "dynamic_date_formats": [
-                    "strict_date_optional_time",
-                    "yyyy/MM/dd HH:mm:ss Z||yyyy/MM/dd Z",
-                ],
-                "dynamic_templates": [],
-                "date_detection": True,
-                "numeric_detection": True,
-            },
-            "settings": {
-                "index": {
-                    "number_of_shards": "1",
-                    "number_of_replicas": "1",
-                }
-            },
+    index_patterns = [ES_TEST_INDEX_PATTERN]
+    data_stream = {}
+    template = {
+        "mappings": {
+            "dynamic": True,
+            "dynamic_date_formats": [
+                "strict_date_optional_time",
+                "yyyy/MM/dd HH:mm:ss Z||yyyy/MM/dd Z",
+            ],
+            "dynamic_templates": [],
+            "date_detection": True,
+            "numeric_detection": True,
+        },
+        "settings": {
+            "index": {
+                "number_of_shards": "1",
+                "number_of_replicas": "1",
+            }
         },
     }
-    client.indices.put_index_template(name=ES_TEST_INDEX_TEMPLATE, body=index_template)
+    client.indices.put_index_template(
+        name=ES_TEST_INDEX_TEMPLATE,
+        index_patterns=index_patterns,
+        data_stream=data_stream,
+        template=template,
+    )
 
     # Create a datastream matching the index template
-    client.indices.create_data_stream(ES_TEST_INDEX)
+    client.indices.create_data_stream(name=ES_TEST_INDEX)
 
     yield client
 
-    client.indices.delete_data_stream(ES_TEST_INDEX)
-    client.indices.delete_index_template(ES_TEST_INDEX_TEMPLATE)
+    client.indices.delete_data_stream(name=ES_TEST_INDEX)
+    client.indices.delete_index_template(name=ES_TEST_INDEX_TEMPLATE)
 
 
 @pytest.fixture
