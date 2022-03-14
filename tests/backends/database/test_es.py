@@ -68,10 +68,9 @@ def test_backends_database_es_client_kwargs(es):
         client_options={"ca_certs": "/path/to/ca/bundle"},
     )
 
-    assert "ca_certs" in database.client.transport.kwargs
-    assert database.client.transport.kwargs.get("ca_certs") == "/path/to/ca/bundle"
     assert (
-        database.client.transport.get_connection().pool.ca_certs == "/path/to/ca/bundle"
+        database.client.transport.node_pool.get().config.ca_certs
+        == "/path/to/ca/bundle"
     )
 
 
