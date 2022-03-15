@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Create a `post` endpoint for statements implementing the LRS spec
+
 ### Changed
 
 - Upgrade `click` to `8.1.2`

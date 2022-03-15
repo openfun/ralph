@@ -1,22 +1,27 @@
 """API routes related to statements."""
 
+import logging
 from datetime import datetime
-from typing import Literal, Optional
-from uuid import UUID
+from typing import List, Literal, Optional, Union
+from uuid import UUID, uuid4
 
 from elasticsearch import Elasticsearch
-from fastapi import APIRouter, Depends, Query, Request
+from elasticsearch.helpers import BulkIndexError, bulk
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 
 from ...defaults import ES_HOSTS, ES_MAX_SEARCH_HITS_COUNT, ES_POINT_IN_TIME_KEEP_ALIVE
 from ..auth import authenticated_user
+from ..models import ErrorDetail, LaxStatement
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(
     prefix="/xAPI/statements",
     dependencies=[Depends(authenticated_user)],
 )
 
-
 ES_CLIENT = Elasticsearch(ES_HOSTS)
+ES_INDEX = "statements"
 
 
 @router.get("/")
@@ -200,7 +205,7 @@ async def get(
     if not pit_id:
         # pylint: disable=unexpected-keyword-arg
         pit_response = ES_CLIENT.open_point_in_time(
-            index="statements", keep_alive=ES_POINT_IN_TIME_KEEP_ALIVE
+            index=ES_INDEX, keep_alive=ES_POINT_IN_TIME_KEEP_ALIVE
         )
         pit_id = pit_response["id"]
     es_query.update(
@@ -254,3 +259,93 @@ async def get(
             statement["_source"] for statement in es_response["hits"]["hits"]
         ],
     }
+
+
+@router.post(
+    "/",
+    responses={
+        400: {
+            "model": ErrorDetail,
+            "description": "The request was invalid.",
+        },
+        409: {
+            "model": ErrorDetail,
+            "description": "Statements had a conflict with existing statements.",
+        },
+    },
+)
+# pylint: disable=unused-argument
+async def post(statements: Union[LaxStatement, List[LaxStatement]]):
+    """
+    Store a set of statements (or a single statement as a single member of a set).
+    NB: at this time, using POST to make a GET request, is not supported.
+
+    LRS Specification:
+    https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#212-post-statements
+    """
+
+    # As we accept both a single statement as a dict, and multiple statements as a list,
+    # we need to normalize the data into a list in all cases before we can process it.
+    if not isinstance(statements, list):
+        statements = [statements]
+
+    # The statements dict has multiple functions:
+    # - generate IDs for statements that are missing them;
+    # - use the list of keys to perform validations and as a final return value;
+    # - provide an iterable containing both the statements and generated IDs for bulk.
+    statements_dict = {
+        str(statement.id) if statement.id else str(uuid4()): statement
+        for statement in statements
+    }
+
+    # Requests with duplicate statement IDs are considered invalid
+    # statements_ids were deduplicated by the dict, statements list was not
+    statements_ids = list(statements_dict.keys())
+    if len(statements) != len(statements_ids):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Duplicate statement IDs in the list of statements",
+        )
+
+    # pylint: disable=unexpected-keyword-arg
+    es_response = ES_CLIENT.search(
+        index=ES_INDEX, body={"query": {"terms": {"_id": statements_ids}}}
+    )
+
+    if len(es_response["hits"]["hits"]) > 0:
+        # NB: LRS specification calls for performing a deep comparison of incoming
+        # statements and existing statements with the same ID.
+        # This seems too costly for performance and was not implemented for this POC.
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Statements already exist with the same ID",
+        )
+
+    # For valid requests, perform the bulk indexing of all incoming statements
+    try:
+        actions, _ = bulk(
+            ES_CLIENT,
+            [
+                {
+                    "_index": ES_INDEX,
+                    "_id": statement_id,
+                    "_op_type": "index",
+                    "_source": {
+                        **statement.dict(),
+                        # Make sure all statements have an ID as part of their source,
+                        # even if we just created it to insert them.
+                        "id": str(statement_id),
+                    },
+                }
+                for statement_id, statement in statements_dict.items()
+            ],
+        )
+    except BulkIndexError as exc:
+        logger.error("Failed to index submitted statements")
+        raise HTTPException(
+            status_code=500, detail="Statements bulk indexation failed"
+        ) from exc
+
+    logger.info("Indexed %d statements with success", actions)
+
+    return statements_ids
