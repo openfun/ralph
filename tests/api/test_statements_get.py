@@ -1,5 +1,5 @@
 """
-Tests for authentication for the Ralph API.
+Tests for the GET statements endpoint of the Ralph API.
 """
 import base64
 import json
