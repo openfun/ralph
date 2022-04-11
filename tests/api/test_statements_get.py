@@ -1,15 +1,12 @@
 """
 Tests for the GET statements endpoint of the Ralph API.
 """
-import base64
-import json
 import os
 import re
 from datetime import datetime, timedelta
 from unittest import mock
 from urllib.parse import quote_plus
 
-import bcrypt
 import pytest
 from elasticsearch import Elasticsearch
 from elasticsearch.client import IndicesClient
@@ -17,7 +14,6 @@ from elasticsearch.helpers import bulk
 from fastapi.testclient import TestClient
 
 from ralph.api import app
-from ralph.defaults import APP_DIR
 
 ES_TEST_HOSTS = os.environ.get("RALPH_ES_TEST_HOSTS", "http://localhost:9200").split(
     ","
@@ -27,32 +23,6 @@ ES_CLIENT = Elasticsearch(ES_TEST_HOSTS)
 ES_INDICES_CLIENT = IndicesClient(ES_CLIENT)
 
 client = TestClient(app)
-
-
-# pylint: disable=invalid-name
-def setup_auth(fs):
-    """
-    Set up the credentials file and return the credentials that need to be passed
-    through headers to authenticate the request.
-    """
-    credential_bytes = base64.b64encode("ralph:admin".encode("utf-8"))
-    credentials = str(credential_bytes, "utf-8")
-
-    auth_file_path = APP_DIR / "auth.json"
-    fs.create_file(
-        auth_file_path,
-        contents=json.dumps(
-            [
-                {
-                    "username": "ralph",
-                    "hash": bcrypt.hashpw(b"admin", bcrypt.gensalt()).decode("UTF-8"),
-                    "scopes": ["ralph_test_scope"],
-                }
-            ]
-        ),
-    )
-
-    return credentials
 
 
 def setup_es_index(statements):
@@ -84,12 +54,10 @@ def teardown_es_index():
     ES_INDICES_CLIENT.delete(index=ES_TEST_INDEX)
 
 
-# pylint: disable=invalid-name
-def test_get_statements(fs):
+def test_get_statements(auth_credentials):
     """
     Get statements without any filters set up.
     """
-    credentials = setup_auth(fs)
     statements = [
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
@@ -103,20 +71,18 @@ def test_get_statements(fs):
     setup_es_index(statements)
 
     response = client.get(
-        "/xAPI/statements/", headers={"Authorization": f"Basic {credentials}"}
+        "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
     )
 
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[1], statements[0]]}
 
 
-# pylint: disable=invalid-name
-def test_get_statements_ascending(fs):
+def test_get_statements_ascending(auth_credentials):
     """
     Get statements without any filters set up, with a query parameter to
     order them by ascending timestamp.
     """
-    credentials = setup_auth(fs)
     statements = [
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
@@ -131,20 +97,18 @@ def test_get_statements_ascending(fs):
 
     response = client.get(
         "/xAPI/statements/?ascending=true",
-        headers={"Authorization": f"Basic {credentials}"},
+        headers={"Authorization": f"Basic {auth_credentials}"},
     )
 
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[0], statements[1]]}
 
 
-# pylint: disable=invalid-name
-def test_get_statements_by_statement_id(fs):
+def test_get_statements_by_statement_id(auth_credentials):
     """
     Filter statements by statement id. Still return a list format response
     to avoid having a polymorphic response type.
     """
-    credentials = setup_auth(fs)
     statements = [
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
@@ -159,19 +123,17 @@ def test_get_statements_by_statement_id(fs):
 
     response = client.get(
         f"/xAPI/statements/?statementId={statements[1]['id']}",
-        headers={"Authorization": f"Basic {credentials}"},
+        headers={"Authorization": f"Basic {auth_credentials}"},
     )
 
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[1]]}
 
 
-# pylint: disable=invalid-name
-def test_get_statements_by_agent(fs):
+def test_get_statements_by_agent(auth_credentials):
     """
     Filter statements by agent.
     """
-    credentials = setup_auth(fs)
     statements = [
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
@@ -188,19 +150,17 @@ def test_get_statements_by_agent(fs):
 
     response = client.get(
         "/xAPI/statements/?agent=96d61e6c-9cdb-4926-9cff-d3a15c662999",
-        headers={"Authorization": f"Basic {credentials}"},
+        headers={"Authorization": f"Basic {auth_credentials}"},
     )
 
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[0]]}
 
 
-# pylint: disable=invalid-name
-def test_get_statements_by_verb(fs):
+def test_get_statements_by_verb(auth_credentials):
     """
     Filter statements by verb.
     """
-    credentials = setup_auth(fs)
     statements = [
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
@@ -217,19 +177,17 @@ def test_get_statements_by_verb(fs):
 
     response = client.get(
         "/xAPI/statements/?verb=" + quote_plus("http://adlnet.gov/expapi/verbs/played"),
-        headers={"Authorization": f"Basic {credentials}"},
+        headers={"Authorization": f"Basic {auth_credentials}"},
     )
 
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[1]]}
 
 
-# pylint: disable=invalid-name
-def test_get_statements_by_activity(fs):
+def test_get_statements_by_activity(auth_credentials):
     """
     Filter statements by activity.
     """
-    credentials = setup_auth(fs)
     statements = [
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
@@ -252,19 +210,17 @@ def test_get_statements_by_activity(fs):
 
     response = client.get(
         "/xAPI/statements/?activity=a2956991-200b-40a7-9548-293cdcc06c4b",
-        headers={"Authorization": f"Basic {credentials}"},
+        headers={"Authorization": f"Basic {auth_credentials}"},
     )
 
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[1]]}
 
 
-# pylint: disable=invalid-name
-def test_get_statements_since_timestamp(fs):
+def test_get_statements_since_timestamp(auth_credentials):
     """
     Get statements filter by timestamp "since" (or "after") a given timestamp.
     """
-    credentials = setup_auth(fs)
     statements = [
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
@@ -280,19 +236,17 @@ def test_get_statements_since_timestamp(fs):
     since = (datetime.now() - timedelta(minutes=30)).isoformat()
     response = client.get(
         f"/xAPI/statements/?since={since}",
-        headers={"Authorization": f"Basic {credentials}"},
+        headers={"Authorization": f"Basic {auth_credentials}"},
     )
 
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[1]]}
 
 
-# pylint: disable=invalid-name
-def test_get_statements_until_timestamp(fs):
+def test_get_statements_until_timestamp(auth_credentials):
     """
     Get statements filter by timestamp "until" (or "before") a given timestamp.
     """
-    credentials = setup_auth(fs)
     statements = [
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
@@ -308,7 +262,7 @@ def test_get_statements_until_timestamp(fs):
     until = (datetime.now() - timedelta(minutes=30)).isoformat()
     response = client.get(
         f"/xAPI/statements/?until={until}",
-        headers={"Authorization": f"Basic {credentials}"},
+        headers={"Authorization": f"Basic {auth_credentials}"},
     )
 
     assert response.status_code == 200
@@ -316,13 +270,11 @@ def test_get_statements_until_timestamp(fs):
 
 
 @mock.patch("ralph.api.routers.statements.ES_MAX_SEARCH_HITS_COUNT", 2)
-# pylint: disable=invalid-name
-def test_get_statements_with_pagination(fs):
+def test_get_statements_with_pagination(auth_credentials):
     """
     When the first page does not contain all possible results, it includes
     a "more" property with a link to get the next page of results.
     """
-    credentials = setup_auth(fs)
     statements = [
         {
             "id": "5d345b99-517c-4b54-848e-45010904b177",
@@ -342,7 +294,7 @@ def test_get_statements_with_pagination(fs):
     # First response gets the first two results, with a "more" entry as
     # we have more results to return on a later page.
     first_response = client.get(
-        "/xAPI/statements/", headers={"Authorization": f"Basic {credentials}"}
+        "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
     )
     assert first_response.status_code == 200
     assert first_response.json()["statements"] == [statements[2], statements[1]]
@@ -352,7 +304,7 @@ def test_get_statements_with_pagination(fs):
     # Second response gets the missing result from the first response.
     second_response = client.get(
         first_response.json()["more"],
-        headers={"Authorization": f"Basic {credentials}"},
+        headers={"Authorization": f"Basic {auth_credentials}"},
     )
     assert second_response.status_code == 200
     assert second_response.json() == {"statements": [statements[0]]}
