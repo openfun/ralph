@@ -33,7 +33,7 @@ jobs:
   # Check that the git history is clean and complies with our expectations
   lint-git:
     docker:
-      - image: circleci/python:3.9-buster
+      - image: cimg/python:3.9
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -54,7 +54,7 @@ jobs:
       - run:
           name: Install gitlint
           command: |
-            pip install --user gitlint
+            pip install --user gitlint requests
       - run:
           name: lint commit messages added to master
           command: |
@@ -122,7 +122,7 @@ jobs:
   # Build backend development environment
   build:
     docker:
-      - image: circleci/python:3.9-buster
+      - image: cimg/python:3.9
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -142,7 +142,7 @@ jobs:
 
   lint:
     docker:
-      - image: circleci/python:3.9-buster
+      - image: cimg/python:3.9
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -170,7 +170,7 @@ jobs:
 
   test:
     docker:
-      - image: circleci/python:3.9-buster
+      - image: cimg/python:3.9
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -305,7 +305,7 @@ jobs:
   # ---- Packaging jobs ----
   package:
     docker:
-      - image: circleci/python:3.9-buster
+      - image: cimg/python:3.9
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -334,7 +334,7 @@ jobs:
   #     environment variables in CircleCI UI (with your PyPI credentials)
   pypi:
     docker:
-      - image: circleci/python:3.9-buster
+      - image: cimg/python:3.9
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -421,7 +421,7 @@ jobs:
   # ---- Documentation jobs ----
   build-docs:
     docker:
-      - image: circleci/python:3.9-buster
+      - image: cimg/python:3.9
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -438,7 +438,7 @@ jobs:
   # Deploy the docs website to GitHub pages.
   deploy-docs:
     docker:
-      - image: circleci/python:3.9-buster
+      - image: cimg/python:3.9
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
