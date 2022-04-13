@@ -219,15 +219,15 @@ jobs:
       - run:
           name: Install the kubectl client and k3d
           command: |
-            export KUBECTL_RELEASE="v1.20.2"
+            export KUBECTL_RELEASE="v1.23.5"
             curl -Lo "${HOME}/bin/kubectl" "https://dl.k8s.io/release/${KUBECTL_RELEASE}/bin/linux/amd64/kubectl"
             curl -Lo /tmp/kubectl.sha256 "https://dl.k8s.io/${KUBECTL_RELEASE}/bin/linux/amd64/kubectl.sha256"
             echo "$(</tmp/kubectl.sha256) ${HOME}/bin/kubectl" | sha256sum --check
             chmod 755 "${HOME}/bin/kubectl"
 
-            export K3D_RELEASE="v4.2.0"
-            curl -Lo "${HOME}/bin/k3d" "https://github.com/rancher/k3d/releases/download/${K3D_RELEASE}/k3d-linux-amd64"
-            curl -sL https://github.com/rancher/k3d/releases/download/${K3D_RELEASE}/sha256sum.txt | \
+            export K3D_RELEASE="v4.4.8"
+            curl -Lo "${HOME}/bin/k3d" "https://github.com/k3d-io/k3d/releases/download/${K3D_RELEASE}/k3d-linux-amd64"
+            curl -sL https://github.com/k3d-io/k3d/releases/download/${K3D_RELEASE}/sha256sum.txt | \
               grep _dist/k3d-linux-amd64 | \
               sed "s|_dist/k3d-linux-amd64|${HOME}/bin/k3d|" | \
               sha256sum --check
