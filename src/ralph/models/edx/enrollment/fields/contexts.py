@@ -14,7 +14,7 @@ class EdxCourseEnrollmentUpgradeClickedContextField(BaseContextField):
 
     Attributes:
         mode (str): Consists of either the `audit` or `honor` value. It identifies the
-        enrollment mode when the user clicked <kbd>Challenge Yourself</kbd>.
+            enrollment mode when the user clicked <kbd>Challenge Yourself</kbd>.
     """
 
     mode: Union[Literal["audit"], Literal["honor"]]

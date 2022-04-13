@@ -72,7 +72,7 @@ class UIProblemCheck(BaseBrowserModel):
 
     Attributes:
         event (str): Consists of values of problem being checked, styled as `GET`
-        parameters.
+            parameters.
         event_type (str): Consists of the value `problem_check`.
         name (str): Consists of the value `problem_check`.
     """
