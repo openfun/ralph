@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [2.1.0] - 2022-04-13
+
 ### Added
 
 - Implement edx problem interaction events pydantic models
@@ -131,7 +133,8 @@ and this project adheres to
 - Add optional sentry integration
 - Distribute Arnold's tray to deploy Ralph in a k8s cluster as cronjobs
 
-[unreleased]: https://github.com/openfun/ralph/compare/v2.0.1...master
+[unreleased]: https://github.com/openfun/ralph/compare/v2.1.0...master
+[2.1.0]: https://github.com/openfun/ralph/compare/v2.0.1...v2.1.0
 [2.0.1]: https://github.com/openfun/ralph/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/openfun/ralph/compare/v1.2.0...v2.0.0
 [1.2.0]: https://github.com/openfun/ralph/compare/v1.1.0...v1.2.0
