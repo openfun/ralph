@@ -13,7 +13,7 @@ and this project adheres to
 - Implement edx problem interaction events pydantic models
 - Implement edx textbook interaction events pydantic models
 - `ws` websocket stream backend (compatible with the `fetch` command)
-- bundle `jq` in the `fundocker/ralph` Docker image
+- bundle `jq`, `curl` and `wget` in the `fundocker/ralph` Docker image
 - Tray: enable ralph app deployment command configuration
 - Add a `runserver` command with basic auth and a `whoami` route
 - Create a `get` endpoint for statements implementing the LRS spec
