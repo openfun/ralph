@@ -1,5 +1,7 @@
 """Common xAPI verb field definitions"""
 
+from typing import Optional
+
 from ..config import BaseModelWithConfig
 from ..constants import (
     LANG_EN_US_DISPLAY,
@@ -8,10 +10,23 @@ from ..constants import (
     VERB_VIEWED_DISPLAY,
     VERB_VIEWED_ID,
 )
+from .common import IRI, LanguageMap
 
 
-class ViewedVerbField(BaseModelWithConfig):
-    """Represents the `verb` xAPI Field for page viewed xAPI statement.
+class VerbField(BaseModelWithConfig):
+    """Represents the `verb` xAPI field.
+
+    Attributes:
+        id (IRI): Consists of an identifier for the verb.
+        display (LanguageMap): Consists of a human readable representation of the verb.
+    """
+
+    id: IRI
+    display: Optional[LanguageMap]
+
+
+class ViewedVerbField(VerbField):
+    """Represents the `verb` xAPI Field for the action `viewed`.
 
     Attributes:
        id (str): Consists of the value `http://id.tincanapi.com/verb/viewed`.
@@ -24,8 +39,8 @@ class ViewedVerbField(BaseModelWithConfig):
     }
 
 
-class TerminatedVerbField(BaseModelWithConfig):
-    """Represents the `verb` xAPI Field for page terminated xAPI statement.
+class TerminatedVerbField(VerbField):
+    """Represents the `verb` xAPI Field for the action `terminated`.
 
     Attributes:
        id (str): Consists of the value `http://adlnet.gov/expapi/verbs/terminated`.

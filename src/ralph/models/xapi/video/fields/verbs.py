@@ -1,6 +1,5 @@
 """Video xAPI events verb fields definitions"""
 
-from ...base import BaseModelWithConfig
 from ...constants import (
     LANG_EN_US_DISPLAY,
     VERB_COMPLETED_DISPLAY,
@@ -15,10 +14,11 @@ from ...constants import (
     VERB_TERMINATED_DISPLAY,
     VERB_TERMINATED_ID,
 )
+from ...fields.verbs import VerbField
 from ..constants import VERB_VIDEO_PAUSED_ID, VERB_VIDEO_PLAYED_ID, VERB_VIDEO_SEEKED_ID
 
 
-class VideoInitializedVerbField(BaseModelWithConfig):
+class VideoInitializedVerbField(VerbField):
     """Represents the `verb` field for video initialized xAPI statement.
 
     Attributes:
@@ -32,7 +32,7 @@ class VideoInitializedVerbField(BaseModelWithConfig):
     }
 
 
-class VideoPlayedVerbField(BaseModelWithConfig):
+class VideoPlayedVerbField(VerbField):
     """Represents the `verb` field for video played xAPI statement.
 
     Attributes:
@@ -46,7 +46,7 @@ class VideoPlayedVerbField(BaseModelWithConfig):
     }
 
 
-class VideoPausedVerbField(BaseModelWithConfig):
+class VideoPausedVerbField(VerbField):
     """Represents the `verb` field for video paused xAPI statement.
 
     Attributes:
@@ -60,7 +60,7 @@ class VideoPausedVerbField(BaseModelWithConfig):
     }
 
 
-class VideoSeekedVerbField(BaseModelWithConfig):
+class VideoSeekedVerbField(VerbField):
     """Represents the `verb` field for video seeked xAPI statement.
 
     Attributes:
@@ -74,7 +74,7 @@ class VideoSeekedVerbField(BaseModelWithConfig):
     }
 
 
-class VideoCompletedVerbField(BaseModelWithConfig):
+class VideoCompletedVerbField(VerbField):
     """Represents the `verb` field for video completed xAPI statement.
 
     Attributes:
@@ -88,7 +88,7 @@ class VideoCompletedVerbField(BaseModelWithConfig):
     }
 
 
-class VideoTerminatedVerbField(BaseModelWithConfig):
+class VideoTerminatedVerbField(VerbField):
     """Represents the `verb` field for video terminated xAPI statement.
 
     Attributes:
@@ -102,7 +102,7 @@ class VideoTerminatedVerbField(BaseModelWithConfig):
     }
 
 
-class VideoInteractedVerbField(BaseModelWithConfig):
+class VideoInteractedVerbField(VerbField):
     """Represents the `verb` field for video interacted xAPI statement.
 
     Attributes:

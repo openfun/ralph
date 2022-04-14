@@ -70,6 +70,7 @@ def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_with_val
             "display": {"en-US": "viewed"},
             "id": "http://id.tincanapi.com/verb/viewed",
         },
+        "version": "1.0.0",
     }
 
 

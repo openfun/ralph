@@ -2,16 +2,13 @@
 
 from typing import Optional
 
-from ...base import BaseModelWithConfig
 from ...constants import ACTIVITY_PAGE_DISPLAY, ACTIVITY_PAGE_ID, LANG_EN_US_DISPLAY
-from ...fields.objects import ObjectDefinitionExtensionsField, ObjectField
+from ...fields.objects import ObjectDefinitionExtensionsField
+from ...fields.unnested_objects import ActivityObjectField, ObjectDefinitionField
 
 
-class PageObjectDefinitionField(BaseModelWithConfig):
+class PageObjectDefinitionField(ObjectDefinitionField):
     """Represents the `object.definition` xAPI field for page viewed xAPI statement.
-
-    WARNING: It doesn't include the recommended `description` field nor the optional
-        `moreInfo`, `Interaction properties` and `extensions` fields.
 
     Attributes:
        type (str): Consists of the value `http://activitystrea.ms/schema/1.0/page`.
@@ -26,13 +23,11 @@ class PageObjectDefinitionField(BaseModelWithConfig):
     extensions: Optional[ObjectDefinitionExtensionsField]
 
 
-class PageObjectField(ObjectField):
+class PageObjectField(ActivityObjectField):
     """Represents the `object` xAPI field for page viewed xAPI statement.
 
-    WARNING: It doesn't include the optional `objectType` field.
-
     Attributes:
-        definition (PageObjectDefinitionField): See PageObjectDefinitionField.
+        definition (dict): See PageObjectDefinitionField.
     """
 
     definition: PageObjectDefinitionField = PageObjectDefinitionField()

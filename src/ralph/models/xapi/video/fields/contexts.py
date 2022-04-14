@@ -5,6 +5,7 @@ from typing import Literal, Optional
 from pydantic import UUID4, Field
 
 from ...base import BaseModelWithConfig
+from ...fields.contexts import ContextActivitiesContextField, ContextField
 from ..constants import (
     VIDEO_CONTEXT_CATEGORY,
     VIDEO_EXTENSION_CC_SUBTITLE_ENABLED,
@@ -24,7 +25,7 @@ from ..constants import (
 )
 
 
-class VideoContextActivitiesField(BaseModelWithConfig):
+class VideoContextActivitiesField(ContextActivitiesContextField):
     """Represents the contextActivities field for video xAPI statements.
 
     Attributes:
@@ -37,7 +38,7 @@ class VideoContextActivitiesField(BaseModelWithConfig):
     ]
 
 
-class BaseVideoContextField(BaseModelWithConfig):
+class BaseVideoContextField(ContextField):
     """Base model for xAPI video context field.
 
     Attributes:

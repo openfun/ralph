@@ -48,4 +48,5 @@ def test_navigational_ui_page_close_to_page_terminated(
             "display": {"en-US": "terminated"},
             "id": "http://adlnet.gov/expapi/verbs/terminated",
         },
+        "version": "1.0.0",
     }

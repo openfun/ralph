@@ -405,8 +405,9 @@ def test_converter_convert_with_invalid_arguments_writes_an_error_message(
     with caplog.at_level(logging.ERROR):
         assert not list(result)
     model_name = "<class 'ralph.models.xapi.navigation.statements.PageTerminated'>"
-    errors = [f"Converted event is not a valid ({model_name}) model"]
-    assert errors == [message for _, _, message in caplog.record_tuples]
+    errors = f"Converted event is not a valid ({model_name}) model"
+    for _, _, message in caplog.record_tuples:
+        assert errors == message
 
 
 @settings(suppress_health_check=(HealthCheck.function_scoped_fixture,))

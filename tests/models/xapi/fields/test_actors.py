@@ -1,11 +1,11 @@
 """Tests for the xAPI actor fields"""
 
-from ralph.models.xapi.fields.actors import ActorField
+from ralph.models.xapi.fields.actors import AccountActorField
 
 from tests.fixtures.hypothesis_strategies import custom_given
 
 
-@custom_given(ActorField)
+@custom_given(AccountActorField)
 def test_models_xapi_fields_actor_account_field_with_valid_content(actor):
     """Tests that an actor field contains an account field."""
 
