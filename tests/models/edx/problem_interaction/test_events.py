@@ -541,7 +541,7 @@ def test_models_edx_reset_problem_fail_event_field_with_valid_field(field):
         ),
         field.problem_id,
     )
-    assert field.failure in ("closed", "not_closed")
+    assert field.failure in ("closed", "not_done")
 
 
 @pytest.mark.parametrize(
