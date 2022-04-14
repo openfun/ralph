@@ -35,6 +35,7 @@ and this project adheres to
 - Tray: enable ralph app deployment command configuration
 - Add a `runserver` command with basic auth and a `whoami` route
 - Create a `get` endpoint for statements implementing the LRS spec
+- Add optional fields to BaseXapiModel
 
 ### Changed
 

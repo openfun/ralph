@@ -1,23 +1,43 @@
 """Common xAPI object field definitions"""
 
-from typing import Optional
+# Nota bene: we split object definitions into `objects.py` and `unnested_objects.py`
+# because of the circular dependency : objects -> context -> objects.
 
-from pydantic import AnyUrl, Field
+from datetime import datetime
+from typing import Literal, Optional, Union
+
+from pydantic import Field
 
 from ..config import BaseModelWithConfig
 from ..constants import EXTENSION_COURSE_ID, EXTENSION_MODULE_ID, EXTENSION_SCHOOL_ID
+from .actors import ActorField
+from .attachments import AttachmentField
+from .contexts import ContextField
+from .results import ResultField
+from .unnested_objects import UnnestedObjectField
+from .verbs import VerbField
 
 
-class ObjectField(BaseModelWithConfig):
-    """Represents the `object` xAPI field.
-
-    WARNING: It doesn't include the optional `objectType` and `definition` fields.
+class SubStatementObjectField(BaseModelWithConfig):
+    """Represents the `object` xAPI field of type SubStatement.
 
     Attributes:
-        id (URL): Consists of an identifier for a single unique Activity.
+        actor (ActorField): See ActorField.
+        verb (VerbField): See VerbField.
+        object (UnnestedObjectField): See UnnestedObjectField.
     """
 
-    id: AnyUrl
+    actor: ActorField
+    verb: VerbField
+    object: UnnestedObjectField
+    objectType: Literal["SubStatement"]
+    result: Optional[ResultField]
+    context: Optional[ContextField]
+    timestamp: Optional[datetime]
+    attachments: Optional[list[AttachmentField]]
+
+
+ObjectField = Union[UnnestedObjectField, SubStatementObjectField]
 
 
 class ObjectDefinitionExtensionsField(BaseModelWithConfig):

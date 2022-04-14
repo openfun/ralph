@@ -71,9 +71,8 @@ class UISeqNext(BaseBrowserModel):
     name: Literal["seq_next"]
 
     @validator("event")
-    def validate_next_jump_event_field(
-        cls, value
-    ):  # pylint: disable=no-self-argument, no-self-use
+    @classmethod
+    def validate_next_jump_event_field(cls, value):
         """Checks that event.new is equal to event.old + 1."""
 
         if value.new != value.old + 1:
@@ -103,9 +102,8 @@ class UISeqPrev(BaseBrowserModel):
     name: Literal["seq_prev"]
 
     @validator("event")
-    def validate_prev_jump_event_field(
-        cls, value
-    ):  # pylint: disable=no-self-argument, no-self-use
+    @classmethod
+    def validate_prev_jump_event_field(cls, value):
         """Checks that event.new is equal to event.old - 1."""
 
         if value.new != value.old - 1:

@@ -9,6 +9,8 @@ from pydantic import BaseModel
 
 from ralph.models.edx.navigational.fields.events import NavigationalEventField
 from ralph.models.edx.navigational.statements import UISeqNext, UISeqPrev
+from ralph.models.xapi.fields.contexts import ContextField
+from ralph.models.xapi.fields.results import ScoreResultField
 
 from tests.fixtures.hypothesis_configuration import is_base_model
 
@@ -24,7 +26,7 @@ def get_strategy_from(annotation):
         return custom_builds(annotation)
     if origin is Union:
         return st.one_of(
-            [get_strategy_from(t) for t in args if t is not type(None)]  # noqa: E721
+            [get_strategy_from(t) for t in args if not isinstance(t, type(None))]
         )
     if origin is list:
         return st.lists(get_strategy_from(args[0]), min_size=1)
@@ -89,4 +91,6 @@ OVERWRITTEN_STATEGIES = {
     UISeqNext: {
         "event": custom_builds(NavigationalEventField, old=st.just(0), new=st.just(1))
     },
+    ContextField: {"revision": False, "platform": False},
+    ScoreResultField: {"raw": False, "min": False, "max": False},
 }

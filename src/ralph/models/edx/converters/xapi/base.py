@@ -50,7 +50,7 @@ class BaseXapiConverter(BaseConversionSet):
             ConversionItem(
                 "actor__account__name",
                 "context__user_id",
-                lambda user_id: user_id if user_id else "anonymous",
+                lambda user_id: str(user_id) if user_id else "anonymous",
             ),
             ConversionItem(
                 "object__definition__extensions__" + EXTENSION_SCHOOL_ID,

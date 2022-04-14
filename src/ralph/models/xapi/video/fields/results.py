@@ -6,6 +6,7 @@ from typing import Literal, Optional
 from pydantic import Field
 
 from ...base import BaseModelWithConfig
+from ...fields.results import ResultField
 from ..constants import (
     VIDEO_EXTENSION_LENGTH,
     VIDEO_EXTENSION_PLAYED_SEGMENTS,
@@ -99,7 +100,7 @@ class VideoTerminatedResultExtensionsField(VideoActionResultExtensionsField):
         min_anystr_length = 0
 
 
-class VideoPlayedResultField(BaseModelWithConfig):
+class VideoPlayedResultField(ResultField):
     """Represents the result field for video `played` xAPI statement.
 
     Attributes:
@@ -109,7 +110,7 @@ class VideoPlayedResultField(BaseModelWithConfig):
     extensions: Optional[VideoActionResultExtensionsField]
 
 
-class VideoPausedResultField(BaseModelWithConfig):
+class VideoPausedResultField(ResultField):
     """Represents the result field for video `paused` xAPI statement.
 
     Attributes:
@@ -119,7 +120,7 @@ class VideoPausedResultField(BaseModelWithConfig):
     extensions: Optional[VideoPausedResultExtensionsField]
 
 
-class VideoSeekedResultField(BaseModelWithConfig):
+class VideoSeekedResultField(ResultField):
     """Represents the result field for video `seeked` xAPI statement.
 
     Attributes:
@@ -129,7 +130,7 @@ class VideoSeekedResultField(BaseModelWithConfig):
     extensions: Optional[VideoSeekedResultExtensionsField]
 
 
-class VideoCompletedResultField(BaseModelWithConfig):
+class VideoCompletedResultField(ResultField):
     """Represents the result field for video `completed` xAPI statement.
 
     Attributes:
@@ -141,10 +142,10 @@ class VideoCompletedResultField(BaseModelWithConfig):
 
     extensions: Optional[VideoCompletedResultExtensionsField]
     completion: Optional[Literal[True]]
-    duration: Optional[timedelta]  # noqa: F722
+    duration: Optional[timedelta]
 
 
-class VideoTerminatedResultField(BaseModelWithConfig):
+class VideoTerminatedResultField(ResultField):
     """Represents the result field for video `terminated` xAPI statement.
 
     Attributes:
@@ -154,7 +155,7 @@ class VideoTerminatedResultField(BaseModelWithConfig):
     extensions: Optional[VideoTerminatedResultExtensionsField]
 
 
-class VideoInteractedResultField(BaseModelWithConfig):
+class VideoInteractedResultField(ResultField):
     """Represents the result field for video `terminated` xAPI statement.
 
     Attributes:
