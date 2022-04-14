@@ -33,7 +33,7 @@ class VideoContextActivitiesField(BaseModelWithConfig):
     """
 
     category: List[dict[Literal["id"], VIDEO_CONTEXT_CATEGORY]] = [
-        {Literal["id"]: VIDEO_CONTEXT_CATEGORY.__args__[0]}
+        {"id": VIDEO_CONTEXT_CATEGORY.__args__[0]}
     ]
 
 
