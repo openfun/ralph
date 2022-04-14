@@ -1,6 +1,6 @@
 """Video xAPI events context fields definitions"""
 
-from typing import List, Literal, Optional
+from typing import Literal, Optional
 
 from pydantic import UUID4, Field
 
@@ -32,7 +32,7 @@ class VideoContextActivitiesField(BaseModelWithConfig):
             {"id": "https://w3id.org/xapi/video"}.
     """
 
-    category: List[dict[Literal["id"], VIDEO_CONTEXT_CATEGORY]] = [
+    category: list[dict[Literal["id"], VIDEO_CONTEXT_CATEGORY]] = [
         {"id": VIDEO_CONTEXT_CATEGORY.__args__[0]}
     ]
 

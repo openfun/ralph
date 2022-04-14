@@ -3,7 +3,6 @@ Authentication & authorization related tools for the Ralph API.
 """
 import json
 from functools import lru_cache
-from typing import List
 
 import bcrypt
 from fastapi import Depends, HTTPException, status
@@ -29,7 +28,7 @@ class AuthenticatedUser(BaseModel):
     """
 
     username: str
-    scopes: List[str]
+    scopes: list[str]
 
 
 @lru_cache()

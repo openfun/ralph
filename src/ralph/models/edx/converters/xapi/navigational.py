@@ -12,7 +12,8 @@ class UIPageCloseToPageTerminated(BaseXapiConverter):
 
     Example Statement: John terminated https://www.fun-mooc.fr/ page.
 
-    WARNING: The converter does not use the `self.platform_url` in the `object__id`.
+    WARNING: The converter does not use the `self.platform_url` in the `object__id`
+    because the `platform_url` is present in the edX's event `page` field.
     """
 
     __src__ = UIPageClose
