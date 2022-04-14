@@ -3,7 +3,6 @@
 from typing import Literal
 
 # Languages
-LANG_EN_DISPLAY = Literal["en"]  # pylint:disable=invalid-name
 LANG_EN_US_DISPLAY = Literal["en-US"]  # pylint:disable=invalid-name
 
 # xAPI activities
