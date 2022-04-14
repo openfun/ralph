@@ -2,14 +2,6 @@
 
 import json
 
-from hypothesis import given, provisional, settings
-from hypothesis import strategies as st
-
-from ralph.models.edx.enrollment.fields.contexts import (
-    EdxCourseEnrollmentUpgradeClickedContextField,
-    EdxCourseEnrollmentUpgradeSucceededContextField,
-)
-from ralph.models.edx.enrollment.fields.events import EnrollmentEventField
 from ralph.models.edx.enrollment.statements import (
     EdxCourseEnrollmentActivated,
     EdxCourseEnrollmentDeactivated,
@@ -19,15 +11,10 @@ from ralph.models.edx.enrollment.statements import (
 )
 from ralph.models.selector import ModelSelector
 
+from tests.fixtures.hypothesis_strategies import custom_given
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        EdxCourseEnrollmentActivated,
-        referer=provisional.urls(),
-        event=st.builds(EnrollmentEventField),
-    )
-)
+
+@custom_given(EdxCourseEnrollmentActivated)
 def test_models_edx_edx_course_enrollment_activated_with_valid_statement(
     statement,
 ):
@@ -39,14 +26,7 @@ def test_models_edx_edx_course_enrollment_activated_with_valid_statement(
     assert statement.name == "edx.course.enrollment.activated"
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        EdxCourseEnrollmentActivated,
-        referer=provisional.urls(),
-        event=st.builds(EnrollmentEventField),
-    )
-)
+@custom_given(EdxCourseEnrollmentActivated)
 def test_models_edx_edx_course_enrollment_activated_selector_with_valid_statement(
     statement,
 ):
@@ -61,14 +41,7 @@ def test_models_edx_edx_course_enrollment_activated_selector_with_valid_statemen
     )
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        EdxCourseEnrollmentDeactivated,
-        referer=provisional.urls(),
-        event=st.builds(EnrollmentEventField),
-    )
-)
+@custom_given(EdxCourseEnrollmentDeactivated)
 def test_models_edx_edx_course_enrollment_deactivated_with_valid_statement(
     statement,
 ):
@@ -80,14 +53,7 @@ def test_models_edx_edx_course_enrollment_deactivated_with_valid_statement(
     assert statement.name == "edx.course.enrollment.deactivated"
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        EdxCourseEnrollmentDeactivated,
-        referer=provisional.urls(),
-        event=st.builds(EnrollmentEventField),
-    )
-)
+@custom_given(EdxCourseEnrollmentDeactivated)
 def test_models_edx_edx_course_enrollment_deactivated_selector_with_valid_statement(
     statement,
 ):
@@ -102,14 +68,7 @@ def test_models_edx_edx_course_enrollment_deactivated_selector_with_valid_statem
     )
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        EdxCourseEnrollmentModeChanged,
-        referer=provisional.urls(),
-        event=st.builds(EnrollmentEventField),
-    )
-)
+@custom_given(EdxCourseEnrollmentModeChanged)
 def test_models_edx_edx_course_enrollment_mode_changed_with_valid_statement(
     statement,
 ):
@@ -121,14 +80,7 @@ def test_models_edx_edx_course_enrollment_mode_changed_with_valid_statement(
     assert statement.name == "edx.course.enrollment.mode_changed"
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        EdxCourseEnrollmentModeChanged,
-        referer=provisional.urls(),
-        event=st.builds(EnrollmentEventField),
-    )
-)
+@custom_given(EdxCourseEnrollmentModeChanged)
 def test_models_edx_edx_course_enrollment_mode_changed_selector_with_valid_statement(
     statement,
 ):
@@ -143,15 +95,7 @@ def test_models_edx_edx_course_enrollment_mode_changed_selector_with_valid_state
     )
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UIEdxCourseEnrollmentUpgradeClicked,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        context=st.builds(EdxCourseEnrollmentUpgradeClickedContextField),
-    )
-)
+@custom_given(UIEdxCourseEnrollmentUpgradeClicked)
 def test_models_edx_ui_edx_course_enrollment_upgrade_clicked_with_valid_statement(
     statement,
 ):
@@ -164,15 +108,7 @@ def test_models_edx_ui_edx_course_enrollment_upgrade_clicked_with_valid_statemen
 
 
 # pylint: disable=line-too-long
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UIEdxCourseEnrollmentUpgradeClicked,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        context=st.builds(EdxCourseEnrollmentUpgradeClickedContextField),
-    )
-)
+@custom_given(UIEdxCourseEnrollmentUpgradeClicked)
 def test_models_edx_ui_edx_course_enrollment_upgrade_clicked_selector_with_valid_statement(  # noqa
     statement,
 ):
@@ -187,14 +123,7 @@ def test_models_edx_ui_edx_course_enrollment_upgrade_clicked_selector_with_valid
     )
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        EdxCourseEnrollmentUpgradeSucceeded,
-        referer=provisional.urls(),
-        context=st.builds(EdxCourseEnrollmentUpgradeSucceededContextField),
-    )
-)
+@custom_given(EdxCourseEnrollmentUpgradeSucceeded)
 def test_models_edx_edx_course_enrollment_upgrade_succeeded_with_valid_statement(
     statement,
 ):
@@ -207,14 +136,7 @@ def test_models_edx_edx_course_enrollment_upgrade_succeeded_with_valid_statement
 
 
 # pylint: disable=line-too-long
-@settings(max_examples=1)
-@given(
-    st.builds(
-        EdxCourseEnrollmentUpgradeSucceeded,
-        referer=provisional.urls(),
-        context=st.builds(EdxCourseEnrollmentUpgradeSucceededContextField),
-    )
-)
+@custom_given(EdxCourseEnrollmentUpgradeSucceeded)
 def test_models_edx_edx_course_enrollment_upgrade_succeeded_selector_with_valid_statement(  # noqa
     statement,
 ):

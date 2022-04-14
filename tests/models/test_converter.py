@@ -5,8 +5,7 @@ import logging
 from typing import Any, Optional
 
 import pytest
-from hypothesis import HealthCheck, given, provisional, settings
-from hypothesis import strategies as st
+from hypothesis import HealthCheck, settings
 from pydantic import BaseModel
 from pydantic.error_wrappers import ValidationError
 
@@ -25,6 +24,8 @@ from ralph.models.converter import (
 from ralph.models.edx.converters.xapi.base import BaseConversionSet
 from ralph.models.edx.navigational.statements import UIPageClose
 from ralph.models.xapi.constants import VERB_TERMINATED_ID
+
+from tests.fixtures.hypothesis_strategies import custom_given
 
 
 @pytest.mark.parametrize(
@@ -386,10 +387,10 @@ def test_converter_convert_with_invalid_page_close_event_raises_an_exception(
             list(result)
 
 
-@settings(max_examples=1, suppress_health_check=(HealthCheck.function_scoped_fixture,))
+@settings(suppress_health_check=(HealthCheck.function_scoped_fixture,))
 @pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 @pytest.mark.parametrize("invalid_platform_url", ["", "not an URL"])
-@given(st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()))
+@custom_given(UIPageClose)
 def test_converter_convert_with_invalid_arguments_writes_an_error_message(
     valid_uuid, invalid_platform_url, caplog, event
 ):
@@ -408,10 +409,10 @@ def test_converter_convert_with_invalid_arguments_writes_an_error_message(
     assert errors == [message for _, _, message in caplog.record_tuples]
 
 
-@settings(max_examples=1, suppress_health_check=(HealthCheck.function_scoped_fixture,))
+@settings(suppress_health_check=(HealthCheck.function_scoped_fixture,))
 @pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 @pytest.mark.parametrize("invalid_platform_url", ["", "not an URL"])
-@given(st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()))
+@custom_given(UIPageClose)
 def test_converter_convert_with_invalid_arguments_raises_an_exception(
     valid_uuid, invalid_platform_url, caplog, event
 ):
@@ -428,11 +429,10 @@ def test_converter_convert_with_invalid_arguments_raises_an_exception(
             list(result)
 
 
-@settings(max_examples=1)
 @pytest.mark.parametrize("ignore_errors", [True, False])
 @pytest.mark.parametrize("fail_on_unknown", [True, False])
 @pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
-@given(st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()))
+@custom_given(UIPageClose)
 def test_converter_convert_with_valid_events(
     ignore_errors, fail_on_unknown, valid_uuid, event
 ):
@@ -445,8 +445,8 @@ def test_converter_convert_with_valid_events(
     assert json.loads(next(result))["verb"]["id"] == VERB_TERMINATED_ID.__args__[0]
 
 
-@settings(max_examples=1, suppress_health_check=(HealthCheck.function_scoped_fixture,))
-@given(st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()))
+@settings(suppress_health_check=(HealthCheck.function_scoped_fixture,))
+@custom_given(UIPageClose)
 @pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_converter_convert_counter(valid_uuid, caplog, event):
     """Tests given multiple events the convert method should log the total and invalid

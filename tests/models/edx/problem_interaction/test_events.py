@@ -4,8 +4,6 @@ import json
 import re
 
 import pytest
-from hypothesis import given, settings
-from hypothesis import strategies as st
 from pydantic.error_wrappers import ValidationError
 
 from ralph.models.edx.problem_interaction.fields.events import (
@@ -19,12 +17,12 @@ from ralph.models.edx.problem_interaction.fields.events import (
     ResetProblemFailEventField,
     SaveProblemFailEventField,
     SaveProblemSuccessEventField,
-    State,
 )
 
+from tests.fixtures.hypothesis_strategies import custom_given
 
-@settings(max_examples=1)
-@given(st.builds(CorrectMap))
+
+@custom_given(CorrectMap)
 def test_models_edx_correct_map_with_valid_content(subfield):
     """Tests that a valid `CorrectMap` does not raise a `ValidationError`."""
 
@@ -33,8 +31,7 @@ def test_models_edx_correct_map_with_valid_content(subfield):
 
 
 @pytest.mark.parametrize("correctness", ["corect", "incorect"])
-@settings(max_examples=1)
-@given(st.builds(CorrectMap))
+@custom_given(CorrectMap)
 def test_models_edx_correct_map_with_invalid_correctness_value(correctness, subfield):
     """Tests that an invalid `correctness` value in `CorrectMap` raises a
     `ValidationError`.
@@ -48,8 +45,7 @@ def test_models_edx_correct_map_with_invalid_correctness_value(correctness, subf
 
 
 @pytest.mark.parametrize("hintmode", ["onrequest", "alway"])
-@settings(max_examples=1)
-@given(st.builds(CorrectMap))
+@custom_given(CorrectMap)
 def test_models_edx_correct_map_with_invalid_hintmode_value(hintmode, subfield):
     """Tests that an invalid `hintmode` value in `CorrectMap` raises a
     `ValidationError`.
@@ -62,8 +58,7 @@ def test_models_edx_correct_map_with_invalid_hintmode_value(hintmode, subfield):
         CorrectMap(**invalid_subfield)
 
 
-@settings(max_examples=1)
-@given(st.builds(EdxProblemHintFeedbackDisplayedEventField))
+@custom_given(EdxProblemHintFeedbackDisplayedEventField)
 def test_models_edx_problem_hint_feedback_displayed_event_field_with_valid_field(field):
     """Tests that a valid `EdxProblemHintFeedbackDisplayedEventField` does not raise a
     `ValidationError`.
@@ -90,8 +85,7 @@ def test_models_edx_problem_hint_feedback_displayed_event_field_with_valid_field
         "optionrespons",
     ],
 )
-@settings(max_examples=1)
-@given(st.builds(EdxProblemHintFeedbackDisplayedEventField))
+@custom_given(EdxProblemHintFeedbackDisplayedEventField)
 def test_models_edx_problem_hint_feedback_displayed_event_field_with_invalid_question_type_value(  # noqa
     question_type, field
 ):
@@ -108,8 +102,7 @@ def test_models_edx_problem_hint_feedback_displayed_event_field_with_invalid_que
 
 # pylint: disable=line-too-long
 @pytest.mark.parametrize("trigger_type", ["jingle", "compund"])
-@settings(max_examples=1)
-@given(st.builds(EdxProblemHintFeedbackDisplayedEventField))
+@custom_given(EdxProblemHintFeedbackDisplayedEventField)
 def test_models_edx_problem_hint_feedback_displayed_event_field_with_invalid_trigger_type_value(  # noqa
     trigger_type, field
 ):
@@ -124,8 +117,7 @@ def test_models_edx_problem_hint_feedback_displayed_event_field_with_invalid_tri
         EdxProblemHintFeedbackDisplayedEventField(**invalid_field)
 
 
-@settings(max_examples=1)
-@given(st.builds(ProblemCheckEventField, state=st.builds(State)))
+@custom_given(ProblemCheckEventField)
 def test_models_edx_problem_check_event_field_with_valid_field(field):
     """Tests that a valid `ProblemCheckEventField` does not raise a
     `ValidationError`.
@@ -168,8 +160,7 @@ def test_models_edx_problem_check_event_field_with_valid_field(field):
         ),
     ],
 )
-@settings(max_examples=1)
-@given(st.builds(ProblemCheckEventField, state=st.builds(State)))
+@custom_given(ProblemCheckEventField)
 def test_models_edx_problem_check_event_field_with_invalid_problem_id_value(
     problem_id, field
 ):
@@ -187,8 +178,7 @@ def test_models_edx_problem_check_event_field_with_invalid_problem_id_value(
 
 
 @pytest.mark.parametrize("success", ["corect", "incorect"])
-@settings(max_examples=1)
-@given(st.builds(ProblemCheckEventField, state=st.builds(State)))
+@custom_given(ProblemCheckEventField)
 def test_models_edx_problem_check_event_field_with_invalid_success_value(
     success, field
 ):
@@ -203,8 +193,7 @@ def test_models_edx_problem_check_event_field_with_invalid_success_value(
         ProblemCheckEventField(**invalid_field)
 
 
-@settings(max_examples=1)
-@given(st.builds(ProblemCheckFailEventField, state=st.builds(State)))
+@custom_given(ProblemCheckFailEventField)
 def test_models_edx_problem_check_fail_event_field_with_valid_field(field):
     """Tests that a valid `ProblemCheckFailEventField` does not raise a
     `ValidationError`.
@@ -247,8 +236,7 @@ def test_models_edx_problem_check_fail_event_field_with_valid_field(field):
         ),
     ],
 )
-@settings(max_examples=1)
-@given(st.builds(ProblemCheckFailEventField, state=st.builds(State)))
+@custom_given(ProblemCheckFailEventField)
 def test_models_edx_problem_check_fail_event_field_with_invalid_problem_id_value(
     problem_id, field
 ):
@@ -266,8 +254,7 @@ def test_models_edx_problem_check_fail_event_field_with_invalid_problem_id_value
 
 
 @pytest.mark.parametrize("failure", ["close", "unresit"])
-@settings(max_examples=1)
-@given(st.builds(ProblemCheckFailEventField, state=st.builds(State)))
+@custom_given(ProblemCheckFailEventField)
 def test_models_edx_problem_check_fail_event_field_with_invalid_failure_value(
     failure, field
 ):
@@ -282,14 +269,7 @@ def test_models_edx_problem_check_fail_event_field_with_invalid_failure_value(
         ProblemCheckFailEventField(**invalid_field)
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        ProblemRescoreEventField,
-        state=st.builds(State),
-        correct_map=st.builds(CorrectMap),
-    )
-)
+@custom_given(ProblemRescoreEventField)
 def test_models_edx_problem_rescore_event_field_with_valid_field(field):
     """Tests that a valid `ProblemRescoreEventField` does not raise a
     `ValidationError`.
@@ -332,14 +312,7 @@ def test_models_edx_problem_rescore_event_field_with_valid_field(field):
         ),
     ],
 )
-@settings(max_examples=1)
-@given(
-    st.builds(
-        ProblemRescoreEventField,
-        state=st.builds(State),
-        correct_map=st.builds(CorrectMap),
-    ),
-)
+@custom_given(ProblemRescoreEventField)
 def test_models_edx_problem_rescore_event_field_with_invalid_problem_id_value(
     problem_id, field
 ):
@@ -357,14 +330,7 @@ def test_models_edx_problem_rescore_event_field_with_invalid_problem_id_value(
 
 
 @pytest.mark.parametrize("success", ["corect", "incorect"])
-@settings(max_examples=1)
-@given(
-    st.builds(
-        ProblemRescoreEventField,
-        state=st.builds(State),
-        correct_map=st.builds(CorrectMap),
-    ),
-)
+@custom_given(ProblemRescoreEventField)
 def test_models_edx_problem_rescore_event_field_with_invalid_success_value(
     success, field
 ):
@@ -379,8 +345,7 @@ def test_models_edx_problem_rescore_event_field_with_invalid_success_value(
         ProblemRescoreEventField(**invalid_field)
 
 
-@settings(max_examples=1)
-@given(st.builds(ProblemRescoreFailEventField, state=st.builds(State)))
+@custom_given(ProblemRescoreFailEventField)
 def test_models_edx_problem_rescore_fail_event_field_with_valid_field(field):
     """Tests that a valid `ProblemRescoreFailEventField` does not raise a
     `ValidationError`.
@@ -423,8 +388,7 @@ def test_models_edx_problem_rescore_fail_event_field_with_valid_field(field):
         ),
     ],
 )
-@settings(max_examples=1)
-@given(st.builds(ProblemRescoreFailEventField, state=st.builds(State)))
+@custom_given(ProblemRescoreFailEventField)
 def test_models_edx_problem_rescore_fail_event_field_with_invalid_problem_id_value(
     problem_id, field
 ):
@@ -442,8 +406,7 @@ def test_models_edx_problem_rescore_fail_event_field_with_invalid_problem_id_val
 
 
 @pytest.mark.parametrize("failure", ["close", "unresit"])
-@settings(max_examples=1)
-@given(st.builds(ProblemRescoreFailEventField, state=st.builds(State)))
+@custom_given(ProblemRescoreFailEventField)
 def test_models_edx_problem_rescore_fail_event_field_with_invalid_failure_value(
     failure, field
 ):
@@ -458,12 +421,7 @@ def test_models_edx_problem_rescore_fail_event_field_with_invalid_failure_value(
         ProblemRescoreFailEventField(**invalid_field)
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        ResetProblemEventField, old_state=st.builds(State), new_state=st.builds(State)
-    )
-)
+@custom_given(ResetProblemEventField)
 def test_models_edx_reset_problem_event_field_with_valid_field(field):
     """Tests that a valid `ResetProblemEventField` does not raise a
     `ValidationError`.
@@ -505,12 +463,7 @@ def test_models_edx_reset_problem_event_field_with_valid_field(field):
         ),
     ],
 )
-@settings(max_examples=1)
-@given(
-    st.builds(
-        ResetProblemEventField, old_state=st.builds(State), new_state=st.builds(State)
-    )
-)
+@custom_given(ResetProblemEventField)
 def test_models_edx_reset_problem_event_field_with_invalid_problem_id_value(
     problem_id, field
 ):
@@ -527,8 +480,7 @@ def test_models_edx_reset_problem_event_field_with_invalid_problem_id_value(
         ResetProblemEventField(**invalid_field)
 
 
-@settings(max_examples=1)
-@given(st.builds(ResetProblemFailEventField, old_state=st.builds(State)))
+@custom_given(ResetProblemFailEventField)
 def test_models_edx_reset_problem_fail_event_field_with_valid_field(field):
     """Tests that a valid `ResetProblemFailEventField` does not raise a
     `ValidationError`.
@@ -571,8 +523,7 @@ def test_models_edx_reset_problem_fail_event_field_with_valid_field(field):
         ),
     ],
 )
-@settings(max_examples=1)
-@given(st.builds(ResetProblemFailEventField, old_state=st.builds(State)))
+@custom_given(ResetProblemFailEventField)
 def test_models_edx_reset_problem_fail_event_field_with_invalid_problem_id_value(
     problem_id, field
 ):
@@ -590,8 +541,7 @@ def test_models_edx_reset_problem_fail_event_field_with_invalid_problem_id_value
 
 
 @pytest.mark.parametrize("failure", ["close", "not_close"])
-@settings(max_examples=1)
-@given(st.builds(ResetProblemFailEventField, old_state=st.builds(State)))
+@custom_given(ResetProblemFailEventField)
 def test_models_edx_reset_problem_fail_event_field_with_invalid_failure_value(
     failure, field
 ):
@@ -606,8 +556,7 @@ def test_models_edx_reset_problem_fail_event_field_with_invalid_failure_value(
         ResetProblemFailEventField(**invalid_field)
 
 
-@settings(max_examples=1)
-@given(st.builds(SaveProblemFailEventField, state=st.builds(State)))
+@custom_given(SaveProblemFailEventField)
 def test_models_edx_save_problem_fail_event_field_with_valid_field(field):
     """Tests that a valid `SaveProblemFailEventField` does not raise a
     `ValidationError`.
@@ -650,8 +599,7 @@ def test_models_edx_save_problem_fail_event_field_with_valid_field(field):
         ),
     ],
 )
-@settings(max_examples=1)
-@given(st.builds(SaveProblemFailEventField, state=st.builds(State)))
+@custom_given(SaveProblemFailEventField)
 def test_models_edx_save_problem_fail_event_field_with_invalid_problem_id_value(
     problem_id, field
 ):
@@ -669,8 +617,7 @@ def test_models_edx_save_problem_fail_event_field_with_invalid_problem_id_value(
 
 
 @pytest.mark.parametrize("failure", ["close", "doned"])
-@settings(max_examples=1)
-@given(st.builds(SaveProblemFailEventField, state=st.builds(State)))
+@custom_given(SaveProblemFailEventField)
 def test_models_edx_save_problem_fail_event_field_with_invalid_failure_value(
     failure, field
 ):
@@ -685,8 +632,7 @@ def test_models_edx_save_problem_fail_event_field_with_invalid_failure_value(
         SaveProblemFailEventField(**invalid_field)
 
 
-@settings(max_examples=1)
-@given(st.builds(SaveProblemSuccessEventField, state=st.builds(State)))
+@custom_given(SaveProblemSuccessEventField)
 def test_models_edx_save_problem_success_event_field_with_valid_field(field):
     """Tests that a valid `SaveProblemFailEventField` does not raise a
     `ValidationError`.
@@ -728,8 +674,7 @@ def test_models_edx_save_problem_success_event_field_with_valid_field(field):
         ),
     ],
 )
-@settings(max_examples=1)
-@given(st.builds(SaveProblemSuccessEventField, state=st.builds(State)))
+@custom_given(SaveProblemSuccessEventField)
 def test_models_edx_save_problem_success_event_field_with_invalid_problem_id_value(
     problem_id, field
 ):

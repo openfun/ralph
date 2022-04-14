@@ -4,26 +4,11 @@ import json
 import re
 
 import pytest
-from hypothesis import given, provisional, settings
-from hypothesis import strategies as st
 from pydantic.error_wrappers import ValidationError
 
 from ralph.models.edx.textbook_interaction.fields.events import (
-    BookEventField,
     TextbookInteractionBaseEventField,
     TextbookPdfChapterNavigatedEventField,
-    TextbookPdfDisplayScaledEventField,
-    TextbookPdfOutlineToggledEventField,
-    TextbookPdfPageNavigatedEventField,
-    TextbookPdfPageScrolledEventField,
-    TextbookPdfSearchCaseSensitivityToggledEventField,
-    TextbookPdfSearchExecutedEventField,
-    TextbookPdfSearchHighlightToggledEventField,
-    TextbookPdfSearchNavigatedNextEventField,
-    TextbookPdfThumbnailNavigatedEventField,
-    TextbookPdfThumbnailsToggledEventField,
-    TextbookPdfZoomButtonsChangedEventField,
-    TextbookPdfZoomMenuChangedEventField,
 )
 from ralph.models.edx.textbook_interaction.statements import (
     UIBook,
@@ -43,9 +28,10 @@ from ralph.models.edx.textbook_interaction.statements import (
 )
 from ralph.models.selector import ModelSelector
 
+from tests.fixtures.hypothesis_strategies import custom_given
 
-@settings(max_examples=1)
-@given(st.builds(TextbookInteractionBaseEventField))
+
+@custom_given(TextbookInteractionBaseEventField)
 def test_fields_edx_textbook_interaction_base_event_field_with_valid_content(field):
     """Tests that a valid `TextbookInteractionBaseEventField` does not raise
     a `ValidationError`.
@@ -92,8 +78,7 @@ def test_fields_edx_textbook_interaction_base_event_field_with_valid_content(fie
         ),
     ),
 )
-@settings(max_examples=1)
-@given(st.builds(TextbookInteractionBaseEventField))
+@custom_given(TextbookInteractionBaseEventField)
 def test_fields_edx_textbook_interaction_base_event_field_with_invalid_content(
     chapter, field
 ):
@@ -108,8 +93,7 @@ def test_fields_edx_textbook_interaction_base_event_field_with_invalid_content(
         TextbookInteractionBaseEventField(**invalid_field)
 
 
-@settings(max_examples=1)
-@given(st.builds(TextbookPdfChapterNavigatedEventField))
+@custom_given(TextbookPdfChapterNavigatedEventField)
 def test_fields_edx_textbook_pdf_chapter_navigated_event_field_with_valid_content(
     field,
 ):
@@ -154,8 +138,7 @@ def test_fields_edx_textbook_pdf_chapter_navigated_event_field_with_valid_conten
         ),
     ),
 )
-@settings(max_examples=1)
-@given(st.builds(TextbookPdfChapterNavigatedEventField))
+@custom_given(TextbookPdfChapterNavigatedEventField)
 def test_fields_edx_textbook_pdf_chapter_navigated_event_field_with_invalid_content(
     chapter, field
 ):
@@ -170,15 +153,7 @@ def test_fields_edx_textbook_pdf_chapter_navigated_event_field_with_invalid_cont
         TextbookPdfChapterNavigatedEventField(**invalid_field)
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UIBook,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(BookEventField),
-    )
-)
+@custom_given(UIBook)
 def test_models_edx_ui_book_with_valid_statement(statement):
     """Tests that a `book` statement has the expected `event_type` and `name`."""
 
@@ -186,15 +161,7 @@ def test_models_edx_ui_book_with_valid_statement(statement):
     assert statement.name == "book"
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UIBook,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(BookEventField),
-    )
-)
+@custom_given(UIBook)
 def test_models_edx_ui_book_selector_with_valid_statement(statement):
     """Tests given a `book` statement the selector `get_model` method should return
     `UIBook` model.
@@ -204,15 +171,7 @@ def test_models_edx_ui_book_selector_with_valid_statement(statement):
     assert ModelSelector(module="ralph.models.edx").get_model(statement) is UIBook
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UITextbookPdfThumbnailsToggled,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(TextbookPdfThumbnailsToggledEventField),
-    )
-)
+@custom_given(UITextbookPdfThumbnailsToggled)
 def test_models_edx_ui_textbook_pdf_thumbnails_toggled_with_valid_statement(statement):
     """Tests that a `textbook.pdf.thumbnails.toggled` statement has the expected
     `event_type` and `name`.
@@ -222,15 +181,7 @@ def test_models_edx_ui_textbook_pdf_thumbnails_toggled_with_valid_statement(stat
     assert statement.name == "textbook.pdf.thumbnails.toggled"
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UITextbookPdfThumbnailsToggled,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(TextbookPdfThumbnailsToggledEventField),
-    )
-)
+@custom_given(UITextbookPdfThumbnailsToggled)
 def test_models_edx_ui_textbook_pdf_thumbnails_toggled_selector_with_valid_statement(
     statement,
 ):
@@ -245,15 +196,7 @@ def test_models_edx_ui_textbook_pdf_thumbnails_toggled_selector_with_valid_state
     )
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UITextbookPdfThumbnailNavigated,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(TextbookPdfThumbnailNavigatedEventField),
-    )
-)
+@custom_given(UITextbookPdfThumbnailNavigated)
 def test_models_edx_ui_textbook_pdf_thumbnail_navigated_with_valid_statement(
     statement,
 ):
@@ -265,15 +208,7 @@ def test_models_edx_ui_textbook_pdf_thumbnail_navigated_with_valid_statement(
     assert statement.name == "textbook.pdf.thumbnail.navigated"
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UITextbookPdfThumbnailNavigated,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(TextbookPdfThumbnailNavigatedEventField),
-    )
-)
+@custom_given(UITextbookPdfThumbnailNavigated)
 def test_models_edx_ui_textbook_pdf_thumbnail_navigated_selector_with_valid_statement(
     statement,
 ):
@@ -288,15 +223,7 @@ def test_models_edx_ui_textbook_pdf_thumbnail_navigated_selector_with_valid_stat
     )
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UITextbookPdfOutlineToggled,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(TextbookPdfOutlineToggledEventField),
-    )
-)
+@custom_given(UITextbookPdfOutlineToggled)
 def test_models_edx_ui_textbook_pdf_outline_toggled_with_valid_statement(
     statement,
 ):
@@ -308,15 +235,7 @@ def test_models_edx_ui_textbook_pdf_outline_toggled_with_valid_statement(
     assert statement.name == "textbook.pdf.outline.toggled"
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UITextbookPdfOutlineToggled,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(TextbookPdfOutlineToggledEventField),
-    )
-)
+@custom_given(UITextbookPdfOutlineToggled)
 def test_models_edx_ui_textbook_pdf_outline_toggled_selector_with_valid_statement(
     statement,
 ):
@@ -331,15 +250,7 @@ def test_models_edx_ui_textbook_pdf_outline_toggled_selector_with_valid_statemen
     )
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UITextbookPdfChapterNavigated,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(TextbookPdfChapterNavigatedEventField),
-    )
-)
+@custom_given(UITextbookPdfChapterNavigated)
 def test_models_edx_ui_textbook_pdf_chapter_navigated_with_valid_statement(
     statement,
 ):
@@ -351,15 +262,7 @@ def test_models_edx_ui_textbook_pdf_chapter_navigated_with_valid_statement(
     assert statement.name == "textbook.pdf.chapter.navigated"
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UITextbookPdfChapterNavigated,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(TextbookPdfChapterNavigatedEventField),
-    )
-)
+@custom_given(UITextbookPdfChapterNavigated)
 def test_models_edx_ui_textbook_pdf_chapter_navigated_selector_with_valid_statement(
     statement,
 ):
@@ -374,15 +277,7 @@ def test_models_edx_ui_textbook_pdf_chapter_navigated_selector_with_valid_statem
     )
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UITextbookPdfPageNavigated,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(TextbookPdfPageNavigatedEventField),
-    )
-)
+@custom_given(UITextbookPdfPageNavigated)
 def test_models_edx_ui_textbook_pdf_page_navigated_with_valid_statement(
     statement,
 ):
@@ -394,15 +289,7 @@ def test_models_edx_ui_textbook_pdf_page_navigated_with_valid_statement(
     assert statement.name == "textbook.pdf.page.navigated"
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UITextbookPdfPageNavigated,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(TextbookPdfPageNavigatedEventField),
-    )
-)
+@custom_given(UITextbookPdfPageNavigated)
 def test_models_edx_ui_textbook_pdf_page_navigated_selector_with_valid_statement(
     statement,
 ):
@@ -417,15 +304,7 @@ def test_models_edx_ui_textbook_pdf_page_navigated_selector_with_valid_statement
     )
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UITextbookPdfZoomButtonsChanged,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(TextbookPdfZoomButtonsChangedEventField),
-    )
-)
+@custom_given(UITextbookPdfZoomButtonsChanged)
 def test_models_edx_ui_textbook_pdf_zoom_buttons_changed_with_valid_statement(
     statement,
 ):
@@ -437,15 +316,7 @@ def test_models_edx_ui_textbook_pdf_zoom_buttons_changed_with_valid_statement(
     assert statement.name == "textbook.pdf.zoom.buttons.changed"
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UITextbookPdfZoomButtonsChanged,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(TextbookPdfZoomButtonsChangedEventField),
-    )
-)
+@custom_given(UITextbookPdfZoomButtonsChanged)
 def test_models_edx_ui_textbook_pdf_zoom_buttons_changed_selector_with_valid_statement(
     statement,
 ):
@@ -460,15 +331,7 @@ def test_models_edx_ui_textbook_pdf_zoom_buttons_changed_selector_with_valid_sta
     )
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UITextbookPdfZoomMenuChanged,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(TextbookPdfZoomMenuChangedEventField),
-    )
-)
+@custom_given(UITextbookPdfZoomMenuChanged)
 def test_models_edx_ui_textbook_pdf_zoom_menu_changed_with_valid_statement(statement):
     """Tests that a `textbook.pdf.zoom.menu.changed` has the expected `event_type` and
     `name`.
@@ -478,15 +341,7 @@ def test_models_edx_ui_textbook_pdf_zoom_menu_changed_with_valid_statement(state
     assert statement.name == "textbook.pdf.zoom.menu.changed"
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UITextbookPdfZoomMenuChanged,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(TextbookPdfZoomMenuChangedEventField),
-    )
-)
+@custom_given(UITextbookPdfZoomMenuChanged)
 def test_models_edx_ui_textbook_pdf_zoom_menu_changed_selector_with_valid_statement(
     statement,
 ):
@@ -501,15 +356,7 @@ def test_models_edx_ui_textbook_pdf_zoom_menu_changed_selector_with_valid_statem
     )
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UITextbookPdfDisplayScaled,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(TextbookPdfDisplayScaledEventField),
-    )
-)
+@custom_given(UITextbookPdfDisplayScaled)
 def test_models_edx_ui_textbook_pdf_display_scaled_with_valid_statement(statement):
     """Tests that a `textbook.pdf.display.scaled` statement has the expected
     `event_type` and `name`.
@@ -519,15 +366,7 @@ def test_models_edx_ui_textbook_pdf_display_scaled_with_valid_statement(statemen
     assert statement.name == "textbook.pdf.display.scaled"
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UITextbookPdfDisplayScaled,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(TextbookPdfDisplayScaledEventField),
-    )
-)
+@custom_given(UITextbookPdfDisplayScaled)
 def test_models_edx_ui_textbook_pdf_display_scaled_selector_with_valid_statement(
     statement,
 ):
@@ -542,15 +381,7 @@ def test_models_edx_ui_textbook_pdf_display_scaled_selector_with_valid_statement
     )
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UITextbookPdfPageScrolled,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(TextbookPdfPageScrolledEventField),
-    )
-)
+@custom_given(UITextbookPdfPageScrolled)
 def test_models_edx_ui_textbook_pdf_page_scrolled_with_valid_statement(statement):
     """Tests that a `textbook.pdf.page.scrolled` statement has the expected `event_type`
     and `name`.
@@ -560,15 +391,7 @@ def test_models_edx_ui_textbook_pdf_page_scrolled_with_valid_statement(statement
     assert statement.name == "textbook.pdf.page.scrolled"
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UITextbookPdfPageScrolled,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(TextbookPdfPageScrolledEventField),
-    )
-)
+@custom_given(UITextbookPdfPageScrolled)
 def test_models_edx_ui_textbook_pdf_page_scrolled_selector_with_valid_statement(
     statement,
 ):
@@ -583,15 +406,7 @@ def test_models_edx_ui_textbook_pdf_page_scrolled_selector_with_valid_statement(
     )
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UITextbookPdfSearchExecuted,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(TextbookPdfSearchExecutedEventField),
-    )
-)
+@custom_given(UITextbookPdfSearchExecuted)
 def test_models_edx_ui_textbook_pdf_search_executed_with_valid_statement(statement):
     """Tests that a `textbook.pdf.search.executed` statement has the expected
     `event_type` and `name`.
@@ -601,15 +416,7 @@ def test_models_edx_ui_textbook_pdf_search_executed_with_valid_statement(stateme
     assert statement.name == "textbook.pdf.search.executed"
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UITextbookPdfSearchExecuted,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(TextbookPdfSearchExecutedEventField),
-    )
-)
+@custom_given(UITextbookPdfSearchExecuted)
 def test_models_edx_ui_textbook_pdf_search_executed_selector_with_valid_statement(
     statement,
 ):
@@ -624,15 +431,7 @@ def test_models_edx_ui_textbook_pdf_search_executed_selector_with_valid_statemen
     )
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UITextbookPdfSearchNavigatedNext,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(TextbookPdfSearchNavigatedNextEventField),
-    )
-)
+@custom_given(UITextbookPdfSearchNavigatedNext)
 def test_models_edx_ui_textbook_pdf_search_navigated_next_with_valid_statement(
     statement,
 ):
@@ -644,15 +443,7 @@ def test_models_edx_ui_textbook_pdf_search_navigated_next_with_valid_statement(
     assert statement.name == "textbook.pdf.search.navigatednext"
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UITextbookPdfSearchNavigatedNext,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(TextbookPdfSearchNavigatedNextEventField),
-    )
-)
+@custom_given(UITextbookPdfSearchNavigatedNext)
 def test_models_edx_ui_textbook_pdf_search_navigated_next_selector_with_valid_statement(
     statement,
 ):
@@ -667,15 +458,7 @@ def test_models_edx_ui_textbook_pdf_search_navigated_next_selector_with_valid_st
     )
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UITextbookPdfSearchHighlightToggled,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(TextbookPdfSearchHighlightToggledEventField),
-    )
-)
+@custom_given(UITextbookPdfSearchHighlightToggled)
 def test_models_edx_ui_textbook_pdf_search_highlight_toggled_with_valid_statement(
     statement,
 ):
@@ -688,15 +471,7 @@ def test_models_edx_ui_textbook_pdf_search_highlight_toggled_with_valid_statemen
 
 
 # pylint: disable=line-too-long
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UITextbookPdfSearchHighlightToggled,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(TextbookPdfSearchHighlightToggledEventField),
-    )
-)
+@custom_given(UITextbookPdfSearchHighlightToggled)
 def test_models_edx_ui_textbook_pdf_search_highlight_toggled_selector_with_valid_statement(  # noqa
     statement,
 ):
@@ -712,15 +487,7 @@ def test_models_edx_ui_textbook_pdf_search_highlight_toggled_selector_with_valid
 
 
 # pylint: disable=line-too-long
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UITextbookPdfSearchCaseSensitivityToggled,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(TextbookPdfSearchCaseSensitivityToggledEventField),
-    )
-)
+@custom_given(UITextbookPdfSearchCaseSensitivityToggled)
 def test_models_edx_ui_textbook_pdf_search_case_sensitivity_toggled_with_valid_statement(  # noqa
     statement,
 ):
@@ -733,15 +500,7 @@ def test_models_edx_ui_textbook_pdf_search_case_sensitivity_toggled_with_valid_s
 
 
 # pylint: disable=line-too-long
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UITextbookPdfSearchCaseSensitivityToggled,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(TextbookPdfSearchCaseSensitivityToggledEventField),
-    )
-)
+@custom_given(UITextbookPdfSearchCaseSensitivityToggled)
 def test_models_edx_ui_textbook_pdf_search_case_sensitivity_toggled_selector_with_valid_statement(  # noqa
     statement,
 ):

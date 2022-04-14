@@ -4,20 +4,16 @@ import json
 from uuid import UUID, uuid5
 
 import pytest
-from hypothesis import given, provisional, settings
-from hypothesis import strategies as st
+from hypothesis import provisional
 
 from ralph.models.converter import convert_dict_event, convert_str_event
-from ralph.models.edx.base import BaseContextField
 from ralph.models.edx.converters.xapi.server import ServerEventToPageViewed
-from ralph.models.edx.server import Server, ServerEventField
+from ralph.models.edx.server import Server
+
+from tests.fixtures.hypothesis_strategies import custom_given
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(Server, event=st.builds(ServerEventField), referer=provisional.urls()),
-    provisional.urls(),
-)
+@custom_given(Server, provisional.urls())
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_constant_uuid(
     uuid_namespace, event, platform_url
@@ -38,19 +34,7 @@ def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_constant
 
 
 # pylint: disable=line-too-long
-@settings(max_examples=1)
-@given(
-    st.builds(
-        Server,
-        event=st.builds(ServerEventField),
-        referer=provisional.urls(),
-        event_type=st.just("/main/blog"),
-        context=st.builds(
-            BaseContextField, user_id=st.just("1"), path=st.just("/main/blog")
-        ),
-    ),
-    provisional.urls(),
-)
+@custom_given(Server, provisional.urls())
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_with_valid_event(  # noqa
     uuid_namespace, event, platform_url
@@ -59,6 +43,10 @@ def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_with_val
     statement.
     """
 
+    event.event_type = "/main/blog"
+    event.context.course_id = ""
+    event.context.org_id = ""
+    event.context.user_id = "1"
     event_str = event.json()
     event = json.loads(event_str)
     xapi_event = convert_dict_event(
@@ -86,22 +74,14 @@ def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_with_val
 
 
 # pylint: disable=line-too-long
-@settings(max_examples=1)
-@given(
-    st.builds(
-        Server,
-        event=st.builds(ServerEventField),
-        referer=provisional.urls(),
-        context=st.builds(BaseContextField, user_id=st.just("")),
-    ),
-    provisional.urls(),
-)
+@custom_given(Server, provisional.urls())
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_with_anonymous_user(  # noqa
     uuid_namespace, event, platform_url
 ):
     """Tests that anonymous usernames are replaced with with `anonymous`."""
 
+    event.context.user_id = ""
     event_str = event.json()
     event = json.loads(event_str)
     xapi_event = convert_dict_event(

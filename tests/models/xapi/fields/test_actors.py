@@ -1,20 +1,11 @@
 """Tests for the xAPI actor fields"""
 
-from hypothesis import given, provisional, settings
-from hypothesis import strategies as st
+from ralph.models.xapi.fields.actors import ActorField
 
-from ralph.models.xapi.fields.actors import ActorAccountField, ActorField
+from tests.fixtures.hypothesis_strategies import custom_given
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        ActorField,
-        account=st.builds(
-            ActorAccountField, name=st.just("username"), homePage=provisional.urls()
-        ),
-    )
-)
+@custom_given(ActorField)
 def test_models_xapi_fields_actor_account_field_with_valid_content(actor):
     """Tests that an actor field contains an account field."""
 

@@ -4,19 +4,14 @@ import json
 import re
 
 import pytest
-from hypothesis import given, provisional, settings
-from hypothesis import strategies as st
 from pydantic.error_wrappers import ValidationError
 
-from ralph.models.edx.base import BaseContextField, BaseEdxModel
+from ralph.models.edx.base import BaseEdxModel
+
+from tests.fixtures.hypothesis_strategies import custom_given
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        BaseEdxModel, context=st.builds(BaseContextField), referer=provisional.urls()
-    )
-)
+@custom_given(BaseEdxModel)
 def test_models_edx_base_edx_model_with_valid_statement(statement):
     """Tests that a valid base `Edx` statement does not raise a `ValidationError`."""
 
@@ -48,12 +43,7 @@ def test_models_edx_base_edx_model_with_valid_statement(statement):
         ),
     ],
 )
-@settings(max_examples=1)
-@given(
-    st.builds(
-        BaseEdxModel, context=st.builds(BaseContextField), referer=provisional.urls()
-    )
-)
+@custom_given(BaseEdxModel)
 def test_models_edx_base_edx_model_with_invalid_statement(course_id, error, statement):
     """Tests that a invalid base `Edx` statement raises a `ValidationError`."""
 
