@@ -1,7 +1,6 @@
 """OVH's LDP storage backend for Ralph"""
 
 import logging
-import sys
 
 import ovh
 import requests
@@ -16,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class LDPStorage(HistoryMixin, BaseStorage):
-    """OVH's LDP storage backend"""
+    """OVH's LDP storage backend."""
 
     # pylint: disable=too-many-arguments
 
@@ -31,6 +30,8 @@ class LDPStorage(HistoryMixin, BaseStorage):
         service_name=None,
         stream_id=None,
     ):
+        """Instantiates the OVH's LDP client."""
+
         self._endpoint = endpoint
         self._application_key = application_key
         self._application_secret = application_secret
@@ -60,7 +61,7 @@ class LDPStorage(HistoryMixin, BaseStorage):
         )
 
     def _details(self, name):
-        """Get name archive details
+        """Returns `name` archive details.
 
         Expected JSON response looks like:
 
@@ -78,7 +79,7 @@ class LDPStorage(HistoryMixin, BaseStorage):
         return self.client.get(f"{self._archive_endpoint}/{name}")
 
     def url(self, name):
-        """Get archive absolute URL"""
+        """Gets archive absolute URL."""
 
         download_url_endpoint = f"{self._archive_endpoint}/{name}/url"
 
@@ -89,12 +90,11 @@ class LDPStorage(HistoryMixin, BaseStorage):
         return download_url
 
     def list(self, details=False, new=False):
-        """List archives for a given stream.
+        """Lists archives for a given stream.
 
-        details: get detailed information about archives instead of their ids
-
-        new: given the history, list only not already fetched archives
-
+        Args:
+            details (bool): Get detailed archive information instead of just ids.
+            new (bool): Given the history, list only not already fetched archives.
         """
 
         list_archives_endpoint = self._archive_endpoint
@@ -112,7 +112,7 @@ class LDPStorage(HistoryMixin, BaseStorage):
             yield self._details(archive) if details else archive
 
     def read(self, name, chunk_size=4096):
-        """Read the `name` archive file and stream its content"""
+        """Reads the `name` archive file and yields its content."""
 
         logger.debug("Getting archive: %s", name)
 
@@ -123,7 +123,7 @@ class LDPStorage(HistoryMixin, BaseStorage):
         with requests.get(self.url(name), stream=True) as result:
             result.raise_for_status()
             for chunk in result.iter_content(chunk_size=chunk_size):
-                sys.stdout.buffer.write(chunk)
+                yield chunk
 
         # Archive is supposed to have been fully fetched, add a new entry to
         # the history.
@@ -138,7 +138,7 @@ class LDPStorage(HistoryMixin, BaseStorage):
             }
         )
 
-    def write(self, name, chunk_size=4096, overwrite=False):
+    def write(self, stream, name, overwrite=False):
         """LDP storage backend is read-only, calling this method will raise an error"""
 
         msg = "LDP storage backend is read-only, cannot write to %s"

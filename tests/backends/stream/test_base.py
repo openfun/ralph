@@ -11,7 +11,7 @@ def test_backends_stream_base_abstract_interface_with_implemented_abstract_metho
 
         name = "good"
 
-        def stream(self):
+        def stream(self, target):
             """Fakes the stream method."""
 
     GoodStream()

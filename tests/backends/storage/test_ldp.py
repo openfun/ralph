@@ -4,12 +4,11 @@ import datetime
 import gzip
 import json
 import os.path
-import sys
 import uuid
 from collections.abc import Iterable
-from io import BytesIO
 from pathlib import Path, PurePath
 from urllib.parse import urlparse
+from xmlrpc.client import gzip_decode
 
 import ovh
 import pytest
@@ -408,14 +407,6 @@ def test_backends_storage_ldp_read_method(monkeypatch, fs):
 
             return freezed_now
 
-    # Mock stdout stream
-    class MockStdout:
-        """A simple mock for sys.stdout.buffer."""
-
-        buffer = BytesIO()
-
-    mock_stdout = MockStdout()
-
     storage = LDPStorage(
         endpoint="ovh-eu",
         application_key="fake_key",
@@ -430,12 +421,11 @@ def test_backends_storage_ldp_read_method(monkeypatch, fs):
     monkeypatch.setattr(storage.client, "get", mock_ovh_get)
     monkeypatch.setattr(requests, "get", mock_requests_get)
     monkeypatch.setattr(datetime, "datetime", MockDatetime)
-    monkeypatch.setattr(sys, "stdout", mock_stdout)
 
     fs.create_dir(str(APP_DIR))
     assert not os.path.exists(str(HISTORY_FILE))
 
-    storage.read(name="5d5c4c93-04a4-42c5-9860-f51fa4044aa1")
+    result = b"".join(storage.read(name="5d5c4c93-04a4-42c5-9860-f51fa4044aa1"))
 
     assert os.path.exists(str(HISTORY_FILE))
     assert storage.history == [
@@ -449,9 +439,7 @@ def test_backends_storage_ldp_read_method(monkeypatch, fs):
         }
     ]
 
-    mock_stdout.buffer.seek(0)
-    with gzip.open(mock_stdout.buffer, "rb") as output:
-        assert json.loads(output.read()) == archive_content
+    assert json.loads(gzip_decode(result)) == archive_content
 
 
 def test_backends_storage_ldp_write_method_with_details():
@@ -470,4 +458,4 @@ def test_backends_storage_ldp_write_method_with_details():
         NotImplementedError,
         match="LDP storage backend is read-only, cannot write to fake",
     ):
-        storage.write("fake", "content")
+        storage.write("truly", "fake", "content")

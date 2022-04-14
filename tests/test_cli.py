@@ -2,7 +2,6 @@
 
 import json
 import logging
-import sys
 from pathlib import Path
 
 import pytest
@@ -312,7 +311,7 @@ def test_cli_fetch_command_with_ldp_backend(monkeypatch):
         """Always return the same archive."""
         # pylint: disable=unused-argument
 
-        sys.stdout.buffer.write(bytes(json.dumps(archive_content), encoding="utf-8"))
+        yield bytes(json.dumps(archive_content), encoding="utf-8")
 
     monkeypatch.setattr(LDPStorage, "read", mock_read)
 
@@ -335,7 +334,7 @@ def test_cli_fetch_command_with_fs_backend(fs, monkeypatch):
         """Always return the same archive."""
         # pylint: disable=unused-argument
 
-        sys.stdout.buffer.write(bytes(json.dumps(archive_content), encoding="utf-8"))
+        yield bytes(json.dumps(archive_content), encoding="utf-8")
 
     monkeypatch.setattr(FSStorage, "read", mock_read)
 

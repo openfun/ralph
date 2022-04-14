@@ -25,6 +25,7 @@ and this project adheres to
 - Upgrade `sentry_sdk` to `1.5.12`
 - Upgrade `uvicorn` to `0.17.6`
 - Upgrade `websockets` to `10.3`
+- Make backends yield results instead of writing to standard streams
 
 ### Fixed
 

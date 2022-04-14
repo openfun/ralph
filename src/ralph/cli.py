@@ -38,12 +38,11 @@ from ralph.utils import (
 # cli module logger
 logger = logging.getLogger(__name__)
 
-# Lazy evaluations
-DATABASE_BACKENDS = (lambda: [backend.value for backend in DatabaseBackends])()
-PARSERS = (lambda: [parser.value for parser in Parsers])()
-STORAGE_BACKENDS = (lambda: [backend.value for backend in StorageBackends])()
-STREAM_BACKENDS = (lambda: [backend.value for backend in StreamBackends])()
-BACKENDS = (lambda: DATABASE_BACKENDS + STORAGE_BACKENDS + STREAM_BACKENDS)()
+DATABASE_BACKENDS = [backend.value for backend in DatabaseBackends]
+PARSERS = [parser.value for parser in Parsers]
+STORAGE_BACKENDS = [backend.value for backend in StorageBackends]
+STREAM_BACKENDS = [backend.value for backend in StreamBackends]
+BACKENDS = DATABASE_BACKENDS + STORAGE_BACKENDS + STREAM_BACKENDS
 
 
 class CommaSeparatedKeyValueParamType(click.ParamType):
@@ -310,11 +309,14 @@ def fetch(backend, archive, chunk_size, **options):
     backend_type = get_backend_type(backend_class)
 
     if backend_type == BackendTypes.STORAGE:
-        backend.read(archive, chunk_size=chunk_size)
+        for data in backend.read(archive, chunk_size=chunk_size):
+            click.echo(data, nl=False)
     elif backend_type == BackendTypes.DATABASE:
-        backend.get(chunk_size=chunk_size)
+        for document in backend.get(chunk_size):
+            source = json.dumps(document.get("_source"))
+            click.echo(bytes(source, encoding="utf-8"))
     elif backend_type == BackendTypes.STREAM:
-        backend.stream()
+        backend.stream(sys.stdout.buffer)
     elif backend_type is None:
         msg = "Cannot find an implemented backend type for backend %s"
         logger.error(msg, backend)
@@ -355,9 +357,9 @@ def push(backend, archive, chunk_size, force, ignore_errors, **options):
     backend_type = get_backend_type(backend_class)
 
     if backend_type == BackendTypes.STORAGE:
-        backend.write(archive, overwrite=force)
+        backend.write(sys.stdin.buffer, archive, overwrite=force)
     elif backend_type == BackendTypes.DATABASE:
-        backend.put(chunk_size=chunk_size, ignore_errors=ignore_errors)
+        backend.put(sys.stdin, chunk_size=chunk_size, ignore_errors=ignore_errors)
     elif backend_type is None:
         msg = "Cannot find an implemented backend type for backend %s"
         logger.error(msg, backend)
