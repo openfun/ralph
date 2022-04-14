@@ -1,6 +1,7 @@
 """Base Stream backend for Ralph"""
 
 from abc import ABC, abstractmethod
+from typing import BinaryIO
 
 
 class BaseStream(ABC):
@@ -9,5 +10,5 @@ class BaseStream(ABC):
     name = "base"
 
     @abstractmethod
-    def stream(self):
-        """Read records and stream them to stdout."""
+    def stream(self, target: BinaryIO):
+        """Reads records and streams them to target."""

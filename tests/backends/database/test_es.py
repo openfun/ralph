@@ -5,7 +5,7 @@ import random
 import sys
 from collections.abc import Iterable
 from datetime import datetime
-from io import BytesIO, StringIO
+from io import StringIO
 from pathlib import Path
 
 import pytest
@@ -127,7 +127,7 @@ def test_backends_database_es_to_documents_method_with_create_op_type(es):
     ]
 
 
-def test_backends_database_es_get_method(es, monkeypatch):
+def test_backends_database_es_get_method(es):
     """Tests ES get method."""
     # pylint: disable=invalid-name
 
@@ -143,24 +143,13 @@ def test_backends_database_es_get_method(es, monkeypatch):
     # queries.
     es.indices.refresh(index=ES_TEST_INDEX)
 
-    # Mock stdout stream
-    class MockStdout:
-        """A simple mock for sys.stdout.buffer."""
-
-        buffer = BytesIO()
-
-    mock_stdout = MockStdout()
-    monkeypatch.setattr(sys, "stdout", mock_stdout)
-
     database = ESDatabase(
         hosts=ES_TEST_HOSTS,
         index=ES_TEST_INDEX,
     )
-    database.get()
 
-    mock_stdout.buffer.seek(0)
-    documents = [json.loads(line) for line in mock_stdout.buffer.readlines()]
-    assert documents == [{"id": idx} for idx in range(10)]
+    expected = [{"id": idx} for idx in range(10)]
+    assert list(map(lambda x: x.get("_source"), database.get())) == expected
 
 
 def test_backends_database_es_put_method(es, fs, monkeypatch):
@@ -183,7 +172,7 @@ def test_backends_database_es_put_method(es, fs, monkeypatch):
         hosts=ES_TEST_HOSTS,
         index=ES_TEST_INDEX,
     )
-    database.put(chunk_size=5)
+    database.put(sys.stdin, chunk_size=5)
 
     # As we bulk insert documents, the index needs to be refreshed before making
     # queries.
@@ -214,7 +203,7 @@ def test_backends_database_es_put_method_with_update_op_type(es, fs, monkeypatch
     assert len(es.search(index=ES_TEST_INDEX)["hits"]["hits"]) == 0
 
     database = ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX)
-    database.put(chunk_size=5)
+    database.put(sys.stdin, chunk_size=5)
 
     # As we bulk insert documents, the index needs to be refreshed before making
     # queries.
@@ -237,7 +226,7 @@ def test_backends_database_es_put_method_with_update_op_type(es, fs, monkeypatch
     )
 
     database = ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX, op_type="update")
-    database.put(chunk_size=5)
+    database.put(sys.stdin, chunk_size=5)
 
     # As we bulk insert documents, the index needs to be refreshed before making
     # queries.
@@ -275,7 +264,7 @@ def test_backends_database_es_put_with_badly_formatted_data_raises_a_bulkindexer
 
     # By default, we should raise an error and stop the importation
     with pytest.raises(BulkIndexError):
-        database.put(chunk_size=2)
+        database.put(sys.stdin, chunk_size=2)
     es.indices.refresh(index=ES_TEST_INDEX)
     hits = es.search(index=ES_TEST_INDEX)["hits"]["hits"]
     assert len(hits) == 5
@@ -305,7 +294,7 @@ def test_backends_database_es_put_with_badly_formatted_data_in_force_mode(
     )
     # When forcing import, We expect the record with non expected type to have
     # been dropped
-    database.put(chunk_size=5, ignore_errors=True)
+    database.put(sys.stdin, chunk_size=5, ignore_errors=True)
     es.indices.refresh(index=ES_TEST_INDEX)
     hits = es.search(index=ES_TEST_INDEX)["hits"]["hits"]
     assert len(hits) == 9
@@ -333,7 +322,7 @@ def test_backends_database_es_put_with_datastream(es_data_stream, fs, monkeypatc
     assert len(es_data_stream.search(index=ES_TEST_INDEX)["hits"]["hits"]) == 0
 
     database = ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX, op_type="create")
-    database.put(chunk_size=5)
+    database.put(sys.stdin, chunk_size=5)
 
     # As we bulk insert documents, the index needs to be refreshed before making
     # queries.

@@ -2,10 +2,9 @@
 
 import datetime
 import logging
-import sys
 from pathlib import Path
 
-from ralph.defaults import FS_STORAGE_DEFAULT_PATH, LOCALE_ENCODING
+from ralph.defaults import FS_STORAGE_DEFAULT_PATH
 from ralph.utils import now
 
 from ..mixins import HistoryMixin
@@ -15,12 +14,12 @@ logger = logging.getLogger(__name__)
 
 
 class FSStorage(HistoryMixin, BaseStorage):
-    """FileSystem storage backend"""
+    """FileSystem storage backend."""
 
     name = "fs"
 
     def __init__(self, path=FS_STORAGE_DEFAULT_PATH):
-        """Create the path directory if it does not exist"""
+        """Creates the path directory if it does not exist."""
 
         self._path = Path(path)
         if not self._path.is_dir():
@@ -30,7 +29,7 @@ class FSStorage(HistoryMixin, BaseStorage):
         logger.debug("File system storage path: %s", self._path)
 
     def _get_filepath(self, name, strict=False):
-        """Return path of the archive in the FS storage, or throws an exception if
+        """Returns path of the archive in the FS storage, or throws an exception if
         not found.
         """
 
@@ -42,7 +41,7 @@ class FSStorage(HistoryMixin, BaseStorage):
         return file_path
 
     def _details(self, name):
-        """Get name archive details"""
+        """Gets `name` archive details."""
 
         file_path = self._get_filepath(name)
         stats = file_path.stat()
@@ -56,7 +55,7 @@ class FSStorage(HistoryMixin, BaseStorage):
         }
 
     def list(self, details=False, new=False):
-        """List files in the storage backend"""
+        """Lists files in the storage backend."""
 
         archives = [archive.name for archive in self._path.iterdir()]
         logger.debug("Found %d archives", len(archives))
@@ -69,18 +68,18 @@ class FSStorage(HistoryMixin, BaseStorage):
             yield self._details(archive) if details else archive
 
     def url(self, name):
-        """Get `name` file absolute URL"""
+        """Gets `name` file absolute URL."""
 
         return str(self._get_filepath(name).resolve(strict=True))
 
     def read(self, name, chunk_size=4096):
-        """Read `name` file and stream its content by chunks of a given size"""
+        """Reads `name` file and yields its content by chunks of a given size."""
 
         logger.debug("Getting archive: %s", name)
 
         with self._get_filepath(name).open("rb") as file:
             while chunk := file.read(chunk_size):
-                sys.stdout.buffer.write(chunk)
+                yield chunk
 
         details = self._details(name)
         # Archive is supposed to have been fully fetched, add a new entry to
@@ -96,8 +95,8 @@ class FSStorage(HistoryMixin, BaseStorage):
             }
         )
 
-    def write(self, name, chunk_size=4096, overwrite=False):
-        """Write content to the `name` target"""
+    def write(self, stream, name, overwrite=False):
+        """Writes content to the `name` target."""
 
         logger.debug("Creating archive: %s", name)
 
@@ -107,8 +106,8 @@ class FSStorage(HistoryMixin, BaseStorage):
             logger.error(msg, name)
             raise FileExistsError(msg, name)
 
-        with file_path.open("w", encoding=LOCALE_ENCODING) as file:
-            while chunk := sys.stdin.read(chunk_size):
+        with file_path.open("wb") as file:
+            for chunk in stream:
                 file.write(chunk)
 
         details = self._details(name)

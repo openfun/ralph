@@ -2,7 +2,7 @@
 
 import asyncio
 import logging
-import sys
+from typing import BinaryIO
 
 import websockets
 
@@ -17,15 +17,16 @@ class WSStream(BaseStream):
     name = "ws"
 
     def __init__(self, uri: str):
-        """Instantiate the websocket client.
+        """Instantiates the websocket client.
 
-        uri: the URI to connect to
+        Args:
+            uri (str): The URI to connect to.
         """
 
         self.uri = uri
 
-    def stream(self):
-        """Stream websocket content to stdout."""
+    def stream(self, target: BinaryIO):
+        """Stream websocket content to target."""
         # pylint: disable=no-member
 
         logger.debug("Streaming from websocket uri: %s", self.uri)
@@ -33,6 +34,6 @@ class WSStream(BaseStream):
         async def _stream():
             async with websockets.connect(self.uri) as websocket:
                 while event := await websocket.recv():
-                    sys.stdout.buffer.write(bytes(f"{event}" + "\n", encoding="utf-8"))
+                    target.write(bytes(f"{event}" + "\n", encoding="utf-8"))
 
         asyncio.get_event_loop().run_until_complete(_stream())

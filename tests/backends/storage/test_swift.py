@@ -3,6 +3,7 @@
 import datetime
 import json
 import logging
+import sys
 
 import pytest
 from swiftclient.service import SwiftService
@@ -138,7 +139,7 @@ def test_backends_storage_swift_read_with_valid_name_should_write_to_history(
     fs.create_file(HISTORY_FILE, contents=json.dumps([]))
 
     swift = swift()
-    swift.read("2020-04-29.gz")
+    list(swift.read("2020-04-29.gz"))
     assert swift.history == [
         {
             "backend": "swift",
@@ -175,7 +176,7 @@ def test_backends_storage_swift_read_with_invalid_name_should_log_the_error(
     swift = swift()
     msg = f"Failed to download 2020-04-31.gz: {error}"
     with pytest.raises(BackendException, match=msg):
-        swift.read("2020-04-31.gz")
+        list(swift.read("2020-04-31.gz"))
     logger_name = "ralph.backends.storage.swift"
     assert caplog.record_tuples == [(logger_name, logging.ERROR, msg)]
     assert swift.history == []
@@ -235,11 +236,11 @@ def test_backends_storage_swift_write_should_write_to_history_new_or_overwriten_
         new_history_entry = []
         msg = f"{archive_name} already exists and overwrite is not allowed"
         with pytest.raises(FileExistsError, match=msg):
-            swift.write(archive_name, overwrite=overwrite)
+            swift.write(sys.stdin.buffer, archive_name, overwrite=overwrite)
         logger_name = "ralph.backends.storage.swift"
         assert caplog.record_tuples == [(logger_name, logging.ERROR, msg)]
     else:
-        swift.write(archive_name, overwrite=overwrite)
+        swift.write(sys.stdin.buffer, archive_name, overwrite=overwrite)
     assert swift.history == history + new_history_entry
 
 
@@ -279,7 +280,7 @@ def test_backends_storage_swift_write_should_log_the_error(
 
     swift = swift()
     with pytest.raises(BackendException, match=error):
-        swift.write("2020-04-29.gz", overwrite=True)
+        swift.write(sys.stdin.buffer, "2020-04-29.gz", overwrite=True)
     logger_name = "ralph.backends.storage.swift"
     assert caplog.record_tuples == [(logger_name, logging.ERROR, error)]
     assert swift.history == history

@@ -1,7 +1,6 @@
 """Swift storage backend for Ralph"""
 
 import logging
-import sys
 from functools import cached_property
 from urllib.parse import urlparse
 
@@ -25,7 +24,7 @@ logger = logging.getLogger(__name__)
 class SwiftStorage(
     HistoryMixin, BaseStorage
 ):  # pylint: disable=too-many-instance-attributes
-    """OpenStack's Swift storage backend"""
+    """OpenStack's Swift storage backend."""
 
     name = "swift"
 
@@ -44,7 +43,7 @@ class SwiftStorage(
         os_auth_url=SWIFT_OS_AUTH_URL,
         os_identity_api_version=SWIFT_OS_IDENTITY_API_VERSION,
     ):
-        """Setup options for the SwiftService"""
+        """Prepares the options for the SwiftService."""
 
         self.os_tenant_id = os_tenant_id
         self.os_tenant_name = os_tenant_name
@@ -67,7 +66,7 @@ class SwiftStorage(
 
     @cached_property
     def options(self):
-        """Returns the required options for the SwiftService"""
+        """Returns the required options for the SwiftService."""
 
         return {
             "os_auth_url": self.os_auth_url,
@@ -83,7 +82,7 @@ class SwiftStorage(
         }
 
     def list(self, details=False, new=False):
-        """List files in the storage backend"""
+        """Lists files in the storage backend."""
 
         archives_to_skip = set()
         if new:
@@ -100,13 +99,13 @@ class SwiftStorage(
                     yield archive if details else archive["name"]
 
     def url(self, name):
-        """Get `name` file absolute URL"""
+        """Gets `name` file absolute URL."""
 
         # What's the purpose of this function ? Seems not used anywhere.
         return f"{self.options.get('os_storage_url')}/{name}"
 
     def read(self, name, chunk_size=None):
-        """Read `name` object and stream its content in chunks of (max) 2 ** 16
+        """Reads `name` object and yields its content in chunks of (max) 2 ** 16.
 
         Why chunks of (max) 2 ** 16 ?
             Because SwiftService opens a file to stream the object into:
@@ -117,16 +116,18 @@ class SwiftStorage(
         logger.debug("Getting archive: %s", name)
 
         with SwiftService(self.options) as swift:
-            download = next(swift.download(self.container, [name], {"out_file": "-"}))
+            options = {"out_file": "-"}
+            download = next(swift.download(self.container, [name], options), {})
         if "contents" not in download:
             msg = "Failed to download %s: %s"
-            logger.error(msg, download["object"], download["error"])
-            raise BackendException(msg % (download["object"], download["error"]))
+            error = download.get("error", "swift.download did not yield")
+            logger.error(msg, download.get("object", name), error)
+            raise BackendException(msg % (download.get("object", name), error))
         size = 0
         for chunk in download["contents"]:
             logger.debug("Chunk %s", len(chunk))
             size += len(chunk)
-            sys.stdout.buffer.write(chunk)
+            yield chunk
 
         # Archive fetched, add a new entry to the history
         self.append_to_history(
@@ -139,8 +140,8 @@ class SwiftStorage(
             }
         )
 
-    def write(self, name, chunk_size=None, overwrite=False):
-        """Write content to the `name` target in chunks of (max) 2 ** 16"""
+    def write(self, stream, name, overwrite=False):
+        """Writes data from `stream` to the `name` target in chunks of (max) 2 ** 16."""
 
         if not overwrite and name in list(self.list()):
             msg = "%s already exists and overwrite is not allowed"
@@ -149,7 +150,7 @@ class SwiftStorage(
 
         logger.debug("Creating archive: %s", name)
 
-        swift_object = SwiftUploadObject(sys.stdin.buffer, object_name=name)
+        swift_object = SwiftUploadObject(stream, object_name=name)
         with SwiftService(self.options) as swift:
             for upload in swift.upload(self.container, [swift_object]):
                 if not upload["success"]:

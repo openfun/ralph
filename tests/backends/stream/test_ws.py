@@ -1,7 +1,6 @@
 """Tests for Ralph ws stream backend"""
 
 import json
-import sys
 from io import BytesIO
 
 import pytest
@@ -40,10 +39,9 @@ def test_backends_stream_ws_stream_stream(ws, monkeypatch, events):
         buffer = BytesIO()
 
     mock_stdout = MockStdout()
-    monkeypatch.setattr(sys, "stdout", mock_stdout)
 
     try:
-        client.stream()
+        client.stream(mock_stdout.buffer)
     except websockets.exceptions.ConnectionClosedOK:
         pass
 
@@ -65,10 +63,9 @@ def test_backends_stream_ws_stream_stream_when_server_stops(ws, monkeypatch, eve
         buffer = BytesIO()
 
     mock_stdout = MockStdout()
-    monkeypatch.setattr(sys, "stdout", mock_stdout)
 
     try:
-        client.stream()
+        client.stream(mock_stdout.buffer)
     except websockets.exceptions.ConnectionClosedOK:
         pass
 

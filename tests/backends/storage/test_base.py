@@ -20,7 +20,7 @@ def test_backends_storage_base_abstract_interface_with_implemented_abstract_meth
         def read(self, name, chunk_size=0):
             """Fakes the read method."""
 
-        def write(self, name, chunk_size=4096, overwrite=False):
+        def write(self, stream, name, overwrite=False):
             """Fakes the write method."""
 
     GoodStorage()

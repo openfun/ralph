@@ -2,7 +2,6 @@
 
 import json
 import logging
-import sys
 from enum import Enum
 
 from elasticsearch import Elasticsearch
@@ -16,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class OpType(Enum):
-    """Elasticsearch operation types"""
+    """Elasticsearch operation types."""
 
     INDEX = "index"
     CREATE = "create"
@@ -28,7 +27,7 @@ DEFAULT_OP_TYPE = OpType.INDEX.value
 
 
 class ESDatabase(BaseDatabase):
-    """Elasticsearch database backend"""
+    """Elasticsearch database backend."""
 
     name = "es"
 
@@ -39,15 +38,15 @@ class ESDatabase(BaseDatabase):
         client_options: dict = None,
         op_type: str = DEFAULT_OP_TYPE,
     ):
-        """Instantiate the Elasticsearch client.
+        """Instantiates the Elasticsearch client.
 
-        hosts: supposed to be a list
-        index: the index name
-        es_client_options: a dict of valid options for the Elasticsearch class
-                           initialization
-        op_type: elasticsearch operation type for every document sent to ES
-                (should be one of: index, create, delete, update)
-
+        Args:
+            hosts (list): List of Elasticsearch nodes we should connect to.
+            index (str): The Elasticsearch index name.
+            es_client_options (dict): A dictionary of valid options for the
+                Elasticsearch class initialization.
+            op_type (str): The Elasticsearch operation type for every document sent to
+                Elasticsearch (should be one of: index, create, delete, update).
         """
         if client_options is None:
             client_options = {}
@@ -62,15 +61,13 @@ class ESDatabase(BaseDatabase):
         self.op_type = op_type
 
     def get(self, chunk_size=500):
-        """Get index documents and stream them"""
+        """Gets index documents and yields them."""
 
         for document in scan(self.client, index=self.index, size=chunk_size):
-            sys.stdout.buffer.write(
-                bytes(json.dumps(document.get("_source")) + "\n", encoding="utf-8")
-            )
+            yield document
 
     def to_documents(self, stream, get_id):
-        """Convert stream lines to ES documents"""
+        """Converts stream lines to ES documents."""
 
         for line in stream:
             item = json.loads(line)
@@ -80,21 +77,13 @@ class ESDatabase(BaseDatabase):
                 "_op_type": self.op_type,
             }
             if self.op_type == "update":
-                action.update(
-                    {
-                        "doc": item,
-                    }
-                )
+                action.update({"doc": item})
             elif self.op_type in ("create", "index"):
-                action.update(
-                    {
-                        "_source": item,
-                    }
-                )
+                action.update({"_source": item})
             yield action
 
-    def put(self, chunk_size=500, ignore_errors=False):
-        """Write documents streamed from the standard input to the instance index"""
+    def put(self, stream, chunk_size=500, ignore_errors=False):
+        """Writes documents from the stream to the instance index."""
 
         logger.debug(
             "Start writing to the %s index (chunk size: %d)", self.index, chunk_size
@@ -103,7 +92,7 @@ class ESDatabase(BaseDatabase):
         documents = 0
         for success, action in streaming_bulk(
             client=self.client,
-            actions=self.to_documents(sys.stdin, lambda d: d.get("id", None)),
+            actions=self.to_documents(stream, lambda d: d.get("id", None)),
             chunk_size=chunk_size,
             raise_on_error=(not ignore_errors),
         ):

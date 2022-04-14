@@ -93,7 +93,7 @@ def test_backends_storage_fs_list(fs):
     assert len(simple_list) == 2
 
     # Fetch it so it's not new anymore
-    storage.read(filename1)
+    list(storage.read(filename1))
 
     new_list = list(storage.list(new=True))
     assert filename1 not in new_list
