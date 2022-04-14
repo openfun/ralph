@@ -19,11 +19,10 @@ class BaseParser(ABC):
         """Parses GELF formatted logs (one JSON string event per row).
 
         Args:
-            input_file (string): Path to the log file to parse.
+            input_file (file-like): The log file to parse.
 
         Yields:
-            event: raw event as extracted from its container
-
+            event: raw event as extracted from its container.
         """
 
 
@@ -40,29 +39,25 @@ class GELFParser(BaseParser):
         """Parses GELF formatted logs (one JSON string event per row).
 
         Args:
-            input_file (string): Path to the log file to parse (could be gunzipped).
+            input_file (file-like): The log file to parse.
 
         Yields:
-            event: events raw short_message string
-
+            event: events raw short_message string.
         """
+
         logger.info("Parsing: %s", input_file)
 
         for event in input_file:
             try:
                 yield json.loads(event)["short_message"]
             except (json.JSONDecodeError, TypeError) as err:
-                logger.error(
-                    "Input event '%s' is not a valid JSON string! It will be ignored.",
-                    event,
-                )
+                msg = "Input event '%s' is not a valid JSON string! It will be ignored."
+                logger.error(msg, event)
                 logger.debug("Raised error was: %s", err)
             except KeyError as err:
-                logger.error(
-                    (
-                        "Input event '%s' doesn't comply with GELF format! It will be "
-                        "ignored."
-                    ),
-                    event,
+                msg = (
+                    "Input event '%s' doesn't comply with GELF format! "
+                    "It will be ignored."
                 )
+                logger.error(msg, event)
                 logger.debug("Raised error was: %s", err)
