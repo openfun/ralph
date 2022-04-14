@@ -3,7 +3,7 @@
 from datetime import datetime
 from ipaddress import IPv4Address
 from pathlib import Path
-from typing import Dict, Literal, Optional, Union
+from typing import Literal, Optional, Union
 
 from pydantic import AnyHttpUrl, BaseModel, constr
 
@@ -76,7 +76,7 @@ class BaseContextField(BaseModelWithConfig):
     """
 
     course_id: constr(regex=r"^$|^course-v1:.+\+.+\+.+$")  # noqa:F722
-    course_user_tags: Optional[Dict[str, str]]
+    course_user_tags: Optional[dict[str, str]]
     module: Optional[ContextModuleField]
     org_id: str
     path: Path
