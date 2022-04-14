@@ -50,8 +50,8 @@ Use curl to get `http://localhost:8100/whoami`:
 
 ```bash
 $ curl http://localhost:8100/whoami
-< HTTP/1.1 400 Bad Request
-< {"error":"Missing authentication credentials."}
+< HTTP/1.1 401 Unauthorized
+< {"error":"Not authenticated"}
 ```
 
 Send your username and password to the API server through HTTP Basic Auth:
