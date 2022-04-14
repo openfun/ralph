@@ -4,11 +4,8 @@ import json
 import re
 
 import pytest
-from hypothesis import given, provisional, settings
-from hypothesis import strategies as st
 from pydantic.error_wrappers import ValidationError
 
-from ralph.models.edx.base import BaseContextField
 from ralph.models.edx.navigational.fields.events import NavigationalEventField
 from ralph.models.edx.navigational.statements import (
     UIPageClose,
@@ -18,9 +15,10 @@ from ralph.models.edx.navigational.statements import (
 )
 from ralph.models.selector import ModelSelector
 
+from tests.fixtures.hypothesis_strategies import custom_given
 
-@settings(max_examples=1)
-@given(st.builds(NavigationalEventField))
+
+@custom_given(NavigationalEventField)
 def test_fields_edx_navigational_events_event_field_with_valid_content(field):
     """Tests that a valid `NavigationalEventField` does not raise a
     `ValidationError`.
@@ -62,8 +60,7 @@ def test_fields_edx_navigational_events_event_field_with_valid_content(field):
         ),
     ],  # pylint: disable=invalid-name
 )
-@settings(max_examples=1)
-@given(st.builds(NavigationalEventField))
+@custom_given(NavigationalEventField)
 def test_fields_edx_navigational_events_event_field_with_invalid_content(
     id, field  # pylint: disable=redefined-builtin, invalid-name
 ):
@@ -76,8 +73,7 @@ def test_fields_edx_navigational_events_event_field_with_invalid_content(
         NavigationalEventField(**invalid_field)
 
 
-@settings(max_examples=1)
-@given(st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()))
+@custom_given(UIPageClose)
 def test_models_edx_ui_page_close_with_valid_statement(statement):
     """Tests that a `page_close` statement has the expected `event`, `event_type` and
     `name`.
@@ -88,8 +84,7 @@ def test_models_edx_ui_page_close_with_valid_statement(statement):
     assert statement.name == "page_close"
 
 
-@settings(max_examples=1)
-@given(st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()))
+@custom_given(UIPageClose)
 def test_models_edx_ui_page_close_selector_with_valid_statement(statement):
     """Tests given a `page_close` statement the selector `get_model` method should
     return `UIPageClose` model.
@@ -99,16 +94,7 @@ def test_models_edx_ui_page_close_selector_with_valid_statement(statement):
     assert ModelSelector(module="ralph.models.edx").get_model(statement) is UIPageClose
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UISeqGoto,
-        context=st.builds(BaseContextField),
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(NavigationalEventField),
-    )
-)
+@custom_given(UISeqGoto)
 def test_models_edx_ui_seq_goto_with_valid_statement(statement):
     """Tests that a `seq_goto` statement has the expected `event_type` and `name`."""
 
@@ -116,16 +102,7 @@ def test_models_edx_ui_seq_goto_with_valid_statement(statement):
     assert statement.name == "seq_goto"
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UISeqGoto,
-        context=st.builds(BaseContextField),
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(NavigationalEventField),
-    )
-)
+@custom_given(UISeqGoto)
 def test_models_edx_ui_seq_goto_selector_with_valid_statement(statement):
     """Tests given a `seq_goto` statement the selector `get_model` method should return
     `UISeqGoto` model.
@@ -135,18 +112,7 @@ def test_models_edx_ui_seq_goto_selector_with_valid_statement(statement):
     assert ModelSelector(module="ralph.models.edx").get_model(statement) is UISeqGoto
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UISeqNext,
-        context=st.builds(BaseContextField),
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(
-            NavigationalEventField, old=st.integers(0, 0), new=st.integers(1, 1)
-        ),
-    )
-)
+@custom_given(UISeqNext)
 def test_models_edx_ui_seq_next_with_valid_statement(statement):
     """Tests that a `seq_next` statement has the expected `event_type` and `name`."""
 
@@ -154,18 +120,7 @@ def test_models_edx_ui_seq_next_with_valid_statement(statement):
     assert statement.name == "seq_next"
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UISeqNext,
-        context=st.builds(BaseContextField),
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(
-            NavigationalEventField, old=st.integers(0, 0), new=st.integers(1, 1)
-        ),
-    )
-)
+@custom_given(UISeqNext)
 def test_models_edx_ui_seq_next_selector_with_valid_statement(statement):
     """Tests given a `seq_next` event the selector `get_model` method should return
     `UISeqNext` model.
@@ -176,18 +131,7 @@ def test_models_edx_ui_seq_next_selector_with_valid_statement(statement):
 
 
 @pytest.mark.parametrize("old,new", [("0", "10"), ("10", "0")])
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UISeqNext,
-        context=st.builds(BaseContextField),
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(
-            NavigationalEventField, old=st.integers(0, 0), new=st.integers(1, 1)
-        ),
-    )
-)
+@custom_given(UISeqNext)
 def test_models_edx_ui_seq_next_with_invalid_statement(old, new, event):
     """Tests that an invalid `seq_next` event raises a ValidationError."""
 
@@ -202,18 +146,7 @@ def test_models_edx_ui_seq_next_with_invalid_statement(old, new, event):
         UISeqNext(**invalid_event)
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UISeqPrev,
-        context=st.builds(BaseContextField),
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(
-            NavigationalEventField, old=st.integers(1, 1), new=st.integers(0, 0)
-        ),
-    )
-)
+@custom_given(UISeqPrev)
 def test_models_edx_ui_seq_prev_with_valid_statement(statement):
     """Tests that a `seq_prev` statement has the expected `event_type` and `name`."""
 
@@ -222,18 +155,7 @@ def test_models_edx_ui_seq_prev_with_valid_statement(statement):
 
 
 @pytest.mark.parametrize("old,new", [("0", "10"), ("10", "0")])
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UISeqPrev,
-        context=st.builds(BaseContextField),
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(
-            NavigationalEventField, old=st.integers(1, 1), new=st.integers(0, 0)
-        ),
-    )
-)
+@custom_given(UISeqPrev)
 def test_models_edx_ui_seq_prev_with_invalid_statement(old, new, event):
     """Tests that an invalid `seq_prev` event raises a ValidationError."""
 
@@ -247,18 +169,7 @@ def test_models_edx_ui_seq_prev_with_invalid_statement(old, new, event):
         UISeqPrev(**invalid_event)
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UISeqPrev,
-        context=st.builds(BaseContextField),
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        event=st.builds(
-            NavigationalEventField, old=st.integers(1, 1), new=st.integers(0, 0)
-        ),
-    )
-)
+@custom_given(UISeqPrev)
 def test_models_edx_ui_seq_prev_selector_with_valid_statement(statement):
     """Tests given a `seq_prev` statement the selector `get_model` method should return
     `UISeqPrev` model.

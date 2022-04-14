@@ -4,27 +4,16 @@ import json
 from uuid import UUID, uuid5
 
 import pytest
-from hypothesis import given, provisional, settings
-from hypothesis import strategies as st
+from hypothesis import provisional
 
 from ralph.models.converter import convert_dict_event
-from ralph.models.edx.base import BaseContextField
 from ralph.models.edx.converters.xapi.navigational import UIPageCloseToPageTerminated
 from ralph.models.edx.navigational.statements import UIPageClose
 
+from tests.fixtures.hypothesis_strategies import custom_given
 
-@settings(max_examples=1)
-@given(
-    st.builds(
-        UIPageClose,
-        referer=provisional.urls(),
-        page=provisional.urls(),
-        context=st.builds(
-            BaseContextField, user_id=st.just("1"), path=st.just("https://fun-mooc.fr/")
-        ),
-    ),
-    provisional.urls(),
-)
+
+@custom_given(UIPageClose, provisional.urls())
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_navigational_ui_page_close_to_page_terminated(
     uuid_namespace, event, platform_url
@@ -33,6 +22,9 @@ def test_navigational_ui_page_close_to_page_terminated(
     constant UUID.
     """
 
+    event.context.course_id = ""
+    event.context.org_id = ""
+    event.context.user_id = "1"
     event_str = event.json()
     event = json.loads(event_str)
     xapi_event = convert_dict_event(

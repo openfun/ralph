@@ -3,16 +3,15 @@
 import json
 
 import pytest
-from hypothesis import given, provisional, settings
-from hypothesis import strategies as st
 
 from ralph.exceptions import UnknownEventException
-from ralph.models.edx.server import Server, ServerEventField
+from ralph.models.edx.server import Server
 from ralph.models.selector import ModelSelector
 
+from tests.fixtures.hypothesis_strategies import custom_given
 
-@settings(max_examples=1)
-@given(st.builds(Server, referer=provisional.urls(), event=st.builds(ServerEventField)))
+
+@custom_given(Server)
 def test_model_selector_server_get_model_with_valid_event(event):
     """Tests given a server statement, the get_model method should return the
     corresponding model.

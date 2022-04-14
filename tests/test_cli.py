@@ -9,8 +9,6 @@ import pytest
 from click.exceptions import BadParameter
 from click.testing import CliRunner
 from elasticsearch.helpers import bulk, scan
-from hypothesis import given, provisional, settings
-from hypothesis import strategies as st
 from pydantic import ValidationError
 
 from ralph.backends.storage.fs import FSStorage
@@ -27,6 +25,7 @@ from tests.fixtures.backends import (
     WS_TEST_HOST,
     WS_TEST_PORT,
 )
+from tests.fixtures.hypothesis_strategies import custom_given
 
 test_logger = logging.getLogger("ralph")
 
@@ -168,10 +167,7 @@ def test_cli_validate_command_usage():
     ) in result.output
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()),
-)
+@custom_given(UIPageClose)
 def test_cli_validate_command_with_edx_format(event):
     """Tests the validate command using the edx format."""
 
@@ -208,33 +204,15 @@ def test_cli_convert_command_usage():
     assert "Error: Missing option '-p' / '--platform-url'" in result.output
 
 
-@settings(max_examples=1)
-@given(
-    st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()),
-)
+@custom_given(UIPageClose)
 @pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_cli_convert_command_from_edx_to_xapi_format(valid_uuid, event):
     """Tests the convert command from edx to xapi format."""
 
     event_str = event.json()
     runner = CliRunner()
-    result = runner.invoke(
-        cli,
-        [
-            "-v",
-            "ERROR",
-            "convert",
-            "-f",
-            "edx",
-            "-t",
-            "xapi",
-            "-u",
-            valid_uuid,
-            "-p",
-            "https://fun-mooc.fr",
-        ],
-        input=event_str,
-    )
+    command = f"-v ERROR convert -f edx -t xapi -u {valid_uuid} -p https://fun-mooc.fr"
+    result = runner.invoke(cli, command.split(), input=event_str)
     assert result.exit_code == 0
     try:
         PageTerminated(**json.loads(result.output))
@@ -249,20 +227,8 @@ def test_cli_convert_command_with_invalid_uuid(invalid_uuid):
     """
 
     runner = CliRunner()
-    result = runner.invoke(
-        cli,
-        [
-            "convert",
-            "-f",
-            "edx",
-            "-t",
-            "xapi",
-            "-u",
-            invalid_uuid,
-            "-p",
-            "https://fun-mooc.fr",
-        ],
-    )
+    command = f"convert -f edx -t xapi -u '{invalid_uuid}' -p https://fun-mooc.fr"
+    result = runner.invoke(cli, command.split())
     assert result.exit_code > 0
     assert isinstance(result.exception, ConfigurationException)
     assert str(result.exception) == "Invalid UUID namespace"
@@ -351,17 +317,8 @@ def test_cli_fetch_command_with_ldp_backend(monkeypatch):
     monkeypatch.setattr(LDPStorage, "read", mock_read)
 
     runner = CliRunner()
-    result = runner.invoke(
-        cli,
-        [
-            "fetch",
-            "-b",
-            "ldp",
-            "--ldp-endpoint",
-            "ovh-eu",
-            "a547d9b3-6f2f-4913-a872-cf4efe699a66",
-        ],
-    )
+    command = "fetch -b ldp --ldp-endpoint ovh-eu a547d9b3-6f2f-4913-a872-cf4efe699a66"
+    result = runner.invoke(cli, command.split())
 
     assert result.exit_code == 0
     assert '{"foo": "bar"}' in result.output
@@ -383,15 +340,7 @@ def test_cli_fetch_command_with_fs_backend(fs, monkeypatch):
     monkeypatch.setattr(FSStorage, "read", mock_read)
 
     runner = CliRunner()
-    result = runner.invoke(
-        cli,
-        [
-            "fetch",
-            "-b",
-            "fs",
-            "foo",
-        ],
-    )
+    result = runner.invoke(cli, "fetch -b fs foo".split())
 
     assert result.exit_code == 0
     assert '{"foo": "bar"}' in result.output
@@ -414,18 +363,9 @@ def test_cli_fetch_command_with_es_backend(es):
     es.indices.refresh(index=ES_TEST_INDEX)
 
     runner = CliRunner()
-    result = runner.invoke(
-        cli,
-        [
-            "fetch",
-            "-b",
-            "es",
-            "--es-hosts",
-            ",".join(ES_TEST_HOSTS),
-            "--es-index",
-            ES_TEST_INDEX,
-        ],
-    )
+    es_hosts = ",".join(ES_TEST_HOSTS)
+    command = f"fetch -b es --es-hosts {es_hosts} --es-index {ES_TEST_INDEX}"
+    result = runner.invoke(cli, command.split())
     assert result.exit_code == 0
     assert "\n".join([json.dumps({"id": idx}) for idx in range(10)]) in result.output
 
@@ -628,16 +568,7 @@ def test_cli_push_command_with_fs_backend(fs):
 
     # Create a file
     runner = CliRunner()
-    result = runner.invoke(
-        cli,
-        [
-            "push",
-            "-b",
-            "fs",
-            "file1",
-        ],
-        input="test content",
-    )
+    result = runner.invoke(cli, "push -b fs file1".split(), input="test content")
 
     assert result.exit_code == 0
 
@@ -648,39 +579,20 @@ def test_cli_push_command_with_fs_backend(fs):
 
     # Trying to create the same file without -f should raise an error
     runner = CliRunner()
-    result = runner.invoke(
-        cli,
-        [
-            "push",
-            "-b",
-            "fs",
-            "file1",
-        ],
-        input="different content",
-    )
+    result = runner.invoke(cli, "push -b fs file1".split(), input="other content")
     assert result.exit_code == 1
     assert "file1 already exists and overwrite is not allowed" in result.output
 
     # Try to create the same file with -f
     runner = CliRunner()
-    result = runner.invoke(
-        cli,
-        [
-            "push",
-            "-b",
-            "fs",
-            "-f",
-            "file1",
-        ],
-        input="different content",
-    )
+    result = runner.invoke(cli, "push -b fs -f file1".split(), input="other content")
 
     assert result.exit_code == 0
 
     with file_path.open("r", encoding=LOCALE_ENCODING) as test_file:
         content = test_file.read()
 
-    assert "different content" in content
+    assert "other content" in content
 
 
 def test_cli_push_command_with_es_backend(es):
@@ -691,17 +603,10 @@ def test_cli_push_command_with_es_backend(es):
     records = [{"id": idx} for idx in range(10)]
 
     runner = CliRunner()
+    es_hosts = ",".join(ES_TEST_HOSTS)
     result = runner.invoke(
         cli,
-        [
-            "push",
-            "-b",
-            "es",
-            "--es-hosts",
-            ",".join(ES_TEST_HOSTS),
-            "--es-index",
-            ES_TEST_INDEX,
-        ],
+        f"push -b es --es-hosts {es_hosts} --es-index {ES_TEST_INDEX}".split(),
         input="\n".join(json.dumps(record) for record in records),
     )
     assert result.exit_code == 0

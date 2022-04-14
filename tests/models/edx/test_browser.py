@@ -4,15 +4,14 @@ import json
 import re
 
 import pytest
-from hypothesis import given, provisional, settings
-from hypothesis import strategies as st
 from pydantic.error_wrappers import ValidationError
 
 from ralph.models.edx.browser import BaseBrowserModel
 
+from tests.fixtures.hypothesis_strategies import custom_given
 
-@settings(max_examples=1)
-@given(st.builds(BaseBrowserModel, referer=provisional.urls(), page=provisional.urls()))
+
+@custom_given(BaseBrowserModel)
 def test_models_edx_base_browser_model_with_valid_statement(statement):
     """Tests that a valid base browser statement does not raise a `ValidationError`."""
 
@@ -30,8 +29,7 @@ def test_models_edx_base_browser_model_with_valid_statement(statement):
         ("abcdef0123456789_abcdef012345678", "string does not match regex"),
     ],
 )
-@settings(max_examples=1)
-@given(st.builds(BaseBrowserModel, referer=provisional.urls(), page=provisional.urls()))
+@custom_given(BaseBrowserModel)
 def test_models_edx_base_browser_model_with_invalid_statement(
     session, error, statement
 ):

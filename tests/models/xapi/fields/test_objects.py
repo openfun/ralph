@@ -1,13 +1,11 @@
 """Tests for the xAPI object fields"""
 
-from hypothesis import given, provisional, settings
-from hypothesis import strategies as st
-
 from ralph.models.xapi.navigation.fields.objects import PageObjectField
 
+from tests.fixtures.hypothesis_strategies import custom_given
 
-@settings(max_examples=1)
-@given(st.builds(PageObjectField, id=provisional.urls()))
+
+@custom_given(PageObjectField)
 def test_models_xapi_fields_object_page_object_field(field):
     """Tests that a page object field contains a definition with the expected values."""
 

@@ -5,14 +5,15 @@ import json
 import logging
 
 import pytest
-from hypothesis import HealthCheck, given, provisional, settings
-from hypothesis import strategies as st
+from hypothesis import HealthCheck, settings
 
 from ralph.exceptions import BadFormatException, UnknownEventException
 from ralph.models.edx.navigational.statements import UIPageClose
-from ralph.models.edx.server import Server, ServerEventField
+from ralph.models.edx.server import Server
 from ralph.models.selector import ModelSelector
 from ralph.models.validator import Validator
+
+from tests.fixtures.hypothesis_strategies import custom_given
 
 
 def test_models_validator_validate_with_no_events(caplog):
@@ -146,10 +147,9 @@ def test_models_validator_validate_with_invalid_page_close_event_raises_an_excep
             list(result)
 
 
-@settings(max_examples=1)
 @pytest.mark.parametrize("ignore_errors", [True, False])
 @pytest.mark.parametrize("fail_on_unknown", [True, False])
-@given(st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()))
+@custom_given(UIPageClose)
 def test_models_validator_validate_with_valid_events(
     ignore_errors, fail_on_unknown, event
 ):
@@ -162,8 +162,8 @@ def test_models_validator_validate_with_valid_events(
     assert json.loads(next(result)) == event_dict
 
 
-@settings(max_examples=1, suppress_health_check=(HealthCheck.function_scoped_fixture,))
-@given(st.builds(UIPageClose, referer=provisional.urls(), page=provisional.urls()))
+@settings(suppress_health_check=(HealthCheck.function_scoped_fixture,))
+@custom_given(UIPageClose)
 def test_models_validator_validate_counter(caplog, event):
     """Tests given multiple events the validate method
     should log the total and invalid events."""
@@ -184,8 +184,7 @@ def test_models_validator_validate_counter(caplog, event):
     ) in caplog.record_tuples
 
 
-@settings(max_examples=1)
-@given(st.builds(Server, referer=provisional.urls(), event=st.builds(ServerEventField)))
+@custom_given(Server)
 def test_models_validator_validate_typing_cleanup(event):
     """Tests given a valid event with wrong field types, the validate method should fix
     them.
