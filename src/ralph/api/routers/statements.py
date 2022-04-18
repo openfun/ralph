@@ -2,14 +2,15 @@
 
 import logging
 from datetime import datetime
-from typing import List, Literal, Optional, Union
+from typing import Literal, Optional, Union
 from uuid import UUID, uuid4
 
-from elasticsearch import Elasticsearch
-from elasticsearch.helpers import BulkIndexError, bulk
+from elasticsearch.helpers import BulkIndexError
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 
-from ...defaults import ES_HOSTS, ES_MAX_SEARCH_HITS_COUNT, ES_POINT_IN_TIME_KEEP_ALIVE
+from ralph.backends.database.es import ESDatabase
+
+from ...defaults import ES_MAX_SEARCH_HITS_COUNT
 from ..auth import authenticated_user
 from ..models import ErrorDetail, LaxStatement
 
@@ -20,8 +21,8 @@ router = APIRouter(
     dependencies=[Depends(authenticated_user)],
 )
 
-ES_CLIENT = Elasticsearch(ES_HOSTS)
-ES_INDEX = "statements"
+
+ES_CLIENT = ESDatabase()
 
 
 @router.get("/")
@@ -72,7 +73,7 @@ async def get(
             "Apply the Activity filter broadly. Include Statements for which "
             "the Object, any of the context Activities, or any of those properties "
             "in a contained SubStatement match the Activity parameter, "
-            "instead of that parameter's normal behavior"
+            "instead of that parameter's normal behaviour"
         ),
     ),
     # pylint: disable=unused-argument
@@ -83,7 +84,7 @@ async def get(
             "Apply the Agent filter broadly. Include Statements for which "
             "the Actor, Object, Authority, Instructor, Team, or any of these "
             "properties in a contained SubStatement match the Agent parameter, "
-            "instead of that parameter's normal behavior."
+            "instead of that parameter's normal behaviour."
         ),
     ),
     since: Optional[datetime] = Query(
@@ -200,24 +201,6 @@ async def get(
         {"sort": [{"timestamp": {"order": "asc" if ascending else "desc"}}]}
     )
 
-    # Create a point-in-time or use the existing one to ensure consistency of search
-    # results over multiple pages.
-    if not pit_id:
-        # pylint: disable=unexpected-keyword-arg
-        pit_response = ES_CLIENT.open_point_in_time(
-            index=ES_INDEX, keep_alive=ES_POINT_IN_TIME_KEEP_ALIVE
-        )
-        pit_id = pit_response["id"]
-    es_query.update(
-        {
-            "pit": {
-                "id": pit_id,
-                # extend duration of PIT whenever it is used
-                "keep_alive": ES_POINT_IN_TIME_KEEP_ALIVE,
-            }
-        }
-    )
-
     if search_after:
         es_query.update({"search_after": search_after.split("|")})
 
@@ -227,11 +210,7 @@ async def get(
     # Make sure the limit does not go above max from settings
     limit = min(limit, ES_MAX_SEARCH_HITS_COUNT)
 
-    # pylint: disable=unexpected-keyword-arg
-    es_response = ES_CLIENT.search(
-        body=es_query,
-        size=limit,
-    )
+    es_response = ES_CLIENT.query(es_query, limit, pit_id)
 
     # Prepare the link to get the next page of the request, while preserving the
     # consistency of search results.
@@ -242,6 +221,7 @@ async def get(
     if len(es_response["hits"]["hits"]) == limit:
         # Search after relies on sorting info located in the last hit
         last_hit_sort = [str(part) for part in es_response["hits"]["hits"][-1]["sort"]]
+        pit_id = es_response["pit_id"]
         path = request.url.components.path
         query = request.url.components.query
         response.update(
@@ -275,7 +255,7 @@ async def get(
     },
 )
 # pylint: disable=unused-argument
-async def post(statements: Union[LaxStatement, List[LaxStatement]]):
+async def post(statements: Union[LaxStatement, list[LaxStatement]]):
     """
     Store a set of statements (or a single statement as a single member of a set).
     NB: at this time, using POST to make a GET request, is not supported.
@@ -294,8 +274,8 @@ async def post(statements: Union[LaxStatement, List[LaxStatement]]):
     # - use the list of keys to perform validations and as a final return value;
     # - provide an iterable containing both the statements and generated IDs for bulk.
     statements_dict = {
-        str(statement.id) if statement.id else str(uuid4()): statement
-        for statement in statements
+        statement.setdefault("id", str(uuid4())): statement
+        for statement in map(lambda x: x.dict(exclude_unset=True), statements)
     }
 
     # Requests with duplicate statement IDs are considered invalid
@@ -307,10 +287,7 @@ async def post(statements: Union[LaxStatement, List[LaxStatement]]):
             detail="Duplicate statement IDs in the list of statements",
         )
 
-    # pylint: disable=unexpected-keyword-arg
-    es_response = ES_CLIENT.search(
-        index=ES_INDEX, body={"query": {"terms": {"_id": statements_ids}}}
-    )
+    es_response = ES_CLIENT.query({"query": {"terms": {"_id": statements_ids}}})
 
     if len(es_response["hits"]["hits"]) > 0:
         # NB: LRS specification calls for performing a deep comparison of incoming
@@ -323,29 +300,13 @@ async def post(statements: Union[LaxStatement, List[LaxStatement]]):
 
     # For valid requests, perform the bulk indexing of all incoming statements
     try:
-        actions, _ = bulk(
-            ES_CLIENT,
-            [
-                {
-                    "_index": ES_INDEX,
-                    "_id": statement_id,
-                    "_op_type": "index",
-                    "_source": {
-                        **statement.dict(),
-                        # Make sure all statements have an ID as part of their source,
-                        # even if we just created it to insert them.
-                        "id": str(statement_id),
-                    },
-                }
-                for statement_id, statement in statements_dict.items()
-            ],
-        )
+        ES_CLIENT.put(statements_dict.values(), ignore_errors=False)
     except BulkIndexError as exc:
         logger.error("Failed to index submitted statements")
         raise HTTPException(
             status_code=500, detail="Statements bulk indexation failed"
         ) from exc
 
-    logger.info("Indexed %d statements with success", actions)
+    logger.info("Indexed %d statements with success", len(statements_dict))
 
     return statements_ids

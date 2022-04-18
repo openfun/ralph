@@ -8,6 +8,7 @@ from uuid import uuid4
 from fastapi.testclient import TestClient
 
 from ralph.api import app
+from ralph.backends.database.es import ESDatabase
 
 from tests.fixtures.backends import ES_TEST_INDEX
 
@@ -15,7 +16,7 @@ client = TestClient(app)
 
 
 # pylint: disable=invalid-name
-@mock.patch("ralph.api.routers.statements.ES_INDEX", ES_TEST_INDEX)
+@mock.patch("ralph.api.routers.statements.ES_CLIENT", ESDatabase(index=ES_TEST_INDEX))
 def test_post_single_statement_directly(auth_credentials, es):
     """
     Statements POST supports adding one statement by passing it as a JSON dict.
@@ -50,7 +51,7 @@ def test_post_single_statement_directly(auth_credentials, es):
 
 
 # pylint: disable=invalid-name
-@mock.patch("ralph.api.routers.statements.ES_INDEX", ES_TEST_INDEX)
+@mock.patch("ralph.api.routers.statements.ES_CLIENT", ESDatabase(index=ES_TEST_INDEX))
 def test_post_statements_list_of_one(auth_credentials, es):
     """
     Statements POST supports adding one statement by just
@@ -86,7 +87,7 @@ def test_post_statements_list_of_one(auth_credentials, es):
 
 
 # pylint: disable=invalid-name
-@mock.patch("ralph.api.routers.statements.ES_INDEX", ES_TEST_INDEX)
+@mock.patch("ralph.api.routers.statements.ES_CLIENT", ESDatabase(index=ES_TEST_INDEX))
 def test_post_statements_list(auth_credentials, es):
     """
     Statements POST supports adding more than one statement by just
@@ -175,7 +176,7 @@ def test_post_statements_list_with_duplicates(auth_credentials, es):
 
 
 # pylint: disable=invalid-name
-@mock.patch("ralph.api.routers.statements.ES_INDEX", ES_TEST_INDEX)
+@mock.patch("ralph.api.routers.statements.ES_CLIENT", ESDatabase(index=ES_TEST_INDEX))
 def test_post_statements_list_with_duplicate_of_existing_statement(
     auth_credentials, es
 ):

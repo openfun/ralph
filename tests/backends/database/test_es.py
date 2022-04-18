@@ -331,3 +331,35 @@ def test_backends_database_es_put_with_datastream(es_data_stream, fs, monkeypatc
     hits = es_data_stream.search(index=ES_TEST_INDEX)["hits"]["hits"]
     assert len(hits) == 10
     assert sorted([hit["_source"]["id"] for hit in hits]) == list(range(10))
+
+
+def test_backends_database_es_query_method(es):
+    """Tests that the ES query method returns the expected result."""
+    # pylint: disable=invalid-name
+
+    # Insert documents
+    documents = [
+        {"_index": ES_TEST_INDEX, "_id": idx, "_source": {"id": idx}}
+        for idx in range(10)
+    ]
+    bulk(es, documents)
+    # As we bulk insert documents, the index needs to be refreshed before making
+    # queries.
+    es.indices.refresh(index=ES_TEST_INDEX)
+
+    database = ESDatabase(
+        hosts=ES_TEST_HOSTS,
+        index=ES_TEST_INDEX,
+    )
+
+    expected = {
+        "_id": "2",
+        "_index": ES_TEST_INDEX,
+        "_source": {"id": 2},
+        "_score": 1.0,
+    }
+    result = database.query({"query": {"terms": {"_id": [2]}}})
+
+    # assert result["hits"] == 1
+    assert len(result["hits"]["hits"]) == 1
+    assert result["hits"]["hits"][0] == expected
