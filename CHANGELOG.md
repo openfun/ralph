@@ -8,6 +8,13 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade `click` to `8.0.4`
+- Upgrade `elasticsearch` to `8.1.0`
+- Upgrade `fastapi` to `0.75.0`
+- Upgrade `python-swiftclient` to `3.13.1`
+
 ## [2.1.0] - 2022-04-13
 
 ### Added
