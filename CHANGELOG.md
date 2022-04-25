@@ -20,6 +20,10 @@ and this project adheres to
 - Upgrade `uvicorn` to `0.17.6`
 - Upgrade `websockets` to `10.3`
 
+### Fixed
+
+- Tray: do not create a cronjobs list when no cronjob has been defined
+
 ## [2.1.0] - 2022-04-13
 
 ### Added
