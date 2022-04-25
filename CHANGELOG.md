@@ -10,10 +10,15 @@ and this project adheres to
 
 ### Changed
 
-- Upgrade `click` to `8.0.4`
-- Upgrade `elasticsearch` to `8.1.0`
-- Upgrade `fastapi` to `0.75.0`
+- Upgrade `click` to `8.1.2`
+- Upgrade `elasticsearch` to `8.1.2`
+- Upgrade `fastapi` to `0.75.2`
+- Upgrade `ovh` to `1.0.0`
+- Upgrade `pyparsing` to `3.0.8`
 - Upgrade `python-swiftclient` to `3.13.1`
+- Upgrade `sentry_sdk` to `1.5.10`
+- Upgrade `uvicorn` to `0.17.6`
+- Upgrade `websockets` to `10.3`
 
 ## [2.1.0] - 2022-04-13
 
