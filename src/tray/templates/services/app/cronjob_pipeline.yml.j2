@@ -1,3 +1,4 @@
+{% if ralph_cronjobs | length > 0 %}
 apiVersion: batch/v1beta1
 kind: CronJobList
 items:
@@ -60,3 +61,4 @@ items:
                 runAsGroup: {{ container_gid }}
               restartPolicy: Never
 {% endfor %}
+{% endif %}
