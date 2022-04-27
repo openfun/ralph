@@ -36,7 +36,7 @@ class VideoPlayedVerbField(VerbField):
     """Represents the `verb` field for video played xAPI statement.
 
     Attributes:
-        id (str): Consists of the value `http://adlnet.gov/expapi/verbs/played`.
+        id (str): Consists of the value `https://w3id.org/xapi/video/verbs/played`.
         display (dict): Consists of the dictionary `{"en-US": "played"}`.
     """
 
@@ -50,7 +50,7 @@ class VideoPausedVerbField(VerbField):
     """Represents the `verb` field for video paused xAPI statement.
 
     Attributes:
-        id (str): Consists of the value `http://adlnet.gov/expapi/verbs/paused`.
+        id (str): Consists of the value `https://w3id.org/xapi/video/verbs/paused`.
         display (dict): Consists of the dictionary `{"en-US": "paused"}`.
     """
 
@@ -64,7 +64,7 @@ class VideoSeekedVerbField(VerbField):
     """Represents the `verb` field for video seeked xAPI statement.
 
     Attributes:
-        id (str): Consists of the value `http://adlnet.gov/expapi/verbs/seeked`.
+        id (str): Consists of the value `https://w3id.org/xapi/video/verbs/seeked`.
         display (dict): Consists of the dictionary `{"en-US": "seeked"}`.
     """
 
