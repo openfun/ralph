@@ -19,5 +19,9 @@ class BaseDatabase(ABC):
         stream: Union[BinaryIO, TextIO],
         chunk_size: int = 10,
         ignore_errors: bool = False,
-    ):
-        """Writes `chunk_size` records from the `stream` to the database."""
+    ) -> int:
+        """Writes `chunk_size` records from the `stream` to the database.
+
+        Returns:
+            int: The count of successfully written records.
+        """

@@ -120,14 +120,14 @@ def test_cli_extract_command_usage():
     assert result.exit_code == 0
     assert (
         "Options:\n"
-        "  -p, --parser [gelf]  Container format parser used to extract events\n"
-        "                       [required]\n"
+        "  -p, --parser [gelf|es]  Container format parser used to extract events\n"
+        "                          [required]\n"
     ) in result.output
 
     result = runner.invoke(cli, ["extract"])
     assert result.exit_code > 0
     assert (
-        "Error: Missing option '-p' / '--parser'. Choose from:\n\tgelf\n"
+        "Error: Missing option '-p' / '--parser'. Choose from:\n\tgelf,\n\tes"
     ) in result.output
 
 
@@ -143,6 +143,33 @@ def test_cli_extract_command_with_gelf_parser(gelf_logger):
         gelf_content = log_file.read()
         result = runner.invoke(cli, ["extract", "-p", "gelf"], input=gelf_content)
         assert '{"username": "foo"}' in result.output
+
+
+def test_cli_extract_command_with_es_parser():
+    """Tests the extract command using the ElasticSearchParser."""
+
+    es_output = (
+        "\n".join(
+            [
+                json.dumps(
+                    {
+                        "_index": ES_TEST_INDEX,
+                        "_id": str(idx),
+                        "_score": None,
+                        "_source": {"id": idx},
+                        "sort": [idx],
+                    }
+                )
+                for idx in range(10)
+            ]
+        )
+        + "\n"
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(cli, "extract -p es".split(), input=es_output)
+    assert result.exit_code == 0
+    assert "\n".join([json.dumps({"id": idx}) for idx in range(10)]) in result.output
 
 
 def test_cli_validate_command_usage():
@@ -363,10 +390,28 @@ def test_cli_fetch_command_with_es_backend(es):
 
     runner = CliRunner()
     es_hosts = ",".join(ES_TEST_HOSTS)
-    command = f"fetch -b es --es-hosts {es_hosts} --es-index {ES_TEST_INDEX}"
+    command = f"-v ERROR fetch -b es --es-hosts {es_hosts} --es-index {ES_TEST_INDEX}"
     result = runner.invoke(cli, command.split())
     assert result.exit_code == 0
-    assert "\n".join([json.dumps({"id": idx}) for idx in range(10)]) in result.output
+    expected = (
+        "\n".join(
+            [
+                json.dumps(
+                    {
+                        "_index": ES_TEST_INDEX,
+                        "_id": str(idx),
+                        "_score": None,
+                        "_source": {"id": idx},
+                        "sort": [idx],
+                    }
+                )
+                for idx in range(10)
+            ]
+        )
+        + "\n"
+    )
+
+    assert expected == result.output
 
 
 def test_cli_fetch_command_with_ws_backend(events, ws):

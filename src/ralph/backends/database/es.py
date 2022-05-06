@@ -6,7 +6,7 @@ from enum import Enum
 from typing import Callable, Generator, TextIO
 
 from elasticsearch import Elasticsearch
-from elasticsearch.helpers import scan, streaming_bulk
+from elasticsearch.helpers import BulkIndexError, scan, streaming_bulk
 
 from ralph.defaults import (
     ES_HOSTS,
@@ -122,7 +122,9 @@ class ESDatabase(BaseDatabase):
                 action.update({"_source": item})
             yield action
 
-    def put(self, stream: TextIO, chunk_size: int = 500, ignore_errors: bool = False):
+    def put(
+        self, stream: TextIO, chunk_size: int = 500, ignore_errors: bool = False
+    ) -> int:
         """Writes documents from the `stream` to the instance index."""
 
         logger.debug(
@@ -130,13 +132,18 @@ class ESDatabase(BaseDatabase):
         )
 
         documents = 0
-        for success, action in streaming_bulk(
-            client=self.client,
-            actions=self.to_documents(stream, lambda d: d.get("id", None)),
-            chunk_size=chunk_size,
-            raise_on_error=(not ignore_errors),
-        ):
-            documents += success
-            logger.debug(
-                "Wrote %d documents [action: %s ok: %d]", documents, action, success
-            )
+        try:
+            for success, action in streaming_bulk(
+                client=self.client,
+                actions=self.to_documents(stream, lambda d: d.get("id", None)),
+                chunk_size=chunk_size,
+                raise_on_error=(not ignore_errors),
+            ):
+                documents += success
+                logger.debug(
+                    "Wrote %d documents [action: %s ok: %d]", documents, action, success
+                )
+        except BulkIndexError as error:
+            error.args = error.args + (f"{documents} succeeded",)
+            raise error
+        return documents

@@ -300,13 +300,13 @@ async def post(statements: Union[LaxStatement, list[LaxStatement]]):
 
     # For valid requests, perform the bulk indexing of all incoming statements
     try:
-        ES_CLIENT.put(statements_dict.values(), ignore_errors=False)
+        success_count = ES_CLIENT.put(statements_dict.values(), ignore_errors=False)
     except BulkIndexError as exc:
         logger.error("Failed to index submitted statements")
         raise HTTPException(
             status_code=500, detail="Statements bulk indexation failed"
         ) from exc
 
-    logger.info("Indexed %d statements with success", len(statements_dict))
+    logger.info("Indexed %d statements with success", success_count)
 
     return statements_ids

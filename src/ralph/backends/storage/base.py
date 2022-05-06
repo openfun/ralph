@@ -18,7 +18,7 @@ class BaseStorage(ABC):
         """Gets `name` file absolute URL."""
 
     @abstractmethod
-    def read(self, name, chunk_size=4096):
+    def read(self, name, chunk_size: int = 4096):
         """Reads `name` file and yields its content by chunks of a given size."""
 
     @abstractmethod

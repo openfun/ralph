@@ -27,6 +27,7 @@ class Parsers(Enum):
     """
 
     GELF = "ralph.parsers.GELFParser"
+    ES = "ralph.parsers.ElasticSearchParser"
 
 
 class StorageBackends(Enum):
