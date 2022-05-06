@@ -172,7 +172,7 @@ def test_backends_database_es_put_method(es, fs, monkeypatch):
         hosts=ES_TEST_HOSTS,
         index=ES_TEST_INDEX,
     )
-    database.put(sys.stdin, chunk_size=5)
+    success_count = database.put(sys.stdin, chunk_size=5)
 
     # As we bulk insert documents, the index needs to be refreshed before making
     # queries.
@@ -180,6 +180,7 @@ def test_backends_database_es_put_method(es, fs, monkeypatch):
 
     hits = es.search(index=ES_TEST_INDEX)["hits"]["hits"]
     assert len(hits) == 10
+    assert success_count == 10
     assert sorted([hit["_source"]["id"] for hit in hits]) == list(range(10))
 
 
@@ -226,7 +227,7 @@ def test_backends_database_es_put_method_with_update_op_type(es, fs, monkeypatch
     )
 
     database = ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX, op_type="update")
-    database.put(sys.stdin, chunk_size=5)
+    success_count = database.put(sys.stdin, chunk_size=5)
 
     # As we bulk insert documents, the index needs to be refreshed before making
     # queries.
@@ -234,6 +235,7 @@ def test_backends_database_es_put_method_with_update_op_type(es, fs, monkeypatch
 
     hits = es.search(index=ES_TEST_INDEX)["hits"]["hits"]
     assert len(hits) == 10
+    assert success_count == 10
     assert sorted([hit["_source"]["id"] for hit in hits]) == list(range(10))
     assert sorted([hit["_source"]["value"] for hit in hits]) == list(
         map(lambda x: str(x + 10), range(10))
@@ -263,11 +265,13 @@ def test_backends_database_es_put_with_badly_formatted_data_raises_a_bulkindexer
     )
 
     # By default, we should raise an error and stop the importation
-    with pytest.raises(BulkIndexError):
+    msg = "\\('1 document\\(s\\) failed to index.', '5 succeeded'\\)"
+    with pytest.raises(BulkIndexError, match=msg) as exception_info:
         database.put(sys.stdin, chunk_size=2)
     es.indices.refresh(index=ES_TEST_INDEX)
     hits = es.search(index=ES_TEST_INDEX)["hits"]["hits"]
     assert len(hits) == 5
+    assert exception_info.value.args[-1] == "5 succeeded"
     assert sorted([hit["_source"]["id"] for hit in hits]) == [0, 1, 2, 3, 5]
 
 

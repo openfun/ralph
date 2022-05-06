@@ -42,7 +42,7 @@ class GELFParser(BaseParser):
             input_file (file-like): The log file to parse.
 
         Yields:
-            event: events raw short_message string.
+            event: Events raw short_message string.
         """
 
         logger.info("Parsing: %s", input_file)
@@ -60,4 +60,34 @@ class GELFParser(BaseParser):
                     "It will be ignored."
                 )
                 logger.error(msg, event)
+                logger.debug("Raised error was: %s", err)
+
+
+class ElasticSearchParser(BaseParser):
+    """ElasticSearch JSON document parser."""
+
+    name = "es"
+
+    def parse(self, input_file):
+        """Parses Elasticsearch JSON documents.
+
+        Args:
+            input_file (file-like): The file containing Elasticsearch JSON documents.
+
+        Yields:
+            document: ElasticSearch documents `_source` field content.
+        """
+
+        logger.info("Parsing: %s", input_file)
+
+        for document in input_file:
+            try:
+                yield json.dumps(json.loads(document)["_source"])
+            except (json.JSONDecodeError, TypeError) as err:
+                msg = "Document '%s' is not a valid JSON string! It will be ignored."
+                logger.error(msg, document)
+                logger.debug("Raised error was: %s", err)
+            except KeyError as err:
+                msg = "Document '%s' has no `_source` field! It will be ignored."
+                logger.error(msg, document)
                 logger.debug("Raised error was: %s", err)

@@ -313,8 +313,12 @@ def fetch(backend, archive, chunk_size, **options):
             click.echo(data, nl=False)
     elif backend_type == BackendTypes.DATABASE:
         for document in backend.get(chunk_size):
-            source = json.dumps(document.get("_source"))
-            click.echo(bytes(source, encoding="utf-8"))
+            click.echo(
+                bytes(
+                    json.dumps(document) if isinstance(document, dict) else document,
+                    encoding="utf-8",
+                )
+            )
     elif backend_type == BackendTypes.STREAM:
         backend.stream(sys.stdout.buffer)
     elif backend_type is None:
