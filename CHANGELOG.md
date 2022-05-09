@@ -16,13 +16,13 @@ and this project adheres to
 
 - Upgrade `bclick` to `3.2.2`
 - Upgrade `click` to `8.1.3`
-- Upgrade `elasticsearch` to `8.1.3`
-- Upgrade `fastapi` to `0.75.2`
+- Upgrade `elasticsearch` to `8.2.0`
+- Upgrade `fastapi` to `0.76.0`
 - Upgrade `Jinja2` to `3.1.2`
 - Upgrade `ovh` to `1.0.0`
 - Upgrade `pyparsing` to `3.0.8`
 - Upgrade `python-swiftclient` to `3.13.1`
-- Upgrade `sentry_sdk` to `1.5.10`
+- Upgrade `sentry_sdk` to `1.5.11`
 - Upgrade `uvicorn` to `0.17.6`
 - Upgrade `websockets` to `10.3`
 
