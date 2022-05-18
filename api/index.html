@@ -668,8 +668,8 @@ $ python3 -c <span class="s1">&#39;import bcrypt; print(bcrypt.hashpw(b&quot;PAS
 <p>The first request that can be answered by the ralph API server is a <code>whoami</code> request, which checks if the user is authenticated and returns their username and permission scopes.</p>
 <p>Use curl to get <code>http://localhost:8100/whoami</code>:</p>
 <div class="highlight"><pre><span></span><code>$ curl http://localhost:8100/whoami
-&lt; HTTP/1.1 <span class="m">400</span> Bad Request
-&lt; <span class="o">{</span><span class="s2">&quot;error&quot;</span>:<span class="s2">&quot;Missing authentication credentials.&quot;</span><span class="o">}</span>
+&lt; HTTP/1.1 <span class="m">401</span> Unauthorized
+&lt; <span class="o">{</span><span class="s2">&quot;error&quot;</span>:<span class="s2">&quot;Not authenticated&quot;</span><span class="o">}</span>
 </code></pre></div>
 <p>Send your username and password to the API server through HTTP Basic Auth:</p>
 <div class="highlight"><pre><span></span><code>$ curl --user john.doe@example.com:PASSWORD http://localhost:8100/whoami
