@@ -20,8 +20,10 @@ and this project adheres to
 - Upgrade `fastapi` to `0.78.0`
 - Upgrade `Jinja2` to `3.1.2`
 - Upgrade `ovh` to `1.0.0`
+- Upgrade `pydantic` to `1.9.1`
 - Upgrade `pyparsing` to `3.0.9`
-- Upgrade `python-swiftclient` to `3.13.1`
+- Upgrade `python-keystoneclient` to `4.5.0`
+- Upgrade `python-swiftclient` to `4.0.0`
 - Upgrade `sentry_sdk` to `1.5.12`
 - Upgrade `uvicorn` to `0.17.6`
 - Upgrade `websockets` to `10.3`
