@@ -14,6 +14,7 @@ and this project adheres to
 
 ### Changed
 
+- Migrate to `python-legacy` handler for `mkdocstrings` package
 - Upgrade `bclick` to `3.2.2`
 - Upgrade `click` to `8.1.3`
 - Upgrade `elasticsearch` to `8.2.0`
