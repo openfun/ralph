@@ -6,5 +6,12 @@ Module py.test fixtures
 from .fixtures import hypothesis_configuration  # noqa: F401
 from .fixtures import hypothesis_strategies  # noqa: F401
 from .fixtures.auth import auth_credentials  # noqa: F401
-from .fixtures.backends import es, es_data_stream, events, swift, ws  # noqa: F401
+from .fixtures.backends import (  # noqa: F401
+    es,
+    es_data_stream,
+    events,
+    mongo,
+    swift,
+    ws,
+)
 from .fixtures.logs import gelf_logger  # noqa: F401

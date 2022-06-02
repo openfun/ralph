@@ -11,6 +11,7 @@ and this project adheres to
 ### Added
 
 - Create a `post` endpoint for statements implementing the LRS spec
+- Implement support for the MongoDB database backend
 
 ### Changed
 

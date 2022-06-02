@@ -183,6 +183,10 @@ jobs:
         environment:
           discovery.type: single-node
           xpack.security.enabled: "false"
+      - image: mongo:5.0.9
+        auth:
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
     working_directory: ~/fun
     steps:
       - checkout
@@ -194,6 +198,7 @@ jobs:
           command: |
             dockerize \
               -wait tcp://${HOSTNAME}:9200 \
+              -wait tcp://${HOSTNAME}:27017 \
               -timeout 60s \
               ~/.local/bin/pytest
 
