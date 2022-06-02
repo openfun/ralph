@@ -1,4 +1,4 @@
-"""Elasticsearch storage backend for Ralph"""
+"""Elasticsearch database backend for Ralph"""
 
 import json
 import logging
@@ -50,7 +50,7 @@ class ESDatabase(BaseDatabase):
         Args:
             hosts (list): List of Elasticsearch nodes we should connect to.
             index (str): The Elasticsearch index name.
-            es_client_options (dict): A dictionary of valid options for the
+            client_options (dict): A dictionary of valid options for the
                 Elasticsearch class initialization.
             op_type (str): The Elasticsearch operation type for every document sent to
                 Elasticsearch (should be one of: index, create, delete, update).
