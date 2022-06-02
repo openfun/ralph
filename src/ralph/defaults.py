@@ -18,6 +18,7 @@ class DatabaseBackends(Enum):
     """
 
     ES = "ralph.backends.database.es.ESDatabase"
+    MONGO = "ralph.backends.database.mongo.MongoDatabase"
 
 
 class Parsers(Enum):
@@ -120,6 +121,9 @@ FS_STORAGE_DEFAULT_PATH = Path(
 HISTORY_FILE = Path(config("RALPH_HISTORY_FILE", APP_DIR / "history.json"))
 LOGGING_CONFIG = config("RALPH_LOGGING", DEFAULT_LOGGING_CONFIG)
 MODEL_PATH_SEPARATOR = "__"
+MONGO_COLLECTION = config("RALPH_MONGO_COLLECTION", "marsha")
+MONGO_DATABASE = config("RALPH_MONGO_DATABASE", "statements")
+MONGO_URI = config("RALPH_MONGO_URI", "mongodb://localhost:27017/")
 SENTRY_DSN = config("RALPH_SENTRY_DSN", None)
 SWIFT_OS_AUTH_URL = config("RALPH_SWIFT_OS_AUTH_URL", "https://auth.cloud.ovh.net/")
 SWIFT_OS_IDENTITY_API_VERSION = config("RALPH_SWIFT_OS_IDENTITY_API_VERSION", "3")

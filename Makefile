@@ -106,14 +106,16 @@ logs: ## display app logs (follow mode)
 	@$(COMPOSE) logs -f app
 .PHONY: logs
 
-run: ## alias for run-es
+run: ## alias for run-es run-mongo
 run: \
-	run-es
+	run-es \
+	run-mongo
 .PHONY: run
 
 run-all: ## start all supported local backends
 run-all: \
 	run-es \
+	run-mongo \
 	run-swift
 .PHONY: run-all
 
@@ -122,6 +124,12 @@ run-es: ## start elasticsearch backend
 	@echo "Waiting for elasticsearch to be up and running..."
 	@$(COMPOSE_RUN) dockerize -wait tcp://elasticsearch:9200 -timeout 60s
 .PHONY: run-es
+
+run-mongo: ## start mongodb backend
+	@$(COMPOSE) up -d mongo
+	@echo "Waiting for mongo to be up and running..."
+	@$(COMPOSE_RUN) dockerize -wait tcp://mongo:27017 -timeout 60s
+.PHONY: run-mongo
 
 run-swift: ## start swift backend
 	@$(COMPOSE) up -d swift
@@ -138,7 +146,7 @@ stop: ## stops backend servers
 .PHONY: stop
 
 test: ## run back-end tests
-test: run-es
+test: run
 	bin/pytest
 .PHONY: test
 

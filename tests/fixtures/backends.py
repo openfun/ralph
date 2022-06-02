@@ -10,6 +10,7 @@ from enum import Enum
 import pytest
 import websockets
 from elasticsearch import Elasticsearch
+from pymongo import MongoClient
 
 from ralph.backends.storage.swift import SwiftStorage
 
@@ -20,6 +21,9 @@ ES_TEST_INDEX_PATTERN = os.environ.get("RALPH_ES_TEST_INDEX_PATTERN", "test-inde
 ES_TEST_HOSTS = os.environ.get("RALPH_ES_TEST_HOSTS", "http://localhost:9200").split(
     ","
 )
+MONGO_TEST_COLLECTION = os.environ.get("RALPH_MONGO_TEST_COLLECTION", "marsha")
+MONGO_TEST_DATABASE = os.environ.get("RALPH_MONGO_TEST_DATABASE", "statements")
+MONGO_TEST_URI = os.environ.get("RALPH_MONGO_TEST_URI", "mongodb://localhost:27017/")
 
 # Websocket test backend defaults
 WS_TEST_HOST = "localhost"
@@ -56,6 +60,20 @@ def es():
     client.indices.create(index=ES_TEST_INDEX)
     yield client
     client.indices.delete(index=ES_TEST_INDEX)
+
+
+@pytest.fixture
+def mongo():
+    """Creates / deletes a Mongo test database + collection and yields an
+    instantiated client.
+    """
+
+    client = MongoClient(MONGO_TEST_URI)
+    database = getattr(client, MONGO_TEST_DATABASE)
+    database.create_collection(MONGO_TEST_COLLECTION)
+    yield client
+    database.drop_collection(MONGO_TEST_COLLECTION)
+    client.drop_database(MONGO_TEST_DATABASE)
 
 
 @pytest.fixture

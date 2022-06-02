@@ -27,11 +27,11 @@ services:
     ports:
       - "9200:9200"
     mem_limit: 2g
-    networks:
-      potsie:
-        aliases:
-          - elasticsearch
-      default:
+
+  mongo:
+    image: mongo:5.0.9
+    ports:
+      - "27017:27017"
 
   swift:
     image: kklopfenstein/openstack-swift-keystone-docker
@@ -44,8 +44,3 @@ services:
   # -- tools
   dockerize:
     image: jwilder/dockerize
-
-networks:
-  potsie:
-    name: potsie
-    external: true
