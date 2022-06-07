@@ -17,7 +17,7 @@ and this project adheres to
 - Migrate to `python-legacy` handler for `mkdocstrings` package
 - Upgrade `bclick` to `3.2.2`
 - Upgrade `click` to `8.1.3`
-- Upgrade `elasticsearch` to `8.2.0`
+- Upgrade `elasticsearch` to `8.2.2`
 - Upgrade `fastapi` to `0.78.0`
 - Upgrade `Jinja2` to `3.1.2`
 - Upgrade `ovh` to `1.0.0`
