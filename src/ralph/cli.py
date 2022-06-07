@@ -327,6 +327,7 @@ def fetch(backend, archive, chunk_size, **options):
         raise UnsupportedBackendException(msg, backend)
 
 
+# pylint: disable=unnecessary-direct-lambda-call
 @click.argument("archive", required=False)
 @backends_options(backends=(lambda: DATABASE_BACKENDS + STORAGE_BACKENDS)())
 @click.option(
