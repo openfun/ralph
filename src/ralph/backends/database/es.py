@@ -3,7 +3,7 @@
 import json
 import logging
 from enum import Enum
-from typing import Callable, Generator, TextIO
+from typing import Callable, Generator, Optional, TextIO
 
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import BulkIndexError, scan, streaming_bulk
@@ -16,7 +16,7 @@ from ralph.defaults import (
 )
 from ralph.exceptions import BackendParameterException
 
-from .base import BaseDatabase
+from .base import BaseDatabase, BaseQuery, enforce_query_checks
 
 logger = logging.getLogger(__name__)
 
@@ -33,10 +33,17 @@ class OpType(Enum):
 DEFAULT_OP_TYPE = OpType.INDEX.value
 
 
+class ESQuery(BaseQuery):
+    """Elasticsearch body query model."""
+
+    query: Optional[dict]
+
+
 class ESDatabase(BaseDatabase):
     """Elasticsearch database backend."""
 
     name = "es"
+    query_model = ESQuery
 
     def __init__(
         self,
@@ -67,10 +74,19 @@ class ESDatabase(BaseDatabase):
             )
         self.op_type = op_type
 
-    def get(self, chunk_size: int = 500):
-        """Gets index documents and yields them."""
+    @enforce_query_checks
+    def get(self, query: ESQuery = None, chunk_size: int = 500):
+        """Gets index documents and yields them.
 
-        for document in scan(self.client, index=self.index, size=chunk_size):
+        The `query` dictionnary should only contains kwargs compatible with the
+        elasticsearch.helpers.scan function signature (API reference
+        documentation:
+        https://elasticsearch-py.readthedocs.io/en/latest/helpers.html#scan).
+        """
+
+        for document in scan(
+            self.client, index=self.index, size=chunk_size, **query.dict()
+        ):
             yield document
 
     def query(self, body: dict, size=ES_MAX_SEARCH_HITS_COUNT, pit_id=None, **kwargs):

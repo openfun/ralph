@@ -12,7 +12,7 @@ import pytest
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import BulkIndexError, bulk
 
-from ralph.backends.database.es import ESDatabase
+from ralph.backends.database.es import ESDatabase, ESQuery
 from ralph.defaults import APP_DIR, HISTORY_FILE
 from ralph.exceptions import BackendParameterException
 
@@ -24,6 +24,7 @@ def test_backends_database_es_database_instantiation(es):
     # pylint: disable=invalid-name,unused-argument,protected-access
 
     assert ESDatabase.name == "es"
+    assert ESDatabase.query_model == ESQuery
 
     database = ESDatabase(
         hosts=ES_TEST_HOSTS,
@@ -150,6 +151,49 @@ def test_backends_database_es_get_method(es):
 
     expected = [{"id": idx} for idx in range(10)]
     assert list(map(lambda x: x.get("_source"), database.get())) == expected
+
+
+def test_backends_database_es_get_method_with_a_custom_query(es):
+    """Tests ES get method with a custom query."""
+    # pylint: disable=invalid-name
+
+    # Insert documents
+    bulk(
+        es,
+        (
+            {
+                "_index": ES_TEST_INDEX,
+                "_id": idx,
+                "_source": {"id": idx, "modulo": idx % 2},
+            }
+            for idx in range(10)
+        ),
+    )
+    # As we bulk insert documents, the index needs to be refreshed before making
+    # queries.
+    es.indices.refresh(index=ES_TEST_INDEX)
+
+    database = ESDatabase(
+        hosts=ES_TEST_HOSTS,
+        index=ES_TEST_INDEX,
+    )
+
+    # Find every even item
+    query = ESQuery(query={"query": {"term": {"modulo": 0}}})
+    results = list(database.get(query=query))
+    assert len(results) == 5
+    assert results[0]["_source"]["id"] == 0
+    assert results[1]["_source"]["id"] == 2
+    assert results[2]["_source"]["id"] == 4
+    assert results[3]["_source"]["id"] == 6
+    assert results[4]["_source"]["id"] == 8
+
+    # Check query argument type
+    with pytest.raises(
+        BackendParameterException,
+        match="'query' argument is expected to be a ESQuery instance.",
+    ):
+        list(database.get(query="foo"))
 
 
 def test_backends_database_es_put_method(es, fs, monkeypatch):

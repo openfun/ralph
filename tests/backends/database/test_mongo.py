@@ -5,8 +5,8 @@ from bson.objectid import ObjectId
 from pymongo import MongoClient
 from pymongo.errors import BulkWriteError
 
-from ralph.backends.database.mongo import MongoDatabase
-from ralph.exceptions import BadFormatException
+from ralph.backends.database.mongo import MongoDatabase, MongoQuery
+from ralph.exceptions import BackendParameterException, BadFormatException
 
 from tests.fixtures.backends import (
     MONGO_TEST_COLLECTION,
@@ -54,6 +54,56 @@ def test_backends_database_mongo_get_method(mongo):
     assert list(backend.get()) == expected
     assert list(backend.get(chunk_size=1)) == expected
     assert list(backend.get(chunk_size=1000)) == expected
+
+
+def test_backends_database_mongo_get_method_with_a_custom_query(mongo):
+    """Test the mongo backend get method with a custom query."""
+
+    # Create records
+    documents = MongoDatabase.to_documents(
+        [{"id": "foo", "bool": 1}, {"id": "bar", "bool": 0}, {"id": "lol", "bool": 1}]
+    )
+    database = getattr(mongo, MONGO_TEST_DATABASE)
+    collection = getattr(database, MONGO_TEST_COLLECTION)
+    collection.insert_many(documents)
+
+    # Get backend
+    backend = MongoDatabase(
+        connection_uri=MONGO_TEST_URI,
+        database=MONGO_TEST_DATABASE,
+        collection=MONGO_TEST_COLLECTION,
+    )
+
+    # Test filtering
+    query = MongoQuery(filter={"_source.bool": {"$eq": 1}})
+    results = list(backend.get(query=query))
+    assert len(results) == 2
+    assert results[0]["_source"]["id"] == "foo"
+    assert results[1]["_source"]["id"] == "lol"
+
+    # Test projection
+    query = MongoQuery(projection={"_source.bool": 1})
+    results = list(backend.get(query=query))
+    assert len(results) == 3
+    assert list(results[0]["_source"].keys()) == ["bool"]
+    assert list(results[1]["_source"].keys()) == ["bool"]
+    assert list(results[2]["_source"].keys()) == ["bool"]
+
+    # Test filtering and projection
+    query = MongoQuery(
+        filter={"_source.bool": {"$eq": 0}}, projection={"_source.id": 1}
+    )
+    results = list(backend.get(query=query))
+    assert len(results) == 1
+    assert results[0]["_source"]["id"] == "bar"
+    assert list(results[0]["_source"].keys()) == ["id"]
+
+    # Check query argument type
+    with pytest.raises(
+        BackendParameterException,
+        match="'query' argument is expected to be a MongoQuery instance.",
+    ):
+        list(backend.get(query="foo"))
 
 
 def test_backends_database_mongo_to_documents_method():
