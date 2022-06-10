@@ -791,12 +791,17 @@
     --ldp-application-secret TEXT
     --ldp-application-key TEXT
     --ldp-endpoint TEXT
+  mongo backend: 
+    --mongo-client-options KEY=VALUE,KEY=VALUE
+    --mongo-collection TEXT
+    --mongo-database TEXT
+    --mongo-connection-uri TEXT
   es backend: 
     --es-op-type TEXT
     --es-client-options KEY=VALUE,KEY=VALUE
     --es-index TEXT
     --es-hosts TEXT
-  -b, --backend [es|ldp|fs|swift|ws]
+  -b, --backend [es|mongo|ldp|fs|swift|ws]
                                   Backend
                                   [required]
   -c, --chunk-size INTEGER        Get events by
@@ -869,12 +874,17 @@
     --ldp-application-secret TEXT
     --ldp-application-key TEXT
     --ldp-endpoint TEXT
+  mongo backend: 
+    --mongo-client-options KEY=VALUE,KEY=VALUE
+    --mongo-collection TEXT
+    --mongo-database TEXT
+    --mongo-connection-uri TEXT
   es backend: 
     --es-op-type TEXT
     --es-client-options KEY=VALUE,KEY=VALUE
     --es-index TEXT
     --es-hosts TEXT
-  -b, --backend [es|ldp|fs|swift]
+  -b, --backend [es|mongo|ldp|fs|swift]
                                   Backend
                                   [required]
   -c, --chunk-size INTEGER        Get events by
