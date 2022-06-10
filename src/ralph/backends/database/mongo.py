@@ -3,7 +3,7 @@
 import hashlib
 import json
 import logging
-from typing import Generator, TextIO, Union
+from typing import Generator, Optional, TextIO, Union
 
 from bson.objectid import ObjectId
 from pymongo import MongoClient
@@ -12,15 +12,23 @@ from pymongo.errors import BulkWriteError
 from ralph.defaults import MONGO_COLLECTION, MONGO_DATABASE, MONGO_URI
 from ralph.exceptions import BadFormatException
 
-from .base import BaseDatabase
+from .base import BaseDatabase, BaseQuery, enforce_query_checks
 
 logger = logging.getLogger(__name__)
+
+
+class MongoQuery(BaseQuery):
+    """Mongo query model."""
+
+    filter: Optional[dict]
+    projection: Optional[dict]
 
 
 class MongoDatabase(BaseDatabase):
     """Mongo database backend."""
 
     name = "mongo"
+    query_model = MongoQuery
 
     def __init__(
         self,
@@ -45,10 +53,16 @@ class MongoDatabase(BaseDatabase):
         self.database = getattr(self.client, database)
         self.collection = getattr(self.database, collection)
 
-    def get(self, chunk_size: int = 500):
-        """Gets collection documents and yields them."""
+    @enforce_query_checks
+    def get(self, query: MongoQuery = None, chunk_size: int = 500):
+        """Gets collection documents and yields them.
 
-        for document in self.collection.find(batch_size=chunk_size):
+        The `query` dictionary should only contain kwargs compatible with the
+        pymongo.collection.Collection.find method signature (API reference
+        documentation: https://pymongo.readthedocs.io/en/stable/api/pymongo/).
+        """
+
+        for document in self.collection.find(batch_size=chunk_size, **query.dict()):
             # Make the document json-serializable
             document.update({"_id": str(document.get("_id"))})
             yield document

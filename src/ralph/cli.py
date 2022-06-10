@@ -84,6 +84,25 @@ class CommaSeparatedKeyValueParamType(click.ParamType):
         return options
 
 
+class JSONStringParamType(click.ParamType):
+    """JSON string parameter type."""
+
+    name = '\'{"key": "value", "key": "value"}\''
+
+    def convert(self, value, param, ctx):
+        """Load value as a json string and return a dict."""
+
+        try:
+            options = json.loads(value)
+        except (json.JSONDecodeError, TypeError):
+            self.fail(
+                ("You should provide a valid JSON string as input"),
+                param,
+                ctx,
+            )
+        return options
+
+
 @click.group(name="ralph")
 @click.option(
     "-v",
@@ -293,14 +312,25 @@ def convert(from_, to_, ignore_errors, fail_on_unknown, **conversion_set_kwargs)
     default=DEFAULT_BACKEND_CHUNK_SIZE,
     help="Get events by chunks of size #",
 )
-def fetch(backend, archive, chunk_size, **options):
+@click.option(
+    "-q",
+    "--query",
+    type=JSONStringParamType(),
+    default=None,
+    help="Query object as a JSON string (database backends ONLY)",
+)
+def fetch(backend, archive, chunk_size, query, **options):
     """Fetch an archive or records from a configured backend."""
 
     logger.info(
-        "Fetching data from the configured %s backend (archive: %s | chunk size: %s)",
+        (
+            "Fetching data from the configured %s backend "
+            "(archive: %s | chunk size: %s | query: %s)"
+        ),
         backend,
         archive,
         chunk_size,
+        query,
     )
     logger.debug("Backend parameters: %s", options)
 
@@ -312,7 +342,9 @@ def fetch(backend, archive, chunk_size, **options):
         for data in backend.read(archive, chunk_size=chunk_size):
             click.echo(data, nl=False)
     elif backend_type == BackendTypes.DATABASE:
-        for document in backend.get(chunk_size):
+        if query is not None:
+            query = backend.query_model.parse_obj(query)
+        for document in backend.get(query=query, chunk_size=chunk_size):
             click.echo(
                 bytes(
                     json.dumps(document) if isinstance(document, dict) else document,

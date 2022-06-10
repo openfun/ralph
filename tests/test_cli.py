@@ -324,6 +324,9 @@ def test_cli_fetch_command_usage():
         "  -b, --backend [es|mongo|ldp|fs|swift|ws]\n"
         "                                  Backend  [required]\n"
         "  -c, --chunk-size INTEGER        Get events by chunks of size #\n"
+        '  -q, --query \'{"KEY": "VALUE", "KEY": "VALUE"}\'\n'
+        "                                  Query object as a JSON string (database\n"
+        "                                  backends ONLY)\n"
     ) in result.output
 
     result = runner.invoke(cli, ["fetch"])
@@ -411,6 +414,61 @@ def test_cli_fetch_command_with_es_backend(es):
                     }
                 )
                 for idx in range(10)
+            ]
+        )
+        + "\n"
+    )
+
+    assert expected == result.output
+
+
+def test_cli_fetch_command_with_es_backend_query(es):
+    """Tests ralph fetch command using the es backend and a query."""
+    # pylint: disable=invalid-name
+
+    # Insert documents
+    bulk(
+        es,
+        (
+            {
+                "_index": ES_TEST_INDEX,
+                "_id": idx,
+                "_source": {"id": idx, "modulo": idx % 2},
+            }
+            for idx in range(10)
+        ),
+    )
+    # As we bulk insert documents, the index needs to be refreshed before making
+    # queries.
+    es.indices.refresh(index=ES_TEST_INDEX)
+
+    runner = CliRunner()
+    es_hosts = ",".join(ES_TEST_HOSTS)
+    query = {"query": {"query": {"term": {"modulo": 0}}}}
+    query_str = json.dumps(query, separators=(",", ":"))
+    command = (
+        "-v ERROR "
+        "fetch "
+        "-b es "
+        f"--es-hosts {es_hosts} "
+        f"--es-index {ES_TEST_INDEX} "
+        f"--query {query_str}"
+    )
+    result = runner.invoke(cli, command.split())
+    assert result.exit_code == 0
+    expected = (
+        "\n".join(
+            [
+                json.dumps(
+                    {
+                        "_index": ES_TEST_INDEX,
+                        "_id": str(idx),
+                        "_score": None,
+                        "_source": {"id": idx, "modulo": 0},
+                        "sort": [idx],
+                    }
+                )
+                for idx in range(0, 10, 2)
             ]
         )
         + "\n"

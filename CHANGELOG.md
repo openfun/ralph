@@ -12,6 +12,8 @@ and this project adheres to
 
 - Create a `post` endpoint for statements implementing the LRS spec
 - Implement support for the MongoDB database backend
+- Implement support for custom queries when using database backends `get`
+  method (used in the `fetch` command)
 
 ### Changed
 
