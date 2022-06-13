@@ -26,6 +26,7 @@ and this project adheres to
 - Upgrade `pyparsing` to `3.0.9`
 - Upgrade `python-keystoneclient` to `4.5.0`
 - Upgrade `python-swiftclient` to `4.0.0`
+- Upgrade `requests` to `2.28.0`
 - Upgrade `sentry_sdk` to `1.5.12`
 - Upgrade `uvicorn` to `0.17.6`
 - Upgrade `websockets` to `10.3`
