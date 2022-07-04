@@ -58,14 +58,14 @@ package](https://pypi.org/project/ralph-malph/) and a [Docker
 image](https://hub.docker.com/repository/docker/fundocker/ralph).
 
 > If you choose to install `ralph` in your native environment (without using
-> Docker), please make sure that **Python 3.9** is installed (and your default
+> Docker), please make sure that **Python 3.11** is installed (and your default
 > python distribution).
 
 Ralph package can be installed from PyPI using the `pip` tool:
 
 ```sh
 # Create a new virtualenv (optional)
-$ python3.9 -m venv venv
+$ python3.11 -m venv venv
 $ source venv/bin/activate
 
 # Install the full package (in a virtualenv)
