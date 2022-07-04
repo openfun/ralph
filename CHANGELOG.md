@@ -24,6 +24,8 @@ and this project adheres to
 - Tray: add the `ca_certs` path for the ES backend client option (LRS)
 - Improve Sentry integration for the LRS
 - Update handbook link to `https://handbook.openfun.fr`
+- Upgrade base python version to 3.11 for the development stack and Docker
+  image
 
 ## [3.1.0] - 2022-11-17
 

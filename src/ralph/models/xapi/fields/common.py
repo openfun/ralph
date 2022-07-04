@@ -32,8 +32,6 @@ class LanguageTag(str):
         yield validate
 
 
-# Python 3.10
-# LanguageMap: TypeAlias = dict[LanguageTag, str]
 LanguageMap = dict[LanguageTag, StrictStr]
 
 

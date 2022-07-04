@@ -33,7 +33,7 @@ jobs:
   # Check that the git history is clean and complies with our expectations
   lint-git:
     docker:
-      - image: cimg/python:3.9
+      - image: cimg/python:3.11
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -125,7 +125,7 @@ jobs:
   # Build backend development environment
   build:
     docker:
-      - image: cimg/python:3.9
+      - image: cimg/python:3.11
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -145,7 +145,7 @@ jobs:
 
   lint:
     docker:
-      - image: cimg/python:3.9
+      - image: cimg/python:3.11
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -176,7 +176,7 @@ jobs:
 
   test:
     docker:
-      - image: cimg/python:3.9
+      - image: cimg/python:3.11
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -210,7 +210,7 @@ jobs:
 
   test-library:
     docker:
-      - image: cimg/python:3.9
+      - image: cimg/python:3.11
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -308,7 +308,7 @@ jobs:
   # ---- Packaging jobs ----
   package:
     docker:
-      - image: cimg/python:3.9
+      - image: cimg/python:3.11
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -337,7 +337,7 @@ jobs:
   #     environment variables in CircleCI UI (with your PyPI credentials)
   pypi:
     docker:
-      - image: cimg/python:3.9
+      - image: cimg/python:3.11
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -427,7 +427,7 @@ jobs:
   # ---- Documentation jobs ----
   build-docs:
     docker:
-      - image: cimg/python:3.9
+      - image: cimg/python:3.11
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -444,7 +444,7 @@ jobs:
   # Deploy the docs website to GitHub pages.
   deploy-docs:
     docker:
-      - image: cimg/python:3.9
+      - image: cimg/python:3.11
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
