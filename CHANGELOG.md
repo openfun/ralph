@@ -29,7 +29,7 @@ and this project adheres to
 - Upgrade `python-keystoneclient` to `4.5.0`
 - Upgrade `python-swiftclient` to `4.0.0`
 - Upgrade `requests` to `2.28.1`
-- Upgrade `sentry_sdk` to `1.6.0`
+- Upgrade `sentry_sdk` to `1.7.0`
 - Upgrade `uvicorn` to `0.18.2`
 - Upgrade `websockets` to `10.3`
 - Make backends yield results instead of writing to standard streams
