@@ -50,7 +50,7 @@ jobs:
       - run:
           name: Check absence of fixup commits
           command: |
-            ! git log | grep 'fixup!'
+            ! git log --pretty=format:%s | grep 'fixup!'
       - run:
           name: Install gitlint
           command: |
