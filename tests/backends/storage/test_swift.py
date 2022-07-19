@@ -8,7 +8,7 @@ import sys
 import pytest
 from swiftclient.service import SwiftService
 
-from ralph.defaults import HISTORY_FILE
+from ralph.conf import settings
 from ralph.exceptions import BackendException, BackendParameterException
 
 
@@ -75,7 +75,7 @@ def test_backends_storage_swift_list_should_yield_archive_names(
 
     monkeypatch.setattr(SwiftService, "list", mock_list_with_pages)
     monkeypatch.setattr(SwiftService, "stat", mock_successful_stat)
-    fs.create_file(HISTORY_FILE, contents=json.dumps(history))
+    fs.create_file(settings.HISTORY_FILE, contents=json.dumps(history))
     swift = swift()
     assert list(swift.list()) == [x["name"] for x in listing] * pages_count
     assert list(swift.list(new=True)) == ["2020-05-01.gz"] * pages_count
@@ -104,7 +104,7 @@ def test_backends_storage_swift_list_with_failed_connection_should_log_the_error
 
     monkeypatch.setattr(SwiftService, "list", mock_list_with_pages)
     monkeypatch.setattr(SwiftService, "stat", mock_successful_stat)
-    fs.create_file(HISTORY_FILE, contents=json.dumps([]))
+    fs.create_file(settings.HISTORY_FILE, contents=json.dumps([]))
     caplog.set_level(logging.ERROR)
     swift = swift()
     msg = "Failed to list container ralph_logs_container: Container not found"
@@ -136,7 +136,7 @@ def test_backends_storage_swift_read_with_valid_name_should_write_to_history(
     monkeypatch.setattr(SwiftService, "download", mock_successful_download)
     monkeypatch.setattr(SwiftService, "stat", mock_successful_stat)
     monkeypatch.setattr("ralph.backends.storage.swift.now", lambda: freezed_now)
-    fs.create_file(HISTORY_FILE, contents=json.dumps([]))
+    fs.create_file(settings.HISTORY_FILE, contents=json.dumps([]))
 
     swift = swift()
     list(swift.read("2020-04-29.gz"))
@@ -170,7 +170,7 @@ def test_backends_storage_swift_read_with_invalid_name_should_log_the_error(
 
     monkeypatch.setattr(SwiftService, "download", mock_failed_download)
     monkeypatch.setattr(SwiftService, "stat", mock_successful_stat)
-    fs.create_file(HISTORY_FILE, contents=json.dumps([]))
+    fs.create_file(settings.HISTORY_FILE, contents=json.dumps([]))
     caplog.set_level(logging.ERROR)
 
     swift = swift()
@@ -228,7 +228,7 @@ def test_backends_storage_swift_write_should_write_to_history_new_or_overwriten_
     monkeypatch.setattr(SwiftService, "list", mock_successful_list)
     monkeypatch.setattr(SwiftService, "stat", mock_successful_stat)
     monkeypatch.setattr("ralph.backends.storage.swift.now", lambda: freezed_now)
-    fs.create_file(HISTORY_FILE, contents=json.dumps(history))
+    fs.create_file(settings.HISTORY_FILE, contents=json.dumps(history))
     caplog.set_level(logging.ERROR)
 
     swift = swift()
@@ -275,7 +275,7 @@ def test_backends_storage_swift_write_should_log_the_error(
     monkeypatch.setattr(SwiftService, "upload", mock_failed_upload)
     monkeypatch.setattr(SwiftService, "list", mock_successful_list)
     monkeypatch.setattr(SwiftService, "stat", mock_successful_stat)
-    fs.create_file(HISTORY_FILE, contents=json.dumps(history))
+    fs.create_file(settings.HISTORY_FILE, contents=json.dumps(history))
     caplog.set_level(logging.ERROR)
 
     swift = swift()

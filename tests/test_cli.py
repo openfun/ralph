@@ -12,8 +12,8 @@ from pydantic import ValidationError
 
 from ralph.backends.storage.fs import FSStorage
 from ralph.backends.storage.ldp import LDPStorage
-from ralph.cli import CommaSeparatedKeyValueParamType, cli
-from ralph.defaults import APP_DIR, FS_STORAGE_DEFAULT_PATH, LOCALE_ENCODING
+from ralph.cli import CommaSeparatedKeyValueParamType, JSONStringParamType, cli
+from ralph.conf import settings
 from ralph.exceptions import ConfigurationException
 from ralph.models.edx.navigational.statements import UIPageClose
 from ralph.models.xapi.navigation.statements import PageTerminated
@@ -51,6 +51,9 @@ def test_cli_comma_separated_key_value_param_type():
         ),
     ):
         param_type.convert("foo=bar,", None, None)
+
+    # Option already a dictionary (from defaults)
+    assert param_type.convert({"foo": "bar"}, None, None) == {"foo": "bar"}
 
     # Simple string parsing
     assert param_type.convert("foo=bar", None, None) == {
@@ -96,6 +99,26 @@ def test_cli_comma_separated_key_value_param_type():
     }
 
 
+@pytest.mark.parametrize("value,expected", [('{"foo": "bar"}', {"foo": "bar"})])
+def test_cli_json_string_param_type_with_valid_input(value, expected):
+    """Tests the JSONStringParamType custom parameter type with valid input."""
+
+    param_type = JSONStringParamType()
+    assert param_type.convert(value, None, None) == expected
+
+
+@pytest.mark.parametrize("value", ["foo", None, {}])
+def test_cli_json_string_param_type_with_invalid_input(value):
+    """Tests the JSONStringParamType custom parameter type with invalid input."""
+
+    param_type = JSONStringParamType()
+    with pytest.raises(
+        BadParameter,
+        match="You should provide a valid JSON string as input",
+    ):
+        param_type.convert(value, None, None)
+
+
 def test_cli_help_option():
     """Tests ralph --help command."""
 
@@ -138,7 +161,7 @@ def test_cli_extract_command_with_gelf_parser(gelf_logger):
 
     runner = CliRunner()
     with Path(gelf_logger.handlers[0].stream.name).open(
-        encoding=LOCALE_ENCODING
+        encoding=settings.LOCALE_ENCODING
     ) as log_file:
         gelf_content = log_file.read()
         result = runner.invoke(cli, ["extract", "-p", "gelf"], input=gelf_content)
@@ -289,6 +312,8 @@ def test_cli_fetch_command_usage():
     assert result.exit_code == 0
     assert (
         "Options:\n"
+        "  -b, --backend [es|mongo|ldp|fs|swift|ws]\n"
+        "                                  Backend  [required]\n"
         "  ws backend: \n"
         "    --ws-uri TEXT\n"
         "  swift backend: \n"
@@ -321,8 +346,6 @@ def test_cli_fetch_command_usage():
         "    --es-client-options KEY=VALUE,KEY=VALUE\n"
         "    --es-index TEXT\n"
         "    --es-hosts TEXT\n"
-        "  -b, --backend [es|mongo|ldp|fs|swift|ws]\n"
-        "                                  Backend  [required]\n"
         "  -c, --chunk-size INTEGER        Get events by chunks of size #\n"
         '  -q, --query \'{"KEY": "VALUE", "KEY": "VALUE"}\'\n'
         "                                  Query object as a JSON string (database\n"
@@ -497,6 +520,7 @@ def test_cli_list_command_usage():
     assert result.exit_code == 0
     assert (
         "Options:\n"
+        "  -b, --backend [ldp|fs|swift]    Backend  [required]\n"
         "  swift backend: \n"
         "    --swift-os-identity-api-version TEXT\n"
         "    --swift-os-auth-url TEXT\n"
@@ -517,7 +541,6 @@ def test_cli_list_command_usage():
         "    --ldp-application-secret TEXT\n"
         "    --ldp-application-key TEXT\n"
         "    --ldp-endpoint TEXT\n"
-        "  -b, --backend [ldp|fs|swift]    Backend  [required]\n"
         "  -n, --new / -a, --all           List not fetched (or all) archives\n"
         "  -D, --details / -I, --ids       Get archives detailed output (JSON)\n"
     ) in result.output
@@ -668,10 +691,10 @@ def test_cli_list_command_with_fs_backend(fs, monkeypatch):
 def test_cli_push_command_with_fs_backend(fs):
     """Tests the push command using the FS backend."""
 
-    fs.create_dir(str(APP_DIR))
+    fs.create_dir(str(settings.APP_DIR))
 
     filename = Path("file1")
-    file_path = FS_STORAGE_DEFAULT_PATH / filename
+    file_path = Path(settings.BACKENDS.STORAGE.FS.PATH) / filename
 
     # Create a file
     runner = CliRunner()
@@ -679,7 +702,7 @@ def test_cli_push_command_with_fs_backend(fs):
 
     assert result.exit_code == 0
 
-    with file_path.open("r", encoding=LOCALE_ENCODING) as test_file:
+    with file_path.open("r", encoding=settings.LOCALE_ENCODING) as test_file:
         content = test_file.read()
 
     assert "test content" in content
@@ -696,7 +719,7 @@ def test_cli_push_command_with_fs_backend(fs):
 
     assert result.exit_code == 0
 
-    with file_path.open("r", encoding=LOCALE_ENCODING) as test_file:
+    with file_path.open("r", encoding=settings.LOCALE_ENCODING) as test_file:
         content = test_file.read()
 
     assert "other content" in content

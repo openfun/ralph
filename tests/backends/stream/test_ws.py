@@ -3,10 +3,10 @@
 import json
 from io import BytesIO
 
-import pytest
 import websockets
 
 from ralph.backends.stream.ws import WSStream
+from ralph.conf import settings
 
 from tests.fixtures.backends import WS_TEST_HOST, WS_TEST_PORT
 
@@ -17,9 +17,7 @@ def test_backends_stream_ws_stream_instantiation(ws):
 
     assert WSStream.name == "ws"
 
-    error = "missing 1 required positional argument: 'uri'"
-    with pytest.raises(TypeError, match=error):
-        WSStream()  # pylint: disable=no-value-for-parameter
+    assert WSStream().uri == settings.BACKENDS.STREAM.WS.URI
 
     uri = f"ws://{WS_TEST_HOST}:{WS_TEST_PORT}"
     client = WSStream(uri)

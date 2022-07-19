@@ -5,7 +5,7 @@ import json
 import bcrypt
 import pytest
 
-from ralph.defaults import APP_DIR
+from ralph.conf import settings
 
 
 # pylint: disable=invalid-name
@@ -18,7 +18,7 @@ def auth_credentials(fs):
     credential_bytes = base64.b64encode("ralph:admin".encode("utf-8"))
     credentials = str(credential_bytes, "utf-8")
 
-    auth_file_path = APP_DIR / "auth.json"
+    auth_file_path = settings.APP_DIR / "auth.json"
     fs.create_file(
         auth_file_path,
         contents=json.dumps(

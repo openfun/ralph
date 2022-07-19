@@ -1,13 +1,10 @@
 """Tests for Ralph utils"""
 
 import pytest
+from pydantic import BaseModel
 
 from ralph import utils as ralph_utils
-from ralph.backends import BackendTypes
-from ralph.backends.database import ESDatabase
-from ralph.backends.storage.ldp import LDPStorage
-
-from .fixtures.backends import NamedClassEnum
+from ralph.conf import InstantiableSettingsItem, settings
 
 
 def test_utils_import_string():
@@ -28,71 +25,55 @@ def test_utils_import_string():
 def test_utils_get_backend_type():
     """Tests get_backend_type utility."""
 
-    class TestBackend:
-        """Dumb test backend that does not inherit from a supported backend type."""
-
-    assert ralph_utils.get_backend_type(ESDatabase) == BackendTypes.DATABASE
-    assert ralph_utils.get_backend_type(LDPStorage) == BackendTypes.STORAGE
-    assert ralph_utils.get_backend_type(TestBackend) is None
-
-
-def test_utils_get_class_names():
-    """Tests get_class_names utility."""
-
-    assert ralph_utils.get_class_names([module.value for module in NamedClassEnum]) == [
-        "A",
-        "B",
-    ]
-
-
-def test_utils_get_class_from_name():
-    """Tests get_class_from_name utility."""
-
     assert (
-        ralph_utils.get_class_from_name(
-            "A", [module.value for module in NamedClassEnum]
-        ).name
-        == "A"
+        ralph_utils.get_backend_type(settings.BACKENDS, "es")
+        == settings.BACKENDS.DATABASE
     )
     assert (
-        ralph_utils.get_class_from_name(
-            "B", [module.value for module in NamedClassEnum]
-        ).name
-        == "B"
+        ralph_utils.get_backend_type(settings.BACKENDS, "ldp")
+        == settings.BACKENDS.STORAGE
     )
-    with pytest.raises(ImportError, match="C class is not available"):
-        assert (
-            ralph_utils.get_class_from_name(
-                "C", [module.value for module in NamedClassEnum]
-            ).name
-            == "B"
-        )
-
-
-def test_utils_get_instance_from_class():
-    """Tests get_instance_from_class utility."""
-
-    class NamedTestClass:
-        """Named test class."""
-
-        name = "test"
-
-        def __init__(self, force=False, verbose=0):
-            self.force = force
-            self.verbose = verbose
-
-    test = ralph_utils.get_instance_from_class(
-        NamedTestClass, test_force=True, test_verbose=2
+    assert (
+        ralph_utils.get_backend_type(settings.BACKENDS, "ws")
+        == settings.BACKENDS.STREAM
     )
-    assert test.force
-    assert test.verbose == 2
+    assert ralph_utils.get_backend_type(settings.BACKENDS, "foo") is None
 
-    # Extra parameters are ignored
-    test = ralph_utils.get_instance_from_class(
-        NamedTestClass, test_force=True, test_verbose=2, misc=True
+
+@pytest.mark.parametrize(
+    "options,expected",
+    [
+        # Empty options should produce default result.
+        ({}, {}),
+        # Options not matching the backend name are ignored.
+        ({"foo": "bar", "not_dummy_foo": "baz"}, {}),
+        # One option matches the backend name and overrides the default.
+        ({"dummy_foo": "bar", "not_dummy_foo": "baz"}, {"foo": "bar"}),
+    ],
+)
+def test_utils_get_backend_instance(options, expected):
+    """Tests get_backend_instance utility should return the expected result."""
+
+    class DummyBackendSettings(InstantiableSettingsItem):
+        """Represents a dummy backend setting."""
+
+        foo: str = "foo"  # pylint: disable=disallowed-name
+
+        def get_instance(self, **init_parameters):  # pylint: disable=no-self-use
+            """Returns the init_parameters."""
+
+            return init_parameters
+
+    class TestBackendType(BaseModel):
+        """A backend type including the DummyBackendSettings."""
+
+        DUMMY: DummyBackendSettings = DummyBackendSettings()
+
+    backend_instance = ralph_utils.get_backend_instance(
+        TestBackendType(), "dummy", options
     )
-    assert test.force
-    assert test.verbose == 2
+    assert isinstance(backend_instance, dict)
+    assert backend_instance == expected
 
 
 @pytest.mark.parametrize("path,value", [(["foo", "bar"], "bar_value")])

@@ -15,7 +15,7 @@ import pytest
 import requests
 
 from ralph.backends.storage.ldp import LDPStorage
-from ralph.defaults import APP_DIR, HISTORY_FILE
+from ralph.conf import settings
 from ralph.exceptions import BackendParameterException
 
 
@@ -230,7 +230,7 @@ def test_backends_storage_ldp_list_method_history_management(monkeypatch, fs):
 
     # Create a fetch history
     fs.create_file(
-        HISTORY_FILE,
+        settings.HISTORY_FILE,
         contents=json.dumps(
             [
                 {
@@ -422,12 +422,12 @@ def test_backends_storage_ldp_read_method(monkeypatch, fs):
     monkeypatch.setattr(requests, "get", mock_requests_get)
     monkeypatch.setattr(datetime, "datetime", MockDatetime)
 
-    fs.create_dir(str(APP_DIR))
-    assert not os.path.exists(str(HISTORY_FILE))
+    fs.create_dir(settings.APP_DIR)
+    assert not os.path.exists(settings.HISTORY_FILE)
 
     result = b"".join(storage.read(name="5d5c4c93-04a4-42c5-9860-f51fa4044aa1"))
 
-    assert os.path.exists(str(HISTORY_FILE))
+    assert os.path.exists(settings.HISTORY_FILE)
     assert storage.history == [
         {
             "backend": "ldp",
