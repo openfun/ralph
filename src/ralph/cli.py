@@ -4,45 +4,22 @@ import json
 import logging
 import re
 import sys
-from inspect import signature
 
 import click
 import uvicorn
 from click_option_group import optgroup
+from pydantic import BaseModel
 
-from ralph.backends import BackendTypes
-from ralph.defaults import (
-    CONVERTER_EDX_XAPI_UUID_NAMESPACE,
-    DEFAULT_BACKEND_CHUNK_SIZE,
-    ENVVAR_PREFIX,
-    RUNSERVER_HOST,
-    RUNSERVER_PORT,
-    DatabaseBackends,
-    Parsers,
-    StorageBackends,
-    StreamBackends,
-)
+from ralph.conf import settings
 from ralph.exceptions import UnsupportedBackendException
 from ralph.logger import configure_logging
 from ralph.models.converter import Converter
 from ralph.models.selector import ModelSelector
 from ralph.models.validator import Validator
-from ralph.utils import (
-    get_backend_type,
-    get_class_from_name,
-    get_class_names,
-    get_instance_from_class,
-    get_root_logger,
-)
+from ralph.utils import get_backend_instance, get_backend_type, get_root_logger
 
 # cli module logger
 logger = logging.getLogger(__name__)
-
-DATABASE_BACKENDS = [backend.value for backend in DatabaseBackends]
-PARSERS = [parser.value for parser in Parsers]
-STORAGE_BACKENDS = [backend.value for backend in StorageBackends]
-STREAM_BACKENDS = [backend.value for backend in StreamBackends]
-BACKENDS = DATABASE_BACKENDS + STORAGE_BACKENDS + STREAM_BACKENDS
 
 
 class CommaSeparatedKeyValueParamType(click.ParamType):
@@ -54,6 +31,9 @@ class CommaSeparatedKeyValueParamType(click.ParamType):
         """Split value by comma and equal sign to return a dict build with key/value
         pairs.
         """
+
+        if isinstance(value, dict):
+            return value
 
         # Parse options string
         try:
@@ -123,52 +103,40 @@ def cli(verbosity=None):
             handler.setLevel(level)
 
 
-def backends_options(name=None, backends=None):
+def backends_options(name=None, backend_types: list[BaseModel] = None):
     """Backend-related options decorator for Ralph commands."""
 
-    backend_names = get_class_names(backends)
-
     def wrapper(command):
-        command = (
-            click.option(
-                "-b",
-                "--backend",
-                type=click.Choice(backend_names),
-                required=True,
-                help="Backend",
-            )
+        backend_names = []
+        for backend_type in backend_types:
+            for backend_name, backend in backend_type:
+                backend_name = backend_name.lower()
+                backend_names.append(backend_name)
+                for field_name, field in backend:
+                    field_type = backend.__fields__[field_name].type_
+                    field_name = f"{backend_name}-{field_name}".replace("_", "-")
+                    option = f"--{field_name}"
+                    option_kwargs = {}
+                    # If the field is a boolean, convert it to a flag option
+                    if field_type is bool:
+                        option = f"{option}/--no-{field_name}"
+                        option_kwargs["is_flag"] = True
+                    elif field_type is dict:
+                        option_kwargs["type"] = CommaSeparatedKeyValueParamType()
+
+                    command = optgroup.option(
+                        option.lower(), default=field, **option_kwargs
+                    )(command)
+
+                command = (optgroup.group(f"{backend_name} backend"))(command)
+
+        command = click.option(
+            "-b",
+            "--backend",
+            type=click.Choice(backend_names),
+            required=True,
+            help="Backend",
         )(command)
-
-        for backend_name in backend_names:
-            backend_class = get_class_from_name(backend_name, backends)
-
-            for parameter in signature(backend_class.__init__).parameters.values():
-                if parameter.name == "self":
-                    continue
-                option = f"--{backend_class.name}-{parameter.name}".replace("_", "-")
-                envvar = (
-                    f"{ENVVAR_PREFIX}_{backend_class.name}_{parameter.name}".upper()
-                )
-                option_kwargs = {}
-                # If the parameter is a boolean, convert it to a flag option
-                if parameter.annotation is bool:
-                    option = (
-                        f"{option}/--no-{backend_class.name}-{parameter.name}".replace(
-                            "_", "-"
-                        )
-                    )
-                    option_kwargs["is_flag"] = True
-                elif parameter.annotation is dict:
-                    option_kwargs["type"] = CommaSeparatedKeyValueParamType()
-                command = (
-                    optgroup.option(
-                        option,
-                        envvar=envvar,
-                        default=parameter.default,
-                        **option_kwargs,
-                    )
-                )(command)
-            command = (optgroup.group(f"{backend_class.name} backend"))(command)
 
         command = (cli.command(name=name or command.__name__))(command)
         return command
@@ -180,7 +148,7 @@ def backends_options(name=None, backends=None):
 @click.option(
     "-p",
     "--parser",
-    type=click.Choice(get_class_names(PARSERS)),
+    type=click.Choice([parser.lower() for parser, _ in settings.PARSERS]),
     required=True,
     help="Container format parser used to extract events",
 )
@@ -189,7 +157,7 @@ def extract(parser):
 
     logger.info("Extracting events using the %s parser", parser)
 
-    parser = get_class_from_name(parser, PARSERS)()
+    parser = getattr(settings.PARSERS, parser.upper()).get_instance()
 
     for event in parser.parse(sys.stdin):
         click.echo(event)
@@ -241,7 +209,7 @@ def validate(format_, ignore_errors, fail_on_unknown):
     "--uuid-namespace",
     type=str,
     required=False,
-    default=CONVERTER_EDX_XAPI_UUID_NAMESPACE,
+    default=settings.CONVERTER_EDX_XAPI_UUID_NAMESPACE,
     help="The UUID namespace to use for the `ID` field generation",
 )
 @optgroup.option(
@@ -304,12 +272,12 @@ def convert(from_, to_, ignore_errors, fail_on_unknown, **conversion_set_kwargs)
 
 
 @click.argument("archive", required=False)
-@backends_options(backends=BACKENDS)
+@backends_options(backend_types=[backend for _, backend in settings.BACKENDS])
 @click.option(
     "-c",
     "--chunk-size",
     type=int,
-    default=DEFAULT_BACKEND_CHUNK_SIZE,
+    default=settings.DEFAULT_BACKEND_CHUNK_SIZE,
     help="Get events by chunks of size #",
 )
 @click.option(
@@ -334,14 +302,13 @@ def fetch(backend, archive, chunk_size, query, **options):
     )
     logger.debug("Backend parameters: %s", options)
 
-    backend_class = get_class_from_name(backend, BACKENDS)
-    backend = get_instance_from_class(backend_class, **options)
-    backend_type = get_backend_type(backend_class)
+    backend_type = get_backend_type(settings.BACKENDS, backend)
+    backend = get_backend_instance(backend_type, backend, options)
 
-    if backend_type == BackendTypes.STORAGE:
+    if backend_type == settings.BACKENDS.STORAGE:
         for data in backend.read(archive, chunk_size=chunk_size):
             click.echo(data, nl=False)
-    elif backend_type == BackendTypes.DATABASE:
+    elif backend_type == settings.BACKENDS.DATABASE:
         if query is not None:
             query = backend.query_model.parse_obj(query)
         for document in backend.get(query=query, chunk_size=chunk_size):
@@ -351,7 +318,7 @@ def fetch(backend, archive, chunk_size, query, **options):
                     encoding="utf-8",
                 )
             )
-    elif backend_type == BackendTypes.STREAM:
+    elif backend_type == settings.BACKENDS.STREAM:
         backend.stream(sys.stdout.buffer)
     elif backend_type is None:
         msg = "Cannot find an implemented backend type for backend %s"
@@ -361,12 +328,12 @@ def fetch(backend, archive, chunk_size, query, **options):
 
 # pylint: disable=unnecessary-direct-lambda-call
 @click.argument("archive", required=False)
-@backends_options(backends=(lambda: DATABASE_BACKENDS + STORAGE_BACKENDS)())
+@backends_options(backend_types=[settings.BACKENDS.DATABASE, settings.BACKENDS.STORAGE])
 @click.option(
     "-c",
     "--chunk-size",
     type=int,
-    default=DEFAULT_BACKEND_CHUNK_SIZE,
+    default=settings.DEFAULT_BACKEND_CHUNK_SIZE,
     help="Get events by chunks of size #",
 )
 @click.option(
@@ -389,13 +356,12 @@ def push(backend, archive, chunk_size, force, ignore_errors, **options):
     logger.info("Pushing archive %s to the configured %s backend", archive, backend)
     logger.debug("Backend parameters: %s", options)
 
-    backend_class = get_class_from_name(backend, BACKENDS)
-    backend = get_instance_from_class(backend_class, **options)
-    backend_type = get_backend_type(backend_class)
+    backend_type = get_backend_type(settings.BACKENDS, backend)
+    backend = get_backend_instance(backend_type, backend, options)
 
-    if backend_type == BackendTypes.STORAGE:
+    if backend_type == settings.BACKENDS.STORAGE:
         backend.write(sys.stdin.buffer, archive, overwrite=force)
-    elif backend_type == BackendTypes.DATABASE:
+    elif backend_type == settings.BACKENDS.DATABASE:
         backend.put(sys.stdin, chunk_size=chunk_size, ignore_errors=ignore_errors)
     elif backend_type is None:
         msg = "Cannot find an implemented backend type for backend %s"
@@ -403,7 +369,7 @@ def push(backend, archive, chunk_size, force, ignore_errors, **options):
         raise UnsupportedBackendException(msg, backend)
 
 
-@backends_options(name="list", backends=STORAGE_BACKENDS)
+@backends_options(name="list", backend_types=[settings.BACKENDS.STORAGE])
 @click.option(
     "-n/-a",
     "--new/--all",
@@ -423,9 +389,8 @@ def list_(details, new, backend, **options):
     logger.debug("Fetch details: %s", str(details))
     logger.debug("Backend parameters: %s", options)
 
-    storage = get_instance_from_class(
-        get_class_from_name(backend, STORAGE_BACKENDS), **options
-    )
+    storage = get_backend_instance(settings.BACKENDS.STORAGE, backend, options)
+
     archives = storage.list(details=details, new=new)
 
     counter = 0
@@ -443,7 +408,12 @@ def runserver():
     Run the API server for the development environment. Starting uvicorn
     programmatically for convenience and documentation.
     """
-    logger.info("Running API server on %s:%s.", RUNSERVER_HOST, RUNSERVER_PORT)
+
+    logger.info(
+        "Running API server on %s:%s.",
+        settings.RUNSERVER_HOST,
+        settings.RUNSERVER_PORT,
+    )
     logger.info(
         (
             "Do not use runserver in production - start production servers "
@@ -452,8 +422,8 @@ def runserver():
     )
     uvicorn.run(
         "ralph.api:app",
-        host=RUNSERVER_HOST,
-        port=RUNSERVER_PORT,
+        host=settings.RUNSERVER_HOST,
+        port=settings.RUNSERVER_PORT,
         log_level="debug",
         reload=True,
     )

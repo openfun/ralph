@@ -10,7 +10,7 @@ from typing import Any, Type, Union
 
 from pydantic import BaseModel
 
-from ralph.defaults import MODEL_PATH_SEPARATOR
+from ralph.conf import MODEL_PATH_SEPARATOR
 from ralph.exceptions import ModelRulesException, UnknownEventException
 from ralph.utils import get_dict_value_from_path
 

@@ -13,7 +13,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch.helpers import BulkIndexError, bulk
 
 from ralph.backends.database.es import ESDatabase, ESQuery
-from ralph.defaults import APP_DIR, HISTORY_FILE
+from ralph.conf import settings
 from ralph.exceptions import BackendParameterException
 
 from tests.fixtures.backends import ES_TEST_HOSTS, ES_TEST_INDEX
@@ -201,9 +201,9 @@ def test_backends_database_es_put_method(es, fs, monkeypatch):
     # pylint: disable=invalid-name
 
     # Prepare fake file system
-    fs.create_dir(str(APP_DIR))
+    fs.create_dir(str(settings.APP_DIR))
     # Force Path instantiation with fake FS
-    history_file = Path(str(HISTORY_FILE))
+    history_file = Path(settings.HISTORY_FILE)
     assert not history_file.exists()
 
     monkeypatch.setattr(
@@ -233,9 +233,9 @@ def test_backends_database_es_put_method_with_update_op_type(es, fs, monkeypatch
     # pylint: disable=invalid-name
 
     # Prepare fake file system
-    fs.create_dir(str(APP_DIR))
+    fs.create_dir(settings.APP_DIR)
     # Force Path instantiation with fake FS
-    history_file = Path(str(HISTORY_FILE))
+    history_file = Path(settings.HISTORY_FILE)
     assert not history_file.exists()
 
     monkeypatch.setattr(

@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from ralph.backends.storage.fs import FSStorage
-from ralph.defaults import APP_DIR, FS_STORAGE_DEFAULT_PATH
+from ralph.conf import settings
 
 
 # pylint: disable=invalid-name
@@ -19,7 +19,7 @@ def test_backends_storage_fs_storage_instantiation(fs):
 
     storage = FSStorage()
 
-    assert storage._path == Path(FS_STORAGE_DEFAULT_PATH)
+    assert str(storage._path) == settings.BACKENDS.STORAGE.FS.PATH
 
     deep_path = "deep/directories/path"
 
@@ -73,7 +73,7 @@ def test_backends_storage_fs_url(fs):
 def test_backends_storage_fs_list(fs):
     """Tests archives listing in FSStorage."""
 
-    fs.create_dir(APP_DIR)
+    fs.create_dir(settings.APP_DIR)
 
     path = "test_fs/"
     filename1 = "file1"

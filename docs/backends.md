@@ -27,14 +27,14 @@ Alternatively, this parameter can be set as an environment variable (in upper
 case, prefixed by the program name, _e.g._ `RALPH_`):
 
 ```bash
-$ export RALPH_SWIFT_OS_USERNAME="johndoe"
+$ export RALPH_BACKENDS__STORAGE__SWIFT__OS_USERNAME="johndoe"
 $ ralph list --backend swift # [...] more options
 ```
 
 The general patterns for backend parameters are:
 
 - `--{{ backend_name }}-{{ parameter | underscore_to_dash }}` for command options, and,
-- `RALPH_{{ backend_name | uppercase }}_{{ parameter | uppercase }}` for environment variables.
+- `RALPH_BACKENDS__{{ backend_type | uppercase }}__{{ backend_name | uppercase }}__{{ parameter | uppercase }}` for environment variables, where the `backend_type` is one of `DATABASE`, `STORAGE` and `STREAM`.
 
 ## Storage backends
 
@@ -111,6 +111,8 @@ better job.
 
 The only required parameter is the `path` we want to list or stream content
 from.
+
+## Stream backends
 
 ### WebSocket
 

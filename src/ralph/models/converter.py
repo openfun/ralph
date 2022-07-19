@@ -11,7 +11,7 @@ from typing import Any, Callable, TextIO, Union
 
 from pydantic import BaseModel, ValidationError
 
-from ralph.defaults import MODEL_PATH_SEPARATOR
+from ralph.conf import MODEL_PATH_SEPARATOR
 from ralph.exceptions import (
     BadFormatException,
     ConversionException,

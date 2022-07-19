@@ -6,10 +6,7 @@ import operator
 from functools import reduce
 from importlib import import_module
 
-from ralph.backends import BackendTypes
-from ralph.backends.database.base import BaseDatabase as BaseDatabaseBackend
-from ralph.backends.storage.base import BaseStorage as BaseStorageBackend
-from ralph.backends.stream.base import BaseStream as BaseStreamBackend
+from pydantic import BaseModel
 
 
 # Taken from Django utilities
@@ -34,45 +31,25 @@ def import_string(dotted_path):
         ) from err
 
 
-def get_backend_type(backend_class):
-    """Get backend type from a backend class"""
+def get_backend_type(backends: BaseModel, backend_name: str):
+    """Returns the backend type from a backend name."""
 
-    if BaseStorageBackend in backend_class.__mro__:
-        return BackendTypes.STORAGE
-    if BaseDatabaseBackend in backend_class.__mro__:
-        return BackendTypes.DATABASE
-    if BaseStreamBackend in backend_class.__mro__:
-        return BackendTypes.STREAM
+    backend_name = backend_name.upper()
+    for _, backend_type in backends:
+        if hasattr(backend_type, backend_name):
+            return backend_type
     return None
 
 
-def get_class_names(modules):
-    """Get class name attributes from class modules list"""
+def get_backend_instance(backend_type: BaseModel, backend_name: str, options: dict):
+    """Returns the instantiated backend instance given backend-name-prefixed options."""
 
-    return [import_string(module).name for module in modules]
-
-
-def get_class_from_name(name, modules):
-    """Get class given its name in a modules list"""
-
-    for module in modules:
-        klass = import_string(module)
-        if klass.name == name:
-            return klass
-    raise ImportError(f"{name} class is not available")
-
-
-def get_instance_from_class(klass, **init_parameters):
-    """Return a class instance given class-name-prefixed init parameters"""
-
+    prefix = f"{backend_name}_"
     # Filter backend-related parameters. Parameter name is supposed to start
     # with the backend name
-    names = filter(lambda p: p.startswith(klass.name), init_parameters.keys())
-    parameters = {
-        name.replace(f"{klass.name}_", ""): init_parameters[name] for name in names
-    }
-
-    return klass(**parameters)
+    names = filter(lambda key: key.startswith(prefix), options.keys())
+    options = {name.replace(prefix, ""): options[name] for name in names}
+    return getattr(backend_type, backend_name.upper()).get_instance(**options)
 
 
 def get_root_logger():

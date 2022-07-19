@@ -15,15 +15,28 @@ from pymongo import MongoClient
 from ralph.backends.storage.swift import SwiftStorage
 
 # Elasticsearch backend defaults
-ES_TEST_INDEX = os.environ.get("RALPH_ES_TEST_INDEX", "test-index-foo")
-ES_TEST_INDEX_TEMPLATE = os.environ.get("RALPH_ES_TEST_INDEX_TEMPLATE", "test-index")
-ES_TEST_INDEX_PATTERN = os.environ.get("RALPH_ES_TEST_INDEX_PATTERN", "test-index-*")
-ES_TEST_HOSTS = os.environ.get("RALPH_ES_TEST_HOSTS", "http://localhost:9200").split(
-    ","
+ES_TEST_INDEX = os.environ.get(
+    "RALPH_BACKENDS__DATABASE__ES__TEST_INDEX", "test-index-foo"
 )
-MONGO_TEST_COLLECTION = os.environ.get("RALPH_MONGO_TEST_COLLECTION", "marsha")
-MONGO_TEST_DATABASE = os.environ.get("RALPH_MONGO_TEST_DATABASE", "statements")
-MONGO_TEST_URI = os.environ.get("RALPH_MONGO_TEST_URI", "mongodb://localhost:27017/")
+ES_TEST_INDEX_TEMPLATE = os.environ.get(
+    "RALPH_BACKENDS__DATABASE__ES__INDEX_TEMPLATE", "test-index"
+)
+ES_TEST_INDEX_PATTERN = os.environ.get(
+    "RALPH_BACKENDS__DATABASE__ES__TEST_INDEX_PATTERN", "test-index-*"
+)
+ES_TEST_HOSTS = os.environ.get(
+    "RALPH_BACKENDS__DATABASE__ES__TEST_HOSTS", "http://localhost:9200"
+).split(",")
+
+MONGO_TEST_COLLECTION = os.environ.get(
+    "RALPH_BACKENDS__DATABASE__MONGO__TEST_COLLECTION", "marsha"
+)
+MONGO_TEST_DATABASE = os.environ.get(
+    "RALPH_BACKENDS__DATABASE__MONGO__TEST_DATABASE", "statements"
+)
+MONGO_TEST_URI = os.environ.get(
+    "RALPH_BACKENDS__DATABASE__MONGO__TEST_URI", "mongodb://localhost:27017/"
+)
 
 # Websocket test backend defaults
 WS_TEST_HOST = "localhost"

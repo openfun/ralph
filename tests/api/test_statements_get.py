@@ -1,10 +1,7 @@
-"""
-Tests for the GET statements endpoint of the Ralph API.
-"""
-import os
+"""Tests for the GET statements endpoint of the Ralph API"""
+
 import re
 from datetime import datetime, timedelta
-from unittest import mock
 from urllib.parse import quote_plus
 
 import pytest
@@ -15,9 +12,8 @@ from fastapi.testclient import TestClient
 
 from ralph.api import app
 
-ES_TEST_HOSTS = os.environ.get("RALPH_ES_TEST_HOSTS", "http://localhost:9200").split(
-    ","
-)
+from tests.fixtures.backends import ES_TEST_HOSTS
+
 ES_TEST_INDEX = "statements"
 ES_CLIENT = Elasticsearch(ES_TEST_HOSTS)
 ES_INDICES_CLIENT = IndicesClient(ES_CLIENT)
@@ -269,12 +265,16 @@ def test_get_statements_until_timestamp(auth_credentials):
     assert response.json() == {"statements": [statements[0]]}
 
 
-@mock.patch("ralph.api.routers.statements.ES_MAX_SEARCH_HITS_COUNT", 2)
-def test_get_statements_with_pagination(auth_credentials):
+def test_get_statements_with_pagination(monkeypatch, auth_credentials):
     """
     When the first page does not contain all possible results, it includes
     a "more" property with a link to get the next page of results.
     """
+
+    monkeypatch.setattr(
+        "ralph.api.routers.statements.settings.RUNSERVER_MAX_SEARCH_HITS_COUNT", 2
+    )
+
     statements = [
         {
             "id": "5d345b99-517c-4b54-848e-45010904b177",

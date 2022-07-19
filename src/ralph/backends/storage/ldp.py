@@ -5,12 +5,14 @@ import logging
 import ovh
 import requests
 
+from ralph.conf import settings
 from ralph.exceptions import BackendParameterException
 from ralph.utils import now
 
 from ..mixins import HistoryMixin
 from .base import BaseStorage
 
+ldp_settings = settings.BACKENDS.STORAGE.LDP
 logger = logging.getLogger(__name__)
 
 
@@ -23,12 +25,12 @@ class LDPStorage(HistoryMixin, BaseStorage):
 
     def __init__(
         self,
-        endpoint,
-        application_key,
-        application_secret,
-        consumer_key,
-        service_name=None,
-        stream_id=None,
+        endpoint: str = ldp_settings.ENDPOINT,
+        application_key: str = ldp_settings.APPLICATION_KEY,
+        application_secret: str = ldp_settings.APPLICATION_SECRET,
+        consumer_key: str = ldp_settings.CONSUMER_KEY,
+        service_name: str = ldp_settings.SERVICE_NAME,
+        stream_id: str = ldp_settings.STREAM_ID,
     ):
         """Instantiates the OVH's LDP client."""
 

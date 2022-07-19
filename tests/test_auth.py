@@ -8,7 +8,7 @@ import bcrypt
 from fastapi.testclient import TestClient
 
 from ralph.api import app
-from ralph.defaults import APP_DIR
+from ralph.conf import settings
 
 client = TestClient(app)
 
@@ -62,7 +62,7 @@ def test_get_whoami_credentials_username_not_found(fs):
     credential_bytes = base64.b64encode("john:admin".encode("utf-8"))
     credentials = str(credential_bytes, "utf-8")
 
-    auth_file_path = APP_DIR / "auth.json"
+    auth_file_path = settings.APP_DIR / "auth.json"
     fs.create_file(auth_file_path, contents=STORED_CREDENTIALS)
 
     response = client.get("/whoami", headers={"Authorization": f"Basic {credentials}"})
@@ -80,7 +80,7 @@ def test_get_whoami_wrong_password(fs):
     credential_bytes = base64.b64encode("john:not-admin".encode("utf-8"))
     credentials = str(credential_bytes, "utf-8")
 
-    auth_file_path = APP_DIR / "auth.json"
+    auth_file_path = settings.APP_DIR / "auth.json"
     fs.create_file(auth_file_path, contents=STORED_CREDENTIALS)
 
     response = client.get("/whoami", headers={"Authorization": f"Basic {credentials}"})
@@ -99,7 +99,7 @@ def test_get_whoami_correct_credentials(fs):
     credential_bytes = base64.b64encode("ralph:admin".encode("utf-8"))
     credentials = str(credential_bytes, "utf-8")
 
-    auth_file_path = APP_DIR / "auth.json"
+    auth_file_path = settings.APP_DIR / "auth.json"
     fs.create_file(auth_file_path, contents=STORED_CREDENTIALS)
 
     response = client.get("/whoami", headers={"Authorization": f"Basic {credentials}"})

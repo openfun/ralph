@@ -38,7 +38,7 @@ def test_logger_exists(fs, monkeypatch):
 
     fs.create_dir("/dev")
 
-    monkeypatch.setattr(ralph.logger, "LOGGING_CONFIG", mock_default_config)
+    monkeypatch.setattr(ralph.logger.settings, "LOGGING", mock_default_config)
 
     runner = CliRunner()
     result = runner.invoke(
@@ -58,7 +58,7 @@ def test_logger_no_config(fs, monkeypatch):
 
     mock_default_config = None
 
-    monkeypatch.setattr(ralph.logger, "LOGGING_CONFIG", mock_default_config)
+    monkeypatch.setattr(ralph.logger.settings, "LOGGING", mock_default_config)
 
     runner = CliRunner()
 
@@ -73,7 +73,7 @@ def test_logger_bad_config(fs, monkeypatch):
 
     mock_default_config = "this is not a valid json"
 
-    monkeypatch.setattr(ralph.logger, "LOGGING_CONFIG", mock_default_config)
+    monkeypatch.setattr(ralph.logger.settings, "LOGGING", mock_default_config)
 
     runner = CliRunner()
 

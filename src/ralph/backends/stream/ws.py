@@ -6,6 +6,8 @@ from typing import BinaryIO
 
 import websockets
 
+from ralph.conf import settings
+
 from .base import BaseStream
 
 logger = logging.getLogger(__name__)
@@ -16,7 +18,7 @@ class WSStream(BaseStream):
 
     name = "ws"
 
-    def __init__(self, uri: str):
+    def __init__(self, uri: str = settings.BACKENDS.STREAM.WS.URI):
         """Instantiates the websocket client.
 
         Args:

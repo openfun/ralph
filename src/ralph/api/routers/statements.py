@@ -9,8 +9,8 @@ from elasticsearch.helpers import BulkIndexError
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 
 from ralph.backends.database.es import ESDatabase
+from ralph.conf import settings
 
-from ...defaults import ES_MAX_SEARCH_HITS_COUNT
 from ..auth import authenticated_user
 from ..models import ErrorDetail, LaxStatement
 
@@ -102,7 +102,7 @@ async def get(
         ),
     ),
     limit: Optional[int] = Query(
-        ES_MAX_SEARCH_HITS_COUNT,
+        settings.RUNSERVER_MAX_SEARCH_HITS_COUNT,
         description=(
             "Maximum number of Statements to return. "
             "0 indicates return the maximum the server will allow"
@@ -208,7 +208,7 @@ async def get(
     es_query.update({"track_total_hits": False})
 
     # Make sure the limit does not go above max from settings
-    limit = min(limit, ES_MAX_SEARCH_HITS_COUNT)
+    limit = min(limit, settings.RUNSERVER_MAX_SEARCH_HITS_COUNT)
 
     es_response = ES_CLIENT.query(es_query, limit, pit_id)
 

@@ -14,6 +14,7 @@ and this project adheres to
 - Implement support for the MongoDB database backend
 - Implement support for custom queries when using database backends `get`
   method (used in the `fetch` command)
+- Add dotenv configuration file support and `python-dotenv` dependency.
 
 ### Changed
 
@@ -33,7 +34,13 @@ and this project adheres to
 - Upgrade `sentry_sdk` to `1.7.0`
 - Upgrade `uvicorn` to `0.18.2`
 - Upgrade `websockets` to `10.3`
-- Make backends yield results instead of writing to standard streams
+- Make backends yield results instead of writing to standard streams (BC)
+- Use pydantic settings management instead of global variables in defaults.py
+- Rename backend and parser parameter environment variables (BC)
+
+### Removed
+
+- Remove YAML configuration file support and `pyyaml` dependency (BC)
 
 ### Fixed
 
