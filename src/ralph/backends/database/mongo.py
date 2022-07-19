@@ -9,12 +9,13 @@ from bson.objectid import ObjectId
 from pymongo import MongoClient
 from pymongo.errors import BulkWriteError
 
-from ralph.defaults import MONGO_COLLECTION, MONGO_DATABASE, MONGO_URI
+from ralph.defaults import get_settings
 from ralph.exceptions import BadFormatException
 
 from .base import BaseDatabase, BaseQuery, enforce_query_checks
 
 logger = logging.getLogger(__name__)
+settings = get_settings()
 
 
 class MongoQuery(BaseQuery):
@@ -32,9 +33,9 @@ class MongoDatabase(BaseDatabase):
 
     def __init__(
         self,
-        connection_uri: str = MONGO_URI,
-        database: str = MONGO_DATABASE,
-        collection: str = MONGO_COLLECTION,
+        connection_uri: str = settings.MONGO_CONNECTION_URI,
+        database: str = settings.MONGO_DATABASE,
+        collection: str = settings.MONGO_COLLECTION,
         client_options: dict = None,
     ):
         """Instantiates the Mongo client.

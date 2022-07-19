@@ -33,6 +33,7 @@ and this project adheres to
 - Upgrade `uvicorn` to `0.18.2`
 - Upgrade `websockets` to `10.3`
 - Make backends yield results instead of writing to standard streams
+- Use pydantic settings management instead of global variables in defaults.py
 
 ### Fixed
 

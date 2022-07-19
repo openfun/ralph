@@ -23,12 +23,12 @@ class LDPStorage(HistoryMixin, BaseStorage):
 
     def __init__(
         self,
-        endpoint,
-        application_key,
-        application_secret,
-        consumer_key,
-        service_name=None,
-        stream_id=None,
+        endpoint: str,
+        application_key: str,
+        application_secret: str,
+        consumer_key: str,
+        service_name: str = None,
+        stream_id: str = None,
     ):
         """Instantiates the OVH's LDP client."""
 

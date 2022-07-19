@@ -6,11 +6,6 @@ import operator
 from functools import reduce
 from importlib import import_module
 
-from ralph.backends import BackendTypes
-from ralph.backends.database.base import BaseDatabase as BaseDatabaseBackend
-from ralph.backends.storage.base import BaseStorage as BaseStorageBackend
-from ralph.backends.stream.base import BaseStream as BaseStreamBackend
-
 
 # Taken from Django utilities
 # https://docs.djangoproject.com/en/3.1/_modules/django/utils/module_loading/#import_string
@@ -32,18 +27,6 @@ def import_string(dotted_path):
         raise ImportError(
             f'Module "{module_path}" does not define a "{class_name}" attribute/class'
         ) from err
-
-
-def get_backend_type(backend_class):
-    """Get backend type from a backend class"""
-
-    if BaseStorageBackend in backend_class.__mro__:
-        return BackendTypes.STORAGE
-    if BaseDatabaseBackend in backend_class.__mro__:
-        return BackendTypes.DATABASE
-    if BaseStreamBackend in backend_class.__mro__:
-        return BackendTypes.STREAM
-    return None
 
 
 def get_class_names(modules):

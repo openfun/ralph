@@ -8,17 +8,13 @@ from typing import Callable, Generator, Optional, TextIO
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import BulkIndexError, scan, streaming_bulk
 
-from ralph.defaults import (
-    ES_HOSTS,
-    ES_INDEX,
-    ES_MAX_SEARCH_HITS_COUNT,
-    ES_POINT_IN_TIME_KEEP_ALIVE,
-)
+from ralph.defaults import get_settings
 from ralph.exceptions import BackendParameterException
 
 from .base import BaseDatabase, BaseQuery, enforce_query_checks
 
 logger = logging.getLogger(__name__)
+settings = get_settings()
 
 
 class OpType(Enum):
@@ -47,8 +43,8 @@ class ESDatabase(BaseDatabase):
 
     def __init__(
         self,
-        hosts: list = ES_HOSTS,
-        index: str = ES_INDEX,
+        hosts: list = settings.ES_HOSTS,
+        index: str = settings.ES_INDEX,
         client_options: dict = None,
         op_type: str = DEFAULT_OP_TYPE,
     ):
@@ -89,7 +85,13 @@ class ESDatabase(BaseDatabase):
         ):
             yield document
 
-    def query(self, body: dict, size=ES_MAX_SEARCH_HITS_COUNT, pit_id=None, **kwargs):
+    def query(
+        self,
+        body: dict,
+        size=settings.RUNSERVER_MAX_SEARCH_HITS_COUNT,
+        pit_id=None,
+        **kwargs,
+    ):
         """Returns the Elasticsearch query results.
 
         Args:
@@ -104,7 +106,7 @@ class ESDatabase(BaseDatabase):
         # results over multiple pages.
         if not pit_id:
             pit_response = self.client.open_point_in_time(
-                index=self.index, keep_alive=ES_POINT_IN_TIME_KEEP_ALIVE
+                index=self.index, keep_alive=settings.RUNSERVER_POINT_IN_TIME_KEEP_ALIVE
             )
             pit_id = pit_response["id"]
 
@@ -113,7 +115,7 @@ class ESDatabase(BaseDatabase):
                 "pit": {
                     "id": pit_id,
                     # extend duration of PIT whenever it is used
-                    "keep_alive": ES_POINT_IN_TIME_KEEP_ALIVE,
+                    "keep_alive": settings.RUNSERVER_POINT_IN_TIME_KEEP_ALIVE,
                 }
             }
         )

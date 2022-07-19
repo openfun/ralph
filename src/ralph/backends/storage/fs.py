@@ -4,13 +4,14 @@ import datetime
 import logging
 from pathlib import Path
 
-from ralph.defaults import FS_STORAGE_DEFAULT_PATH
+from ralph.defaults import get_settings
 from ralph.utils import now
 
 from ..mixins import HistoryMixin
 from .base import BaseStorage
 
 logger = logging.getLogger(__name__)
+settings = get_settings()
 
 
 class FSStorage(HistoryMixin, BaseStorage):
@@ -18,7 +19,7 @@ class FSStorage(HistoryMixin, BaseStorage):
 
     name = "fs"
 
-    def __init__(self, path=FS_STORAGE_DEFAULT_PATH):
+    def __init__(self, path: str = settings.FS_PATH):
         """Creates the path directory if it does not exist."""
 
         self._path = Path(path)

@@ -35,6 +35,9 @@ class GELFParser(BaseParser):
 
     name = "gelf"
 
+    def __init__(self):
+        """Instantiates the GELFParser."""
+
     def parse(self, input_file):
         """Parses GELF formatted logs (one JSON string event per row).
 
@@ -67,6 +70,9 @@ class ElasticSearchParser(BaseParser):
     """ElasticSearch JSON document parser."""
 
     name = "es"
+
+    def __init__(self):
+        """Instantiates the ElasticSearchParser."""
 
     def parse(self, input_file):
         """Parses Elasticsearch JSON documents.

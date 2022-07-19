@@ -10,7 +10,7 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel
 from starlette.authentication import AuthenticationError
 
-from ralph.defaults import AUTH_FILE, LOCALE_ENCODING
+from ralph.defaults import get_settings
 
 # Unused password used to avoid timing attacks, by comparing passwords supplied
 # with invalid credentials to something innocuous with the same method as if
@@ -38,7 +38,7 @@ def get_stored_credentials(auth_file):
     reload it with every request.
     """
     try:
-        with open(auth_file, encoding=LOCALE_ENCODING) as auth:
+        with open(auth_file, encoding=get_settings().LOCALE_ENCODING) as auth:
             stored_credentials = json.load(auth)
     except FileNotFoundError as exc:
         raise AuthenticationError(f"Credentials file {auth_file} not found.") from exc
@@ -54,7 +54,7 @@ def authenticated_user(credentials: HTTPBasicCredentials = Depends(security)):
         user_info = next(
             filter(
                 lambda u: u.get("username") == credentials.username,
-                get_stored_credentials(AUTH_FILE),
+                get_stored_credentials(get_settings().AUTH_FILE),
             )
         )
         hashed_password = user_info.get("hash", None)

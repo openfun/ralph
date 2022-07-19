@@ -4,7 +4,6 @@ import json
 import logging
 import re
 import sys
-from inspect import signature
 
 import click
 import uvicorn
@@ -12,37 +11,22 @@ from click_option_group import optgroup
 
 from ralph.backends import BackendTypes
 from ralph.defaults import (
-    CONVERTER_EDX_XAPI_UUID_NAMESPACE,
-    DEFAULT_BACKEND_CHUNK_SIZE,
-    ENVVAR_PREFIX,
-    RUNSERVER_HOST,
-    RUNSERVER_PORT,
-    DatabaseBackends,
-    Parsers,
-    StorageBackends,
-    StreamBackends,
+    BACKENDS,
+    DATABASE_BACKENDS,
+    PARSERS,
+    STORAGE_BACKENDS,
+    Settings,
+    get_settings,
 )
 from ralph.exceptions import UnsupportedBackendException
 from ralph.logger import configure_logging
 from ralph.models.converter import Converter
 from ralph.models.selector import ModelSelector
 from ralph.models.validator import Validator
-from ralph.utils import (
-    get_backend_type,
-    get_class_from_name,
-    get_class_names,
-    get_instance_from_class,
-    get_root_logger,
-)
+from ralph.utils import get_root_logger, import_string
 
 # cli module logger
 logger = logging.getLogger(__name__)
-
-DATABASE_BACKENDS = [backend.value for backend in DatabaseBackends]
-PARSERS = [parser.value for parser in Parsers]
-STORAGE_BACKENDS = [backend.value for backend in StorageBackends]
-STREAM_BACKENDS = [backend.value for backend in StreamBackends]
-BACKENDS = DATABASE_BACKENDS + STORAGE_BACKENDS + STREAM_BACKENDS
 
 
 class CommaSeparatedKeyValueParamType(click.ParamType):
@@ -123,52 +107,35 @@ def cli(verbosity=None):
             handler.setLevel(level)
 
 
-def backends_options(name=None, backends=None):
+def backends_options(name=None, backends: dict = None):
     """Backend-related options decorator for Ralph commands."""
 
-    backend_names = get_class_names(backends)
-
     def wrapper(command):
-        command = (
-            click.option(
-                "-b",
-                "--backend",
-                type=click.Choice(backend_names),
-                required=True,
-                help="Backend",
-            )
-        )(command)
-
-        for backend_name in backend_names:
-            backend_class = get_class_from_name(backend_name, backends)
-
-            for parameter in signature(backend_class.__init__).parameters.values():
-                if parameter.name == "self":
-                    continue
-                option = f"--{backend_class.name}-{parameter.name}".replace("_", "-")
-                envvar = (
-                    f"{ENVVAR_PREFIX}_{backend_class.name}_{parameter.name}".upper()
-                )
+        for backend_name in backends:
+            backend_fields = Settings.get_fields_by_backend()[backend_name]
+            for field_name, model_field in backend_fields.items():
+                option_name = f"--{field_name}".replace("_", "-")
                 option_kwargs = {}
-                # If the parameter is a boolean, convert it to a flag option
-                if parameter.annotation is bool:
-                    option = (
-                        f"{option}/--no-{backend_class.name}-{parameter.name}".replace(
-                            "_", "-"
-                        )
-                    )
+                # If the field is a boolean, convert it to a flag option
+                if model_field.type_ is bool:
+                    option_name = f"{option_name}/--no-{field_name}".replace("_", "-")
                     option_kwargs["is_flag"] = True
-                elif parameter.annotation is dict:
+                elif model_field.type_ is dict:
                     option_kwargs["type"] = CommaSeparatedKeyValueParamType()
-                command = (
-                    optgroup.option(
-                        option,
-                        envvar=envvar,
-                        default=parameter.default,
-                        **option_kwargs,
-                    )
+
+                command = optgroup.option(
+                    option_name.lower(), default=model_field.default, **option_kwargs
                 )(command)
-            command = (optgroup.group(f"{backend_class.name} backend"))(command)
+
+            command = (optgroup.group(f"{backend_name} backend"))(command)
+
+        command = click.option(
+            "-b",
+            "--backend",
+            type=click.Choice(backends.keys()),
+            required=True,
+            help="Backend",
+        )(command)
 
         command = (cli.command(name=name or command.__name__))(command)
         return command
@@ -180,7 +147,7 @@ def backends_options(name=None, backends=None):
 @click.option(
     "-p",
     "--parser",
-    type=click.Choice(get_class_names(PARSERS)),
+    type=click.Choice(PARSERS.keys()),
     required=True,
     help="Container format parser used to extract events",
 )
@@ -189,7 +156,7 @@ def extract(parser):
 
     logger.info("Extracting events using the %s parser", parser)
 
-    parser = get_class_from_name(parser, PARSERS)()
+    parser = import_string(PARSERS[parser])()
 
     for event in parser.parse(sys.stdin):
         click.echo(event)
@@ -241,7 +208,7 @@ def validate(format_, ignore_errors, fail_on_unknown):
     "--uuid-namespace",
     type=str,
     required=False,
-    default=CONVERTER_EDX_XAPI_UUID_NAMESPACE,
+    default=None,
     help="The UUID namespace to use for the `ID` field generation",
 )
 @optgroup.option(
@@ -284,6 +251,11 @@ def validate(format_, ignore_errors, fail_on_unknown):
 def convert(from_, to_, ignore_errors, fail_on_unknown, **conversion_set_kwargs):
     """Converts input events to a given format."""
 
+    if not conversion_set_kwargs.get("uuid_namespace"):
+        conversion_set_kwargs[
+            "uuid_namespace"
+        ] = get_settings().CONVERTER_EDX_XAPI_UUID_NAMESPACE
+
     logger.info(
         "Converting %s events to %s format (ignore_errors=%s | fail-on-unknown=%s)",
         from_,
@@ -309,7 +281,7 @@ def convert(from_, to_, ignore_errors, fail_on_unknown, **conversion_set_kwargs)
     "-c",
     "--chunk-size",
     type=int,
-    default=DEFAULT_BACKEND_CHUNK_SIZE,
+    default=None,
     help="Get events by chunks of size #",
 )
 @click.option(
@@ -321,6 +293,9 @@ def convert(from_, to_, ignore_errors, fail_on_unknown, **conversion_set_kwargs)
 )
 def fetch(backend, archive, chunk_size, query, **options):
     """Fetch an archive or records from a configured backend."""
+
+    if not chunk_size:
+        chunk_size = get_settings().DEFAULT_BACKEND_CHUNK_SIZE
 
     logger.info(
         (
@@ -334,9 +309,8 @@ def fetch(backend, archive, chunk_size, query, **options):
     )
     logger.debug("Backend parameters: %s", options)
 
-    backend_class = get_class_from_name(backend, BACKENDS)
-    backend = get_instance_from_class(backend_class, **options)
-    backend_type = get_backend_type(backend_class)
+    backend_type = get_settings().get_backend_type(backend)
+    backend = get_settings().get_backend_instance(backend, **options)
 
     if backend_type == BackendTypes.STORAGE:
         for data in backend.read(archive, chunk_size=chunk_size):
@@ -361,12 +335,12 @@ def fetch(backend, archive, chunk_size, query, **options):
 
 # pylint: disable=unnecessary-direct-lambda-call
 @click.argument("archive", required=False)
-@backends_options(backends=(lambda: DATABASE_BACKENDS + STORAGE_BACKENDS)())
+@backends_options(backends=DATABASE_BACKENDS | STORAGE_BACKENDS)
 @click.option(
     "-c",
     "--chunk-size",
     type=int,
-    default=DEFAULT_BACKEND_CHUNK_SIZE,
+    default=None,
     help="Get events by chunks of size #",
 )
 @click.option(
@@ -386,12 +360,14 @@ def fetch(backend, archive, chunk_size, query, **options):
 def push(backend, archive, chunk_size, force, ignore_errors, **options):
     """Push an archive to a configured backend."""
 
+    if not chunk_size:
+        chunk_size = get_settings().DEFAULT_BACKEND_CHUNK_SIZE
+
     logger.info("Pushing archive %s to the configured %s backend", archive, backend)
     logger.debug("Backend parameters: %s", options)
 
-    backend_class = get_class_from_name(backend, BACKENDS)
-    backend = get_instance_from_class(backend_class, **options)
-    backend_type = get_backend_type(backend_class)
+    backend_type = get_settings().get_backend_type(backend)
+    backend = get_settings().get_backend_instance(backend, **options)
 
     if backend_type == BackendTypes.STORAGE:
         backend.write(sys.stdin.buffer, archive, overwrite=force)
@@ -423,9 +399,7 @@ def list_(details, new, backend, **options):
     logger.debug("Fetch details: %s", str(details))
     logger.debug("Backend parameters: %s", options)
 
-    storage = get_instance_from_class(
-        get_class_from_name(backend, STORAGE_BACKENDS), **options
-    )
+    storage = get_settings().get_backend_instance(backend, **options)
     archives = storage.list(details=details, new=new)
 
     counter = 0
@@ -443,7 +417,12 @@ def runserver():
     Run the API server for the development environment. Starting uvicorn
     programmatically for convenience and documentation.
     """
-    logger.info("Running API server on %s:%s.", RUNSERVER_HOST, RUNSERVER_PORT)
+
+    logger.info(
+        "Running API server on %s:%s.",
+        get_settings().RUNSERVER_HOST,
+        get_settings().RUNSERVER_PORT,
+    )
     logger.info(
         (
             "Do not use runserver in production - start production servers "
@@ -452,8 +431,8 @@ def runserver():
     )
     uvicorn.run(
         "ralph.api:app",
-        host=RUNSERVER_HOST,
-        port=RUNSERVER_PORT,
+        host=get_settings().RUNSERVER_HOST,
+        port=get_settings().RUNSERVER_PORT,
         log_level="debug",
         reload=True,
     )

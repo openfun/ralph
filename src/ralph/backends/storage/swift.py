@@ -6,12 +6,7 @@ from urllib.parse import urlparse
 
 from swiftclient.service import SwiftService, SwiftUploadObject
 
-from ralph.defaults import (
-    SWIFT_OS_AUTH_URL,
-    SWIFT_OS_IDENTITY_API_VERSION,
-    SWIFT_OS_PROJECT_DOMAIN_NAME,
-    SWIFT_OS_USER_DOMAIN_NAME,
-)
+from ralph.defaults import get_settings
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import now
 
@@ -19,6 +14,7 @@ from ..mixins import HistoryMixin
 from .base import BaseStorage
 
 logger = logging.getLogger(__name__)
+settings = get_settings()
 
 
 class SwiftStorage(
@@ -32,16 +28,16 @@ class SwiftStorage(
 
     def __init__(
         self,
-        os_tenant_id,
-        os_tenant_name,
-        os_username,
-        os_password,
-        os_region_name,
-        os_storage_url,
-        os_user_domain_name=SWIFT_OS_USER_DOMAIN_NAME,
-        os_project_domain_name=SWIFT_OS_PROJECT_DOMAIN_NAME,
-        os_auth_url=SWIFT_OS_AUTH_URL,
-        os_identity_api_version=SWIFT_OS_IDENTITY_API_VERSION,
+        os_tenant_id: str,
+        os_tenant_name: str,
+        os_username: str,
+        os_password: str,
+        os_region_name: str,
+        os_storage_url: str,
+        os_user_domain_name: str = settings.SWIFT_OS_USER_DOMAIN_NAME,
+        os_project_domain_name: str = settings.SWIFT_OS_PROJECT_DOMAIN_NAME,
+        os_auth_url: str = settings.SWIFT_OS_AUTH_URL,
+        os_identity_api_version: str = settings.SWIFT_OS_IDENTITY_API_VERSION,
     ):
         """Prepares the options for the SwiftService."""
 

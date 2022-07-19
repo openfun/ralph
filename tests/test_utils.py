@@ -4,8 +4,7 @@ import pytest
 
 from ralph import utils as ralph_utils
 from ralph.backends import BackendTypes
-from ralph.backends.database import ESDatabase
-from ralph.backends.storage.ldp import LDPStorage
+from ralph.defaults import Settings
 
 from .fixtures.backends import NamedClassEnum
 
@@ -28,12 +27,10 @@ def test_utils_import_string():
 def test_utils_get_backend_type():
     """Tests get_backend_type utility."""
 
-    class TestBackend:
-        """Dumb test backend that does not inherit from a supported backend type."""
-
-    assert ralph_utils.get_backend_type(ESDatabase) == BackendTypes.DATABASE
-    assert ralph_utils.get_backend_type(LDPStorage) == BackendTypes.STORAGE
-    assert ralph_utils.get_backend_type(TestBackend) is None
+    assert Settings.get_backend_type("es") == BackendTypes.DATABASE
+    assert Settings.get_backend_type("ldp") == BackendTypes.STORAGE
+    assert Settings.get_backend_type("ws") == BackendTypes.STREAM
+    assert Settings.get_backend_type("TestBackend") is None
 
 
 def test_utils_get_class_names():

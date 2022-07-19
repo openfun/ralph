@@ -3,9 +3,10 @@
 import json
 import logging
 
-from ralph.defaults import HISTORY_FILE, LOCALE_ENCODING
+from ralph.defaults import get_settings
 
 logger = logging.getLogger(__name__)
+settings = get_settings()
 
 
 class HistoryMixin:
@@ -16,11 +17,13 @@ class HistoryMixin:
     def history(self):
         """Get backend history"""
 
-        logging.debug("Loading history file: %s", str(HISTORY_FILE))
+        logging.debug("Loading history file: %s", str(settings.HISTORY_FILE))
 
         if not hasattr(self, "_history"):
             try:
-                with HISTORY_FILE.open(encoding=LOCALE_ENCODING) as history_file:
+                with settings.HISTORY_FILE.open(
+                    encoding=settings.LOCALE_ENCODING
+                ) as history_file:
                     self._history = json.load(history_file)
             except FileNotFoundError:
                 self._history = []
@@ -30,12 +33,14 @@ class HistoryMixin:
     def write_history(self, history):
         """Write given history as a JSON file"""
 
-        logging.debug("Writing history file: %s", str(HISTORY_FILE))
+        logging.debug("Writing history file: %s", str(settings.HISTORY_FILE))
 
-        if not HISTORY_FILE.parent.exists():
-            HISTORY_FILE.parent.mkdir(parents=True)
+        if not settings.HISTORY_FILE.parent.exists():
+            settings.HISTORY_FILE.parent.mkdir(parents=True)
 
-        with HISTORY_FILE.open("w", encoding=LOCALE_ENCODING) as history_file:
+        with settings.HISTORY_FILE.open(
+            "w", encoding=settings.LOCALE_ENCODING
+        ) as history_file:
             json.dump(history, history_file)
 
         # Update history

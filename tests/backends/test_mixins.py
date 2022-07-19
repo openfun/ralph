@@ -4,7 +4,7 @@ import json
 import os.path
 
 from ralph.backends.mixins import HistoryMixin
-from ralph.defaults import APP_DIR, HISTORY_FILE, LOCALE_ENCODING
+from ralph.defaults import APP_DIR, get_settings
 
 
 def test_backends_mixins_history_mixin_empty_history(fs):
@@ -18,14 +18,14 @@ def test_backends_mixins_history_mixin_empty_history(fs):
 
     # History file or even the APP_DIR are not supposed to exist before trying
     # to access the history for the first time.
-    assert not os.path.exists(str(APP_DIR))
-    assert not os.path.exists(str(HISTORY_FILE))
+    assert not os.path.exists(APP_DIR)
+    assert not os.path.exists(get_settings().HISTORY_FILE)
     assert history.history == []
 
     # Even after trying to read the history for the first time, the file system
     # should stay pristine.
-    assert not os.path.exists(str(APP_DIR))
-    assert not os.path.exists(str(HISTORY_FILE))
+    assert not os.path.exists(APP_DIR)
+    assert not os.path.exists(get_settings().HISTORY_FILE)
 
     # Cached property should be effective now.
     assert hasattr(history, "_history")
@@ -40,7 +40,7 @@ def test_backends_mixins_history_mixin_with_history(fs):
 
     # Add history events
     events = [{"event": "foo"}]
-    fs.create_file(HISTORY_FILE, contents=json.dumps(events))
+    fs.create_file(get_settings().HISTORY_FILE, contents=json.dumps(events))
 
     assert history.history == events
 
@@ -53,8 +53,8 @@ def test_backends_mixins_history_mixin_write_history(fs):
 
     # History file or even the APP_DIR are not supposed to exist before trying
     # to write the history for the first time.
-    assert not os.path.exists(str(APP_DIR))
-    assert not os.path.exists(str(HISTORY_FILE))
+    assert not os.path.exists(APP_DIR)
+    assert not os.path.exists(get_settings().HISTORY_FILE)
 
     # Looks like pyfakefs needs some help with pathlib overrides (we are using
     # Path().parent in our implementation).
@@ -63,9 +63,11 @@ def test_backends_mixins_history_mixin_write_history(fs):
     # Write history
     events = [{"event": "foo"}]
     history.write_history(events)
-    assert os.path.exists(str(APP_DIR))
-    assert os.path.exists(str(HISTORY_FILE))
-    assert HISTORY_FILE.read_text(encoding=LOCALE_ENCODING) == json.dumps(events)
+    assert os.path.exists(APP_DIR)
+    assert os.path.exists(get_settings().HISTORY_FILE)
+    assert get_settings().HISTORY_FILE.read_text(
+        encoding=get_settings().LOCALE_ENCODING
+    ) == json.dumps(events)
     assert history._history == events
     assert history.history == events
 
@@ -84,7 +86,7 @@ def test_backends_mixins_history_mixin_clean_history(fs):
         {"command": "lol"},
         {"command": "bar"},
     ]
-    fs.create_file(HISTORY_FILE, contents=json.dumps(events))
+    fs.create_file(get_settings().HISTORY_FILE, contents=json.dumps(events))
 
     history.clean_history(lambda event: event.get("command") == "foo")
     assert history.history == [
@@ -111,6 +113,8 @@ def test_backends_mixins_history_mixin_append_to_history(fs):
     # Append new event
     history.append_to_history({"event": "bar"})
     expected = [{"event": "foo"}, {"event": "bar"}]
-    assert HISTORY_FILE.read_text(encoding=LOCALE_ENCODING) == json.dumps(expected)
+    assert get_settings().HISTORY_FILE.read_text(
+        encoding=get_settings().LOCALE_ENCODING
+    ) == json.dumps(expected)
     assert history._history == expected
     assert history.history == expected

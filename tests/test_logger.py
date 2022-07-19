@@ -5,6 +5,7 @@ from click.testing import CliRunner
 
 import ralph.logger
 from ralph.cli import cli
+from ralph.defaults import Settings
 from ralph.exceptions import ConfigurationException
 
 
@@ -38,7 +39,12 @@ def test_logger_exists(fs, monkeypatch):
 
     fs.create_dir("/dev")
 
-    monkeypatch.setattr(ralph.logger, "LOGGING_CONFIG", mock_default_config)
+    def mock_settings():
+        """Mocks the get_settings function."""
+
+        return Settings(LOGGING=mock_default_config)
+
+    monkeypatch.setattr(ralph.logger, "get_settings", mock_settings)
 
     runner = CliRunner()
     result = runner.invoke(
@@ -58,7 +64,12 @@ def test_logger_no_config(fs, monkeypatch):
 
     mock_default_config = None
 
-    monkeypatch.setattr(ralph.logger, "LOGGING_CONFIG", mock_default_config)
+    def mock_settings():
+        """Mocks the get_settings function."""
+
+        return Settings(LOGGING=mock_default_config)
+
+    monkeypatch.setattr(ralph.logger, "get_settings", mock_settings)
 
     runner = CliRunner()
 
@@ -73,7 +84,12 @@ def test_logger_bad_config(fs, monkeypatch):
 
     mock_default_config = "this is not a valid json"
 
-    monkeypatch.setattr(ralph.logger, "LOGGING_CONFIG", mock_default_config)
+    def mock_settings():
+        """Mocks the get_settings function."""
+
+        return Settings(LOGGING=mock_default_config)
+
+    monkeypatch.setattr(ralph.logger, "get_settings", mock_settings)
 
     runner = CliRunner()
 
