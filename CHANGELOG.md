@@ -25,6 +25,7 @@ and this project adheres to
 - Upgrade `Jinja2` to `3.1.2`
 - Upgrade `ovh` to `1.0.0`
 - Upgrade `pydantic` to `1.9.1`
+- Upgrade `pymongo` to `4.2.0`
 - Upgrade `pyparsing` to `3.0.9`
 - Upgrade `python-keystoneclient` to `5.0.0`
 - Upgrade `python-swiftclient` to `4.0.1`
