@@ -413,6 +413,19 @@
   
 </li>
         
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stream_backends" class="md-nav__link">
+    Stream backends
+  </a>
+  
+    <nav class="md-nav" aria-label="Stream backends">
+      <ul class="md-nav__list">
+        
           <li class="md-nav__item">
   <a href="#websocket" class="md-nav__link">
     WebSocket
@@ -772,6 +785,19 @@
   
 </li>
         
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stream_backends" class="md-nav__link">
+    Stream backends
+  </a>
+  
+    <nav class="md-nav" aria-label="Stream backends">
+      <ul class="md-nav__list">
+        
           <li class="md-nav__item">
   <a href="#websocket" class="md-nav__link">
     WebSocket
@@ -868,13 +894,13 @@ of the OpenStack Swift backend, it can be set as a command line option using
 </code></pre></div>
 <p>Alternatively, this parameter can be set as an environment variable (in upper
 case, prefixed by the program name, <em>e.g.</em> <code>RALPH_</code>):</p>
-<div class="highlight"><pre><span></span><code>$ <span class="nb">export</span> <span class="nv">RALPH_SWIFT_OS_USERNAME</span><span class="o">=</span><span class="s2">&quot;johndoe&quot;</span>
+<div class="highlight"><pre><span></span><code>$ <span class="nb">export</span> <span class="nv">RALPH_BACKENDS__STORAGE__SWIFT__OS_USERNAME</span><span class="o">=</span><span class="s2">&quot;johndoe&quot;</span>
 $ ralph list --backend swift <span class="c1"># [...] more options</span>
 </code></pre></div>
 <p>The general patterns for backend parameters are:</p>
 <ul>
 <li><code>--{{ backend_name }}-{{ parameter | underscore_to_dash }}</code> for command options, and,</li>
-<li><code>RALPH_{{ backend_name | uppercase }}_{{ parameter | uppercase }}</code> for environment variables.</li>
+<li><code>RALPH_BACKENDS__{{ backend_type | uppercase }}__{{ backend_name | uppercase }}__{{ parameter | uppercase }}</code> for environment variables, where the <code>backend_type</code> is one of <code>DATABASE</code>, <code>STORAGE</code> and <code>STREAM</code>.</li>
 </ul>
 <h2 id="storage_backends">Storage backends<a class="headerlink" href="#storage_backends" title="Permanent link">&para;</a></h2>
 <h3 id="ovh_-_log_data_platform_ldp">OVH - Log Data Platform (LDP)<a class="headerlink" href="#ovh_-_log_data_platform_ldp" title="Permanent link">&para;</a></h3>
@@ -940,6 +966,7 @@ better job.</p>
 <h4 id="backend_parameters_2">Backend parameters<a class="headerlink" href="#backend_parameters_2" title="Permanent link">&para;</a></h4>
 <p>The only required parameter is the <code>path</code> we want to list or stream content
 from.</p>
+<h2 id="stream_backends">Stream backends<a class="headerlink" href="#stream_backends" title="Permanent link">&para;</a></h2>
 <h3 id="websocket">WebSocket<a class="headerlink" href="#websocket" title="Permanent link">&para;</a></h3>
 <p>The webSocket backend is <strong>read-only</strong> and can be used to get real-time events.</p>
 <blockquote>

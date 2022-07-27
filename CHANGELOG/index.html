@@ -532,6 +532,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#removed" class="md-nav__link">
+    Removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#fixed" class="md-nav__link">
     Fixed
   </a>
@@ -654,7 +661,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#removed" class="md-nav__link">
+  <a href="#removed_1" class="md-nav__link">
     Removed
   </a>
   
@@ -688,7 +695,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#removed_1" class="md-nav__link">
+  <a href="#removed_2" class="md-nav__link">
     Removed
   </a>
   
@@ -797,6 +804,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#removed" class="md-nav__link">
+    Removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#fixed" class="md-nav__link">
     Fixed
   </a>
@@ -919,7 +933,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#removed" class="md-nav__link">
+  <a href="#removed_1" class="md-nav__link">
     Removed
   </a>
   
@@ -953,7 +967,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#removed_1" class="md-nav__link">
+  <a href="#removed_2" class="md-nav__link">
     Removed
   </a>
   
@@ -1014,6 +1028,7 @@ and this project adheres to
 <li>Implement support for the MongoDB database backend</li>
 <li>Implement support for custom queries when using database backends <code>get</code>
   method (used in the <code>fetch</code> command)</li>
+<li>Add dotenv configuration file support and <code>python-dotenv</code> dependency.</li>
 </ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1033,7 +1048,13 @@ and this project adheres to
 <li>Upgrade <code>sentry_sdk</code> to <code>1.7.0</code></li>
 <li>Upgrade <code>uvicorn</code> to <code>0.18.2</code></li>
 <li>Upgrade <code>websockets</code> to <code>10.3</code></li>
-<li>Make backends yield results instead of writing to standard streams</li>
+<li>Make backends yield results instead of writing to standard streams (BC)</li>
+<li>Use pydantic settings management instead of global variables in defaults.py</li>
+<li>Rename backend and parser parameter environment variables (BC)</li>
+</ul>
+<h3 id="removed">Removed<a class="headerlink" href="#removed" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Remove YAML configuration file support and <code>pyyaml</code> dependency (BC)</li>
 </ul>
 <h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1125,7 +1146,7 @@ and this project adheres to
 <li>Tray: add missing Swift variables in the secret</li>
 <li>Tray: fix pods anti-affinity selector</li>
 </ul>
-<h3 id="removed">Removed<a class="headerlink" href="#removed" title="Permanent link">&para;</a></h3>
+<h3 id="removed_1">Removed<a class="headerlink" href="#removed_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>pandas</code> is no longer required</li>
 </ul>
@@ -1142,7 +1163,7 @@ and this project adheres to
 <li>Upgrade <code>pyyaml</code> to <code>5.4.1</code></li>
 <li>Upgrade <code>pandas</code> to <code>1.2.1</code></li>
 </ul>
-<h3 id="removed_1">Removed<a class="headerlink" href="#removed_1" title="Permanent link">&para;</a></h3>
+<h3 id="removed_2">Removed<a class="headerlink" href="#removed_2" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>click_log</code> is no longer required as we are able to configure logging</li>
 </ul>
