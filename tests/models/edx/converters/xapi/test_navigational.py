@@ -1,4 +1,4 @@
-"""Tests for the server event xAPI converter"""
+"""Tests for the navigational event xAPI converter"""
 
 import json
 from uuid import UUID, uuid5
@@ -18,8 +18,8 @@ from tests.fixtures.hypothesis_strategies import custom_given
 def test_navigational_ui_page_close_to_page_terminated(
     uuid_namespace, event, platform_url
 ):
-    """Tests that ServerEventToPageViewed.convert returns a JSON string with a
-    constant UUID.
+    """Tests that converting with UIPageCloseToPageTerminated returns the expected xAPI
+    statement.
     """
 
     event.context.course_id = ""

@@ -40,9 +40,9 @@ class ConversionItem:
         Args:
             dest (str): The destination path where to place the converted value.
             src (str or None): The source from where the value to convert is fetched.
-                - When `src` is a path (ex. `context__user_id`) - the value is the item
+                When `src` is a path (ex. `context__user_id`), the value is the item
                     of the event at the path.
-                - When `src` is `None` - the value is the whole event.
+                When `src` is `None`, the value is the whole event.
             transformers (function or tuple of functions): The function(s) to apply on
                 the source value.
             raw_input (bool): Flag indicating whether `get_value` will receive a raw

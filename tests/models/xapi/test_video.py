@@ -6,14 +6,17 @@ import pytest
 from hypothesis import strategies as st
 
 from ralph.models.selector import ModelSelector
+from ralph.models.validator import Validator
 from ralph.models.xapi.video.statements import (
     VideoCompleted,
+    VideoEnableClosedCaptioning,
     VideoInitialized,
-    VideoInteracted,
     VideoPaused,
     VideoPlayed,
+    VideoScreenChangeInteraction,
     VideoSeeked,
     VideoTerminated,
+    VideoVolumeChangeInteraction,
 )
 
 from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
@@ -24,7 +27,6 @@ from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
     [
         VideoCompleted,
         VideoInitialized,
-        VideoInteracted,
         VideoPaused,
         VideoPlayed,
         VideoSeeked,
@@ -41,6 +43,29 @@ def test_models_xapi_video_selectors_with_valid_statements(class_, data):
     model = ModelSelector(module="ralph.models.xapi").get_first_model(statement)
     assert model is class_
 
+@pytest.mark.parametrize(
+    "class_",
+    [
+        VideoVolumeChangeInteraction,
+        VideoEnableClosedCaptioning, 
+        VideoScreenChangeInteraction,
+    ],
+)
+@custom_given(st.data())
+def test_models_xapi_video_interaction_validator_with_valid_statements(class_, data):
+    """Tests given a valid video interaction xAPI statement the `get_first_valid_model`
+    validator method should return the expected model.
+    """
+
+    statement = json.loads(
+        data.draw(custom_builds(class_)).json(exclude_none=True, by_alias=True)
+    )
+
+    model = Validator(ModelSelector(module="ralph.models.xapi")).get_first_valid_model(
+        statement
+    )
+
+    assert isinstance(model, class_)
 
 @custom_given(VideoInitialized)
 def test_models_xapi_video_initialized_with_valid_statement(statement):
@@ -84,8 +109,25 @@ def test_models_xapi_video_terminated_with_valid_statement(statement):
     assert statement.verb.id == "http://adlnet.gov/expapi/verbs/terminated"
 
 
-@custom_given(VideoInteracted)
-def test_models_xapi_video_interacted_with_valid_statement(statement):
-    """Tests that a video interacted statement has the expected verb.id."""
+@custom_given(VideoEnableClosedCaptioning)
+def test_models_xapi_video_enable_closed_captioning_with_valid_statement(statement):
+    """Tests that a video enable closed captioning statement has the expected
+    verb.id."""
+
+    assert statement.verb.id == "http://adlnet.gov/expapi/verbs/interacted"
+
+
+@custom_given(VideoVolumeChangeInteraction)
+def test_models_xapi_video_volume_change_interaction_with_valid_statement(statement):
+    """Tests that a video volume change interaction statement has the expected
+    verb.id."""
+
+    assert statement.verb.id == "http://adlnet.gov/expapi/verbs/interacted"
+
+
+@custom_given(VideoScreenChangeInteraction)
+def test_models_xapi_video_screen_change_interaction_with_valid_statement(statement):
+    """Tests that a video screen change interaction statement has the expected
+    verb.id."""
 
     assert statement.verb.id == "http://adlnet.gov/expapi/verbs/interacted"

@@ -1,24 +1,30 @@
 """Video xAPI event definitions"""
 
+from typing import Optional
+
 from ...selector import selector
 from ..base import BaseXapiModel
 from .fields.contexts import (
     VideoCompletedContextField,
+    VideoEnableClosedCaptioningContextField,
     VideoInitializedContextField,
-    VideoInteractedContextField,
     VideoPausedContextField,
     VideoPlayedContextField,
+    VideoScreenChangeInteractionContextField,
     VideoSeekedContextField,
     VideoTerminatedContextField,
+    VideoVolumeChangeInteractionContextField,
 )
 from .fields.objects import VideoObjectField
 from .fields.results import (
     VideoCompletedResultField,
-    VideoInteractedResultField,
+    VideoEnableClosedCaptioningResultField,
     VideoPausedResultField,
     VideoPlayedResultField,
+    VideoScreenChangeInteractionResultField,
     VideoSeekedResultField,
     VideoTerminatedResultField,
+    VideoVolumeChangeInteractionResultField,
 )
 from .fields.verbs import (
     VideoCompletedVerbField,
@@ -56,7 +62,7 @@ class VideoInitialized(BaseVideoStatement):
         verb__id="http://adlnet.gov/expapi/verbs/initialized",
     )
 
-    verb: VideoInitializedVerbField
+    verb: VideoInitializedVerbField = VideoInitializedVerbField()
     context: VideoInitializedContextField
 
 
@@ -76,9 +82,9 @@ class VideoPlayed(BaseVideoStatement):
         verb__id="https://w3id.org/xapi/video/verbs/played",
     )
 
-    verb: VideoPlayedVerbField
+    verb: VideoPlayedVerbField = VideoPlayedVerbField()
     result: VideoPlayedResultField
-    context: VideoPlayedContextField
+    context: Optional[VideoPlayedContextField]
 
 
 class VideoPaused(BaseVideoStatement):
@@ -97,7 +103,7 @@ class VideoPaused(BaseVideoStatement):
         verb__id="https://w3id.org/xapi/video/verbs/paused",
     )
 
-    verb: VideoPausedVerbField
+    verb: VideoPausedVerbField = VideoPausedVerbField()
     result: VideoPausedResultField
     context: VideoPausedContextField
 
@@ -119,9 +125,9 @@ class VideoSeeked(BaseVideoStatement):
         verb__id="https://w3id.org/xapi/video/verbs/seeked",
     )
 
-    verb: VideoSeekedVerbField
+    verb: VideoSeekedVerbField = VideoSeekedVerbField()
     result: VideoSeekedResultField
-    context: VideoSeekedContextField
+    context: Optional[VideoSeekedContextField]
 
 
 class VideoCompleted(BaseVideoStatement):
@@ -140,7 +146,7 @@ class VideoCompleted(BaseVideoStatement):
         verb__id="http://adlnet.gov/expapi/verbs/completed",
     )
 
-    verb: VideoCompletedVerbField
+    verb: VideoCompletedVerbField = VideoCompletedVerbField()
     result: VideoCompletedResultField
     context: VideoCompletedContextField
 
@@ -161,21 +167,20 @@ class VideoTerminated(BaseVideoStatement):
         verb__id="http://adlnet.gov/expapi/verbs/terminated",
     )
 
-    verb: VideoTerminatedVerbField
+    verb: VideoTerminatedVerbField = VideoTerminatedVerbField()
     result: VideoTerminatedResultField
     context: VideoTerminatedContextField
 
 
-class VideoInteracted(BaseVideoStatement):
-    """Represents a video terminated xAPI statement.
+class VideoEnableClosedCaptioning(BaseVideoStatement):
+    """Represents a video enable closed captioning xAPI statement.
 
-    Example: John interacted with the player (except play, pause, seek). e.g. mute,
-        unmute, change resolution, change player size, etc.
+    Example: John interacted with the player to enable closed captioning.
 
     Attributes:
         verb (dict): See VideoInteractedVerbField.
-        result (dict): See VideoInteractedResultField.
-        context (dict): See VideoInteractedContextField.
+        result (dict): See VideoEnableClosedCaptioningResultField.
+        context (dict): See VideoEnableClosedCaptioningContextField.
     """
 
     __selector__ = selector(
@@ -183,6 +188,48 @@ class VideoInteracted(BaseVideoStatement):
         verb__id="http://adlnet.gov/expapi/verbs/interacted",
     )
 
-    verb: VideoInteractedVerbField
-    result: VideoInteractedResultField
-    context: VideoInteractedContextField
+    verb: VideoInteractedVerbField = VideoInteractedVerbField()
+    result: VideoEnableClosedCaptioningResultField
+    context: VideoEnableClosedCaptioningContextField
+
+
+class VideoVolumeChangeInteraction(BaseVideoStatement):
+    """Represents a video volume change interaction xAPI statement.
+
+    Example: John interacted with the player to change the volume.
+
+    Attributes:
+        verb (dict): See VideoInteractedVerbField.
+        result (dict): See VideoVolumeChangeInteractionResultField.
+        context (dict): See VideoVolumeChangeInteractionContextField.
+    """
+
+    __selector__ = selector(
+        object__definition__type="https://w3id.org/xapi/video/activity-type/video",
+        verb__id="http://adlnet.gov/expapi/verbs/interacted",
+    )
+
+    verb: VideoInteractedVerbField = VideoInteractedVerbField()
+    result: VideoVolumeChangeInteractionResultField
+    context: VideoVolumeChangeInteractionContextField
+
+
+class VideoScreenChangeInteraction(BaseVideoStatement):
+    """Represents a video screen change interaction xAPI statement.
+
+    Example: John interacted with the player to activate or deactivate full screen.
+
+    Attributes:
+        verb (dict): See VideoInteractedVerbField.
+        result (dict): See VideoScreenChangeInteractionResultField.
+        context (dict): See VideoScreenChangeInteractionContextField.
+    """
+
+    __selector__ = selector(
+        object__definition__type="https://w3id.org/xapi/video/activity-type/video",
+        verb__id="http://adlnet.gov/expapi/verbs/interacted",
+    )
+
+    verb: VideoInteractedVerbField = VideoInteractedVerbField()
+    result: VideoScreenChangeInteractionResultField
+    context: VideoScreenChangeInteractionContextField
