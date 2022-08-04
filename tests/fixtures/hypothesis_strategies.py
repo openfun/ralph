@@ -12,7 +12,7 @@ from ralph.models.edx.navigational.statements import UISeqNext, UISeqPrev
 from ralph.models.xapi.fields.contexts import ContextField
 from ralph.models.xapi.fields.results import ScoreResultField
 
-OVERWRITTEN_STATEGIES = {}
+OVERWRITTEN_STRATEGIES = {}
 
 
 def is_base_model(klass):
@@ -62,7 +62,7 @@ def custom_builds(
             present (True) or omitted (False) in the generated model.
     """
 
-    for special_class, special_kwargs in OVERWRITTEN_STATEGIES.items():
+    for special_class, special_kwargs in OVERWRITTEN_STRATEGIES.items():
         if issubclass(klass, special_class):
             kwargs = special_kwargs | kwargs
             break
@@ -93,8 +93,8 @@ def custom_given(*args: Union[st.SearchStrategy, BaseModel], **kwargs):
     return given(*strategies, **kwargs)
 
 
-OVERWRITTEN_STATEGIES = {
-    UISeqPrev: {  # pylint: disable=unhashable-member
+OVERWRITTEN_STRATEGIES = {
+    UISeqPrev: {
         "event": custom_builds(NavigationalEventField, old=st.just(1), new=st.just(0))
     },
     UISeqNext: {  # pylint: disable=unhashable-member

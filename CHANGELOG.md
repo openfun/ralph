@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- EdX to xAPI converters for video events
+
 ### Changed
 
 - Improve Ralph's library integration by unpinning dependencies (and prefer

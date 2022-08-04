@@ -33,4 +33,4 @@ class VideoObjectField(ActivityObjectField):
     """
 
     name: Optional[dict[LANG_EN_US_DISPLAY, str]]
-    definition: VideoObjectDefinitionField
+    definition: VideoObjectDefinitionField = VideoObjectDefinitionField()

@@ -6,9 +6,7 @@ from typing import Literal
 VIDEO_EXTENSION_CC_SUBTITLE_LANG = (
     "https://w3id.org/xapi/video/extensions/cc-subtitle-lang"
 )
-VIDEO_EXTENSION_CC_SUBTITLE_ENABLED = (
-    "https://w3id.org/xapi/video/extensions/cc-subtitle-enabled"
-)
+VIDEO_EXTENSION_CC_ENABLED = "https://w3id.org/xapi/video/extensions/cc-enabled"
 VIDEO_EXTENSION_COMPLETION_THRESHOLD = (
     "https://w3id.org/xapi/video/extensions/completion-threshold"
 )
