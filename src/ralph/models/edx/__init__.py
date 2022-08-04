@@ -47,3 +47,15 @@ from .textbook_interaction.statements import (
     UITextbookPdfZoomButtonsChanged,
     UITextbookPdfZoomMenuChanged,
 )
+from .video.statements import (
+    UIHideTranscript,
+    UILoadVideo,
+    UIPauseVideo,
+    UIPlayVideo,
+    UISeekVideo,
+    UIShowTranscript,
+    UISpeedChangeVideo,
+    UIStopVideo,
+    UIVideoHideCCMenu,
+    UIVideoShowCCMenu,
+)
