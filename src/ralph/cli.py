@@ -403,17 +403,29 @@ def list_(details, new, backend, **options):
 
 
 @cli.command()
-def runserver():
-    """
-    Run the API server for the development environment. Starting uvicorn
-    programmatically for convenience and documentation.
+@click.option(
+    "-h",
+    "--host",
+    type=str,
+    required=False,
+    default=settings.RUNSERVER_HOST,
+    help="LRS server host name",
+)
+@click.option(
+    "-p",
+    "--port",
+    type=int,
+    required=False,
+    default=settings.RUNSERVER_PORT,
+    help="LRS server port",
+)
+def runserver(host: str, port: int):
+    """Runs the API server for the development environment.
+
+    Starts uvicorn programmatically for convenience and documentation.
     """
 
-    logger.info(
-        "Running API server on %s:%s.",
-        settings.RUNSERVER_HOST,
-        settings.RUNSERVER_PORT,
-    )
+    logger.info("Running API server on %s:%s.", host, port)
     logger.info(
         (
             "Do not use runserver in production - start production servers "
@@ -422,8 +434,8 @@ def runserver():
     )
     uvicorn.run(
         "ralph.api:app",
-        host=settings.RUNSERVER_HOST,
-        port=settings.RUNSERVER_PORT,
+        host=host,
+        port=port,
         log_level="debug",
         reload=True,
     )
