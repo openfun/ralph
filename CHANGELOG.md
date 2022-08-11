@@ -15,7 +15,8 @@ and this project adheres to
 - Implement support for the MongoDB database backend
 - Implement support for custom queries when using database backends `get`
   method (used in the `fetch` command)
-- Add dotenv configuration file support and `python-dotenv` dependency.
+- Add dotenv configuration file support and `python-dotenv` dependency
+- Add `host` and `port` options for the `runserver` cli command
 
 ### Changed
 

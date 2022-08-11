@@ -748,3 +748,35 @@ def test_cli_push_command_with_es_backend(es):
 
     assert len(documents) == 10
     assert [document.get("_source") for document in documents] == records
+
+
+def test_cli_runserver_command_usage():
+    """Tests ralph runserver command usage."""
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["runserver", "--help"])
+
+    assert result.exit_code == 0
+    assert (
+        "Options:\n"
+        "  -h, --host TEXT     LRS server host name\n"
+        "  -p, --port INTEGER  LRS server port\n"
+    ) in result.output
+
+
+@pytest.mark.parametrize("host_,port_", [("0.0.0.0", "8000"), ("127.0.0.1", "80")])
+def test_cli_runserver_command_with_host_and_port_arguments(host_, port_, monkeypatch):
+    """Tests the ralph runserver command should consider the host and port arguments."""
+
+    def mock_uvicorn_run(_, host=None, port=None, **kwargs):
+        """Mocks uvicorn.run asserting host and port values."""
+
+        assert host == host_
+        assert port == int(port_)
+
+    monkeypatch.setattr("ralph.cli.uvicorn.run", mock_uvicorn_run)
+
+    runner = CliRunner()
+    result = runner.invoke(cli, f"runserver -h {host_} -p {port_}".split())
+    assert result.exit_code == 0
+    assert f"Running API server on {host_}:{port_}" in result.output
