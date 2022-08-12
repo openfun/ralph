@@ -17,6 +17,7 @@ and this project adheres to
   method (used in the `fetch` command)
 - Add dotenv configuration file support and `python-dotenv` dependency
 - Add `host` and `port` options for the `runserver` cli command
+- Add support for database selection when running the Ralph LRS server
 
 ### Changed
 

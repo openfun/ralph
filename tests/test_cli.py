@@ -12,7 +12,12 @@ from pydantic import ValidationError
 
 from ralph.backends.storage.fs import FSStorage
 from ralph.backends.storage.ldp import LDPStorage
-from ralph.cli import CommaSeparatedKeyValueParamType, JSONStringParamType, cli
+from ralph.cli import (
+    CommaSeparatedKeyValueParamType,
+    CommaSeparatedTupleParamType,
+    JSONStringParamType,
+    cli,
+)
 from ralph.conf import settings
 from ralph.exceptions import ConfigurationException
 from ralph.models.edx.navigational.statements import UIPageClose
@@ -97,6 +102,34 @@ def test_cli_comma_separated_key_value_param_type():
         "baz": 1,
         "spam": True,
     }
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        ("foo", ("foo",)),
+        ("foo,bar", ("foo", "bar")),
+        ("foo,bar,baz", ("foo", "bar", "baz")),
+        (("foo", "bar", "baz"), ("foo", "bar", "baz")),
+    ],
+)
+def test_cli_comma_separated_tuple_param_type_with_valid_input(value, expected):
+    """Tests the CommaSeparatedTupleParamType parameter type with valid input."""
+
+    param_type = CommaSeparatedTupleParamType()
+    assert param_type.convert(value, None, None) == expected
+
+
+@pytest.mark.parametrize("value", [None, {}, ["foo"], 10, True])
+def test_cli_comma_separated_tuple_param_type_with_invalid_input(value):
+    """Tests the CommaSeparatedTupleParamType parameter type with invalid input."""
+
+    param_type = CommaSeparatedTupleParamType()
+    with pytest.raises(
+        BadParameter,
+        match="You should provide values separated by commas, e.g. foo,bar,baz",
+    ):
+        param_type.convert(value, None, None)
 
 
 @pytest.mark.parametrize("value,expected", [('{"foo": "bar"}', {"foo": "bar"})])
@@ -345,7 +378,7 @@ def test_cli_fetch_command_usage():
         "    --es-op-type TEXT\n"
         "    --es-client-options KEY=VALUE,KEY=VALUE\n"
         "    --es-index TEXT\n"
-        "    --es-hosts TEXT\n"
+        "    --es-hosts VALUE1,VALUE2,VALUE3\n"
         "  -c, --chunk-size INTEGER        Get events by chunks of size #\n"
         '  -q, --query \'{"KEY": "VALUE", "KEY": "VALUE"}\'\n'
         "                                  Query object as a JSON string (database\n"
@@ -759,8 +792,19 @@ def test_cli_runserver_command_usage():
     assert result.exit_code == 0
     assert (
         "Options:\n"
-        "  -h, --host TEXT     LRS server host name\n"
-        "  -p, --port INTEGER  LRS server port\n"
+        "  -b, --backend [es|mongo]        Backend  [required]\n"
+        "  mongo backend: \n"
+        "    --mongo-client-options KEY=VALUE,KEY=VALUE\n"
+        "    --mongo-collection TEXT\n"
+        "    --mongo-database TEXT\n"
+        "    --mongo-connection-uri TEXT\n"
+        "  es backend: \n"
+        "    --es-op-type TEXT\n"
+        "    --es-client-options KEY=VALUE,KEY=VALUE\n"
+        "    --es-index TEXT\n"
+        "    --es-hosts VALUE1,VALUE2,VALUE3\n"
+        "  -h, --host TEXT                 LRS server host name\n"
+        "  -p, --port INTEGER              LRS server port\n"
     ) in result.output
 
 
@@ -777,6 +821,30 @@ def test_cli_runserver_command_with_host_and_port_arguments(host_, port_, monkey
     monkeypatch.setattr("ralph.cli.uvicorn.run", mock_uvicorn_run)
 
     runner = CliRunner()
-    result = runner.invoke(cli, f"runserver -h {host_} -p {port_}".split())
+    result = runner.invoke(cli, f"runserver -h {host_} -p {port_} -b es".split())
     assert result.exit_code == 0
-    assert f"Running API server on {host_}:{port_}" in result.output
+    assert f"Running API server on {host_}:{port_} with es backend" in result.output
+
+
+def test_cli_runserver_command_environment_file_generation(monkeypatch):
+    """Tests the ralph runserver command should create the expected environment file."""
+
+    def mock_uvicorn_run(_, env_file=None, **kwargs):
+        """Mocks uvicorn.run asserting environment file content."""
+
+        with open(env_file, mode="r", encoding=settings.LOCALE_ENCODING) as file:
+            assert file.readlines() == [
+                "RALPH_RUNSERVER_BACKEND=es\n",
+                "RALPH_BACKENDS__DATABASE__ES__INDEX=foo\n",
+                "RALPH_BACKENDS__DATABASE__MONGO__COLLECTION=marsha\n",
+                "RALPH_BACKENDS__DATABASE__MONGO__DATABASE=statements\n",
+                "RALPH_BACKENDS__DATABASE__MONGO__CONNECTION_URI="
+                "mongodb://localhost:27017/\n",
+                "RALPH_BACKENDS__DATABASE__ES__OP_TYPE=index\n",
+                "RALPH_BACKENDS__DATABASE__ES__HOSTS=http://localhost:9200\n",
+            ]
+
+    monkeypatch.setattr("ralph.cli.uvicorn.run", mock_uvicorn_run)
+    runner = CliRunner()
+    result = runner.invoke(cli, "runserver -b es --es-index foo".split())
+    assert result.exit_code == 0

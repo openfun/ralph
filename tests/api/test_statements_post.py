@@ -1,27 +1,27 @@
-"""
-Tests for the POST statements endpoint of the Ralph API.
-"""
+"""Tests for the POST statements endpoint of the Ralph API"""
+
 import re
-from unittest import mock
 from uuid import uuid4
 
+import pytest
 from fastapi.testclient import TestClient
 
 from ralph.api import app
-from ralph.backends.database.es import ESDatabase
+from ralph.exceptions import BackendException
 
-from tests.fixtures.backends import ES_TEST_INDEX
+from tests.fixtures.backends import get_es_test_backend, get_mongo_test_backend
 
 client = TestClient(app)
 
 
-# pylint: disable=invalid-name
-@mock.patch("ralph.api.routers.statements.ES_CLIENT", ESDatabase(index=ES_TEST_INDEX))
-def test_post_single_statement_directly(auth_credentials, es):
-    """
-    Statements POST supports adding one statement by passing it as a JSON dict.
-    """
+@pytest.mark.parametrize("backend", [get_es_test_backend, get_mongo_test_backend])
+def test_api_statements_post_single_statement_directly(
+    backend, monkeypatch, auth_credentials, es, mongo
+):
+    """Tests the post statements API route with one statement."""
+    # pylint: disable=invalid-name,unused-argument
 
+    monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
     statement = {
         "actor": {
             "account": {
@@ -32,7 +32,7 @@ def test_post_single_statement_directly(auth_credentials, es):
         },
         "id": str(uuid4()),
         "object": {"id": "https://example.com/object-id/1/"},
-        "timestamp": 1647349671,
+        "timestamp": "2022-06-22T08:31:38Z",
         "verb": {"id": "https://example.com/verb-id/1/"},
     }
 
@@ -44,20 +44,24 @@ def test_post_single_statement_directly(auth_credentials, es):
 
     assert response.status_code == 200
     assert response.json() == [statement["id"]]
+
     es.indices.refresh()
-    hits = es.search(index=ES_TEST_INDEX)["hits"]["hits"]
-    assert len(hits) == 1
-    assert hits[0]["_id"] == statement["id"]
+
+    response = client.get(
+        "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
+    )
+    assert response.status_code == 200
+    assert response.json() == {"statements": [statement]}
 
 
-# pylint: disable=invalid-name
-@mock.patch("ralph.api.routers.statements.ES_CLIENT", ESDatabase(index=ES_TEST_INDEX))
-def test_post_statements_list_of_one(auth_credentials, es):
-    """
-    Statements POST supports adding one statement by just
-    passing a list of one statement.
-    """
+@pytest.mark.parametrize("backend", [get_es_test_backend, get_mongo_test_backend])
+def test_api_statements_post_statements_list_of_one(
+    backend, monkeypatch, auth_credentials, es, mongo
+):
+    """Tests the post statements API route with one statement in a list."""
+    # pylint: disable=invalid-name,unused-argument
 
+    monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
     statement = {
         "actor": {
             "account": {
@@ -68,7 +72,7 @@ def test_post_statements_list_of_one(auth_credentials, es):
         },
         "id": str(uuid4()),
         "object": {"id": "https://example.com/object-id/1/"},
-        "timestamp": 1647349671,
+        "timestamp": "2022-03-15T14:07:51Z",
         "verb": {"id": "https://example.com/verb-id/1/"},
     }
 
@@ -81,19 +85,22 @@ def test_post_statements_list_of_one(auth_credentials, es):
     assert response.status_code == 200
     assert response.json() == [statement["id"]]
     es.indices.refresh()
-    hits = es.search(index=ES_TEST_INDEX)["hits"]["hits"]
-    assert len(hits) == 1
-    assert hits[0]["_id"] == statement["id"]
+
+    response = client.get(
+        "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
+    )
+    assert response.status_code == 200
+    assert response.json() == {"statements": [statement]}
 
 
-# pylint: disable=invalid-name
-@mock.patch("ralph.api.routers.statements.ES_CLIENT", ESDatabase(index=ES_TEST_INDEX))
-def test_post_statements_list(auth_credentials, es):
-    """
-    Statements POST supports adding more than one statement by just
-    passing a list of statements.
-    """
+@pytest.mark.parametrize("backend", [get_es_test_backend, get_mongo_test_backend])
+def test_api_statements_post_statements_list(
+    backend, monkeypatch, auth_credentials, es, mongo
+):
+    """Tests the post statements API route with two statements in a list."""
+    # pylint: disable=invalid-name,unused-argument
 
+    monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
     statements = [
         {
             "actor": {
@@ -105,7 +112,7 @@ def test_post_statements_list(auth_credentials, es):
             },
             "id": str(uuid4()),
             "object": {"id": "https://example.com/object-id/1/"},
-            "timestamp": 1647349671,
+            "timestamp": "2022-03-15T14:07:52Z",
             "verb": {"id": "https://example.com/verb-id/1/"},
         },
         {
@@ -118,7 +125,7 @@ def test_post_statements_list(auth_credentials, es):
             },
             # Note the second statement has no preexisting ID
             "object": {"id": "https://example.com/object-id/1/"},
-            "timestamp": 1647349671,
+            "timestamp": "2022-03-15T14:07:51Z",
             "verb": {"id": "https://example.com/verb-id/1/"},
         },
     ]
@@ -132,20 +139,27 @@ def test_post_statements_list(auth_credentials, es):
     assert response.status_code == 200
     assert response.json()[0] == statements[0]["id"]
     regex = re.compile("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
-    assert regex.match(response.json()[1])
+    generated_id = response.json()[1]
+    assert regex.match(generated_id)
     es.indices.refresh()
-    hits = es.search(index=ES_TEST_INDEX)["hits"]["hits"]
-    assert len(hits) == 2
-    assert hits[0]["_id"] == statements[0]["id"]
-    assert hits[1]["_id"] == response.json()[1]
+
+    get_response = client.get(
+        "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
+    )
+    assert get_response.status_code == 200
+    # Update statements with the generated id.
+    statements[1] = statements[1] | {"id": generated_id}
+    assert get_response.json() == {"statements": statements}
 
 
-# pylint: disable=invalid-name
-def test_post_statements_list_with_duplicates(auth_credentials, es):
-    """
-    A POST statements request with duplicate statement IDs should fail.
-    """
+@pytest.mark.parametrize("backend", [get_es_test_backend, get_mongo_test_backend])
+def test_api_statements_post_statements_list_with_duplicates(
+    backend, monkeypatch, auth_credentials, es_data_stream, mongo
+):
+    """Tests the post statements API route with duplicate statement IDs should fail."""
+    # pylint: disable=invalid-name,unused-argument
 
+    monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
     statement = {
         "actor": {
             "account": {
@@ -156,7 +170,7 @@ def test_post_statements_list_with_duplicates(auth_credentials, es):
         },
         "id": str(uuid4()),
         "object": {"id": "https://example.com/object-id/1/"},
-        "timestamp": 1647349671,
+        "timestamp": "2022-03-15T14:07:51Z",
         "verb": {"id": "https://example.com/verb-id/1/"},
     }
 
@@ -170,21 +184,25 @@ def test_post_statements_list_with_duplicates(auth_credentials, es):
     assert response.json() == {
         "detail": "Duplicate statement IDs in the list of statements"
     }
-    es.indices.refresh()
-    hits = es.search(index=ES_TEST_INDEX)["hits"]["hits"]
-    assert len(hits) == 0
+    # The failure should imply no statement insertion.
+    es_data_stream.indices.refresh()
+    response = client.get(
+        "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
+    )
+    assert response.status_code == 200
+    assert response.json() == {"statements": []}
 
 
-# pylint: disable=invalid-name
-@mock.patch("ralph.api.routers.statements.ES_CLIENT", ESDatabase(index=ES_TEST_INDEX))
-def test_post_statements_list_with_duplicate_of_existing_statement(
-    auth_credentials, es
+@pytest.mark.parametrize("backend", [get_es_test_backend, get_mongo_test_backend])
+def test_api_statements_post_statements_list_with_duplicate_of_existing_statement(
+    backend, monkeypatch, auth_credentials, es, mongo
 ):
+    """Tests the post statements API route, given a statement that already exist in the
+    database (has the same ID), should fail.
     """
-    A POST statements request containing a statement with an ID that already
-    exists in the database should fail.
-    """
+    # pylint: disable=invalid-name,unused-argument
 
+    monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
     statement = {
         "actor": {
             "account": {
@@ -195,26 +213,73 @@ def test_post_statements_list_with_duplicate_of_existing_statement(
         },
         "id": str(uuid4()),
         "object": {"id": "https://example.com/object-id/1/"},
-        "timestamp": 1647349671,
+        "timestamp": "2022-03-15T14:07:51Z",
         "verb": {"id": "https://example.com/verb-id/1/"},
     }
 
-    # pylint: disable=unexpected-keyword-arg, no-value-for-parameter
-    es.index(
-        index=ES_TEST_INDEX,
-        id=statement["id"],
-        document=statement,
-    )
-    es.indices.refresh()
-
+    # Post the statement once.
     response = client.post(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {auth_credentials}"},
-        json=[statement],
+        json=statement,
+    )
+    assert response.status_code == 200
+
+    es.indices.refresh()
+
+    # Post the statement twice, trying to change the version field which is not allowed.
+    response = client.post(
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {auth_credentials}"},
+        json=[statement | {"version": "1.0.0"}],
     )
 
     assert response.status_code == 409
     assert response.json() == {"detail": "Statements already exist with the same ID"}
-    es.indices.refresh()
-    hits = es.search(index=ES_TEST_INDEX)["hits"]["hits"]
-    assert len(hits) == 1
+
+    response = client.get(
+        "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
+    )
+    assert response.status_code == 200
+    assert response.json() == {"statements": [statement]}
+
+
+@pytest.mark.parametrize("backend", [get_es_test_backend, get_mongo_test_backend])
+def test_api_statements_post_statements_with_a_failure_during_storage(
+    backend, monkeypatch, auth_credentials, es, mongo
+):
+    """Tests the post statements API route with a failure happening during storage."""
+    # pylint: disable=invalid-name,unused-argument, too-many-arguments
+
+    def put_mock(*args, **kwargs):
+        """Raises an exception. Mocks the database.put method."""
+
+        raise BackendException()
+
+    backend_instance = backend()
+    monkeypatch.setattr(backend_instance, "put", put_mock)
+    monkeypatch.setattr(
+        "ralph.api.routers.statements.DATABASE_CLIENT", backend_instance
+    )
+    statement = {
+        "actor": {
+            "account": {
+                "homePage": "https://example.com/homepage/",
+                "name": str(uuid4()),
+            },
+            "objectType": "Agent",
+        },
+        "id": str(uuid4()),
+        "object": {"id": "https://example.com/object-id/1/"},
+        "timestamp": "2022-03-15T14:07:51Z",
+        "verb": {"id": "https://example.com/verb-id/1/"},
+    }
+
+    response = client.post(
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {auth_credentials}"},
+        json=statement,
+    )
+
+    assert response.status_code == 500
+    assert response.json() == {"detail": "Statements bulk indexation failed"}
