@@ -4,13 +4,14 @@ import json
 import logging
 import re
 import sys
+from tempfile import NamedTemporaryFile
 
 import click
 import uvicorn
 from click_option_group import optgroup
 from pydantic import BaseModel
 
-from ralph.conf import settings
+from ralph.conf import CommaSeparatedTuple, settings
 from ralph.exceptions import UnsupportedBackendException
 from ralph.logger import configure_logging
 from ralph.models.converter import Converter
@@ -22,14 +23,35 @@ from ralph.utils import get_backend_instance, get_backend_type, get_root_logger
 logger = logging.getLogger(__name__)
 
 
+class CommaSeparatedTupleParamType(click.ParamType):
+    """Comma separated tuple parameter type."""
+
+    name = "value1,value2,value3"
+
+    def convert(self, value, param, ctx):
+        """Splits the value by comma to return a tuple of values."""
+
+        if isinstance(value, str):
+            return tuple(value.split(","))
+
+        if not isinstance(value, tuple):
+            self.fail(
+                "You should provide values separated by commas, e.g. foo,bar,baz",
+                param,
+                ctx,
+            )
+
+        return value
+
+
 class CommaSeparatedKeyValueParamType(click.ParamType):
     """Comma separated key=value parameter type."""
 
     name = "key=value,key=value"
 
     def convert(self, value, param, ctx):
-        """Split value by comma and equal sign to return a dict build with key/value
-        pairs.
+        """Splits the values by comma and equal sign to return a dictionary build with
+        key/value pairs.
         """
 
         if isinstance(value, dict):
@@ -123,6 +145,8 @@ def backends_options(name=None, backend_types: list[BaseModel] = None):
                         option_kwargs["is_flag"] = True
                     elif field_type is dict:
                         option_kwargs["type"] = CommaSeparatedKeyValueParamType()
+                    elif field_type is CommaSeparatedTuple:
+                        option_kwargs["type"] = CommaSeparatedTupleParamType()
 
                     command = optgroup.option(
                         option.lower(), default=field, **option_kwargs
@@ -402,7 +426,7 @@ def list_(details, new, backend, **options):
         logger.warning("Configured %s backend contains no archive", backend)
 
 
-@cli.command()
+@backends_options(name="runserver", backend_types=[settings.BACKENDS.DATABASE])
 @click.option(
     "-h",
     "--host",
@@ -419,24 +443,44 @@ def list_(details, new, backend, **options):
     default=settings.RUNSERVER_PORT,
     help="LRS server port",
 )
-def runserver(host: str, port: int):
+def runserver(backend: str, host: str, port: int, **options):
     """Runs the API server for the development environment.
 
     Starts uvicorn programmatically for convenience and documentation.
     """
 
-    logger.info("Running API server on %s:%s.", host, port)
+    logger.info("Running API server on %s:%s with %s backend", host, port, backend)
     logger.info(
         (
             "Do not use runserver in production - start production servers "
             "through a process manager such as gunicorn/supervisor/circus."
         )
     )
-    uvicorn.run(
-        "ralph.api:app",
-        host=host,
-        port=port,
-        log_level="debug",
-        reload=True,
-    )
+
+    # The LRS server relies only on environment and configuration variables for its
+    # configuration (not CLI arguments). Therefore, we convert the CLI arguments to
+    # environment variables by creating a temporary environment file and passing it to
+    # uvicorn.
+    with NamedTemporaryFile(mode="w", encoding=settings.LOCALE_ENCODING) as env_file:
+        env_file.write(f"RALPH_RUNSERVER_BACKEND={backend}\n")
+        for key, value in options.items():
+            if value is None:
+                continue
+            backend_name, field_name = key.split(sep="_", maxsplit=1)
+            key = f"RALPH_BACKENDS__DATABASE__{backend_name}__{field_name}".upper()
+            if isinstance(value, tuple):
+                value = ",".join(value)
+            logger.debug("Setting environment variable %s to '%s'", key, value)
+            env_file.write(f"{key}={value}\n")
+
+        env_file.seek(0)
+        uvicorn.run(
+            "ralph.api:app",
+            env_file=env_file.name,
+            host=host,
+            port=port,
+            log_level="debug",
+            reload=True,
+        )
+
     logger.info("Shutting down uvicorn server.")

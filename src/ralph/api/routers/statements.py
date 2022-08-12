@@ -1,15 +1,15 @@
-"""API routes related to statements."""
+"""API routes related to statements"""
 
 import logging
 from datetime import datetime
 from typing import Literal, Optional, Union
 from uuid import UUID, uuid4
 
-from elasticsearch.helpers import BulkIndexError
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 
-from ralph.backends.database.es import ESDatabase
+from ralph.backends.database.base import BaseDatabase, StatementParameters
 from ralph.conf import settings
+from ralph.exceptions import BackendException, BadFormatException
 
 from ..auth import authenticated_user
 from ..models import ErrorDetail, LaxStatement
@@ -22,7 +22,9 @@ router = APIRouter(
 )
 
 
-ES_CLIENT = ESDatabase()
+DATABASE_CLIENT: BaseDatabase = getattr(
+    settings.BACKENDS.DATABASE, settings.RUNSERVER_BACKEND.upper()
+).get_instance()
 
 
 @router.get("/")
@@ -160,57 +162,18 @@ async def get(
         ),
     ),
 ):
-    """
-    Fetch a single xAPI Statement or multiple xAPI Statements.
+    """Fetches a single xAPI Statement or multiple xAPI Statements.
 
     LRS Specification:
     https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#213-get-statements
     """
 
-    # Create a list to aggregate all the enabled filters for the search
-    es_query_filters = []
-
-    if statementId:
-        es_query_filters += [{"term": {"_id": statementId}}]
-
-    if agent:
-        es_query_filters += [{"term": {"actor.account.name.keyword": agent}}]
-
-    if verb:
-        es_query_filters += [{"term": {"verb.id.keyword": verb}}]
-
-    if activity:
-        es_query_filters += [
-            {"term": {"object.objectType.keyword": "Activity"}},
-            {"term": {"object.id.keyword": activity}},
-        ]
-
-    if since:
-        es_query_filters += [{"range": {"timestamp": {"gt": since}}}]
-
-    if until:
-        es_query_filters += [{"range": {"timestamp": {"lte": until}}}]
-
-    if len(es_query_filters) > 0:
-        es_query = {"query": {"bool": {"filter": es_query_filters}}}
-    else:
-        es_query = {"query": {"match_all": {}}}
-
-    # Honor the "ascending" parameter, otherwise show most recent statements first
-    es_query.update(
-        {"sort": [{"timestamp": {"order": "asc" if ascending else "desc"}}]}
-    )
-
-    if search_after:
-        es_query.update({"search_after": search_after.split("|")})
-
-    # Disable total hits counting for performance as we're not using it.
-    es_query.update({"track_total_hits": False})
-
     # Make sure the limit does not go above max from settings
     limit = min(limit, settings.RUNSERVER_MAX_SEARCH_HITS_COUNT)
 
-    es_response = ES_CLIENT.query(es_query, limit, pit_id)
+    query_result = DATABASE_CLIENT.query_statements(
+        StatementParameters(**{**request.query_params, "limit": limit})
+    )
 
     # Prepare the link to get the next page of the request, while preserving the
     # consistency of search results.
@@ -218,27 +181,20 @@ async def get(
     # exactly a multiple of the "limit", in which case we'll offer an extra page
     # with 0 results.
     response = {}
-    if len(es_response["hits"]["hits"]) == limit:
+    if len(query_result.statements) == limit:
         # Search after relies on sorting info located in the last hit
-        last_hit_sort = [str(part) for part in es_response["hits"]["hits"][-1]["sort"]]
-        pit_id = es_response["pit_id"]
         path = request.url.components.path
         query = request.url.components.query
         response.update(
             {
                 "more": (
-                    f"{path}{query + '&' if query else '?'}pit_id={pit_id}"
-                    f"&search_after={'|'.join(last_hit_sort)}"
+                    f"{path}{query + '&' if query else '?'}pit_id={query_result.pit_id}"
+                    f"&search_after={query_result.search_after}"
                 )
             }
         )
 
-    return {
-        **response,
-        "statements": [
-            statement["_source"] for statement in es_response["hits"]["hits"]
-        ],
-    }
+    return {**response, "statements": query_result.statements}
 
 
 @router.post(
@@ -256,10 +212,9 @@ async def get(
 )
 # pylint: disable=unused-argument
 async def post(statements: Union[LaxStatement, list[LaxStatement]]):
-    """
-    Store a set of statements (or a single statement as a single member of a set).
-    NB: at this time, using POST to make a GET request, is not supported.
+    """Stores a set of statements (or a single statement as a single member of a set).
 
+    NB: at this time, using POST to make a GET request, is not supported.
     LRS Specification:
     https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#212-post-statements
     """
@@ -273,10 +228,11 @@ async def post(statements: Union[LaxStatement, list[LaxStatement]]):
     # - generate IDs for statements that are missing them;
     # - use the list of keys to perform validations and as a final return value;
     # - provide an iterable containing both the statements and generated IDs for bulk.
-    statements_dict = {
-        statement.setdefault("id", str(uuid4())): statement
-        for statement in map(lambda x: x.dict(exclude_unset=True), statements)
-    }
+    statements_dict = {}
+    for statement in map(lambda x: x.dict(exclude_unset=True), statements):
+        statement_id = str(statement.get("id", uuid4()))
+        statement["id"] = statement_id
+        statements_dict[statement_id] = statement
 
     # Requests with duplicate statement IDs are considered invalid
     # statements_ids were deduplicated by the dict, statements list was not
@@ -287,9 +243,7 @@ async def post(statements: Union[LaxStatement, list[LaxStatement]]):
             detail="Duplicate statement IDs in the list of statements",
         )
 
-    es_response = ES_CLIENT.query({"query": {"terms": {"_id": statements_ids}}})
-
-    if len(es_response["hits"]["hits"]) > 0:
+    if len(DATABASE_CLIENT.query_statements_by_ids(statements_ids)) > 0:
         # NB: LRS specification calls for performing a deep comparison of incoming
         # statements and existing statements with the same ID.
         # This seems too costly for performance and was not implemented for this POC.
@@ -300,8 +254,10 @@ async def post(statements: Union[LaxStatement, list[LaxStatement]]):
 
     # For valid requests, perform the bulk indexing of all incoming statements
     try:
-        success_count = ES_CLIENT.put(statements_dict.values(), ignore_errors=False)
-    except BulkIndexError as exc:
+        success_count = DATABASE_CLIENT.put(
+            statements_dict.values(), ignore_errors=False
+        )
+    except (BackendException, BadFormatException) as exc:
         logger.error("Failed to index submitted statements")
         raise HTTPException(
             status_code=500, detail="Statements bulk indexation failed"

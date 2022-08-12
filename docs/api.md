@@ -7,10 +7,15 @@ Ralph comes with an API server that aims to implement the LRS specification (sti
 The API server can be started up with the following command:
 
 ```bash
-$ ralph runserver
+$ ralph runserver --backend es
 ```
 
-Before you can start your API server and make requests against it, you need to set up your credentials.
+The `--backend` (or `-b`) option specifies which database backend to use for LRS data
+storage and retrieval. See Ralph's [backends documentation](./backends.md) for more
+details.
+
+However, before you can start your API server and make requests against it, you need to
+set up your credentials.
 
 ### Creating a credentials file
 

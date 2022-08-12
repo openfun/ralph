@@ -10,11 +10,11 @@ from pathlib import Path
 
 import pytest
 from elasticsearch import Elasticsearch
-from elasticsearch.helpers import BulkIndexError, bulk
+from elasticsearch.helpers import bulk
 
 from ralph.backends.database.es import ESDatabase, ESQuery
 from ralph.conf import settings
-from ralph.exceptions import BackendParameterException
+from ralph.exceptions import BackendException, BackendParameterException
 
 from tests.fixtures.backends import ES_TEST_HOSTS, ES_TEST_INDEX
 
@@ -286,7 +286,7 @@ def test_backends_database_es_put_method_with_update_op_type(es, fs, monkeypatch
     )
 
 
-def test_backends_database_es_put_with_badly_formatted_data_raises_a_bulkindexerror(
+def test_backends_database_es_put_with_badly_formatted_data_raises_a_backend_exception(
     es, fs, monkeypatch
 ):
     """Tests ES put method with badly formatted data."""
@@ -309,13 +309,13 @@ def test_backends_database_es_put_with_badly_formatted_data_raises_a_bulkindexer
     )
 
     # By default, we should raise an error and stop the importation
-    msg = "\\('1 document\\(s\\) failed to index.', '5 succeeded'\\)"
-    with pytest.raises(BulkIndexError, match=msg) as exception_info:
+    msg = "\\('1 document\\(s\\) failed to index.', '5 succeeded writes'\\)"
+    with pytest.raises(BackendException, match=msg) as exception_info:
         database.put(sys.stdin, chunk_size=2)
     es.indices.refresh(index=ES_TEST_INDEX)
     hits = es.search(index=ES_TEST_INDEX)["hits"]["hits"]
     assert len(hits) == 5
-    assert exception_info.value.args[-1] == "5 succeeded"
+    assert exception_info.value.args[-1] == "5 succeeded writes"
     assert sorted([hit["_source"]["id"] for hit in hits]) == [0, 1, 2, 3, 5]
 
 
@@ -379,35 +379,3 @@ def test_backends_database_es_put_with_datastream(es_data_stream, fs, monkeypatc
     hits = es_data_stream.search(index=ES_TEST_INDEX)["hits"]["hits"]
     assert len(hits) == 10
     assert sorted([hit["_source"]["id"] for hit in hits]) == list(range(10))
-
-
-def test_backends_database_es_query_method(es):
-    """Tests that the ES query method returns the expected result."""
-    # pylint: disable=invalid-name
-
-    # Insert documents
-    documents = [
-        {"_index": ES_TEST_INDEX, "_id": idx, "_source": {"id": idx}}
-        for idx in range(10)
-    ]
-    bulk(es, documents)
-    # As we bulk insert documents, the index needs to be refreshed before making
-    # queries.
-    es.indices.refresh(index=ES_TEST_INDEX)
-
-    database = ESDatabase(
-        hosts=ES_TEST_HOSTS,
-        index=ES_TEST_INDEX,
-    )
-
-    expected = {
-        "_id": "2",
-        "_index": ES_TEST_INDEX,
-        "_source": {"id": 2},
-        "_score": 1.0,
-    }
-    result = database.query({"query": {"terms": {"_id": [2]}}})
-
-    # assert result["hits"] == 1
-    assert len(result["hits"]["hits"]) == 1
-    assert result["hits"]["hits"][0] == expected

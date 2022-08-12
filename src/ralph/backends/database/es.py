@@ -9,9 +9,15 @@ from elasticsearch import Elasticsearch
 from elasticsearch.helpers import BulkIndexError, scan, streaming_bulk
 
 from ralph.conf import settings
-from ralph.exceptions import BackendParameterException
+from ralph.exceptions import BackendException, BackendParameterException
 
-from .base import BaseDatabase, BaseQuery, enforce_query_checks
+from .base import (
+    BaseDatabase,
+    BaseQuery,
+    StatementParameters,
+    StatementQueryResult,
+    enforce_query_checks,
+)
 
 es_settings = settings.BACKENDS.DATABASE.ES
 logger = logging.getLogger(__name__)
@@ -71,7 +77,7 @@ class ESDatabase(BaseDatabase):
     def get(self, query: ESQuery = None, chunk_size: int = 500):
         """Gets index documents and yields them.
 
-        The `query` dictionnary should only contains kwargs compatible with the
+        The `query` dictionary should only contains kwargs compatible with the
         elasticsearch.helpers.scan function signature (API reference
         documentation:
         https://elasticsearch-py.readthedocs.io/en/latest/helpers.html#scan).
@@ -81,44 +87,6 @@ class ESDatabase(BaseDatabase):
             self.client, index=self.index, size=chunk_size, **query.dict()
         ):
             yield document
-
-    def query(
-        self,
-        body: dict,
-        size=settings.RUNSERVER_MAX_SEARCH_HITS_COUNT,
-        pit_id=None,
-        **kwargs,
-    ):
-        """Returns the Elasticsearch query results.
-
-        Args:
-            body (dict): The Elasticsearch query definition (Query DSL).
-            size (int): The (maximal) number of results to return.
-            pit_id (string): Limits the search to a point in time.
-            **kwargs: Additional arguments for the `Elasticsearch.search` method.
-        """
-        # pylint: disable=unexpected-keyword-arg
-
-        # Create a point-in-time or use the existing one to ensure consistency of search
-        # results over multiple pages.
-        if not pit_id:
-            pit_response = self.client.open_point_in_time(
-                index=self.index,
-                keep_alive=settings.RUNSERVER_POINT_IN_TIME_KEEP_ALIVE,
-            )
-            pit_id = pit_response["id"]
-
-        body.update(
-            {
-                "pit": {
-                    "id": pit_id,
-                    # extend duration of PIT whenever it is used
-                    "keep_alive": settings.RUNSERVER_POINT_IN_TIME_KEEP_ALIVE,
-                }
-            }
-        )
-
-        return self.client.search(body=body, size=size, **kwargs)
 
     def to_documents(
         self, stream: TextIO, get_id: Callable[[dict], str]
@@ -160,6 +128,85 @@ class ESDatabase(BaseDatabase):
                     "Wrote %d documents [action: %s ok: %d]", documents, action, success
                 )
         except BulkIndexError as error:
-            error.args = error.args + (f"{documents} succeeded",)
-            raise error
+            raise BackendException(
+                *error.args, f"{documents} succeeded writes"
+            ) from error
         return documents
+
+    def query_statements(self, params: StatementParameters) -> StatementQueryResult:
+        """Returns the results of a statements query using xAPI parameters."""
+
+        es_query_filters = []
+
+        if params.statementId:
+            es_query_filters += [{"term": {"_id": params.statementId}}]
+
+        if params.agent:
+            es_query_filters += [{"term": {"actor.account.name.keyword": params.agent}}]
+
+        if params.verb:
+            es_query_filters += [{"term": {"verb.id.keyword": params.verb}}]
+
+        if params.activity:
+            es_query_filters += [
+                {"term": {"object.objectType.keyword": "Activity"}},
+                {"term": {"object.id.keyword": params.activity}},
+            ]
+
+        if params.since:
+            es_query_filters += [{"range": {"timestamp": {"gt": params.since}}}]
+
+        if params.until:
+            es_query_filters += [{"range": {"timestamp": {"lte": params.until}}}]
+
+        if len(es_query_filters) > 0:
+            es_query = {"query": {"bool": {"filter": es_query_filters}}}
+        else:
+            es_query = {"query": {"match_all": {}}}
+
+        # Honor the "ascending" parameter, otherwise show most recent statements first
+        es_query.update(
+            {"sort": [{"timestamp": {"order": "asc" if params.ascending else "desc"}}]}
+        )
+
+        if params.search_after:
+            es_query.update({"search_after": params.search_after.split("|")})
+
+        # Disable total hits counting for performance as we're not using it.
+        es_query.update({"track_total_hits": False})
+
+        if not params.pit_id:
+            pit_response = self.client.open_point_in_time(
+                index=self.index, keep_alive=settings.RUNSERVER_POINT_IN_TIME_KEEP_ALIVE
+            )
+            params.pit_id = pit_response["id"]
+
+        es_query.update(
+            {
+                "pit": {
+                    "id": params.pit_id,
+                    # extend duration of PIT whenever it is used
+                    "keep_alive": settings.RUNSERVER_POINT_IN_TIME_KEEP_ALIVE,
+                }
+            }
+        )
+        es_response = self.client.search(  # pylint: disable=unexpected-keyword-arg
+            body=es_query, size=params.limit
+        )
+        es_documents = es_response["hits"]["hits"]
+        search_after = None
+        if es_documents:
+            search_after = "|".join([str(part) for part in es_documents[-1]["sort"]])
+
+        return StatementQueryResult(
+            statements=[document["_source"] for document in es_documents],
+            pit_id=es_response["pit_id"],
+            search_after=search_after,
+        )
+
+    def query_statements_by_ids(self, ids: list[str]) -> list:
+        """Returns the list of matching statement IDs from the database."""
+
+        return self.client.search(  # pylint: disable=unexpected-keyword-arg
+            body={"query": {"terms": {"_id": ids}}}
+        )["hits"]["hits"]

@@ -5,29 +5,28 @@ from datetime import datetime, timedelta
 from urllib.parse import quote_plus
 
 import pytest
-from elasticsearch import Elasticsearch
-from elasticsearch.client import IndicesClient
 from elasticsearch.helpers import bulk
 from fastapi.testclient import TestClient
 
 from ralph.api import app
+from ralph.backends.database.mongo import MongoDatabase
 
-from tests.fixtures.backends import ES_TEST_HOSTS
-
-ES_TEST_INDEX = "statements"
-ES_CLIENT = Elasticsearch(ES_TEST_HOSTS)
-ES_INDICES_CLIENT = IndicesClient(ES_CLIENT)
+from tests.fixtures.backends import (
+    ES_TEST_INDEX,
+    MONGO_TEST_COLLECTION,
+    MONGO_TEST_DATABASE,
+    get_es_test_backend,
+    get_mongo_test_backend,
+)
 
 client = TestClient(app)
 
 
-def setup_es_index(statements):
-    """
-    Set up the Elasticsearch index with a bunch of example documents to run tests.
-    """
-    ES_INDICES_CLIENT.create(index=ES_TEST_INDEX)
+def insert_es_statements(es_client, statements):
+    """Inserts a bunch of example statements into Elasticsearch for testing."""
+
     bulk(
-        ES_CLIENT,
+        es_client,
         [
             {
                 "_index": ES_TEST_INDEX,
@@ -38,22 +37,42 @@ def setup_es_index(statements):
             for statement in statements
         ],
     )
-    ES_INDICES_CLIENT.refresh()
+    es_client.indices.refresh()
 
 
-@pytest.fixture(autouse=True)
-def teardown_es_index():
-    """
-    Clean up Elasticsearch after each test.
-    """
-    yield
-    ES_INDICES_CLIENT.delete(index=ES_TEST_INDEX)
+def insert_mongo_statements(mongo_client, statements):
+    """Inserts a bunch of example statements into MongoDB for testing."""
+
+    database = getattr(mongo_client, MONGO_TEST_DATABASE)
+    collection = getattr(database, MONGO_TEST_COLLECTION)
+    collection.insert_many(list(MongoDatabase.to_documents(statements)))
 
 
-def test_get_statements(auth_credentials):
-    """
-    Get statements without any filters set up.
-    """
+@pytest.fixture(params=["es", "mongo"])
+def insert_statements_and_monkeypatch_backend(request, es, mongo, monkeypatch):
+    """Retuns a function that inserts statements into Elasticsearch and MongoDB."""
+    # pylint: disable=invalid-name
+
+    def _insert_statements_and_monkeypatch_backend(statements):
+        """Inserts statements once into Elasticsearch and once into MongoDB."""
+
+        database_client_class_path = "ralph.api.routers.statements.DATABASE_CLIENT"
+        if request.param == "mongo":
+            insert_mongo_statements(mongo, statements)
+            monkeypatch.setattr(database_client_class_path, get_mongo_test_backend())
+            return
+        insert_es_statements(es, statements)
+        monkeypatch.setattr(database_client_class_path, get_es_test_backend())
+
+    return _insert_statements_and_monkeypatch_backend
+
+
+def test_api_statements_get_statements(
+    insert_statements_and_monkeypatch_backend, auth_credentials
+):
+    """Tests the get statements API route without any filters set up."""
+    # pylint: disable=redefined-outer-name
+
     statements = [
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
@@ -64,7 +83,7 @@ def test_get_statements(auth_credentials):
             "timestamp": datetime.now().isoformat(),
         },
     ]
-    setup_es_index(statements)
+    insert_statements_and_monkeypatch_backend(statements)
 
     response = client.get(
         "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
@@ -74,11 +93,14 @@ def test_get_statements(auth_credentials):
     assert response.json() == {"statements": [statements[1], statements[0]]}
 
 
-def test_get_statements_ascending(auth_credentials):
+def test_api_statements_get_statements_ascending(
+    insert_statements_and_monkeypatch_backend, auth_credentials
+):
+    """Tests the get statements API route, given an "ascending" query parameter, should
+    return statements in ascending order by their timestamp.
     """
-    Get statements without any filters set up, with a query parameter to
-    order them by ascending timestamp.
-    """
+    # pylint: disable=redefined-outer-name
+
     statements = [
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
@@ -89,7 +111,7 @@ def test_get_statements_ascending(auth_credentials):
             "timestamp": datetime.now().isoformat(),
         },
     ]
-    setup_es_index(statements)
+    insert_statements_and_monkeypatch_backend(statements)
 
     response = client.get(
         "/xAPI/statements/?ascending=true",
@@ -100,11 +122,14 @@ def test_get_statements_ascending(auth_credentials):
     assert response.json() == {"statements": [statements[0], statements[1]]}
 
 
-def test_get_statements_by_statement_id(auth_credentials):
+def test_api_statements_get_statements_by_statement_id(
+    insert_statements_and_monkeypatch_backend, auth_credentials
+):
+    """Tests the get statements API route, given a "statementId" query parameter, should
+    return a list of statements matching the given statementId.
     """
-    Filter statements by statement id. Still return a list format response
-    to avoid having a polymorphic response type.
-    """
+    # pylint: disable=redefined-outer-name
+
     statements = [
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
@@ -115,7 +140,7 @@ def test_get_statements_by_statement_id(auth_credentials):
             "timestamp": datetime.now().isoformat(),
         },
     ]
-    setup_es_index(statements)
+    insert_statements_and_monkeypatch_backend(statements)
 
     response = client.get(
         f"/xAPI/statements/?statementId={statements[1]['id']}",
@@ -126,10 +151,14 @@ def test_get_statements_by_statement_id(auth_credentials):
     assert response.json() == {"statements": [statements[1]]}
 
 
-def test_get_statements_by_agent(auth_credentials):
+def test_api_statements_get_statements_by_agent(
+    insert_statements_and_monkeypatch_backend, auth_credentials
+):
+    """Tests the get statements API route, given an "agent" query parameter, should
+    return a list of statements filtered by the given agent.
     """
-    Filter statements by agent.
-    """
+    # pylint: disable=redefined-outer-name
+
     statements = [
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
@@ -142,7 +171,7 @@ def test_get_statements_by_agent(auth_credentials):
             "actor": {"account": {"name": "cdcb1c95-dd5b-4085-8236-9c1580051155"}},
         },
     ]
-    setup_es_index(statements)
+    insert_statements_and_monkeypatch_backend(statements)
 
     response = client.get(
         "/xAPI/statements/?agent=96d61e6c-9cdb-4926-9cff-d3a15c662999",
@@ -153,10 +182,14 @@ def test_get_statements_by_agent(auth_credentials):
     assert response.json() == {"statements": [statements[0]]}
 
 
-def test_get_statements_by_verb(auth_credentials):
+def test_api_statements_get_statements_by_verb(
+    insert_statements_and_monkeypatch_backend, auth_credentials
+):
+    """Tests the get statements API route, given a "verb" query parameter, should
+    return a list of statements filtered by the given verb id.
     """
-    Filter statements by verb.
-    """
+    # pylint: disable=redefined-outer-name
+
     statements = [
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
@@ -169,7 +202,7 @@ def test_get_statements_by_verb(auth_credentials):
             "verb": {"id": "http://adlnet.gov/expapi/verbs/played"},
         },
     ]
-    setup_es_index(statements)
+    insert_statements_and_monkeypatch_backend(statements)
 
     response = client.get(
         "/xAPI/statements/?verb=" + quote_plus("http://adlnet.gov/expapi/verbs/played"),
@@ -180,10 +213,14 @@ def test_get_statements_by_verb(auth_credentials):
     assert response.json() == {"statements": [statements[1]]}
 
 
-def test_get_statements_by_activity(auth_credentials):
+def test_api_statements_get_statements_by_activity(
+    insert_statements_and_monkeypatch_backend, auth_credentials
+):
+    """Tests the get statements API route, given an "activity" query parameter, should
+    return a list of statements filtered by the given activity id.
     """
-    Filter statements by activity.
-    """
+    # pylint: disable=redefined-outer-name
+
     statements = [
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
@@ -202,7 +239,7 @@ def test_get_statements_by_activity(auth_credentials):
             },
         },
     ]
-    setup_es_index(statements)
+    insert_statements_and_monkeypatch_backend(statements)
 
     response = client.get(
         "/xAPI/statements/?activity=a2956991-200b-40a7-9548-293cdcc06c4b",
@@ -213,10 +250,14 @@ def test_get_statements_by_activity(auth_credentials):
     assert response.json() == {"statements": [statements[1]]}
 
 
-def test_get_statements_since_timestamp(auth_credentials):
+def test_api_statements_get_statements_since_timestamp(
+    insert_statements_and_monkeypatch_backend, auth_credentials
+):
+    """Tests the get statements API route, given a "since" query parameter, should
+    return a list of statements filtered by the given timestamp.
     """
-    Get statements filter by timestamp "since" (or "after") a given timestamp.
-    """
+    # pylint: disable=redefined-outer-name
+
     statements = [
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
@@ -227,7 +268,7 @@ def test_get_statements_since_timestamp(auth_credentials):
             "timestamp": datetime.now().isoformat(),
         },
     ]
-    setup_es_index(statements)
+    insert_statements_and_monkeypatch_backend(statements)
 
     since = (datetime.now() - timedelta(minutes=30)).isoformat()
     response = client.get(
@@ -239,10 +280,14 @@ def test_get_statements_since_timestamp(auth_credentials):
     assert response.json() == {"statements": [statements[1]]}
 
 
-def test_get_statements_until_timestamp(auth_credentials):
+def test_api_statements_get_statements_until_timestamp(
+    insert_statements_and_monkeypatch_backend, auth_credentials
+):
+    """Tests the get statements API route, given an "until" query parameter,
+    should return a list of statements filtered by the given timestamp.
     """
-    Get statements filter by timestamp "until" (or "before") a given timestamp.
-    """
+    # pylint: disable=redefined-outer-name
+
     statements = [
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
@@ -253,7 +298,7 @@ def test_get_statements_until_timestamp(auth_credentials):
             "timestamp": datetime.now().isoformat(),
         },
     ]
-    setup_es_index(statements)
+    insert_statements_and_monkeypatch_backend(statements)
 
     until = (datetime.now() - timedelta(minutes=30)).isoformat()
     response = client.get(
@@ -265,11 +310,14 @@ def test_get_statements_until_timestamp(auth_credentials):
     assert response.json() == {"statements": [statements[0]]}
 
 
-def test_get_statements_with_pagination(monkeypatch, auth_credentials):
+def test_api_statements_get_statements_with_pagination(
+    monkeypatch, insert_statements_and_monkeypatch_backend, auth_credentials
+):
+    """Tests the get statements API route, given a request leading to more results than
+    can fit on the first page, should return a list of statements non exceeding the page
+    limit and include a "more" property with a link to get the next page of results.
     """
-    When the first page does not contain all possible results, it includes
-    a "more" property with a link to get the next page of results.
-    """
+    # pylint: disable=redefined-outer-name
 
     monkeypatch.setattr(
         "ralph.api.routers.statements.settings.RUNSERVER_MAX_SEARCH_HITS_COUNT", 2
@@ -289,7 +337,7 @@ def test_get_statements_with_pagination(monkeypatch, auth_credentials):
             "timestamp": datetime.now().isoformat(),
         },
     ]
-    setup_es_index(statements)
+    insert_statements_and_monkeypatch_backend(statements)
 
     # First response gets the first two results, with a "more" entry as
     # we have more results to return on a later page.
@@ -308,3 +356,32 @@ def test_get_statements_with_pagination(monkeypatch, auth_credentials):
     )
     assert second_response.status_code == 200
     assert second_response.json() == {"statements": [statements[0]]}
+
+
+def test_api_statements_get_statements_with_no_matching_statement(
+    insert_statements_and_monkeypatch_backend, auth_credentials
+):
+    """Tests the get statements API route, given a query yielding no matching statement,
+    should return an empty list.
+    """
+    # pylint: disable=redefined-outer-name
+
+    statements = [
+        {
+            "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
+            "timestamp": (datetime.now() - timedelta(hours=1)).isoformat(),
+        },
+        {
+            "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
+            "timestamp": datetime.now().isoformat(),
+        },
+    ]
+    insert_statements_and_monkeypatch_backend(statements)
+
+    response = client.get(
+        "/xAPI/statements/?statementId=foo",
+        headers={"Authorization": f"Basic {auth_credentials}"},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {"statements": []}

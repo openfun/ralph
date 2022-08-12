@@ -6,12 +6,15 @@ import os
 import random
 import time
 from enum import Enum
+from functools import lru_cache
 
 import pytest
 import websockets
 from elasticsearch import Elasticsearch
 from pymongo import MongoClient
 
+from ralph.backends.database.es import ESDatabase
+from ralph.backends.database.mongo import MongoDatabase
 from ralph.backends.storage.swift import SwiftStorage
 
 # Elasticsearch backend defaults
@@ -41,6 +44,24 @@ MONGO_TEST_URI = os.environ.get(
 # Websocket test backend defaults
 WS_TEST_HOST = "localhost"
 WS_TEST_PORT = 8765
+
+
+@lru_cache
+def get_es_test_backend():
+    """Returns a ESDatabase backend instance using test defaults."""
+
+    return ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX)
+
+
+@lru_cache
+def get_mongo_test_backend():
+    """Returns a MongoDatabase backend instance using test defaults."""
+
+    return MongoDatabase(
+        connection_uri=MONGO_TEST_URI,
+        database=MONGO_TEST_DATABASE,
+        collection=MONGO_TEST_COLLECTION,
+    )
 
 
 class NamedClassA:
@@ -110,6 +131,15 @@ def es_data_stream():
             "dynamic_templates": [],
             "date_detection": True,
             "numeric_detection": True,
+            # Note: We define an explicit mapping of the `timestamp` field to allow the
+            # ElasticSearch database to be queried even if no document has been inserted
+            # before.
+            "properties": {
+                "timestamp": {
+                    "type": "date",
+                    "index": True,
+                }
+            },
         },
         "settings": {
             "index": {
