@@ -21,17 +21,17 @@ and this project adheres to
 - Migrate to `python-legacy` handler for `mkdocstrings` package
 - Upgrade `bclick` to `3.2.2`
 - Upgrade `click` to `8.1.3`
-- Upgrade `elasticsearch` to `8.3.1`
+- Upgrade `elasticsearch` to `8.3.3`
 - Upgrade `fastapi` to `0.79.0`
 - Upgrade `Jinja2` to `3.1.2`
 - Upgrade `ovh` to `1.0.0`
-- Upgrade `pydantic` to `1.9.1`
+- Upgrade `pydantic` to `1.9.2`
 - Upgrade `pymongo` to `4.2.0`
 - Upgrade `pyparsing` to `3.0.9`
 - Upgrade `python-keystoneclient` to `5.0.0`
 - Upgrade `python-swiftclient` to `4.0.1`
 - Upgrade `requests` to `2.28.1`
-- Upgrade `sentry_sdk` to `1.7.0`
+- Upgrade `sentry_sdk` to `1.9.5`
 - Upgrade `uvicorn` to `0.18.2`
 - Upgrade `websockets` to `10.3`
 - Make backends yield results instead of writing to standard streams (BC)
