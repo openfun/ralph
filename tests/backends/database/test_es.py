@@ -1,6 +1,7 @@
 """Tests for Ralph es database backend"""
 
 import json
+import logging
 import random
 import sys
 from collections.abc import Iterable
@@ -9,9 +10,11 @@ from io import StringIO
 from pathlib import Path
 
 import pytest
-from elasticsearch import Elasticsearch
+from elastic_transport import ApiResponseMeta
+from elasticsearch import ApiError, Elasticsearch
 from elasticsearch.helpers import bulk
 
+from ralph.backends.database.base import StatementParameters
 from ralph.backends.database.es import ESDatabase, ESQuery
 from ralph.conf import settings
 from ralph.exceptions import BackendException, BackendParameterException
@@ -379,3 +382,84 @@ def test_backends_database_es_put_with_datastream(es_data_stream, fs, monkeypatc
     hits = es_data_stream.search(index=ES_TEST_INDEX)["hits"]["hits"]
     assert len(hits) == 10
     assert sorted([hit["_source"]["id"] for hit in hits]) == list(range(10))
+
+
+def test_backends_database_es_query_statements_with_pit_query_failure(
+    monkeypatch, caplog, es
+):
+    """Tests the ES query_statements method, given a point in time query failure, should
+    raise a BackendException and log the error.
+    """
+    # pylint: disable=invalid-name,unused-argument
+
+    def mock_open_point_in_time(**_):
+        """Mocks the Elasticsearch.open_point_in_time method."""
+
+        raise ValueError("Something went wrong")
+
+    database = ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX)
+    monkeypatch.setattr(database.client, "open_point_in_time", mock_open_point_in_time)
+
+    caplog.set_level(logging.ERROR)
+
+    msg = "'Failed to open ElasticSearch point in time', 'Something went wrong'"
+    with pytest.raises(BackendException, match=msg):
+        database.query_statements(StatementParameters())
+
+    logger_name = "ralph.backends.database.es"
+    msg = "Failed to open ElasticSearch point in time. Something went wrong"
+    assert caplog.record_tuples == [(logger_name, logging.ERROR, msg)]
+
+
+def test_backends_database_es_query_statements_with_search_query_failure(
+    monkeypatch, caplog, es
+):
+    """Tests the ES query_statements method, given a search query failure, should
+    raise a BackendException and log the error.
+    """
+    # pylint: disable=invalid-name,unused-argument
+
+    def mock_search(**_):
+        """Mocks the Elasticsearch.search method."""
+
+        raise ApiError("Something is wrong", ApiResponseMeta(*([None] * 5)), None)
+
+    database = ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX)
+    monkeypatch.setattr(database.client, "search", mock_search)
+
+    caplog.set_level(logging.ERROR)
+
+    msg = "'Failed to execute ElasticSearch query', 'Something is wrong'"
+    with pytest.raises(BackendException, match=msg):
+        database.query_statements(StatementParameters())
+
+    logger_name = "ralph.backends.database.es"
+    msg = "Failed to execute ElasticSearch query. ApiError(None, 'Something is wrong')"
+    assert caplog.record_tuples == [(logger_name, logging.ERROR, msg)]
+
+
+def test_backends_database_es_query_statements_by_ids_with_search_query_failure(
+    monkeypatch, caplog, es
+):
+    """Tests the ES query_statements_by_ids method, given a search query failure, should
+    raise a BackendException and log the error.
+    """
+    # pylint: disable=invalid-name,unused-argument
+
+    def mock_search(**_):
+        """Mocks the Elasticsearch.search method."""
+
+        raise ApiError("Something is wrong", ApiResponseMeta(*([None] * 5)), None)
+
+    database = ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX)
+    monkeypatch.setattr(database.client, "search", mock_search)
+
+    caplog.set_level(logging.ERROR)
+
+    msg = "'Failed to execute ElasticSearch query', 'Something is wrong'"
+    with pytest.raises(BackendException, match=msg):
+        database.query_statements_by_ids(StatementParameters())
+
+    logger_name = "ralph.backends.database.es"
+    msg = "Failed to execute ElasticSearch query. ApiError(None, 'Something is wrong')"
+    assert caplog.record_tuples == [(logger_name, logging.ERROR, msg)]

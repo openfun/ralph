@@ -834,14 +834,18 @@ def test_cli_runserver_command_environment_file_generation(monkeypatch):
 
         with open(env_file, mode="r", encoding=settings.LOCALE_ENCODING) as file:
             assert file.readlines() == [
-                "RALPH_RUNSERVER_BACKEND=es\n",
+                f"RALPH_RUNSERVER_BACKEND={settings.RUNSERVER_BACKEND}\n",
                 "RALPH_BACKENDS__DATABASE__ES__INDEX=foo\n",
-                "RALPH_BACKENDS__DATABASE__MONGO__COLLECTION=marsha\n",
-                "RALPH_BACKENDS__DATABASE__MONGO__DATABASE=statements\n",
+                "RALPH_BACKENDS__DATABASE__MONGO__COLLECTION="
+                f"{settings.BACKENDS.DATABASE.MONGO.COLLECTION}\n",
+                "RALPH_BACKENDS__DATABASE__MONGO__DATABASE="
+                f"{settings.BACKENDS.DATABASE.MONGO.DATABASE}\n",
                 "RALPH_BACKENDS__DATABASE__MONGO__CONNECTION_URI="
-                "mongodb://localhost:27017/\n",
-                "RALPH_BACKENDS__DATABASE__ES__OP_TYPE=index\n",
-                "RALPH_BACKENDS__DATABASE__ES__HOSTS=http://localhost:9200\n",
+                f"{settings.BACKENDS.DATABASE.MONGO.CONNECTION_URI}\n",
+                "RALPH_BACKENDS__DATABASE__ES__OP_TYPE="
+                f"{settings.BACKENDS.DATABASE.ES.OP_TYPE}\n",
+                "RALPH_BACKENDS__DATABASE__ES__HOSTS="
+                f"{','.join(settings.BACKENDS.DATABASE.ES.HOSTS)}\n",
             ]
 
     monkeypatch.setattr("ralph.cli.uvicorn.run", mock_uvicorn_run)

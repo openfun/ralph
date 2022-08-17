@@ -283,3 +283,46 @@ def test_api_statements_post_statements_with_a_failure_during_storage(
 
     assert response.status_code == 500
     assert response.json() == {"detail": "Statements bulk indexation failed"}
+
+
+@pytest.mark.parametrize("backend", [get_es_test_backend, get_mongo_test_backend])
+def test_api_statements_post_statements_with_a_failure_during_id_query(
+    backend, monkeypatch, auth_credentials, es, mongo
+):
+    """Tests the post statements API route with a failure during query execution."""
+    # pylint: disable=invalid-name,unused-argument, too-many-arguments
+
+    def query_statements_by_ids_mock(*args, **kwargs):
+        """Raises an exception. Mocks the database.query_statements_by_ids method."""
+
+        raise BackendException()
+
+    backend_instance = backend()
+    monkeypatch.setattr(
+        backend_instance, "query_statements_by_ids", query_statements_by_ids_mock
+    )
+    monkeypatch.setattr(
+        "ralph.api.routers.statements.DATABASE_CLIENT", backend_instance
+    )
+    statement = {
+        "actor": {
+            "account": {
+                "homePage": "https://example.com/homepage/",
+                "name": str(uuid4()),
+            },
+            "objectType": "Agent",
+        },
+        "id": str(uuid4()),
+        "object": {"id": "https://example.com/object-id/1/"},
+        "timestamp": "2022-03-15T14:07:51Z",
+        "verb": {"id": "https://example.com/verb-id/1/"},
+    }
+
+    response = client.post(
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {auth_credentials}"},
+        json=statement,
+    )
+
+    assert response.status_code == 500
+    assert response.json() == {"detail": "xAPI statements query failed"}

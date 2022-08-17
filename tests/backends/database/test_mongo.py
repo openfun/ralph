@@ -1,11 +1,14 @@
 """Tests for Ralph mongo database backend"""
 
+import logging
 from datetime import datetime
 
 import pytest
 from bson.objectid import ObjectId
 from pymongo import MongoClient
+from pymongo.errors import PyMongoError
 
+from ralph.backends.database.base import StatementParameters
 from ralph.backends.database.mongo import MongoDatabase, MongoQuery
 from ralph.exceptions import (
     BackendException,
@@ -15,8 +18,8 @@ from ralph.exceptions import (
 
 from tests.fixtures.backends import (
     MONGO_TEST_COLLECTION,
+    MONGO_TEST_CONNECTION_URI,
     MONGO_TEST_DATABASE,
-    MONGO_TEST_URI,
 )
 
 
@@ -26,7 +29,7 @@ def test_backends_database_mongo_database_instantiation():
     assert MongoDatabase.name == "mongo"
 
     backend = MongoDatabase(
-        connection_uri=MONGO_TEST_URI,
+        connection_uri=MONGO_TEST_CONNECTION_URI,
         database=MONGO_TEST_DATABASE,
         collection=MONGO_TEST_COLLECTION,
     )
@@ -54,7 +57,7 @@ def test_backends_database_mongo_get_method(mongo):
 
     # Get backend
     backend = MongoDatabase(
-        connection_uri=MONGO_TEST_URI,
+        connection_uri=MONGO_TEST_CONNECTION_URI,
         database=MONGO_TEST_DATABASE,
         collection=MONGO_TEST_COLLECTION,
     )
@@ -85,7 +88,7 @@ def test_backends_database_mongo_get_method_with_a_custom_query(mongo):
 
     # Get backend
     backend = MongoDatabase(
-        connection_uri=MONGO_TEST_URI,
+        connection_uri=MONGO_TEST_CONNECTION_URI,
         database=MONGO_TEST_DATABASE,
         collection=MONGO_TEST_COLLECTION,
     )
@@ -260,7 +263,7 @@ def test_backends_database_mongo_bulk_import_method(mongo):
     # pylint: disable=unused-argument
 
     backend = MongoDatabase(
-        connection_uri=MONGO_TEST_URI,
+        connection_uri=MONGO_TEST_CONNECTION_URI,
         database=MONGO_TEST_DATABASE,
         collection=MONGO_TEST_COLLECTION,
     )
@@ -284,7 +287,7 @@ def test_backends_database_mongo_bulk_import_method_with_duplicated_key(mongo):
     # pylint: disable=unused-argument
 
     backend = MongoDatabase(
-        connection_uri=MONGO_TEST_URI,
+        connection_uri=MONGO_TEST_CONNECTION_URI,
         database=MONGO_TEST_DATABASE,
         collection=MONGO_TEST_COLLECTION,
     )
@@ -314,7 +317,7 @@ def test_backends_database_mongo_bulk_import_method_import_partial_chunks_on_err
     # pylint: disable=unused-argument
 
     backend = MongoDatabase(
-        connection_uri=MONGO_TEST_URI,
+        connection_uri=MONGO_TEST_CONNECTION_URI,
         database=MONGO_TEST_DATABASE,
         collection=MONGO_TEST_COLLECTION,
     )
@@ -343,7 +346,7 @@ def test_backends_database_mongo_put_method(mongo):
     timestamp = {"timestamp": "2022-06-27T15:36:50"}
     statements = [{"id": "foo", **timestamp}, {"id": "bar", **timestamp}]
     backend = MongoDatabase(
-        connection_uri=MONGO_TEST_URI,
+        connection_uri=MONGO_TEST_CONNECTION_URI,
         database=MONGO_TEST_DATABASE,
         collection=MONGO_TEST_COLLECTION,
     )
@@ -373,7 +376,7 @@ def test_backends_database_mongo_put_method_with_custom_chunk_size(mongo):
     timestamp = {"timestamp": "2022-06-27T15:36:50"}
     statements = [{"id": "foo", **timestamp}, {"id": "bar", **timestamp}]
     backend = MongoDatabase(
-        connection_uri=MONGO_TEST_URI,
+        connection_uri=MONGO_TEST_CONNECTION_URI,
         database=MONGO_TEST_DATABASE,
         collection=MONGO_TEST_COLLECTION,
     )
@@ -391,3 +394,64 @@ def test_backends_database_mongo_put_method_with_custom_chunk_size(mongo):
         "_id": ObjectId("62b9ce92fcde2b2edba56bf4"),
         "_source": {"id": "bar", **timestamp},
     }
+
+
+def test_backends_database_mongo_query_statements_with_search_query_failure(
+    monkeypatch, caplog, mongo
+):
+    """Tests the mongo backend query_statements method, given a search query failure,
+    should raise a BackendException and log the error.
+    """
+    # pylint: disable=unused-argument
+
+    def mock_find(**_):
+        """Mocks the MongoClient.collection.find method."""
+
+        raise PyMongoError("Something is wrong")
+
+    backend = MongoDatabase(
+        connection_uri=MONGO_TEST_CONNECTION_URI,
+        database=MONGO_TEST_DATABASE,
+        collection=MONGO_TEST_COLLECTION,
+    )
+    monkeypatch.setattr(backend.collection, "find", mock_find)
+
+    caplog.set_level(logging.ERROR)
+
+    msg = "'Failed to execute MongoDB query', 'Something is wrong'"
+    with pytest.raises(BackendException, match=msg):
+        backend.query_statements(StatementParameters())
+
+    logger_name = "ralph.backends.database.mongo"
+    msg = "Failed to execute MongoDB query. Something is wrong"
+    assert caplog.record_tuples == [(logger_name, logging.ERROR, msg)]
+
+
+def test_backends_database_mongo_query_statements_by_ids_with_search_query_failure(
+    monkeypatch, caplog, mongo
+):
+    """Tests the mongo backend query_statements_by_ids method, given a search query
+    failure, should raise a BackendException and log the error.
+    """
+    # pylint: disable=unused-argument
+
+    def mock_find(**_):
+        """Mocks the MongoClient.collection.find method."""
+
+        raise ValueError("Something is wrong")
+
+    backend = MongoDatabase(
+        connection_uri=MONGO_TEST_CONNECTION_URI,
+        database=MONGO_TEST_DATABASE,
+        collection=MONGO_TEST_COLLECTION,
+    )
+    monkeypatch.setattr(backend.collection, "find", mock_find)
+    caplog.set_level(logging.ERROR)
+
+    msg = "'Failed to execute MongoDB query', 'Something is wrong'"
+    with pytest.raises(BackendException, match=msg):
+        backend.query_statements_by_ids(StatementParameters())
+
+    logger_name = "ralph.backends.database.mongo"
+    msg = "Failed to execute MongoDB query. Something is wrong"
+    assert caplog.record_tuples == [(logger_name, logging.ERROR, msg)]
