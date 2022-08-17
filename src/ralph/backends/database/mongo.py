@@ -9,7 +9,7 @@ from typing import Generator, Optional, TextIO, Union
 from bson.objectid import ObjectId
 from dateutil.parser import isoparse
 from pymongo import ASCENDING, DESCENDING, MongoClient
-from pymongo.errors import BulkWriteError
+from pymongo.errors import BulkWriteError, PyMongoError
 
 from ralph.conf import settings
 from ralph.exceptions import BackendException, BadFormatException
@@ -218,10 +218,8 @@ class MongoDatabase(BaseDatabase):
             ("_id", mongo_sort_order),
         ]
 
-        mongo_response = list(
-            self.collection.find(
-                filter=mongo_query_filters, limit=params.limit, sort=mongo_query_sort
-            )
+        mongo_response = self._find(
+            filter=mongo_query_filters, limit=params.limit, sort=mongo_query_sort
         )
         search_after = None
         if mongo_response:
@@ -236,4 +234,16 @@ class MongoDatabase(BaseDatabase):
     def query_statements_by_ids(self, ids: list[str]) -> list:
         """Returns the list of matching statement IDs from the database."""
 
-        return list(self.collection.find(filter={"_source.id": {"$in": ids}}))
+        return self._find(filter={"_source.id": {"$in": ids}})
+
+    def _find(self, **kwargs):
+        """Wraps the MongoClient.collection.find method to raise a BackendException in
+        case of any failure.
+        """
+
+        try:
+            return list(self.collection.find(**kwargs))
+        except (PyMongoError, IndexError, TypeError, ValueError) as error:
+            msg = "Failed to execute MongoDB query"
+            logger.error("%s. %s", msg, error)
+            raise BackendException(msg, *error.args) from error

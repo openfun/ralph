@@ -37,8 +37,8 @@ MONGO_TEST_COLLECTION = os.environ.get(
 MONGO_TEST_DATABASE = os.environ.get(
     "RALPH_BACKENDS__DATABASE__MONGO__TEST_DATABASE", "statements"
 )
-MONGO_TEST_URI = os.environ.get(
-    "RALPH_BACKENDS__DATABASE__MONGO__TEST_URI", "mongodb://localhost:27017/"
+MONGO_TEST_CONNECTION_URI = os.environ.get(
+    "RALPH_BACKENDS__DATABASE__MONGO__TEST_CONNECTION_URI", "mongodb://localhost:27017/"
 )
 
 # Websocket test backend defaults
@@ -58,7 +58,7 @@ def get_mongo_test_backend():
     """Returns a MongoDatabase backend instance using test defaults."""
 
     return MongoDatabase(
-        connection_uri=MONGO_TEST_URI,
+        connection_uri=MONGO_TEST_CONNECTION_URI,
         database=MONGO_TEST_DATABASE,
         collection=MONGO_TEST_COLLECTION,
     )
@@ -102,7 +102,7 @@ def mongo():
     instantiated client.
     """
 
-    client = MongoClient(MONGO_TEST_URI)
+    client = MongoClient(MONGO_TEST_CONNECTION_URI)
     database = getattr(client, MONGO_TEST_DATABASE)
     database.create_collection(MONGO_TEST_COLLECTION)
     yield client

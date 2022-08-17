@@ -171,9 +171,15 @@ async def get(
     # Make sure the limit does not go above max from settings
     limit = min(limit, settings.RUNSERVER_MAX_SEARCH_HITS_COUNT)
 
-    query_result = DATABASE_CLIENT.query_statements(
-        StatementParameters(**{**request.query_params, "limit": limit})
-    )
+    try:
+        query_result = DATABASE_CLIENT.query_statements(
+            StatementParameters(**{**request.query_params, "limit": limit})
+        )
+    except BackendException as error:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="xAPI statements query failed",
+        ) from error
 
     # Prepare the link to get the next page of the request, while preserving the
     # consistency of search results.
@@ -243,7 +249,15 @@ async def post(statements: Union[LaxStatement, list[LaxStatement]]):
             detail="Duplicate statement IDs in the list of statements",
         )
 
-    if len(DATABASE_CLIENT.query_statements_by_ids(statements_ids)) > 0:
+    try:
+        statements_ids_result = DATABASE_CLIENT.query_statements_by_ids(statements_ids)
+    except BackendException as error:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="xAPI statements query failed",
+        ) from error
+
+    if len(statements_ids_result) > 0:
         # NB: LRS specification calls for performing a deep comparison of incoming
         # statements and existing statements with the same ID.
         # This seems too costly for performance and was not implemented for this POC.

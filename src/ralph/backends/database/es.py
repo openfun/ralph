@@ -5,7 +5,7 @@ import logging
 from enum import Enum
 from typing import Callable, Generator, Optional, TextIO
 
-from elasticsearch import Elasticsearch
+from elasticsearch import ApiError, Elasticsearch
 from elasticsearch.helpers import BulkIndexError, scan, streaming_bulk
 
 from ralph.conf import settings
@@ -176,7 +176,7 @@ class ESDatabase(BaseDatabase):
         es_query.update({"track_total_hits": False})
 
         if not params.pit_id:
-            pit_response = self.client.open_point_in_time(
+            pit_response = self._open_point_in_time(
                 index=self.index, keep_alive=settings.RUNSERVER_POINT_IN_TIME_KEEP_ALIVE
             )
             params.pit_id = pit_response["id"]
@@ -190,9 +190,7 @@ class ESDatabase(BaseDatabase):
                 }
             }
         )
-        es_response = self.client.search(  # pylint: disable=unexpected-keyword-arg
-            body=es_query, size=params.limit
-        )
+        es_response = self._search(body=es_query, size=params.limit)
         es_documents = es_response["hits"]["hits"]
         search_after = None
         if es_documents:
@@ -207,6 +205,28 @@ class ESDatabase(BaseDatabase):
     def query_statements_by_ids(self, ids: list[str]) -> list:
         """Returns the list of matching statement IDs from the database."""
 
-        return self.client.search(  # pylint: disable=unexpected-keyword-arg
-            body={"query": {"terms": {"_id": ids}}}
-        )["hits"]["hits"]
+        return self._search(body={"query": {"terms": {"_id": ids}}})["hits"]["hits"]
+
+    def _search(self, **kwargs):
+        """Wraps the ElasticSearch.search method to raise a BackendException in case
+        of any failure.
+        """
+
+        try:
+            return self.client.search(**kwargs)
+        except ApiError as error:
+            msg = "Failed to execute ElasticSearch query"
+            logger.error("%s. %s", msg, error)
+            raise BackendException(msg, *error.args) from error
+
+    def _open_point_in_time(self, **kwargs):
+        """Wraps the ElasticSearch.open_point_in_time method to raise a BackendException
+        in case of any failure.
+        """
+
+        try:
+            return self.client.open_point_in_time(**kwargs)
+        except (ApiError, ValueError) as error:
+            msg = "Failed to open ElasticSearch point in time"
+            logger.error("%s. %s", msg, error)
+            raise BackendException(msg, *error.args) from error

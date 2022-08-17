@@ -10,6 +10,7 @@ from fastapi.testclient import TestClient
 
 from ralph.api import app
 from ralph.backends.database.mongo import MongoDatabase
+from ralph.exceptions import BackendException
 
 from tests.fixtures.backends import (
     ES_TEST_INDEX,
@@ -385,3 +386,29 @@ def test_api_statements_get_statements_with_no_matching_statement(
 
     assert response.status_code == 200
     assert response.json() == {"statements": []}
+
+
+def test_api_statements_get_statements_with_database_query_failure(
+    auth_credentials, monkeypatch
+):
+    """Tests the get statements API route, given a query raising a BackendException,
+    should return an error response with HTTP code 500.
+    """
+    # pylint: disable=redefined-outer-name
+
+    def mock_query_statements(*_):
+        """Mocks the DATABASE_CLIENT.query_statements method."""
+
+        raise BackendException()
+
+    monkeypatch.setattr(
+        "ralph.api.routers.statements.DATABASE_CLIENT.query_statements",
+        mock_query_statements,
+    )
+
+    response = client.get(
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {auth_credentials}"},
+    )
+    assert response.status_code == 500
+    assert response.json() == {"detail": "xAPI statements query failed"}
