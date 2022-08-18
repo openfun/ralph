@@ -41,6 +41,25 @@ services:
     environment:
       KS_SWIFT_PUBLIC_URL: http://127.0.0.1:49177
 
+  graylog:
+    image: graylog/graylog:4.2.2
+    environment:
+      - GRAYLOG_PASSWORD_SECRET=somepasswordpepper
+      - GRAYLOG_ROOT_PASSWORD_SHA2=d74ff0ee8da3b9806b18c877dbf29bbde50b5bd8e4dad7a3a725000feb82e8f1
+      - GRAYLOG_HTTP_EXTERNAL_URI=http://localhost:9000/
+      - GRAYLOG_ROTATION_STRATEGY=count
+    entrypoint: /usr/bin/tini -- wait-for-it elasticsearch:9200 --  /docker-entrypoint.sh
+    networks:
+      default:
+    depends_on:
+      - mongo
+      - elasticsearch
+    ports:
+      # Graylog web interface and REST API
+      - 9000:9000
+      # GELF TCP
+      - 12201:12201
+
   # -- tools
   dockerize:
     image: jwilder/dockerize

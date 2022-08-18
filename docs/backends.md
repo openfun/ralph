@@ -145,3 +145,19 @@ Elasticsearch backend parameters required to connect to a cluster are:
 > For a complete list of supported `client_options`, please refer to the
 > [official client's
 > documentation](https://elasticsearch-py.readthedocs.io/en/latest/api.html#elasticsearch).
+
+## Logging backends
+
+### Graylog
+
+The Graylog backend is a log management solution mostly used for storing both structured and
+unstructured records of application activities.
+
+#### Backend parameters
+
+- `host`: the name of the Docker graylog service (_e.g._`graylog`)
+- `port`: the port of the Graylog backend
+- `username`: the username of the Web interface admin account (_e.g._`admin`)
+- `pass`: the password of the Web interface admin account (_e.g._`pass`)
+- `input_title`: the title of the configured input (_e.g._`TCP Input`)
+- `input_type`: the type of the configured input (_e.g._`org.graylog2.inputs.gelf.tcp.GELFTCPInput`)
