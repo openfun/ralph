@@ -22,7 +22,7 @@ and this project adheres to
 - Upgrade `bclick` to `3.2.2`
 - Upgrade `click` to `8.1.3`
 - Upgrade `elasticsearch` to `8.3.3`
-- Upgrade `fastapi` to `0.79.0`
+- Upgrade `fastapi` to `0.79.1`
 - Upgrade `Jinja2` to `3.1.2`
 - Upgrade `ovh` to `1.0.0`
 - Upgrade `pydantic` to `1.9.2`
