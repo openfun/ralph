@@ -803,7 +803,7 @@
     --es-op-type TEXT
     --es-client-options KEY=VALUE,KEY=VALUE
     --es-index TEXT
-    --es-hosts TEXT
+    --es-hosts VALUE1,VALUE2,VALUE3
   -c, --chunk-size INTEGER        Get events by
                                   chunks of size #
   -q, --query &#39;{&quot;KEY&quot;: &quot;VALUE&quot;, &quot;KEY&quot;: &quot;VALUE&quot;}&#39;
@@ -891,7 +891,7 @@
     --es-op-type TEXT
     --es-client-options KEY=VALUE,KEY=VALUE
     --es-index TEXT
-    --es-hosts TEXT
+    --es-hosts VALUE1,VALUE2,VALUE3
   -c, --chunk-size INTEGER        Get events by
                                   chunks of size #
   -f, --force                     Overwrite
@@ -906,13 +906,30 @@
                                   exit.
 </code></pre></div>
 <h3 id="ralph-runserver">ralph runserver<a class="headerlink" href="#ralph-runserver" title="Permanent link">&para;</a></h3>
-<p>Run the API server for the development environment. Starting uvicorn
-programmatically for convenience and documentation.</p>
+<p>Runs the API server for the development environment.</p>
+<p>Starts uvicorn programmatically for convenience and documentation.</p>
 <p><strong>Usage:</strong></p>
 <div class="highlight"><pre><span></span><code>ralph runserver [OPTIONS]
 </code></pre></div>
 <p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  --help  Show this message and exit.
+<div class="highlight"><pre><span></span><code>  -b, --backend [es|mongo]        Backend
+                                  [required]
+  mongo backend: 
+    --mongo-client-options KEY=VALUE,KEY=VALUE
+    --mongo-collection TEXT
+    --mongo-database TEXT
+    --mongo-connection-uri TEXT
+  es backend: 
+    --es-op-type TEXT
+    --es-client-options KEY=VALUE,KEY=VALUE
+    --es-index TEXT
+    --es-hosts VALUE1,VALUE2,VALUE3
+  -h, --host TEXT                 LRS server host
+                                  name
+  -p, --port INTEGER              LRS server port
+  --help                          Show this
+                                  message and
+                                  exit.
 </code></pre></div>
 <h3 id="ralph-validate">ralph validate<a class="headerlink" href="#ralph-validate" title="Permanent link">&para;</a></h3>
 <p>Validates input events of given format.</p>

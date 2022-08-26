@@ -640,9 +640,13 @@
 <p>Ralph comes with an API server that aims to implement the LRS specification (still a work in progress).</p>
 <h2 id="getting_started">Getting started<a class="headerlink" href="#getting_started" title="Permanent link">&para;</a></h2>
 <p>The API server can be started up with the following command:</p>
-<div class="highlight"><pre><span></span><code>$ ralph runserver
+<div class="highlight"><pre><span></span><code>$ ralph runserver --backend es
 </code></pre></div>
-<p>Before you can start your API server and make requests against it, you need to set up your credentials.</p>
+<p>The <code>--backend</code> (or <code>-b</code>) option specifies which database backend to use for LRS data
+storage and retrieval. See Ralph&rsquo;s <a href="../backends/">backends documentation</a> for more
+details.</p>
+<p>However, before you can start your API server and make requests against it, you need to
+set up your credentials.</p>
 <h3 id="creating_a_credentials_file">Creating a credentials file<a class="headerlink" href="#creating_a_credentials_file" title="Permanent link">&para;</a></h3>
 <p>The credentials file is expected to be a valid JSON file. Its location is specified by the <code>RALPH_AUTH_FILE</code> configuration value. By default, <code>ralph</code> will look for the <code>auth.json</code> file in the application directory (see <a href="https://click.palletsprojects.com/en/8.0.x/api/#click.get_app_dir">click documentation for details</a>).</p>
 <p>The expected format is a list of entries (JSON objects) each containing the username, the user&rsquo;s <code>bcrypt</code> hashed+salted password and scopes they can access:</p>
