@@ -15,6 +15,7 @@ from ralph.models.selector import (
     selector,
 )
 
+
 @pytest.mark.parametrize(
     "model_rules,decision_tree",
     [
@@ -25,7 +26,7 @@ from ralph.models.selector import (
             {Server: selector(event_source="server")},
             {
                 Rule(LazyModelField("event_source"), "server"): {
-                    True: Server, # pylint : disable=unhashable-member
+                    True: Server,  # pylint : disable=unhashable-member
                     False: None,
                 }
             },
