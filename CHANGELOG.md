@@ -27,6 +27,7 @@ and this project adheres to
 
 ### Changed
 
+- Upgrade `brcypt` to `4.0.0`
 - Migrate to `python-legacy` handler for `mkdocstrings` package
 - Upgrade `click` to `8.1.3`
 - Upgrade `elasticsearch` to `8.3.3`
@@ -38,7 +39,7 @@ and this project adheres to
 - Upgrade `python-swiftclient` to `4.0.1`
 - Upgrade `requests` to `2.28.1`
 - Upgrade `sentry_sdk` to `1.9.5`
-- Upgrade `uvicorn` to `0.18.2`
+- Upgrade `uvicorn` to `0.18.3`
 - Upgrade `websockets` to `10.3`
 - Make backends yield results instead of writing to standard streams (BC)
 - Use pydantic settings management instead of global variables in defaults.py
