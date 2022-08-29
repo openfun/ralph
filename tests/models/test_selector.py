@@ -15,6 +15,8 @@ from ralph.models.selector import (
     selector,
 )
 
+# pylint : disable=unhashable-member
+
 
 @pytest.mark.parametrize(
     "model_rules,decision_tree",

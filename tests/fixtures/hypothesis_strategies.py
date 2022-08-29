@@ -86,6 +86,7 @@ def custom_given(*args: Union[st.SearchStrategy, BaseModel], **kwargs):
     return given(*strategies, **kwargs)
 
 
+# pylint : disable=unhashable-member
 OVERWRITTEN_STATEGIES = {
     UISeqPrev: {
         "event": custom_builds(NavigationalEventField, old=st.just(1), new=st.just(0))

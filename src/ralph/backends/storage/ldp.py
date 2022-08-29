@@ -122,6 +122,7 @@ class LDPStorage(HistoryMixin, BaseStorage):
         details = self._details(name)
 
         # Stream response (archive content)
+        # pylint: disable=missing-timeout
         with requests.get(self.url(name), stream=True) as result:
             result.raise_for_status()
             for chunk in result.iter_content(chunk_size=chunk_size):
