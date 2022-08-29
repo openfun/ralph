@@ -24,9 +24,9 @@ from ralph.models.selector import (
         # Single model, single rule case.
         (
             {
-                Server: selector(
+                Server: selector(  # pylint : disable=unhashable-member
                     event_source="server"
-                )  # pylint : disable=unhashable-member
+                )
             },
             {
                 Rule(LazyModelField("event_source"), "server"): {
