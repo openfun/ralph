@@ -179,7 +179,7 @@ jobs:
           password: $DOCKER_HUB_PASSWORD
         environment:
           RALPH_APP_DIR: ~/fun/.ralph
-      - image: elasticsearch:8.1.0
+      - image: elasticsearch:8.4.0
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD

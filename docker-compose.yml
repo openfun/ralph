@@ -27,7 +27,7 @@ services:
 
   # -- backends
   elasticsearch:
-    image: elasticsearch:8.1.0
+    image: elasticsearch:8.4.0
     environment:
       discovery.type: single-node
       xpack.security.enabled: "false"
