@@ -77,11 +77,13 @@ def custom_builds(
     return st.fixed_dictionaries(required, optional=optional).map(klass.parse_obj)
 
 
-def custom_given(klass: Union[st.SearchStrategy, BaseModel], *args, **kwargs):
+def custom_given(*args: Union[st.SearchStrategy, BaseModel], **kwargs):
     """Wraps the Hypothesis `given` function. Replaces st.builds with custom_builds."""
 
-    strategy = custom_builds(klass) if is_base_model(klass) else klass
-    return given(strategy, *args, **kwargs)
+    strategies = []
+    for arg in args:
+        strategies.append(custom_builds(arg) if is_base_model(arg) else arg)
+    return given(*strategies, **kwargs)
 
 
 OVERWRITTEN_STATEGIES = {

@@ -1,6 +1,7 @@
 """Tests for the BaseXapiModel"""
 
 import pytest
+from hypothesis import settings
 from hypothesis import strategies as st
 from pydantic import ValidationError
 
@@ -485,6 +486,7 @@ def test_models_xapi_base_statement_with_valid_version(statement):
     assert "1.0.0" == BaseXapiModel(**statement).dict()["version"]
 
 
+@settings(deadline=None)
 @pytest.mark.parametrize(
     "model",
     [

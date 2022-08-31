@@ -18,6 +18,7 @@ and this project adheres to
 - Add dotenv configuration file support and `python-dotenv` dependency
 - Add `host` and `port` options for the `runserver` cli command
 - Add support for database selection when running the Ralph LRS server
+- Implement support for xAPI statement forwarding
 
 ### Changed
 

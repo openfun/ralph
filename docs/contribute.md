@@ -54,6 +54,9 @@ $ make test
 
 # Run pytest with options
 $ bin/pytest -x -k mixins
+
+# Run pytest with options and more debugging logs
+$ bin/pytest -x -vvv -s --log-level=DEBUG -k mixins
 ```
 
 ### Working with local backends

@@ -5,8 +5,17 @@ from datetime import datetime
 from typing import Literal, Optional, Union
 from uuid import UUID, uuid4
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    HTTPException,
+    Query,
+    Request,
+    status,
+)
 
+from ralph.api.forwarding import forward_xapi_statements, get_active_xapi_forwardings
 from ralph.backends.database.base import BaseDatabase, StatementParameters
 from ralph.conf import settings
 from ralph.exceptions import BackendException, BadFormatException
@@ -217,7 +226,10 @@ async def get(
     },
 )
 # pylint: disable=unused-argument
-async def post(statements: Union[LaxStatement, list[LaxStatement]]):
+async def post(
+    statements: Union[LaxStatement, list[LaxStatement]],
+    background_tasks: BackgroundTasks,
+):
     """Stores a set of statements (or a single statement as a single member of a set).
 
     NB: at this time, using POST to make a GET request, is not supported.
@@ -249,6 +261,11 @@ async def post(statements: Union[LaxStatement, list[LaxStatement]]):
             detail="Duplicate statement IDs in the list of statements",
         )
 
+    if get_active_xapi_forwardings():
+        background_tasks.add_task(
+            forward_xapi_statements, list(statements_dict.values())
+        )
+
     try:
         statements_ids_result = DATABASE_CLIENT.query_statements_by_ids(statements_ids)
     except BackendException as error:
@@ -274,7 +291,8 @@ async def post(statements: Union[LaxStatement, list[LaxStatement]]):
     except (BackendException, BadFormatException) as exc:
         logger.error("Failed to index submitted statements")
         raise HTTPException(
-            status_code=500, detail="Statements bulk indexation failed"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Statements bulk indexation failed",
         ) from exc
 
     logger.info("Indexed %d statements with success", success_count)

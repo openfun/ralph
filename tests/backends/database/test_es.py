@@ -19,7 +19,11 @@ from ralph.backends.database.es import ESDatabase, ESQuery
 from ralph.conf import settings
 from ralph.exceptions import BackendException, BackendParameterException
 
-from tests.fixtures.backends import ES_TEST_HOSTS, ES_TEST_INDEX, ES_TEST_INDEX_2
+from tests.fixtures.backends import (
+    ES_TEST_FORWARDING_INDEX,
+    ES_TEST_HOSTS,
+    ES_TEST_INDEX,
+)
 
 
 def test_backends_database_es_database_instantiation(es):
@@ -395,19 +399,19 @@ def test_backends_database_es_query_statements_with_pit_query_failure(
     def mock_open_point_in_time(**_):
         """Mocks the Elasticsearch.open_point_in_time method."""
 
-        raise ValueError("Something went wrong")
+        raise ValueError("ES failure")
 
     database = ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX)
     monkeypatch.setattr(database.client, "open_point_in_time", mock_open_point_in_time)
 
     caplog.set_level(logging.ERROR)
 
-    msg = "'Failed to open ElasticSearch point in time', 'Something went wrong'"
+    msg = "'Failed to open ElasticSearch point in time', 'ES failure'"
     with pytest.raises(BackendException, match=msg):
         database.query_statements(StatementParameters())
 
     logger_name = "ralph.backends.database.es"
-    msg = "Failed to open ElasticSearch point in time. Something went wrong"
+    msg = "Failed to open ElasticSearch point in time. ES failure"
     assert caplog.record_tuples == [(logger_name, logging.ERROR, msg)]
 
 
@@ -465,7 +469,9 @@ def test_backends_database_es_query_statements_by_ids_with_search_query_failure(
     assert caplog.record_tuples == [(logger_name, logging.ERROR, msg)]
 
 
-def test_backends_database_es_query_statements_by_ids_with_multiple_indexes(es, es2):
+def test_backends_database_es_query_statements_by_ids_with_multiple_indexes(
+    es, es_forwarding
+):
     """Tests the ES query_statements_by_ids method, given a valid search
     query, should execute the query uniquely on the specified index and return the
     expected results.
@@ -474,17 +480,21 @@ def test_backends_database_es_query_statements_by_ids_with_multiple_indexes(es, 
 
     # Insert documents
     index_1_document = {"_index": ES_TEST_INDEX, "_id": "1", "_source": {"id": "1"}}
-    index_2_document = {"_index": ES_TEST_INDEX_2, "_id": "2", "_source": {"id": "2"}}
+    index_2_document = {
+        "_index": ES_TEST_FORWARDING_INDEX,
+        "_id": "2",
+        "_source": {"id": "2"},
+    }
     bulk(es, [index_1_document])
-    bulk(es2, [index_2_document])
+    bulk(es_forwarding, [index_2_document])
 
     # As we bulk insert documents, the index needs to be refreshed before making queries
     es.indices.refresh(index=ES_TEST_INDEX)
-    es2.indices.refresh(index=ES_TEST_INDEX_2)
+    es_forwarding.indices.refresh(index=ES_TEST_FORWARDING_INDEX)
 
     # Instantiate ES Databases
     database = ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX)
-    database_2 = ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX_2)
+    database_2 = ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_FORWARDING_INDEX)
 
     # Check the expected search query results
     index_1_document = index_1_document | {"_score": 1.0}
