@@ -19,7 +19,7 @@ from ralph.backends.database.es import ESDatabase, ESQuery
 from ralph.conf import settings
 from ralph.exceptions import BackendException, BackendParameterException
 
-from tests.fixtures.backends import ES_TEST_HOSTS, ES_TEST_INDEX
+from tests.fixtures.backends import ES_TEST_HOSTS, ES_TEST_INDEX, ES_TEST_INDEX_2
 
 
 def test_backends_database_es_database_instantiation(es):
@@ -463,3 +463,33 @@ def test_backends_database_es_query_statements_by_ids_with_search_query_failure(
     logger_name = "ralph.backends.database.es"
     msg = "Failed to execute ElasticSearch query. ApiError(None, 'Something is wrong')"
     assert caplog.record_tuples == [(logger_name, logging.ERROR, msg)]
+
+
+def test_backends_database_es_query_statements_by_ids_with_multiple_indexes(es, es2):
+    """Tests the ES query_statements_by_ids method, given a valid search
+    query, should execute the query uniquely on the specified index and return the
+    expected results.
+    """
+    # pylint: disable=invalid-name,use-implicit-booleaness-not-comparison
+
+    # Insert documents
+    index_1_document = {"_index": ES_TEST_INDEX, "_id": "1", "_source": {"id": "1"}}
+    index_2_document = {"_index": ES_TEST_INDEX_2, "_id": "2", "_source": {"id": "2"}}
+    bulk(es, [index_1_document])
+    bulk(es2, [index_2_document])
+
+    # As we bulk insert documents, the index needs to be refreshed before making queries
+    es.indices.refresh(index=ES_TEST_INDEX)
+    es2.indices.refresh(index=ES_TEST_INDEX_2)
+
+    # Instantiate ES Databases
+    database = ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX)
+    database_2 = ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX_2)
+
+    # Check the expected search query results
+    index_1_document = index_1_document | {"_score": 1.0}
+    index_2_document = index_2_document | {"_score": 1.0}
+    assert database.query_statements_by_ids(["1"]) == [index_1_document]
+    assert database.query_statements_by_ids(["2"]) == []
+    assert database_2.query_statements_by_ids(["1"]) == []
+    assert database_2.query_statements_by_ids(["2"]) == [index_2_document]

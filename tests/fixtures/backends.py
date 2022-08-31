@@ -10,8 +10,9 @@ from functools import lru_cache
 
 import pytest
 import websockets
-from elasticsearch import Elasticsearch
+from elasticsearch import BadRequestError, Elasticsearch
 from pymongo import MongoClient
+from pymongo.errors import CollectionInvalid
 
 from ralph.backends.database.es import ESDatabase
 from ralph.backends.database.mongo import MongoDatabase
@@ -20,6 +21,9 @@ from ralph.backends.storage.swift import SwiftStorage
 # Elasticsearch backend defaults
 ES_TEST_INDEX = os.environ.get(
     "RALPH_BACKENDS__DATABASE__ES__TEST_INDEX", "test-index-foo"
+)
+ES_TEST_INDEX_2 = os.environ.get(
+    "RALPH_BACKENDS__DATABASE__ES__TEST_INDEX_2", "test-index-foo-2"
 )
 ES_TEST_INDEX_TEMPLATE = os.environ.get(
     "RALPH_BACKENDS__DATABASE__ES__INDEX_TEMPLATE", "test-index"
@@ -33,6 +37,9 @@ ES_TEST_HOSTS = os.environ.get(
 
 MONGO_TEST_COLLECTION = os.environ.get(
     "RALPH_BACKENDS__DATABASE__MONGO__TEST_COLLECTION", "marsha"
+)
+MONGO_TEST_COLLECTION_2 = os.environ.get(
+    "RALPH_BACKENDS__DATABASE__MONGO__TEST_COLLECTION_2", "marsha-2"
 )
 MONGO_TEST_DATABASE = os.environ.get(
     "RALPH_BACKENDS__DATABASE__MONGO__TEST_DATABASE", "statements"
@@ -83,31 +90,75 @@ class NamedClassEnum(Enum):
     B = "tests.fixtures.backends.NamedClassB"
 
 
-@pytest.fixture
-def es():
+def get_es_fixture(host=ES_TEST_HOSTS, index=ES_TEST_INDEX):
     """Creates / deletes an ElasticSearch test index and yields an instantiated
     client.
     """
-    # pylint: disable=invalid-name
 
-    client = Elasticsearch(ES_TEST_HOSTS)
-    client.indices.create(index=ES_TEST_INDEX)
+    client = Elasticsearch(host)
+    try:
+        client.indices.create(index=index)
+    except BadRequestError:
+        # The index might already exist
+        client.indices.delete(index=index)
+        client.indices.create(index=index)
     yield client
-    client.indices.delete(index=ES_TEST_INDEX)
+    client.indices.delete(index=index)
 
 
 @pytest.fixture
-def mongo():
+def es():
+    """Yields an ElasticSearch test client. See get_es_fixture above."""
+    # pylint: disable=invalid-name
+
+    for es_client in get_es_fixture():
+        yield es_client
+
+
+@pytest.fixture
+def es2():
+    """Yields a second ElasticSearch test client. See get_es_fixture above."""
+
+    for es_client in get_es_fixture(index=ES_TEST_INDEX_2):
+        yield es_client
+
+
+def get_mongo_fixture(
+    connection_uri=MONGO_TEST_CONNECTION_URI,
+    database=MONGO_TEST_DATABASE,
+    collection=MONGO_TEST_COLLECTION,
+):
     """Creates / deletes a Mongo test database + collection and yields an
     instantiated client.
     """
 
-    client = MongoClient(MONGO_TEST_CONNECTION_URI)
-    database = getattr(client, MONGO_TEST_DATABASE)
-    database.create_collection(MONGO_TEST_COLLECTION)
+    client = MongoClient(connection_uri)
+    database = getattr(client, database)
+    try:
+        database.create_collection(collection)
+    except CollectionInvalid:
+        # The collection might already exist
+        database.drop_collection(collection)
+        database.create_collection(collection)
     yield client
-    database.drop_collection(MONGO_TEST_COLLECTION)
-    client.drop_database(MONGO_TEST_DATABASE)
+    database.drop_collection(collection)
+    client.drop_database(database)
+
+
+@pytest.fixture
+def mongo():
+    """Yields a Mongo test client. See get_mongo_fixture above."""
+
+    for mongo_client in get_mongo_fixture():
+        yield mongo_client
+
+
+@pytest.fixture
+def mongo2():
+    """Yields a second Mongo test client. See get_mongo_fixture above."""
+
+    for mongo_client in get_mongo_fixture(collection=MONGO_TEST_COLLECTION_2):
+        yield mongo_client
 
 
 @pytest.fixture

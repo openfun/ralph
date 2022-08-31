@@ -205,7 +205,8 @@ class ESDatabase(BaseDatabase):
     def query_statements_by_ids(self, ids: list[str]) -> list:
         """Returns the list of matching statement IDs from the database."""
 
-        return self._search(body={"query": {"terms": {"_id": ids}}})["hits"]["hits"]
+        body = {"query": {"terms": {"_id": ids}}}
+        return self._search(index=self.index, body=body)["hits"]["hits"]
 
     def _search(self, **kwargs):
         """Wraps the ElasticSearch.search method to raise a BackendException in case

@@ -18,6 +18,7 @@ from ralph.exceptions import (
 
 from tests.fixtures.backends import (
     MONGO_TEST_COLLECTION,
+    MONGO_TEST_COLLECTION_2,
     MONGO_TEST_CONNECTION_URI,
     MONGO_TEST_DATABASE,
 )
@@ -455,3 +456,38 @@ def test_backends_database_mongo_query_statements_by_ids_with_search_query_failu
     logger_name = "ralph.backends.database.mongo"
     msg = "Failed to execute MongoDB query. Something is wrong"
     assert caplog.record_tuples == [(logger_name, logging.ERROR, msg)]
+
+
+def test_backends_database_mongo_query_statements_by_ids_with_multiple_collections(
+    mongo, mongo2
+):
+    """Tests the mongo backend query_statements_by_ids method, given a valid search
+    query, should execute the query uniquely on the specified collection and return the
+    expected results.
+    """
+    # pylint: disable=unused-argument,use-implicit-booleaness-not-comparison
+
+    # Instantiate Mongo Databases
+    backend_1 = MongoDatabase(
+        connection_uri=MONGO_TEST_CONNECTION_URI,
+        database=MONGO_TEST_DATABASE,
+        collection=MONGO_TEST_COLLECTION,
+    )
+    backend_2 = MongoDatabase(
+        connection_uri=MONGO_TEST_CONNECTION_URI,
+        database=MONGO_TEST_DATABASE,
+        collection=MONGO_TEST_COLLECTION_2,
+    )
+
+    # Insert documents
+    timestamp = {"timestamp": "2022-06-27T15:36:50"}
+    collection_1_document = list(MongoDatabase.to_documents([{"id": "1", **timestamp}]))
+    collection_2_document = list(MongoDatabase.to_documents([{"id": "2", **timestamp}]))
+    backend_1.bulk_import(collection_1_document)
+    backend_2.bulk_import(collection_2_document)
+
+    # Check the expected search query results
+    assert backend_1.query_statements_by_ids(["1"]) == collection_1_document
+    assert backend_1.query_statements_by_ids(["2"]) == []
+    assert backend_2.query_statements_by_ids(["1"]) == []
+    assert backend_2.query_statements_by_ids(["2"]) == collection_2_document
