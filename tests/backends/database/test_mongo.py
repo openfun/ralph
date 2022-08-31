@@ -18,9 +18,9 @@ from ralph.exceptions import (
 
 from tests.fixtures.backends import (
     MONGO_TEST_COLLECTION,
-    MONGO_TEST_COLLECTION_2,
     MONGO_TEST_CONNECTION_URI,
     MONGO_TEST_DATABASE,
+    MONGO_TEST_FORWARDING_COLLECTION,
 )
 
 
@@ -459,7 +459,7 @@ def test_backends_database_mongo_query_statements_by_ids_with_search_query_failu
 
 
 def test_backends_database_mongo_query_statements_by_ids_with_multiple_collections(
-    mongo, mongo2
+    mongo, mongo_forwarding
 ):
     """Tests the mongo backend query_statements_by_ids method, given a valid search
     query, should execute the query uniquely on the specified collection and return the
@@ -476,7 +476,7 @@ def test_backends_database_mongo_query_statements_by_ids_with_multiple_collectio
     backend_2 = MongoDatabase(
         connection_uri=MONGO_TEST_CONNECTION_URI,
         database=MONGO_TEST_DATABASE,
-        collection=MONGO_TEST_COLLECTION_2,
+        collection=MONGO_TEST_FORWARDING_COLLECTION,
     )
 
     # Insert documents

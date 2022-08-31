@@ -5,12 +5,16 @@ import json
 import os
 import random
 import time
+from contextlib import asynccontextmanager
 from enum import Enum
 from functools import lru_cache
+from multiprocessing import Process
 
 import pytest
+import uvicorn
 import websockets
 from elasticsearch import BadRequestError, Elasticsearch
+from httpx import AsyncClient, ConnectError
 from pymongo import MongoClient
 from pymongo.errors import CollectionInvalid
 
@@ -22,8 +26,8 @@ from ralph.backends.storage.swift import SwiftStorage
 ES_TEST_INDEX = os.environ.get(
     "RALPH_BACKENDS__DATABASE__ES__TEST_INDEX", "test-index-foo"
 )
-ES_TEST_INDEX_2 = os.environ.get(
-    "RALPH_BACKENDS__DATABASE__ES__TEST_INDEX_2", "test-index-foo-2"
+ES_TEST_FORWARDING_INDEX = os.environ.get(
+    "RALPH_BACKENDS__DATABASE__ES__TEST_FORWARDING_INDEX", "test-index-foo-2"
 )
 ES_TEST_INDEX_TEMPLATE = os.environ.get(
     "RALPH_BACKENDS__DATABASE__ES__INDEX_TEMPLATE", "test-index"
@@ -38,8 +42,8 @@ ES_TEST_HOSTS = os.environ.get(
 MONGO_TEST_COLLECTION = os.environ.get(
     "RALPH_BACKENDS__DATABASE__MONGO__TEST_COLLECTION", "marsha"
 )
-MONGO_TEST_COLLECTION_2 = os.environ.get(
-    "RALPH_BACKENDS__DATABASE__MONGO__TEST_COLLECTION_2", "marsha-2"
+MONGO_TEST_FORWARDING_COLLECTION = os.environ.get(
+    "RALPH_BACKENDS__DATABASE__MONGO__TEST_FORWARDING_COLLECTION", "marsha-2"
 )
 MONGO_TEST_DATABASE = os.environ.get(
     "RALPH_BACKENDS__DATABASE__MONGO__TEST_DATABASE", "statements"
@@ -47,6 +51,9 @@ MONGO_TEST_DATABASE = os.environ.get(
 MONGO_TEST_CONNECTION_URI = os.environ.get(
     "RALPH_BACKENDS__DATABASE__MONGO__TEST_CONNECTION_URI", "mongodb://localhost:27017/"
 )
+
+RUNSERVER_TEST_HOST = os.environ.get("RALPH_RUNSERVER_TEST_HOST", "0.0.0.0")
+RUNSERVER_TEST_PORT = int(os.environ.get("RALPH_RUNSERVER_TEST_PORT", 8101))
 
 # Websocket test backend defaults
 WS_TEST_HOST = "localhost"
@@ -116,10 +123,10 @@ def es():
 
 
 @pytest.fixture
-def es2():
+def es_forwarding():
     """Yields a second ElasticSearch test client. See get_es_fixture above."""
 
-    for es_client in get_es_fixture(index=ES_TEST_INDEX_2):
+    for es_client in get_es_fixture(index=ES_TEST_FORWARDING_INDEX):
         yield es_client
 
 
@@ -154,10 +161,10 @@ def mongo():
 
 
 @pytest.fixture
-def mongo2():
+def mongo_forwarding():
     """Yields a second Mongo test client. See get_mongo_fixture above."""
 
-    for mongo_client in get_mongo_fixture(collection=MONGO_TEST_COLLECTION_2):
+    for mongo_client in get_mongo_fixture(collection=MONGO_TEST_FORWARDING_COLLECTION):
         yield mongo_client
 
 
@@ -259,3 +266,34 @@ def ws(events):
     yield server
 
     server.ws_server.close()
+
+
+@pytest.fixture
+def lrs():
+    """Returns a context manager that runs ralph's lrs server."""
+    # pylint: disable=invalid-name,redefined-outer-name
+
+    @asynccontextmanager
+    async def runserver(app, host=RUNSERVER_TEST_HOST, port=RUNSERVER_TEST_PORT):
+        process = Process(
+            target=uvicorn.run,
+            args=(app,),
+            kwargs={"host": host, "port": port, "log_level": "debug"},
+            daemon=True,
+        )
+        try:
+            process.start()
+            async with AsyncClient() as client:
+                server_ready = False
+                while not server_ready:
+                    try:
+                        response = await client.get(f"http://{host}:{port}/whoami")
+                        assert response.status_code == 401
+                        server_ready = True
+                    except ConnectError:
+                        await asyncio.sleep(0.1)
+            yield process
+        finally:
+            process.terminate()
+
+    return runserver

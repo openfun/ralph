@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Literal, Union
 
 from click import get_app_dir
-from pydantic import BaseModel, BaseSettings
+from pydantic import AnyUrl, BaseModel, BaseSettings
 
 from ralph.utils import import_string
 
@@ -197,6 +197,20 @@ class ParserSettings(BaseModel):
     ES: ESParserSettings = ESParserSettings()
 
 
+class XapiForwardingConfigurationSettings(BaseModel):
+    """Represents an xAPI forwarding configuration item."""
+
+    class Config:  # pylint: disable=missing-class-docstring
+        min_anystr_length = 1
+
+    url: AnyUrl
+    is_active: bool
+    basic_username: str
+    basic_password: str
+    max_retries: int
+    timeout: float
+
+
 class Settings(BaseSettings):
     """Represents Ralph's global environment & configuration settings."""
 
@@ -238,6 +252,10 @@ class Settings(BaseSettings):
                 "handlers": ["console"],
                 "level": "ERROR",
             },
+            "uvicorn": {
+                "handlers": ["console"],
+                "level": "INFO",
+            },
         },
     }
     PARSERS: ParserSettings = ParserSettings()
@@ -247,6 +265,7 @@ class Settings(BaseSettings):
     RUNSERVER_POINT_IN_TIME_KEEP_ALIVE: str = "1m"
     RUNSERVER_PORT: int = 8100
     SENTRY_DSN: str = None
+    XAPI_FORWARDINGS: list[XapiForwardingConfigurationSettings] = []
 
     @property
     def APP_DIR(self) -> Path:  # pylint: disable=invalid-name
