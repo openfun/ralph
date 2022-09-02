@@ -435,6 +435,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#forwarding_statements" class="md-nav__link">
+    Forwarding statements
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -613,6 +620,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#forwarding_statements" class="md-nav__link">
+    Forwarding statements
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -637,7 +651,8 @@
 
 
 <h1 id="api_server">API Server<a class="headerlink" href="#api_server" title="Permanent link">&para;</a></h1>
-<p>Ralph comes with an API server that aims to implement the LRS specification (still a work in progress).</p>
+<p>Ralph comes with an API server that aims to implement the Learning Record Store (LRS)
+specification (still a work in progress).</p>
 <h2 id="getting_started">Getting started<a class="headerlink" href="#getting_started" title="Permanent link">&para;</a></h2>
 <p>The API server can be started up with the following command:</p>
 <div class="highlight"><pre><span></span><code>$ ralph runserver --backend es
@@ -680,6 +695,82 @@ $ python3 -c <span class="s1">&#39;import bcrypt; print(bcrypt.hashpw(b&quot;PAS
 <div class="highlight"><pre><span></span><code>$ curl --user john.doe@example.com:PASSWORD http://localhost:8100/whoami
 &lt; HTTP/1.1 <span class="m">200</span> OK
 &lt; <span class="o">{</span><span class="s2">&quot;username&quot;</span>:<span class="s2">&quot;john.doe@example.com&quot;</span>,<span class="s2">&quot;scopes&quot;</span>:<span class="o">[</span><span class="s2">&quot;authenticated&quot;</span>,<span class="s2">&quot;example_scope&quot;</span><span class="o">]}</span>
+</code></pre></div>
+<h3 id="forwarding_statements">Forwarding statements<a class="headerlink" href="#forwarding_statements" title="Permanent link">&para;</a></h3>
+<p>Ralph&rsquo;s API server can be configured to forward xAPI statements it receives to other
+LRSes.</p>
+<p>To configure statement forwarding, you need to create a <code>.env</code> file in the current
+directory and define the <code>RALPH_XAPI_FORWARDINGS</code> variable or define the
+<code>RALPH_XAPI_FORWARDINGS</code> environment variable.</p>
+<p>The value of the <code>RALPH_XAPI_FORWARDINGS</code> variable should be a JSON encoded list of
+dictionaries where each dictionary defines a forwarding configuration and consists of
+the following key/value pairs:</p>
+<table>
+<thead>
+<tr>
+<th align="left">key</th>
+<th align="left">value type</th>
+<th align="left">description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>is_active</code></td>
+<td align="left"><code>boolean</code></td>
+<td align="left">Specifies whether or not this forwarding configuration should take effect.</td>
+</tr>
+<tr>
+<td align="left"><code>url</code></td>
+<td align="left"><code>URL</code></td>
+<td align="left">Specifies the endpoint URL where forwarded statements should be send.</td>
+</tr>
+<tr>
+<td align="left"><code>basic_username</code></td>
+<td align="left"><code>string</code></td>
+<td align="left">Specifies the basic auth username.</td>
+</tr>
+<tr>
+<td align="left"><code>basic_password</code></td>
+<td align="left"><code>string</code></td>
+<td align="left">Specifies the basic auth password.</td>
+</tr>
+<tr>
+<td align="left"><code>max_retries</code></td>
+<td align="left"><code>number</code></td>
+<td align="left">Specifies the number of times a failed forwarding request should be retried.</td>
+</tr>
+<tr>
+<td align="left"><code>timeout</code></td>
+<td align="left"><code>number</code></td>
+<td align="left">Specifies the duration in seconds of network inactivity leading to a timeout.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Note that for a forwarding configuration to be valid it is required that all key/value
+pairs are defined.</p>
+</blockquote>
+<p>Example of a valid forwarding configuration:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">RALPH_XAPI_FORWARDINGS</span><span class="o">=</span><span class="s1">&#39;</span>
+<span class="s1">[</span>
+<span class="s1">  {</span>
+<span class="s1">    &quot;is_active&quot;: true,</span>
+<span class="s1">    &quot;url&quot;: &quot;http://lrs1.example.com/xAPI/statements/&quot;,</span>
+<span class="s1">    &quot;basic_username&quot;: &quot;admin1@example.com&quot;,</span>
+<span class="s1">    &quot;basic_password&quot;: &quot;PASSWORD1&quot;,</span>
+<span class="s1">    &quot;max_retries&quot;: 1,</span>
+<span class="s1">    &quot;timeout&quot;: 5</span>
+<span class="s1">  },</span>
+<span class="s1">  {</span>
+<span class="s1">    &quot;is_active&quot;: true,</span>
+<span class="s1">    &quot;url&quot;: &quot;http://lrs2.example.com/xAPI/statements/&quot;,</span>
+<span class="s1">    &quot;basic_username&quot;: &quot;admin2@example.com&quot;,</span>
+<span class="s1">    &quot;basic_password&quot;: &quot;PASSWORD2&quot;,</span>
+<span class="s1">    &quot;max_retries&quot;: 5,</span>
+<span class="s1">    &quot;timeout&quot;: 0.2</span>
+<span class="s1">  }</span>
+<span class="s1">]</span>
+<span class="s1">&#39;</span>
 </code></pre></div>
 
 
