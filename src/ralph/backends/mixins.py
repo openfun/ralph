@@ -16,7 +16,7 @@ class HistoryMixin:
     def history(self):
         """Get backend history"""
 
-        logging.debug("Loading history file: %s", str(settings.HISTORY_FILE))
+        logger.debug("Loading history file: %s", str(settings.HISTORY_FILE))
 
         if not hasattr(self, "_history"):
             try:
@@ -32,7 +32,7 @@ class HistoryMixin:
     def write_history(self, history):
         """Write given history as a JSON file"""
 
-        logging.debug("Writing history file: %s", str(settings.HISTORY_FILE))
+        logger.debug("Writing history file: %s", str(settings.HISTORY_FILE))
 
         if not settings.HISTORY_FILE.parent.exists():
             settings.HISTORY_FILE.parent.mkdir(parents=True)

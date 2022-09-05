@@ -49,6 +49,7 @@ and this project adheres to
 ### Fixed
 
 - Tray: do not create a cronjobs list when no cronjob has been defined
+- Restore history mixin logger
 
 ## [2.1.0] - 2022-04-13
 
