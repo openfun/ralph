@@ -1,6 +1,5 @@
-"""
-Ralph tracking logs filters.
-"""
+"""Ralph tracking logs filters."""
+
 from .exceptions import EventKeyError
 
 
@@ -16,7 +15,6 @@ def anonymous(event):
 
     Raises:
         EventKeyError: When the event does not contain the `username` key.
-
     """
 
     if "username" not in event:

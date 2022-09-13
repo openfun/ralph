@@ -26,7 +26,8 @@ def test_models_xapi_video_initialized_with_valid_statement(statement):
 @custom_given(VideoInitialized)
 def test_models_xapi_video_initialized_selector_with_valid_statement(statement):
     """Tests given a video initialized event, the get_model method should return
-    VideoInitialized model."""
+    VideoInitialized model.
+    """
 
     statement = json.loads(statement.json())
     assert (
@@ -113,7 +114,8 @@ def test_models_xapi_video_terminated_with_valid_statement(statement):
 @custom_given(VideoTerminated)
 def test_models_xapi_video_terminated_selector_with_valid_statement(statement):
     """Tests given a video terminated event, the get_model method should return
-    VideoTerminated model."""
+    VideoTerminated model.
+    """
 
     event = json.loads(statement.json())
     assert ModelSelector(module="ralph.models.xapi").get_model(event) is VideoTerminated
@@ -129,7 +131,8 @@ def test_models_xapi_video_interacted_with_valid_statement(statement):
 @custom_given(VideoInteracted)
 def test_models_xapi_video_interacted_selector_with_valid_statement(statement):
     """Tests given a video interacted event, the get_model method should return
-    VideoInteracted model."""
+    VideoInteracted model.
+    """
 
     event = json.loads(statement.json())
     assert ModelSelector(module="ralph.models.xapi").get_model(event) is VideoInteracted

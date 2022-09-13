@@ -1,4 +1,4 @@
-"""Event validator definition"""
+"""Event validator definition."""
 
 
 import json
@@ -55,6 +55,7 @@ class Validator:
             JSONDecodeError: When the event_str is not a valid JSON string.
             UnknownEventException: When no matching model is found for the event.
             ValidationError: When the event is failing the pydantic model validation.
+
         Returns:
             event_str (str): The cleaned JSON-formatted input event_str.
         """

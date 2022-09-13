@@ -145,7 +145,8 @@ def test_models_edx_problem_check_fail_selector_with_valid_statement(statement):
 @custom_given(UIProblemGraded)
 def test_models_edx_ui_problem_graded_with_valid_statement(statement):
     """Tests that a `problem_graded` browser statement has the expected `event_type` and
-    `name`."""
+    `name`.
+    """
 
     assert statement.event_type == "problem_graded"
     assert statement.name == "problem_graded"
@@ -153,7 +154,8 @@ def test_models_edx_ui_problem_graded_with_valid_statement(statement):
 
 @custom_given(UIProblemGraded)
 def test_models_edx_ui_problem_graded_selector_with_valid_statement(statement):
-    """Tests given a `problem_graded` statement the selector `get_model`
+    """
+    Tests given a `problem_graded` statement the selector `get_model`
     method should return `ProblemGraded` model.
     """
 
@@ -166,7 +168,8 @@ def test_models_edx_ui_problem_graded_selector_with_valid_statement(statement):
 @custom_given(ProblemRescore)
 def test_models_edx_problem_rescore_with_valid_statement(statement):
     """Tests that a `problem_rescore` server statement has the expected `event_type` and
-    `page`."""
+    `page`.
+    """
 
     assert statement.event_type == "problem_rescore"
     assert statement.page == "x_module"
@@ -187,7 +190,8 @@ def test_models_edx_problem_rescore_selector_with_valid_statement(statement):
 @custom_given(ProblemRescoreFail)
 def test_models_edx_problem_rescore_fail_with_valid_statement(statement):
     """Tests that a `problem_rescore` server statement has the expected `event_type` and
-    `page`."""
+    `page`.
+    """
 
     assert statement.event_type == "problem_rescore_fail"
     assert statement.page == "x_module"
@@ -195,7 +199,8 @@ def test_models_edx_problem_rescore_fail_with_valid_statement(statement):
 
 @custom_given(ProblemRescoreFail)
 def test_models_edx_problem_rescore_fail_selector_with_valid_statement(statement):
-    """Tests given a `problem_rescore_fail` statement the selector `get_model` method
+    """
+    Tests given a `problem_rescore_fail` statement the selector `get_model` method
     should return `ProblemRescoreFail` model.
     """
 
@@ -209,7 +214,8 @@ def test_models_edx_problem_rescore_fail_selector_with_valid_statement(statement
 @custom_given(UIProblemReset)
 def test_models_edx_ui_problem_reset_with_valid_statement(statement):
     """Tests that a `problem_reset` browser statement has the expected `event_type` and
-    `name`."""
+    `name`.
+    """
 
     assert statement.event_type == "problem_reset"
     assert statement.name == "problem_reset"

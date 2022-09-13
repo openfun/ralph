@@ -1,6 +1,4 @@
-"""
-Authentication & authorization related tools for the Ralph API.
-"""
+"""Authentication & authorization related tools for the Ralph API."""
 import json
 from functools import lru_cache
 

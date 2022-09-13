@@ -1,6 +1,4 @@
-"""
-Tests for authentication for the Ralph API.
-"""
+"""Tests for authentication for the Ralph API."""
 import base64
 import json
 
@@ -25,9 +23,7 @@ STORED_CREDENTIALS = json.dumps(
 
 
 def test_get_whoami_no_credentials():
-    """
-    whoami route returns a 401 error when no credentials are sent.
-    """
+    """Whoami route returns a 401 error when no credentials are sent."""
     response = client.get("/whoami")
     assert response.status_code == 401
     assert response.headers["www-authenticate"] == "Basic"
@@ -35,9 +31,7 @@ def test_get_whoami_no_credentials():
 
 
 def test_get_whoami_credentials_wrong_scheme():
-    """
-    whoami route returns a 401 error when the wrong scheme is used for authorization.
-    """
+    """Whoami route returns a 401 error when the wrong scheme is used for authorization."""
     response = client.get("/whoami", headers={"Authorization": "Bearer sometoken"})
     assert response.status_code == 401
     assert response.headers["www-authenticate"] == "Basic"
@@ -45,9 +39,7 @@ def test_get_whoami_credentials_wrong_scheme():
 
 
 def test_get_whoami_credentials_encoding_error():
-    """
-    whoami route returns a 401 error when the credentials' encoding is broken.
-    """
+    """Whoami route returns a 401 error when the credentials' encoding is broken."""
     response = client.get("/whoami", headers={"Authorization": "Basic not-base64"})
     assert response.status_code == 401
     assert response.headers["www-authenticate"] == "Basic"
@@ -56,9 +48,7 @@ def test_get_whoami_credentials_encoding_error():
 
 # pylint: disable=invalid-name
 def test_get_whoami_credentials_username_not_found(fs):
-    """
-    whoami route returns a 401 error when the credentials' username cannot be found.
-    """
+    """Whoami route returns a 401 error when the credentials' username cannot be found."""
     credential_bytes = base64.b64encode("john:admin".encode("utf-8"))
     credentials = str(credential_bytes, "utf-8")
 
@@ -74,9 +64,7 @@ def test_get_whoami_credentials_username_not_found(fs):
 
 # pylint: disable=invalid-name
 def test_get_whoami_wrong_password(fs):
-    """
-    whoami route returns a 401 error when the credentials' password is wrong.
-    """
+    """Whoami route returns a 401 error when the credentials' password is wrong."""
     credential_bytes = base64.b64encode("john:not-admin".encode("utf-8"))
     credentials = str(credential_bytes, "utf-8")
 
@@ -92,8 +80,7 @@ def test_get_whoami_wrong_password(fs):
 
 # pylint: disable=invalid-name
 def test_get_whoami_correct_credentials(fs):
-    """
-    whoami returns a 200 response with the username and associated scopes when
+    """Whoami returns a 200 response with the username and associated scopes when
     the credentials are correct.
     """
     credential_bytes = base64.b64encode("ralph:admin".encode("utf-8"))

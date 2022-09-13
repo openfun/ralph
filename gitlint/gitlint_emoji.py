@@ -1,6 +1,5 @@
-"""
-Gitlint extra rule to validate that the message title is of the form
-"<gitmoji>(<scope>) <subject>"
+"""Gitlint extra rule to validate that the message title is of the form
+"<gitmoji>(<scope>) <subject>".
 """
 from __future__ import unicode_literals
 
@@ -12,11 +11,10 @@ from gitlint.rules import CommitMessageTitle, LineRule, RuleViolation
 
 
 class GitmojiTitle(LineRule):
-    """
-    This rule will enforce that each commit title is of the form
+    """The rule will enforce that each commit title is of the form
     "<gitmoji>(<scope>) <subject>" where gitmoji is an emoji from the list
     defined in https://gitmoji.carloscuesta.me and subject should be all
-    lowercase
+    lowercase.
     """
 
     id = "UC1"
@@ -24,8 +22,7 @@ class GitmojiTitle(LineRule):
     target = CommitMessageTitle
 
     def validate(self, title, _commit):
-        """
-        Download the list possible gitmojis from the project's github
+        """Download the list possible gitmojis from the project's github
         repository and check that title contains one of them.
         """
         gitmojis = requests.get(

@@ -1,5 +1,4 @@
-"""
-Define API-specific data models so we can be exactly as lax as we want
+"""Define API-specific data models so we can be exactly as lax as we want
 when it comes to exact object shape and validation.
 """
 from typing import Optional
@@ -20,31 +19,26 @@ class ErrorDetail(BaseModel):
 
 
 class BaseModelWithLaxConfig(BaseModel):
-    """
-    Common base lax model to perform light input validation as
+    """Common base lax model to perform light input validation as
     we receive statements through the API.
     """
 
     class Config:
-        """
-        Enable extra properties so we do not have to perform comprehensive validation.
+        """Enable extra properties so we do not have to perform comprehensive 
+        validation.
         """
 
         extra = Extra.allow
 
 
 class LaxObjectField(BaseModelWithLaxConfig):
-    """
-    Lightest definition of an object field compliant to the specification.
-    """
+    """Lightest definition of an object field compliant to the specification."""
 
     id: AnyUrl
 
 
 class LaxVerbField(BaseModelWithLaxConfig):
-    """
-    Lightest definition of a verb field compliant to the specification.
-    """
+    """Lightest definition of a verb field compliant to the specification."""
 
     id: AnyUrl
 
