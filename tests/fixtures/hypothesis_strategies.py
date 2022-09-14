@@ -1,4 +1,4 @@
-"""Hypothesis build strategies with special constraints"""
+"""Hypothesis build strategies with special constraints."""
 
 import random
 from typing import Union
@@ -19,7 +19,6 @@ OVERWRITTEN_STATEGIES = {}
 
 def get_strategy_from(annotation):
     """Infers a Hypothesis strategy from the given annotation."""
-
     origin = getattr(annotation, "__origin__", None)
     args = getattr(annotation, "__args__", None)
     if is_base_model(annotation):
@@ -42,9 +41,9 @@ def get_strategy_from(annotation):
 def custom_builds(
     klass: BaseModel, _overwrite_default=True, **kwargs: Union[st.SearchStrategy, bool]
 ):
-    """Returns a fixed_dictionaries Hypothesis strategy for pydantic models.
+    """Return a fixed_dictionaries Hypothesis strategy for pydantic models.
 
-    Args:
+    Parameters:
         klass (BaseModel): The pydantic model for which to generate a strategy.
         _overwrite_default (bool): By default, fields overwritten by kwargs become
             required. If _overwrite_default is set to False, we keep the original field
@@ -54,7 +53,6 @@ def custom_builds(
             If kwargs contains booleans, they set whether the given key should be
             present (True) or omitted (False) in the generated model.
     """
-
     for special_class, special_kwargs in OVERWRITTEN_STATEGIES.items():
         if issubclass(klass, special_class):
             kwargs = special_kwargs | kwargs
@@ -78,8 +76,7 @@ def custom_builds(
 
 
 def custom_given(*args: Union[st.SearchStrategy, BaseModel], **kwargs):
-    """Wraps the Hypothesis `given` function. Replaces st.builds with custom_builds."""
-
+    """Wrap the Hypothesis `given` function. Replaces st.builds with custom_builds."""
     strategies = []
     for arg in args:
         strategies.append(custom_builds(arg) if is_base_model(arg) else arg)

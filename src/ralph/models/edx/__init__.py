@@ -1,4 +1,4 @@
-"""edX pydantic models"""
+"""edX pydantic models."""
 
 # flake8: noqa
 

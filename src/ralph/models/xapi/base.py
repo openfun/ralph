@@ -1,4 +1,4 @@
-"""Base xAPI model definition"""
+"""Base xAPI model definition."""
 
 from datetime import datetime
 from typing import Optional
@@ -47,12 +47,11 @@ class BaseXapiModel(BaseModelWithConfig):
     @root_validator(pre=True)
     @classmethod
     def check_abscence_of_empty_and_invalid_values(cls, values):
-        """Checks the model for empty and invalid values.
+        """Check the model for empty and invalid values.
 
         Checks that the `context` field contains `platform` and `revision` fields
         only if the `object.objectType` property is equal to `Activity`.
         """
-
         for field, value in list(values.items()):
             if value in [None, "", {}]:
                 raise ValueError(f"{field}: invalid empty value")

@@ -1,4 +1,4 @@
-"""Constants for xAPI video specifications"""
+"""Constants for xAPI video specifications."""
 
 from typing import Literal
 

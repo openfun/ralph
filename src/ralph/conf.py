@@ -1,4 +1,4 @@
-"""Configurations for Ralph"""
+"""Configurations for Ralph."""
 
 import io
 from pathlib import Path
@@ -21,7 +21,7 @@ class BaseSettingsConfig:
 
 
 class CoreSettings(BaseSettings):
-    """Represents Ralph's core settings."""
+    """Represent Ralph's core settings."""
 
     class Config(BaseSettingsConfig):
         """Pydantic Configuration."""
@@ -34,13 +34,12 @@ core_settings = CoreSettings()
 
 
 class CommaSeparatedTuple(str):
-    """Represents a pydantic field type validating comma separated strings or tuples."""
+    """Represent a pydantic field type validating comma separated strings or tuples."""
 
     @classmethod
     def __get_validators__(cls):
         def validate(value: Union[str, tuple[str]]) -> tuple[str]:
-            """Checks whether the value is a comma separated string or a tuple."""
-
+            """Check whether the value is a comma separated string or a tuple."""
             if isinstance(value, tuple):
                 return value
 
@@ -53,7 +52,7 @@ class CommaSeparatedTuple(str):
 
 
 class InstantiableSettingsItem(BaseModel):
-    """Represents a settings configuration item that can be instantiated."""
+    """Represent a settings configuration item that can be instantiated."""
 
     class Config:  # pylint: disable=missing-class-docstring
         underscore_attrs_are_private = True
@@ -61,8 +60,7 @@ class InstantiableSettingsItem(BaseModel):
     _class_path: str = None
 
     def get_instance(self, **init_parameters):
-        """Returns an instance of the settings item class using it's `_class_path`."""
-
+        """Return an instance of the settings item class using it's `_class_path`."""
         return import_string(self._class_path)(**init_parameters)
 
 
@@ -70,7 +68,7 @@ class InstantiableSettingsItem(BaseModel):
 
 
 class ESDatabaseBackendSettings(InstantiableSettingsItem):
-    """Represents the Elasticsearch database backend configuration settings."""
+    """Represent the Elasticsearch database backend configuration settings."""
 
     _class_path: str = "ralph.backends.database.es.ESDatabase"
 
@@ -81,7 +79,7 @@ class ESDatabaseBackendSettings(InstantiableSettingsItem):
 
 
 class MongoDatabaseBackendSettings(InstantiableSettingsItem):
-    """Represents the Mongo database backend configuration settings."""
+    """Represent the Mongo database backend configuration settings."""
 
     _class_path: str = "ralph.backends.database.mongo.MongoDatabase"
 
@@ -92,7 +90,7 @@ class MongoDatabaseBackendSettings(InstantiableSettingsItem):
 
 
 class DatabaseBackendSettings(BaseModel):
-    """Represents database backend configuration settings."""
+    """Represent database backend configuration settings."""
 
     ES: ESDatabaseBackendSettings = ESDatabaseBackendSettings()
     MONGO: MongoDatabaseBackendSettings = MongoDatabaseBackendSettings()
@@ -102,7 +100,7 @@ class DatabaseBackendSettings(BaseModel):
 
 
 class FSStorageBackendSettings(InstantiableSettingsItem):
-    """Represents the FileSystem storage backend configuration settings."""
+    """Represent the FileSystem storage backend configuration settings."""
 
     _class_path: str = "ralph.backends.storage.fs.FSStorage"
 
@@ -110,7 +108,7 @@ class FSStorageBackendSettings(InstantiableSettingsItem):
 
 
 class LDPStorageBackendSettings(InstantiableSettingsItem):
-    """Represents the LDP storage backend configuration settings."""
+    """Represent the LDP storage backend configuration settings."""
 
     _class_path: str = "ralph.backends.storage.ldp.LDPStorage"
 
@@ -123,7 +121,7 @@ class LDPStorageBackendSettings(InstantiableSettingsItem):
 
 
 class SWIFTStorageBackendSettings(InstantiableSettingsItem):
-    """Represents the SWIFT storage backend configuration settings."""
+    """Represent the SWIFT storage backend configuration settings."""
 
     _class_path: str = "ralph.backends.storage.swift.SwiftStorage"
 
@@ -140,7 +138,7 @@ class SWIFTStorageBackendSettings(InstantiableSettingsItem):
 
 
 class StorageBackendSettings(BaseModel):
-    """Represents storage backend configuration settings."""
+    """Represent storage backend configuration settings."""
 
     LDP: LDPStorageBackendSettings = LDPStorageBackendSettings()
     FS: FSStorageBackendSettings = FSStorageBackendSettings()
@@ -151,7 +149,7 @@ class StorageBackendSettings(BaseModel):
 
 
 class WSStreamBackendSettings(InstantiableSettingsItem):
-    """Represents the Websocket stream backend configuration settings."""
+    """Represent the Websocket stream backend configuration settings."""
 
     _class_path: str = "ralph.backends.stream.ws.WSStream"
 
@@ -159,7 +157,7 @@ class WSStreamBackendSettings(InstantiableSettingsItem):
 
 
 class StreamBackendSettings(BaseModel):
-    """Represents stream backend configuration settings."""
+    """Represent stream backend configuration settings."""
 
     WS: WSStreamBackendSettings = WSStreamBackendSettings()
 
@@ -168,7 +166,7 @@ class StreamBackendSettings(BaseModel):
 
 
 class BackendSettings(BaseModel):
-    """Represents backends configuration settings."""
+    """Represent backends configuration settings."""
 
     DATABASE: DatabaseBackendSettings = DatabaseBackendSettings()
     STORAGE: StorageBackendSettings = StorageBackendSettings()
@@ -179,26 +177,26 @@ class BackendSettings(BaseModel):
 
 
 class ESParserSettings(InstantiableSettingsItem):
-    """Represents the Elastisearch parser configuration settings."""
+    """Represent the Elastisearch parser configuration settings."""
 
     _class_path: str = "ralph.parsers.ElasticSearchParser"
 
 
 class GELFParserSettings(InstantiableSettingsItem):
-    """Represents the GELF parser configuration settings."""
+    """Represent the GELF parser configuration settings."""
 
     _class_path: str = "ralph.parsers.GELFParser"
 
 
 class ParserSettings(BaseModel):
-    """Represents parsers configuration settings."""
+    """Represent parsers configuration settings."""
 
     GELF: GELFParserSettings = GELFParserSettings()
     ES: ESParserSettings = ESParserSettings()
 
 
 class XapiForwardingConfigurationSettings(BaseModel):
-    """Represents an xAPI forwarding configuration item."""
+    """Represent an xAPI forwarding configuration item."""
 
     class Config:  # pylint: disable=missing-class-docstring
         min_anystr_length = 1
@@ -212,7 +210,7 @@ class XapiForwardingConfigurationSettings(BaseModel):
 
 
 class Settings(BaseSettings):
-    """Represents Ralph's global environment & configuration settings."""
+    """Represent Ralph's global environment & configuration settings."""
 
     class Config(BaseSettingsConfig):
         """Pydantic Configuration."""
@@ -269,14 +267,12 @@ class Settings(BaseSettings):
 
     @property
     def APP_DIR(self) -> Path:  # pylint: disable=invalid-name
-        """Returns the path to Ralph's configuration directory."""
-
+        """Return the path to Ralph's configuration directory."""
         return self._CORE.APP_DIR
 
     @property
     def LOCALE_ENCODING(self) -> str:  # pylint: disable=invalid-name
-        """Returns Ralph's default locale encoding."""
-
+        """Return Ralph's default locale encoding."""
         return self._CORE.LOCALE_ENCODING
 
 

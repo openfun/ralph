@@ -1,4 +1,4 @@
-"""API routes related to statements"""
+"""API routes related to statements."""
 
 import logging
 from datetime import datetime
@@ -171,7 +171,7 @@ async def get(
         ),
     ),
 ):
-    """Fetches a single xAPI Statement or multiple xAPI Statements.
+    """Fetch a single xAPI Statement or multiple xAPI Statements.
 
     LRS Specification:
     https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#213-get-statements
@@ -230,7 +230,7 @@ async def post(
     statements: Union[LaxStatement, list[LaxStatement]],
     background_tasks: BackgroundTasks,
 ):
-    """Stores a set of statements (or a single statement as a single member of a set).
+    """Store a set of statements (or a single statement as a single member of a set).
 
     NB: at this time, using POST to make a GET request, is not supported.
     LRS Specification:

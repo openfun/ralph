@@ -1,4 +1,4 @@
-"""Common xAPI result field definitions"""
+"""Common xAPI result field definitions."""
 
 from datetime import timedelta
 from decimal import Decimal
@@ -28,8 +28,7 @@ class ScoreResultField(BaseModelWithConfig):
     @root_validator
     @classmethod
     def check_raw_min_max_relation(cls, values):
-        """Checks the relationship `min < raw < max`."""
-
+        """Check the relationship `min < raw < max`."""
         raw_value = values.get("raw", None)
         min_value = values.get("min", None)
         max_value = values.get("max", None)

@@ -1,4 +1,4 @@
-"""Video xAPI events result fields definitions"""
+"""Video xAPI events result fields definitions."""
 
 from datetime import timedelta
 from typing import Literal, Optional

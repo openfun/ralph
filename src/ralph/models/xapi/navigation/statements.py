@@ -1,4 +1,4 @@
-"""Navigation xAPI event definitions"""
+"""Navigation xAPI event definitions."""
 
 from ...selector import selector
 from ..base import BaseXapiModel

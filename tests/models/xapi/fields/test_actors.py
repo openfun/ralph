@@ -1,4 +1,4 @@
-"""Tests for the xAPI actor fields"""
+"""Tests for the xAPI actor fields."""
 
 from ralph.models.xapi.fields.actors import AccountActorField
 

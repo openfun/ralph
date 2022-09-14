@@ -1,4 +1,4 @@
-"""Base database backend for Ralph"""
+"""Base database backend for Ralph."""
 
 import functools
 import logging
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 class BaseQuery(BaseModel):
-    """Base query model"""
+    """Base query model."""
 
     class Config:
         """Base query model configuration."""
@@ -63,7 +63,6 @@ def enforce_query_checks(method):
     @functools.wraps(method)
     def wrapper(*args, **kwargs):
         """Wrap method execution."""
-
         query = kwargs.pop("query", None)
         self_ = args[0]
 
@@ -79,8 +78,7 @@ class BaseDatabase(ABC):
     query_model = BaseQuery
 
     def validate_query(self, query: BaseQuery = None):
-        """Validate database query"""
-
+        """Validate database query."""
         if query is None:
             query = self.query_model()
 
@@ -97,7 +95,7 @@ class BaseDatabase(ABC):
     @abstractmethod
     @enforce_query_checks
     def get(self, query: BaseQuery = None, chunk_size: int = 10):
-        """Reads `chunk_size` records from the database query results and yields
+        """Read `chunk_size` records from the database query results and yields
         them.
         """
 
@@ -108,7 +106,7 @@ class BaseDatabase(ABC):
         chunk_size: int = 10,
         ignore_errors: bool = False,
     ) -> int:
-        """Writes `chunk_size` records from the `stream` to the database.
+        """Write `chunk_size` records from the `stream` to the database.
 
         Returns:
             int: The count of successfully written records.
@@ -116,8 +114,8 @@ class BaseDatabase(ABC):
 
     @abstractmethod
     def query_statements(self, params: StatementParameters) -> StatementQueryResult:
-        """Returns the statements query payload using xAPI parameters."""
+        """Return the statements query payload using xAPI parameters."""
 
     @abstractmethod
     def query_statements_by_ids(self, ids: list[str]) -> list:
-        """Returns the list of matching statement IDs from the database."""
+        """Return the list of matching statement IDs from the database."""

@@ -1,4 +1,4 @@
-"""Tests for the xAPI statements forwarding background task"""
+"""Tests for the xAPI statements forwarding background task."""
 
 import asyncio
 import json
@@ -152,10 +152,10 @@ def test_api_forwarding_forward_xapi_statements_with_successful_request(
 
         @staticmethod
         def raise_for_status():
-            """Does not raise any exceptions."""
+            """Do not raise any exceptions."""
 
     async def post_success(*args, **kwargs):  # pylint: disable=unused-argument
-        """Returns a MockSuccessfulResponse instance."""
+        """Return a MockSuccessfulResponse instance."""
 
         return MockSuccessfulResponse()
 
@@ -193,12 +193,11 @@ def test_api_forwarding_forward_xapi_statements_with_unsuccessful_request(
 
         @staticmethod
         def raise_for_status():
-            """Dummy raise_for_status method that is always raising an exception."""
-
+            """Fake raise_for_status method that is always raising an exception."""
             raise RequestError("Failure during request.")
 
     async def post_fail(*args, **kwargs):  # pylint: disable=unused-argument
-        """Returns a MockUnsuccessfulResponse instance."""
+        """Return a MockUnsuccessfulResponse instance."""
 
         return MockUnsuccessfulResponse()
 

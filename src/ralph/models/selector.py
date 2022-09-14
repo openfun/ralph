@@ -1,4 +1,4 @@
-"""Model selector definition"""
+"""Model selector definition."""
 
 from collections import Counter
 from dataclasses import dataclass
@@ -33,9 +33,9 @@ class Rule:
     value: Union[LazyModelField, Any]  # pylint: disable=unsubscriptable-object
 
     def check(self, event):
-        """Checks if event matches the rule.
+        """Check if event matches the rule.
 
-        Args:
+        Parameters:
             event (dict): The event to check.
         """
 
@@ -47,10 +47,10 @@ class Rule:
 
 
 class ModelRules(dict):
-    """Stores the list of rules for each model."""
+    """Store the list of rules for each model."""
 
     def __setitem__(self, new_model: Type[BaseModel], new_rules: list[Rule]):
-        """Inserts a new model with it's associated list of rules.
+        """Insert a new model with it's associated list of rules.
 
         Raises:
             ModelRulesException: When new_rules list is a subset or superset of
@@ -68,9 +68,9 @@ class ModelRules(dict):
 
 
 def selector(**filters):
-    """Returns a list of rules that should match in order to select an event.
+    """Return a list of rules that should match in order to select an event.
 
-    Args:
+    Parameters:
         **filters: Each keyword represents the path to a field, the corresponding
             value represents the value which the field should match.
             Example: `event_type="server"` will generate a Rule verifying that
@@ -89,14 +89,14 @@ class ModelSelector:
     """
 
     def __init__(self, module="ralph.models.edx"):
-        """Instantiates ModelSelector."""
+        """Instantiate ModelSelector."""
 
         self.model_rules = ModelSelector.build_model_rules(import_module(module))
         self.decision_tree = self.get_decision_tree(self.model_rules)
 
     @staticmethod
     def build_model_rules(module: ModuleType):
-        """Builds the model_rules dictionary from BaseModel classes defined
+        """Build the model_rules dictionary from BaseModel classes defined
         in the module.
         """
 
@@ -110,7 +110,7 @@ class ModelSelector:
         """Recursively walks through the decision tree to return the matching model
         for the event.
 
-        Args:
+        Parameters:
             event (dict): Event to retrieve the corresponding model.
             tree (dict): The (sub) decision tree, `None` stands for the whole decision
                          tree.

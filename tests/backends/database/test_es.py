@@ -398,7 +398,7 @@ def test_backends_database_es_query_statements_with_pit_query_failure(
     # pylint: disable=invalid-name,unused-argument
 
     def mock_open_point_in_time(**_):
-        """Mocks the Elasticsearch.open_point_in_time method."""
+        """Mock the Elasticsearch.open_point_in_time method."""
 
         raise ValueError("ES failure")
 
@@ -425,7 +425,7 @@ def test_backends_database_es_query_statements_with_search_query_failure(
     # pylint: disable=invalid-name,unused-argument
 
     def mock_search(**_):
-        """Mocks the Elasticsearch.search method."""
+        """Mock the Elasticsearch.search method."""
 
         raise ApiError("Something is wrong", ApiResponseMeta(*([None] * 5)), None)
 
@@ -452,7 +452,7 @@ def test_backends_database_es_query_statements_by_ids_with_search_query_failure(
     # pylint: disable=invalid-name,unused-argument
 
     def mock_search(**_):
-        """Mocks the Elasticsearch.search method."""
+        """Mock the Elasticsearch.search method."""
 
         raise ApiError("Something is wrong", ApiResponseMeta(*([None] * 5)), None)
 

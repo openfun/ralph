@@ -1,4 +1,4 @@
-"""Tests for the server event xAPI converter"""
+"""Tests for the server event xAPI converter."""
 
 import json
 from uuid import UUID, uuid5

@@ -1,4 +1,4 @@
-"""Base xAPI Converter"""
+"""Base xAPI Converter."""
 
 import re
 from uuid import UUID, uuid5
@@ -25,8 +25,7 @@ class BaseXapiConverter(BaseConversionSet):
     """
 
     def __init__(self, uuid_namespace: str, platform_url: str):
-        """Initializes BaseXapiConverter."""
-
+        """Initialize BaseXapiConverter."""
         self.platform_url = platform_url
         try:
             self.uuid_namespace = UUID(uuid_namespace)
@@ -35,8 +34,7 @@ class BaseXapiConverter(BaseConversionSet):
         super().__init__()
 
     def _get_conversion_items(self):
-        """Returns a set of ConversionItems used for conversion."""
-
+        """Return a set of ConversionItems used for conversion."""
         return {
             ConversionItem(
                 "id",
@@ -71,10 +69,9 @@ class BaseXapiConverter(BaseConversionSet):
 
     @staticmethod
     def parse_course_id(course_id: str):
-        """Returns a dictionary with `course` and `module` of edX event's
+        """Return a dictionary with `course` and `module` of edX event's
         `context.course_id`.
         """
-
         match = re.match(r"^course-v1:.+\+(.+)\+(.+)$", course_id)
         if not match:
             return {"course": None, "module": None}

@@ -1,4 +1,4 @@
-"""Tests for common xAPI fields"""
+"""Tests for common xAPI fields."""
 
 import pytest
 from pydantic import BaseModel, ValidationError

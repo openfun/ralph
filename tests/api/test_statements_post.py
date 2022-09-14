@@ -1,4 +1,4 @@
-"""Tests for the POST statements endpoint of the Ralph API"""
+"""Tests for the POST statements endpoint of the Ralph API."""
 
 import re
 from uuid import uuid4
@@ -266,7 +266,7 @@ def test_api_statements_post_statements_with_a_failure_during_storage(
     # pylint: disable=invalid-name,unused-argument, too-many-arguments
 
     def put_mock(*args, **kwargs):
-        """Raises an exception. Mocks the database.put method."""
+        """Raise an exception. Mocks the database.put method."""
 
         raise BackendException()
 
@@ -307,7 +307,7 @@ def test_api_statements_post_statements_with_a_failure_during_id_query(
     # pylint: disable=invalid-name,unused-argument,too-many-arguments
 
     def query_statements_by_ids_mock(*args, **kwargs):
-        """Raises an exception. Mocks the database.query_statements_by_ids method."""
+        """Raise an exception. Mocks the database.query_statements_by_ids method."""
 
         raise BackendException()
 
@@ -354,7 +354,7 @@ def test_post_statements_list_without_statement_forwarding(
     spy = {}
 
     def spy_mock_forward_xapi_statements(_):
-        """Mocks the forward_xapi_statements; spies over whether it has been called."""
+        """Mock the forward_xapi_statements; spies over whether it has been called."""
 
         spy["error"] = "forward_xapi_statements should not have been called!"
 

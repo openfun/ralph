@@ -1,4 +1,4 @@
-"""Navigational event field definition"""
+"""Navigational event field definition."""
 
 from pydantic import constr
 

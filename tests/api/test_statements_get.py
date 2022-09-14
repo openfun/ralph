@@ -1,4 +1,4 @@
-"""Tests for the GET statements endpoint of the Ralph API"""
+"""Tests for the GET statements endpoint of the Ralph API."""
 
 import re
 from datetime import datetime, timedelta
@@ -24,7 +24,7 @@ client = TestClient(app)
 
 
 def insert_es_statements(es_client, statements):
-    """Inserts a bunch of example statements into Elasticsearch for testing."""
+    """Insert a bunch of example statements into Elasticsearch for testing."""
 
     bulk(
         es_client,
@@ -42,7 +42,7 @@ def insert_es_statements(es_client, statements):
 
 
 def insert_mongo_statements(mongo_client, statements):
-    """Inserts a bunch of example statements into MongoDB for testing."""
+    """Insert a bunch of example statements into MongoDB for testing."""
 
     database = getattr(mongo_client, MONGO_TEST_DATABASE)
     collection = getattr(database, MONGO_TEST_COLLECTION)
@@ -55,7 +55,7 @@ def insert_statements_and_monkeypatch_backend(request, es, mongo, monkeypatch):
     # pylint: disable=invalid-name
 
     def _insert_statements_and_monkeypatch_backend(statements):
-        """Inserts statements once into Elasticsearch and once into MongoDB."""
+        """Insert statements once into Elasticsearch and once into MongoDB."""
 
         database_client_class_path = "ralph.api.routers.statements.DATABASE_CLIENT"
         if request.param == "mongo":
@@ -397,7 +397,7 @@ def test_api_statements_get_statements_with_database_query_failure(
     # pylint: disable=redefined-outer-name
 
     def mock_query_statements(*_):
-        """Mocks the DATABASE_CLIENT.query_statements method."""
+        """Mock the DATABASE_CLIENT.query_statements method."""
 
         raise BackendException()
 

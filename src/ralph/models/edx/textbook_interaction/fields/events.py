@@ -1,4 +1,4 @@
-"""Textbook interaction event fields definitions"""
+"""Textbook interaction event fields definitions."""
 
 from typing import Literal, Optional, Union
 

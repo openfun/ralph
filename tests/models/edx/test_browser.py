@@ -1,4 +1,4 @@
-"""Tests for the browser event models"""
+"""Tests for the browser event models."""
 
 import json
 import re

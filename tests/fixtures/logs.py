@@ -1,4 +1,4 @@
-"""Logs format pytest fixtures"""
+"""Logs format pytest fixtures."""
 
 import logging
 from secrets import token_hex
@@ -11,7 +11,6 @@ from logging_gelf.formatters import GELFFormatter
 @pytest.fixture
 def gelf_logger():
     """Generate a GELF logger to generate wrapped tracking log fixtures."""
-
     with NamedTemporaryFile(mode="w+", delete=False) as temp_file:
         handler = logging.StreamHandler(temp_file)
         handler.setLevel(logging.INFO)

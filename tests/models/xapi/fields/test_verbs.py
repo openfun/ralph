@@ -1,4 +1,4 @@
-"""Tests for the xAPI verb fields"""
+"""Tests for the xAPI verb fields."""
 
 import json
 

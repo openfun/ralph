@@ -1,4 +1,4 @@
-"""Tests for the models selector"""
+"""Tests for the models selector."""
 
 
 import pytest

@@ -1,4 +1,4 @@
-"""xAPI statement forwarding background task"""
+"""xAPI statement forwarding background task."""
 
 import logging
 from functools import lru_cache
@@ -12,8 +12,7 @@ logger = logging.getLogger(__name__)
 
 @lru_cache
 def get_active_xapi_forwardings() -> list[XapiForwardingConfigurationSettings]:
-    """Returns a list of active xAPI forwarding configuration settings."""
-
+    """Return a list of active xAPI forwarding configuration settings."""
     active_forwardings = []
     if not settings.XAPI_FORWARDINGS:
         logger.info("No xAPI forwarding configured; forwarding is disabled.")
@@ -33,8 +32,7 @@ def get_active_xapi_forwardings() -> list[XapiForwardingConfigurationSettings]:
 
 
 async def forward_xapi_statements(statements: list[dict]):
-    """Forwards xAPI statements."""
-
+    """Forward xAPI statements."""
     for forwarding in get_active_xapi_forwardings():
         transport = AsyncHTTPTransport(retries=forwarding.max_retries)
         async with AsyncClient(transport=transport) as client:

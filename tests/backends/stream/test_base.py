@@ -1,4 +1,4 @@
-"""Tests for Ralph base stream backend"""
+"""Tests for Ralph base stream backend."""
 
 from ralph.backends.stream.base import BaseStream
 

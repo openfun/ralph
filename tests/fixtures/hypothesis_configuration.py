@@ -1,4 +1,4 @@
-"""Hypothesis fixture configuration"""
+"""Hypothesis fixture configuration."""
 
 import operator
 
@@ -11,8 +11,7 @@ from ralph.models.xapi.fields.common import IRI, LanguageTag, MailtoEmail
 
 
 def is_base_model(klass):
-    """Returns True if the given class is a subclass of the pydantic BaseModel."""
-
+    """Return True if the given class is a subclass of the pydantic BaseModel."""
     try:
         return issubclass(klass, BaseModel)
     except TypeError:
@@ -20,8 +19,7 @@ def is_base_model(klass):
 
 
 def custom_resolve_json(cls):
-    """Returns a hypothesis build strategy for Json types."""
-
+    """Return a hypothesis build strategy for Json types."""
     if not is_base_model(getattr(cls, "inner_type", None)):
         return resolve_json(cls)
     return st.builds(cls.inner_type.json, st.from_type(cls.inner_type))

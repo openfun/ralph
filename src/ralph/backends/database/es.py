@@ -1,4 +1,4 @@
-"""Elasticsearch database backend for Ralph"""
+"""Elasticsearch database backend for Ralph."""
 
 import json
 import logging
@@ -51,9 +51,9 @@ class ESDatabase(BaseDatabase):
         client_options: dict = es_settings.CLIENT_OPTIONS,
         op_type: str = es_settings.OP_TYPE,
     ):
-        """Instantiates the Elasticsearch client.
+        """Instantiate the Elasticsearch client.
 
-        Args:
+        Parameters:
             hosts (list): List of Elasticsearch nodes we should connect to.
             index (str): The Elasticsearch index name.
             client_options (dict): A dictionary of valid options for the
@@ -75,7 +75,7 @@ class ESDatabase(BaseDatabase):
 
     @enforce_query_checks
     def get(self, query: ESQuery = None, chunk_size: int = 500):
-        """Gets index documents and yields them.
+        """Get index documents and yields them.
 
         The `query` dictionary should only contains kwargs compatible with the
         elasticsearch.helpers.scan function signature (API reference
@@ -91,7 +91,7 @@ class ESDatabase(BaseDatabase):
     def to_documents(
         self, stream: TextIO, get_id: Callable[[dict], str]
     ) -> Generator[dict, None, None]:
-        """Converts `stream` lines to ES documents."""
+        """Convert `stream` lines to ES documents."""
 
         for line in stream:
             item = json.loads(line) if isinstance(line, str) else line
@@ -109,7 +109,7 @@ class ESDatabase(BaseDatabase):
     def put(
         self, stream: TextIO, chunk_size: int = 500, ignore_errors: bool = False
     ) -> int:
-        """Writes documents from the `stream` to the instance index."""
+        """Write documents from the `stream` to the instance index."""
 
         logger.debug(
             "Start writing to the %s index (chunk size: %d)", self.index, chunk_size
@@ -134,7 +134,7 @@ class ESDatabase(BaseDatabase):
         return documents
 
     def query_statements(self, params: StatementParameters) -> StatementQueryResult:
-        """Returns the results of a statements query using xAPI parameters."""
+        """Return the results of a statements query using xAPI parameters."""
 
         es_query_filters = []
 
@@ -203,13 +203,13 @@ class ESDatabase(BaseDatabase):
         )
 
     def query_statements_by_ids(self, ids: list[str]) -> list:
-        """Returns the list of matching statement IDs from the database."""
+        """Return the list of matching statement IDs from the database."""
 
         body = {"query": {"terms": {"_id": ids}}}
         return self._search(index=self.index, body=body)["hits"]["hits"]
 
     def _search(self, **kwargs):
-        """Wraps the ElasticSearch.search method to raise a BackendException in case
+        """Wrap the ElasticSearch.search method to raise a BackendException in case
         of any failure.
         """
 
@@ -221,7 +221,7 @@ class ESDatabase(BaseDatabase):
             raise BackendException(msg, *error.args) from error
 
     def _open_point_in_time(self, **kwargs):
-        """Wraps the ElasticSearch.open_point_in_time method to raise a BackendException
+        """Wrap the ElasticSearch.open_point_in_time method to raise a BackendException
         in case of any failure.
         """
 

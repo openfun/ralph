@@ -1,4 +1,4 @@
-"""Video xAPI event definitions"""
+"""Video xAPI event definitions."""
 
 from ...selector import selector
 from ..base import BaseXapiModel

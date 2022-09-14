@@ -1,4 +1,4 @@
-"""Video event model definitions"""
+"""Video event model definitions."""
 
 from typing import Literal, Optional, Union
 

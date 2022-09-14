@@ -1,4 +1,4 @@
-"""Swift storage backend for Ralph"""
+"""Swift storage backend for Ralph."""
 
 import logging
 from functools import cached_property
@@ -39,7 +39,7 @@ class SwiftStorage(
         os_auth_url: str = swift_settings.OS_AUTH_URL,
         os_identity_api_version: str = swift_settings.OS_IDENTITY_API_VERSION,
     ):
-        """Prepares the options for the SwiftService."""
+        """Prepare the options for the SwiftService."""
 
         self.os_tenant_id = os_tenant_id
         self.os_tenant_name = os_tenant_name
@@ -62,8 +62,7 @@ class SwiftStorage(
 
     @cached_property
     def options(self):
-        """Returns the required options for the SwiftService."""
-
+        """Return the required options for the SwiftService."""
         return {
             "os_auth_url": self.os_auth_url,
             "os_identity_api_version": self.os_identity_api_version,
@@ -78,8 +77,7 @@ class SwiftStorage(
         }
 
     def list(self, details=False, new=False):
-        """Lists files in the storage backend."""
-
+        """List files in the storage backend."""
         archives_to_skip = set()
         if new:
             archives_to_skip = set(self.get_command_history(self.name, "fetch"))
@@ -95,13 +93,13 @@ class SwiftStorage(
                     yield archive if details else archive["name"]
 
     def url(self, name):
-        """Gets `name` file absolute URL."""
+        """Get `name` file absolute URL."""
 
         # What's the purpose of this function ? Seems not used anywhere.
         return f"{self.options.get('os_storage_url')}/{name}"
 
     def read(self, name, chunk_size=None):
-        """Reads `name` object and yields its content in chunks of (max) 2 ** 16.
+        """Read `name` object and yields its content in chunks of (max) 2 ** 16.
 
         Why chunks of (max) 2 ** 16 ?
             Because SwiftService opens a file to stream the object into:
@@ -137,7 +135,7 @@ class SwiftStorage(
         )
 
     def write(self, stream, name, overwrite=False):
-        """Writes data from `stream` to the `name` target in chunks of (max) 2 ** 16."""
+        """Write data from `stream` to the `name` target in chunks of (max) 2 ** 16."""
 
         if not overwrite and name in list(self.list()):
             msg = "%s already exists and overwrite is not allowed"

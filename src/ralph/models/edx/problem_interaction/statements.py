@@ -1,4 +1,4 @@
-"""Problem interaction events model definitions"""
+"""Problem interaction events model definitions."""
 
 from typing import Literal, Union
 

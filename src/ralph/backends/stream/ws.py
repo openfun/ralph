@@ -1,4 +1,4 @@
-"""Websocket stream backend for Ralph"""
+"""Websocket stream backend for Ralph."""
 
 import asyncio
 import logging
@@ -19,18 +19,16 @@ class WSStream(BaseStream):
     name = "ws"
 
     def __init__(self, uri: str = settings.BACKENDS.STREAM.WS.URI):
-        """Instantiates the websocket client.
+        """Instantiate the websocket client.
 
-        Args:
+        Parameters:
             uri (str): The URI to connect to.
         """
-
         self.uri = uri
 
     def stream(self, target: BinaryIO):
         """Streams websocket content to target."""
         # pylint: disable=no-member
-
         logger.debug("Streaming from websocket uri: %s", self.uri)
 
         async def _stream():

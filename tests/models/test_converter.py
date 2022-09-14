@@ -1,4 +1,4 @@
-"""Tests for converter method"""
+"""Tests for converter method."""
 
 import json
 import logging
@@ -116,7 +116,7 @@ def test_converter_convert_dict_event_with_empty_conversion_set(event):
         __dest__ = BaseModel
 
         def _get_conversion_items(self):  # pylint: disable=no-self-use
-            """Returns a set of ConversionItems used for conversion."""
+            """Return a set of ConversionItems used for conversion."""
 
             return set()
 
@@ -157,7 +157,7 @@ def test_converter_convert_dict_event_with_one_conversion_item(
         __dest__ = DummyBaseModel
 
         def _get_conversion_items(self):  # pylint: disable=no-self-use
-            """Returns a set of ConversionItems used for conversion."""
+            """Return a set of ConversionItems used for conversion."""
 
             return {ConversionItem("converted", source, transformer)}
 
@@ -177,7 +177,7 @@ def test_converter_convert_dict_event_with_one_conversion_item_raising_an_except
         __dest__ = BaseModel
 
         def _get_conversion_items(self):  # pylint: disable=no-self-use
-            """Returns a set of ConversionItems used for conversion."""
+            """Return a set of ConversionItems used for conversion."""
 
             return {item}
 
@@ -196,7 +196,7 @@ def test_converter_convert_str_event_with_invalid_json_string(invalid_json):
         __dest__ = BaseModel
 
         def _get_conversion_items(self):  # pylint: disable=no-self-use
-            """Returns a set of ConversionItems used for conversion."""
+            """Return a set of ConversionItems used for conversion."""
 
             return set()
 

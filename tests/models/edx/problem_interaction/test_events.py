@@ -1,4 +1,4 @@
-"""Tests for problem interaction models event fields"""
+"""Tests for problem interaction models event fields."""
 
 import json
 import re

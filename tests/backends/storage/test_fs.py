@@ -1,4 +1,4 @@
-"""Tests for Ralph fs storage backend"""
+"""Tests for Ralph fs storage backend."""
 
 from collections.abc import Iterable
 from pathlib import Path

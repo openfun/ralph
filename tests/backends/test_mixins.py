@@ -1,4 +1,4 @@
-"""Tests for ralph backends mixins"""
+"""Tests for ralph backends mixins."""
 
 import json
 import os.path

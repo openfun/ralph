@@ -31,7 +31,9 @@ def test_get_whoami_no_credentials():
 
 
 def test_get_whoami_credentials_wrong_scheme():
-    """Whoami route returns a 401 error when the wrong scheme is used for authorization."""
+    """Whoami route returns a 401 error when the wrong scheme is used for
+    authorization.
+    """
     response = client.get("/whoami", headers={"Authorization": "Bearer sometoken"})
     assert response.status_code == 401
     assert response.headers["www-authenticate"] == "Basic"
@@ -48,7 +50,9 @@ def test_get_whoami_credentials_encoding_error():
 
 # pylint: disable=invalid-name
 def test_get_whoami_credentials_username_not_found(fs):
-    """Whoami route returns a 401 error when the credentials' username cannot be found."""
+    """Whoami route returns a 401 error when the credentials' username cannot be
+    found.
+    """
     credential_bytes = base64.b64encode("john:admin".encode("utf-8"))
     credentials = str(credential_bytes, "utf-8")
 

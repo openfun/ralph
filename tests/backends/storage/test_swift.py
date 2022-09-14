@@ -1,4 +1,4 @@
-"""Tests for Ralph swift storage backend"""
+"""Tests for Ralph swift storage backend."""
 
 import datetime
 import json
@@ -15,7 +15,7 @@ from ralph.exceptions import BackendException, BackendParameterException
 def test_backends_storage_swift_storage_instantiation_failure_should_raise_exception(
     monkeypatch, swift, caplog
 ):
-    """Checks that SwiftStorage raises BackendParameterException on failure."""
+    """Check that SwiftStorage raises BackendParameterException on failure."""
 
     error = "Unauthorized. Check username/id"
 
@@ -35,7 +35,7 @@ def test_backends_storage_swift_storage_instantiation_failure_should_raise_excep
 def test_backends_storage_swift_storage_instantiation_should_not_raise_exception(
     monkeypatch, swift
 ):
-    """Checks that SwiftStorage doesn't raise exceptions when the connection is
+    """Check that SwiftStorage doesn't raise exceptions when the connection is
     successful.
     """
 
@@ -289,7 +289,7 @@ def test_backends_storage_swift_write_should_log_the_error(
 def test_backends_storage_url_should_concatenate_the_storage_url_and_name(
     swift, monkeypatch
 ):
-    """Checks the url method returns `os_storage_url/name`."""
+    """Check the url method returns `os_storage_url/name`."""
 
     def mock_successful_stat(*args, **kwargs):  # pylint:disable=unused-argument
         return {"success": True}

@@ -1,4 +1,4 @@
-"""Utilities for Ralph"""
+"""Utilities for Ralph."""
 
 import datetime
 import logging
@@ -32,8 +32,7 @@ def import_string(dotted_path):
 
 
 def get_backend_type(backends: BaseModel, backend_name: str):
-    """Returns the backend type from a backend name."""
-
+    """Return the backend type from a backend name."""
     backend_name = backend_name.upper()
     for _, backend_type in backends:
         if hasattr(backend_type, backend_name):
@@ -42,7 +41,7 @@ def get_backend_type(backends: BaseModel, backend_name: str):
 
 
 def get_backend_instance(backend_type: BaseModel, backend_name: str, options: dict):
-    """Returns the instantiated backend instance given backend-name-prefixed options."""
+    """Return the instantiated backend instance given backend-name-prefixed options."""
 
     prefix = f"{backend_name}_"
     # Filter backend-related parameters. Parameter name is supposed to start
@@ -53,8 +52,7 @@ def get_backend_instance(backend_type: BaseModel, backend_name: str, options: di
 
 
 def get_root_logger():
-    """Get main Ralph logger"""
-
+    """Get main Ralph logger."""
     ralph_logger = logging.getLogger("ralph")
     ralph_logger.propagate = True
 
@@ -62,13 +60,12 @@ def get_root_logger():
 
 
 def now():
-    """Return the current UTC time in ISO format"""
-
+    """Return the current UTC time in ISO format."""
     return datetime.datetime.now(tz=datetime.timezone.utc).isoformat()
 
 
 def get_dict_value_from_path(dict_: dict, path: list[str]):
-    """Gets a nested dictionary value using an array of keys representing the path
+    """Get a nested dictionary value using an array of keys representing the path
     to the value.
     """
 
@@ -81,7 +78,7 @@ def get_dict_value_from_path(dict_: dict, path: list[str]):
 
 
 def set_dict_value_from_path(dict_: dict, path: list[str], value: any):
-    """Sets a nested dictionary value using an array of keys representing the path
+    """Set a nested dictionary value using an array of keys representing the path
     to the value.
     """
 

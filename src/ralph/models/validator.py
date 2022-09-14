@@ -14,16 +14,14 @@ logger = logging.getLogger(__name__)
 
 
 class Validator:
-    """Validates events using pydantic models."""
+    """Validate events using pydantic models."""
 
     def __init__(self, model_selector: ModelSelector):
-        """Initializes Validator."""
-
+        """Initialize Validator."""
         self.model_selector = model_selector
 
     def validate(self, input_file: TextIO, ignore_errors: bool, fail_on_unknown: bool):
-        """Validates JSON event strings line by line."""
-
+        """Validate JSON event strings line by line."""
         total = 0
         success = 0
         for event_str in input_file:
@@ -48,7 +46,7 @@ class Validator:
         logger.info("Total events: %d, Invalid events: %d", total, total - success)
 
     def _validate_event(self, event_str: str):
-        """Validates a single JSON string event.
+        """Validate a single JSON string event.
 
         Raises:
             TypeError: When the event_str is not of type string.
@@ -59,7 +57,6 @@ class Validator:
         Returns:
             event_str (str): The cleaned JSON-formatted input event_str.
         """
-
         event = json.loads(event_str)
         return self.model_selector.get_model(event)(**event).json()
 

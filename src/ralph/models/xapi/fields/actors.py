@@ -1,4 +1,4 @@
-"""Common xAPI actor field definitions"""
+"""Common xAPI actor field definitions."""
 
 from typing import Literal, Optional, Union
 

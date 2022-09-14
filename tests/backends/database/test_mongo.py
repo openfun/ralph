@@ -1,4 +1,4 @@
-"""Tests for Ralph mongo database backend"""
+"""Tests for Ralph mongo database backend."""
 
 import logging
 from datetime import datetime
@@ -406,7 +406,7 @@ def test_backends_database_mongo_query_statements_with_search_query_failure(
     # pylint: disable=unused-argument
 
     def mock_find(**_):
-        """Mocks the MongoClient.collection.find method."""
+        """Mock the MongoClient.collection.find method."""
 
         raise PyMongoError("Something is wrong")
 
@@ -437,7 +437,7 @@ def test_backends_database_mongo_query_statements_by_ids_with_search_query_failu
     # pylint: disable=unused-argument
 
     def mock_find(**_):
-        """Mocks the MongoClient.collection.find method."""
+        """Mock the MongoClient.collection.find method."""
 
         raise ValueError("Something is wrong")
 

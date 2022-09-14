@@ -1,4 +1,4 @@
-"""Video xAPI events context fields definitions"""
+"""Video xAPI events context fields definitions."""
 
 from typing import Literal, Optional
 

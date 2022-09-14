@@ -1,4 +1,4 @@
-"""Tests for Ralph cli"""
+"""Tests for Ralph cli."""
 
 import json
 import logging
@@ -36,7 +36,6 @@ test_logger = logging.getLogger("ralph")
 
 def test_cli_comma_separated_key_value_param_type():
     """Tests the CommaSeparatedKeyValueParamType custom parameter type."""
-
     param_type = CommaSeparatedKeyValueParamType()
 
     # Bad options
@@ -399,9 +398,8 @@ def test_cli_fetch_command_with_ldp_backend(monkeypatch):
     archive_content = {"foo": "bar"}
 
     def mock_read(this, name, chunk_size=500):
-        """Always return the same archive."""
+        """Return the same archive everytime."""
         # pylint: disable=unused-argument
-
         yield bytes(json.dumps(archive_content), encoding="utf-8")
 
     monkeypatch.setattr(LDPStorage, "read", mock_read)
@@ -422,9 +420,8 @@ def test_cli_fetch_command_with_fs_backend(fs, monkeypatch):
     archive_content = {"foo": "bar"}
 
     def mock_read(this, name, chunk_size):
-        """Always return the same archive."""
+        """Return the same archive everytime."""
         # pylint: disable=unused-argument
-
         yield bytes(json.dumps(archive_content), encoding="utf-8")
 
     monkeypatch.setattr(FSStorage, "read", mock_read)
@@ -813,7 +810,7 @@ def test_cli_runserver_command_with_host_and_port_arguments(host_, port_, monkey
     """Tests the ralph runserver command should consider the host and port arguments."""
 
     def mock_uvicorn_run(_, host=None, port=None, **kwargs):
-        """Mocks uvicorn.run asserting host and port values."""
+        """Mock uvicorn.run asserting host and port values."""
 
         assert host == host_
         assert port == int(port_)
@@ -830,7 +827,7 @@ def test_cli_runserver_command_environment_file_generation(monkeypatch):
     """Tests the ralph runserver command should create the expected environment file."""
 
     def mock_uvicorn_run(_, env_file=None, **kwargs):
-        """Mocks uvicorn.run asserting environment file content."""
+        """Mock uvicorn.run asserting environment file content."""
 
         with open(env_file, mode="r", encoding=settings.LOCALE_ENCODING) as file:
             assert file.readlines() == [

@@ -1,4 +1,4 @@
-"""Tests for Ralph utils"""
+"""Tests for Ralph utils."""
 
 import pytest
 from pydantic import BaseModel
@@ -60,7 +60,7 @@ def test_utils_get_backend_instance(options, expected):
         foo: str = "foo"  # pylint: disable=disallowed-name
 
         def get_instance(self, **init_parameters):  # pylint: disable=no-self-use
-            """Returns the init_parameters."""
+            """Return the init_parameters."""
 
             return init_parameters
 

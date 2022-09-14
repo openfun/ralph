@@ -24,7 +24,7 @@ class BaseModelWithLaxConfig(BaseModel):
     """
 
     class Config:
-        """Enable extra properties so we do not have to perform comprehensive 
+        """Enable extra properties so we do not have to perform comprehensive
         validation.
         """
 

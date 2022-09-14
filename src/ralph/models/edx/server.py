@@ -1,4 +1,4 @@
-"""Server event model definitions"""
+"""Server event model definitions."""
 
 from pathlib import Path
 from typing import Literal, Union

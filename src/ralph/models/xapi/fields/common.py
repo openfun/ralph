@@ -1,4 +1,4 @@
-"""Common xAPI field definitions"""
+"""Common xAPI field definitions."""
 
 from langcodes import tag_is_valid
 from pydantic import StrictStr, validate_email
@@ -11,8 +11,7 @@ class IRI(str):
     @classmethod
     def __get_validators__(cls):
         def validate(iri: str):
-            """Checks whether the provided IRI is a valid RFC 3987 IRI."""
-
+            """Check whether the provided IRI is a valid RFC 3987 IRI."""
             parse(iri, rule="IRI")
             return cls(iri)
 
@@ -25,8 +24,7 @@ class LanguageTag(str):
     @classmethod
     def __get_validators__(cls):
         def validate(tag: str):
-            """Checks whether the provided tag is a valid RFC 5646 Language tag."""
-
+            """Check whether the provided tag is a valid RFC 5646 Language tag."""
             if not tag_is_valid(tag):
                 raise TypeError("Invalid RFC 5646 Language tag")
             return cls(tag)
@@ -45,8 +43,7 @@ class MailtoEmail(str):
     @classmethod
     def __get_validators__(cls):
         def validate(mailto: str):
-            """Checks whether the provided value follows the `mailto:email` format."""
-
+            """Check whether the provided value follows the `mailto:email` format."""
             if not mailto.startswith("mailto:"):
                 raise TypeError("Invalid `mailto:email` value")
             valid = validate_email(mailto[7:])

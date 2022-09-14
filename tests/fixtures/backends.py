@@ -1,4 +1,4 @@
-"""Test fixtures for backends"""
+"""Test fixtures for backends."""
 
 import asyncio
 import json
@@ -62,15 +62,13 @@ WS_TEST_PORT = 8765
 
 @lru_cache
 def get_es_test_backend():
-    """Returns a ESDatabase backend instance using test defaults."""
-
+    """Return a ESDatabase backend instance using test defaults."""
     return ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX)
 
 
 @lru_cache
 def get_mongo_test_backend():
-    """Returns a MongoDatabase backend instance using test defaults."""
-
+    """Return a MongoDatabase backend instance using test defaults."""
     return MongoDatabase(
         connection_uri=MONGO_TEST_CONNECTION_URI,
         database=MONGO_TEST_DATABASE,
@@ -98,10 +96,9 @@ class NamedClassEnum(Enum):
 
 
 def get_es_fixture(host=ES_TEST_HOSTS, index=ES_TEST_INDEX):
-    """Creates / deletes an ElasticSearch test index and yields an instantiated
+    """Create / deletes an ElasticSearch test index and yields an instantiated
     client.
     """
-
     client = Elasticsearch(host)
     try:
         client.indices.create(index=index)
@@ -115,17 +112,15 @@ def get_es_fixture(host=ES_TEST_HOSTS, index=ES_TEST_INDEX):
 
 @pytest.fixture
 def es():
-    """Yields an ElasticSearch test client. See get_es_fixture above."""
+    """Yield an ElasticSearch test client. See get_es_fixture above."""
     # pylint: disable=invalid-name
-
     for es_client in get_es_fixture():
         yield es_client
 
 
 @pytest.fixture
 def es_forwarding():
-    """Yields a second ElasticSearch test client. See get_es_fixture above."""
-
+    """Yield a second ElasticSearch test client. See get_es_fixture above."""
     for es_client in get_es_fixture(index=ES_TEST_FORWARDING_INDEX):
         yield es_client
 
@@ -135,10 +130,9 @@ def get_mongo_fixture(
     database=MONGO_TEST_DATABASE,
     collection=MONGO_TEST_COLLECTION,
 ):
-    """Creates / deletes a Mongo test database + collection and yields an
+    """Create / deletes a Mongo test database + collection and yields an
     instantiated client.
     """
-
     client = MongoClient(connection_uri)
     database = getattr(client, database)
     try:
@@ -154,26 +148,23 @@ def get_mongo_fixture(
 
 @pytest.fixture
 def mongo():
-    """Yields a Mongo test client. See get_mongo_fixture above."""
-
+    """Yield a Mongo test client. See get_mongo_fixture above."""
     for mongo_client in get_mongo_fixture():
         yield mongo_client
 
 
 @pytest.fixture
 def mongo_forwarding():
-    """Yields a second Mongo test client. See get_mongo_fixture above."""
-
+    """Yield a second Mongo test client. See get_mongo_fixture above."""
     for mongo_client in get_mongo_fixture(collection=MONGO_TEST_FORWARDING_COLLECTION):
         yield mongo_client
 
 
 @pytest.fixture
 def es_data_stream():
-    """Creates / deletes an ElasticSearch test datastream and yields an instantiated
+    """Create / deletes an ElasticSearch test datastream and yields an instantiated
     client.
     """
-
     client = Elasticsearch(ES_TEST_HOSTS)
 
     # Create statements index template with enabled data stream
@@ -224,11 +215,10 @@ def es_data_stream():
 
 @pytest.fixture
 def swift():
-    """Returns get_swift_storage function."""
+    """Return get_swift_storage function."""
 
     def get_swift_storage():
-        """Returns an instance of SwiftStorage."""
-
+        """Return an instance of SwiftStorage."""
         return SwiftStorage(
             os_tenant_id="os_tenant_id",
             os_tenant_name="os_tenant_name",
@@ -243,15 +233,14 @@ def swift():
 
 @pytest.fixture
 def events():
-    """Returns test events fixture."""
+    """Return test events fixture."""
     return [{"id": idx} for idx in range(10)]
 
 
 @pytest.fixture
 def ws(events):
-    """Returns a websocket server instance."""
+    """Return a websocket server instance."""
     # pylint: disable=invalid-name,redefined-outer-name
-
     async def forward(websocket, path):
         """Stupid test server that sends events."""
         # pylint: disable=unused-argument
@@ -270,9 +259,8 @@ def ws(events):
 
 @pytest.fixture
 def lrs():
-    """Returns a context manager that runs ralph's lrs server."""
+    """Return a context manager that runs ralph's lrs server."""
     # pylint: disable=invalid-name,redefined-outer-name
-
     @asynccontextmanager
     async def runserver(app, host=RUNSERVER_TEST_HOST, port=RUNSERVER_TEST_PORT):
         process = Process(

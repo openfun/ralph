@@ -32,7 +32,7 @@ class AuthenticatedUser(BaseModel):
 @lru_cache()
 def get_stored_credentials(auth_file):
     """
-    Helper to read the credentials/scopes file to JSON and memoize it so we do not
+    Retrieve credentials/scopes file to JSON and memorize it so we do not
     reload it with every request.
     """
     try:

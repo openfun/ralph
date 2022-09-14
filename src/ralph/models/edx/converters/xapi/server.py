@@ -1,4 +1,4 @@
-"""Server event xAPI Converter"""
+"""Server event xAPI Converter."""
 
 from ralph.models.converter import ConversionItem
 from ralph.models.edx.server import Server
@@ -8,7 +8,7 @@ from .base import BaseXapiConverter
 
 
 class ServerEventToPageViewed(BaseXapiConverter):
-    """Converts a common edX server event to xAPI.
+    """Convert a common edX server event to xAPI.
 
     Example Statement: John viewed https://www.fun-mooc.fr/ page.
     """
@@ -17,7 +17,7 @@ class ServerEventToPageViewed(BaseXapiConverter):
     __dest__ = PageViewed
 
     def _get_conversion_items(self):
-        """Returns a set of ConversionItems used for conversion."""
+        """Return a set of ConversionItems used for conversion."""
 
         conversion_items = super()._get_conversion_items()
         return conversion_items.union(

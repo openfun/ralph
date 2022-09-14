@@ -1,4 +1,4 @@
-"""Tests for the base xAPI Converter"""
+"""Tests for the base xAPI Converter."""
 
 from uuid import UUID
 
@@ -18,7 +18,7 @@ def test_base_xapi_converter_successful_initialization(
         """Dummy implementation of abstract BaseXapiConverter."""
 
         def _get_conversion_items(self):  # pylint: disable=no-self-use
-            """Returns a set of ConversionItems used for conversion."""
+            """Return a set of ConversionItems used for conversion."""
 
             return set()
 
@@ -34,7 +34,7 @@ def test_base_xapi_converter_unsuccessful_initialization():
         """Dummy implementation of abstract BaseXapiConverter."""
 
         def _get_conversion_items(self):  # pylint: disable=no-self-use
-            """Returns a set of ConversionItems used for conversion."""
+            """Return a set of ConversionItems used for conversion."""
 
             return set()
 

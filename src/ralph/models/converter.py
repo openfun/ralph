@@ -1,4 +1,4 @@
-"""Converter methods definition"""
+"""Converter methods definition."""
 
 import json
 import logging
@@ -35,9 +35,9 @@ class ConversionItem:
     raw_input: bool
 
     def __init__(self, dest: str, src=None, transformers=lambda _: _, raw_input=False):
-        """Initializes ConversionItem.
+        """Initialize ConversionItem.
 
-        Args:
+        Parameters:
             dest (str): The destination path where to place the converted value.
             src (str or None): The source from where the value to convert is fetched.
                 - When `src` is a path (ex. `context__user_id`) - the value is the item
@@ -48,7 +48,6 @@ class ConversionItem:
             raw_input (bool): Flag indicating whether `get_value` will receive a raw
                 event string or a parsed event dictionary.
         """
-
         object.__setattr__(self, "dest", tuple(dest.split(MODEL_PATH_SEPARATOR)))
         src = tuple(src.split(MODEL_PATH_SEPARATOR)) if src else None
         object.__setattr__(self, "src", src)
@@ -57,15 +56,14 @@ class ConversionItem:
         object.__setattr__(self, "raw_input", raw_input)
 
     def get_value(self, data: Union[dict, str]):
-        """Returns fetched source value after having applied all transformers to it.
+        """Return fetched source value after having applied all transformers to it.
 
-        Args:
+        Parameters:
             data (dict or string): The event to convert.
 
         Raises:
             ConversionException: When a field transformation fails.
         """
-
         if self.src:
             data = get_dict_value_from_path(data, self.src)
         try:
@@ -87,13 +85,12 @@ class BaseConversionSet(ABC):
     __dest__: BaseModel
 
     def __init__(self):
-        """Initializes BaseConversionSet."""
-
+        """Initialize BaseConversionSet."""
         self._conversion_items = self._get_conversion_items()
 
     @abstractmethod
     def _get_conversion_items(self) -> set[ConversionItem]:
-        """Returns a set of ConversionItems used for conversion."""
+        """Return a set of ConversionItems used for conversion."""
 
     def __iter__(self):
         return iter(self._conversion_items)
@@ -102,10 +99,10 @@ class BaseConversionSet(ABC):
 def convert_dict_event(
     event: dict, event_str: str, conversion_set: BaseConversionSet
 ) -> BaseModel:
-    """Converts the event dictionary using the provided original event string and
+    """Convert the event dictionary using the provided original event string and
     conversion_set.
 
-    Args:
+    Parameters:
         event (dict): The event to convert.
         event_str (dict): The original event string.
         conversion_set (BaseConversionSet): A conversion set used for conversion.
@@ -117,7 +114,6 @@ def convert_dict_event(
         ConversionException: When a field transformation fails.
         ValidationError: When the final converted event is invalid.
     """
-
     converted_event = {}
     for conversion_item in conversion_set:
         data = event_str if conversion_item.raw_input else event
@@ -129,9 +125,9 @@ def convert_dict_event(
 
 
 def convert_str_event(event_str: str, conversion_set: BaseConversionSet) -> BaseModel:
-    """Converts the event string using the provided conversion_set.
+    """Convert the event string using the provided conversion_set.
 
-    Args:
+    Parameters:
         event_str (str): The event to convert.
         conversion_set (BaseConversionSet): A conversion set used for conversion.
 
@@ -143,7 +139,6 @@ def convert_str_event(event_str: str, conversion_set: BaseConversionSet) -> Base
         ConversionException: When a field transformation fails.
         ValidationError: When the converted event is invalid.
     """
-
     try:
         event = json.loads(event_str)
     except (TypeError, json.JSONDecodeError) as err:
@@ -153,7 +148,7 @@ def convert_str_event(event_str: str, conversion_set: BaseConversionSet) -> Base
 
 
 class Converter:
-    """Converts events using pydantic models."""
+    """Convert events using pydantic models."""
 
     def __init__(
         self,
@@ -161,8 +156,7 @@ class Converter:
         module="ralph.models.edx.converters.xapi",
         **conversion_set_kwargs,
     ):
-        """Initializes the Converter."""
-
+        """Initialize the Converter."""
         self.model_selector = model_selector
         self.src_conversion_set = self.get_src_conversion_set(
             import_module(module), **conversion_set_kwargs
@@ -170,8 +164,7 @@ class Converter:
 
     @staticmethod
     def get_src_conversion_set(module: ModuleType, **conversion_set_kwargs):
-        """Returns a dictionary of initialized conversion_sets defined in the module."""
-
+        """Return a dictionary of initialized conversion_sets defined in the module."""
         src_conversion_set = {}
         for _, class_ in getmembers(module, isclass):
             if issubclass(class_, BaseConversionSet):
@@ -179,8 +172,7 @@ class Converter:
         return src_conversion_set
 
     def convert(self, input_file: TextIO, ignore_errors: bool, fail_on_unknown: bool):
-        """Converts JSON event strings line by line."""
-
+        """Convert JSON event strings line by line."""
         total = 0
         success = 0
         for event_str in input_file:
@@ -211,9 +203,9 @@ class Converter:
         logger.info("Total events: %d, Invalid events: %d", total, total - success)
 
     def _convert_event(self, event_str: str):
-        """Converts a single JSON string event.
+        """Convert a single JSON string event.
 
-        Args:
+        Parameters:
             event_str (str): The event to convert.
 
         Returns:
@@ -228,7 +220,6 @@ class Converter:
             ConversionException: When a field transformation fails.
             ValidationError: When the final converted event is invalid.
         """
-
         event = json.loads(event_str)
         model = self.model_selector.get_model(event)
         conversion_set = self.src_conversion_set.get(model, None)

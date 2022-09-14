@@ -14,9 +14,9 @@ class BaseParser(ABC):
 
     @abstractmethod
     def parse(self, input_file):
-        """Parses GELF formatted logs (one JSON string event per row).
+        """Parse GELF formatted logs (one JSON string event per row).
 
-        Args:
+        Parameters:
             input_file (file-like): The log file to parse.
 
         Yields:
@@ -34,9 +34,9 @@ class GELFParser(BaseParser):
     name = "gelf"
 
     def parse(self, input_file):
-        """Parses GELF formatted logs (one JSON string event per row).
+        """Parse GELF formatted logs (one JSON string event per row).
 
-        Args:
+        Parameters:
             input_file (file-like): The log file to parse.
 
         Yields:
@@ -67,9 +67,9 @@ class ElasticSearchParser(BaseParser):
     name = "es"
 
     def parse(self, input_file):
-        """Parses Elasticsearch JSON documents.
+        """Parse Elasticsearch JSON documents.
 
-        Args:
+        Parameters:
             input_file (file-like): The file containing Elasticsearch JSON documents.
 
         Yields:

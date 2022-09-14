@@ -1,4 +1,4 @@
-"""MongoDB database backend for Ralph"""
+"""MongoDB database backend for Ralph."""
 
 import hashlib
 import json
@@ -46,9 +46,9 @@ class MongoDatabase(BaseDatabase):
         collection: str = mongo_settings.COLLECTION,
         client_options: dict = mongo_settings.CLIENT_OPTIONS,
     ):
-        """Instantiates the Mongo client.
+        """Instantiate the Mongo client.
 
-        Args:
+        Parameters:
             connection_uri (str): MongoDB connection URI.
             database (str): MongoDB database to connect to.
             collection (str): MongoDB database collection to get objects from.
@@ -64,13 +64,12 @@ class MongoDatabase(BaseDatabase):
 
     @enforce_query_checks
     def get(self, query: MongoQuery = None, chunk_size: int = 500):
-        """Gets collection documents and yields them.
+        """Get collection documents and yields them.
 
         The `query` dictionary should only contain kwargs compatible with the
         pymongo.collection.Collection.find method signature (API reference
         documentation: https://pymongo.readthedocs.io/en/stable/api/pymongo/).
         """
-
         for document in self.collection.find(batch_size=chunk_size, **query.dict()):
             # Make the document json-serializable
             document.update({"_id": str(document.get("_id"))})
@@ -80,13 +79,12 @@ class MongoDatabase(BaseDatabase):
     def to_documents(
         stream: Union[TextIO, list], ignore_errors: bool = False
     ) -> Generator[dict, None, None]:
-        """Converts `stream` lines (one statement per line) to Mongo documents.
+        """Convert `stream` lines (one statement per line) to Mongo documents.
 
         We expect statements to have at least an `id` and a `timestamp` field that will
         be used to compute a unique MongoDB Object ID. This ensures that we will not
         duplicate statements in our database and allows us to support pagination.
         """
-
         for line in stream:
             statement = json.loads(line) if isinstance(line, str) else line
             if "id" not in statement:
@@ -124,8 +122,7 @@ class MongoDatabase(BaseDatabase):
             yield document
 
     def bulk_import(self, batch: list, ignore_errors: bool = False):
-        """Inserts a batch of documents into the selected database collection."""
-
+        """Insert a batch of documents into the selected database collection."""
         try:
             new_documents = self.collection.insert_many(batch)
         except BulkWriteError as error:
@@ -150,8 +147,7 @@ class MongoDatabase(BaseDatabase):
         chunk_size: int = 500,
         ignore_errors: bool = False,
     ) -> int:
-        """Writes documents from the `stream` to the instance collection."""
-
+        """Write documents from the `stream` to the instance collection."""
         logger.debug(
             "Start writing to the %s collection of the %s database (chunk size: %d)",
             self.collection,
@@ -179,8 +175,7 @@ class MongoDatabase(BaseDatabase):
         return success
 
     def query_statements(self, params: StatementParameters) -> StatementQueryResult:
-        """Returns the results of a statements query using xAPI parameters."""
-
+        """Return the results of a statements query using xAPI parameters."""
         mongo_query_filters = {}
 
         if params.statementId:
@@ -232,15 +227,13 @@ class MongoDatabase(BaseDatabase):
         )
 
     def query_statements_by_ids(self, ids: list[str]) -> list:
-        """Returns the list of matching statement IDs from the database."""
-
+        """Return the list of matching statement IDs from the database."""
         return self._find(filter={"_source.id": {"$in": ids}})
 
     def _find(self, **kwargs):
-        """Wraps the MongoClient.collection.find method to raise a BackendException in
+        """Wrap the MongoClient.collection.find method to raise a BackendException in
         case of any failure.
         """
-
         try:
             return list(self.collection.find(**kwargs))
         except (PyMongoError, IndexError, TypeError, ValueError) as error:

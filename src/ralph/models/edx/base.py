@@ -1,4 +1,4 @@
-"""Base event model definitions"""
+"""Base event model definitions."""
 
 from datetime import datetime
 from ipaddress import IPv4Address

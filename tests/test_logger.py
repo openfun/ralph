@@ -1,4 +1,4 @@
-"""Tests for the ralph.logger module"""
+"""Tests for the ralph.logger module."""
 
 import pytest
 from click.testing import CliRunner
