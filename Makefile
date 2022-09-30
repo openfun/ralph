@@ -125,6 +125,13 @@ run-es: ## start elasticsearch backend
 	@$(COMPOSE_RUN) dockerize -wait tcp://elasticsearch:9200 -timeout 60s
 .PHONY: run-es
 
+run-lrs: ## run LRS server with the runserver backend (development mode)
+run-lrs: \
+	run-es \
+	run-mongo
+	@$(COMPOSE) up -d app
+.PHONY: run-lrs
+
 run-mongo: ## start mongodb backend
 	@$(COMPOSE) up -d mongo
 	@echo "Waiting for mongo to be up and running..."
