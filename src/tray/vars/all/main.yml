@@ -28,3 +28,17 @@ ralph_mount_es_ca_secret: false
 #               --backend es \
 #               --es-client-options ca_certs=/usr/local/share/ca-certificates/es-cluster.pem"
 ralph_cronjobs: []
+
+# LRS
+ralph_lrs_host: "lrs.{{ namespace_name }}.{{ domain_name }}"
+ralph_lrs_port: 8000
+ralph_lrs_command:
+  - uvicorn
+  - "ralph.api:app"
+  - "--proxy-headers"
+  - "--host"
+  - "0.0.0.0"
+  - "--port"
+  - "8000"
+ralph_lrs_auth_secret_name: "ralph-lrs-auth-{{ ralph_vault_checksum | default('undefined_ralph_vault_checksum') }}"
+ralph_ingress_class_name: "{{ default_ingress_class_name }}"

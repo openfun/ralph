@@ -21,6 +21,7 @@ and this project adheres to
 - Implement support for xAPI statement forwarding
 - Add database backends `status` checking
 - Add `health` LRS router
+- Tray: add LRS server support
 
 ### Changed
 

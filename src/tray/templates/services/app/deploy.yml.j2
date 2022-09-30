@@ -4,7 +4,9 @@ metadata:
   labels:
     app: ralph
     service: app
-  name: "ralph-app"
+    version: "{{ ralph_image_tag }}"
+    deployment_stamp: "{{ deployment_stamp }}"
+  name: "ralph-app-{{ deployment_stamp }}"
   namespace: "{{ namespace_name }}"
 spec:
   replicas: {{ ralph_app_replicas }}
@@ -12,13 +14,17 @@ spec:
     matchLabels:
       app: ralph
       service: app
-      deployment: "ralph-app"
+      version: "{{ ralph_image_tag }}"
+      deployment: "ralph-app-{{ deployment_stamp }}"
+      deployment_stamp: "{{ deployment_stamp }}"
   template:
     metadata:
       labels:
         app: ralph
         service: app
-        deployment: "ralph-app"
+        version: "{{ ralph_image_tag }}"
+        deployment: "ralph-app-{{ deployment_stamp }}"
+        deployment_stamp: "{{ deployment_stamp }}"
     spec:
       # Prefer running pods on different nodes for redundancy
       affinity:
@@ -31,7 +37,7 @@ spec:
                     - key: deployment
                       operator: In
                       values:
-                        - "ralph-app"
+                        - "ralph-app-{{ deployment_stamp }}"
                 topologyKey: kubernetes.io/hostname
 {% set image_pull_secret_name = ralph_image_pull_secret_name | default(default_image_pull_secret_name) %}
 {% if image_pull_secret_name | length %}
@@ -42,10 +48,30 @@ spec:
         - name: ralph
           image: "{{ ralph_image_name }}:{{ ralph_image_tag }}"
           imagePullPolicy: Always
-          command: {{ ralph_app_command }}
+          command: {{ ralph_lrs_command }}
+          livenessProbe:
+            httpGet:
+              path: /__heartbeat__
+              port: {{ ralph_lrs_port }}
+              httpHeaders:
+                - name: Host
+                  value: "{{ ralph_lrs_host }}"
+            initialDelaySeconds: 15
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /__lbheartbeat__
+              port: {{ ralph_lrs_port }}
+              httpHeaders:
+                - name: Host
+                  value: "{{ ralph_lrs_host }}"
+            initialDelaySeconds: 5
+            periodSeconds: 5
           env:
             - name: RALPH_APP_DIR
               value: "/app/.ralph"
+            - name: RALPH_AUTH_FILE
+              value: "/var/run/ralph/auth.json"
           envFrom:
             - secretRef:
                 name: "{{ ralph_secret_name }}"
@@ -56,6 +82,8 @@ spec:
             - name: es-ca-certificate
               mountPath: /usr/local/share/ca-certificates/
 {% endif %}
+            - name: lrs-auth
+              mountPath: /var/run/ralph/
       volumes:
         - name: ralph-v-history
           persistentVolumeClaim:
@@ -65,6 +93,9 @@ spec:
           secret:
             secretName: "{{ ralph_es_ca_secret_name }}"
 {% endif %}
+        - name: lrs-auth
+          secret:
+            secretName: "{{ ralph_lrs_auth_secret_name }}"
       securityContext:
         runAsUser: {{ container_uid }}
         runAsGroup: {{ container_gid }}
