@@ -4,10 +4,11 @@ Main module for Ralph's LRS API.
 from fastapi import Depends, FastAPI
 
 from .auth import AuthenticatedUser, authenticated_user
-from .routers import statements
+from .routers import health, statements
 
 app = FastAPI()
 app.include_router(statements.router)
+app.include_router(health.router)
 
 
 @app.get("/whoami")

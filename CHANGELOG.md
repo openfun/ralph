@@ -20,6 +20,7 @@ and this project adheres to
 - Add support for database selection when running the Ralph LRS server
 - Implement support for xAPI statement forwarding
 - Add database backends `status` checking
+- Add `health` LRS router
 
 ### Changed
 
