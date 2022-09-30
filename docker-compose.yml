@@ -15,6 +15,13 @@ services:
       PYLINTHOME: /app/.pylint.d
     ports:
       - "${RALPH_RUNSERVER_PORT:-8100}:${RALPH_RUNSERVER_PORT:-8100}"
+    command:
+      - ralph
+      - "-v"
+      - DEBUG
+      - runserver
+      - "-b"
+      - "${RALPH_RUNSERVER_BACKEND:-es}"
     volumes:
       - .:/app
 
