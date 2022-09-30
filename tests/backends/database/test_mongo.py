@@ -8,7 +8,7 @@ from bson.objectid import ObjectId
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 
-from ralph.backends.database.base import StatementParameters
+from ralph.backends.database.base import DatabaseStatus, StatementParameters
 from ralph.backends.database.mongo import MongoDatabase, MongoQuery
 from ralph.exceptions import (
     BackendException,
@@ -491,3 +491,19 @@ def test_backends_database_mongo_query_statements_by_ids_with_multiple_collectio
     assert backend_1.query_statements_by_ids(["2"]) == []
     assert backend_2.query_statements_by_ids(["1"]) == []
     assert backend_2.query_statements_by_ids(["2"]) == collection_2_document
+
+
+def test_backends_database_mongo_status(mongo):
+    """Test the Mongo status method.
+
+    As pymongo is monkeypatching the MongoDB client to add admin object, it's
+    barely untestable. 😢
+    """
+    # pylint: disable=unused-argument
+
+    database = MongoDatabase(
+        connection_uri=MONGO_TEST_CONNECTION_URI,
+        database=MONGO_TEST_DATABASE,
+        collection=MONGO_TEST_COLLECTION,
+    )
+    assert database.status() == DatabaseStatus.OK

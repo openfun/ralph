@@ -19,6 +19,7 @@ and this project adheres to
 - Add `host` and `port` options for the `runserver` cli command
 - Add support for database selection when running the Ralph LRS server
 - Implement support for xAPI statement forwarding
+- Add database backends `status` checking
 
 ### Changed
 

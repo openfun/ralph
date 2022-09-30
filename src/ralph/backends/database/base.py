@@ -5,6 +5,7 @@ import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
+from enum import Enum, unique
 from typing import BinaryIO, Literal, Optional, TextIO, Union
 from uuid import UUID
 
@@ -31,6 +32,15 @@ class StatementQueryResult:
     statements: list[dict]
     pit_id: str
     search_after: str
+
+
+@unique
+class DatabaseStatus(Enum):
+    """Database statuses"""
+
+    OK = "ok"
+    AWAY = "away"
+    ERROR = "error"
 
 
 @dataclass
@@ -93,6 +103,10 @@ class BaseDatabase(ABC):
         logger.debug("Query: %s", str(query))
 
         return query
+
+    @abstractmethod
+    def status(self) -> DatabaseStatus:
+        """Implements database checks (e.g. connection, cluster status)."""
 
     @abstractmethod
     @enforce_query_checks
