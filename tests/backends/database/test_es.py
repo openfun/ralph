@@ -11,10 +11,13 @@ from pathlib import Path
 
 import pytest
 from elastic_transport import ApiResponseMeta
-from elasticsearch import ApiError, Elasticsearch
+from elasticsearch import ApiError
+from elasticsearch import ConnectionError as ESConnectionError
+from elasticsearch import Elasticsearch
+from elasticsearch.client import CatClient
 from elasticsearch.helpers import bulk
 
-from ralph.backends.database.base import StatementParameters
+from ralph.backends.database.base import DatabaseStatus, StatementParameters
 from ralph.backends.database.es import ESDatabase, ESQuery
 from ralph.conf import settings
 from ralph.exceptions import BackendException, BackendParameterException
@@ -503,3 +506,39 @@ def test_backends_database_es_query_statements_by_ids_with_multiple_indexes(
     assert database.query_statements_by_ids(["2"]) == []
     assert database_2.query_statements_by_ids(["1"]) == []
     assert database_2.query_statements_by_ids(["2"]) == [index_2_document]
+
+
+def test_backends_database_es_status(es, monkeypatch):
+    """Test the ES status method."""
+    # pylint: disable=invalid-name,unused-argument
+
+    database = ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX)
+
+    with monkeypatch.context() as mkpch:
+        mkpch.setattr(
+            CatClient,
+            "health",
+            lambda client: (
+                "1664532320 10:05:20 docker-cluster green 1 1 2 2 0 0 1 0 - 66.7%"
+            ),
+        )
+        assert database.status() == DatabaseStatus.OK
+
+    with monkeypatch.context() as mkpch:
+        mkpch.setattr(
+            CatClient,
+            "health",
+            lambda client: (
+                "1664532320 10:05:20 docker-cluster yellow 1 1 2 2 0 0 1 0 - 66.7%"
+            ),
+        )
+        assert database.status() == DatabaseStatus.ERROR
+
+    with monkeypatch.context() as mkpch:
+
+        def mock_connection_error(*args, **kwargs):
+            """ES client info mock that raises a connection error."""
+            raise ESConnectionError("Mocked connection error")
+
+        mkpch.setattr(Elasticsearch, "info", mock_connection_error)
+        assert database.status() == DatabaseStatus.AWAY

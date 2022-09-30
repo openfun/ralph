@@ -9,7 +9,7 @@ from typing import Generator, Optional, TextIO, Union
 from bson.objectid import ObjectId
 from dateutil.parser import isoparse
 from pymongo import ASCENDING, DESCENDING, MongoClient
-from pymongo.errors import BulkWriteError, PyMongoError
+from pymongo.errors import BulkWriteError, ConnectionFailure, PyMongoError
 
 from ralph.conf import settings
 from ralph.exceptions import BackendException, BadFormatException
@@ -17,6 +17,7 @@ from ralph.exceptions import BackendException, BadFormatException
 from .base import (
     BaseDatabase,
     BaseQuery,
+    DatabaseStatus,
     StatementParameters,
     StatementQueryResult,
     enforce_query_checks,
@@ -61,6 +62,21 @@ class MongoDatabase(BaseDatabase):
         self.client = MongoClient(connection_uri, **client_options)
         self.database = getattr(self.client, database)
         self.collection = getattr(self.database, collection)
+
+    def status(self) -> DatabaseStatus:
+        """Checks MongoDB cluster connection status."""
+
+        # Check Mongo cluster connection
+        try:
+            self.client.admin.command("ping")
+        except ConnectionFailure:
+            return DatabaseStatus.AWAY
+
+        # Check cluster status
+        if self.client.admin.command("serverStatus").get("ok", 0.0) < 1.0:
+            return DatabaseStatus.ERROR
+
+        return DatabaseStatus.OK
 
     @enforce_query_checks
     def get(self, query: MongoQuery = None, chunk_size: int = 500):

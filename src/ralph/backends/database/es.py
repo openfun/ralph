@@ -5,7 +5,10 @@ import logging
 from enum import Enum
 from typing import Callable, Generator, Optional, TextIO
 
-from elasticsearch import ApiError, Elasticsearch
+from elasticsearch import ApiError
+from elasticsearch import ConnectionError as ESConnectionError
+from elasticsearch import Elasticsearch
+from elasticsearch.client import CatClient
 from elasticsearch.helpers import BulkIndexError, scan, streaming_bulk
 
 from ralph.conf import settings
@@ -14,6 +17,7 @@ from ralph.exceptions import BackendException, BackendParameterException
 from .base import (
     BaseDatabase,
     BaseQuery,
+    DatabaseStatus,
     StatementParameters,
     StatementQueryResult,
     enforce_query_checks,
@@ -72,6 +76,21 @@ class ESDatabase(BaseDatabase):
                 f"{op_type} is not an allowed operation type"
             )
         self.op_type = op_type
+
+    def status(self) -> DatabaseStatus:
+        """Checks Elasticsearch cluster (connection) status."""
+
+        # Check ES cluster connection
+        try:
+            self.client.info()
+        except ESConnectionError:
+            return DatabaseStatus.AWAY
+
+        # Check cluster status
+        if "green" not in CatClient(self.client).health():
+            return DatabaseStatus.ERROR
+
+        return DatabaseStatus.OK
 
     @enforce_query_checks
     def get(self, query: ESQuery = None, chunk_size: int = 500):
