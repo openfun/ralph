@@ -205,10 +205,11 @@ jobs:
   # ---- Tray jobs (k8s) ----
   tray:
     machine:
-      image: ubuntu-2004:202201-02
+      image: ubuntu-2004:2022.07.1
       # Prevent cache-related issues
       docker_layer_caching: false
     working_directory: ~/fun
+    resource_class: large
     steps:
       - checkout
       - *generate-version-file
@@ -225,18 +226,16 @@ jobs:
       - run:
           name: Install the kubectl client and k3d
           command: |
-            export KUBECTL_RELEASE="v1.23.5"
+            export KUBECTL_RELEASE="v1.25.2"
             curl -Lo "${HOME}/bin/kubectl" "https://dl.k8s.io/release/${KUBECTL_RELEASE}/bin/linux/amd64/kubectl"
             curl -Lo /tmp/kubectl.sha256 "https://dl.k8s.io/${KUBECTL_RELEASE}/bin/linux/amd64/kubectl.sha256"
             echo "$(</tmp/kubectl.sha256) ${HOME}/bin/kubectl" | sha256sum --check
             chmod 755 "${HOME}/bin/kubectl"
 
-            export K3D_RELEASE="v4.4.8"
+            export K3D_RELEASE="v5.4.6"
             curl -Lo "${HOME}/bin/k3d" "https://github.com/k3d-io/k3d/releases/download/${K3D_RELEASE}/k3d-linux-amd64"
-            curl -sL https://github.com/k3d-io/k3d/releases/download/${K3D_RELEASE}/sha256sum.txt | \
-              grep _dist/k3d-linux-amd64 | \
-              sed "s|_dist/k3d-linux-amd64|${HOME}/bin/k3d|" | \
-              sha256sum --check
+            # FIXME
+            # Removed checksum checking: https://github.com/k3d-io/k3d/discussions/1037
             chmod 755 "${HOME}/bin/k3d"
 
       - run:
@@ -279,12 +278,14 @@ jobs:
           command: |
             arnold -c ralph -e ci setup
             arnold -d -c ralph -e ci -a ralph create_app_vaults
+            arnold -d -c ralph -e ci -a elasticsearch create_app_vaults
             arnold -d -c ralph -e ci -- vault -a ralph decrypt
             sed -i 's/^# RALPH_/RALPH_/g' group_vars/customer/ralph/ci/secrets/ralph.vault.yml
             arnold -d -c ralph -e ci -- vault -a ralph encrypt
             VARS_FILE="group_vars/customer/ralph/ci/main.yml"
             echo "skip_verification: True" > ${VARS_FILE}
             echo "apps:" >> ${VARS_FILE}
+            echo "  - name: elasticsearch" >> ${VARS_FILE}
             echo "  - name: ralph" >> ${VARS_FILE}
             echo "ralph_image_name: ${K3D_REGISTRY_NAME}:${K3D_REGISTRY_PORT}/ci-ralph/ralph" >> ${VARS_FILE}
             echo "ralph_image_tag: ${CIRCLE_SHA1}" >> ${VARS_FILE}
@@ -303,10 +304,16 @@ jobs:
       - run:
           name: Bootstrap ralph application
           command: |
-            arnold -d -c ralph -e ci -a ralph init
+            arnold -d -c ralph -e ci -a elasticsearch,ralph init
+            arnold -d -c ralph -e ci -a elasticsearch deploy
+            kubectl -n ci-ralph wait --for=condition=ready pod --selector=type=es-node --timeout=120s
+            kubectl -n ci-ralph exec svc/elasticsearch -- curl -s -X PUT "localhost:9200/statements?pretty"
             arnold -d -c ralph -e ci -a ralph deploy
+            arnold -d -c ralph -e ci -a ralph switch
             kubectl -n ci-ralph get pods -l app=ralph | grep Running
             test $(kubectl -n ci-ralph get cj -o name ralph-ci-test | wc -l) -eq 1
+            curl -sLk $(kubectl -n ci-ralph get ingress/ralph-app-current --output=jsonpath="{.spec.rules[0].host}")/__heartbeat__ | \
+              grep '"database":"ok"'
 
   # ---- Packaging jobs ----
   package:

@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ralph
+    service: app
+    version: "{{ ralph_image_tag }}"
+    deployment_stamp: "{{ deployment_stamp }}"
+  name: ralph-app-{{ deployment_stamp }}  # name of the service should be host name in nginx
+  namespace: "{{ namespace_name }}"
+spec:
+  ports:
+  - name: {{ ralph_lrs_port }}-tcp
+    port: {{ ralph_lrs_port }}
+    protocol: TCP
+    targetPort: {{ ralph_lrs_port }}
+  selector:
+    app: ralph
+    deployment: "ralph-app-{{ deployment_stamp }}"
+  type: ClusterIP

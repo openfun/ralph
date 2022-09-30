@@ -1,35 +1,9 @@
 # customer: {{ customer }}
 # env_type: {{ env_type }}
 
-# LDP storage backend
-#
-# You need to generate an API token for your OVH's account and fill the service
-# name and stream id you are targetting.
-
-# RALPH_LDP_ENDPOINT:
-# RALPH_LDP_APPLICATION_KEY:
-# RALPH_LDP_APPLICATION_SECRET:
-# RALPH_LDP_CONSUMER_KEY:
-# RALPH_LDP_SERVICE_NAME:
-# RALPH_LDP_STREAM_ID:
-
-# Swift storage backend
-
-# RALPH_SWIFT_OS_AUTH_URL:
-# RALPH_SWIFT_OS_IDENTITY_API_VERSION:
-# RALPH_SWIFT_OS_USER_DOMAIN_NAME:
-# RALPH_SWIFT_OS_PROJECT_DOMAIN_NAME:
-# RALPH_SWIFT_OS_TENANT_ID:
-# RALPH_SWIFT_OS_TENANT_NAME:
-# RALPH_SWIFT_OS_USERNAME:
-# RALPH_SWIFT_OS_PASSWORD:
-# RALPH_SWIFT_OS_REGION_NAME:
-# RALPH_SWIFT_OS_STORAGE_URL:
-
 # ES database backend
-
-# RALPH_ES_HOSTS: http://elasticsearch:9200
-# RALPH_ES_INDEX: statements
+# RALPH_BACKENDS__DATABASE__ES__HOSTS: http://elasticsearch:9200
+# RALPH_BACKENDS__DATABASE__ES__INDEX: statements
 
 # If you have self-generated a CA certificate for your ES cluster nodes, you may
 # also need this CA certificate to check certificates while requesting the
@@ -38,6 +12,28 @@
 #
 # We expect this certificate to be pasted in PEM format
 # ES_CA_CERTIFICATE:
+
+# LRS
+
+# Authentication
+#
+# For each entry, we expect the following keys:
+#
+#   - username (str)
+#   - hash (str)
+#   - scopes (list)
+#
+# Example:
+#
+# LRS_AUTH:
+#   - username: "foo"
+#     hash: "thehash"
+#     scopes:
+#       - "foo_scope"
+#
+# For more information about hash generation, see Ralph's documentation:
+# https://openfun.github.io/ralph/api/#creating_a_credentials_file
+LRS_AUTH: []
 
 # Sentry
 
