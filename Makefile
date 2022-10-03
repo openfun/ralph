@@ -1,3 +1,6 @@
+# -- General
+SHELL := /bin/bash
+
 # -- Docker
 # Get the current user ID to use for docker run and docker exec commands
 DOCKER_UID           = $(shell id -u)
@@ -16,15 +19,77 @@ ES_PORT     = 9200
 ES_INDEX    = statements
 ES_URL      = $(ES_PROTOCOL)://$(ES_HOST):$(ES_PORT)
 
+# -- Arnold
+ARNOLD             = ARNOLD_IMAGE_TAG=6.13.0 bin/arnold
+ARNOLD_CUSTOMER    = ralph
+ARNOLD_ENVIRONMENT = development
+ARNOLD_APP         = ralph
+ARNOLD_APP_VARS    = group_vars/customer/$(ARNOLD_CUSTOMER)/$(ARNOLD_ENVIRONMENT)/main.yml
+
+# -- RALPH
+RALPH_IMAGE_NAME ?= ralph
+RALPH_IMAGE_TAG  ?= development
+
+# -- K3D
+K3D_CLUSTER_NAME              ?= ralph
+K3D_REGISTRY_HOST             ?= registry.127.0.0.1.nip.io
+K3D_REGISTRY_NAME             ?= k3d-registry.127.0.0.1.nip.io
+K3D_REGISTRY_PORT             ?= 5000
+K3D_REGISTRY_RALPH_IMAGE_NAME  = $(K3D_REGISTRY_NAME):$(K3D_REGISTRY_PORT)/$(ARNOLD_ENVIRONMENT)-$(ARNOLD_APP)/$(RALPH_IMAGE_NAME)
+
 # ==============================================================================
 # RULES
 
 default: help
 
+bin/arnold:
+	curl -Lo "bin/arnold" "https://raw.githubusercontent.com/openfun/arnold/master/bin/arnold"
+	chmod +x bin/arnold
+
+bin/init-cluster:
+	curl -Lo "bin/init-cluster" "https://raw.githubusercontent.com/openfun/arnold/master/bin/init-cluster"
+	chmod +x bin/init-cluster
+
 .env:
 	cp .env.dist .env
 
 # -- Docker/compose
+arnold-bootstrap: ## bootstrap arnold's project
+arnold-bootstrap: \
+	bin/arnold
+	$(ARNOLD) -c $(ARNOLD_CUSTOMER) -e $(ARNOLD_ENVIRONMENT) setup
+	$(ARNOLD) -d -c $(ARNOLD_CUSTOMER) -e $(ARNOLD_ENVIRONMENT) -a $(ARNOLD_APP) create_app_vaults
+	$(ARNOLD) -d -c $(ARNOLD_CUSTOMER) -e $(ARNOLD_ENVIRONMENT) -a elasticsearch create_app_vaults
+	$(ARNOLD) -d -c $(ARNOLD_CUSTOMER) -e $(ARNOLD_ENVIRONMENT) -- vault -a $(ARNOLD_APP) decrypt
+	sed -i 's/^# RALPH_BACKENDS__DATABASE__ES/RALPH_BACKENDS__DATABASE__ES/g' group_vars/customer/$(ARNOLD_CUSTOMER)/$(ARNOLD_ENVIRONMENT)/secrets/$(ARNOLD_APP).vault.yml
+	$(ARNOLD) -d -c $(ARNOLD_CUSTOMER) -e $(ARNOLD_ENVIRONMENT) -- vault -a $(ARNOLD_APP) encrypt
+	echo "skip_verification: True" > $(ARNOLD_APP_VARS)
+	echo "apps:" >> $(ARNOLD_APP_VARS)
+	echo "  - name: elasticsearch" >> $(ARNOLD_APP_VARS)
+	echo "  - name: $(ARNOLD_APP)" >> $(ARNOLD_APP_VARS)
+	echo "ralph_image_name: $(K3D_REGISTRY_RALPH_IMAGE_NAME)" >> $(ARNOLD_APP_VARS)
+	echo "ralph_image_tag: $(RALPH_IMAGE_TAG)" >> $(ARNOLD_APP_VARS)
+	echo "ralph_app_replicas: 1" >> $(ARNOLD_APP_VARS)
+	echo "ralph_cronjobs:" >> $(ARNOLD_APP_VARS)
+	echo "  - name: $(ARNOLD_ENVIRONMENT)-test" >> $(ARNOLD_APP_VARS)
+	echo "    schedule: '* * * * *'" >> $(ARNOLD_APP_VARS)
+	echo "    command: ['date']" >> $(ARNOLD_APP_VARS)
+.PHONY: arnold-bootstrap
+
+arnold-deploy: ## deploy Ralph to k3d using Arnold
+	source .k3d-cluster.env.sh && \
+		$(ARNOLD) -d -c $(ARNOLD_CUSTOMER) -e $(ARNOLD_ENVIRONMENT) -a $(ARNOLD_APP) deploy && \
+		$(ARNOLD) -d -c $(ARNOLD_CUSTOMER) -e $(ARNOLD_ENVIRONMENT) -a $(ARNOLD_APP) switch
+.PHONY: arnold-deploy
+
+arnold-init: ## initialize Ralph k3d project using Arnold
+arnold-init:
+	source .k3d-cluster.env.sh && \
+		$(ARNOLD) -d -c $(ARNOLD_CUSTOMER) -e $(ARNOLD_ENVIRONMENT) -a elasticsearch,ralph init && \
+		$(ARNOLD) -d -c $(ARNOLD_CUSTOMER) -e $(ARNOLD_ENVIRONMENT) -a elasticsearch deploy && \
+		kubectl exec svc/elasticsearch -- curl -s -X PUT "localhost:9200/statements?pretty"
+.PHONY: arnold-deploy
+
 bootstrap: ## bootstrap the project for development
 bootstrap: \
   .env \
@@ -32,6 +97,7 @@ bootstrap: \
   dev \
   es-index
 .PHONY: bootstrap
+
 build: ## build the app container
 	@$(COMPOSE) build app
 .PHONY: build
@@ -61,11 +127,33 @@ down: ## stop and remove backend containers
 	@$(COMPOSE) down
 .PHONY: down
 
-es-index:  ## create elasticsearch index and sample documents
+es-index: ## create elasticsearch index and sample documents
 es-index: run-es
 	@echo "Creating $(ES_INDEX) index"
 	bin/es index $(ES_INDEX)
 .PHONY: es-index
+
+k3d-cluster: ## boot a k3d cluster for k8s-related development
+k3d-cluster: \
+	bin/init-cluster
+	source .k3d-cluster.env.sh && \
+		bin/init-cluster "$(K3D_CLUSTER_NAME)"
+.PHONY: k3d-cluster
+
+k3d-push: ## push build image to local k3d docker registry
+k3d-push: build
+	source .k3d-cluster.env.sh && \
+		docker tag \
+			$(RALPH_IMAGE_NAME):$(RALPH_IMAGE_TAG) \
+			"$(K3D_REGISTRY_RALPH_IMAGE_NAME):$(RALPH_IMAGE_TAG)" && \
+		docker push \
+			"$(K3D_REGISTRY_RALPH_IMAGE_NAME):$(RALPH_IMAGE_TAG)"
+.PHONY: k3d-push
+
+k3d-stop: ## stop local k8s cluster
+	source .k3d-cluster.env.sh && \
+		k3d cluster stop "$(K3D_CLUSTER_NAME)"
+.PHONY: k3d-stop
 
 # Nota bene: Black should come after isort just in case they don't agree...
 lint: ## lint back-end python sources

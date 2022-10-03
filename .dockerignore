@@ -48,3 +48,4 @@ data
 .team
 group_vars
 src/tray
+k3d-storage

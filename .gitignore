@@ -54,9 +54,12 @@ data/
 site/
 
 # Arnold environment
+bin/arnold
+bin/init-cluster
 bin/vault_password
 .team
 group_vars/
+k3d-storage/
 
 # hypothesis
 .hypothesis/
