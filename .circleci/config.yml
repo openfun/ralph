@@ -113,7 +113,10 @@ jobs:
       # collisions in parallel builds.
       - run:
           name: Build production image
-          command: docker build -t ralph:${CIRCLE_SHA1} --target production .
+          command: |
+            RALPH_IMAGE_BUILD_TARGET=production \
+            RALPH_IMAGE_TAG=${CIRCLE_SHA1} \
+              make build
       - run:
           name: Check built image availability
           command: docker images "ralph:${CIRCLE_SHA1}*"
@@ -216,14 +219,6 @@ jobs:
       - *docker-login
 
       - run:
-          name: Build production image
-          command: docker build -t "ralph:${CIRCLE_SHA1}" --target production .
-
-      - run:
-          name: Check built images availability
-          command: docker images "ralph:${CIRCLE_SHA1}*"
-
-      - run:
           name: Install the kubectl client and k3d
           command: |
             export KUBECTL_RELEASE="v1.25.2"
@@ -247,71 +242,37 @@ jobs:
       - run:
           name: Run local k3d cluster & configure environment
           command: |
-            curl -Lo "${HOME}/bin/init-cluster" "https://raw.githubusercontent.com/openfun/arnold/master/bin/init-cluster"
-            chmod +x "${HOME}/bin/init-cluster"
-            # Bootstrap the k3d cluster with the following specific settings :
-            # - use standard HTTP and HTTPS ports
-            # - pre-provision 15 volumes instead of 100
-            MINIMUM_AVAILABLE_RWX_VOLUME=15 \
-            K3D_BIND_HOST_PORT_HTTP=80 \
-            K3D_BIND_HOST_PORT_HTTPS=443 \
-            K3D_REGISTRY_HOST=registry.127.0.0.1.nip.io \
-            K3D_ENABLE_REGISTRY=1 \
-              init-cluster arnold
-            # Set environment variables for the CI
-            echo "export K8S_DOMAIN=$(hostname -I | awk '{print $1}')" >> $BASH_ENV
-            echo 'export ARNOLD_DEFAULT_VAULT_PASSWORD="arnold"' >> $BASH_ENV
-            echo 'export ANSIBLE_VAULT_PASSWORD="${ARNOLD_DEFAULT_VAULT_PASSWORD}"' >> $BASH_ENV
-            echo "export ARNOLD_IMAGE_TAG=master" >> $BASH_ENV
-            echo "export K3D_REGISTRY_NAME=k3d-registry.127.0.0.1.nip.io" >> $BASH_ENV
-            echo "export K3D_REGISTRY_PORT=5000" >> $BASH_ENV
+            make k3d-cluster
+            echo "export ARNOLD_ENVIRONMENT=ci" >> $BASH_ENV
+            echo "export RALPH_IMAGE_TAG=${CIRCLE_SHA1}" >> $BASH_ENV
             source $BASH_ENV
 
       - run:
-          name: Install arnold CLI
-          command: |
-            curl -Lo"${HOME}/bin/arnold" "https://raw.githubusercontent.com/openfun/arnold/master/bin/arnold"
-            chmod +x "${HOME}/bin/arnold"
-
-      - run:
           name: Setup a new Arnold project
-          command: |
-            arnold -c ralph -e ci setup
-            arnold -d -c ralph -e ci -a ralph create_app_vaults
-            arnold -d -c ralph -e ci -a elasticsearch create_app_vaults
-            arnold -d -c ralph -e ci -- vault -a ralph decrypt
-            sed -i 's/^# RALPH_/RALPH_/g' group_vars/customer/ralph/ci/secrets/ralph.vault.yml
-            arnold -d -c ralph -e ci -- vault -a ralph encrypt
-            VARS_FILE="group_vars/customer/ralph/ci/main.yml"
-            echo "skip_verification: True" > ${VARS_FILE}
-            echo "apps:" >> ${VARS_FILE}
-            echo "  - name: elasticsearch" >> ${VARS_FILE}
-            echo "  - name: ralph" >> ${VARS_FILE}
-            echo "ralph_image_name: ${K3D_REGISTRY_NAME}:${K3D_REGISTRY_PORT}/ci-ralph/ralph" >> ${VARS_FILE}
-            echo "ralph_image_tag: ${CIRCLE_SHA1}" >> ${VARS_FILE}
-            echo "ralph_app_replicas: 1" >> ${VARS_FILE}
-            echo "ralph_cronjobs:" >> ${VARS_FILE}
-            echo "  - name: ci-test" >> ${VARS_FILE}
-            echo "    schedule: '* * * * *'" >> ${VARS_FILE}
-            echo "    command: ['date']" >> ${VARS_FILE}
+          command: make arnold-bootstrap
 
       - run:
-          name: Push ralph image to the k8s cluster docker registry
+          name: Build production image and publish it to the k8s cluster docker registry
           command: |
-            docker tag ralph:${CIRCLE_SHA1} "${K3D_REGISTRY_NAME}:${K3D_REGISTRY_PORT}/ci-ralph/ralph:${CIRCLE_SHA1}"
-            docker push "${K3D_REGISTRY_NAME}:${K3D_REGISTRY_PORT}/ci-ralph/ralph:${CIRCLE_SHA1}"
+            RALPH_IMAGE_BUILD_TARGET=production \
+            RALPH_IMAGE_TAG=${CIRCLE_SHA1} \
+              make k3d-push
+
+      - run:
+          name: Check built images availability
+          command: docker images "ralph:*"
 
       - run:
           name: Bootstrap ralph application
           command: |
-            arnold -d -c ralph -e ci -a elasticsearch,ralph init
-            arnold -d -c ralph -e ci -a elasticsearch deploy
-            kubectl -n ci-ralph wait --for=condition=ready pod --selector=type=es-node --timeout=120s
-            kubectl -n ci-ralph exec svc/elasticsearch -- curl -s -X PUT "localhost:9200/statements?pretty"
-            arnold -d -c ralph -e ci -a ralph deploy
-            arnold -d -c ralph -e ci -a ralph switch
-            kubectl -n ci-ralph get pods -l app=ralph | grep Running
+            make arnold-init
+            make arnold-deploy
+
+            # Test the deployment/switch
+            kubectl -n ci-ralph wait --for=condition=ready pod --selector=app=ralph,service=app,type=server --timeout=120s
+            # Test cronjobs
             test $(kubectl -n ci-ralph get cj -o name ralph-ci-test | wc -l) -eq 1
+            # Test the LRS server health
             curl -sLk $(kubectl -n ci-ralph get ingress/ralph-app-current --output=jsonpath="{.spec.rules[0].host}")/__heartbeat__ | \
               grep '"database":"ok"'
 
@@ -385,10 +346,13 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
       - run:
-          name: Build production image (using cached layers)
-          command: docker build -t ralph:${CIRCLE_SHA1} --target production .
+          name: Build production image
+          command: |
+            RALPH_IMAGE_BUILD_TARGET=production \
+            RALPH_IMAGE_TAG=${CIRCLE_SHA1} \
+              make build
       - run:
-          name: Check built images availability
+          name: Check built image availability
           command: docker images "ralph:${CIRCLE_SHA1}*"
       # Tag docker images with the same pattern used in Git (Semantic Versioning)
       #

@@ -14,6 +14,7 @@ spec:
     matchLabels:
       app: ralph
       service: app
+      type: server
       version: "{{ ralph_image_tag }}"
       deployment: "ralph-app-{{ deployment_stamp }}"
       deployment_stamp: "{{ deployment_stamp }}"
@@ -22,6 +23,7 @@ spec:
       labels:
         app: ralph
         service: app
+        type: server
         version: "{{ ralph_image_tag }}"
         deployment: "ralph-app-{{ deployment_stamp }}"
         deployment_stamp: "{{ deployment_stamp }}"
