@@ -26,7 +26,7 @@ RUN apt-get update && \
         python-dev && \
     rm -rf /var/lib/apt/lists/*
 
-RUN python setup.py install
+RUN pip install .[backend-es,backend-ldp,backend-mongo,backend-swift,backend-ws,cli,lrs]
 
 
 # -- Core --

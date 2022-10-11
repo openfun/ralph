@@ -4,10 +4,18 @@ import io
 from pathlib import Path
 from typing import Literal, Union
 
-from click import get_app_dir
+try:
+    from click import get_app_dir
+except ImportError:
+    # If we use Ralph as a library and Click is not installed, we consider the
+    # application directory to be the current directory. For non-CLI usage, it
+    # has no consequences.
+    from unittest.mock import Mock
+
+    get_app_dir = Mock(return_value=".")
 from pydantic import AnyUrl, BaseModel, BaseSettings
 
-from ralph.utils import import_string
+from .utils import import_string
 
 MODEL_PATH_SEPARATOR = "__"
 
