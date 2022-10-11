@@ -11,6 +11,7 @@ items:
       labels:
         app: ralph
         service: app
+        type: job
         version: "{{ ralph_image_tag }}"
     spec:
       schedule: "{{ cronjob.schedule }}"
@@ -26,6 +27,7 @@ items:
               labels:
                 app: ralph
                 service: app
+                type: job
                 version: "{{ ralph_image_tag }}"
             spec:
               containers:
