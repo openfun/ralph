@@ -39,14 +39,26 @@ Ralph package can be installed from PyPI using the `pip` tool:
 $ python3.9 -m venv venv
 $ source venv/bin/activate
 
-# Install the package (in a virtualenv)
-(venv) $ pip install ralph-malph
+# Install the full package (in a virtualenv)
+(venv) $ pip install ralph-malph[backend-es,backend-ldp,backend-mongo,backend-swift,backend-ws,cli,lrs]
+
+# Install only the core package with the Elasticsearch backend and the LRS (in a virtualenv)
+(venv) $ pip install ralph-malph[backend-es,lrs]
 
 # Test the ralph command (it should be in your PATH)
 (venv) $ ralph --help
 ```
 
-Alternatively, Docker users can pull the latest ralph image and start playing
+If you only need to integrate `ralph` models in your project, you don't need to
+install the `backends`, `cli` or `lrs` extra dependencies, the core package is
+what you need:
+
+```sh
+# Install the core library (in a virtualenv)
+(venv) $ pip install ralph-malph
+```
+
+Alternatively, Docker users can pull the latest `ralph` image and start playing
 with it:
 
 ```sh

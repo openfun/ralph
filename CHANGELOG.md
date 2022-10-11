@@ -26,15 +26,12 @@ and this project adheres to
 ### Changed
 
 - Migrate to `python-legacy` handler for `mkdocstrings` package
-- Upgrade `bclick` to `3.2.2`
 - Upgrade `click` to `8.1.3`
 - Upgrade `elasticsearch` to `8.3.3`
 - Upgrade `fastapi` to `0.79.1`
-- Upgrade `Jinja2` to `3.1.2`
 - Upgrade `ovh` to `1.0.0`
 - Upgrade `pydantic` to `1.9.2`
 - Upgrade `pymongo` to `4.2.0`
-- Upgrade `pyparsing` to `3.0.9`
 - Upgrade `python-keystoneclient` to `5.0.0`
 - Upgrade `python-swiftclient` to `4.0.1`
 - Upgrade `requests` to `2.28.1`
@@ -44,6 +41,7 @@ and this project adheres to
 - Make backends yield results instead of writing to standard streams (BC)
 - Use pydantic settings management instead of global variables in defaults.py
 - Rename backend and parser parameter environment variables (BC)
+- Make project dependencies management more modular for library usage
 
 ### Removed
 

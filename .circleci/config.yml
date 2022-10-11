@@ -137,7 +137,7 @@ jobs:
             - v1-dependencies-{{ .Revision }}
       - run:
           name: Install development dependencies
-          command: pip install --user .[dev]
+          command: pip install --user .[backend-es,backend-ldp,backend-mongo,backend-swift,backend-ws,cli,dev,lrs]
       - save_cache:
           paths:
             - ~/.local
@@ -204,6 +204,32 @@ jobs:
               -wait tcp://${HOSTNAME}:27017 \
               -timeout 60s \
               ~/.local/bin/pytest
+
+  test-library:
+    docker:
+      - image: cimg/python:3.9
+        auth:
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
+    working_directory: ~/fun
+    steps:
+      - checkout
+      - run:
+          name: Install development dependencies
+          command: pip install --user .
+
+      - run:
+          name: Test library usage
+          command: |
+            for module in $(\
+              find src/ralph/models/**/*.py | \
+              sed "s|^src/\(.*\)\.py|\1|g" | \
+              tr "/" "." | \
+              sed "s/\.__init__//g" | \
+              sort \
+            ); do
+              python -c "from ${module} import *"
+            done
 
   # ---- Tray jobs (k8s) ----
   tray:
@@ -489,6 +515,10 @@ workflows:
           filters:
             tags:
               only: /.*/
+      - test-library:
+          filters:
+            tags:
+              only: /.*/
 
       # Docs
       #
@@ -516,6 +546,7 @@ workflows:
             - build-docs
             - lint
             - test
+            - test-library
           filters:
             tags:
               only: /.*/
