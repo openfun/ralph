@@ -63,7 +63,7 @@ jobs:
   # Check that the CHANGELOG has been updated in the current branch
   check-changelog:
     docker:
-      - image: circleci/buildpack-deps:stretch-scm
+      - image: cimg/base:current
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -95,7 +95,7 @@ jobs:
   # Build the Docker image ready for production
   build-docker:
     docker:
-      - image: circleci/buildpack-deps:stretch
+      - image: cimg/base:current
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -331,7 +331,7 @@ jobs:
   # ---- DockerHub publication job ----
   hub:
     docker:
-      - image: circleci/buildpack-deps:stretch
+      - image: cimg/base:current
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
