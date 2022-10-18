@@ -486,6 +486,54 @@
     Ralph's tray
   </a>
   
+    <nav class="md-nav" aria-label="Ralph's tray">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create_a_local_k3d_cluster" class="md-nav__link">
+    Create a local k3d cluster
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bootstrap_an_arnold_project" class="md-nav__link">
+    Bootstrap an Arnold project
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prepare_working_namespace" class="md-nav__link">
+    Prepare working namespace
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploy_code_repeat" class="md-nav__link">
+    Deploy, code, repeat
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#perform_arnolds_operations" class="md-nav__link">
+    Perform Arnold's operations
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stop_k3d_cluster" class="md-nav__link">
+    Stop k3d cluster
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -616,6 +664,54 @@
     Ralph's tray
   </a>
   
+    <nav class="md-nav" aria-label="Ralph's tray">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create_a_local_k3d_cluster" class="md-nav__link">
+    Create a local k3d cluster
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bootstrap_an_arnold_project" class="md-nav__link">
+    Bootstrap an Arnold project
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prepare_working_namespace" class="md-nav__link">
+    Prepare working namespace
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploy_code_repeat" class="md-nav__link">
+    Deploy, code, repeat
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#perform_arnolds_operations" class="md-nav__link">
+    Perform Arnold's operations
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stop_k3d_cluster" class="md-nav__link">
+    Stop k3d cluster
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -688,6 +784,15 @@ only <code>elasticsearch</code> and <code>swift</code> services are accessible a
 <p>To configure those backends, we provide default parameters in the <code>.env.dist</code>
 template, you can copy/paste them in your <code>.env</code> file (and uncomment them so
 that they are properly injected in running containers).</p>
+<blockquote>
+<p>In order to run the Elasticsearch backend locally on GNU/Linux operating
+systems, ensure that your virtual memory limits are not too low and increase
+them (temporally) if needed by typing this command from your terminal (as
+<code>root</code> or using <code>sudo</code>):</p>
+<p><code>sysctl -w vm.max_map_count=262144</code></p>
+<p>Reference:
+https://www.elastic.co/guide/en/elasticsearch/reference/master/vm-max-map-count.html</p>
+</blockquote>
 <p>Once configured, start available backends using:</p>
 <div class="highlight"><pre><span></span><code>$ make run-<span class="o">[</span>BACKEND<span class="o">]</span>
 </code></pre></div>
@@ -721,7 +826,158 @@ $ bin/ralph fetch -b es
 <h2 id="ralphs_tray">Ralph&rsquo;s tray<a class="headerlink" href="#ralphs_tray" title="Permanent link">&para;</a></h2>
 <p>Ralph is distributed along with its tray (a deployable package for Kubernetes
 clusters using <a href="https://github.com/openfun/arnold">Arnold</a>). If you intend to
-work on this tray, please refer to Arnold&rsquo;s documentation.</p>
+work on this tray, please refer to Arnold&rsquo;s documentation first.</p>
+<p>Dependencies:</p>
+<ul>
+<li><a href="https://kubernetes.io/docs/tasks/tools/">Kubectl</a> (&gt;<code>v.1.23.5</code>):
+  This CLI is used to communicate with the running Kubernetes instance you
+  will use.</li>
+<li><a href="https://k3d.io/">k3d</a> (&gt;<code>v.5.0.0</code>): This tool is used to setup
+  and run a lightweight Kubernetes cluster, in order to have a local
+  environment (it is required to complete below&rsquo;s quickstart instructions to
+  avoid depending on an existing Kubernetes cluster).</li>
+<li><a href="https://curl.se/">curl</a> is required by Arnold&rsquo;s CLI.</li>
+<li><a href="https://gnupg.org/">gnupg</a> to encrypt Ansible vaults passwords and
+  collaborate with your team.</li>
+</ul>
+<h3 id="create_a_local_k3d_cluster">Create a local <code>k3d</code> cluster<a class="headerlink" href="#create_a_local_k3d_cluster" title="Permanent link">&para;</a></h3>
+<p>To create (or run) a local kubernetes cluster, we use <code>k3d</code>. The cluster&rsquo;s
+bootstrapping should be run <em>via</em>:</p>
+<div class="highlight"><pre><span></span><code>$ make k3d-cluster
+</code></pre></div>
+<blockquote>
+<p>Running a k3d-cluster locally supposes that the 80 and 443 ports of your
+machine are available, so that the ingresses created for your project
+responds properly. If one or both ports are already used by another service
+running on your machine, the <code>make k3d-cluster</code> command may fail.</p>
+</blockquote>
+<p>You can check that your cluster is running using the <code>k3d cluster</code> command:</p>
+<div class="highlight"><pre><span></span><code>$ k3d cluster list
+NAME     SERVERS   AGENTS   LOADBALANCER
+ralph    <span class="m">1</span>/1       <span class="m">0</span>/0      <span class="nb">true</span>
+</code></pre></div>
+<p>As you can see, we are running a single node cluster called <code>ralph</code>.</p>
+<h3 id="bootstrap_an_arnold_project">Bootstrap an Arnold project<a class="headerlink" href="#bootstrap_an_arnold_project" title="Permanent link">&para;</a></h3>
+<p>Once your Kubernetes cluster is running, you need to create a standard Arnold
+project describing applications and environments you need to deploy:</p>
+<div class="highlight"><pre><span></span><code>$ make arnold-bootstrap
+</code></pre></div>
+<p>Once bootstrapped, Arnold should have created a <code>group_vars</code> directory
+containing the following files:</p>
+<div class="highlight"><pre><span></span><code>$ tree group_vars
+group_vars
+├── common
+└── customer
+    └── ralph
+        ├── development
+        │   ├── main.yml
+        │   └── secrets
+        │       ├── databases.vault.yml
+        │       ├── elasticsearch.vault.yml
+        │       └── ralph.vault.yml
+        └── main.yml
+
+<span class="m">5</span> directories, <span class="m">5</span> files
+</code></pre></div>
+<p>To create the LRS credentials file, you need to provide a list of accounts
+allowed to request the LRS in Ralph&rsquo;s vault:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Setup your kubernetes environment</span>
+$ <span class="nb">source</span> .k3d-cluster.env.sh
+
+<span class="c1"># Decrypt the vault</span>
+$ bin/arnold -d -c ralph -e development -- vault -a ralph decrypt
+</code></pre></div>
+<p>Edit the vault file to add a new account for the <code>foo</code> user with the <code>bar</code>
+password and a relevant scope:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># group_vars/customer/ralph/development/secrets/ralph.vault.yml</span><span class="w"></span>
+<span class="c1">#</span><span class="w"></span>
+<span class="c1"># [...]</span><span class="w"></span>
+<span class="c1">#</span><span class="w"></span>
+<span class="c1"># LRS</span><span class="w"></span>
+<span class="nt">LRS_AUTH</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;foo&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;$2b$12$lCggI749U6TrzK7Qyr7xGe1KVSAXdPjtkMew.BD6lzIk//T5YSb72&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">scopes</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;foo_scope&quot;</span><span class="w"></span>
+</code></pre></div>
+<p>The password hash has been generated using <code>bcrypt</code> as explained in the <a href="./api/#creating_a_credentials_file">API
+user guide</a>.</p>
+<p>And finally (re-)encrypt Ralph&rsquo;s vault:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Encrypt the vault</span>
+$ bin/arnold -d -c ralph -e development -- vault -a ralph encrypt
+</code></pre></div>
+<p>You are now ready to create the related Kubernetes Secret while initializing
+Arnold project in the next step.</p>
+<h3 id="prepare_working_namespace">Prepare working namespace<a class="headerlink" href="#prepare_working_namespace" title="Permanent link">&para;</a></h3>
+<p>You are now ready to create required Kubernetes objects to start working on
+Ralph&rsquo;s deployment:</p>
+<div class="highlight"><pre><span></span><code>$ make arnold-init
+</code></pre></div>
+<p>At this point an Elasticsearch cluster should be running on your Kubernetes
+cluster:</p>
+<div class="highlight"><pre><span></span><code>$ kubectl -n development-ralph get -l <span class="nv">app</span><span class="o">=</span>elasticsearch pod
+NAME                                         READY   STATUS      RESTARTS   AGE
+elasticsearch-node-0                         <span class="m">1</span>/1     Running     <span class="m">0</span>          69s
+elasticsearch-node-1                         <span class="m">1</span>/1     Running     <span class="m">0</span>          69s
+elasticsearch-node-2                         <span class="m">1</span>/1     Running     <span class="m">0</span>          69s
+es-index-template-j-221010-09h25m24s-nx5qz   <span class="m">0</span>/1     Completed   <span class="m">0</span>          49s
+</code></pre></div>
+<p>We are now ready to deploy Ralph to Kubernetes!</p>
+<h3 id="deploy_code_repeat">Deploy, code, repeat<a class="headerlink" href="#deploy_code_repeat" title="Permanent link">&para;</a></h3>
+<p>To test your local docker image, you need to build it and publish it to the
+local kubernetes cluster docker registry using the <code>k3d-push</code> Makefile rule:</p>
+<div class="highlight"><pre><span></span><code>$ make k3d-push
+</code></pre></div>
+<blockquote>
+<p>Note that each time you modify Ralph&rsquo;s application or its Docker image, you
+will need to make this update.</p>
+</blockquote>
+<p>Now that your Docker image is published, it&rsquo;s time to deploy it!</p>
+<div class="highlight"><pre><span></span><code>$ make arnold-deploy
+</code></pre></div>
+<p>To test this deployment, let&rsquo;s try to make an authenticated request to the LRS:</p>
+<div class="highlight"><pre><span></span><code>$ curl -sLk <span class="se">\</span>
+    --user foo:bar <span class="se">\</span>
+    <span class="s2">&quot;https://</span><span class="k">$(</span><span class="se">\</span>
+        kubectl -n development-ralph <span class="se">\</span>
+        get <span class="se">\</span>
+        ingress/ralph-app-current <span class="se">\</span>
+        -o <span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.spec.rules[0].host}&#39;</span><span class="k">)</span><span class="s2">/whoami&quot;</span>
+</code></pre></div>
+<p>And why not send test statements from Potsie&rsquo;s repository:</p>
+<div class="highlight"><pre><span></span><code>$ curl -sL <span class="se">\</span>
+    https://github.com/openfun/potsie/raw/main/fixtures/elasticsearch/lrs.json.gz <span class="p">|</span> <span class="se">\</span>
+  gunzip <span class="p">|</span> <span class="se">\</span>
+  head -n <span class="m">100</span> <span class="p">|</span> <span class="se">\</span>
+  jq -s . <span class="p">|</span> <span class="se">\</span>
+  sed <span class="s2">&quot;s/@timestamp/timestamp/g&quot;</span> <span class="p">|</span> <span class="se">\</span>
+  curl -sLk <span class="se">\</span>
+    --user foo:bar <span class="se">\</span>
+    -X POST <span class="se">\</span>
+    -H <span class="s2">&quot;Content-Type: application/json&quot;</span> <span class="se">\</span>
+    <span class="s2">&quot;https://</span><span class="k">$(</span><span class="se">\</span>
+        kubectl -n development-ralph <span class="se">\</span>
+        get <span class="se">\</span>
+        ingress/ralph-app-current <span class="se">\</span>
+        -o <span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.spec.rules[0].host}&#39;</span><span class="k">)</span><span class="s2">/xAPI/statements/&quot;</span> <span class="se">\</span>
+    -d @-
+</code></pre></div>
+<blockquote>
+<p>This example command requires <a href="https://stedolan.github.io/jq/"><code>jq</code></a> to
+serialize the request payload (xAPI statements). When dealing with JSON data,
+we strongly recommend to install it to manipulate them from the command line.</p>
+</blockquote>
+<h3 id="perform_arnolds_operations">Perform Arnold&rsquo;s operations<a class="headerlink" href="#perform_arnolds_operations" title="Permanent link">&para;</a></h3>
+<p>If you want to run the <code>bin/arnold</code> script to run specific Arnold commands, you
+must ensure that your environment is properly set and that Arnold runs in
+development mode (<em>i.e.</em> using the <code>-d</code> flag):</p>
+<div class="highlight"><pre><span></span><code>$ <span class="nb">source</span> .k3d-cluster.env.sh
+$ bin/arnold -d -c ralph -e development -- vault -a ralph view
+</code></pre></div>
+<h3 id="stop_k3d_cluster">Stop <code>k3d</code> cluster<a class="headerlink" href="#stop_k3d_cluster" title="Permanent link">&para;</a></h3>
+<p>When finished to work on the Tray, you can stop the <code>k3d</code> cluster using the <code>k3d-stop</code> helper:</p>
+<div class="highlight"><pre><span></span><code>$ make k3d-stop
+</code></pre></div>
 
 
 
