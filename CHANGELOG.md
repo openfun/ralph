@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [3.0.0] - 2022-10-19
+
 ### Added
 
 - Implement edx video browser events pydantic models
@@ -178,7 +180,8 @@ and this project adheres to
 - Add optional sentry integration
 - Distribute Arnold's tray to deploy Ralph in a k8s cluster as cronjobs
 
-[unreleased]: https://github.com/openfun/ralph/compare/v2.1.0...master
+[unreleased]: https://github.com/openfun/ralph/compare/v3.0.0...master
+[3.0.0]: https://github.com/openfun/ralph/compare/v2.1.0...v3.0.0
 [2.1.0]: https://github.com/openfun/ralph/compare/v2.0.1...v2.1.0
 [2.0.1]: https://github.com/openfun/ralph/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/openfun/ralph/compare/v1.2.0...v2.0.0
