@@ -668,13 +668,22 @@ python distribution).</p>
 $ python3.9 -m venv venv
 $ <span class="nb">source</span> venv/bin/activate
 
-<span class="c1"># Install the package (in a virtualenv)</span>
-<span class="o">(</span>venv<span class="o">)</span> $ pip install ralph-malph
+<span class="c1"># Install the full package (in a virtualenv)</span>
+<span class="o">(</span>venv<span class="o">)</span> $ pip install ralph-malph<span class="o">[</span>backend-es,backend-ldp,backend-mongo,backend-swift,backend-ws,cli,lrs<span class="o">]</span>
+
+<span class="c1"># Install only the core package with the Elasticsearch backend and the LRS (in a virtualenv)</span>
+<span class="o">(</span>venv<span class="o">)</span> $ pip install ralph-malph<span class="o">[</span>backend-es,lrs<span class="o">]</span>
 
 <span class="c1"># Test the ralph command (it should be in your PATH)</span>
 <span class="o">(</span>venv<span class="o">)</span> $ ralph --help
 </code></pre></div>
-<p>Alternatively, Docker users can pull the latest ralph image and start playing
+<p>If you only need to integrate <code>ralph</code> models in your project, you don&rsquo;t need to
+install the <code>backends</code>, <code>cli</code> or <code>lrs</code> extra dependencies, the core package is
+what you need:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Install the core library (in a virtualenv)</span>
+<span class="o">(</span>venv<span class="o">)</span> $ pip install ralph-malph
+</code></pre></div>
+<p>Alternatively, Docker users can pull the latest <code>ralph</code> image and start playing
 with it:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Pull latest docker image and get usage</span>
 $ docker run --rm -i fundocker/ralph:latest ralph --help
