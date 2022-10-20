@@ -1,14 +1,41 @@
 # Introduction
 
-Ralph is a command-line tool to fetch, extract, convert and push your tracking
-logs (_aka_ learning events) from various storage backends to your LRS or any
-other compatible storage or database backend.
+Ralph is a toolbox for your learning analytics, it can be used as a:
 
-## Key concepts
+- **library**, to fetch learning events from various backends, (de)serialize or
+  convert them from various standard formats such as
+  [xAPI](https://adlnet.gov/projects/xapi/),
+- **command-line interface** (CLI), to build data pipelines the UNIX-way™️,
+- **HTTP API server**, to collect xAPI statements (learning events)
+  following the [ADL LRS
+  standard](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#partthree).
 
-Ralph has been designed to batch process your logs using base commands and UNIX
-standard streams (`stdin`, `stdout`) to connect them in a pipeline that fits
-your needs. A base example pipeline may be:
+## Supported backends
+
+As a library or a CLI, you will be able to read and write from/to the following
+backends:
+
+- [Elasticsearch](https://www.elastic.co/elasticsearch/)
+- [MongoDB](https://www.mongodb.com/)
+- [OpenStack Swift](https://wiki.openstack.org/wiki/Swift)
+- [AWS S3](https://aws.amazon.com/s3/) (_WIP_)
+- [OVH Logs Data Platform](https://docs.ovh.com/gb/en/logs-data-platform/)\*
+- [WebSocket](https://en.wikipedia.org/wiki/WebSocket)
+- File system
+
+\* _read-only backend_
+
+The LRS server currently supports the following backends to store learning
+traces in xAPI format:
+
+- Elasticsearch
+- MongoDB
+
+## CLI key concepts
+
+At first, Ralph has been designed as a CLI to batch process your logs using
+base commands and UNIX standard streams (`stdin`, `stdout`) to connect them in
+a pipeline. A base example pipeline may be:
 
 ```sh
 $ ralph fetch --backend swift my_archive.gzip | \
@@ -26,7 +53,9 @@ commands with other standard commands or command line tools.
 
 ## Quick start guide
 
-Ralph is distributed as a python package and a Docker image.
+Ralph is distributed as a [python
+package](https://pypi.org/project/ralph-malph/) and a [Docker
+image](https://hub.docker.com/repository/docker/fundocker/ralph).
 
 > If you choose to install `ralph` in your native environment (without using
 > Docker), please make sure that **Python 3.9** is installed (and your default
@@ -40,9 +69,11 @@ $ python3.9 -m venv venv
 $ source venv/bin/activate
 
 # Install the full package (in a virtualenv)
-(venv) $ pip install ralph-malph[backend-es,backend-ldp,backend-mongo,backend-swift,backend-ws,cli,lrs]
+(venv) $ pip install \
+    ralph-malph[backend-es,backend-ldp,backend-mongo,backend-swift,backend-ws,cli,lrs]
 
-# Install only the core package with the Elasticsearch backend and the LRS (in a virtualenv)
+# Install only the core package with the Elasticsearch backend and the LRS (in
+# a virtualenv)
 (venv) $ pip install ralph-malph[backend-es,lrs]
 
 # Test the ralph command (it should be in your PATH)
