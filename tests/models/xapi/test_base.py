@@ -491,7 +491,7 @@ def test_models_xapi_base_statement_with_valid_version(statement):
     "model",
     [
         model
-        for model in ModelSelector("ralph.models.xapi").model_rules.keys()
+        for model in ModelSelector("ralph.models.xapi").model_rules
         # We have to bypass Video Statements in this test because we want to support
         # invalid values (non IRI keys) in their extension fields.
         if not issubclass(model, BaseVideoStatement)

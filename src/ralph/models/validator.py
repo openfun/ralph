@@ -5,7 +5,7 @@ import json
 import logging
 from typing import TextIO
 
-from pydantic.error_wrappers import ValidationError
+from pydantic import ValidationError
 
 from ralph.exceptions import BadFormatException, UnknownEventException
 from ralph.models.selector import ModelSelector
@@ -47,6 +47,23 @@ class Validator:
                     raise BadFormatException(message) from err
         logger.info("Total events: %d, Invalid events: %d", total, total - success)
 
+    def get_first_valid_model(self, event: dict):
+        """Returns the first successfully instantiated model for the event.
+
+        Raises:
+            UnknownEventException: When the event does not match any model.
+            ValidationError: When the last validated event is invalid.
+        """
+
+        error = None
+        for model in self.model_selector.get_models(event):
+            try:
+                return model(**event)
+            except ValidationError as err:
+                error = err
+
+        raise error
+
     def _validate_event(self, event_str: str):
         """Validates a single JSON string event.
 
@@ -60,7 +77,7 @@ class Validator:
         """
 
         event = json.loads(event_str)
-        return self.model_selector.get_model(event)(**event).json()
+        return self.get_first_valid_model(event).json()
 
     @staticmethod
     def _log_error(message, event_str, error=None):

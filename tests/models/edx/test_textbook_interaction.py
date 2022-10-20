@@ -4,6 +4,7 @@ import json
 import re
 
 import pytest
+from hypothesis import strategies as st
 from pydantic.error_wrappers import ValidationError
 
 from ralph.models.edx.textbook_interaction.fields.events import (
@@ -28,7 +29,39 @@ from ralph.models.edx.textbook_interaction.statements import (
 )
 from ralph.models.selector import ModelSelector
 
-from tests.fixtures.hypothesis_strategies import custom_given
+from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
+
+
+@pytest.mark.parametrize(
+    "class_",
+    [
+        UIBook,
+        UITextbookPdfChapterNavigated,
+        UITextbookPdfDisplayScaled,
+        UITextbookPdfOutlineToggled,
+        UITextbookPdfPageNavigated,
+        UITextbookPdfPageScrolled,
+        UITextbookPdfSearchCaseSensitivityToggled,
+        UITextbookPdfSearchExecuted,
+        UITextbookPdfSearchHighlightToggled,
+        UITextbookPdfSearchNavigatedNext,
+        UITextbookPdfThumbnailNavigated,
+        UITextbookPdfThumbnailsToggled,
+        UITextbookPdfZoomButtonsChanged,
+        UITextbookPdfZoomMenuChanged,
+    ],
+)
+@custom_given(st.data())
+def test_models_edx_ui_textbook_interaction_selectors_with_valid_statements(
+    class_, data
+):
+    """Tests given a valid textbook interaction edX statement the `get_first_model`
+    selector method should return the expected model.
+    """
+
+    statement = json.loads(data.draw(custom_builds(class_)).json())
+    model = ModelSelector(module="ralph.models.edx").get_first_model(statement)
+    assert model is class_
 
 
 @custom_given(TextbookInteractionBaseEventField)
@@ -161,16 +194,6 @@ def test_models_edx_ui_book_with_valid_statement(statement):
     assert statement.name == "book"
 
 
-@custom_given(UIBook)
-def test_models_edx_ui_book_selector_with_valid_statement(statement):
-    """Tests given a `book` statement the selector `get_model` method should return
-    `UIBook` model.
-    """
-
-    statement = json.loads(statement.json())
-    assert ModelSelector(module="ralph.models.edx").get_model(statement) is UIBook
-
-
 @custom_given(UITextbookPdfThumbnailsToggled)
 def test_models_edx_ui_textbook_pdf_thumbnails_toggled_with_valid_statement(statement):
     """Tests that a `textbook.pdf.thumbnails.toggled` statement has the expected
@@ -179,21 +202,6 @@ def test_models_edx_ui_textbook_pdf_thumbnails_toggled_with_valid_statement(stat
 
     assert statement.event_type == "textbook.pdf.thumbnails.toggled"
     assert statement.name == "textbook.pdf.thumbnails.toggled"
-
-
-@custom_given(UITextbookPdfThumbnailsToggled)
-def test_models_edx_ui_textbook_pdf_thumbnails_toggled_selector_with_valid_statement(
-    statement,
-):
-    """Tests given a `textbook.pdf.thumbnails.toggled` event the selector `get_model`
-    method should return `UITextbookPdfThumbnailsToggled` model.
-    """
-
-    statement = json.loads(statement.json())
-    assert (
-        ModelSelector(module="ralph.models.edx").get_model(statement)
-        is UITextbookPdfThumbnailsToggled
-    )
 
 
 @custom_given(UITextbookPdfThumbnailNavigated)
@@ -208,21 +216,6 @@ def test_models_edx_ui_textbook_pdf_thumbnail_navigated_with_valid_statement(
     assert statement.name == "textbook.pdf.thumbnail.navigated"
 
 
-@custom_given(UITextbookPdfThumbnailNavigated)
-def test_models_edx_ui_textbook_pdf_thumbnail_navigated_selector_with_valid_statement(
-    statement,
-):
-    """Tests given a `textbook.pdf.thumbnail.navigated` statement the selector
-    `get_model` method should return `UITextbookPdfThumbnailNavigated` model.
-    """
-
-    statement = json.loads(statement.json())
-    assert (
-        ModelSelector(module="ralph.models.edx").get_model(statement)
-        is UITextbookPdfThumbnailNavigated
-    )
-
-
 @custom_given(UITextbookPdfOutlineToggled)
 def test_models_edx_ui_textbook_pdf_outline_toggled_with_valid_statement(
     statement,
@@ -233,21 +226,6 @@ def test_models_edx_ui_textbook_pdf_outline_toggled_with_valid_statement(
 
     assert statement.event_type == "textbook.pdf.outline.toggled"
     assert statement.name == "textbook.pdf.outline.toggled"
-
-
-@custom_given(UITextbookPdfOutlineToggled)
-def test_models_edx_ui_textbook_pdf_outline_toggled_selector_with_valid_statement(
-    statement,
-):
-    """Tests given a `textbook.pdf.outline.toggled` statement the selector `get_model`
-    method should return `UITextbookPdfOutlineToggled` model.
-    """
-
-    statement = json.loads(statement.json())
-    assert (
-        ModelSelector(module="ralph.models.edx").get_model(statement)
-        is UITextbookPdfOutlineToggled
-    )
 
 
 @custom_given(UITextbookPdfChapterNavigated)
@@ -262,21 +240,6 @@ def test_models_edx_ui_textbook_pdf_chapter_navigated_with_valid_statement(
     assert statement.name == "textbook.pdf.chapter.navigated"
 
 
-@custom_given(UITextbookPdfChapterNavigated)
-def test_models_edx_ui_textbook_pdf_chapter_navigated_selector_with_valid_statement(
-    statement,
-):
-    """Tests given a `textbook.pdf.chapter.navigated` statement the selector `get_model`
-    method should return `UITextbookPdfChapterNavigated` model.
-    """
-
-    statement = json.loads(statement.json())
-    assert (
-        ModelSelector(module="ralph.models.edx").get_model(statement)
-        is UITextbookPdfChapterNavigated
-    )
-
-
 @custom_given(UITextbookPdfPageNavigated)
 def test_models_edx_ui_textbook_pdf_page_navigated_with_valid_statement(
     statement,
@@ -287,21 +250,6 @@ def test_models_edx_ui_textbook_pdf_page_navigated_with_valid_statement(
 
     assert statement.event_type == "textbook.pdf.page.navigated"
     assert statement.name == "textbook.pdf.page.navigated"
-
-
-@custom_given(UITextbookPdfPageNavigated)
-def test_models_edx_ui_textbook_pdf_page_navigated_selector_with_valid_statement(
-    statement,
-):
-    """Tests given a `textbook.pdf.page.navigated` statement the selector `get_model`
-    method should return `UITextbookPdfPageNavigated` model.
-    """
-
-    statement = json.loads(statement.json())
-    assert (
-        ModelSelector(module="ralph.models.edx").get_model(statement)
-        is UITextbookPdfPageNavigated
-    )
 
 
 @custom_given(UITextbookPdfZoomButtonsChanged)
@@ -316,21 +264,6 @@ def test_models_edx_ui_textbook_pdf_zoom_buttons_changed_with_valid_statement(
     assert statement.name == "textbook.pdf.zoom.buttons.changed"
 
 
-@custom_given(UITextbookPdfZoomButtonsChanged)
-def test_models_edx_ui_textbook_pdf_zoom_buttons_changed_selector_with_valid_statement(
-    statement,
-):
-    """Tests given a `textbook.pdf.zoom.buttons.changed` statement the selector
-    `get_model` method should return `UITextbookPdfZoomButtonsChanged` model.
-    """
-
-    statement = json.loads(statement.json())
-    assert (
-        ModelSelector(module="ralph.models.edx").get_model(statement)
-        is UITextbookPdfZoomButtonsChanged
-    )
-
-
 @custom_given(UITextbookPdfZoomMenuChanged)
 def test_models_edx_ui_textbook_pdf_zoom_menu_changed_with_valid_statement(statement):
     """Tests that a `textbook.pdf.zoom.menu.changed` has the expected `event_type` and
@@ -339,21 +272,6 @@ def test_models_edx_ui_textbook_pdf_zoom_menu_changed_with_valid_statement(state
 
     assert statement.event_type == "textbook.pdf.zoom.menu.changed"
     assert statement.name == "textbook.pdf.zoom.menu.changed"
-
-
-@custom_given(UITextbookPdfZoomMenuChanged)
-def test_models_edx_ui_textbook_pdf_zoom_menu_changed_selector_with_valid_statement(
-    statement,
-):
-    """Tests given a `textbook.pdf.zoom.menu.changed` statement the selector `get_model`
-    method should return `UITextbookPdfZoomMenuChanged` model.
-    """
-
-    statement = json.loads(statement.json())
-    assert (
-        ModelSelector(module="ralph.models.edx").get_model(statement)
-        is UITextbookPdfZoomMenuChanged
-    )
 
 
 @custom_given(UITextbookPdfDisplayScaled)
@@ -366,21 +284,6 @@ def test_models_edx_ui_textbook_pdf_display_scaled_with_valid_statement(statemen
     assert statement.name == "textbook.pdf.display.scaled"
 
 
-@custom_given(UITextbookPdfDisplayScaled)
-def test_models_edx_ui_textbook_pdf_display_scaled_selector_with_valid_statement(
-    statement,
-):
-    """Tests given a `textbook.pdf.display.scaled` statement the selector `get_model`
-    method should return `UITextbookPdfDisplayScaled` model.
-    """
-
-    statement = json.loads(statement.json())
-    assert (
-        ModelSelector(module="ralph.models.edx").get_model(statement)
-        is UITextbookPdfDisplayScaled
-    )
-
-
 @custom_given(UITextbookPdfPageScrolled)
 def test_models_edx_ui_textbook_pdf_page_scrolled_with_valid_statement(statement):
     """Tests that a `textbook.pdf.page.scrolled` statement has the expected `event_type`
@@ -389,21 +292,6 @@ def test_models_edx_ui_textbook_pdf_page_scrolled_with_valid_statement(statement
 
     assert statement.event_type == "textbook.pdf.page.scrolled"
     assert statement.name == "textbook.pdf.page.scrolled"
-
-
-@custom_given(UITextbookPdfPageScrolled)
-def test_models_edx_ui_textbook_pdf_page_scrolled_selector_with_valid_statement(
-    statement,
-):
-    """Tests given a `textbook.pdf.page.scrolled` statement the selector `get_model`
-    method should return `UITextbookPdfPageScrolled` model.
-    """
-
-    statement = json.loads(statement.json())
-    assert (
-        ModelSelector(module="ralph.models.edx").get_model(statement)
-        is UITextbookPdfPageScrolled
-    )
 
 
 @custom_given(UITextbookPdfSearchExecuted)
@@ -416,21 +304,6 @@ def test_models_edx_ui_textbook_pdf_search_executed_with_valid_statement(stateme
     assert statement.name == "textbook.pdf.search.executed"
 
 
-@custom_given(UITextbookPdfSearchExecuted)
-def test_models_edx_ui_textbook_pdf_search_executed_selector_with_valid_statement(
-    statement,
-):
-    """Tests given a `textbook.pdf.search.executed` statement the selector `get_model`
-    method should return `UITextbookPdfSearchExecuted` model.
-    """
-
-    statement = json.loads(statement.json())
-    assert (
-        ModelSelector(module="ralph.models.edx").get_model(statement)
-        is UITextbookPdfSearchExecuted
-    )
-
-
 @custom_given(UITextbookPdfSearchNavigatedNext)
 def test_models_edx_ui_textbook_pdf_search_navigated_next_with_valid_statement(
     statement,
@@ -441,21 +314,6 @@ def test_models_edx_ui_textbook_pdf_search_navigated_next_with_valid_statement(
 
     assert statement.event_type == "textbook.pdf.search.navigatednext"
     assert statement.name == "textbook.pdf.search.navigatednext"
-
-
-@custom_given(UITextbookPdfSearchNavigatedNext)
-def test_models_edx_ui_textbook_pdf_search_navigated_next_selector_with_valid_statement(
-    statement,
-):
-    """Tests given a `textbook.pdf.search.navigatednext` statement the selector
-    `get_model` method should return `UITextbookPdfSearchNavigatedNext` model.
-    """
-
-    statement = json.loads(statement.json())
-    assert (
-        ModelSelector(module="ralph.models.edx").get_model(statement)
-        is UITextbookPdfSearchNavigatedNext
-    )
 
 
 @custom_given(UITextbookPdfSearchHighlightToggled)
@@ -471,22 +329,6 @@ def test_models_edx_ui_textbook_pdf_search_highlight_toggled_with_valid_statemen
 
 
 # pylint: disable=line-too-long
-@custom_given(UITextbookPdfSearchHighlightToggled)
-def test_models_edx_ui_textbook_pdf_search_highlight_toggled_selector_with_valid_statement(  # noqa
-    statement,
-):
-    """Tests given a `textbook.pdf.search.highlight.toggled` statement the selector
-    `get_model` method should return `UITextbookPdfSearchHighlightToggled` model.
-    """
-
-    statement = json.loads(statement.json())
-    assert (
-        ModelSelector(module="ralph.models.edx").get_model(statement)
-        is UITextbookPdfSearchHighlightToggled
-    )
-
-
-# pylint: disable=line-too-long
 @custom_given(UITextbookPdfSearchCaseSensitivityToggled)
 def test_models_edx_ui_textbook_pdf_search_case_sensitivity_toggled_with_valid_statement(  # noqa
     statement,
@@ -497,19 +339,3 @@ def test_models_edx_ui_textbook_pdf_search_case_sensitivity_toggled_with_valid_s
 
     assert statement.event_type == "textbook.pdf.searchcasesensitivity.toggled"
     assert statement.name == "textbook.pdf.searchcasesensitivity.toggled"
-
-
-# pylint: disable=line-too-long
-@custom_given(UITextbookPdfSearchCaseSensitivityToggled)
-def test_models_edx_ui_textbook_pdf_search_case_sensitivity_toggled_selector_with_valid_statement(  # noqa
-    statement,
-):
-    """Tests given a `textbook.pdf.searchcasesensitivity.toggled` statement the selector
-    `get_model` method should return `UITextbookPdfSearchCaseSensitivityToggled` model.
-    """
-
-    statement = json.loads(statement.json())
-    assert (
-        ModelSelector(module="ralph.models.edx").get_model(statement)
-        is UITextbookPdfSearchCaseSensitivityToggled
-    )

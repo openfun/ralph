@@ -2,31 +2,25 @@
 
 
 import pytest
-from pydantic.main import BaseModel
+from pydantic import BaseModel
 
-from ralph.exceptions import ModelRulesException, UnknownEventException
-from ralph.models.edx.navigational.statements import UIPageClose
+from ralph.exceptions import UnknownEventException
+from ralph.models.edx.navigational.statements import UIPageClose, UISeqGoto
 from ralph.models.edx.server import Server
-from ralph.models.selector import (
-    LazyModelField,
-    ModelRules,
-    ModelSelector,
-    Rule,
-    selector,
-)
+from ralph.models.selector import LazyModelField, ModelSelector, Rule, selector
 
 
 @pytest.mark.parametrize(
     "model_rules,decision_tree",
     [
         # Empty model_rules => empty decision_tree.
-        ({}, {}),
+        ({}, []),
         # Single model, single rule case.
         (
             {Server: selector(event_source="server")},
             {
                 Rule(LazyModelField("event_source"), "server"): {
-                    True: Server,
+                    True: [Server],
                     False: None,
                 }
             },
@@ -45,7 +39,7 @@ from ralph.models.selector import (
                             LazyModelField("event_type"),
                             LazyModelField("context__path"),
                         ): {
-                            True: Server,
+                            True: [Server],
                             False: None,
                         },
                     },
@@ -65,7 +59,7 @@ from ralph.models.selector import (
                 Rule(LazyModelField("event_source"), "browser"): {
                     True: {
                         Rule(LazyModelField("event_type"), "page_close"): {
-                            True: UIPageClose,
+                            True: [UIPageClose],
                             False: None,
                         }
                     },
@@ -76,7 +70,7 @@ from ralph.models.selector import (
                                     LazyModelField("event_type"),
                                     LazyModelField("context__path"),
                                 ): {
-                                    True: Server,
+                                    True: [Server],
                                     False: None,
                                 }
                             },
@@ -86,7 +80,7 @@ from ralph.models.selector import (
                 }
             },
         ),
-        # Tree models, multiple rules, event_source="server" occurs twice.
+        # Three models, multiple rules, event_source="server" occurs twice.
         (
             {
                 UIPageClose: selector(event_source="browser", event_type="page_close"),
@@ -102,10 +96,10 @@ from ralph.models.selector import (
                             LazyModelField("event_type"),
                             LazyModelField("context__path"),
                         ): {
-                            True: Server,
+                            True: [Server],
                             False: {
                                 Rule(LazyModelField("event_type"), "base"): {
-                                    True: BaseModel,
+                                    True: [BaseModel],
                                     False: None,
                                 }
                             },
@@ -115,7 +109,73 @@ from ralph.models.selector import (
                         Rule(LazyModelField("event_source"), "browser"): {
                             True: {
                                 Rule(LazyModelField("event_type"), "page_close"): {
-                                    True: UIPageClose,
+                                    True: [UIPageClose],
+                                    False: None,
+                                }
+                            },
+                            False: None,
+                        }
+                    },
+                }
+            },
+        ),
+        # Three models, multiple rules, two models have the same rules.
+        (
+            {
+                UIPageClose: selector(event_source="browser", event_type="page_close"),
+                BaseModel: selector(event_source="server", event_type="base"),
+                Server: selector(event_source="browser", event_type="page_close"),
+            },
+            {
+                Rule(LazyModelField("event_source"), "browser"): {
+                    True: {
+                        Rule(LazyModelField("event_type"), "page_close"): {
+                            True: [UIPageClose, Server],
+                            False: None,
+                        }
+                    },
+                    False: {
+                        Rule(LazyModelField("event_source"), "server"): {
+                            True: {
+                                Rule(LazyModelField("event_type"), "base"): {
+                                    True: [BaseModel],
+                                    False: None,
+                                }
+                            },
+                            False: None,
+                        }
+                    },
+                }
+            },
+        ),
+        # Four models, multiple rules, with rules being subsets of other rules.
+        (
+            {
+                UIPageClose: selector(event_source="browser"),
+                Server: selector(
+                    event_source="browser", event_type="page_close", page=None
+                ),
+                BaseModel: selector(event_source="server", event_type="base"),
+                UISeqGoto: selector(event_source="browser", event_type="page_close"),
+            },
+            {
+                Rule(LazyModelField("event_source"), "browser"): {
+                    True: {
+                        Rule(LazyModelField("event_type"), "page_close"): {
+                            True: {
+                                Rule(LazyModelField("page"), None): {
+                                    True: [Server],
+                                    False: [UISeqGoto],
+                                }
+                            },
+                            False: [UIPageClose],
+                        },
+                    },
+                    False: {
+                        Rule(LazyModelField("event_source"), "server"): {
+                            True: {
+                                Rule(LazyModelField("event_type"), "base"): {
+                                    True: [BaseModel],
                                     False: None,
                                 }
                             },
@@ -142,28 +202,7 @@ def test_models_selector_model_selector_get_model_with_invalid_event():
     """
 
     with pytest.raises(UnknownEventException):
-        ModelSelector(module="ralph.models.edx").get_model({"invalid": "event"})
-
-
-@pytest.mark.parametrize(
-    "model_rules,rules",
-    [
-        # rules are equal to Server model rules.
-        ({Server: selector(foo="foo")}, selector(foo="foo")),
-        # rules are a subset of Server model rules.
-        ({Server: selector(foo="foo", bar="bar")}, selector(bar="bar")),
-        # rules are a superset of Server model rules.
-        ({Server: selector(bar="bar")}, selector(foo="foo", bar="bar")),
-    ],
-)
-def test_models_selector_model_selector_model_rules(model_rules, rules):
-    """Check that the ModelRules dictionary raises an exception when the provided
-    model has a list of rules that is a superset or subset of another list of rules.
-    """
-
-    model_rules = ModelRules(model_rules)
-    with pytest.raises(ModelRulesException):
-        model_rules[BaseModel] = rules
+        ModelSelector(module="ralph.models.edx").get_first_model({"invalid": "event"})
 
 
 @pytest.mark.parametrize(
@@ -172,7 +211,7 @@ def test_models_selector_model_selector_model_rules(model_rules, rules):
         (type("empty_module", (), {}), {}),
         (type("no_classes", (), {"int_member": 1, "str_member": "foo"}), {}),
         (
-            type("not_a_subclass_of_base_model", (), {"not_base_model": ModelRules}),
+            type("not_a_subclass_of_base_model", (), {"not_base_model": dict}),
             {},
         ),
         (
@@ -191,7 +230,7 @@ def test_models_selector_model_selector_model_rules(model_rules, rules):
                     "int_member": 1,
                     "page_close": UIPageClose,
                     "no_selector": BaseModel,
-                    "not_base_model": ModelRules,
+                    "not_base_model": dict,
                     "server": Server,
                     "str_member": "foo",
                 },
@@ -204,8 +243,8 @@ def test_models_selector_model_selector_model_rules(model_rules, rules):
     ],
 )
 def test_models_selector_model_selector_build_model_rules(module, model_rules):
-    """Given an imported module build_model_rules should return the corresponding
-    model_rules.
+    """Given an imported module the `build_model_rules` method should return the
+    corresponding model_rules.
     """
 
     assert ModelSelector.build_model_rules(module) == model_rules

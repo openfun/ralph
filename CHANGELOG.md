@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Removed
+
+- ModelRules constraint
+
 ## [3.0.0] - 2022-10-19
 
 ### Added
