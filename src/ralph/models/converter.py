@@ -229,13 +229,21 @@ class Converter:
             ValidationError: When the final converted event is invalid.
         """
 
+        error = None
         event = json.loads(event_str)
-        model = self.model_selector.get_model(event)
-        conversion_set = self.src_conversion_set.get(model, None)
-        if not conversion_set:
-            message = "No conversion set found for input event"
-            raise MissingConversionSetException(message)
-        return convert_dict_event(event, event_str, conversion_set)
+        for model in self.model_selector.get_models(event):
+            conversion_set = self.src_conversion_set.get(model, None)
+            if not conversion_set:
+                message = "No conversion set found for input event"
+                error = MissingConversionSetException(message)
+                continue
+
+            try:
+                return convert_dict_event(event, event_str, conversion_set)
+            except (ConversionException, ValidationError) as err:
+                error = err
+
+        raise error
 
     @staticmethod
     def _log_error(message, event_str, error=None):

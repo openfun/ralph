@@ -6,12 +6,12 @@ from importlib import import_module
 from inspect import getmembers, isclass
 from itertools import chain
 from types import ModuleType
-from typing import Any, Type, Union
+from typing import Any, Union
 
 from pydantic import BaseModel
 
 from ralph.conf import MODEL_PATH_SEPARATOR
-from ralph.exceptions import ModelRulesException, UnknownEventException
+from ralph.exceptions import UnknownEventException
 from ralph.utils import get_dict_value_from_path
 
 
@@ -44,27 +44,6 @@ class Rule:
         if isinstance(expected_value, LazyModelField):
             expected_value = get_dict_value_from_path(event, expected_value.path)
         return event_value == expected_value
-
-
-class ModelRules(dict):
-    """Stores the list of rules for each model."""
-
-    def __setitem__(self, new_model: Type[BaseModel], new_rules: list[Rule]):
-        """Inserts a new model with it's associated list of rules.
-
-        Raises:
-            ModelRulesException: When new_rules list is a subset or superset of
-            another rules list.
-        """
-
-        rules_set = set(new_rules)
-        for model, rules in self.items():
-            if rules_set.issubset(rules) or rules_set.issuperset(rules):
-                raise ModelRulesException(
-                    f"{new_model.__name__} rules are a subset or superset "
-                    f"of {model.__name__} rules"
-                )
-        super().__setitem__(new_model, new_rules)
 
 
 def selector(**filters):
@@ -100,14 +79,19 @@ class ModelSelector:
         in the module.
         """
 
-        model_rules = ModelRules()
+        model_rules = {}
         for _, class_ in getmembers(module, isclass):
             if issubclass(class_, BaseModel) and hasattr(class_, "__selector__"):
                 model_rules[class_] = class_.__selector__
         return model_rules
 
-    def get_model(self, event: dict, tree=None):
-        """Recursively walks through the decision tree to return the matching model
+    def get_first_model(self, event: dict):
+        """Returns the first matching model for the event. See `self.get_models`."""
+
+        return self.get_models(event)[0]
+
+    def get_models(self, event: dict, tree=None):
+        """Recursively walks through the decision tree to return the matching models
         for the event.
 
         Args:
@@ -116,7 +100,7 @@ class ModelSelector:
                          tree.
 
         Returns:
-            model (BaseModel): When the event matches all rules of the model.
+            models (list of BaseModels): When the event matches all rules of the models.
 
         Raises:
             UnknownEventException: When the event does not match any model.
@@ -134,14 +118,14 @@ class ModelSelector:
                 )
             # Here we have found the model.
             return subtree
-        return self.get_model(event, subtree)
+        return self.get_models(event, subtree)
 
     def get_decision_tree(self, model_rules):
         """Recursively constructs the decision tree."""
 
         rule_counter = Counter(chain.from_iterable(model_rules.values()))
         if not rule_counter:
-            return {}
+            return list(model_rules)
 
         # We retrieve the rule with the highest occurrence and use it to split
         # the decision tree in two subtrees:
@@ -158,10 +142,10 @@ class ModelSelector:
                 continue
             true_subtree[model] = list(filter(lambda rule: rule != root_rule, rules))
 
-        if next(iter(true_subtree.values())):
+        if sorted(true_subtree.values(), key=lambda x: -len(x))[0]:
             true_subtree = self.get_decision_tree(true_subtree)
         else:
-            true_subtree = next(iter(true_subtree))
+            true_subtree = list(true_subtree)
         false_subtree = self.get_decision_tree(false_subtree) if false_subtree else None
 
         return {root_rule: {True: true_subtree, False: false_subtree}}

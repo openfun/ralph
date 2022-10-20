@@ -4,6 +4,7 @@ import json
 import re
 
 import pytest
+from hypothesis import strategies as st
 from pydantic.error_wrappers import ValidationError
 
 from ralph.models.edx.navigational.fields.events import NavigationalEventField
@@ -15,7 +16,27 @@ from ralph.models.edx.navigational.statements import (
 )
 from ralph.models.selector import ModelSelector
 
-from tests.fixtures.hypothesis_strategies import custom_given
+from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
+
+
+@pytest.mark.parametrize(
+    "class_",
+    [
+        UIPageClose,
+        UISeqGoto,
+        UISeqNext,
+        UISeqPrev,
+    ],
+)
+@custom_given(st.data())
+def test_models_edx_navigational_selectors_with_valid_statements(class_, data):
+    """Tests given a valid navigational edX statement the `get_first_model`
+    selector method should return the expected model.
+    """
+
+    statement = json.loads(data.draw(custom_builds(class_)).json())
+    model = ModelSelector(module="ralph.models.edx").get_first_model(statement)
+    assert model is class_
 
 
 @custom_given(NavigationalEventField)
@@ -84,16 +105,6 @@ def test_models_edx_ui_page_close_with_valid_statement(statement):
     assert statement.name == "page_close"
 
 
-@custom_given(UIPageClose)
-def test_models_edx_ui_page_close_selector_with_valid_statement(statement):
-    """Tests given a `page_close` statement the selector `get_model` method should
-    return `UIPageClose` model.
-    """
-
-    statement = json.loads(statement.json())
-    assert ModelSelector(module="ralph.models.edx").get_model(statement) is UIPageClose
-
-
 @custom_given(UISeqGoto)
 def test_models_edx_ui_seq_goto_with_valid_statement(statement):
     """Tests that a `seq_goto` statement has the expected `event_type` and `name`."""
@@ -102,32 +113,12 @@ def test_models_edx_ui_seq_goto_with_valid_statement(statement):
     assert statement.name == "seq_goto"
 
 
-@custom_given(UISeqGoto)
-def test_models_edx_ui_seq_goto_selector_with_valid_statement(statement):
-    """Tests given a `seq_goto` statement the selector `get_model` method should return
-    `UISeqGoto` model.
-    """
-
-    statement = json.loads(statement.json())
-    assert ModelSelector(module="ralph.models.edx").get_model(statement) is UISeqGoto
-
-
 @custom_given(UISeqNext)
 def test_models_edx_ui_seq_next_with_valid_statement(statement):
     """Tests that a `seq_next` statement has the expected `event_type` and `name`."""
 
     assert statement.event_type == "seq_next"
     assert statement.name == "seq_next"
-
-
-@custom_given(UISeqNext)
-def test_models_edx_ui_seq_next_selector_with_valid_statement(statement):
-    """Tests given a `seq_next` event the selector `get_model` method should return
-    `UISeqNext` model.
-    """
-
-    statement = json.loads(statement.json())
-    assert ModelSelector(module="ralph.models.edx").get_model(statement) is UISeqNext
 
 
 @pytest.mark.parametrize("old,new", [("0", "10"), ("10", "0")])
@@ -167,13 +158,3 @@ def test_models_edx_ui_seq_prev_with_invalid_statement(old, new, event):
         ValidationError, match="event\n  event.old - event.new should be equal to 1"
     ):
         UISeqPrev(**invalid_event)
-
-
-@custom_given(UISeqPrev)
-def test_models_edx_ui_seq_prev_selector_with_valid_statement(statement):
-    """Tests given a `seq_prev` statement the selector `get_model` method should return
-    `UISeqPrev` model.
-    """
-
-    statement = json.loads(statement.json())
-    assert ModelSelector(module="ralph.models.edx").get_model(statement) is UISeqPrev

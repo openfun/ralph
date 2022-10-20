@@ -6,6 +6,7 @@ import logging
 
 import pytest
 from hypothesis import HealthCheck, settings
+from pydantic import ValidationError, create_model
 
 from ralph.exceptions import BadFormatException, UnknownEventException
 from ralph.models.edx.navigational.statements import UIPageClose
@@ -209,3 +210,36 @@ def test_models_validator_validate_typing_cleanup(event):
         [invalid_event_str], ignore_errors=False, fail_on_unknown=True
     )
     assert json.loads(next(result)) == valid_event
+
+
+@pytest.mark.parametrize(
+    "event, models, expected",
+    [({"foo": 1}, [Server, create_model("A", foo=1)], create_model("A", foo=1))],
+)
+def test_models_validator_get_first_valid_model_with_match(event, models, expected):
+    """Tests that the `get_first_valid_model` method returns the expected model."""
+
+    def dummy_get_models(event: dict):  # pylint: disable=unused-argument
+        return models
+
+    validator = Validator(ModelSelector(module="os"))
+    validator.model_selector.get_models = dummy_get_models
+    assert validator.get_first_valid_model(event) == expected(**event)
+
+
+@pytest.mark.parametrize(
+    "event, models, error",
+    [({"foo": 1}, [Server, UIPageClose], "validation errors for UIPageClose")],
+)
+def test_models_validator_get_first_valid_model_without_match(event, models, error):
+    """Tests that the `get_first_valid_model` method raises an exception when no model
+    matches the given event.
+    """
+
+    def dummy_get_models(event: dict):  # pylint: disable=unused-argument
+        return models
+
+    validator = Validator(ModelSelector(module="os"))
+    validator.model_selector.get_models = dummy_get_models
+    with pytest.raises(ValidationError, match=error):
+        validator.get_first_valid_model(event)
