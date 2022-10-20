@@ -39,7 +39,10 @@ function index(){
 "
   done
 
-  curl -X PUT "${ES_URL}/_bulk?pretty" -H "Content-Type: application/json" -d "${data}"
+  declare json_content_type="Content-Type: application/json"
+  curl -X PUT "${ES_URL}/_bulk?pretty" -H "${json_content_type}" -d "${data}"
+  declare settings='{"index": {"number_of_replicas": 0}}'
+  curl -X PUT "${ES_URL}/${index}/_settings" -H "${json_content_type}" -d "${settings}"
 }
 
 declare action="${1:-usage}"
