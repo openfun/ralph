@@ -85,7 +85,7 @@ and this project adheres to
 - `ws` websocket stream backend (compatible with the `fetch` command)
 - bundle `jq`, `curl` and `wget` in the `fundocker/ralph` Docker image
 - Tray: enable ralph app deployment command configuration
-- Add a `runserver` command with basic auth and a `whoami` route
+- Add a `runserver` command with basic auth and a `Whoami` route
 - Create a `get` endpoint for statements implementing the LRS spec
 - Add optional fields to BaseXapiModel
 
