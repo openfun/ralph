@@ -1,19 +1,31 @@
 # Ralph
 
-Ralph is a command-line tool to fetch, extract, convert and push your tracking
-logs (_aka_ learning events) from various storage backends to your LRS or any
-other compatible storage or database backend.
+Ralph is a toolbox for your learning analytics, it can be used as a:
+
+- **library**, to fetch learning events from various backends, (de)serialize or
+  convert them from various standard formats such as
+  [xAPI](https://adlnet.gov/projects/xapi/),
+- **command-line interface** (CLI), to build data pipelines the UNIX-way™️,
+- **HTTP API server**, to collect xAPI statements (learning events)
+  following the [ADL LRS
+  standard](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#partthree).
 
 ## Quick start guide
 
 Ralph is distributed as a standard python package; it can be installed _via_
 `pip` or any other python package manager (_e.g_ Poetry, Pipenv, etc.):
 
-```
+```sh
+# Install the full package
+$ pip install \
+    ralph-malph[backend-es,backend-ldp,backend-mongo,backend-swift,backend-ws,cli,lrs]
+
+# Install only the core package (library usage without backends, CLI and LRS)
 $ pip install ralph-malph
 ```
 
-Once installed, the `ralph` command should be available in your `PATH`. Try to
+If you installed the full package (including the CLI, LRS and supported
+backends), the `ralph` command should be available in your `PATH`. Try to
 invoke the program usage thanks to the `--help` flag:
 
 ```
