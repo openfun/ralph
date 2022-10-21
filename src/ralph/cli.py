@@ -6,8 +6,20 @@ import re
 import sys
 from tempfile import NamedTemporaryFile
 
-import click
-import uvicorn
+try:
+    import click
+except ModuleNotFoundError as err:
+    raise ModuleNotFoundError(
+        "You need to install 'cli' optional dependencies to use the ralph "
+        "command: pip install ralph-malph[cli]"
+    ) from err
+try:
+    import uvicorn
+except ModuleNotFoundError:
+    # This error will be catched in the runserver command. We should be able to
+    # use all commands except the runserver command when lrs optional
+    # dependencies are not installed.
+    pass
 from click_option_group import optgroup
 from pydantic import BaseModel
 
@@ -474,13 +486,19 @@ def runserver(backend: str, host: str, port: int, **options):
             env_file.write(f"{key}={value}\n")
 
         env_file.seek(0)
-        uvicorn.run(
-            "ralph.api:app",
-            env_file=env_file.name,
-            host=host,
-            port=port,
-            log_level="debug",
-            reload=True,
-        )
+        try:
+            uvicorn.run(
+                "ralph.api:app",
+                env_file=env_file.name,
+                host=host,
+                port=port,
+                log_level="debug",
+                reload=True,
+            )
+        except NameError as err:  # pylint: disable=redefined-outer-name
+            raise ModuleNotFoundError(
+                "You need to install 'lrs' optional dependencies to use the runserver "
+                "command: pip install ralph-malph[lrs]"
+            ) from err
 
     logger.info("Shutting down uvicorn server.")
