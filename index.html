@@ -277,8 +277,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#key_concepts" class="md-nav__link">
-    Key concepts
+  <a href="#supported_backends" class="md-nav__link">
+    Supported backends
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli_key_concepts" class="md-nav__link">
+    CLI key concepts
   </a>
   
 </li>
@@ -593,8 +600,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#key_concepts" class="md-nav__link">
-    Key concepts
+  <a href="#supported_backends" class="md-nav__link">
+    Supported backends
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli_key_concepts" class="md-nav__link">
+    CLI key concepts
   </a>
   
 </li>
@@ -639,13 +653,39 @@
 
 
 <h1 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h1>
-<p>Ralph is a command-line tool to fetch, extract, convert and push your tracking
-logs (<em>aka</em> learning events) from various storage backends to your LRS or any
-other compatible storage or database backend.</p>
-<h2 id="key_concepts">Key concepts<a class="headerlink" href="#key_concepts" title="Permanent link">&para;</a></h2>
-<p>Ralph has been designed to batch process your logs using base commands and UNIX
-standard streams (<code>stdin</code>, <code>stdout</code>) to connect them in a pipeline that fits
-your needs. A base example pipeline may be:</p>
+<p>Ralph is a toolbox for your learning analytics, it can be used as a:</p>
+<ul>
+<li><strong>library</strong>, to fetch learning events from various backends, (de)serialize or
+  convert them from various standard formats such as
+  <a href="https://adlnet.gov/projects/xapi/">xAPI</a>,</li>
+<li><strong>command-line interface</strong> (CLI), to build data pipelines the UNIX-way™️,</li>
+<li><strong>HTTP API server</strong>, to collect xAPI statements (learning events)
+  following the <a href="https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#partthree">ADL LRS
+  standard</a>.</li>
+</ul>
+<h2 id="supported_backends">Supported backends<a class="headerlink" href="#supported_backends" title="Permanent link">&para;</a></h2>
+<p>As a library or a CLI, you will be able to read and write from/to the following
+backends:</p>
+<ul>
+<li><a href="https://www.elastic.co/elasticsearch/">Elasticsearch</a></li>
+<li><a href="https://www.mongodb.com/">MongoDB</a></li>
+<li><a href="https://wiki.openstack.org/wiki/Swift">OpenStack Swift</a></li>
+<li><a href="https://aws.amazon.com/s3/">AWS S3</a> (<em>WIP</em>)</li>
+<li><a href="https://docs.ovh.com/gb/en/logs-data-platform/">OVH Logs Data Platform</a>*</li>
+<li><a href="https://en.wikipedia.org/wiki/WebSocket">WebSocket</a></li>
+<li>File system</li>
+</ul>
+<p>* <em>read-only backend</em></p>
+<p>The LRS server currently supports the following backends to store learning
+traces in xAPI format:</p>
+<ul>
+<li>Elasticsearch</li>
+<li>MongoDB</li>
+</ul>
+<h2 id="cli_key_concepts">CLI key concepts<a class="headerlink" href="#cli_key_concepts" title="Permanent link">&para;</a></h2>
+<p>At first, Ralph has been designed as a CLI to batch process your logs using
+base commands and UNIX standard streams (<code>stdin</code>, <code>stdout</code>) to connect them in
+a pipeline. A base example pipeline may be:</p>
 <div class="highlight"><pre><span></span><code>$ ralph fetch --backend swift my_archive.gzip <span class="p">|</span> <span class="se">\</span>
     gunzip <span class="p">|</span> <span class="se">\</span>
     ralph push --backend es
@@ -657,7 +697,9 @@ index (using the <code>push</code> command).</p>
 <p>As UNIX is beautiful, Ralph offers many powerful possibilities by combining its
 commands with other standard commands or command line tools.</p>
 <h2 id="quick_start_guide">Quick start guide<a class="headerlink" href="#quick_start_guide" title="Permanent link">&para;</a></h2>
-<p>Ralph is distributed as a python package and a Docker image.</p>
+<p>Ralph is distributed as a <a href="https://pypi.org/project/ralph-malph/">python
+package</a> and a <a href="https://hub.docker.com/repository/docker/fundocker/ralph">Docker
+image</a>.</p>
 <blockquote>
 <p>If you choose to install <code>ralph</code> in your native environment (without using
 Docker), please make sure that <strong>Python 3.9</strong> is installed (and your default
@@ -669,9 +711,11 @@ $ python3.9 -m venv venv
 $ <span class="nb">source</span> venv/bin/activate
 
 <span class="c1"># Install the full package (in a virtualenv)</span>
-<span class="o">(</span>venv<span class="o">)</span> $ pip install ralph-malph<span class="o">[</span>backend-es,backend-ldp,backend-mongo,backend-swift,backend-ws,cli,lrs<span class="o">]</span>
+<span class="o">(</span>venv<span class="o">)</span> $ pip install <span class="se">\</span>
+    ralph-malph<span class="o">[</span>backend-es,backend-ldp,backend-mongo,backend-swift,backend-ws,cli,lrs<span class="o">]</span>
 
-<span class="c1"># Install only the core package with the Elasticsearch backend and the LRS (in a virtualenv)</span>
+<span class="c1"># Install only the core package with the Elasticsearch backend and the LRS (in</span>
+<span class="c1"># a virtualenv)</span>
 <span class="o">(</span>venv<span class="o">)</span> $ pip install ralph-malph<span class="o">[</span>backend-es,lrs<span class="o">]</span>
 
 <span class="c1"># Test the ralph command (it should be in your PATH)</span>
