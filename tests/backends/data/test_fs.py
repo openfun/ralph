@@ -15,7 +15,7 @@ from ralph.exceptions import BackendParameterException
 
 
 def test_backends_data_fs_file_system_data_backend_instantiation(fs):
-    """Tests the `FileSystemDataBackend` backend instantiation."""
+    """Test the `FileSystemDataBackend` backend instantiation."""
     # pylint: disable=invalid-name,unused-argument
 
     assert FileSystemDataBackend.name == "fs"
@@ -47,7 +47,7 @@ def test_backends_data_fs_file_system_data_backend_instantiation(fs):
 
 
 def test_backends_data_fs_file_system_data_backend_status_method(fs):
-    """Tests the `FileSystemDataBackend.status` method."""
+    """Test the `FileSystemDataBackend.status` method."""
     # pylint: disable=invalid-name
 
     fs.create_dir(settings.APP_DIR)
@@ -63,7 +63,7 @@ def test_backends_data_fs_file_system_data_backend_status_method(fs):
 
 
 def test_backends_data_fs_file_system_data_backend_list_method(fs):
-    """Tests the `FileSystemDataBackend.list` method."""
+    """Test the `FileSystemDataBackend.list` method."""
     # pylint: disable=invalid-name
 
     fs.create_dir(settings.APP_DIR)
@@ -104,7 +104,7 @@ def test_backends_data_fs_file_system_data_backend_list_method(fs):
 
 
 def test_backends_data_fs_file_system_data_backend_read_method_with_raw_ouput(fs):
-    """Tests the FileSystemDataBackend read method with `raw_output` set to `True`."""
+    """Test the FileSystemDataBackend read method with `raw_output` set to `True`."""
     # pylint: disable=invalid-name
 
     fs.create_dir(settings.APP_DIR)
@@ -148,7 +148,7 @@ def test_backends_data_fs_file_system_data_backend_read_method_with_raw_ouput(fs
 
 
 def test_backends_data_fs_file_system_data_backend_read_method_without_raw_output(fs):
-    """Tests the FileSystemDataBackend read method with `raw_output` set to `False`."""
+    """Test the FileSystemDataBackend read method with `raw_output` set to `False`."""
     # pylint: disable=invalid-name
 
     fs.create_dir(settings.APP_DIR)
@@ -203,7 +203,7 @@ def test_backends_data_fs_file_system_data_backend_read_method_without_raw_outpu
 def test_backends_data_fs_file_system_data_backend_write_method_with_file_exists_error(
     operation_type, fs
 ):
-    """Tests the `FileSystemDataBackend.write` method, given a target matching an
+    """Test the `FileSystemDataBackend.write` method, given a target matching an
     existing file and a `CREATE` or `INDEX` `operation_type`, should raise a
     `FileExistsError`.
     """
@@ -222,7 +222,7 @@ def test_backends_data_fs_file_system_data_backend_write_method_with_file_exists
 def test_backends_data_fs_file_system_data_backend_write_method_with_delete_operation(
     fs,
 ):
-    """Tests the `FileSystemDataBackend.write` method, given a `DELETE`
+    """Test the `FileSystemDataBackend.write` method, given a `DELETE`
     `operation_type`, should raise a `BackendParameterException`.
     """
     # pylint: disable=invalid-name
@@ -237,7 +237,7 @@ def test_backends_data_fs_file_system_data_backend_write_method_with_delete_oper
 def test_backends_data_fs_file_system_data_backend_write_method_with_update_operation(
     fs,
 ):
-    """Tests the `FileSystemDataBackend.write` method, given an `UPDATE`
+    """Test the `FileSystemDataBackend.write` method, given an `UPDATE`
     `operation_type`, should overwrite the target file content with the content from the
     stream.
     """
@@ -264,7 +264,7 @@ def test_backends_data_fs_file_system_data_backend_write_method_with_update_oper
 def test_backends_data_fs_file_system_data_backend_write_method_with_append_operation(
     fs,
 ):
-    """Tests the `FileSystemDataBackend.write` method, given an `APPEND`
+    """Test the `FileSystemDataBackend.write` method, given an `APPEND`
     `operation_type`, should append the content from the stream to the end of the target
     file.
     """
@@ -283,7 +283,7 @@ def test_backends_data_fs_file_system_data_backend_write_method_with_append_oper
 def test_backends_data_fs_file_system_data_backend_write_method_without_target(
     fs, monkeypatch
 ):
-    """Tests the `FileSystemDataBackend.write` method, given no `target` argument,
+    """Test the `FileSystemDataBackend.write` method, given no `target` argument,
     should create a new random file and write the stream content into it.
     """
     # pylint: disable=invalid-name

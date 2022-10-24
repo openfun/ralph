@@ -72,17 +72,17 @@ class FileSystemDataBackend(HistoryMixin, BaseDataBackend):
         logger.debug("Default directory: %s", self.default_directory)
 
     def status(self) -> DataBackendStatus:
-        """Checks whether the default directory has appropriate write permissions."""
+        """Check whether the default directory has appropriate write permissions."""
 
         if os.access(self.default_directory, os.W_OK):
             return DataBackendStatus.OK
-            
+
         return DataBackendStatus.ERROR
 
     def list(
         self, target: str = None, details: bool = False, new: bool = False
     ) -> Generator[None, Union[str, dict], None]:
-        """Lists files and directories contained in the target directory.
+        """List files and directories contained in the target directory.
 
         Args:
             target (str or None): The directory path where to list the files.
@@ -129,7 +129,7 @@ class FileSystemDataBackend(HistoryMixin, BaseDataBackend):
         chunk_size: Union[int, None] = None,
         raw_output: bool = False,
     ) -> Generator[None, Union[bytes, dict], None]:
-        """Reads files matching the query in the target folder and yields them.
+        """Read files matching the query in the target folder and yield them.
 
         Args:
             query: (str or BaseQuery): The relative pattern for the files to read.
@@ -186,7 +186,7 @@ class FileSystemDataBackend(HistoryMixin, BaseDataBackend):
         ignore_errors: bool = False,
         operation_type: Union[BaseOperationType, None] = None,
     ) -> int:
-        """Writes stream records to the target file and returns their count.
+        """Write stream records to the target file and return their count.
 
         Args:
             stream: (Iterable): The stream containing data to write.
@@ -258,14 +258,14 @@ class FileSystemDataBackend(HistoryMixin, BaseDataBackend):
 
     @staticmethod
     def _read_raw(file, chunk_size):
-        """Reads the `file` in chunks of size `chunk_size` and yields them."""
+        """Read the `file` in chunks of size `chunk_size` and yield them."""
 
         while chunk := file.read(chunk_size):
             yield chunk
 
     @staticmethod
     def _read_dict(file, _chunk_size):
-        """Reads the `file` by line and yields JSON parsed dictionaries."""
+        """Read the `file` by line and yield JSON parsed dictionaries."""
 
         for i, line in enumerate(file):
             try:
