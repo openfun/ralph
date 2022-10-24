@@ -1,4 +1,4 @@
-"""FileSystem data backend for Ralph"""
+"""FileSystem data backend for Ralph."""
 
 import json
 import logging
