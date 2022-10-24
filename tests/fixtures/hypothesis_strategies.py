@@ -87,12 +87,19 @@ def custom_given(*args: Union[st.SearchStrategy, BaseModel], **kwargs):
 
 
 OVERWRITTEN_STATEGIES = {
-    UISeqPrev: {
+    UISeqPrev: {  # pylint: disable=unhashable-member
         "event": custom_builds(NavigationalEventField, old=st.just(1), new=st.just(0))
     },
-    UISeqNext: {
+    UISeqNext: {  # pylint: disable=unhashable-member
         "event": custom_builds(NavigationalEventField, old=st.just(0), new=st.just(1))
     },
-    ContextField: {"revision": False, "platform": False},
-    ScoreResultField: {"raw": False, "min": False, "max": False},
+    ContextField: {  # pylint: disable=unhashable-member
+        "revision": False,
+        "platform": False,
+    },
+    ScoreResultField: {  # pylint: disable=unhashable-member
+        "raw": False,
+        "min": False,
+        "max": False,
+    },
 }
