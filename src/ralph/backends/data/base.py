@@ -108,7 +108,7 @@ class BaseDataBackend(ABC):
 
     @abstractmethod
     def status(self) -> DataBackendStatus:
-        """Implements data backend checks (e.g. connection, cluster status)."""
+        """Implement data backend checks (e.g. connection, cluster status)."""
 
     @abstractmethod
     def list(
