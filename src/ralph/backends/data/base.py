@@ -147,4 +147,4 @@ class BaseDataBackend(ABC):
         ignore_errors: bool = False,
         operation_type: Union[BaseOperationType, None] = None,
     ) -> int:
-        """Writes stream records to the target container and returns their count."""
+        """Write stream records to the target container and return their count."""
