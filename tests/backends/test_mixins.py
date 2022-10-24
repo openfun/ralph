@@ -59,6 +59,7 @@ def test_backends_mixins_history_mixin_write_history(fs, monkeypatch):
     # Looks like pyfakefs needs some help with pathlib overrides (we are using
     # Path().parent in our implementation).
     monkeypatch.setattr("ralph.backends.mixins.settings", Settings())
+    fs.create_dir(str(settings.APP_DIR))
 
     # Write history
     events = [{"event": "foo"}]
