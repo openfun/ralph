@@ -114,7 +114,7 @@ class BaseDataBackend(ABC):
     def list(
         self, target: str = None, details: bool = False, new: bool = False
     ) -> Generator[None, Union[str, dict], None]:
-        """Lists containers in the data backend. E.g., collections, files, indexes.
+        """List containers in the data backend. E.g., collections, files, indexes.
 
         Yields:
             str: If `details` is False.
