@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 
 class FileSystemDataBackendSettings(BaseDataBackendSettings):
-    """Represents the FileSystem data backend default configuration."""
+    """Represent the FileSystem data backend default configuration."""
 
     class Config(BaseSettingsConfig):
         """Pydantic Configuration."""
