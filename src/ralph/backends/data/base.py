@@ -65,7 +65,7 @@ class DataBackendStatus(Enum):
 
 
 def enforce_query_checks(method):
-    """Enforces query argument type checking for methods using it."""
+    """Enforce query argument type checking for methods using it."""
 
     @functools.wraps(method)
     def wrapper(*args, **kwargs):
