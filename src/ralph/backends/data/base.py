@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class BaseDataBackendSettings(BaseSettings):
-    """Represents the data backend default configuration."""
+    """Represent the data backend default configuration."""
 
     class Config(BaseSettingsConfig):
         """Pydantic Configuration."""
