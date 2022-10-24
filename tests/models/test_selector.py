@@ -17,7 +17,11 @@ from ralph.models.selector import LazyModelField, ModelSelector, Rule, selector
         ({}, []),
         # Single model, single rule case.
         (
-            {Server: selector(event_source="server")},
+            {
+                Server: selector(  # pylint: disable=unhashable-member
+                    event_source="server"
+                )
+            },
             {
                 Rule(LazyModelField("event_source"), "server"): {
                     True: [Server],
@@ -28,7 +32,7 @@ from ralph.models.selector import LazyModelField, ModelSelector, Rule, selector
         # Single model, multiple rules case.
         (
             {
-                Server: selector(
+                Server: selector(  # pylint: disable=unhashable-member
                     event_source="server", event_type=LazyModelField("context__path")
                 )
             },
@@ -50,8 +54,10 @@ from ralph.models.selector import LazyModelField, ModelSelector, Rule, selector
         # Two models, multiple rules case, each rule occurs only once.
         (
             {
-                UIPageClose: selector(event_source="browser", event_type="page_close"),
-                Server: selector(
+                UIPageClose: selector(  # pylint: disable=unhashable-member
+                    event_source="browser", event_type="page_close"
+                ),
+                Server: selector(  # pylint: disable=unhashable-member
                     event_source="server", event_type=LazyModelField("context__path")
                 ),
             },
@@ -83,8 +89,10 @@ from ralph.models.selector import LazyModelField, ModelSelector, Rule, selector
         # Three models, multiple rules, event_source="server" occurs twice.
         (
             {
-                UIPageClose: selector(event_source="browser", event_type="page_close"),
-                Server: selector(
+                UIPageClose: selector(  # pylint: disable=unhashable-member
+                    event_source="browser", event_type="page_close"
+                ),
+                Server: selector(  # pylint: disable=unhashable-member
                     event_source="server", event_type=LazyModelField("context__path")
                 ),
                 BaseModel: selector(event_source="server", event_type="base"),
@@ -122,9 +130,13 @@ from ralph.models.selector import LazyModelField, ModelSelector, Rule, selector
         # Three models, multiple rules, two models have the same rules.
         (
             {
-                UIPageClose: selector(event_source="browser", event_type="page_close"),
+                UIPageClose: selector(  # pylint: disable=unhashable-member
+                    event_source="browser", event_type="page_close"
+                ),
                 BaseModel: selector(event_source="server", event_type="base"),
-                Server: selector(event_source="browser", event_type="page_close"),
+                Server: selector(  # pylint: disable=unhashable-member
+                    event_source="browser", event_type="page_close"
+                ),
             },
             {
                 Rule(LazyModelField("event_source"), "browser"): {
@@ -151,12 +163,16 @@ from ralph.models.selector import LazyModelField, ModelSelector, Rule, selector
         # Four models, multiple rules, with rules being subsets of other rules.
         (
             {
-                UIPageClose: selector(event_source="browser"),
-                Server: selector(
+                UIPageClose: selector(  # pylint: disable=unhashable-member
+                    event_source="browser"
+                ),
+                Server: selector(  # pylint: disable=unhashable-member
                     event_source="browser", event_type="page_close", page=None
                 ),
                 BaseModel: selector(event_source="server", event_type="base"),
-                UISeqGoto: selector(event_source="browser", event_type="page_close"),
+                UISeqGoto: selector(  # pylint: disable=unhashable-member
+                    event_source="browser", event_type="page_close"
+                ),
             },
             {
                 Rule(LazyModelField("event_source"), "browser"): {
@@ -220,7 +236,11 @@ def test_models_selector_model_selector_get_model_with_invalid_event():
         ),
         (
             type("one_valid_base_model", (), {"page_close": UIPageClose}),
-            {UIPageClose: UIPageClose.__selector__},
+            {
+                UIPageClose: (  # pylint: disable=unhashable-member
+                    UIPageClose.__selector__
+                )
+            },
         ),
         (
             type(
@@ -236,8 +256,10 @@ def test_models_selector_model_selector_get_model_with_invalid_event():
                 },
             ),
             {
-                UIPageClose: UIPageClose.__selector__,
-                Server: Server.__selector__,
+                UIPageClose: (  # pylint: disable=unhashable-member
+                    UIPageClose.__selector__
+                ),
+                Server: Server.__selector__,  # pylint: disable=unhashable-member
             },
         ),
     ],
