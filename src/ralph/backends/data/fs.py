@@ -86,7 +86,7 @@ class FileSystemDataBackend(HistoryMixin, BaseDataBackend):
 
         Args:
             target (str or None): The directory path where to list the files.
-                If target is `None`, the `default_directory_path` is used instead.
+                If target is `None`, the `default_directory` is used instead.
             details (bool): Get detailed file information instead of just file paths.
             new (bool): Given the history, list only not already read files.
 
