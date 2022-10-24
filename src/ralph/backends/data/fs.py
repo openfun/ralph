@@ -76,6 +76,7 @@ class FileSystemDataBackend(HistoryMixin, BaseDataBackend):
 
         if os.access(self.default_directory, os.W_OK):
             return DataBackendStatus.OK
+            
         return DataBackendStatus.ERROR
 
     def list(
