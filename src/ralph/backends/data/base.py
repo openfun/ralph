@@ -88,7 +88,7 @@ class BaseDataBackend(ABC):
     settings = BaseDataBackendSettings()
 
     def validate_query(self, query: Union[str, BaseQuery] = None) -> BaseQuery:
-        """Validates and transforms the query."""
+        """Validate and transform the query."""
 
         if query is None:
             query = self.query_model()
