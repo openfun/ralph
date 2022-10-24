@@ -50,7 +50,7 @@ class FileSystemDataBackend(HistoryMixin, BaseDataBackend):
         default_query_string: str = settings.DEFAULT_QUERY_STRING,
         default_chunk_size: int = settings.DEFAULT_CHUNK_SIZE,
     ):
-        """Creates the default target directory if it does not exist.
+        """Create the default target directory if it does not exist.
 
         Args:
             default_directory_path (str): The default target directory path where to
