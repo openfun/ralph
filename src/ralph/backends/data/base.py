@@ -1,4 +1,4 @@
-"""Base data backend for Ralph"""
+"""Base data backend for Ralph."""
 
 import functools
 import logging
