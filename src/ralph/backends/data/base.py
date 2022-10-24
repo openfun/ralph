@@ -131,7 +131,7 @@ class BaseDataBackend(ABC):
         chunk_size: Union[int, None] = None,
         raw_output: bool = False,
     ) -> Generator[None, Union[bytes, dict], None]:
-        """Reads records matching the query in the target container and yields them.
+        """Read records matching the query in the target container and yield them.
 
         Yields:
             dict: If `raw_output` is False.
