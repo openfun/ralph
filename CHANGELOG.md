@@ -12,6 +12,19 @@ and this project adheres to
 
 - ModelRules constraint
 
+### Changed
+
+- Upgrade `bcrypt` to `4.0.1`
+- Upgrade `click-option-group` to `0.5.5`
+- Upgrade `elasticsearch` to `8.4.3`
+- Upgrade `fastapi` to `0.85.1`
+- Upgrade `pydantic` to `1.10.2`
+- Upgrade `pymongo` to `4.3.2`
+- Upgrade `python-keystoneclient` to `5.0.1`
+- Upgrade `python-swiftclient` to `4.1.0`
+- Upgrade `sentry_sdk` to `1.10.1`
+- Upgrade `uvicorn` to `0.19.2`
+
 ## [3.0.0] - 2022-10-19
 
 ### Added
