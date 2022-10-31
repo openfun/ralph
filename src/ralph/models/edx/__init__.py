@@ -12,6 +12,18 @@ from .enrollment.statements import (
     UIEdxCourseEnrollmentUpgradeClicked,
 )
 from .navigational.statements import UIPageClose, UISeqGoto, UISeqNext, UISeqPrev
+from .open_response_assessment.statements import (
+    ORACreateSubmission,
+    ORAGetPeerSubmission,
+    ORAGetSubmissionForStaffGrading,
+    ORAPeerAssess,
+    ORASaveSubmission,
+    ORASelfAssess,
+    ORAStaffAssess,
+    ORAStudentTrainingAssessExample,
+    ORASubmitFeedbackOnAssessments,
+    ORAUploadFile,
+)
 from .problem_interaction.statements import (
     EdxProblemHintDemandhintDisplayed,
     EdxProblemHintFeedbackDisplayed,
