@@ -4,7 +4,7 @@ import json
 import os.path
 
 from ralph.backends.mixins import HistoryMixin
-from ralph.conf import Settings, settings
+from ralph.conf import settings
 
 
 def test_backends_mixins_history_mixin_empty_history(fs):
@@ -45,7 +45,7 @@ def test_backends_mixins_history_mixin_with_history(fs):
     assert history.history == events
 
 
-def test_backends_mixins_history_mixin_write_history(fs, monkeypatch):
+def test_backends_mixins_history_mixin_write_history(fs):
     """Tests the write_history method of the HistoryMixin."""
     # pylint: disable=invalid-name, protected-access, unused-argument
 
@@ -58,7 +58,6 @@ def test_backends_mixins_history_mixin_write_history(fs, monkeypatch):
 
     # Looks like pyfakefs needs some help with pathlib overrides (we are using
     # Path().parent in our implementation).
-    monkeypatch.setattr("ralph.backends.mixins.settings", Settings())
     fs.create_dir(str(settings.APP_DIR))
 
     # Write history
