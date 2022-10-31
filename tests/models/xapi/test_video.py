@@ -43,11 +43,12 @@ def test_models_xapi_video_selectors_with_valid_statements(class_, data):
     model = ModelSelector(module="ralph.models.xapi").get_first_model(statement)
     assert model is class_
 
+
 @pytest.mark.parametrize(
     "class_",
     [
         VideoVolumeChangeInteraction,
-        VideoEnableClosedCaptioning, 
+        VideoEnableClosedCaptioning,
         VideoScreenChangeInteraction,
     ],
 )
@@ -66,6 +67,7 @@ def test_models_xapi_video_interaction_validator_with_valid_statements(class_, d
     )
 
     assert isinstance(model, class_)
+
 
 @custom_given(VideoInitialized)
 def test_models_xapi_video_initialized_with_valid_statement(statement):
