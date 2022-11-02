@@ -45,7 +45,7 @@ class CommaSeparatedTuple(str):
     """Represents a pydantic field type validating comma separated strings or tuples."""
 
     @classmethod
-    def __get_validators__(cls):
+    def __get_validators__(cls):  # noqa: D105
         def validate(value: Union[str, tuple[str]]) -> tuple[str]:
             """Checks whether the value is a comma separated string or a tuple."""
 
