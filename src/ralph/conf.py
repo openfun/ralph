@@ -63,7 +63,7 @@ class CommaSeparatedTuple(str):
 class InstantiableSettingsItem(BaseModel):
     """Represents a settings configuration item that can be instantiated."""
 
-    class Config:  # pylint: disable=missing-class-docstring
+    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
         underscore_attrs_are_private = True
 
     _class_path: str = None
@@ -208,7 +208,7 @@ class ParserSettings(BaseModel):
 class XapiForwardingConfigurationSettings(BaseModel):
     """Represents an xAPI forwarding configuration item."""
 
-    class Config:  # pylint: disable=missing-class-docstring
+    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
         min_anystr_length = 1
 
     url: AnyUrl

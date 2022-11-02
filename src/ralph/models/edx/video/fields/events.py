@@ -16,7 +16,7 @@ class VideoBaseEventField(AbstractBaseEventField):
             course creators, or the system-generated hash code otherwise.
     """
 
-    class Config:  # pylint: disable=missing-class-docstring
+    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
         extra = "allow"
 
     code: str

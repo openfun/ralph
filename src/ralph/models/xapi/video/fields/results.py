@@ -40,7 +40,7 @@ class VideoPausedResultExtensionsField(VideoResultExtensionsField):
 
     progress: Optional[NonNegativeFloat] = Field(alias=VIDEO_EXTENSION_PROGRESS)
 
-    class Config:  # pylint: disable=missing-class-docstring
+    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
         min_anystr_length = 0
 
 
@@ -57,7 +57,7 @@ class VideoSeekedResultExtensionsField(BaseModelWithConfig):
     timeFrom: NonNegativeFloat = Field(alias=VIDEO_EXTENSION_TIME_FROM)
     timeTo: NonNegativeFloat = Field(alias=VIDEO_EXTENSION_TIME_TO)
 
-    class Config:  # pylint: disable=missing-class-docstring
+    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
         min_anystr_length = 0
 
 
@@ -70,7 +70,7 @@ class VideoCompletedResultExtensionsField(VideoResultExtensionsField):
 
     progress: NonNegativeFloat = Field(alias=VIDEO_EXTENSION_PROGRESS)
 
-    class Config:  # pylint: disable=missing-class-docstring
+    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
         min_anystr_length = 0
 
 
@@ -83,7 +83,7 @@ class VideoTerminatedResultExtensionsField(VideoResultExtensionsField):
 
     progress: NonNegativeFloat = Field(alias=VIDEO_EXTENSION_PROGRESS)
 
-    class Config:  # pylint: disable=missing-class-docstring
+    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
         min_anystr_length = 0
 
 
@@ -97,7 +97,7 @@ class VideoEnableClosedCaptioningResultExtensionsField(VideoResultExtensionsFiel
 
     ccEnabled: bool = Field(alias=VIDEO_EXTENSION_CC_ENABLED)
 
-    class Config:  # pylint: disable=missing-class-docstring
+    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
         min_anystr_length = 0
 
 
