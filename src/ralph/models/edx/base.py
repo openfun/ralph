@@ -11,7 +11,7 @@ from pydantic import AnyHttpUrl, BaseModel, constr
 class BaseModelWithConfig(BaseModel):
     """Base model defining configuration shared among all models."""
 
-    class Config:  # pylint: disable=missing-class-docstring
+    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
         extra = "forbid"
 
 
