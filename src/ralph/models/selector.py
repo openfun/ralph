@@ -22,6 +22,7 @@ class LazyModelField:
     path: tuple[str]
 
     def __init__(self, path: str):
+        """Initalizes Lazy Model Field."""
         object.__setattr__(self, "path", tuple(path.split(MODEL_PATH_SEPARATOR)))
 
 
