@@ -1,7 +1,5 @@
-"""
-Main module for Ralph's LRS API.
-"""
-import sentry_sdk
+"""Main module for Ralph's LRS API."""
+
 from fastapi import Depends, FastAPI
 
 from ralph.conf import settings
@@ -26,7 +24,5 @@ app.include_router(health.router)
 
 @app.get("/whoami")
 async def whoami(user: AuthenticatedUser = Depends(authenticated_user)):
-    """
-    Return the current user's username along with their scopes.
-    """
+    """Return the current user's username along with their scopes."""
     return {"username": user.username, "scopes": user.scopes}

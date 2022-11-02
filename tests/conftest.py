@@ -1,6 +1,5 @@
-"""
-Module py.test fixtures
-"""
+"""Module py.test fixtures"""
+
 # pylint: disable=unused-import
 
 from .fixtures import hypothesis_configuration  # noqa: F401

@@ -1,6 +1,4 @@
-"""
-Ralph tracking logs parsers.
-"""
+"""Ralph tracking logs parsers."""
 
 import json
 import logging
