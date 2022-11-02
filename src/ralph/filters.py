@@ -1,6 +1,5 @@
-"""
-Ralph tracking logs filters.
-"""
+"""Ralph tracking logs filters."""
+
 from .exceptions import EventKeyError
 
 

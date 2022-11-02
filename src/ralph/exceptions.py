@@ -1,6 +1,4 @@
-"""
-Ralph exceptions.
-"""
+"""Ralph exceptions."""
 
 
 class BackendException(Exception):
