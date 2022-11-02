@@ -95,7 +95,7 @@ class BaseConversionSet(ABC):
     def _get_conversion_items(self) -> set[ConversionItem]:
         """Returns a set of ConversionItems used for conversion."""
 
-    def __iter__(self):
+    def __iter__(self):  # noqa: D105
         return iter(self._conversion_items)
 
 

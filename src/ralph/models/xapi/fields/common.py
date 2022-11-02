@@ -9,7 +9,7 @@ class IRI(str):
     """Represents a pydantic custom data type validating RFC 3987 IRIs."""
 
     @classmethod
-    def __get_validators__(cls):
+    def __get_validators__(cls):  # noqa: D105
         def validate(iri: str):
             """Checks whether the provided IRI is a valid RFC 3987 IRI."""
 
@@ -23,7 +23,7 @@ class LanguageTag(str):
     """Represents a pydantic custom data type validating RFC 5646 Language tags."""
 
     @classmethod
-    def __get_validators__(cls):
+    def __get_validators__(cls):  # noqa: D105
         def validate(tag: str):
             """Checks whether the provided tag is a valid RFC 5646 Language tag."""
 
@@ -43,7 +43,7 @@ class MailtoEmail(str):
     """Represents a pydantic custom data type validating `mailto:email` format."""
 
     @classmethod
-    def __get_validators__(cls):
+    def __get_validators__(cls):  # noqa: D105
         def validate(mailto: str):
             """Checks whether the provided value follows the `mailto:email` format."""
 
