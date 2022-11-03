@@ -72,6 +72,7 @@ def get_dict_value_from_path(dict_: dict, path: list[str]):
     """Gets a nested dictionary value.
 
     Args:
+        dict_ (dict): #FIXME I miss the info for this argument.
         path (list): array of keys representing the path to the value
     """
 
@@ -87,7 +88,9 @@ def set_dict_value_from_path(dict_: dict, path: list[str], value: any):
     """Sets a nested dictionary value.
 
     Args:
-        list(str): array of keys representing the path to the value
+        dict_ (dict): #FIXME I miss the info for this argument.
+        path (list): array of keys representing the path to the value
+        value: #FIXME I miss the info for this argument.
     """
 
     for key in path[:-1]:
