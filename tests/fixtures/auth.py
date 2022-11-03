@@ -11,9 +11,11 @@ from ralph.conf import settings
 # pylint: disable=invalid-name
 @pytest.fixture
 def auth_credentials(fs):
-    """
-    Set up the credentials file and return the credentials that need to be passed
-    through headers to authenticate the request.
+    """Sets up the credentials file for request authentication.
+    
+    Returns: 
+        credentials (str): auth parameters that need to be passed
+            through headers to authenticate the request.
     """
     credential_bytes = base64.b64encode("ralph:admin".encode("utf-8"))
     credentials = str(credential_bytes, "utf-8")
