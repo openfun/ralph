@@ -16,9 +16,9 @@ from .fields.events import EnrollmentEventField
 
 
 class EdxCourseEnrollmentActivated(BaseServerModel):
-    """Represents the `edx.course.enrollment.activated` server statement.
+    """Pydantic model for `edx.course.enrollment.activated` statement.
 
-    The server emits it when a student enrolls in a course.
+    The server emits this statement when a student enrolls in a course.
 
     Attributes:
         event (EnrollmentEventField): See EnrollmentEventField.
@@ -39,9 +39,9 @@ class EdxCourseEnrollmentActivated(BaseServerModel):
 
 
 class EdxCourseEnrollmentDeactivated(BaseServerModel):
-    """Represents the `edx.course.enrollment.deactivated` server statement.
+    """Pydantic model for `edx.course.enrollment.deactivated` statement.
 
-    The server emits it when a student unenrolls from a course.
+    The server emits this statement when a student unenrolls from a course.
 
     Attributes:
         event (EnrollmentEventField): See EnrollmentEventField.
@@ -62,9 +62,9 @@ class EdxCourseEnrollmentDeactivated(BaseServerModel):
 
 
 class EdxCourseEnrollmentModeChanged(BaseServerModel):
-    """Represents the `edx.course.enrollment.mode_changed` server statement.
+    """Pydantic model for `edx.course.enrollment.mode_changed` statement.
 
-    The server emits it when the process of changing a student’s
+    The server emits this statement when the process of changing a student’s
     student_courseenrollment.mode to a different mode is complete.
 
     Attributes:
@@ -86,11 +86,11 @@ class EdxCourseEnrollmentModeChanged(BaseServerModel):
 
 
 class UIEdxCourseEnrollmentUpgradeClicked(BaseBrowserModel):
-    """Represents the `edx.course.enrollment.upgrade_clicked` browser statement.
+    """Pydantic model for `edx.course.enrollment.upgrade_clicked` statement.
 
-    The browser emits it when a student clicks <kbd>ChallengeYourself</kbd> option,
-    and the process of upgrading the student_courseenrollment.mode for the student
-    to `verified` begins.
+    The browser emits this statement when a student clicks <kbd>ChallengeYourself</kbd>
+    option, and the process of upgrading the student_courseenrollment.mode for the
+    student to `verified` begins.
 
     Attributes:
         context (EdxCourseEnrollmentUpgradeClickedContextField):
@@ -109,9 +109,9 @@ class UIEdxCourseEnrollmentUpgradeClicked(BaseBrowserModel):
 
 
 class EdxCourseEnrollmentUpgradeSucceeded(BaseServerModel):
-    """Represents the `edx.course.enrollment.upgrade.succeeded` server statement.
+    """Pydantic model for `edx.course.enrollment.upgrade.succeeded` statement.
 
-    The server emits it when the process of upgrading a student’s
+    The server emits this statement when the process of upgrading a student’s
     student_courseenrollment.mode from `audit` or `honor` to `verified` is complete.
 
     Attributes:

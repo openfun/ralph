@@ -16,7 +16,7 @@ from .fields.verbs import VerbField
 
 
 class BaseXapiModel(BaseModelWithConfig):
-    """Base model for xAPI statements.
+    """Pydantic model for base statements.
 
     Attributes:
         id (UUID): Consists of a generated UUID string from the source event string.

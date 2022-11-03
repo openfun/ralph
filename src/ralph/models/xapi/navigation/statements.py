@@ -7,7 +7,7 @@ from .fields.objects import PageObjectField
 
 
 class PageViewed(BaseXapiModel):
-    """Represents a page viewed xAPI statement.
+    """Pydantic model for page viewed statement.
 
     Example: John viewed the https://www.fun-mooc.fr/ page.
 
@@ -26,7 +26,7 @@ class PageViewed(BaseXapiModel):
 
 
 class PageTerminated(BaseXapiModel):
-    """Represents a page terminated xAPI statement.
+    """Pydantic model for page terminated statement.
 
     Example: John terminated the https://www.fun-mooc.fr/ page.
 

@@ -6,7 +6,7 @@ from ...base import AbstractBaseEventField
 
 
 class EnrollmentEventField(AbstractBaseEventField):
-    """Represents the `event` field for enrollment statements.
+    """Pydantic model for enrollment `event` field.
 
     Note: Only server enrollment statements require an `event` field.
 

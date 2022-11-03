@@ -11,7 +11,8 @@ from ralph.models.edx.video.fields.events import (
     SpeedChangeVideoEventField,
     StopVideoEventField,
     VideoBaseEventField,
-    VideoTranscriptEventField,
+    VideoHideTranscriptEventField,
+    VideoShowTranscriptEventField,
 )
 from ralph.models.selector import selector
 
@@ -19,7 +20,10 @@ from ..browser import BaseBrowserModel
 
 
 class UILoadVideo(BaseBrowserModel):
-    """Represents the `load_video` event model.
+    """Pydantic model for `load_video` statement.
+
+    The browser emits this statement when the video is fully rendered and ready to
+    play.
 
     Attributes:
         event (VideoBaseEventField): See VideoBaseEventField.
@@ -38,7 +42,10 @@ class UILoadVideo(BaseBrowserModel):
 
 
 class UIPlayVideo(BaseBrowserModel):
-    """Represents the `play_video` event model.
+    """Pydantic model for `play_video` statement.
+
+    The browser emits this statement when a user selects the video player's play
+    control.
 
     Attributes:
         event (PlayVideoEventField): See PlayVideoEventField.
@@ -57,7 +64,10 @@ class UIPlayVideo(BaseBrowserModel):
 
 
 class UIPauseVideo(BaseBrowserModel):
-    """Represents the `pause_video` event model.
+    """Pydantic model for `pause_video` statement.
+
+    The browser emits this statement when a user selects the video player's pause
+    control.
 
     Attributes:
         event (PauseVideoEventField): See PauseVideoEventField.
@@ -76,7 +86,10 @@ class UIPauseVideo(BaseBrowserModel):
 
 
 class UISeekVideo(BaseBrowserModel):
-    """Represents the `seek_video` event model.
+    """Pydantic model for `seek_video` statement.
+
+    The browser emits this statement when a user selects a user interface control to go
+    to a different point in the video file.
 
     Attributes:
         event (SeekVideoEventField): See SeekVideoEventField.
@@ -96,7 +109,10 @@ class UISeekVideo(BaseBrowserModel):
 
 
 class UIStopVideo(BaseBrowserModel):
-    """Represents the `stop_video` event model.
+    """Pydantic model for `stop_video` statement.
+
+    The browser emits this statement when the video player reaches the end of the video
+    file and play automatically stops.
 
     Attributes:
         event (StopVideoEventField): See StopVideoEventField.
@@ -115,7 +131,10 @@ class UIStopVideo(BaseBrowserModel):
 
 
 class UIHideTranscript(BaseBrowserModel):
-    """Represents the `hide_transcript` event model.
+    """Pydantic model for `hide_transcript` statement.
+
+    The browser emits this statement when a user selects <kbd>CC</kbd> to suppress
+    display of the video transcript.
 
     Attributes:
         event (VideoTranscriptEventField): See VideoTranscriptEventField.
@@ -127,15 +146,18 @@ class UIHideTranscript(BaseBrowserModel):
     __selector__ = selector(event_source="browser", event_type="hide_transcript")
 
     event: Union[
-        Json[VideoTranscriptEventField],  # pylint: disable=unsubscriptable-object
-        VideoTranscriptEventField,
+        Json[VideoHideTranscriptEventField],  # pylint: disable=unsubscriptable-object
+        VideoHideTranscriptEventField,
     ]
     event_type: Literal["hide_transcript"]
     name: Literal["hide_transcript", "edx.video.transcript.hidden"]
 
 
 class UIShowTranscript(BaseBrowserModel):
-    """Represents the `show_transcript` event model.
+    """Pydantic model for `show_transcript` statement.
+
+    The browser emits this statement when a user selects <kbd>CC</kbd> to display the
+    video transcript.
 
     Attributes:
         event (VideoTranscriptEventField): See VideoTranscriptEventField.
@@ -147,15 +169,18 @@ class UIShowTranscript(BaseBrowserModel):
     __selector__ = selector(event_source="browser", event_type="show_transcript")
 
     event: Union[
-        Json[VideoTranscriptEventField],  # pylint: disable=unsubscriptable-object
-        VideoTranscriptEventField,
+        Json[VideoShowTranscriptEventField],  # pylint: disable=unsubscriptable-object
+        VideoShowTranscriptEventField,
     ]
     event_type: Literal["show_transcript"]
     name: Literal["show_transcript", "edx.video.transcript.shown"]
 
 
 class UISpeedChangeVideo(BaseBrowserModel):
-    """Represents the `speed_change_video` event model.
+    """Pydantic model for `speed_change_video` statement.
+
+    The browser emits this statement when a user selects a different playing speed for
+    the video.
 
     Attributes:
         event (SpeedChangeVideoEventField): See SpeedChangeVideoEventField.
@@ -173,7 +198,10 @@ class UISpeedChangeVideo(BaseBrowserModel):
 
 
 class UIVideoHideCCMenu(BaseBrowserModel):
-    """Represents the `video_hide_cc_menu` event model.
+    """Pydantic model for `video_hide_cc_menu` statement.
+
+    The browser emits this statement when a user selects a language from the CC menu
+    for a video that has transcripts in multiple languages
 
     Attributes:
         event (VideoBaseEventField): See VideoBaseEventField.
@@ -191,7 +219,12 @@ class UIVideoHideCCMenu(BaseBrowserModel):
 
 
 class UIVideoShowCCMenu(BaseBrowserModel):
-    """Represents the `video_show_cc_menu` event model.
+    """Pydantic model for `video_show_cc_menu` statement.
+
+    The browser emits this statement when a user selects CC for a video that has
+    transcripts in multiple languages.
+
+    Note: This statement is emitted in addition to the show_transcript event.
 
     Attributes:
         event (VideoBaseEventField): See VideoBaseEventField.

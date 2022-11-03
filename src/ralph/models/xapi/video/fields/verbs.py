@@ -19,7 +19,7 @@ from ..constants import VERB_VIDEO_PAUSED_ID, VERB_VIDEO_PLAYED_ID, VERB_VIDEO_S
 
 
 class VideoInitializedVerbField(VerbField):
-    """Represents the `verb` field for video initialized xAPI statement.
+    """Pydantic model for video initialized `verb` field.
 
     Attributes:
         id (str): Consists of the value `http://adlnet.gov/expapi/verbs/initialized`.
@@ -33,7 +33,7 @@ class VideoInitializedVerbField(VerbField):
 
 
 class VideoPlayedVerbField(VerbField):
-    """Represents the `verb` field for video played xAPI statement.
+    """Pydantic model for video played `verb` field.
 
     Attributes:
         id (str): Consists of the value `https://w3id.org/xapi/video/verbs/played`.
@@ -47,7 +47,7 @@ class VideoPlayedVerbField(VerbField):
 
 
 class VideoPausedVerbField(VerbField):
-    """Represents the `verb` field for video paused xAPI statement.
+    """Pydantic model for video paused `verb` field.
 
     Attributes:
         id (str): Consists of the value `https://w3id.org/xapi/video/verbs/paused`.
@@ -61,7 +61,7 @@ class VideoPausedVerbField(VerbField):
 
 
 class VideoSeekedVerbField(VerbField):
-    """Represents the `verb` field for video seeked xAPI statement.
+    """Pydantic model for video seeked `verb` field.
 
     Attributes:
         id (str): Consists of the value `https://w3id.org/xapi/video/verbs/seeked`.
@@ -75,7 +75,7 @@ class VideoSeekedVerbField(VerbField):
 
 
 class VideoCompletedVerbField(VerbField):
-    """Represents the `verb` field for video completed xAPI statement.
+    """Pydantic model for video completed `verb` field.
 
     Attributes:
         id (str): Consists of the value `http://adlnet.gov/expapi/verbs/completed`.
@@ -89,7 +89,7 @@ class VideoCompletedVerbField(VerbField):
 
 
 class VideoTerminatedVerbField(VerbField):
-    """Represents the `verb` field for video terminated xAPI statement.
+    """Pydantic model for video termainated `verb` field.
 
     Attributes:
         id (str): Consists of the value `http://adlnet.gov/expapi/verbs/terminated`.
@@ -103,7 +103,7 @@ class VideoTerminatedVerbField(VerbField):
 
 
 class VideoInteractedVerbField(VerbField):
-    """Represents the `verb` field for video interacted xAPI statement.
+    """Pydantic model for video interacted `verb` field.
 
     Attributes:
         id (str): Consists of the value `http://adlnet.gov/expapi/verbs/interacted`.

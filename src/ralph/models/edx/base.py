@@ -9,14 +9,14 @@ from pydantic import AnyHttpUrl, BaseModel, constr
 
 
 class BaseModelWithConfig(BaseModel):
-    """Base model defining configuration shared among all models."""
+    """Pydantic model for base configuration shared among all models."""
 
     class Config:  # pylint: disable=missing-class-docstring # noqa: D106
         extra = "forbid"
 
 
 class ContextModuleField(BaseModelWithConfig):
-    """Represents the context `module` field.
+    """Pydantic model for `context`.`module` field.
 
     Attributes:
         usage_key (str): Consists of a block ID of the current component.
@@ -34,7 +34,7 @@ class ContextModuleField(BaseModelWithConfig):
 
 
 class BaseContextField(BaseModelWithConfig):
-    """Represents the base model inherited by all event `context` fields.
+    """Pydantic model for core `context` field.
 
     Attributes:
         course_user_tags (dict of str): Content from `user_api_usercoursetag` table.
@@ -84,7 +84,7 @@ class BaseContextField(BaseModelWithConfig):
 
 
 class AbstractBaseEventField(BaseModelWithConfig):
-    """Represents the base model inherited by all `event` fields.
+    """Pydantic model for core `event` fields.
 
     The base model does not have any attributes as event field does not have common
     sub-fields.
@@ -92,7 +92,7 @@ class AbstractBaseEventField(BaseModelWithConfig):
 
 
 class BaseEdxModel(BaseModelWithConfig):
-    """Represents the base model all statements inherit from.
+    """Pydantic model for core statement.
 
     WARNING: it does not define the `event`, `event_type` and `event_source` fields.
 

@@ -21,9 +21,11 @@ security = HTTPBasic()
 
 
 class AuthenticatedUser(BaseModel):
-    """
-    Base User class used for authentication purposes. Carries the username
-    as well as the scopes the user has access to.
+    """Pydantic model for user authentication.
+
+    Attributes:
+        username(str): Consists of the username of the current user.
+        scopes (list): Consists of the scopes the user has access to.
     """
 
     username: str
@@ -32,9 +34,16 @@ class AuthenticatedUser(BaseModel):
 
 @lru_cache()
 def get_stored_credentials(auth_file):
-    """
-    Helper to read the credentials/scopes file to JSON and memoize it so we do not
-    reload it with every request.
+    """Helper to read the credentials/scopes file.
+
+    Reads credentials from JSON file and stored them to avoid reloading them with every
+    request.
+
+    Args:
+        auth_file (file): Path to the JSON credentiales scope file.
+
+    Returns:
+        stored_credentials (json): Cache-memorized credentials.
     """
     try:
         with open(auth_file, encoding=settings.LOCALE_ENCODING) as auth:
@@ -45,9 +54,15 @@ def get_stored_credentials(auth_file):
 
 
 def authenticated_user(credentials: HTTPBasicCredentials = Depends(security)):
-    """
-    Get the basic auth parameters from the Authorization header, and check them
+    """Checks valid auth parameters.
+
+    Gets the basic auth parameters from the Authorization header, and checks them
     against our own list of hashed credentials.
+
+    Args:
+        credentials (iterator): auth parameters from the Authorization header
+
+
     """
     try:
         user_info = next(

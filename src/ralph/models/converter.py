@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class ConversionItem:
-    """Represents a conversion set item."""
+    """Conversion set item."""
 
     dest: tuple[str]
     src: Union[tuple[str], str, None]
@@ -102,8 +102,7 @@ class BaseConversionSet(ABC):
 def convert_dict_event(
     event: dict, event_str: str, conversion_set: BaseConversionSet
 ) -> BaseModel:
-    """Converts the event dictionary using the provided original event string and
-    conversion_set.
+    """Converts the event dictionary with a conversion_set.
 
     Args:
         event (dict): The event to convert.
@@ -153,7 +152,7 @@ def convert_str_event(event_str: str, conversion_set: BaseConversionSet) -> Base
 
 
 class Converter:
-    """Converts events using pydantic models."""
+    """Events converter using pydantic models."""
 
     def __init__(
         self,

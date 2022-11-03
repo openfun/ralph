@@ -9,7 +9,7 @@ from ..constants import VIDEO_OBJECT_DEFINITION_TYPE
 
 
 class VideoObjectDefinitionField(ObjectDefinitionField):
-    """Represents the `object.definition` xAPI field for page viewed xAPI statement.
+    """Pydantic model for video `object`.`definition` field.
 
     Attributes:
         type (str): Consists of the value
@@ -22,7 +22,7 @@ class VideoObjectDefinitionField(ObjectDefinitionField):
 
 
 class VideoObjectField(ActivityObjectField):
-    """Represents the `object` xAPI field for video statements.
+    """Pydantic model for video `object` field.
 
     WARNING: Contains an optional name property, this is not a violation of
     conformity but goes against xAPI specification recommendations.

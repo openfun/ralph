@@ -9,7 +9,7 @@ from .common import IRI, LanguageMap
 
 
 class AttachmentField(BaseModelWithConfig):
-    """Represents the `attachment` xAPI field.
+    """Pydantic model for `attachment` field.
 
     Attributes:
         usageType (IRI): Identifies the usage of this Attachment.

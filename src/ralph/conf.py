@@ -21,7 +21,7 @@ MODEL_PATH_SEPARATOR = "__"
 
 
 class BaseSettingsConfig:
-    """Pydantic BaseSettings Configuration."""
+    """Pydantic model for BaseSettings Configuration."""
 
     case_sensitive = True
     env_nested_delimiter = "__"
@@ -29,7 +29,7 @@ class BaseSettingsConfig:
 
 
 class CoreSettings(BaseSettings):
-    """Represents Ralph's core settings."""
+    """Pydantice model for Ralph's core settings."""
 
     class Config(BaseSettingsConfig):
         """Pydantic Configuration."""
@@ -42,7 +42,7 @@ core_settings = CoreSettings()
 
 
 class CommaSeparatedTuple(str):
-    """Represents a pydantic field type validating comma separated strings or tuples."""
+    """Pydantic field type validating comma separated strings or tuples."""
 
     @classmethod
     def __get_validators__(cls):  # noqa: D105
@@ -61,7 +61,7 @@ class CommaSeparatedTuple(str):
 
 
 class InstantiableSettingsItem(BaseModel):
-    """Represents a settings configuration item that can be instantiated."""
+    """Pydantic model for a settings configuration item that can be instantiated."""
 
     class Config:  # pylint: disable=missing-class-docstring # noqa: D106
         underscore_attrs_are_private = True
@@ -78,7 +78,7 @@ class InstantiableSettingsItem(BaseModel):
 
 
 class ESDatabaseBackendSettings(InstantiableSettingsItem):
-    """Represents the Elasticsearch database backend configuration settings."""
+    """Pydantic modelf for Elasticsearch database backend configuration settings."""
 
     _class_path: str = "ralph.backends.database.es.ESDatabase"
 
@@ -89,7 +89,7 @@ class ESDatabaseBackendSettings(InstantiableSettingsItem):
 
 
 class MongoDatabaseBackendSettings(InstantiableSettingsItem):
-    """Represents the Mongo database backend configuration settings."""
+    """Pydantic model for Mongo database backend configuration settings."""
 
     _class_path: str = "ralph.backends.database.mongo.MongoDatabase"
 
@@ -100,7 +100,7 @@ class MongoDatabaseBackendSettings(InstantiableSettingsItem):
 
 
 class DatabaseBackendSettings(BaseModel):
-    """Represents database backend configuration settings."""
+    """Pydantic model for database backend configuration settings."""
 
     ES: ESDatabaseBackendSettings = ESDatabaseBackendSettings()
     MONGO: MongoDatabaseBackendSettings = MongoDatabaseBackendSettings()
@@ -110,7 +110,7 @@ class DatabaseBackendSettings(BaseModel):
 
 
 class FSStorageBackendSettings(InstantiableSettingsItem):
-    """Represents the FileSystem storage backend configuration settings."""
+    """Pydantic model for FileSystem storage backend configuration settings."""
 
     _class_path: str = "ralph.backends.storage.fs.FSStorage"
 
@@ -118,7 +118,7 @@ class FSStorageBackendSettings(InstantiableSettingsItem):
 
 
 class LDPStorageBackendSettings(InstantiableSettingsItem):
-    """Represents the LDP storage backend configuration settings."""
+    """Pydantic model for LDP storage backend configuration settings."""
 
     _class_path: str = "ralph.backends.storage.ldp.LDPStorage"
 
@@ -131,7 +131,7 @@ class LDPStorageBackendSettings(InstantiableSettingsItem):
 
 
 class SWIFTStorageBackendSettings(InstantiableSettingsItem):
-    """Represents the SWIFT storage backend configuration settings."""
+    """Pydantic model for SWIFT storage backend configuration settings."""
 
     _class_path: str = "ralph.backends.storage.swift.SwiftStorage"
 
@@ -148,7 +148,7 @@ class SWIFTStorageBackendSettings(InstantiableSettingsItem):
 
 
 class StorageBackendSettings(BaseModel):
-    """Represents storage backend configuration settings."""
+    """Pydantic model for storage backend configuration settings."""
 
     LDP: LDPStorageBackendSettings = LDPStorageBackendSettings()
     FS: FSStorageBackendSettings = FSStorageBackendSettings()
@@ -159,7 +159,7 @@ class StorageBackendSettings(BaseModel):
 
 
 class WSStreamBackendSettings(InstantiableSettingsItem):
-    """Represents the Websocket stream backend configuration settings."""
+    """Pydantic model for Websocket stream backend configuration settings."""
 
     _class_path: str = "ralph.backends.stream.ws.WSStream"
 
@@ -167,7 +167,7 @@ class WSStreamBackendSettings(InstantiableSettingsItem):
 
 
 class StreamBackendSettings(BaseModel):
-    """Represents stream backend configuration settings."""
+    """Pydantic model for stream backend configuration settings."""
 
     WS: WSStreamBackendSettings = WSStreamBackendSettings()
 
@@ -176,7 +176,7 @@ class StreamBackendSettings(BaseModel):
 
 
 class BackendSettings(BaseModel):
-    """Represents backends configuration settings."""
+    """Pydantic model for backends configuration settings."""
 
     DATABASE: DatabaseBackendSettings = DatabaseBackendSettings()
     STORAGE: StorageBackendSettings = StorageBackendSettings()
@@ -187,26 +187,26 @@ class BackendSettings(BaseModel):
 
 
 class ESParserSettings(InstantiableSettingsItem):
-    """Represents the Elastisearch parser configuration settings."""
+    """Pydantic model for Elastisearch parser configuration settings."""
 
     _class_path: str = "ralph.parsers.ElasticSearchParser"
 
 
 class GELFParserSettings(InstantiableSettingsItem):
-    """Represents the GELF parser configuration settings."""
+    """Pydantic model for GELF parser configuration settings."""
 
     _class_path: str = "ralph.parsers.GELFParser"
 
 
 class ParserSettings(BaseModel):
-    """Represents parsers configuration settings."""
+    """Pydantic model for parsers configuration settings."""
 
     GELF: GELFParserSettings = GELFParserSettings()
     ES: ESParserSettings = ESParserSettings()
 
 
 class XapiForwardingConfigurationSettings(BaseModel):
-    """Represents an xAPI forwarding configuration item."""
+    """Pydantic model for xAPI forwarding configuration item."""
 
     class Config:  # pylint: disable=missing-class-docstring # noqa: D106
         min_anystr_length = 1
@@ -220,7 +220,7 @@ class XapiForwardingConfigurationSettings(BaseModel):
 
 
 class Settings(BaseSettings):
-    """Represents Ralph's global environment & configuration settings."""
+    """Pydantic model for Ralph's global environment & configuration settings."""
 
     class Config(BaseSettingsConfig):
         """Pydantic Configuration."""

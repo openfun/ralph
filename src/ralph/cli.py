@@ -62,8 +62,9 @@ class CommaSeparatedKeyValueParamType(click.ParamType):
     name = "key=value,key=value"
 
     def convert(self, value, param, ctx):
-        """Splits the values by comma and equal sign to return a dictionary build with
-        key/value pairs.
+        """Splits the values by comma and equal sign.
+
+        Returns a dictionary build with key/value pairs.
         """
 
         if isinstance(value, dict):

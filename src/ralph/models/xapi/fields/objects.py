@@ -19,7 +19,9 @@ from .verbs import VerbField
 
 
 class SubStatementObjectField(BaseModelWithConfig):
-    """Represents the `object` xAPI field of type SubStatement.
+    """Pydantic model for `object` field.
+
+    It is defined for SubStatement tyoe.
 
     Attributes:
         actor (ActorField): See ActorField.
@@ -41,7 +43,7 @@ ObjectField = Union[UnnestedObjectField, SubStatementObjectField]
 
 
 class ObjectDefinitionExtensionsField(BaseModelWithConfig):
-    """Represents the `object.definition.extensions` xAPI field.
+    """Pydantic model for `object.definition.extensions` field.
 
     Attributes:
         school (str): Consists of the name of the school.

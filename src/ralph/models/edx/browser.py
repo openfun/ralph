@@ -8,7 +8,7 @@ from .base import BaseEdxModel
 
 
 class BaseBrowserModel(BaseEdxModel):
-    """Represents the base model all browser statements inherit from.
+    """Pydantic model for core browser statements.
 
     This type of event is triggered on (XHR) POST/GET requests to the `/event` URL.
 

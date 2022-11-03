@@ -6,7 +6,7 @@ from rfc3987 import parse
 
 
 class IRI(str):
-    """Represents a pydantic custom data type validating RFC 3987 IRIs."""
+    """Pydantic custom data type validating RFC 3987 IRIs."""
 
     @classmethod
     def __get_validators__(cls):  # noqa: D105
@@ -20,7 +20,7 @@ class IRI(str):
 
 
 class LanguageTag(str):
-    """Represents a pydantic custom data type validating RFC 5646 Language tags."""
+    """Pydantic custom data type validating RFC 5646 Language tags."""
 
     @classmethod
     def __get_validators__(cls):  # noqa: D105
@@ -40,7 +40,7 @@ LanguageMap = dict[LanguageTag, StrictStr]
 
 
 class MailtoEmail(str):
-    """Represents a pydantic custom data type validating `mailto:email` format."""
+    """Pydantic custom data type validating `mailto:email` format."""
 
     @classmethod
     def __get_validators__(cls):  # noqa: D105

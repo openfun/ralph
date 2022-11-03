@@ -26,9 +26,9 @@ from .fields.events import (
 
 
 class EdxProblemHintDemandhintDisplayed(BaseServerModel):
-    """Represents the `edx.problem.hint.demandhint_displayed` server event.
+    """Pydantic model for `edx.problem.hint.demandhint_displayed` statement.
 
-    This event is triggered when a user requests a hint for a problem.
+    The server emits this statement when a user requests a hint for a problem.
 
     Attributes:
         event (dict): See EdxProblemHintDemandhintDisplayedEventField.
@@ -46,9 +46,9 @@ class EdxProblemHintDemandhintDisplayed(BaseServerModel):
 
 
 class EdxProblemHintFeedbackDisplayed(BaseServerModel):
-    """Represents the `edx.problem.hint.feedback_displayed` server event.
+    """Pydantic model for `edx.problem.hint.feedback_displayed` statement.
 
-    This event is triggered when a user receives a hint after answering a problem.
+    The server emits this event when a user receives a hint after answering a problem.
 
     Attributes:
         event (dict): See EdxProblemHintFeedbackDisplayedEventField.
@@ -66,7 +66,7 @@ class EdxProblemHintFeedbackDisplayed(BaseServerModel):
 
 
 class UIProblemCheck(BaseBrowserModel):
-    """Represents the `problem_check` browser event.
+    """Pydantic model for `problem_check` statement.
 
     The browser emits this event when a user checks a problem.
 
@@ -85,9 +85,9 @@ class UIProblemCheck(BaseBrowserModel):
 
 
 class ProblemCheck(BaseServerModel):
-    """Represents the `problem_check` server event.
+    """Pydantic model for `problem_check` statement.
 
-    This event is triggered when a user checks a problem.
+    The server emits this event when a user checks a problem.
 
     Attributes:
         event (dict): See ProblemCheckEventField.
@@ -103,9 +103,9 @@ class ProblemCheck(BaseServerModel):
 
 
 class ProblemCheckFail(BaseServerModel):
-    """Represents the `problem_check_fail` server event.
+    """Pydantic model for `problem_check_fail` statement.
 
-    This event is triggered when a user checks a problem and a failure prevents the
+    The server emits this event when a user checks a problem and a failure prevents the
     problem from being checked successfully.
 
     Attributes:
@@ -122,7 +122,10 @@ class ProblemCheckFail(BaseServerModel):
 
 
 class UIProblemGraded(BaseBrowserModel):
-    """Represents the `problem_graded` browser event.
+    """Pydantic model for `problem_graded` statement.
+
+    The server emits this statement each time a user clicks <kbd>Check</kbd> for a
+    problem and it is graded successfully.
 
     Attributes:
         event (list): See ProblemGradedEventField.
@@ -138,7 +141,9 @@ class UIProblemGraded(BaseBrowserModel):
 
 
 class ProblemRescore(BaseServerModel):
-    """Represents the `problem_rescore` server event.
+    """Pydantic model for `problem_rescore` statement.
+
+    The server emits this statement when a problem is successfully rescored.
 
     Attributes:
         event (dict): See ProblemRescoreEventField.
@@ -154,7 +159,9 @@ class ProblemRescore(BaseServerModel):
 
 
 class ProblemRescoreFail(BaseServerModel):
-    """Represents the `problem_rescore_fail` server event.
+    """Pydantic model for `problem_rescore_fail` statement.
+
+    The server emits this statement when a problem cannot be successfully rescored.
 
     Attributes:
         event (dict): See ProblemRescoreFailEventField.
@@ -170,7 +177,10 @@ class ProblemRescoreFail(BaseServerModel):
 
 
 class UIProblemReset(BaseBrowserModel):
-    """Represents the `problem_reset` browser event.
+    """Pydantic model for `problem_reset` statement.
+
+    The browser emits problem_reset events when a user clicks <kbd>Reset</kbd> to reset
+    the problem answer.
 
     Attributes:
         event (json): See ProblemResetEventField.
@@ -190,7 +200,9 @@ class UIProblemReset(BaseBrowserModel):
 
 
 class UIProblemSave(BaseBrowserModel):
-    """Represents the `problem_save` browser event.
+    """Pydantic model for `problem_save` statement.
+
+    The browser emits this statement when a user saves a problem.
 
     Attributes:
         event (str): Consists of all the answers saved for the problem.
@@ -206,7 +218,10 @@ class UIProblemSave(BaseBrowserModel):
 
 
 class UIProblemShow(BaseBrowserModel):
-    """Represents the `problem_show` browser event.
+    """Pydantic model for `problem_show` statement.
+
+    The browser emits this statement when the answer clicks <kbd>Show Answer</kbd> to
+    show the problem answer.
 
     Attributes:
         event (json): See ProblemShowEventField.
@@ -225,7 +240,9 @@ class UIProblemShow(BaseBrowserModel):
 
 
 class ResetProblem(BaseServerModel):
-    """Represents the `reset_problem` server event.
+    """Pydantic model for `reset_problem` statement.
+
+    The server emits this statement when a problem has been reset successfully.
 
     Attributes:
         event (dict): See ResetProblemEventField.
@@ -241,7 +258,9 @@ class ResetProblem(BaseServerModel):
 
 
 class ResetProblemFail(BaseServerModel):
-    """Represents the `reset_problem_fail` server event.
+    """Pydantic model for `reset_problem_fail` statement.
+
+    The server emits this statement when a problem cannot be reset successfully.
 
     Attributes:
         event (dict): See ResetProblemFailEventField.
@@ -257,7 +276,9 @@ class ResetProblemFail(BaseServerModel):
 
 
 class SaveProblemFail(BaseServerModel):
-    """Represents the `save_problem_fail` server event.
+    """Pydantic model for `save_problem_fail` statement.
+
+    The server emits this statement when a problem cannot be saved successfully.
 
     Attributes:
         event (dict): See SaveProblemFailEventField.
@@ -273,7 +294,9 @@ class SaveProblemFail(BaseServerModel):
 
 
 class SaveProblemSuccess(BaseServerModel):
-    """Represents the `save_problem_success` server event.
+    """Pydantic model for `save_problem_success` statement.
+
+    The server emits this statement when a problem is saved successfully.
 
     Attributes:
         event (dict): See SaveProblemSuccessEventField.
@@ -289,7 +312,9 @@ class SaveProblemSuccess(BaseServerModel):
 
 
 class ShowAnswer(BaseServerModel):
-    """Represents the `showanswer` server event.
+    """Pydantic model for `showanswer` statement.
+
+    The server emits this statement when the answer to a problem is shown.
 
     Attributes:
         event (dict): See ShowAnswerEventField.

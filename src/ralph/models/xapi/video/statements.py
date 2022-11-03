@@ -38,7 +38,7 @@ from .fields.verbs import (
 
 
 class BaseVideoStatement(BaseXapiModel):
-    """Base model for xAPI video statements.
+    """Pydantic model for video core statements.
 
     Attributes:
         object (dict): See VideoObjectField.
@@ -48,7 +48,7 @@ class BaseVideoStatement(BaseXapiModel):
 
 
 class VideoInitialized(BaseVideoStatement):
-    """Represents a video initialized xAPI statement.
+    """Pydantic model for video initialized statement.
 
     Example: A video has been fully initialized.
 
@@ -67,7 +67,7 @@ class VideoInitialized(BaseVideoStatement):
 
 
 class VideoPlayed(BaseVideoStatement):
-    """Represents a video played xAPI statement.
+    """Pydantic model for video played statement.
 
     Example: John played the video or clicked the play button.
 
@@ -88,7 +88,7 @@ class VideoPlayed(BaseVideoStatement):
 
 
 class VideoPaused(BaseVideoStatement):
-    """Represents a video paused xAPI statement.
+    """Pydantic model for video paused statement.
 
     Example: John paused the video or clicked the pause button.
 
@@ -109,7 +109,7 @@ class VideoPaused(BaseVideoStatement):
 
 
 class VideoSeeked(BaseVideoStatement):
-    """Represents a video seeked xAPI statement.
+    """Pydantic model for video seeked statement.
 
     Example: John moved the progress bar forward or backward to a specific time in the
         video.
@@ -131,7 +131,7 @@ class VideoSeeked(BaseVideoStatement):
 
 
 class VideoCompleted(BaseVideoStatement):
-    """Represents a video completed xAPI statement.
+    """Pydantic model for video completed statement.
 
     Example: John completed a video by watching major parts of the video at least once.
 
@@ -152,7 +152,7 @@ class VideoCompleted(BaseVideoStatement):
 
 
 class VideoTerminated(BaseVideoStatement):
-    """Represents a video terminated xAPI statement.
+    """Pydantic model for video terminated statement.
 
     Example: John ended a video (quit the player).
 

@@ -45,7 +45,7 @@ class VideoPausedResultExtensionsField(VideoResultExtensionsField):
 
 
 class VideoSeekedResultExtensionsField(BaseModelWithConfig):
-    """Represents the result.extensions field for video `seeked` xAPI statement.
+    """Pydantic model for video seeked `result`.`extensions` field.
 
     Attributes:
         timeFrom (float): Consists of the point in time the actor changed from in a
@@ -102,7 +102,7 @@ class VideoEnableClosedCaptioningResultExtensionsField(VideoResultExtensionsFiel
 
 
 class VideoPlayedResultField(ResultField):
-    """Represents the result field for video `played` xAPI statement.
+    """Pydantic model for video played `result` field.
 
     Attributes:
         extensions (dict): See VideoResultExtensionsField.
@@ -112,7 +112,7 @@ class VideoPlayedResultField(ResultField):
 
 
 class VideoPausedResultField(ResultField):
-    """Represents the result field for video `paused` xAPI statement.
+    """Pydantic model for video paused `result` field.
 
     Attributes:
         extensions (dict): See VideoPausedResultExtensionsField.
@@ -122,7 +122,7 @@ class VideoPausedResultField(ResultField):
 
 
 class VideoSeekedResultField(ResultField):
-    """Represents the result field for video `seeked` xAPI statement.
+    """Pydantic model for video seeked `result` field.
 
     Attributes:
         extensions (dict): See VideoSeekedResultExtensionsField.
@@ -132,7 +132,7 @@ class VideoSeekedResultField(ResultField):
 
 
 class VideoCompletedResultField(ResultField):
-    """Represents the result field for video `completed` xAPI statement.
+    """Pydantic model for video completed `result` field.
 
     Attributes:
         extensions (dict): See VideoCompletedResultExtensionsField.
@@ -147,7 +147,7 @@ class VideoCompletedResultField(ResultField):
 
 
 class VideoTerminatedResultField(ResultField):
-    """Represents the result field for video `terminated` xAPI statement.
+    """Pydantic model for video terminated `result` field.
 
     Attributes:
         extensions (dict): See VideoTerminatedResultExtensionsField.
