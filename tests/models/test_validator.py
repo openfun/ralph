@@ -167,7 +167,8 @@ def test_models_validator_validate_with_valid_events(
 @custom_given(UIPageClose)
 def test_models_validator_validate_counter(caplog, event):
     """Tests given multiple events the validate method
-    should log the total and invalid events."""
+    should log the total and invalid events.
+    """
 
     valid_event = event.json()
     invalid_event_1 = 1
