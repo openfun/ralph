@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
-"""
-Ralph main entrypoint.
+"""Ralph main entrypoint.
 
 This script is a POC for now, we aim to make ralph a nice CLI to use.
 """
