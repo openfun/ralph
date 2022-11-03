@@ -8,7 +8,6 @@ from ralph.exceptions import ConfigurationException
 
 def configure_logging():
     """Set up Ralph logging configuration."""
-
     try:
         dictConfig(settings.LOGGING)
     except Exception as error:

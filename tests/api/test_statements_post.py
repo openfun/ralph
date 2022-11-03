@@ -267,7 +267,6 @@ def test_api_statements_post_statements_with_a_failure_during_storage(
 
     def put_mock(*args, **kwargs):
         """Raises an exception. Mocks the database.put method."""
-
         raise BackendException()
 
     backend_instance = backend()
@@ -308,7 +307,6 @@ def test_api_statements_post_statements_with_a_failure_during_id_query(
 
     def query_statements_by_ids_mock(*args, **kwargs):
         """Raises an exception. Mocks the database.query_statements_by_ids method."""
-
         raise BackendException()
 
     backend_instance = backend()
@@ -355,7 +353,6 @@ def test_post_statements_list_without_statement_forwarding(
 
     def spy_mock_forward_xapi_statements(_):
         """Mocks the forward_xapi_statements; spies over whether it has been called."""
-
         spy["error"] = "forward_xapi_statements should not have been called!"
 
     monkeypatch.setattr(

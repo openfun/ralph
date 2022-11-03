@@ -15,7 +15,6 @@ def test_models_edx_speed_change_video_event_field_with_valid_field(field):
     """Tests that a valid `SpeedChangeVideoEventField` does not raise a
     `ValidationError`.
     """
-
     assert field.old_speed in ["0.75", "1.0", "1.25", "1.50", "2.0"]
     assert field.new_speed in ["0.75", "1.0", "1.25", "1.50", "2.0"]
 
@@ -27,11 +26,10 @@ def test_models_edx_speed_change_video_event_field_with_valid_field(field):
 @custom_given(SpeedChangeVideoEventField)
 def test_models_edx_speed_change_video_event_field_with_invalid_old_speed_value(
     old_speed, field
-):  # noqa
+):
     """Tests that an invalid `old_speed` value in
     `SpeedChangeVideoEventField` raises a `ValidationError`.
     """
-
     invalid_field = json.loads(field.json())
     invalid_field["old_speed"] = old_speed
 
@@ -46,11 +44,10 @@ def test_models_edx_speed_change_video_event_field_with_invalid_old_speed_value(
 @custom_given(SpeedChangeVideoEventField)
 def test_models_edx_speed_change_video_event_field_with_invalid_new_speed_value(
     new_speed, field
-):  # noqa
+):
     """Tests that an invalid `new_speed` value in
     `SpeedChangeVideoEventField` raises a `ValidationError`.
     """
-
     invalid_field = json.loads(field.json())
     invalid_field["new_speed"] = new_speed
 

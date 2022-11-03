@@ -16,7 +16,6 @@ def test_model_selector_server_get_model_with_valid_event(event):
     """Tests given a server statement, the get_model method should return the
     corresponding model.
     """
-
     event = json.loads(event.json())
     assert ModelSelector(module="ralph.models.edx").get_first_model(event) is Server
 
@@ -25,6 +24,5 @@ def test_model_selector_server_get_model_with_invalid_event():
     """Tests given a server statement, the get_model method should raise
     UnknownEventException.
     """
-
     with pytest.raises(UnknownEventException):
         ModelSelector(module="ralph.models.edx").get_first_model({"invalid": "event"})

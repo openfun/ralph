@@ -25,7 +25,6 @@ client = TestClient(app)
 
 def insert_es_statements(es_client, statements):
     """Inserts a bunch of example statements into Elasticsearch for testing."""
-
     bulk(
         es_client,
         [
@@ -43,7 +42,6 @@ def insert_es_statements(es_client, statements):
 
 def insert_mongo_statements(mongo_client, statements):
     """Inserts a bunch of example statements into MongoDB for testing."""
-
     database = getattr(mongo_client, MONGO_TEST_DATABASE)
     collection = getattr(database, MONGO_TEST_COLLECTION)
     collection.insert_many(list(MongoDatabase.to_documents(statements)))
@@ -56,7 +54,6 @@ def insert_statements_and_monkeypatch_backend(request, es, mongo, monkeypatch):
 
     def _insert_statements_and_monkeypatch_backend(statements):
         """Inserts statements once into Elasticsearch and once into MongoDB."""
-
         database_client_class_path = "ralph.api.routers.statements.DATABASE_CLIENT"
         if request.param == "mongo":
             insert_mongo_statements(mongo, statements)
@@ -398,7 +395,6 @@ def test_api_statements_get_statements_with_database_query_failure(
 
     def mock_query_statements(*_):
         """Mocks the DATABASE_CLIENT.query_statements method."""
-
         raise BackendException()
 
     monkeypatch.setattr(

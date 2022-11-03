@@ -402,7 +402,6 @@ def test_backends_database_es_query_statements_with_pit_query_failure(
 
     def mock_open_point_in_time(**_):
         """Mocks the Elasticsearch.open_point_in_time method."""
-
         raise ValueError("ES failure")
 
     database = ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX)
@@ -429,7 +428,6 @@ def test_backends_database_es_query_statements_with_search_query_failure(
 
     def mock_search(**_):
         """Mocks the Elasticsearch.search method."""
-
         raise ApiError("Something is wrong", ApiResponseMeta(*([None] * 5)), None)
 
     database = ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX)
@@ -456,7 +454,6 @@ def test_backends_database_es_query_statements_by_ids_with_search_query_failure(
 
     def mock_search(**_):
         """Mocks the Elasticsearch.search method."""
-
         raise ApiError("Something is wrong", ApiResponseMeta(*([None] * 5)), None)
 
     database = ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX)

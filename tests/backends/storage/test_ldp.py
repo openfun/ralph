@@ -95,7 +95,6 @@ def test_backends_storage_ldp_details_method(monkeypatch):
 
     def mock_get(url):
         """Mocks the OVH client get request."""
-
         name = PurePath(urlparse(url).path).name
         return {
             "archiveId": str(uuid.UUID(name)),
@@ -273,7 +272,6 @@ def test_backends_storage_ldp_list_method_history_management(monkeypatch, fs):
 
 def test_backends_storage_ldp_list_method_with_details(monkeypatch):
     """Tests the LDPStorage list method with detailed output."""
-
     details_responses = [
         {
             "archiveId": "5d5c4c93-04a4-42c5-9860-f51fa4044aa1",
@@ -300,7 +298,6 @@ def test_backends_storage_ldp_list_method_with_details(monkeypatch):
 
     def mock_get(url):
         """Mocks OVH client get requests."""
-
         # list request
         if url.endswith("archive"):
             return [
@@ -444,7 +441,6 @@ def test_backends_storage_ldp_read_method(monkeypatch, fs):
 
 def test_backends_storage_ldp_write_method_with_details():
     """Tests the LDPStorage write method."""
-
     storage = LDPStorage(
         endpoint="ovh-eu",
         application_key="fake_key",

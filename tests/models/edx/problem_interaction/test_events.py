@@ -25,7 +25,6 @@ from tests.fixtures.hypothesis_strategies import custom_given
 @custom_given(CorrectMap)
 def test_models_edx_correct_map_with_valid_content(subfield):
     """Tests that a valid `CorrectMap` does not raise a `ValidationError`."""
-
     assert subfield.correctness in ("correct", "incorrect")
     assert subfield.hintmode in ("on_request", "always", None)
 
@@ -36,7 +35,6 @@ def test_models_edx_correct_map_with_invalid_correctness_value(correctness, subf
     """Tests that an invalid `correctness` value in `CorrectMap` raises a
     `ValidationError`.
     """
-
     invalid_subfield = json.loads(subfield.json())
     invalid_subfield["correctness"] = correctness
 
@@ -50,7 +48,6 @@ def test_models_edx_correct_map_with_invalid_hintmode_value(hintmode, subfield):
     """Tests that an invalid `hintmode` value in `CorrectMap` raises a
     `ValidationError`.
     """
-
     invalid_subfield = json.loads(subfield.json())
     invalid_subfield["hintmode"] = hintmode
 
@@ -63,7 +60,6 @@ def test_models_edx_problem_hint_feedback_displayed_event_field_with_valid_field
     """Tests that a valid `EdxProblemHintFeedbackDisplayedEventField` does not raise a
     `ValidationError`.
     """
-
     assert field.question_type in (
         "stringresponse",
         "choiceresponse",
@@ -92,7 +88,6 @@ def test_models_edx_problem_hint_feedback_displayed_event_field_with_invalid_que
     """Tests that an invalid `question_type` value in
     `EdxProblemHintFeedbackDisplayedEventField` raises a `ValidationError`.
     """
-
     invalid_field = json.loads(field.json())
     invalid_field["question_type"] = question_type
 
@@ -109,7 +104,6 @@ def test_models_edx_problem_hint_feedback_displayed_event_field_with_invalid_tri
     """Tests that an invalid `question_type` value in
     `EdxProblemHintFeedbackDisplayedEventField` raises a `ValidationError`.
     """
-
     invalid_field = json.loads(field.json())
     invalid_field["trigger_type"] = trigger_type
 
@@ -122,7 +116,6 @@ def test_models_edx_problem_check_event_field_with_valid_field(field):
     """Tests that a valid `ProblemCheckEventField` does not raise a
     `ValidationError`.
     """
-
     assert re.match(
         (
             r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]"
@@ -167,7 +160,6 @@ def test_models_edx_problem_check_event_field_with_invalid_problem_id_value(
     """Tests that an invalid `problem_id` value in `ProblemCheckEventField` raises a
     `ValidationError`.
     """
-
     invalid_field = json.loads(field.json())
     invalid_field["problem_id"] = problem_id
 
@@ -185,7 +177,6 @@ def test_models_edx_problem_check_event_field_with_invalid_success_value(
     """Tests that an invalid `success` value in `ProblemCheckEventField` raises a
     `ValidationError`.
     """
-
     invalid_field = json.loads(field.json())
     invalid_field["success"] = success
 
@@ -198,7 +189,6 @@ def test_models_edx_problem_check_fail_event_field_with_valid_field(field):
     """Tests that a valid `ProblemCheckFailEventField` does not raise a
     `ValidationError`.
     """
-
     assert re.match(
         (
             r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]"
@@ -243,7 +233,6 @@ def test_models_edx_problem_check_fail_event_field_with_invalid_problem_id_value
     """Tests that an invalid `problem_id` value in `ProblemCheckFailEventField` raises a
     `ValidationError`.
     """
-
     invalid_field = json.loads(field.json())
     invalid_field["problem_id"] = problem_id
 
@@ -261,7 +250,6 @@ def test_models_edx_problem_check_fail_event_field_with_invalid_failure_value(
     """Tests that an invalid `failure` value in `ProblemCheckFailEventField` raises a
     `ValidationError`.
     """
-
     invalid_field = json.loads(field.json())
     invalid_field["failure"] = failure
 
@@ -274,7 +262,6 @@ def test_models_edx_problem_rescore_event_field_with_valid_field(field):
     """Tests that a valid `ProblemRescoreEventField` does not raise a
     `ValidationError`.
     """
-
     assert re.match(
         (
             r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]"
@@ -319,7 +306,6 @@ def test_models_edx_problem_rescore_event_field_with_invalid_problem_id_value(
     """Tests that an invalid `problem_id` value in `ProblemRescoreEventField` raises a
     `ValidationError`.
     """
-
     invalid_field = json.loads(field.json())
     invalid_field["problem_id"] = problem_id
 
@@ -337,7 +323,6 @@ def test_models_edx_problem_rescore_event_field_with_invalid_success_value(
     """Tests that an invalid `success` value in `ProblemRescoreEventField` raises a
     `ValidationError`.
     """
-
     invalid_field = json.loads(field.json())
     invalid_field["success"] = success
 
@@ -350,7 +335,6 @@ def test_models_edx_problem_rescore_fail_event_field_with_valid_field(field):
     """Tests that a valid `ProblemRescoreFailEventField` does not raise a
     `ValidationError`.
     """
-
     assert re.match(
         (
             r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]"
@@ -395,7 +379,6 @@ def test_models_edx_problem_rescore_fail_event_field_with_invalid_problem_id_val
     """Tests that an invalid `problem_id` value in `ProblemRescoreFailEventField` raises
     a `ValidationError`.
     """
-
     invalid_field = json.loads(field.json())
     invalid_field["problem_id"] = problem_id
 
@@ -413,7 +396,6 @@ def test_models_edx_problem_rescore_fail_event_field_with_invalid_failure_value(
     """Tests that an invalid `failure` value in `ProblemRescoreFailEventField` raises a
     `ValidationError`.
     """
-
     invalid_field = json.loads(field.json())
     invalid_field["failure"] = failure
 
@@ -426,7 +408,6 @@ def test_models_edx_reset_problem_event_field_with_valid_field(field):
     """Tests that a valid `ResetProblemEventField` does not raise a
     `ValidationError`.
     """
-
     assert re.match(
         (
             r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]"
@@ -470,7 +451,6 @@ def test_models_edx_reset_problem_event_field_with_invalid_problem_id_value(
     """Tests that an invalid `problem_id` value in `ResetProblemEventField` raises a
     `ValidationError`.
     """
-
     invalid_field = json.loads(field.json())
     invalid_field["problem_id"] = problem_id
 
@@ -485,7 +465,6 @@ def test_models_edx_reset_problem_fail_event_field_with_valid_field(field):
     """Tests that a valid `ResetProblemFailEventField` does not raise a
     `ValidationError`.
     """
-
     assert re.match(
         (
             r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]"
@@ -530,7 +509,6 @@ def test_models_edx_reset_problem_fail_event_field_with_invalid_problem_id_value
     """Tests that an invalid `problem_id` value in `ResetProblemFailEventField` raises
     a `ValidationError`.
     """
-
     invalid_field = json.loads(field.json())
     invalid_field["problem_id"] = problem_id
 
@@ -548,7 +526,6 @@ def test_models_edx_reset_problem_fail_event_field_with_invalid_failure_value(
     """Tests that an invalid `failure` value in `ResetProblemFailEventField` raises a
     `ValidationError`.
     """
-
     invalid_field = json.loads(field.json())
     invalid_field["failure"] = failure
 
@@ -561,7 +538,6 @@ def test_models_edx_save_problem_fail_event_field_with_valid_field(field):
     """Tests that a valid `SaveProblemFailEventField` does not raise a
     `ValidationError`.
     """
-
     assert re.match(
         (
             r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]"
@@ -606,7 +582,6 @@ def test_models_edx_save_problem_fail_event_field_with_invalid_problem_id_value(
     """Tests that an invalid `problem_id` value in `SaveProblemFailEventField` raises a
     `ValidationError`.
     """
-
     invalid_field = json.loads(field.json())
     invalid_field["problem_id"] = problem_id
 
@@ -624,7 +599,6 @@ def test_models_edx_save_problem_fail_event_field_with_invalid_failure_value(
     """Tests that an invalid `failure` value in `SaveProblemFailEventField` raises a
     `ValidationError`.
     """
-
     invalid_field = json.loads(field.json())
     invalid_field["failure"] = failure
 
@@ -637,7 +611,6 @@ def test_models_edx_save_problem_success_event_field_with_valid_field(field):
     """Tests that a valid `SaveProblemFailEventField` does not raise a
     `ValidationError`.
     """
-
     assert re.match(
         (
             r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]"
@@ -681,7 +654,6 @@ def test_models_edx_save_problem_success_event_field_with_invalid_problem_id_val
     """Tests that an invalid `problem_id` value in `SaveProblemSuccessEventField`
     raises a `ValidationError`.
     """
-
     invalid_field = json.loads(field.json())
     invalid_field["problem_id"] = problem_id
 

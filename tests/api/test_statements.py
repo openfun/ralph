@@ -12,7 +12,6 @@ def test_api_statements_backend_instance_with_runserver_backend_env(monkeypatch)
     """Tests that given the RALPH_RUNSERVER_BACKEND environment variable, the backend
     instance `DATABASE_CLIENT` should be updated accordingly.
     """
-
     # Default backend
     assert isinstance(statements.DATABASE_CLIENT, ESDatabase)
 

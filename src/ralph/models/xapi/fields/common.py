@@ -12,7 +12,6 @@ class IRI(str):
     def __get_validators__(cls):  # noqa: D105
         def validate(iri: str):
             """Checks whether the provided IRI is a valid RFC 3987 IRI."""
-
             parse(iri, rule="IRI")
             return cls(iri)
 
@@ -26,7 +25,6 @@ class LanguageTag(str):
     def __get_validators__(cls):  # noqa: D105
         def validate(tag: str):
             """Checks whether the provided tag is a valid RFC 5646 Language tag."""
-
             if not tag_is_valid(tag):
                 raise TypeError("Invalid RFC 5646 Language tag")
             return cls(tag)
@@ -46,7 +44,6 @@ class MailtoEmail(str):
     def __get_validators__(cls):  # noqa: D105
         def validate(mailto: str):
             """Checks whether the provided value follows the `mailto:email` format."""
-
             if not mailto.startswith("mailto:"):
                 raise TypeError("Invalid `mailto:email` value")
             valid = validate_email(mailto[7:])

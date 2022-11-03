@@ -42,7 +42,6 @@ def test_conf_settings_field_value_priority(fs, monkeypatch):
 )
 def test_conf_comma_separated_list_with_valid_values(value, expected, monkeypatch):
     """Tests the CommaSeparatedTuple pydantic data type with valid values."""
-
     assert next(CommaSeparatedTuple.__get_validators__())(value) == expected
     monkeypatch.setenv("RALPH_BACKENDS__DATABASE__ES__HOSTS", "".join(value))
     assert Settings().BACKENDS.DATABASE.ES.HOSTS == expected
@@ -51,14 +50,12 @@ def test_conf_comma_separated_list_with_valid_values(value, expected, monkeypatc
 @pytest.mark.parametrize("value", [{}, [], None])
 def test_conf_comma_separated_list_with_invalid_values(value):
     """Tests the CommaSeparatedTuple pydantic data type with invalid values."""
-
     with pytest.raises(TypeError, match="Invalid comma separated list"):
         next(CommaSeparatedTuple.__get_validators__())(value)
 
 
 def test_conf_settings_should_define_all_backends_options():
     """Tests that Settings model defines all backends options."""
-
     for _, backends in settings.BACKENDS:
         for _, backend in backends:
             # pylint: disable=protected-access
@@ -71,7 +68,6 @@ def test_conf_settings_should_define_all_backends_options():
 
 def test_conf_core_settings_should_impact_settings_defaults(monkeypatch):
     """Tests that core settings update application settings values."""
-
     monkeypatch.setenv("RALPH_APP_DIR", "/foo")
     monkeypatch.setenv("RALPH_LOCALE_ENCODING", "ascii")
     reload(conf)

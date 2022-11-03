@@ -48,7 +48,6 @@ class CommaSeparatedTuple(str):
     def __get_validators__(cls):  # noqa: D105
         def validate(value: Union[str, tuple[str]]) -> tuple[str]:
             """Checks whether the value is a comma separated string or a tuple."""
-
             if isinstance(value, tuple):
                 return value
 
@@ -70,7 +69,6 @@ class InstantiableSettingsItem(BaseModel):
 
     def get_instance(self, **init_parameters):
         """Returns an instance of the settings item class using it's `_class_path`."""
-
         return import_string(self._class_path)(**init_parameters)
 
 
@@ -278,13 +276,11 @@ class Settings(BaseSettings):
     @property
     def APP_DIR(self) -> Path:  # pylint: disable=invalid-name
         """Returns the path to Ralph's configuration directory."""
-
         return self._CORE.APP_DIR
 
     @property
     def LOCALE_ENCODING(self) -> str:  # pylint: disable=invalid-name
         """Returns Ralph's default locale encoding."""
-
         return self._CORE.LOCALE_ENCODING
 
 

@@ -29,7 +29,6 @@ class ScoreResultField(BaseModelWithConfig):
     @classmethod
     def check_raw_min_max_relation(cls, values):
         """Checks the relationship `min < raw < max`."""
-
         raw_value = values.get("raw", None)
         min_value = values.get("min", None)
         max_value = values.get("max", None)

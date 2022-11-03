@@ -65,7 +65,6 @@ class MongoDatabase(BaseDatabase):
 
     def status(self) -> DatabaseStatus:
         """Checks MongoDB cluster connection status."""
-
         # Check Mongo cluster connection
         try:
             self.client.admin.command("ping")
@@ -86,7 +85,6 @@ class MongoDatabase(BaseDatabase):
         pymongo.collection.Collection.find method signature (API reference
         documentation: https://pymongo.readthedocs.io/en/stable/api/pymongo/).
         """
-
         for document in self.collection.find(batch_size=chunk_size, **query.dict()):
             # Make the document json-serializable
             document.update({"_id": str(document.get("_id"))})
@@ -102,7 +100,6 @@ class MongoDatabase(BaseDatabase):
         be used to compute a unique MongoDB Object ID. This ensures that we will not
         duplicate statements in our database and allows us to support pagination.
         """
-
         for line in stream:
             statement = json.loads(line) if isinstance(line, str) else line
             if "id" not in statement:
@@ -141,7 +138,6 @@ class MongoDatabase(BaseDatabase):
 
     def bulk_import(self, batch: list, ignore_errors: bool = False):
         """Inserts a batch of documents into the selected database collection."""
-
         try:
             new_documents = self.collection.insert_many(batch)
         except BulkWriteError as error:
@@ -167,7 +163,6 @@ class MongoDatabase(BaseDatabase):
         ignore_errors: bool = False,
     ) -> int:
         """Writes documents from the `stream` to the instance collection."""
-
         logger.debug(
             "Start writing to the %s collection of the %s database (chunk size: %d)",
             self.collection,
@@ -196,7 +191,6 @@ class MongoDatabase(BaseDatabase):
 
     def query_statements(self, params: StatementParameters) -> StatementQueryResult:
         """Returns the results of a statements query using xAPI parameters."""
-
         mongo_query_filters = {}
 
         if params.statementId:
@@ -249,7 +243,6 @@ class MongoDatabase(BaseDatabase):
 
     def query_statements_by_ids(self, ids: list[str]) -> list:
         """Returns the list of matching statement IDs from the database."""
-
         return self._find(filter={"_source.id": {"$in": ids}})
 
     def _find(self, **kwargs):
@@ -258,7 +251,6 @@ class MongoDatabase(BaseDatabase):
         Raises:
             BackendException: raised for any failure.
         """
-
         try:
             return list(self.collection.find(**kwargs))
         except (PyMongoError, IndexError, TypeError, ValueError) as error:

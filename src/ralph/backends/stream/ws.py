@@ -24,7 +24,6 @@ class WSStream(BaseStream):
         Args:
             uri (str): The URI to connect to.
         """
-
         self.uri = uri
 
     def stream(self, target: BinaryIO):

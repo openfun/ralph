@@ -18,7 +18,6 @@ class HistoryMixin:
     @property
     def history(self):
         """Get backend history."""
-
         logger.debug("Loading history file: %s", str(settings.HISTORY_FILE))
 
         if not hasattr(self, "_history"):
@@ -34,7 +33,6 @@ class HistoryMixin:
     # pylint: disable=no-self-use
     def write_history(self, history):
         """Write given history as a JSON file."""
-
         logger.debug("Writing history file: %s", str(settings.HISTORY_FILE))
 
         if not settings.HISTORY_FILE.parent.exists():
@@ -58,12 +56,10 @@ class HistoryMixin:
 
     def append_to_history(self, event):
         """Append event to history."""
-
         self.write_history(self.history + [event])
 
     def get_command_history(self, backend_name, command):
         """Extracts entry ids from the history for a given command and backend_name."""
-
         return [
             entry["id"]
             for entry in filter(

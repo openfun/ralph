@@ -40,7 +40,6 @@ class SwiftStorage(
         os_identity_api_version: str = swift_settings.OS_IDENTITY_API_VERSION,
     ):
         """Prepares the options for the SwiftService."""
-
         self.os_tenant_id = os_tenant_id
         self.os_tenant_name = os_tenant_name
         self.os_username = os_username
@@ -63,7 +62,6 @@ class SwiftStorage(
     @cached_property
     def options(self):
         """Returns the required options for the SwiftService."""
-
         return {
             "os_auth_url": self.os_auth_url,
             "os_identity_api_version": self.os_identity_api_version,
@@ -79,7 +77,6 @@ class SwiftStorage(
 
     def list(self, details=False, new=False):
         """Lists files in the storage backend."""
-
         archives_to_skip = set()
         if new:
             archives_to_skip = set(self.get_command_history(self.name, "fetch"))
@@ -96,7 +93,6 @@ class SwiftStorage(
 
     def url(self, name):
         """Gets `name` file absolute URL."""
-
         # What's the purpose of this function ? Seems not used anywhere.
         return f"{self.options.get('os_storage_url')}/{name}"
 
@@ -108,7 +104,6 @@ class SwiftStorage(
             See swiftclient.service.py:2082 open(filename, 'rb', DISK_BUFFER)
             Where filename = "/dev/stdout" and DISK_BUFFER = 2 ** 16
         """
-
         logger.debug("Getting archive: %s", name)
 
         with SwiftService(self.options) as swift:
@@ -138,7 +133,6 @@ class SwiftStorage(
 
     def write(self, stream, name, overwrite=False):
         """Writes data from `stream` to the `name` target in chunks of (max) 2 ** 16."""
-
         if not overwrite and name in list(self.list()):
             msg = "%s already exists and overwrite is not allowed"
             logger.error(msg, name)

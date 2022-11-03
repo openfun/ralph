@@ -42,7 +42,6 @@ class GELFParser(BaseParser):
         Yields:
             event: Events raw short_message string.
         """
-
         logger.info("Parsing: %s", input_file)
 
         for event in input_file:
@@ -75,7 +74,6 @@ class ElasticSearchParser(BaseParser):
         Yields:
             document: ElasticSearch documents `_source` field content.
         """
-
         logger.info("Parsing: %s", input_file)
 
         for document in input_file:

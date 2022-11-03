@@ -42,7 +42,6 @@ class CommaSeparatedTupleParamType(click.ParamType):
 
     def convert(self, value, param, ctx):
         """Splits the value by comma to return a tuple of values."""
-
         if isinstance(value, str):
             return tuple(value.split(","))
 
@@ -66,7 +65,6 @@ class CommaSeparatedKeyValueParamType(click.ParamType):
 
         Returns a dictionary build with key/value pairs.
         """
-
         if isinstance(value, dict):
             return value
 
@@ -106,7 +104,6 @@ class JSONStringParamType(click.ParamType):
 
     def convert(self, value, param, ctx):
         """Load value as a json string and return a dict."""
-
         try:
             options = json.loads(value)
         except (json.JSONDecodeError, TypeError):
@@ -129,7 +126,6 @@ class JSONStringParamType(click.ParamType):
 )
 def cli(verbosity=None):
     """Ralph is a stream-based tool to play with your logs."""
-
     configure_logging()
     if verbosity is not None:
         level = getattr(logging, verbosity, None)
@@ -191,7 +187,6 @@ def backends_options(name=None, backend_types: list[BaseModel] = None):
 )
 def extract(parser):
     """Extracts input events from a container format using a dedicated parser."""
-
     logger.info("Extracting events using the %s parser", parser)
 
     parser = getattr(settings.PARSERS, parser.upper()).get_instance()
@@ -225,7 +220,6 @@ def extract(parser):
 )
 def validate(format_, ignore_errors, fail_on_unknown):
     """Validates input events of given format."""
-
     logger.info(
         "Validating %s events (ignore_errors=%s | fail-on-unknown=%s)",
         format_,
@@ -288,7 +282,6 @@ def validate(format_, ignore_errors, fail_on_unknown):
 )
 def convert(from_, to_, ignore_errors, fail_on_unknown, **conversion_set_kwargs):
     """Converts input events to a given format."""
-
     logger.info(
         "Converting %s events to %s format (ignore_errors=%s | fail-on-unknown=%s)",
         from_,
@@ -326,7 +319,6 @@ def convert(from_, to_, ignore_errors, fail_on_unknown, **conversion_set_kwargs)
 )
 def fetch(backend, archive, chunk_size, query, **options):
     """Fetch an archive or records from a configured backend."""
-
     logger.info(
         (
             "Fetching data from the configured %s backend "
@@ -389,7 +381,6 @@ def fetch(backend, archive, chunk_size, query, **options):
 )
 def push(backend, archive, chunk_size, force, ignore_errors, **options):
     """Push an archive to a configured backend."""
-
     logger.info("Pushing archive %s to the configured %s backend", archive, backend)
     logger.debug("Backend parameters: %s", options)
 
@@ -421,7 +412,6 @@ def push(backend, archive, chunk_size, force, ignore_errors, **options):
 )
 def list_(details, new, backend, **options):
     """List available archives from a configured storage backend."""
-
     logger.info("Listing archives for the configured %s backend", backend)
     logger.debug("Fetch details: %s", str(details))
     logger.debug("Backend parameters: %s", options)
@@ -461,7 +451,6 @@ def runserver(backend: str, host: str, port: int, **options):
 
     Starts uvicorn programmatically for convenience and documentation.
     """
-
     logger.info("Running API server on %s:%s with %s backend", host, port, backend)
     logger.info(
         (

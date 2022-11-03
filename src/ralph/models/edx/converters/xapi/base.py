@@ -26,7 +26,6 @@ class BaseXapiConverter(BaseConversionSet):
 
     def __init__(self, uuid_namespace: str, platform_url: str):
         """Initializes BaseXapiConverter."""
-
         self.platform_url = platform_url
         try:
             self.uuid_namespace = UUID(uuid_namespace)
@@ -36,7 +35,6 @@ class BaseXapiConverter(BaseConversionSet):
 
     def _get_conversion_items(self):
         """Returns a set of ConversionItems used for conversion."""
-
         return {
             ConversionItem(
                 "id",
@@ -75,7 +73,6 @@ class BaseXapiConverter(BaseConversionSet):
 
         Returns a dictionary with `course` and `module`.
         """
-
         match = re.match(r"^course-v1:.+\+(.+)\+(.+)$", course_id)
         if not match:
             return {"course": None, "module": None}

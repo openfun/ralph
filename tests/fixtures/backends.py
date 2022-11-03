@@ -63,14 +63,12 @@ WS_TEST_PORT = 8765
 @lru_cache
 def get_es_test_backend():
     """Returns a ESDatabase backend instance using test defaults."""
-
     return ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX)
 
 
 @lru_cache
 def get_mongo_test_backend():
     """Returns a MongoDatabase backend instance using test defaults."""
-
     return MongoDatabase(
         connection_uri=MONGO_TEST_CONNECTION_URI,
         database=MONGO_TEST_DATABASE,
@@ -101,7 +99,6 @@ def get_es_fixture(host=ES_TEST_HOSTS, index=ES_TEST_INDEX):
     """Creates / deletes an ElasticSearch test index and yields an instantiated
     client.
     """
-
     client = Elasticsearch(host)
     try:
         client.indices.create(index=index)
@@ -125,7 +122,6 @@ def es():
 @pytest.fixture
 def es_forwarding():
     """Yields a second ElasticSearch test client. See get_es_fixture above."""
-
     for es_client in get_es_fixture(index=ES_TEST_FORWARDING_INDEX):
         yield es_client
 
@@ -138,7 +134,6 @@ def get_mongo_fixture(
     """Creates / deletes a Mongo test database + collection and yields an
     instantiated client.
     """
-
     client = MongoClient(connection_uri)
     database = getattr(client, database)
     try:
@@ -155,7 +150,6 @@ def get_mongo_fixture(
 @pytest.fixture
 def mongo():
     """Yields a Mongo test client. See get_mongo_fixture above."""
-
     for mongo_client in get_mongo_fixture():
         yield mongo_client
 
@@ -163,7 +157,6 @@ def mongo():
 @pytest.fixture
 def mongo_forwarding():
     """Yields a second Mongo test client. See get_mongo_fixture above."""
-
     for mongo_client in get_mongo_fixture(collection=MONGO_TEST_FORWARDING_COLLECTION):
         yield mongo_client
 
@@ -173,7 +166,6 @@ def es_data_stream():
     """Creates / deletes an ElasticSearch test datastream and yields an instantiated
     client.
     """
-
     client = Elasticsearch(ES_TEST_HOSTS)
 
     # Create statements index template with enabled data stream
@@ -228,7 +220,6 @@ def swift():
 
     def get_swift_storage():
         """Returns an instance of SwiftStorage."""
-
         return SwiftStorage(
             os_tenant_id="os_tenant_id",
             os_tenant_name="os_tenant_name",
