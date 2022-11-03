@@ -68,7 +68,8 @@ def test_backends_database_es_database_instantiation_with_forbidden_op_type(es):
 
 def test_backends_database_es_client_kwargs(es):
     """Tests the ES backend client instantiation using client_options that must be
-    passed to the http(s) connection pool."""
+    passed to the http(s) connection pool.
+    """
     # pylint: disable=invalid-name,unused-argument,protected-access
 
     database = ESDatabase(

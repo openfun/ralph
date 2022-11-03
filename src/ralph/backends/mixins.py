@@ -10,7 +10,8 @@ logger = logging.getLogger(__name__)
 
 class HistoryMixin:
     """Handle backend download history to avoid fetching same files multiple
-    times if they are already available."""
+    times if they are already available.
+    """
 
     @property
     def history(self):
