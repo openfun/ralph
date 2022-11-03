@@ -1,4 +1,4 @@
-"""Tests for the base event model"""
+"""Tests for the base event model."""
 
 import json
 import re

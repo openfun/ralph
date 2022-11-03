@@ -1,4 +1,4 @@
-"""Navigation xAPI events object fields definitions"""
+"""Navigation xAPI events object fields definitions."""
 
 from typing import Optional
 

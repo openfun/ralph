@@ -12,8 +12,8 @@ from ralph.conf import settings
 @pytest.fixture
 def auth_credentials(fs):
     """Sets up the credentials file for request authentication.
-    
-    Returns: 
+
+    Returns:
         credentials (str): auth parameters that need to be passed
             through headers to authenticate the request.
     """

@@ -1,4 +1,4 @@
-"""Tests for the ralph.filters module"""
+"""Tests for the ralph.filters module."""
 
 import pytest
 

@@ -1,4 +1,4 @@
-"""Tests for the textbook interaction event models"""
+"""Tests for the textbook interaction event models."""
 
 import json
 

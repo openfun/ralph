@@ -1,4 +1,4 @@
-"""Websocket stream backend for Ralph"""
+"""Websocket stream backend for Ralph."""
 
 import asyncio
 import logging

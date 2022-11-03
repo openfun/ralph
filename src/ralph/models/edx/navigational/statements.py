@@ -1,4 +1,4 @@
-"""Navigational event model definitions"""
+"""Navigational event model definitions."""
 
 from typing import Literal, Union
 

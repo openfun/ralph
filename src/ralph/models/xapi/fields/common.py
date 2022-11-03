@@ -1,4 +1,4 @@
-"""Common xAPI field definitions"""
+"""Common xAPI field definitions."""
 
 from langcodes import tag_is_valid
 from pydantic import StrictStr, validate_email

@@ -1,4 +1,4 @@
-"""xAPI statement forwarding background task"""
+"""xAPI statement forwarding background task."""
 
 import logging
 from functools import lru_cache

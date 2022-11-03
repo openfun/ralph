@@ -1,4 +1,4 @@
-"""Common xAPI verb field definitions"""
+"""Common xAPI verb field definitions."""
 
 from typing import Optional
 

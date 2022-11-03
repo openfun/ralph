@@ -1,4 +1,4 @@
-"""Tests for the navigational event models"""
+"""Tests for the navigational event models."""
 
 import json
 import re

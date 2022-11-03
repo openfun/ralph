@@ -1,4 +1,4 @@
-"""Converter methods definition"""
+"""Converter methods definition."""
 
 import json
 import logging

@@ -1,4 +1,4 @@
-"""Common xAPI attachments field definitions"""
+"""Common xAPI attachments field definitions."""
 
 from typing import Optional
 

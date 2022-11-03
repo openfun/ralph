@@ -1,4 +1,4 @@
-"""Tests for video models event fields"""
+"""Tests for video models event fields."""
 
 import json
 

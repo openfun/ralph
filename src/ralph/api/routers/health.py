@@ -1,4 +1,4 @@
-"""API routes related to application health checking"""
+"""API routes related to application health checking."""
 
 import logging
 

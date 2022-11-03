@@ -1,4 +1,4 @@
-"""Tests for the xAPI object fields"""
+"""Tests for the xAPI object fields."""
 
 from ralph.models.xapi.navigation.fields.objects import PageObjectField
 

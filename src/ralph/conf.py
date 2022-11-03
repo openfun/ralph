@@ -1,4 +1,4 @@
-"""Configurations for Ralph"""
+"""Configurations for Ralph."""
 
 import io
 from pathlib import Path

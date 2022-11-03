@@ -1,4 +1,4 @@
-"""MongoDB database backend for Ralph"""
+"""MongoDB database backend for Ralph."""
 
 import hashlib
 import json
@@ -253,8 +253,10 @@ class MongoDatabase(BaseDatabase):
         return self._find(filter={"_source.id": {"$in": ids}})
 
     def _find(self, **kwargs):
-        """Wraps the MongoClient.collection.find method to raise a BackendException in
-        case of any failure.
+        """Wraps the MongoClient.collection.find method.
+
+        Raises:
+            BackendException: raised for any failure.
         """
 
         try:

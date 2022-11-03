@@ -1,4 +1,4 @@
-"""Video xAPI events object fields definitions"""
+"""Video xAPI events object fields definitions."""
 
 from typing import Optional
 

@@ -1,4 +1,4 @@
-"""Swift storage backend for Ralph"""
+"""Swift storage backend for Ralph."""
 
 import logging
 from functools import cached_property

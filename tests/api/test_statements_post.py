@@ -1,4 +1,4 @@
-"""Tests for the POST statements endpoint of the Ralph API"""
+"""Tests for the POST statements endpoint of the Ralph API."""
 
 import re
 from uuid import uuid4

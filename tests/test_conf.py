@@ -1,4 +1,4 @@
-"""Tests for Ralph's configuration loading"""
+"""Tests for Ralph's configuration loading."""
 
 from importlib import reload
 from inspect import signature

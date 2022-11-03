@@ -1,4 +1,4 @@
-"""Tests for the xAPI statements forwarding background task"""
+"""Tests for the xAPI statements forwarding background task."""
 
 import asyncio
 import json

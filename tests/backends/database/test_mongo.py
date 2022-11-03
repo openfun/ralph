@@ -1,4 +1,4 @@
-"""Tests for Ralph mongo database backend"""
+"""Tests for Ralph mongo database backend."""
 
 import logging
 from datetime import datetime

@@ -1,4 +1,4 @@
-"""Tests for the event validator"""
+"""Tests for the event validator."""
 
 import copy
 import json

@@ -1,4 +1,4 @@
-"""Tests for the base xAPI Converter"""
+"""Tests for the base xAPI Converter."""
 
 from uuid import UUID
 

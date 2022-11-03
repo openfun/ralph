@@ -1,4 +1,4 @@
-"""Tests for converter method"""
+"""Tests for converter method."""
 
 import json
 import logging

@@ -1,4 +1,4 @@
-"""OVH's LDP storage backend for Ralph"""
+"""OVH's LDP storage backend for Ralph."""
 
 import logging
 
@@ -143,7 +143,7 @@ class LDPStorage(HistoryMixin, BaseStorage):
         )
 
     def write(self, stream, name, overwrite=False):
-        """LDP storage backend is read-only, calling this method will raise an error"""
+        """LDP storage backend is read-only, calling this method will raise an error."""
 
         msg = "LDP storage backend is read-only, cannot write to %s"
         logger.error(msg, name)

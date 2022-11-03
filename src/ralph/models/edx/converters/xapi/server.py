@@ -1,4 +1,4 @@
-"""Server event xAPI Converter"""
+"""Server event xAPI Converter."""
 
 from ralph.models.converter import ConversionItem
 from ralph.models.edx.server import Server

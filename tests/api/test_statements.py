@@ -1,4 +1,4 @@
-"""Tests for the statements endpoint of the Ralph API"""
+"""Tests for the statements endpoint of the Ralph API."""
 
 from importlib import reload
 

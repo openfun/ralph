@@ -1,4 +1,4 @@
-"""Video event fields definitions"""
+"""Video event fields definitions."""
 
 from typing import Literal
 

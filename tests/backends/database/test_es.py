@@ -1,4 +1,4 @@
-"""Tests for Ralph es database backend"""
+"""Tests for Ralph es database backend."""
 
 import json
 import logging

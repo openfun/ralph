@@ -1,4 +1,4 @@
-"""FileSystem storage backend for Ralph"""
+"""FileSystem storage backend for Ralph."""
 
 import datetime
 import logging
@@ -29,8 +29,13 @@ class FSStorage(HistoryMixin, BaseStorage):
         logger.debug("File system storage path: %s", self._path)
 
     def _get_filepath(self, name, strict=False):
-        """Returns path of the archive in the FS storage, or throws an exception if
-        not found.
+        """Gets path for `name` file.
+
+        Raises:
+            FileNotFoundError: When the file_path is not found.
+
+        Returns:
+            file_path (Path): path of the archive in the FS storage.
         """
 
         file_path = self._path / Path(name)

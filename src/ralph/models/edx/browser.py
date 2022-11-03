@@ -1,4 +1,4 @@
-"""Browser event model definitions"""
+"""Browser event model definitions."""
 
 from typing import Literal, Union
 

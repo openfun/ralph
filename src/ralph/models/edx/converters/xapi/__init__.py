@@ -1,4 +1,4 @@
-"""edX to xAPI conversion sets"""
+"""edX to xAPI conversion sets."""
 
 # flake8: noqa
 

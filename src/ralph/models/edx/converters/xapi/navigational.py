@@ -1,4 +1,4 @@
-"""Navigational event xAPI Converter"""
+"""Navigational event xAPI Converter."""
 
 from ralph.models.converter import ConversionItem
 from ralph.models.edx.navigational.statements import UIPageClose

@@ -1,4 +1,4 @@
-"""Tests for the enrollment event models"""
+"""Tests for the enrollment event models."""
 
 import json
 

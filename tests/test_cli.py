@@ -1,4 +1,4 @@
-"""Tests for Ralph cli"""
+"""Tests for Ralph cli."""
 
 import json
 import logging
