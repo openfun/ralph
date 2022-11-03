@@ -36,7 +36,6 @@ test_logger = logging.getLogger("ralph")
 
 def test_cli_comma_separated_key_value_param_type():
     """Tests the CommaSeparatedKeyValueParamType custom parameter type."""
-
     param_type = CommaSeparatedKeyValueParamType()
 
     # Bad options
@@ -115,7 +114,6 @@ def test_cli_comma_separated_key_value_param_type():
 )
 def test_cli_comma_separated_tuple_param_type_with_valid_input(value, expected):
     """Tests the CommaSeparatedTupleParamType parameter type with valid input."""
-
     param_type = CommaSeparatedTupleParamType()
     assert param_type.convert(value, None, None) == expected
 
@@ -123,7 +121,6 @@ def test_cli_comma_separated_tuple_param_type_with_valid_input(value, expected):
 @pytest.mark.parametrize("value", [None, {}, ["foo"], 10, True])
 def test_cli_comma_separated_tuple_param_type_with_invalid_input(value):
     """Tests the CommaSeparatedTupleParamType parameter type with invalid input."""
-
     param_type = CommaSeparatedTupleParamType()
     with pytest.raises(
         BadParameter,
@@ -135,7 +132,6 @@ def test_cli_comma_separated_tuple_param_type_with_invalid_input(value):
 @pytest.mark.parametrize("value,expected", [('{"foo": "bar"}', {"foo": "bar"})])
 def test_cli_json_string_param_type_with_valid_input(value, expected):
     """Tests the JSONStringParamType custom parameter type with valid input."""
-
     param_type = JSONStringParamType()
     assert param_type.convert(value, None, None) == expected
 
@@ -143,7 +139,6 @@ def test_cli_json_string_param_type_with_valid_input(value, expected):
 @pytest.mark.parametrize("value", ["foo", None, {}])
 def test_cli_json_string_param_type_with_invalid_input(value):
     """Tests the JSONStringParamType custom parameter type with invalid input."""
-
     param_type = JSONStringParamType()
     with pytest.raises(
         BadParameter,
@@ -154,7 +149,6 @@ def test_cli_json_string_param_type_with_invalid_input(value):
 
 def test_cli_help_option():
     """Tests ralph --help command."""
-
     runner = CliRunner()
     result = runner.invoke(cli, ["--help"])
 
@@ -169,7 +163,6 @@ def test_cli_help_option():
 
 def test_cli_extract_command_usage():
     """Tests ralph extract command usage."""
-
     runner = CliRunner()
     result = runner.invoke(cli, ["extract", "--help"])
 
@@ -189,7 +182,6 @@ def test_cli_extract_command_usage():
 
 def test_cli_extract_command_with_gelf_parser(gelf_logger):
     """Tests the extract command using the GELF parser."""
-
     gelf_logger.info('{"username": "foo"}')
 
     runner = CliRunner()
@@ -203,7 +195,6 @@ def test_cli_extract_command_with_gelf_parser(gelf_logger):
 
 def test_cli_extract_command_with_es_parser():
     """Tests the extract command using the ElasticSearchParser."""
-
     es_output = (
         "\n".join(
             [
@@ -230,7 +221,6 @@ def test_cli_extract_command_with_es_parser():
 
 def test_cli_validate_command_usage():
     """Tests ralph validate command usage."""
-
     runner = CliRunner()
     result = runner.invoke(cli, ["validate", "--help"])
 
@@ -252,7 +242,6 @@ def test_cli_validate_command_usage():
 @custom_given(UIPageClose)
 def test_cli_validate_command_with_edx_format(event):
     """Tests the validate command using the edx format."""
-
     event_str = event.json()
     runner = CliRunner()
     result = runner.invoke(cli, ["validate", "-f", "edx"], input=event_str)
@@ -261,7 +250,6 @@ def test_cli_validate_command_with_edx_format(event):
 
 def test_cli_convert_command_usage():
     """Tests ralph convert command usage."""
-
     runner = CliRunner()
     result = runner.invoke(cli, ["convert", "--help"])
 
@@ -290,7 +278,6 @@ def test_cli_convert_command_usage():
 @pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_cli_convert_command_from_edx_to_xapi_format(valid_uuid, event):
     """Tests the convert command from edx to xapi format."""
-
     event_str = event.json()
     runner = CliRunner()
     command = f"-v ERROR convert -f edx -t xapi -u {valid_uuid} -p https://fun-mooc.fr"
@@ -307,7 +294,6 @@ def test_cli_convert_command_with_invalid_uuid(invalid_uuid):
     """Tests that the convert command raises an exception when the uuid namespace is
     invalid.
     """
-
     runner = CliRunner()
     command = f"convert -f edx -t xapi -u '{invalid_uuid}' -p https://fun-mooc.fr"
     result = runner.invoke(cli, command.split())
@@ -319,7 +305,6 @@ def test_cli_convert_command_with_invalid_uuid(invalid_uuid):
 @cli.command()
 def dummy_verbosity_check():
     """Adding a dummy command to the cli with all logging levels."""
-
     test_logger.critical("CRITICAL")
     test_logger.error("ERROR")
     test_logger.warning("WARNING")
@@ -330,7 +315,6 @@ def dummy_verbosity_check():
 @pytest.mark.parametrize("verbosity", ["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"])
 def test_cli_verbosity_option_should_impact_logging_behaviour(verbosity):
     """Tests that the verbosity option impacts logging output."""
-
     runner = CliRunner()
     result = runner.invoke(cli, ["-v", verbosity, "dummy-verbosity-check"])
     assert verbosity in result.output
@@ -338,7 +322,6 @@ def test_cli_verbosity_option_should_impact_logging_behaviour(verbosity):
 
 def test_cli_fetch_command_usage():
     """Tests ralph fetch command usage."""
-
     runner = CliRunner()
     result = runner.invoke(cli, ["fetch", "--help"])
 
@@ -395,7 +378,6 @@ def test_cli_fetch_command_usage():
 
 def test_cli_fetch_command_with_ldp_backend(monkeypatch):
     """Tests the fetch command using the LDP backend."""
-
     archive_content = {"foo": "bar"}
 
     def mock_read(this, name, chunk_size=500):
@@ -418,7 +400,6 @@ def test_cli_fetch_command_with_ldp_backend(monkeypatch):
 # pylint: disable=unused-argument
 def test_cli_fetch_command_with_fs_backend(fs, monkeypatch):
     """Tests the fetch command using the FS backend."""
-
     archive_content = {"foo": "bar"}
 
     def mock_read(this, name, chunk_size):
@@ -535,7 +516,6 @@ def test_cli_fetch_command_with_es_backend_query(es):
 
 def test_cli_fetch_command_with_ws_backend(events, ws):
     """Tests ralph fetch command using the ws backend."""
-
     runner = CliRunner()
     result = runner.invoke(
         cli,
@@ -546,7 +526,6 @@ def test_cli_fetch_command_with_ws_backend(events, ws):
 
 def test_cli_list_command_usage():
     """Tests ralph list command usage."""
-
     runner = CliRunner()
     result = runner.invoke(cli, ["list", "--help"])
 
@@ -588,7 +567,6 @@ def test_cli_list_command_usage():
 
 def test_cli_list_command_with_ldp_backend(monkeypatch):
     """Tests the list command using the LDP backend."""
-
     archive_list = [
         "5d5c4c93-04a4-42c5-9860-f51fa4044aa1",
         "997db3eb-b9ca-485d-810f-b530a6cef7c6",
@@ -661,7 +639,6 @@ def test_cli_list_command_with_ldp_backend(monkeypatch):
 # pylint: disable=unused-argument
 def test_cli_list_command_with_fs_backend(fs, monkeypatch):
     """Tests the list command using the LDP backend."""
-
     archive_list = [
         "file1",
         "file2",
@@ -723,7 +700,6 @@ def test_cli_list_command_with_fs_backend(fs, monkeypatch):
 # pylint: disable=invalid-name
 def test_cli_push_command_with_fs_backend(fs):
     """Tests the push command using the FS backend."""
-
     fs.create_dir(str(settings.APP_DIR))
 
     filename = Path("file1")
@@ -785,7 +761,6 @@ def test_cli_push_command_with_es_backend(es):
 
 def test_cli_runserver_command_usage():
     """Tests ralph runserver command usage."""
-
     runner = CliRunner()
     result = runner.invoke(cli, ["runserver", "--help"])
 
@@ -814,7 +789,6 @@ def test_cli_runserver_command_with_host_and_port_arguments(host_, port_, monkey
 
     def mock_uvicorn_run(_, host=None, port=None, **kwargs):
         """Mocks uvicorn.run asserting host and port values."""
-
         assert host == host_
         assert port == int(port_)
 
@@ -831,7 +805,6 @@ def test_cli_runserver_command_environment_file_generation(monkeypatch):
 
     def mock_uvicorn_run(_, env_file=None, **kwargs):
         """Mocks uvicorn.run asserting environment file content."""
-
         with open(env_file, mode="r", encoding=settings.LOCALE_ENCODING) as file:
             assert file.readlines() == [
                 f"RALPH_RUNSERVER_BACKEND={settings.RUNSERVER_BACKEND}\n",

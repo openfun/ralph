@@ -15,7 +15,6 @@ client = TestClient(app)
 @pytest.mark.parametrize("backend", [get_es_test_backend, get_mongo_test_backend])
 def test_api_health_lbheartbeat(backend, monkeypatch):
     """Test the load balancer heartbeat healthcheck."""
-
     monkeypatch.setattr(health, "DATABASE_CLIENT", backend())
 
     response = client.get("/__lbheartbeat__")
@@ -26,7 +25,6 @@ def test_api_health_lbheartbeat(backend, monkeypatch):
 @pytest.mark.parametrize("backend", [get_es_test_backend, get_mongo_test_backend])
 def test_api_health_heartbeat(backend, monkeypatch):
     """Test the heartbeat healthcheck."""
-
     monkeypatch.setattr(health, "DATABASE_CLIENT", backend())
 
     response = client.get("/__heartbeat__")

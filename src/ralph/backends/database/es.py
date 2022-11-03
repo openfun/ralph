@@ -79,7 +79,6 @@ class ESDatabase(BaseDatabase):
 
     def status(self) -> DatabaseStatus:
         """Checks Elasticsearch cluster (connection) status."""
-
         # Check ES cluster connection
         try:
             self.client.info()
@@ -101,7 +100,6 @@ class ESDatabase(BaseDatabase):
         documentation:
         https://elasticsearch-py.readthedocs.io/en/latest/helpers.html#scan).
         """
-
         for document in scan(
             self.client, index=self.index, size=chunk_size, **query.dict()
         ):
@@ -111,7 +109,6 @@ class ESDatabase(BaseDatabase):
         self, stream: TextIO, get_id: Callable[[dict], str]
     ) -> Generator[dict, None, None]:
         """Converts `stream` lines to ES documents."""
-
         for line in stream:
             item = json.loads(line) if isinstance(line, str) else line
             action = {
@@ -129,7 +126,6 @@ class ESDatabase(BaseDatabase):
         self, stream: TextIO, chunk_size: int = 500, ignore_errors: bool = False
     ) -> int:
         """Writes documents from the `stream` to the instance index."""
-
         logger.debug(
             "Start writing to the %s index (chunk size: %d)", self.index, chunk_size
         )
@@ -154,7 +150,6 @@ class ESDatabase(BaseDatabase):
 
     def query_statements(self, params: StatementParameters) -> StatementQueryResult:
         """Returns the results of a statements query using xAPI parameters."""
-
         es_query_filters = []
 
         if params.statementId:
@@ -223,7 +218,6 @@ class ESDatabase(BaseDatabase):
 
     def query_statements_by_ids(self, ids: list[str]) -> list:
         """Returns the list of matching statement IDs from the database."""
-
         body = {"query": {"terms": {"_id": ids}}}
         return self._search(index=self.index, body=body)["hits"]["hits"]
 
@@ -233,7 +227,6 @@ class ESDatabase(BaseDatabase):
         Raises:
             BackendException: raised for any failure.
         """
-
         try:
             return self.client.search(**kwargs)
         except ApiError as error:
@@ -247,7 +240,6 @@ class ESDatabase(BaseDatabase):
         Raises:
             BackendException: raised for any failure.
         """
-
         try:
             return self.client.open_point_in_time(**kwargs)
         except (ApiError, ValueError) as error:

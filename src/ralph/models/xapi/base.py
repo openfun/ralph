@@ -52,7 +52,6 @@ class BaseXapiModel(BaseModelWithConfig):
         Checks that the `context` field contains `platform` and `revision` fields
         only if the `object.objectType` property is equal to `Activity`.
         """
-
         for field, value in list(values.items()):
             if value in [None, "", {}]:
                 raise ValueError(f"{field}: invalid empty value")

@@ -73,7 +73,6 @@ class UISeqNext(BaseBrowserModel):
     @classmethod
     def validate_next_jump_event_field(cls, value):
         """Checks that event.new is equal to event.old + 1."""
-
         if value.new != value.old + 1:
             raise ValueError("event.new - event.old should be equal to 1")
 
@@ -104,7 +103,6 @@ class UISeqPrev(BaseBrowserModel):
     @classmethod
     def validate_prev_jump_event_field(cls, value):
         """Checks that event.new is equal to event.old - 1."""
-
         if value.new != value.old - 1:
             raise ValueError("event.old - event.new should be equal to 1")
 

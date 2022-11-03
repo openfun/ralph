@@ -26,7 +26,6 @@ from tests.fixtures.backends import (
 
 def test_backends_database_mongo_database_instantiation():
     """Test the Mongo backend instantiation."""
-
     assert MongoDatabase.name == "mongo"
 
     backend = MongoDatabase(
@@ -43,7 +42,6 @@ def test_backends_database_mongo_database_instantiation():
 
 def test_backends_database_mongo_get_method(mongo):
     """Test the mongo backend get method."""
-
     # Create records
     timestamp = {"timestamp": "2022-06-27T15:36:50"}
     documents = MongoDatabase.to_documents(
@@ -73,7 +71,6 @@ def test_backends_database_mongo_get_method(mongo):
 
 def test_backends_database_mongo_get_method_with_a_custom_query(mongo):
     """Test the mongo backend get method with a custom query."""
-
     # Create records
     timestamp = {"timestamp": datetime.now().isoformat()}
     documents = MongoDatabase.to_documents(
@@ -128,7 +125,6 @@ def test_backends_database_mongo_get_method_with_a_custom_query(mongo):
 
 def test_backends_database_mongo_to_documents_method():
     """Test the mongo backend to_documents method."""
-
     timestamp = {"timestamp": "2022-06-27T15:36:50"}
     statements = [
         {"id": "foo", **timestamp},
@@ -154,7 +150,6 @@ def test_backends_database_mongo_to_documents_method():
 
 def test_backends_database_mongo_to_documents_method_when_statement_has_no_id(caplog):
     """Test the mongo backend to_documents method when a statement has no id field."""
-
     timestamp = {"timestamp": "2022-06-27T15:36:50"}
     statements = [{"id": "foo", **timestamp}, timestamp, {"id": "bar", **timestamp}]
 
@@ -186,7 +181,6 @@ def test_backends_database_mongo_to_documents_method_when_statement_has_no_times
     caplog,
 ):
     """Tests the mongo backend to_documents method when a statement has no timestamp."""
-
     timestamp = {"timestamp": "2022-06-27T15:36:50"}
     statements = [{"id": "foo", **timestamp}, {"id": "bar"}, {"id": "baz", **timestamp}]
 
@@ -221,7 +215,6 @@ def test_backends_database_mongo_to_documents_method_with_invalid_timestamp(capl
     """Tests the mongo backend to_documents method given a statement with an invalid
     timestamp.
     """
-
     valid_timestamp = {"timestamp": "2022-06-27T15:36:50"}
     invalid_timestamp = {"timestamp": "This is not a valid timestamp!"}
     invalid_statement = {"id": "bar", **invalid_timestamp}
@@ -339,7 +332,6 @@ def test_backends_database_mongo_bulk_import_method_import_partial_chunks_on_err
 
 def test_backends_database_mongo_put_method(mongo):
     """Test the mongo backend put method."""
-
     database = getattr(mongo, MONGO_TEST_DATABASE)
     collection = getattr(database, MONGO_TEST_COLLECTION)
     assert collection.estimated_document_count() == 0
@@ -369,7 +361,6 @@ def test_backends_database_mongo_put_method(mongo):
 
 def test_backends_database_mongo_put_method_with_custom_chunk_size(mongo):
     """Test the mongo backend put method with a custom chunk_size."""
-
     database = getattr(mongo, MONGO_TEST_DATABASE)
     collection = getattr(database, MONGO_TEST_COLLECTION)
     assert collection.estimated_document_count() == 0
@@ -407,7 +398,6 @@ def test_backends_database_mongo_query_statements_with_search_query_failure(
 
     def mock_find(**_):
         """Mocks the MongoClient.collection.find method."""
-
         raise PyMongoError("Something is wrong")
 
     backend = MongoDatabase(
@@ -438,7 +428,6 @@ def test_backends_database_mongo_query_statements_by_ids_with_search_query_failu
 
     def mock_find(**_):
         """Mocks the MongoClient.collection.find method."""
-
         raise ValueError("Something is wrong")
 
     backend = MongoDatabase(

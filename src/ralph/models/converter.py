@@ -48,7 +48,6 @@ class ConversionItem:
             raw_input (bool): Flag indicating whether `get_value` will receive a raw
                 event string or a parsed event dictionary.
         """
-
         object.__setattr__(self, "dest", tuple(dest.split(MODEL_PATH_SEPARATOR)))
         src = tuple(src.split(MODEL_PATH_SEPARATOR)) if src else None
         object.__setattr__(self, "src", src)
@@ -65,7 +64,6 @@ class ConversionItem:
         Raises:
             ConversionException: When a field transformation fails.
         """
-
         if self.src:
             data = get_dict_value_from_path(data, self.src)
         try:
@@ -88,7 +86,6 @@ class BaseConversionSet(ABC):
 
     def __init__(self):
         """Initializes BaseConversionSet."""
-
         self._conversion_items = self._get_conversion_items()
 
     @abstractmethod
@@ -116,7 +113,6 @@ def convert_dict_event(
         ConversionException: When a field transformation fails.
         ValidationError: When the final converted event is invalid.
     """
-
     converted_event = {}
     for conversion_item in conversion_set:
         data = event_str if conversion_item.raw_input else event
@@ -142,7 +138,6 @@ def convert_str_event(event_str: str, conversion_set: BaseConversionSet) -> Base
         ConversionException: When a field transformation fails.
         ValidationError: When the converted event is invalid.
     """
-
     try:
         event = json.loads(event_str)
     except (TypeError, json.JSONDecodeError) as err:
@@ -161,7 +156,6 @@ class Converter:
         **conversion_set_kwargs,
     ):
         """Initializes the Converter."""
-
         self.model_selector = model_selector
         self.src_conversion_set = self.get_src_conversion_set(
             import_module(module), **conversion_set_kwargs
@@ -170,7 +164,6 @@ class Converter:
     @staticmethod
     def get_src_conversion_set(module: ModuleType, **conversion_set_kwargs):
         """Returns a dictionary of initialized conversion_sets defined in the module."""
-
         src_conversion_set = {}
         for _, class_ in getmembers(module, isclass):
             if issubclass(class_, BaseConversionSet):
@@ -179,7 +172,6 @@ class Converter:
 
     def convert(self, input_file: TextIO, ignore_errors: bool, fail_on_unknown: bool):
         """Converts JSON event strings line by line."""
-
         total = 0
         success = 0
         for event_str in input_file:
@@ -227,7 +219,6 @@ class Converter:
             ConversionException: When a field transformation fails.
             ValidationError: When the final converted event is invalid.
         """
-
         error = None
         event = json.loads(event_str)
         for model in self.model_selector.get_models(event):

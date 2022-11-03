@@ -21,6 +21,5 @@ class UIPageCloseToPageTerminated(BaseXapiConverter):
 
     def _get_conversion_items(self):
         """Returns a set of ConversionItems used for conversion."""
-
         conversion_items = super()._get_conversion_items()
         return conversion_items.union({ConversionItem("object__id", "page")})

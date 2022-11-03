@@ -58,7 +58,6 @@ def test_backends_storage_fs_getfile(fs):
 # pylint: disable=unused-argument
 def test_backends_storage_fs_url(fs):
     """Tests that the full URL of the file can be returned."""
-
     path = "test_fs/"
     filename = "some_file"
     storage = FSStorage(path)
@@ -72,7 +71,6 @@ def test_backends_storage_fs_url(fs):
 # pylint: disable=unused-argument
 def test_backends_storage_fs_list(fs):
     """Tests archives listing in FSStorage."""
-
     fs.create_dir(settings.APP_DIR)
 
     path = "test_fs/"

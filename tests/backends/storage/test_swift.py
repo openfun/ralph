@@ -16,7 +16,6 @@ def test_backends_storage_swift_storage_instantiation_failure_should_raise_excep
     monkeypatch, swift, caplog
 ):
     """Checks that SwiftStorage raises BackendParameterException on failure."""
-
     error = "Unauthorized. Check username/id"
 
     def mock_failed_stat(*args, **kwargs):  # pylint:disable=unused-argument
@@ -56,7 +55,6 @@ def test_backends_storage_swift_list_should_yield_archive_names(
     """Tests that given SwiftService.list method successfully connects to the Swift
     storage, the SwiftStorage list method should yield the archives.
     """
-
     listing = [
         {"name": "2020-04-29.gz"},
         {"name": "2020-04-30.gz"},
@@ -159,7 +157,6 @@ def test_backends_storage_swift_read_with_invalid_name_should_log_the_error(
     the SwiftStorage read method should log the error, not write to history and raise a
     BackendException.
     """
-
     error = "ClientException Object GET failed"
 
     def mock_failed_download(*args, **kwargs):  # pylint:disable=unused-argument
@@ -194,7 +191,6 @@ def test_backends_storage_swift_write_should_write_to_history_new_or_overwriten_
     In case overwrite is False and the archive is in the history, the write method
     should raise a FileExistsError.
     """
-
     history = [
         {"id": "2020-04-29.gz", "backend": "swift", "command": "fetch"},
         {"id": "2020-04-30.gz", "backend": "swift", "command": "fetch"},
@@ -251,7 +247,6 @@ def test_backends_storage_swift_write_should_log_the_error(
     the SwiftStorage write method should log the error, raise a BackendException
     and not write to history.
     """
-
     error = "Unauthorized. Check username/id, password"
     history = [
         {"id": "2020-04-29.gz", "backend": "swift", "command": "fetch"},

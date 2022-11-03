@@ -73,7 +73,6 @@ def enforce_query_checks(method):
     @functools.wraps(method)
     def wrapper(*args, **kwargs):
         """Wrap method execution."""
-
         query = kwargs.pop("query", None)
         self_ = args[0]
 
@@ -90,7 +89,6 @@ class BaseDatabase(ABC):
 
     def validate_query(self, query: BaseQuery = None):
         """Validate database query."""
-
         if query is None:
             query = self.query_model()
 

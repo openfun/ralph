@@ -176,7 +176,6 @@ async def get(
     LRS Specification:
     https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#213-get-statements
     """
-
     # Make sure the limit does not go above max from settings
     limit = min(limit, settings.RUNSERVER_MAX_SEARCH_HITS_COUNT)
 
@@ -236,7 +235,6 @@ async def post(
     LRS Specification:
     https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#212-post-statements
     """
-
     # As we accept both a single statement as a dict, and multiple statements as a list,
     # we need to normalize the data into a list in all cases before we can process it.
     if not isinstance(statements, list):

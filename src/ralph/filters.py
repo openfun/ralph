@@ -17,7 +17,6 @@ def anonymous(event):
         EventKeyError: When the event does not contain the `username` key.
 
     """
-
     if "username" not in event:
         raise EventKeyError("Cannot filter anonymous event without 'username' key.")
     if not event.get("username", ""):

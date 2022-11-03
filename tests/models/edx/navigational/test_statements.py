@@ -33,7 +33,6 @@ def test_models_edx_navigational_selectors_with_valid_statements(class_, data):
     """Tests given a valid navigational edX statement the `get_first_model`
     selector method should return the expected model.
     """
-
     statement = json.loads(data.draw(custom_builds(class_)).json())
     model = ModelSelector(module="ralph.models.edx").get_first_model(statement)
     assert model is class_
@@ -44,7 +43,6 @@ def test_fields_edx_navigational_events_event_field_with_valid_content(field):
     """Tests that a valid `NavigationalEventField` does not raise a
     `ValidationError`.
     """
-
     assert re.match(
         (
             r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"
@@ -86,7 +84,6 @@ def test_fields_edx_navigational_events_event_field_with_invalid_content(
     id, field  # pylint: disable=redefined-builtin, invalid-name
 ):
     """Tests that an invalid `NavigationalEventField` raises a `ValidationError`."""
-
     invalid_field = json.loads(field.json())
     invalid_field["id"] = id
 
@@ -99,7 +96,6 @@ def test_models_edx_ui_page_close_with_valid_statement(statement):
     """Tests that a `page_close` statement has the expected `event`, `event_type` and
     `name`.
     """
-
     assert statement.event == "{}"
     assert statement.event_type == "page_close"
     assert statement.name == "page_close"
@@ -108,7 +104,6 @@ def test_models_edx_ui_page_close_with_valid_statement(statement):
 @custom_given(UISeqGoto)
 def test_models_edx_ui_seq_goto_with_valid_statement(statement):
     """Tests that a `seq_goto` statement has the expected `event_type` and `name`."""
-
     assert statement.event_type == "seq_goto"
     assert statement.name == "seq_goto"
 
@@ -116,7 +111,6 @@ def test_models_edx_ui_seq_goto_with_valid_statement(statement):
 @custom_given(UISeqNext)
 def test_models_edx_ui_seq_next_with_valid_statement(statement):
     """Tests that a `seq_next` statement has the expected `event_type` and `name`."""
-
     assert statement.event_type == "seq_next"
     assert statement.name == "seq_next"
 
@@ -125,7 +119,6 @@ def test_models_edx_ui_seq_next_with_valid_statement(statement):
 @custom_given(UISeqNext)
 def test_models_edx_ui_seq_next_with_invalid_statement(old, new, event):
     """Tests that an invalid `seq_next` event raises a ValidationError."""
-
     invalid_event = json.loads(event.json())
     invalid_event["event"]["old"] = old
     invalid_event["event"]["new"] = new
@@ -140,7 +133,6 @@ def test_models_edx_ui_seq_next_with_invalid_statement(old, new, event):
 @custom_given(UISeqPrev)
 def test_models_edx_ui_seq_prev_with_valid_statement(statement):
     """Tests that a `seq_prev` statement has the expected `event_type` and `name`."""
-
     assert statement.event_type == "seq_prev"
     assert statement.name == "seq_prev"
 
@@ -149,7 +141,6 @@ def test_models_edx_ui_seq_prev_with_valid_statement(statement):
 @custom_given(UISeqPrev)
 def test_models_edx_ui_seq_prev_with_invalid_statement(old, new, event):
     """Tests that an invalid `seq_prev` event raises a ValidationError."""
-
     invalid_event = json.loads(event.json())
     invalid_event["event"]["old"] = old
     invalid_event["event"]["new"] = new

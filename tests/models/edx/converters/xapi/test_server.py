@@ -21,7 +21,6 @@ def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_constant
     """Tests that `ServerEventToPageViewed.convert` returns a JSON string with a
     constant UUID.
     """
-
     event_str = event.json()
     event = json.loads(event_str)
     xapi_event1 = convert_str_event(
@@ -42,7 +41,6 @@ def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_with_val
     """Tests that converting with `ServerEventToPageViewed` returns the expected xAPI
     statement.
     """
-
     event.event_type = "/main/blog"
     event.context.course_id = ""
     event.context.org_id = ""

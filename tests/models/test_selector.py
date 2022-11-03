@@ -207,7 +207,6 @@ def test_models_selector_model_selector_decision_tree(model_rules, decision_tree
     """Given `model_rules` the ModelSelector should create the expected decision
     tree.
     """
-
     model_selector = ModelSelector(module="ralph.models.edx")
     assert model_selector.get_decision_tree(model_rules) == decision_tree
 
@@ -216,7 +215,6 @@ def test_models_selector_model_selector_get_model_with_invalid_event():
     """Tests given an invalid event the get_model method should raise
     UnknownEventException.
     """
-
     with pytest.raises(UnknownEventException):
         ModelSelector(module="ralph.models.edx").get_first_model({"invalid": "event"})
 
@@ -268,5 +266,4 @@ def test_models_selector_model_selector_build_model_rules(module, model_rules):
     """Given an imported module the `build_model_rules` method should return the
     corresponding model_rules.
     """
-
     assert ModelSelector.build_model_rules(module) == model_rules

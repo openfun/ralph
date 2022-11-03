@@ -41,7 +41,6 @@ def test_models_xapi_base_statement_with_invalid_null_values(path, value, statem
     value is set to "null", an empty object, or has no value, except in an "extensions"
     property
     """
-
     statement = statement.dict(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), value)
     with pytest.raises(ValidationError, match="invalid empty value"):
@@ -66,7 +65,6 @@ def test_models_xapi_base_statement_with_valid_null_values(path, value, statemen
     value is set to "null", an empty object, or has no value, except in an "extensions"
     property
     """
-
     statement = statement.dict(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), value)
     try:
@@ -91,7 +89,6 @@ def test_models_xapi_base_statement_with_valid_empty_array(path, statement):
     Where the Correct Responses Pattern contains an empty array, the meaning of this is
     that there is no correct answer.
     """
-
     statement = statement.dict(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), [])
     try:
@@ -118,7 +115,6 @@ def test_models_xapi_base_statement_must_use_actor_verb_and_object(field, statem
     An LRS rejects with error code 400 Bad Request a Statement which does not contain an
     "object" property
     """
-
     statement = statement.dict(exclude_none=True)
     del statement[field]
     with pytest.raises(ValidationError, match="field required"):
@@ -145,7 +141,6 @@ def test_models_xapi_base_statement_with_invalid_data_types(path, value, stateme
     An LRS rejects with error code 400 Bad Request a Statement which uses the wrong data
     type
     """
-
     statement = statement.dict(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), value)
     err = "(type expected|not a valid dict|expected string )"
@@ -172,7 +167,6 @@ def test_models_xapi_base_statement_with_invalid_data_format(path, value, statem
     particular format (such as mailto IRI, UUID, or IRI) is required.
     (Empty strings are covered by XAPI-00001)
     """
-
     statement = statement.dict(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), value)
     err = "(Invalid `mailto:email`|Invalid RFC 5646 Language tag|not a valid uuid)"
@@ -189,7 +183,6 @@ def test_models_xapi_base_statement_with_invalid_letter_cases(path, value, state
     An LRS rejects with error code 400 Bad Request a Statement where the case of a key
     does not match the case specified in this specification.
     """
-
     statement = statement.dict(exclude_none=True)
     if statement["actor"].get("objectType", None):
         del statement["actor"]["objectType"]
@@ -207,7 +200,6 @@ def test_models_xapi_base_statement_should_not_accept_additional_properies(state
     An LRS rejects with error code 400 Bad Request a Statement where a key or value is
     not allowed by this specification.
     """
-
     invalid_statement = statement.dict(exclude_none=True)
     invalid_statement["NEW_INVALID_FIELD"] = "some value"
     with pytest.raises(ValidationError, match="extra fields not permitted"):
@@ -223,7 +215,6 @@ def test_models_xapi_base_statement_with_iri_wihout_scheme(path, value, statemen
     An LRS rejects with error code 400 Bad Request a Statement containing IRL or IRI
     values without a scheme.
     """
-
     statement = statement.dict(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), value)
     with pytest.raises(ValidationError, match="is not a valid 'IRI'"):
@@ -246,7 +237,6 @@ def test_models_xapi_base_statement_with_invalid_extensions(path, statement):
     An Extension "key" is an IRI. The LRS rejects with 400 a statement which has an
     extension key which is not a valid IRI, if an extension object is present.
     """
-
     statement = statement.dict(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), "")
     with pytest.raises(ValidationError, match="is not a valid 'IRI'"):
@@ -260,7 +250,6 @@ def test_models_xapi_base_statement_with_two_agent_types(path, value, statement)
 
     An Agent MUST NOT include more than one Inverse Functional Identifier.
     """
-
     statement = statement.dict(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), value)
     with pytest.raises(ValidationError, match="extra fields not permitted"):
@@ -275,7 +264,6 @@ def test_models_xapi_base_statement_missing_member_property(statement):
 
     An Anonymous Group MUST include a "member" property listing constituent Agents.
     """
-
     statement = statement.dict(exclude_none=True)
     del statement["actor"]["member"]
     with pytest.raises(ValidationError, match="member\n  field required"):
@@ -308,7 +296,6 @@ def test_models_xapi_base_statement_with_invalid_group_objects(value, statement,
     An Anonymous Group MUST NOT contain Group Objects in the "member" identifiers.
     An Identified Group MUST NOT contain Group Objects in the "member" property.
     """
-
     kwargs = {"exclude_none": True}
     statement = statement.dict(**kwargs)
     statement["actor"]["member"] = [data.draw(custom_builds(value)).dict(**kwargs)]
@@ -324,7 +311,6 @@ def test_models_xapi_base_statement_with_two_group_identifiers(path, value, stat
 
     An Identified Group MUST include exactly one Inverse Functional Identifier.
     """
-
     statement = statement.dict(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), value)
     with pytest.raises(ValidationError, match="extra fields not permitted"):
@@ -349,7 +335,6 @@ def test_models_xapi_base_statement_with_sub_statement_ref(path, value, statemen
     A SubStatement MUST NOT have the "id", "stored", "version" or "authority"
     properties.
     """
-
     statement = statement.dict(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), value)
     with pytest.raises(ValidationError, match="extra fields not permitted"):
@@ -379,7 +364,6 @@ def test_models_xapi_base_statement_with_invalid_interaction_object(value, state
     An interaction component's id value SHOULD NOT have whitespace.
     Within an array of interaction components, all id values MUST be distinct.
     """
-
     statement = statement.dict(exclude_none=True)
     path = "object.definition.scale".split(".")
     set_dict_value_from_path(statement, path, value)
@@ -407,7 +391,6 @@ def test_models_xapi_base_statement_with_invalid_context_value(path, value, stat
     The "revision" property MUST only be used if the Statement's Object is an Activity.
     The "platform" property MUST only be used if the Statement's Object is an Activity.
     """
-
     statement = statement.dict(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), value)
     err = "properties can only be used if the Statement's Object is an Activity"
@@ -423,7 +406,6 @@ def test_models_xapi_base_statement_with_invalid_context_activities(path, statem
     Every key in the contextActivities Object MUST be one of parent, grouping, category,
     or other.
     """
-
     statement = statement.dict(exclude_none=True)
     set_dict_value_from_path(statement, path.split("."), {"id": "http://w3id.org/xapi"})
     with pytest.raises(ValidationError, match="extra fields not permitted"):
@@ -445,7 +427,6 @@ def test_models_xapi_base_statement_with_valid_context_activities(value, stateme
     Every value in the contextActivities Object MUST be either a single Activity Object
     or an array of Activity Objects.
     """
-
     statement = statement.dict(exclude_none=True)
     path = ["context", "contextActivities"]
     for activity in ["parent", "grouping", "category", "other"]:
@@ -464,7 +445,6 @@ def test_models_xapi_base_statement_with_invalid_version(value, statement):
     An LRS MUST reject all Statements with a version specified that does not start with
     1.0..
     """
-
     statement = statement.dict(exclude_none=True)
     set_dict_value_from_path(statement, ["version"], value)
     with pytest.raises(ValidationError, match="version\n  string does not match regex"):
@@ -478,7 +458,6 @@ def test_models_xapi_base_statement_with_valid_version(statement):
     Statements returned by an LRS MUST retain the version they are accepted with.
     If they lack a version, the version MUST be set to 1.0.0
     """
-
     statement = statement.dict(exclude_none=True)
     set_dict_value_from_path(statement, ["version"], "1.0.3")
     assert "1.0.3" == BaseXapiModel(**statement).dict()["version"]
@@ -502,7 +481,6 @@ def test_models_xapi_base_statement_should_consider_valid_all_defined_xapi_model
     model, data
 ):
     """Tests that all defined xAPI models in the ModelSelector make valid statements."""
-
     # All specific xAPI models should inherit BaseXapiModel
     assert issubclass(model, BaseXapiModel)
     statement = data.draw(custom_builds(model)).dict(exclude_none=True)

@@ -39,7 +39,6 @@ class Rule:
         Args:
             event (dict): The event to check.
         """
-
         event_value = get_dict_value_from_path(event, self.field.path)
         expected_value = self.value
         if isinstance(expected_value, LazyModelField):
@@ -56,7 +55,6 @@ def selector(**filters):
             Example: `event_type="server"` will generate a Rule verifying that
             `event.event_type == "server"`
     """
-
     return [Rule(LazyModelField(field), value) for field, value in filters.items()]
 
 
@@ -70,7 +68,6 @@ class ModelSelector:
 
     def __init__(self, module="ralph.models.edx"):
         """Instantiates ModelSelector."""
-
         self.model_rules = ModelSelector.build_model_rules(import_module(module))
         self.decision_tree = self.get_decision_tree(self.model_rules)
 
@@ -80,7 +77,6 @@ class ModelSelector:
 
         Using BaseModel classes defined in the module.
         """
-
         model_rules = {}
         for _, class_ in getmembers(module, isclass):
             if issubclass(class_, BaseModel) and hasattr(class_, "__selector__"):
@@ -89,7 +85,6 @@ class ModelSelector:
 
     def get_first_model(self, event: dict):
         """Returns the first matching model for the event. See `self.get_models`."""
-
         return self.get_models(event)[0]
 
     def get_models(self, event: dict, tree=None):
@@ -106,7 +101,6 @@ class ModelSelector:
         Raises:
             UnknownEventException: When the event does not match any model.
         """
-
         if tree is None:
             tree = self.decision_tree
         rule = next(iter(tree))
@@ -123,7 +117,6 @@ class ModelSelector:
 
     def get_decision_tree(self, model_rules):
         """Recursively constructs the decision tree."""
-
         rule_counter = Counter(chain.from_iterable(model_rules.values()))
         if not rule_counter:
             return list(model_rules)

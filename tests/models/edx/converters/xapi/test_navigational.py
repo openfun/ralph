@@ -21,7 +21,6 @@ def test_navigational_ui_page_close_to_page_terminated(
     """Tests that converting with UIPageCloseToPageTerminated returns the expected xAPI
     statement.
     """
-
     event.context.course_id = ""
     event.context.org_id = ""
     event.context.user_id = "1"

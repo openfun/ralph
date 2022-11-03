@@ -9,7 +9,6 @@ from ralph.conf import InstantiableSettingsItem, settings
 
 def test_utils_import_string():
     """Tests import_string utility taken from Django utilities."""
-
     with pytest.raises(ImportError, match="foo doesn't look like a module path"):
         ralph_utils.import_string("foo")
 
@@ -24,7 +23,6 @@ def test_utils_import_string():
 
 def test_utils_get_backend_type():
     """Tests get_backend_type utility."""
-
     assert (
         ralph_utils.get_backend_type(settings.BACKENDS, "es")
         == settings.BACKENDS.DATABASE
@@ -61,7 +59,6 @@ def test_utils_get_backend_instance(options, expected):
 
         def get_instance(self, **init_parameters):  # pylint: disable=no-self-use
             """Returns the init_parameters."""
-
             return init_parameters
 
     class TestBackendType(BaseModel):
@@ -81,7 +78,6 @@ def test_utils_get_dict_value_from_path_should_return_given_value(path, value):
     """Tests the get_dict_value_from_path function should return the value when it's
     present.
     """
-
     dictionary = {"foo": {"bar": "bar_value"}}
     assert ralph_utils.get_dict_value_from_path(dictionary, path) == value
 
@@ -101,7 +97,6 @@ def test_utils_get_dict_value_from_path_should_return_none_when_value_does_not_e
     """Tests the get_dict_value_from_path function should return None if the value is
     not found.
     """
-
     dictionary = {"foo": {"bar": "bar_value"}}
     assert ralph_utils.get_dict_value_from_path(dictionary, path) is None
 
@@ -110,7 +105,6 @@ def test_utils_set_dict_value_from_path_creating_new_fields():
     """Tests when the fields are not present, set_dict_value_from_path should add
     them.
     """
-
     dictionary = {}
     ralph_utils.set_dict_value_from_path(dictionary, ["foo", "bar"], "baz")
     assert dictionary == {"foo": {"bar": "baz"}}
@@ -120,7 +114,6 @@ def test_utils_set_dict_value_from_path_updating_fields():
     """Tests when the fields are present, set_dict_value_from_path should update
     them.
     """
-
     dictionary = {"foo": {"bar": "bar_value"}}
     ralph_utils.set_dict_value_from_path(dictionary, ["foo", "bar"], "baz")
     assert dictionary == {"foo": {"bar": "baz"}}

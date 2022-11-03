@@ -23,7 +23,6 @@ async def lbheartbeat():
 
     Returns a 200 when the server is running.
     """
-
     return
 
 
@@ -33,7 +32,6 @@ async def heartbeat():
 
     Returns a 200 if all checks are successful.
     """
-
     content = {"database": DATABASE_CLIENT.status().value}
     status_code = (
         status.HTTP_200_OK

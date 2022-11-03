@@ -77,7 +77,6 @@ class InteractionObjectDefinitionField(ObjectDefinitionField):
     @classmethod
     def check_unique_ids(cls, value):
         """Checks the uniqueness of interaction components IDs."""
-
         if len(value) != len({x.id for x in value}):
             raise ValueError("Duplicate InteractionComponents are not valid")
 

@@ -19,7 +19,6 @@ from tests.fixtures.hypothesis_strategies import custom_given
 
 def test_models_validator_validate_with_no_events(caplog):
     """Tests given no events, the validate method does not write error messages."""
-
     result = Validator(ModelSelector(module="ralph.models.edx")).validate(
         [], ignore_errors=False, fail_on_unknown=True
     )
@@ -35,7 +34,6 @@ def test_models_validator_validate_with_a_non_json_event_writes_an_error_message
     """Tests given a non JSON event, the validate method should write an error
     message.
     """
-
     result = Validator(ModelSelector(module="ralph.models.edx")).validate(
         [event], ignore_errors=True, fail_on_unknown=True
     )
@@ -52,7 +50,6 @@ def test_models_validator_validate_with_a_non_json_event_raises_an_exception(
     """Tests given a non JSON event, the validate method should raise a
     BadFormatException.
     """
-
     result = Validator(ModelSelector(module="ralph.models.edx")).validate(
         [event], ignore_errors=False, fail_on_unknown=True
     )
@@ -75,7 +72,6 @@ def test_models_validator_validate_with_an_unknown_event_writes_an_error_message
     """Tests given an unknown event the validate method should write an error
     message.
     """
-
     result = Validator(ModelSelector(module="ralph.models.edx")).validate(
         [event],
         ignore_errors=False,
@@ -101,7 +97,6 @@ def test_models_validator_validate_with_an_unknown_event_raises_an_exception(
     """Tests given an unknown event the validate method should raise an
     UnknownEventException.
     """
-
     result = Validator(ModelSelector(module="ralph.models.edx")).validate(
         [event],
         ignore_errors=False,
@@ -119,7 +114,6 @@ def test_models_validator_validate_with_an_invalid_page_close_event_writes_an_er
     """Tests given an event that match a pydantic model but fail at the model validation
     step, the validate method should write an error message.
     """
-
     result = Validator(ModelSelector(module="ralph.models.edx")).validate(
         [json.dumps({"event_source": "browser", "event_type": "page_close"})],
         ignore_errors=True,
@@ -137,7 +131,6 @@ def test_models_validator_validate_with_invalid_page_close_event_raises_an_excep
     """Tests given an event that match a pydantic model but fail at the model validation
     step, the validate method should raise a BadFormatException.
     """
-
     result = Validator(ModelSelector(module="ralph.models.edx")).validate(
         [json.dumps({"event_source": "browser", "event_type": "page_close"})],
         ignore_errors=False,
@@ -155,7 +148,6 @@ def test_models_validator_validate_with_valid_events(
     ignore_errors, fail_on_unknown, event
 ):
     """Tests given a valid event the validate method should yield it."""
-
     event_str = event.json()
     event_dict = json.loads(event_str)
     validator = Validator(ModelSelector(module="ralph.models.edx"))
@@ -169,7 +161,6 @@ def test_models_validator_validate_counter(caplog, event):
     """Tests given multiple events the validate method
     should log the total and invalid events.
     """
-
     valid_event = event.json()
     invalid_event_1 = 1
     invalid_event_2 = ""
@@ -191,7 +182,6 @@ def test_models_validator_validate_typing_cleanup(event):
     """Tests given a valid event with wrong field types, the validate method should fix
     them.
     """
-
     valid_event_str = event.json()
     valid_event = json.loads(valid_event_str)
     valid_event["host"] = "1"

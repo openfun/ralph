@@ -19,7 +19,6 @@ def test_base_xapi_converter_successful_initialization(
 
         def _get_conversion_items(self):  # pylint: disable=no-self-use
             """Returns a set of ConversionItems used for conversion."""
-
             return set()
 
     converter = DummyBaseXapiConverter(uuid_namespace, "https://fun-mooc.fr")
@@ -35,7 +34,6 @@ def test_base_xapi_converter_unsuccessful_initialization():
 
         def _get_conversion_items(self):  # pylint: disable=no-self-use
             """Returns a set of ConversionItems used for conversion."""
-
             return set()
 
     with pytest.raises(ConfigurationException, match="Invalid UUID namespace"):
@@ -55,5 +53,4 @@ def test_base_xapi_converter_unsuccessful_initialization():
 )
 def test_base_xapi_converter_parse_course_id(course_id, expected):
     """Tests that the parse_course_id method returns the expected value."""
-
     assert BaseXapiConverter.parse_course_id(course_id) == expected

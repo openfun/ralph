@@ -34,7 +34,6 @@ class VideoBaseXapiConverter(BaseXapiConverter):
 
     def _get_conversion_items(self):
         """Returns a set of ConversionItems used for conversion."""
-
         conversion_items = super()._get_conversion_items()
         return conversion_items.union(
             {
@@ -68,7 +67,6 @@ class UILoadVideoToVideoInitialized(VideoBaseXapiConverter):
 
     def _get_conversion_items(self):
         """Returns a set of ConversionItems used for conversion."""
-
         conversion_items = super()._get_conversion_items()
         return conversion_items.union(
             {
@@ -99,7 +97,6 @@ class UIPlayVideoToVideoPlayed(VideoBaseXapiConverter):
 
     def _get_conversion_items(self):
         """Returns a set of ConversionItems used for conversion."""
-
         conversion_items = super()._get_conversion_items()
         return conversion_items.union(
             {
@@ -123,7 +120,6 @@ class UIPauseVideoToVideoPaused(VideoBaseXapiConverter):
 
     def _get_conversion_items(self):
         """Returns a set of ConversionItems used for conversion."""
-
         conversion_items = super()._get_conversion_items()
         return conversion_items.union(
             {
@@ -155,7 +151,6 @@ class UIStopVideoToVideoTerminated(VideoBaseXapiConverter):
 
     def _get_conversion_items(self):
         """Returns a set of ConversionItems used for conversion."""
-
         conversion_items = super()._get_conversion_items()
         return conversion_items.union(
             {
@@ -195,7 +190,6 @@ class UISeekVideoToVideoSeeked(VideoBaseXapiConverter):
 
     def _get_conversion_items(self):
         """Returns a set of ConversionItems used for conversion."""
-
         conversion_items = super()._get_conversion_items()
         return conversion_items.union(
             {

@@ -23,7 +23,6 @@ def test_api_forwarding_with_valid_configuration(monkeypatch, forwarding_setting
     """Tests the settings, given a valid forwarding configuration, should not raise an
     exception.
     """
-
     monkeypatch.delenv("RALPH_XAPI_FORWARDINGS", raising=False)
     settings = Settings()
     # pylint: disable=use-implicit-booleaness-not-comparison
@@ -45,7 +44,6 @@ def test_api_forwarding_configuration_with_missing_field(missing_key, forwarding
     """Tests the forwarding configuration, given a missing field, should raise a
     validation exception.
     """
-
     forwarding_dict = json.loads(forwarding.json())
     del forwarding_dict[missing_key]
     with pytest.raises(ValidationError, match=f"{missing_key}\n  field required"):
@@ -58,7 +56,6 @@ def test_api_forwarding_get_active_xapi_forwardings_with_empty_forwardings(
     """Tests that the get_active_xapi_forwardings function, given an empty forwarding
     configuration, should log that forwarding is inactive and return an empty list.
     """
-
     expected_log = "No xAPI forwarding configured; forwarding is disabled."
     # RALPH_XAPI_FORWARDINGS not set
     monkeypatch.delenv("RALPH_XAPI_FORWARDINGS", raising=False)
@@ -93,7 +90,6 @@ def test_api_forwarding_get_active_xapi_forwardings_with_inactive_forwardings(
     configuration containing inactive forwardings, should log which forwarding
     configurations are inactive and return a list containing only active forwardings.
     """
-
     active_forwarding_json = active_forwarding.json()
     inactive_forwarding_json = inactive_forwarding.json()
 
@@ -156,7 +152,6 @@ def test_api_forwarding_forward_xapi_statements_with_successful_request(
 
     async def post_success(*args, **kwargs):  # pylint: disable=unused-argument
         """Returns a MockSuccessfulResponse instance."""
-
         return MockSuccessfulResponse()
 
     monkeypatch.setattr("ralph.api.forwarding.AsyncClient.post", post_success)
@@ -194,12 +189,10 @@ def test_api_forwarding_forward_xapi_statements_with_unsuccessful_request(
         @staticmethod
         def raise_for_status():
             """Dummy raise_for_status method that is always raising an exception."""
-
             raise RequestError("Failure during request.")
 
     async def post_fail(*args, **kwargs):  # pylint: disable=unused-argument
         """Returns a MockUnsuccessfulResponse instance."""
-
         return MockUnsuccessfulResponse()
 
     monkeypatch.setattr("ralph.api.forwarding.AsyncClient.post", post_fail)

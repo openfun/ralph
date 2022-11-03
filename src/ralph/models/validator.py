@@ -18,12 +18,10 @@ class Validator:
 
     def __init__(self, model_selector: ModelSelector):
         """Initializes Validator."""
-
         self.model_selector = model_selector
 
     def validate(self, input_file: TextIO, ignore_errors: bool, fail_on_unknown: bool):
         """Validates JSON event strings line by line."""
-
         total = 0
         success = 0
         for event_str in input_file:
@@ -54,7 +52,6 @@ class Validator:
             UnknownEventException: When the event does not match any model.
             ValidationError: When the last validated event is invalid.
         """
-
         error = None
         for model in self.model_selector.get_models(event):
             try:
@@ -76,7 +73,6 @@ class Validator:
         Returns:
             event_str (str): The cleaned JSON-formatted input event_str.
         """
-
         event = json.loads(event_str)
         return self.get_first_valid_model(event).json()
 
