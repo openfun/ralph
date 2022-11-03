@@ -6,8 +6,7 @@ from ...base import AbstractBaseEventField
 
 
 class VideoBaseEventField(AbstractBaseEventField):
-    """Represents the event field which attributes are common to most
-    of the video statements.
+    """Pydantic model for video core `event` field.
 
     Attributes:
         code (str): Consists of the `html5` value for browser-played
@@ -24,7 +23,7 @@ class VideoBaseEventField(AbstractBaseEventField):
 
 
 class PlayVideoEventField(VideoBaseEventField):
-    """Represents the event field of `play_video` statement.
+    """Pydantic model for `play_video`.`event` field.
 
     Attributes:
         currentTime (float): Consists of the time in the video at which
@@ -35,7 +34,7 @@ class PlayVideoEventField(VideoBaseEventField):
 
 
 class PauseVideoEventField(VideoBaseEventField):
-    """Represents the event field of `pause_video` statement.
+    """Pydantic model for `pause_video`.`event`.
 
     Attributes:
         currentTime (float): Consists of the time in the video at which
@@ -46,7 +45,7 @@ class PauseVideoEventField(VideoBaseEventField):
 
 
 class SeekVideoEventField(VideoBaseEventField):
-    """Represents the event field of `seek_video` statement.
+    """Pydantic model for `seek_video`.`event` field.
 
     Attributes:
         new_time (float): Consists of the point in time the actor changed to in a media
@@ -63,7 +62,7 @@ class SeekVideoEventField(VideoBaseEventField):
 
 
 class StopVideoEventField(VideoBaseEventField):
-    """Represents the event field of `stop_video` statement.
+    """Pydantic model for `stop_video`.`event` field.
 
     Attributes:
         currentTime (float): Consists of the time in the video at which
@@ -73,9 +72,19 @@ class StopVideoEventField(VideoBaseEventField):
     currentTime: float
 
 
-class VideoTranscriptEventField(VideoBaseEventField):
-    """Represents the event field of `hide_transcript` and `show_transcript`
-    statement.
+class VideoHideTranscriptEventField(VideoBaseEventField):
+    """Pydantic model for `hide_transcript`.`event` field.
+
+    Attributes:
+        current_time (float): Consists of the time in the video at which
+            the statement was emitted.
+    """
+
+    current_time: float
+
+
+class VideoShowTranscriptEventField(VideoBaseEventField):
+    """Pydantic model for `show_transcript`.`event` field.
 
     Attributes:
         current_time (float): Consists of the time in the video at which
@@ -86,7 +95,7 @@ class VideoTranscriptEventField(VideoBaseEventField):
 
 
 class SpeedChangeVideoEventField(VideoBaseEventField):
-    """Represents the event field of `speed_change_video` statement.
+    """Pydantic model for `speed_change_video`.`event` field.
 
     Attributes:
         currentTime (float): Consists of the time in the video at which

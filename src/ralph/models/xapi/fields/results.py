@@ -11,7 +11,7 @@ from .common import IRI
 
 
 class ScoreResultField(BaseModelWithConfig):
-    """Represents the `results.score` xAPI field.
+    """Pydantic model for `results.score` field.
 
     Attributes:
         scaled (int): Consists of the normalized score related to the experience.
@@ -47,7 +47,7 @@ class ScoreResultField(BaseModelWithConfig):
 
 
 class ResultField(BaseModelWithConfig):
-    """Represents the `result` xAPI field.
+    """Pydantic model for `result` field.
 
     Attributes:
         score (ScoreResultField): See ScoreResultField.

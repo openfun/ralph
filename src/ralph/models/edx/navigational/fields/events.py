@@ -6,7 +6,7 @@ from ...base import AbstractBaseEventField
 
 
 class NavigationalEventField(AbstractBaseEventField):
-    """Represents the `event` field of navigational statements.
+    """Pydantic model for navigational `event` field.
 
     Note: All navigational statements are emitted from the browser.
 

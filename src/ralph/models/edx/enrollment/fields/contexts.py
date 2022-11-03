@@ -6,8 +6,7 @@ from ...base import BaseContextField
 
 
 class EdxCourseEnrollmentUpgradeClickedContextField(BaseContextField):
-    """Represents the `context` field of the `edx.course.enrollment.upgrade_clicked`
-    server statement.
+    """Pydantic model for `edx.course.enrollment.upgrade_clicked`.`context` field.
 
     In addition to the common context member fields, this statement also comprises the
     `mode` context member field.
@@ -21,8 +20,7 @@ class EdxCourseEnrollmentUpgradeClickedContextField(BaseContextField):
 
 
 class EdxCourseEnrollmentUpgradeSucceededContextField(BaseContextField):
-    """Represents the `context` field of the `edx.course.enrollment.upgrade.succeeded`
-    server statement.
+    """Pydantic model for `edx.course.enrollment.upgrade.succeeded`.`context` field.
 
     In addition to the common context member fields, this statement also comprises the
     `mode` context member field.

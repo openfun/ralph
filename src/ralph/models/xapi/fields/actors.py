@@ -9,7 +9,7 @@ from .common import IRI, MailtoEmail
 
 
 class AccountActorAccountField(BaseModelWithConfig):
-    """Represents the `actor.account` xAPI field.
+    """Pydantic model for `actor.account` field.
 
     Attributes:
         homePage (IRI): Consists of the home page of the account's service provider.
@@ -21,7 +21,9 @@ class AccountActorAccountField(BaseModelWithConfig):
 
 
 class BaseActorField(BaseModelWithConfig):
-    """Represents the base `actor` xAPI Field defining who performed the action.
+    """Pydantic model for core `actor` field.
+
+    It defines who performed the action.
 
     Attributes:
         objectType (str): Consists of the value `Agent`.
@@ -33,7 +35,9 @@ class BaseActorField(BaseModelWithConfig):
 
 
 class MboxActorField(BaseActorField):
-    """Represents the `actor` xAPI Field with a mailto Inverse Functional Identifier.
+    """Pydantic model for `actor` field.
+
+    It defines a mailto Inverse Functional Identifier.
 
     Attributes:
         mbox (MailtoEmail): Consists of the Agent's email address.
@@ -43,7 +47,9 @@ class MboxActorField(BaseActorField):
 
 
 class MboxSha1SumActorField(BaseActorField):
-    """Represents the `actor` xAPI Field with a hash Inverse Functional Identifier.
+    """Pydantic model for `actor` field.
+
+    It defines a hash Inverse Functional Identifier.
 
     Attributes:
         mbox_sha1sum (str): Consists of the SHA1 hash of the Agent's email address.
@@ -53,7 +59,9 @@ class MboxSha1SumActorField(BaseActorField):
 
 
 class OpenIdActorField(BaseActorField):
-    """Represents the `actor` xAPI Field with an OpenID Inverse Functional Identifier.
+    """Pydantic model for `actor` field.
+
+    It defines an OpenID Inverse Functional Identifier.
 
     Attributes:
         openid (URI): Consists of an openID that uniquely identifies the Agent.
@@ -63,7 +71,9 @@ class OpenIdActorField(BaseActorField):
 
 
 class AccountActorField(BaseActorField):
-    """Represents the `actor` xAPI Field with an account Inverse Functional Identifier.
+    """Pydantic model for `actor` field.
+
+    It defines an account Inverse Functional Identifier.
 
     Attributes:
         account (dict): See AccountActorAccountField.
@@ -78,7 +88,9 @@ AgentActorField = Union[
 
 
 class AnonymousGroupActorField(BaseActorField):
-    """Represents the `actor` xAPI Field of type Anonymous Group.
+    """Pydantic model for `actor` field.
+
+    It is defined for Anonymous Group type.
 
     Attributes:
         objectType (str): Consists of the value `Group`.
@@ -90,7 +102,9 @@ class AnonymousGroupActorField(BaseActorField):
 
 
 class BaseIdentifiedGroupActorField(AnonymousGroupActorField):
-    """Represents the base `actor` xAPI Field of Identified Group type.
+    """Pydantic model for `actor` field.
+
+    It is defined for Identified Group type.
 
     Attributes:
         member (list): Consist of a list of the members of this Group.
@@ -100,19 +114,31 @@ class BaseIdentifiedGroupActorField(AnonymousGroupActorField):
 
 
 class MboxGroupActorField(BaseIdentifiedGroupActorField, MboxActorField):
-    """Represents the `actor` xAPI Field of group type with a mailto IFI."""
+    """Pydantic model for `actor` field.
+
+    It is defined for group type with a mailto IFI.
+    """
 
 
 class MboxSha1SumGroupActorField(BaseIdentifiedGroupActorField, MboxSha1SumActorField):
-    """Represents the `actor` xAPI Field of group type with a hash IFI."""
+    """Pydantic model for `actor` field.
+
+    It is defined for group type with a hash IFI.
+    """
 
 
 class OpenIdGroupActorField(BaseIdentifiedGroupActorField, OpenIdActorField):
-    """Represents the `actor` xAPI Field of group type with an openID IFI."""
+    """Pydantic model for `actor` field.
+
+    It is defined for group type with an openID IFI.
+    """
 
 
 class AccountGroupActorField(BaseIdentifiedGroupActorField, AccountActorField):
-    """Represents the `actor` xAPI Field of group type with an account IFI."""
+    """Pydantic model for `actor` field.
+
+    It is defined for group type with an account IFI.
+    """
 
 
 GroupActorField = Union[

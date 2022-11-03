@@ -9,7 +9,7 @@ from ...base import AbstractBaseEventField, BaseModelWithConfig
 
 
 class QueueState(BaseModelWithConfig):
-    """Represents the `queuestate` sub-field.
+    """Pydantic model for problem interaction `event`.`correct_map`.`queuestate` field.
 
     Attributes:
         key (str): Consists of a secret string.
@@ -22,7 +22,7 @@ class QueueState(BaseModelWithConfig):
 
 
 class CorrectMap(BaseModelWithConfig):
-    """Represents the `correct_map` sub-field.
+    """Pydantic model for problem interaction `event`.`correct_map` field.
 
     Attributes:
         answervariable (str): Consists of the variable chosen in answer in the case of
@@ -45,7 +45,7 @@ class CorrectMap(BaseModelWithConfig):
 
 
 class State(BaseModelWithConfig):
-    """Represents the `state` sub-field.
+    """Pydantic modelfor problem interaction `event`.`state` field.
 
     Attributes:
         correct_map (dict): see CorrectMapSubFields.
@@ -66,7 +66,7 @@ class State(BaseModelWithConfig):
 
 
 class SubmissionAnswerField(BaseModelWithConfig):
-    """Represents the information in a problem of `submission` field.
+    """Pydantic model for `problem_check`.`event`.`submission` field.
 
     Attributes:
         answer (str, list): Consists of the answer string or a list of the answer
@@ -89,7 +89,7 @@ class SubmissionAnswerField(BaseModelWithConfig):
 
 
 class EdxProblemHintDemandhintDisplayedEventField(AbstractBaseEventField):
-    """Represents the `event` field of `EdxProblemHintDemandhintDisplayed` model.
+    """Pydantic model for `edx.problem.hint.demandhint_displayed`.`event` field.
 
     Attributes:
         hint_index (int): Consists of the identifier for the hint that was displayed to
@@ -108,7 +108,7 @@ class EdxProblemHintDemandhintDisplayedEventField(AbstractBaseEventField):
 
 
 class EdxProblemHintFeedbackDisplayedEventField(AbstractBaseEventField):
-    """Represents the `event` field of `EdxProblemHintFeedbackDisplayed` model.
+    """Pydantic model for `edx.problem.hint.feedback_displayed`.`event` field.
 
     Attributes:
         choice_all (list): Lists all of the answer choices for problems with multiple
@@ -147,7 +147,7 @@ class EdxProblemHintFeedbackDisplayedEventField(AbstractBaseEventField):
 
 
 class ProblemCheckEventField(AbstractBaseEventField):
-    """Represents the `event` field of `ProblemCheck` model.
+    """Pydantic model for `problem_check`.`event` field.
 
     Attributes:
         answers (dict): Consists of a dictionary of problem ID and the corresponding
@@ -187,7 +187,7 @@ class ProblemCheckEventField(AbstractBaseEventField):
 
 
 class ProblemCheckFailEventField(AbstractBaseEventField):
-    """Represents the `event` field of `ProblemCheckFail` model.
+    """Pydantic model for `problem_check_fail`.`event` field.
 
     Attributes:
         answers (dict): Consists of a dictionary of problem ID and the internal answer
@@ -210,7 +210,7 @@ class ProblemCheckFailEventField(AbstractBaseEventField):
 
 
 class ProblemRescoreEventField(AbstractBaseEventField):
-    """Represents the `event` field of `ProblemRescore` model.
+    """Pydantic model for `problem_rescore`.`event` field.
 
     Attributes:
         attempts (int): Consists of the number of attempts of rescoring.
@@ -238,7 +238,7 @@ class ProblemRescoreEventField(AbstractBaseEventField):
 
 
 class ProblemRescoreFailEventField(AbstractBaseEventField):
-    """Represents the `event` field of `ProblemRescoreFail` model.
+    """Pydantic model for `problem_rescore_fail`.`event` field.
 
     Attributes:
         failure (str): Consists either of the `closed` or `unreset` value.
@@ -255,7 +255,7 @@ class ProblemRescoreFailEventField(AbstractBaseEventField):
 
 
 class UIProblemResetEventField(AbstractBaseEventField):
-    """Represents the `event` field of `ProblemReset` model.
+    """Pydantic model for `problem_reset`.`event` field.
 
     Attributes:
         answers (str, list): Consists of the answer string or a list of the answer
@@ -266,7 +266,7 @@ class UIProblemResetEventField(AbstractBaseEventField):
 
 
 class UIProblemShowEventField(AbstractBaseEventField):
-    """Represents the `event` field of `ProblemShow` model.
+    """Pydantic model for `problem_show`.`event` field.
 
     Attributes:
         problem (str): Consists of the optional name value that the course creators
@@ -277,7 +277,7 @@ class UIProblemShowEventField(AbstractBaseEventField):
 
 
 class ResetProblemEventField(AbstractBaseEventField):
-    """Represents the `event` field of `ResetProblem` model.
+    """Pydantic model for `reset_problem`.`event` field.
 
     Attributes:
         new_state (json): see StateField.
@@ -294,7 +294,7 @@ class ResetProblemEventField(AbstractBaseEventField):
 
 
 class ResetProblemFailEventField(AbstractBaseEventField):
-    """Represents the `event` field of `ResetProblemFail` model.
+    """Pydantic model for `reset_problem_fail`.`event` field.
 
     Attributes:
         failure (str): Consists either of `closed` or `not_done` value.
@@ -311,7 +311,7 @@ class ResetProblemFailEventField(AbstractBaseEventField):
 
 
 class SaveProblemFailEventField(AbstractBaseEventField):
-    """Represents the `event` field of `SaveProblemFail` model.
+    """Pydantic model for `save_problem_fail`.`event` field.
 
     Attributes:
         answers (dict): Consists of a dict of the answer string or a list or a dict of
@@ -331,7 +331,7 @@ class SaveProblemFailEventField(AbstractBaseEventField):
 
 
 class SaveProblemSuccessEventField(AbstractBaseEventField):
-    """Represents the `event` field of `SaveProblemSuccess` model.
+    """Pydantic model for `save_problem_success`.`event` field.
 
     Attributes:
         answers (dict): Consists of a dict of the answer string or a list or a dict of
@@ -349,7 +349,7 @@ class SaveProblemSuccessEventField(AbstractBaseEventField):
 
 
 class ShowAnswerEventField(AbstractBaseEventField):
-    """Represents the `event` field of `ShowAnswer` model.
+    """Pydantic model for `show_answer`.`event` field.
 
     Attributes:
         problem_id (str): Consists of the ID of the problem being shown.

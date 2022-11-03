@@ -9,8 +9,7 @@ from ...base import AbstractBaseEventField
 
 # pylint: disable=line-too-long
 class TextbookInteractionBaseEventField(AbstractBaseEventField):
-    """Represents the event field which attributes are common to most of the textbook
-    interaction events.
+    """Pydantic model for textbook interaction core `event` field.
 
     Attributes:
         chapter (str): Consists of the name of the PDF file.
@@ -27,7 +26,7 @@ class TextbookInteractionBaseEventField(AbstractBaseEventField):
 
 
 class TextbookPdfThumbnailsToggledEventField(TextbookInteractionBaseEventField):
-    """Represents the `textbook.pdf.thumbnails.toggled` event field.
+    """Pydantic model for `textbook.pdf.thumbnails.toggled`.`event` field.
 
     Attribute:
         name (str): Consists of the value `textbook.pdf.thumbnails.toggled`.
@@ -37,7 +36,7 @@ class TextbookPdfThumbnailsToggledEventField(TextbookInteractionBaseEventField):
 
 
 class TextbookPdfThumbnailNavigatedEventField(TextbookInteractionBaseEventField):
-    """Represents the `textbook.pdf.thumbnail.navigated` event field.
+    """Pydantic model for `textbook.pdf.thumbnail.navigated`.`event` field.
 
     Attribute:
         name (str): Consists of the value `textbook.pdf.thumbnail.navigated`.
@@ -49,7 +48,7 @@ class TextbookPdfThumbnailNavigatedEventField(TextbookInteractionBaseEventField)
 
 
 class TextbookPdfOutlineToggledEventField(TextbookInteractionBaseEventField):
-    """Represents the `textbook.pdf.outline.toggled` event field.
+    """Pydantic model for `textbook.pdf.outline.toggled`.`event` field.
 
     Attribute:
         name (str): Consists of the value `textbook.pdf.outline.toggled`.
@@ -60,7 +59,7 @@ class TextbookPdfOutlineToggledEventField(TextbookInteractionBaseEventField):
 
 # pylint: disable=line-too-long
 class TextbookPdfChapterNavigatedEventField(AbstractBaseEventField):
-    """Represents the `textbook.pdf.chapter.navigated` event field.
+    """Pydantic model for `textbook.pdf.chapter.navigated`.`event` field.
 
     Attributes:
         name (str): Consists of the value `textbook.pdf.chapter.navigated`.
@@ -78,7 +77,7 @@ class TextbookPdfChapterNavigatedEventField(AbstractBaseEventField):
 
 
 class TextbookPdfPageNavigatedEventField(TextbookInteractionBaseEventField):
-    """Represents the `textbook.pdf.page.navigated` event field.
+    """Pydantic model for `textbook.pdf.page.navigated`.`event` field.
 
     Attribute:
         name (str): Consists of the value `textbook.pdf.page.navigated`.
@@ -88,7 +87,7 @@ class TextbookPdfPageNavigatedEventField(TextbookInteractionBaseEventField):
 
 
 class TextbookPdfZoomButtonsChangedEventField(TextbookInteractionBaseEventField):
-    """Represents the `textbook.pdf.zoom.buttons.changed` event field.
+    """Pydantic model for `textbook.pdf.zoom.buttons.changed`.`event` field.
 
     Attributes:
         name (str): Consists of the value `textbook.pdf.zoom.buttons.changed`.
@@ -100,7 +99,7 @@ class TextbookPdfZoomButtonsChangedEventField(TextbookInteractionBaseEventField)
 
 
 class TextbookPdfZoomMenuChangedEventField(TextbookInteractionBaseEventField):
-    """Represents the `textbook.pdf.zoom.menu.changed` event field.
+    """Pydantic model for `textbook.pdf.zoom.menu.changed`.`event` field.
 
     Attributes:
         name (str): Consists of the value `textbook.pdf.zoom.menu.changed`.
@@ -127,7 +126,7 @@ class TextbookPdfZoomMenuChangedEventField(TextbookInteractionBaseEventField):
 
 
 class TextbookPdfDisplayScaledEventField(TextbookInteractionBaseEventField):
-    """Represents the `textbook.pdf.display.scaled` event field.
+    """Pydantic model for `textbook.pdf.display.scaled`.`event` field.
 
     Attributes:
         name (str): Consists of the value `textbook.pdf.display.scaled`.
@@ -139,7 +138,7 @@ class TextbookPdfDisplayScaledEventField(TextbookInteractionBaseEventField):
 
 
 class TextbookPdfPageScrolledEventField(TextbookInteractionBaseEventField):
-    """Represents the `textbook.pdf.page.scrolled` event field.
+    """Pydantic model for `textbook.pdf.page.scrolled`.`event` field.
 
     Attributes:
         name (str): Consists of the value `textbook.pdf.page.scrolled`.
@@ -151,7 +150,7 @@ class TextbookPdfPageScrolledEventField(TextbookInteractionBaseEventField):
 
 
 class TextbookPdfSearchExecutedEventField(TextbookInteractionBaseEventField):
-    """Represents the `textbook.pdf.search.executed` event field.
+    """Pydantic model for `textbook.pdf.search.executed`.`event` field.
 
     Attributes:
         name (str): Consists of the value `textbook.pdf.search.executed`.
@@ -172,7 +171,7 @@ class TextbookPdfSearchExecutedEventField(TextbookInteractionBaseEventField):
 
 
 class TextbookPdfSearchNavigatedNextEventField(TextbookInteractionBaseEventField):
-    """Represents the `textbook.pdf.search.navigatednext` event field.
+    """Pydantic model for `textbook.pdf.search.navigatednext`.`event` field.
 
     Attributes:
         name (str): Consists of the value `textbook.pdf.search.navigatednext`.
@@ -197,7 +196,7 @@ class TextbookPdfSearchNavigatedNextEventField(TextbookInteractionBaseEventField
 
 
 class TextbookPdfSearchHighlightToggledEventField(TextbookInteractionBaseEventField):
-    """Represents the `textbook.pdf.search.highlight.toggled` event field.
+    """Pydantic model for `textbook.pdf.search.highlight.toggled`.`event` field.
 
     Attributes:
         name (str): Consists of the value `textbook.pdf.search.highlight.toggled`.
@@ -220,7 +219,7 @@ class TextbookPdfSearchHighlightToggledEventField(TextbookInteractionBaseEventFi
 class TextbookPdfSearchCaseSensitivityToggledEventField(
     TextbookInteractionBaseEventField
 ):
-    """Represents the `textbook.pdf.searchcasesensitivity.toggled` event field.
+    """Pydantic model for `textbook.pdf.searchcasesensitivity.toggled`.`event` field.
 
     Attributes:
         name (str): Consists of the value `textbook.pdf.searchcasesensitivity.toggled`.
@@ -242,7 +241,7 @@ class TextbookPdfSearchCaseSensitivityToggledEventField(
 
 # pylint: disable=line-too-long
 class BookEventField(AbstractBaseEventField):
-    """Represents the `book` event field.
+    """Pydantic model for `book`.`event` field.
 
     Attributes:
         chapter (str): Consists of the name of the PDF file.

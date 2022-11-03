@@ -14,7 +14,7 @@ from .common import IRI, LanguageMap
 
 
 class VerbField(BaseModelWithConfig):
-    """Represents the `verb` xAPI field.
+    """Pydantic model for core `verb` field.
 
     Attributes:
         id (IRI): Consists of an identifier for the verb.
@@ -26,7 +26,7 @@ class VerbField(BaseModelWithConfig):
 
 
 class ViewedVerbField(VerbField):
-    """Represents the `verb` xAPI Field for the action `viewed`.
+    """Pydantic model for viewed `verb` field.
 
     Attributes:
         id (str): Consists of the value `http://id.tincanapi.com/verb/viewed`.
@@ -40,7 +40,7 @@ class ViewedVerbField(VerbField):
 
 
 class TerminatedVerbField(VerbField):
-    """Represents the `verb` xAPI Field for the action `terminated`.
+    """Pydantic model for terminated `verb` field.
 
     Attributes:
         id (str): Consists of the value `http://adlnet.gov/expapi/verbs/terminated`.

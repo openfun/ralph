@@ -12,9 +12,10 @@ from pydantic import BaseModel
 # Taken from Django utilities
 # https://docs.djangoproject.com/en/3.1/_modules/django/utils/module_loading/#import_string
 def import_string(dotted_path):
-    """
-    Import a dotted module path and return the attribute/class designated by the
-    last name in the path. Raise ImportError if the import failed.
+    """Import a dotted module path.
+
+    Returns the attribute/class designated by the last name in the path.
+    Raise ImportError if the import failed.
     """
     try:
         module_path, class_name = dotted_path.rsplit(".", 1)
@@ -68,8 +69,10 @@ def now():
 
 
 def get_dict_value_from_path(dict_: dict, path: list[str]):
-    """Gets a nested dictionary value using an array of keys representing the path
-    to the value.
+    """Gets a nested dictionary value.
+
+    Args:
+        path (list): array of keys representing the path to the value
     """
 
     if path is None:
@@ -81,8 +84,10 @@ def get_dict_value_from_path(dict_: dict, path: list[str]):
 
 
 def set_dict_value_from_path(dict_: dict, path: list[str], value: any):
-    """Sets a nested dictionary value using an array of keys representing the path
-    to the value.
+    """Sets a nested dictionary value.
+
+    Args:
+        list(str): array of keys representing the path to the value
     """
 
     for key in path[:-1]:

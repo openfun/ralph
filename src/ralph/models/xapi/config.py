@@ -4,7 +4,7 @@ from pydantic import BaseModel, Extra
 
 
 class BaseModelWithConfig(BaseModel):
-    """Base model defining configuration shared among all models."""
+    """Pydantic model for base configuration shared among all models."""
 
     class Config:  # pylint: disable=missing-class-docstring # noqa: D106
         extra = Extra.forbid

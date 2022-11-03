@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 class Validator:
-    """Validates events using pydantic models."""
+    """Events validator using pydantic models."""
 
     def __init__(self, model_selector: ModelSelector):
         """Initializes Validator."""

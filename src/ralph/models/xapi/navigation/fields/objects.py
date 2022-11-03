@@ -8,7 +8,7 @@ from ...fields.unnested_objects import ActivityObjectField, ObjectDefinitionFiel
 
 
 class PageObjectDefinitionField(ObjectDefinitionField):
-    """Represents the `object.definition` xAPI field for page viewed xAPI statement.
+    """Pydantic model for page viewed `object`.`definition` field.
 
     Attributes:
        type (str): Consists of the value `http://activitystrea.ms/schema/1.0/page`.
@@ -24,7 +24,7 @@ class PageObjectDefinitionField(ObjectDefinitionField):
 
 
 class PageObjectField(ActivityObjectField):
-    """Represents the `object` xAPI field for page viewed xAPI statement.
+    """Pydantic model for page viewed `object` field.
 
     Attributes:
         definition (dict): See PageObjectDefinitionField.

@@ -24,7 +24,7 @@ from ..constants import (
 
 
 class VideoContextActivitiesField(ContextActivitiesContextField):
-    """Represents the contextActivities field for video xAPI statements.
+    """Pydantic model for video `contextActivities` field.
 
     Attributes:
         category (list): Consists of a list containing the dictionary
@@ -37,7 +37,7 @@ class VideoContextActivitiesField(ContextActivitiesContextField):
 
 
 class BaseVideoContextField(ContextField):
-    """Base model for xAPI video context field.
+    """Pydantic model for video core `context` field.
 
     Attributes:
         contextActivities (dict): see VideoContextActivitiesField.
@@ -47,7 +47,7 @@ class BaseVideoContextField(ContextField):
 
 
 class VideoContextExtensionsField(BaseModelWithConfig):
-    """Represents the common context.extensions field for video xAPI statement.
+    """Pydantic model for video core `context`.`extensions` field.
 
     Attributes:
         session (uuid): Consists of the ID of the active session.
@@ -57,7 +57,7 @@ class VideoContextExtensionsField(BaseModelWithConfig):
 
 
 class VideoInitializedContextExtensionsField(VideoContextExtensionsField):
-    """Represents the context.extensions field for video `initialized` xAPI statement.
+    """Pydantic model for video initialized `context`.`extensions` field.
 
     Attributes:
         length (float): Consists of the length of the video.
@@ -93,7 +93,7 @@ class VideoInitializedContextExtensionsField(VideoContextExtensionsField):
 
 
 class VideoBrowsingContextExtensionsField(VideoContextExtensionsField):
-    """Represents the context.extensions field for video browsing xAPI statements.
+    """Pydantic model for video browsing `context`.`extensions` field.
 
     Such field is used in `paused`, `completed` and `terminated` events.
 
@@ -148,7 +148,7 @@ class VideoScreenChangeInteractionContextExtensionsField(VideoContextExtensionsF
 
 
 class VideoInitializedContextField(BaseVideoContextField):
-    """Represents the context field for video `initialized` xAPI statement.
+    """Pydantic model for video initialized `context` field.
 
     Attributes:
         extensions (dict): See VideoInitializedContextExtensionsField.
@@ -158,7 +158,7 @@ class VideoInitializedContextField(BaseVideoContextField):
 
 
 class VideoPlayedContextField(BaseVideoContextField):
-    """Represents the context field for video `played` xAPI statement.
+    """Pydantic model for video played `context` field.
 
     Attributes:
         extensions (dict): See VideoContextExtensionsField.
@@ -168,7 +168,7 @@ class VideoPlayedContextField(BaseVideoContextField):
 
 
 class VideoPausedContextField(BaseVideoContextField):
-    """Represents the context field for video `paused` xAPI statement.
+    """Pydantic model for video paused `context` field.
 
     Attributes:
         extensions (dict): See VideoBrowsingContextExtensionsField.
@@ -178,7 +178,7 @@ class VideoPausedContextField(BaseVideoContextField):
 
 
 class VideoSeekedContextField(BaseVideoContextField):
-    """Represents the context field for video `seeked` xAPI statement.
+    """Pydantic model for video seeked `context` field.
 
     Attributes:
         extensions (dict): See VideoContextExtensionsField.
@@ -188,7 +188,7 @@ class VideoSeekedContextField(BaseVideoContextField):
 
 
 class VideoCompletedContextField(BaseVideoContextField):
-    """Represents the context field for video `completed` xAPI statement.
+    """Pydantic model for video completed `context` field.
 
     Attributes:
         extensions (dict): See VideoBrowsingContextExtensionsField.
@@ -198,7 +198,7 @@ class VideoCompletedContextField(BaseVideoContextField):
 
 
 class VideoTerminatedContextField(BaseVideoContextField):
-    """Represents the context field for video `terminated` xAPI statement.
+    """Pydantic model for video terminated `context` field.
 
     Attributes:
         extensions (dict): See VideoBrowsingContextExtensionsField.

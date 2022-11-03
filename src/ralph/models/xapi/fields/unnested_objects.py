@@ -10,7 +10,7 @@ from .common import IRI, LanguageMap
 
 
 class ObjectDefinitionField(BaseModelWithConfig):
-    """Represents the `object.definition` xAPI field.
+    """Pydantic model for `object.definition` field.
 
     Attributes:
         name (LanguageMap): Consists of the human readable/visual name of the Activity.
@@ -28,7 +28,7 @@ class ObjectDefinitionField(BaseModelWithConfig):
 
 
 class InteractionComponent(BaseModelWithConfig):
-    """Represents an xAPI Interaction component.
+    """Pydantic model for an interaction component.
 
     Attributes:
         id (str): Consists of an identifier of the interaction component.
@@ -40,7 +40,9 @@ class InteractionComponent(BaseModelWithConfig):
 
 
 class InteractionObjectDefinitionField(ObjectDefinitionField):
-    """Represents the `object.definition` xAPI field with interaction properties.
+    """Pydantic model for `object.definition` field.
+
+    It is defined for field with interaction properties.
 
     Attributes:
         interactionType (str): Consists of the type of the interaction.
@@ -81,7 +83,9 @@ class InteractionObjectDefinitionField(ObjectDefinitionField):
 
 
 class ActivityObjectField(BaseModelWithConfig):
-    """Represents the `object` xAPI field of type Activity.
+    """Pydantic model for `object` field.
+
+    It is defined for Activity type.
 
     Attributes:
         objectType (str): Consists of the value `Activity`.
@@ -95,7 +99,9 @@ class ActivityObjectField(BaseModelWithConfig):
 
 
 class StatementRefObjectField(BaseModelWithConfig):
-    """Represents the `object` xAPI field of type StatementRef.
+    """Pydantic model for `object` field.
+
+    It is defined for StatementRef type.
 
     Attributes:
         objectType (str): Consists of the value `StatementRef`.

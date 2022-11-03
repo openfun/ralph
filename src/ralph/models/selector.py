@@ -17,7 +17,7 @@ from ralph.utils import get_dict_value_from_path
 
 @dataclass(frozen=True)
 class LazyModelField:
-    """Represents a model field."""
+    """Model field."""
 
     path: tuple[str]
 
@@ -28,7 +28,7 @@ class LazyModelField:
 
 @dataclass(frozen=True)
 class Rule:
-    """Represents a rule used for selection."""
+    """Rule used for selection."""
 
     field: LazyModelField
     value: Union[LazyModelField, Any]  # pylint: disable=unsubscriptable-object
@@ -61,7 +61,7 @@ def selector(**filters):
 
 
 class ModelSelector:
-    """Selects the matching model for a given event.
+    """Matching model selector for a given event.
 
     Attributes:
         model_rules (dict): Stores the list of rules for each model.
@@ -76,8 +76,9 @@ class ModelSelector:
 
     @staticmethod
     def build_model_rules(module: ModuleType):
-        """Builds the model_rules dictionary from BaseModel classes defined
-        in the module.
+        """Builds the model_rules dictionary.
+
+        Using BaseModel classes defined in the module.
         """
 
         model_rules = {}
@@ -92,13 +93,12 @@ class ModelSelector:
         return self.get_models(event)[0]
 
     def get_models(self, event: dict, tree=None):
-        """Recursively walks through the decision tree to return the matching models
-        for the event.
+        """Recursively go through the decision tree to find the event matching models.
 
         Args:
             event (dict): Event to retrieve the corresponding model.
             tree (dict): The (sub) decision tree, `None` stands for the whole decision
-                         tree.
+                tree.
 
         Returns:
             models (list of BaseModels): When the event matches all rules of the models.

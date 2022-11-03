@@ -11,20 +11,20 @@ from .base import AbstractBaseEventField, BaseEdxModel
 
 
 class BaseServerModel(BaseEdxModel):
-    """Represents the base model all server statements inherit from."""
+    """Pydantic model for core server statement."""
 
     event_source: Literal["server"]
 
 
 class ServerEventField(AbstractBaseEventField):
-    """Represents the `event` field of the ServerEventModel."""
+    """Pydantic model for common server `event` field."""
 
     GET: dict
     POST: dict
 
 
 class Server(BaseServerModel):
-    """Represents a common server statement.
+    """Pydantic model for common server statement.
 
     This type of event is triggered from the django middleware on each request
     excluding: `/event`, `login`, `heartbeat`, `/segmentio/event` and `/performance`.

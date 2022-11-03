@@ -12,7 +12,7 @@ from .unnested_objects import ActivityObjectField, StatementRefObjectField
 
 
 class ContextActivitiesContextField(BaseModelWithConfig):
-    """Represents the `context.contextActivities` xAPI field.
+    """Pydantic model for `context.contextActivities` field.
 
     Attributes:
         parent (list): An Activity with a direct relation to the statement's Activity.
@@ -29,7 +29,7 @@ class ContextActivitiesContextField(BaseModelWithConfig):
 
 
 class ContextField(BaseModelWithConfig):
-    """Represents the `context` xAPI field.
+    """Pydantic model for `context` field.
 
     Attributes:
         registration (UUID): The registration that the Statement is associated with.
