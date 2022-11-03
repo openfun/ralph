@@ -1,4 +1,4 @@
-"""Base database backend for Ralph"""
+"""Base database backend for Ralph."""
 
 import functools
 import logging
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class BaseQuery(BaseModel):
-    """Base query model"""
+    """Base query model."""
 
     class Config:
         """Base query model configuration."""
@@ -36,7 +36,7 @@ class StatementQueryResult:
 
 @unique
 class DatabaseStatus(Enum):
-    """Database statuses"""
+    """Database statuses."""
 
     OK = "ok"
     AWAY = "away"
@@ -89,7 +89,7 @@ class BaseDatabase(ABC):
     query_model = BaseQuery
 
     def validate_query(self, query: BaseQuery = None):
-        """Validate database query"""
+        """Validate database query."""
 
         if query is None:
             query = self.query_model()
@@ -111,9 +111,7 @@ class BaseDatabase(ABC):
     @abstractmethod
     @enforce_query_checks
     def get(self, query: BaseQuery = None, chunk_size: int = 10):
-        """Reads `chunk_size` records from the database query results and yields
-        them.
-        """
+        """Yields `chunk_size` records read from the database query results."""
 
     @abstractmethod
     def put(

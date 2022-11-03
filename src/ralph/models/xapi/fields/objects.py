@@ -1,4 +1,4 @@
-"""Common xAPI object field definitions"""
+"""Common xAPI object field definitions."""
 
 # Nota bene: we split object definitions into `objects.py` and `unnested_objects.py`
 # because of the circular dependency : objects -> context -> objects.

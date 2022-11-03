@@ -1,4 +1,4 @@
-"""Hypothesis fixture configuration"""
+"""Hypothesis fixture configuration."""
 
 import operator
 

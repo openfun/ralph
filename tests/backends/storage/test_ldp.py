@@ -1,4 +1,4 @@
-"""Tests for Ralph ldp storage backend"""
+"""Tests for Ralph ldp storage backend."""
 
 import datetime
 import gzip

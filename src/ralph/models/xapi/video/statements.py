@@ -1,4 +1,4 @@
-"""Video xAPI event definitions"""
+"""Video xAPI event definitions."""
 
 from typing import Optional
 
@@ -173,7 +173,7 @@ class VideoTerminated(BaseVideoStatement):
 
 
 class VideoEnableClosedCaptioning(BaseVideoStatement):
-    """Represents a video enable closed captioning xAPI statement.
+    """Pydantic model for video enable closed captioning statement.
 
     Example: John interacted with the player to enable closed captioning.
 
@@ -194,7 +194,7 @@ class VideoEnableClosedCaptioning(BaseVideoStatement):
 
 
 class VideoVolumeChangeInteraction(BaseVideoStatement):
-    """Represents a video volume change interaction xAPI statement.
+    """Pydantic model for video volume change interaction statement.
 
     Example: John interacted with the player to change the volume.
 
@@ -215,7 +215,7 @@ class VideoVolumeChangeInteraction(BaseVideoStatement):
 
 
 class VideoScreenChangeInteraction(BaseVideoStatement):
-    """Represents a video screen change interaction xAPI statement.
+    """Pydantic model for video screen change interaction statement.
 
     Example: John interacted with the player to activate or deactivate full screen.
 

@@ -1,4 +1,4 @@
-"""Enrollment event model definitions"""
+"""Enrollment event model definitions."""
 
 from typing import Literal, Union
 

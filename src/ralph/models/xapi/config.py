@@ -1,4 +1,4 @@
-"""Base xAPI model configuration"""
+"""Base xAPI model configuration."""
 
 from pydantic import BaseModel, Extra
 

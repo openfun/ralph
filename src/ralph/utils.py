@@ -1,4 +1,4 @@
-"""Utilities for Ralph"""
+"""Utilities for Ralph."""
 
 import datetime
 import logging
@@ -54,7 +54,7 @@ def get_backend_instance(backend_type: BaseModel, backend_name: str, options: di
 
 
 def get_root_logger():
-    """Get main Ralph logger"""
+    """Get main Ralph logger."""
 
     ralph_logger = logging.getLogger("ralph")
     ralph_logger.propagate = True
@@ -63,7 +63,7 @@ def get_root_logger():
 
 
 def now():
-    """Return the current UTC time in ISO format"""
+    """Return the current UTC time in ISO format."""
 
     return datetime.datetime.now(tz=datetime.timezone.utc).isoformat()
 

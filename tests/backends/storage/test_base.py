@@ -1,4 +1,4 @@
-"""Tests for Ralph base storage backend"""
+"""Tests for Ralph base storage backend."""
 
 from ralph.backends.storage.base import BaseStorage
 

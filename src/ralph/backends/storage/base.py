@@ -1,4 +1,4 @@
-"""Base storage backend for Ralph"""
+"""Base storage backend for Ralph."""
 
 from abc import ABC, abstractmethod
 from typing import Iterable

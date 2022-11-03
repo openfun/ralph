@@ -1,4 +1,4 @@
-"""Module py.test fixtures"""
+"""Module py.test fixtures."""
 
 # pylint: disable=unused-import
 

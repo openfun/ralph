@@ -1,6 +1,6 @@
-"""API-specific data models definition. 
+"""API-specific data models definition.
 
-Allows to be exactly as lax as we want when it comes to exact object shape and 
+Allows to be exactly as lax as we want when it comes to exact object shape and
 validation.
 """
 from typing import Optional

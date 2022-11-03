@@ -1,4 +1,4 @@
-"""Constants for xAPI specifications"""
+"""Constants for xAPI specifications."""
 
 from typing import Literal
 

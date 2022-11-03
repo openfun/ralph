@@ -1,4 +1,4 @@
-"""Video event xAPI Converter"""
+"""Video event xAPI Converter."""
 
 from ralph.models.converter import ConversionItem
 from ralph.models.edx.video.statements import (

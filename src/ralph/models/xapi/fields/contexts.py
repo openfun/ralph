@@ -1,4 +1,4 @@
-"""Common xAPI context field definitions"""
+"""Common xAPI context field definitions."""
 
 from typing import Optional, Union
 from uuid import UUID

@@ -1,4 +1,4 @@
-"""Video xAPI events context fields definitions"""
+"""Video xAPI events context fields definitions."""
 
 from typing import Literal, Optional
 from uuid import UUID
@@ -121,8 +121,7 @@ class VideoEnableClosedCaptioningContextExtensionsField(VideoContextExtensionsFi
 
 
 class VideoVolumeChangeInteractionContextExtensionsField(VideoContextExtensionsField):
-    """Represents the context.extensions field for video volume change interaction xAPI
-    statement.
+    """Pydantic model for video volume change interaction `context`.`extensions` field.
 
     Attributes:
         volume (int): Consists of the volume of the video.
@@ -132,8 +131,7 @@ class VideoVolumeChangeInteractionContextExtensionsField(VideoContextExtensionsF
 
 
 class VideoScreenChangeInteractionContextExtensionsField(VideoContextExtensionsField):
-    """Represents the context.extensions field for video screen change interaction xAPI
-    statement.
+    """Pydantic model for video screen change interaction `context`.`extensions` field.
 
     Attributes:
         fullScreen (bool): Indicates whether the video is played in full screen mode.
@@ -208,7 +206,7 @@ class VideoTerminatedContextField(BaseVideoContextField):
 
 
 class VideoEnableClosedCaptioningContextField(BaseVideoContextField):
-    """Represents the context field for video enable closed captioning xAPI statement.
+    """Pydantic modle for video enable closed captioning `context` field.
 
     Attributes:
         extensions (dict): See VideoEnableClosedCaptioningContextExtensionsField.
@@ -218,8 +216,7 @@ class VideoEnableClosedCaptioningContextField(BaseVideoContextField):
 
 
 class VideoVolumeChangeInteractionContextField(BaseVideoContextField):
-    """Represents the context field for video volume change interaction xAPI
-    statement.
+    """Pydantic model for video volume change interaction `context` field.
 
     Attributes:
         extensions (dict): See VideoVolumeChangeInteractionContextExtensionsField.
@@ -229,8 +226,7 @@ class VideoVolumeChangeInteractionContextField(BaseVideoContextField):
 
 
 class VideoScreenChangeInteractionContextField(BaseVideoContextField):
-    """Represents the context field for video screen change interaction xAPI
-    statement.
+    """Pydantic model for video screen change interaction `context` field.
 
     Attributes:
         extensions (dict): See VideoScreenChangeInteractionContextExtensionsField.

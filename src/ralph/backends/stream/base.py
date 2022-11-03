@@ -1,4 +1,4 @@
-"""Base Stream backend for Ralph"""
+"""Base Stream backend for Ralph."""
 
 from abc import ABC, abstractmethod
 from typing import BinaryIO

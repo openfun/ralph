@@ -1,4 +1,4 @@
-"""Video xAPI events result fields definitions"""
+"""Video xAPI events result fields definitions."""
 
 from datetime import timedelta
 from typing import Literal, Optional
@@ -18,7 +18,7 @@ from ..constants import (
 
 
 class VideoResultExtensionsField(BaseModelWithConfig):
-    """Represents the result.extensions field for video `played` xAPI statement.
+    """Pydantic model for video `result`.`extensions` field.
 
     Attributes:
         playedSegments (str): Consists of parts of the video the actor watched during
@@ -32,7 +32,7 @@ class VideoResultExtensionsField(BaseModelWithConfig):
 
 
 class VideoPausedResultExtensionsField(VideoResultExtensionsField):
-    """Represents the result.extensions field for video `paused` xAPI statement.
+    """Pydantic model for video paused `result`.`extensions` field.
 
     Attributes:
         progress (float): Consists of the ratio of media consumed by the actor.
@@ -62,7 +62,7 @@ class VideoSeekedResultExtensionsField(BaseModelWithConfig):
 
 
 class VideoCompletedResultExtensionsField(VideoResultExtensionsField):
-    """Represents the result.extensions field for video `completed` xAPI statement.
+    """Pydantic model for video completed `result`.`extensions` field.
 
     Attributes:
         progress (float): Consists of the percentage of media consumed by the actor.
@@ -75,7 +75,7 @@ class VideoCompletedResultExtensionsField(VideoResultExtensionsField):
 
 
 class VideoTerminatedResultExtensionsField(VideoResultExtensionsField):
-    """Represents the result.extensions field for video `terminated` xAPI statement.
+    """Pydantic model for video terminated `result`.`extensions` field.
 
     Attributes:
         progress (float): Consists of the percentage of media consumed by the actor.
@@ -88,8 +88,7 @@ class VideoTerminatedResultExtensionsField(VideoResultExtensionsField):
 
 
 class VideoEnableClosedCaptioningResultExtensionsField(VideoResultExtensionsField):
-    """Represents the result.extensions field for video enable closed captioning
-    `interacted` xAPI statement.
+    """Pydantic model for video enable closed captioning `result`.`extensions` field.
 
     Attributes:
         ccEnabled (bool): Indicates whether subtitles are enabled.
@@ -157,8 +156,7 @@ class VideoTerminatedResultField(ResultField):
 
 
 class VideoEnableClosedCaptioningResultField(ResultField):
-    """Represents the result field for video enable closed captioning
-    `interacted` xAPI statement.
+    """Pydantic model for video enable closed captioning `result` field.
 
     Attributes:
         extensions (dict): See VideoEnableClosedCaptioningResultExtensionsField.
@@ -168,8 +166,7 @@ class VideoEnableClosedCaptioningResultField(ResultField):
 
 
 class VideoVolumeChangeInteractionResultField(ResultField):
-    """Represents the result field for video volume change
-    `interacted` xAPI statement.
+    """Pydantic model for video volume change interaction `result` field.
 
     Attributes:
         extensions (dict): See VideoResultExtensionsField.
@@ -179,7 +176,7 @@ class VideoVolumeChangeInteractionResultField(ResultField):
 
 
 class VideoScreenChangeInteractionResultField(ResultField):
-    """Represents the result field for video screen change `interacted` xAPI statement.
+    """Pydantic model for video screen change interaction `result` field.
 
     Attributes:
         extensions (dict): See VideoResultExtensionsField.

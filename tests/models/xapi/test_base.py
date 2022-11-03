@@ -1,4 +1,4 @@
-"""Tests for the BaseXapiModel"""
+"""Tests for the BaseXapiModel."""
 
 import pytest
 from hypothesis import settings

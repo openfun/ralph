@@ -1,4 +1,4 @@
-"""Tests for the xAPI navigation statements"""
+"""Tests for the xAPI navigation statements."""
 
 import json
 

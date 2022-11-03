@@ -1,4 +1,4 @@
-"""API routes related to statements"""
+"""API routes related to statements."""
 
 import logging
 from datetime import datetime

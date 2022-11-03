@@ -1,4 +1,4 @@
-"""Ralph CLI entrypoint"""
+"""Ralph CLI entrypoint."""
 
 import json
 import logging

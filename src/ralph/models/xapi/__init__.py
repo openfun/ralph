@@ -1,4 +1,4 @@
-"""xAPI pydantic models"""
+"""xAPI pydantic models."""
 
 # flake8: noqa
 

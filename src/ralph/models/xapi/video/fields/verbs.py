@@ -1,4 +1,4 @@
-"""Video xAPI events verb fields definitions"""
+"""Video xAPI events verb fields definitions."""
 
 from ...constants import (
     LANG_EN_US_DISPLAY,

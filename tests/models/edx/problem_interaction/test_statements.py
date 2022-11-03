@@ -1,4 +1,4 @@
-"""Tests for the problem interaction event models"""
+"""Tests for the problem interaction event models."""
 
 import json
 

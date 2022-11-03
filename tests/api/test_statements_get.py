@@ -1,4 +1,4 @@
-"""Tests for the GET statements endpoint of the Ralph API"""
+"""Tests for the GET statements endpoint of the Ralph API."""
 
 import re
 from datetime import datetime, timedelta

@@ -1,4 +1,4 @@
-"""Elasticsearch database backend for Ralph"""
+"""Elasticsearch database backend for Ralph."""
 
 import json
 import logging
@@ -228,8 +228,10 @@ class ESDatabase(BaseDatabase):
         return self._search(index=self.index, body=body)["hits"]["hits"]
 
     def _search(self, **kwargs):
-        """Wraps the ElasticSearch.search method to raise a BackendException in case
-        of any failure.
+        """Wraps the ElasticSearch.search method.
+
+        Raises:
+            BackendException: raised for any failure.
         """
 
         try:
@@ -240,8 +242,10 @@ class ESDatabase(BaseDatabase):
             raise BackendException(msg, *error.args) from error
 
     def _open_point_in_time(self, **kwargs):
-        """Wraps the ElasticSearch.open_point_in_time method to raise a BackendException
-        in case of any failure.
+        """Wraps the ElasticSearch.open_point_in_time method.
+
+        Raises:
+            BackendException: raised for any failure.
         """
 
         try:

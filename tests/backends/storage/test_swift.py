@@ -1,4 +1,4 @@
-"""Tests for Ralph swift storage backend"""
+"""Tests for Ralph swift storage backend."""
 
 import datetime
 import json

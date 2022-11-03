@@ -1,4 +1,4 @@
-"""Base xAPI model definition"""
+"""Base xAPI model definition."""
 
 from datetime import datetime
 from typing import Optional

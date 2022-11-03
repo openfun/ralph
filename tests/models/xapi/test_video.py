@@ -1,4 +1,4 @@
-"""Tests for the xAPI played statement"""
+"""Tests for the xAPI played statement."""
 
 import json
 

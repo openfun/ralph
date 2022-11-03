@@ -1,4 +1,4 @@
-"""Problem interaction events model event fields definitions"""
+"""Problem interaction events model event fields definitions."""
 
 from datetime import datetime
 from typing import Literal, Optional, Union

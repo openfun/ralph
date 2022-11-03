@@ -1,4 +1,4 @@
-"""Base xAPI Converter"""
+"""Base xAPI Converter."""
 
 import re
 from uuid import UUID, uuid5
@@ -71,8 +71,9 @@ class BaseXapiConverter(BaseConversionSet):
 
     @staticmethod
     def parse_course_id(course_id: str):
-        """Returns a dictionary with `course` and `module` of edX event's
-        `context.course_id`.
+        """Parses edX event's `context`.`course_id`.
+
+        Returns a dictionary with `course` and `module`.
         """
 
         match = re.match(r"^course-v1:.+\+(.+)\+(.+)$", course_id)

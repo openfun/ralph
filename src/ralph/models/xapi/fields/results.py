@@ -1,4 +1,4 @@
-"""Common xAPI result field definitions"""
+"""Common xAPI result field definitions."""
 
 from datetime import timedelta
 from decimal import Decimal

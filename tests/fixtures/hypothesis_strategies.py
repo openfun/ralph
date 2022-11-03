@@ -1,4 +1,4 @@
-"""Hypothesis build strategies with special constraints"""
+"""Hypothesis build strategies with special constraints."""
 
 import random
 from typing import Union

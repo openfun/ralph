@@ -1,4 +1,4 @@
-"""Tests for Ralph utils"""
+"""Tests for Ralph utils."""
 
 import pytest
 from pydantic import BaseModel

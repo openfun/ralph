@@ -1,4 +1,4 @@
-"""Enrollment event models context fields definitions"""
+"""Enrollment event models context fields definitions."""
 
 from typing import Literal, Union
 

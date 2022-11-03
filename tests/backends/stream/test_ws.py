@@ -1,4 +1,4 @@
-"""Tests for Ralph ws stream backend"""
+"""Tests for Ralph ws stream backend."""
 
 import json
 from io import BytesIO

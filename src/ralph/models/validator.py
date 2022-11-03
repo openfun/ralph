@@ -1,4 +1,4 @@
-"""Event validator definition"""
+"""Event validator definition."""
 
 
 import json
