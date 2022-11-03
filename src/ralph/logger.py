@@ -1,4 +1,4 @@
-""""Ralph logging manager"""
+"""Ralph logging manager"""
 
 from logging.config import dictConfig
 
