@@ -12,9 +12,16 @@ from ralph.models.edx.navigational.statements import UISeqNext, UISeqPrev
 from ralph.models.xapi.fields.contexts import ContextField
 from ralph.models.xapi.fields.results import ScoreResultField
 
-from tests.fixtures.hypothesis_configuration import is_base_model
-
 OVERWRITTEN_STATEGIES = {}
+
+
+def is_base_model(klass):
+    """Returns True if the given class is a subclass of the pydantic BaseModel."""
+
+    try:
+        return issubclass(klass, BaseModel)
+    except TypeError:
+        return False
 
 
 def get_strategy_from(annotation):
