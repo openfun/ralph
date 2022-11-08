@@ -1,0 +1,29 @@
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: "ralph-app-{{ .Values.ralph.prefix }}"
+  labels:
+    {{- include "ralph.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  tls:
+    - hosts:
+        - {{ .Values.ralph_lrs.host | quote }}
+      secretName: "ralph-app-tls-{{ .Values.ralph.prefix }}"
+  rules:
+    - host: {{ .Values.ralph_lrs.host | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: "ralph-app-{{ .Values.ralph.prefix }}"
+                port:
+                  number: {{ .Values.ralph_lrs.port }}
+{{- end }}

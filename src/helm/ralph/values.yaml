@@ -1,0 +1,120 @@
+# Default values for ralph.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+###########################
+### CHART CONFIGURATION ###
+###########################
+
+namespace: default
+
+replicaCount: 1
+
+image:
+  repository: fundocker/ralph
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+
+securityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: false
+  className: "traefik"
+  annotations:
+    # kubernetes.io/ingress.class: traefik
+    cert-manager.io/issuer: letsencrypt
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: deployment
+                operator: In
+                values:
+                  - "ralph-app"
+          topologyKey: kubernetes.io/hostname
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+resources:
+  {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+###########################
+### RALPH CONFIGURATION ###
+###########################
+
+ralph:
+  customer: ""
+  env_type: ""
+  prefix: "traefik"
+  acme_enabled_route_prefix: "traefik.acme"
+  secret_name: "secret-ralph"
+  volume_history:
+    size: 2Gi
+    access_modes: ReadWriteMany
+    storage_class: "local-storage"
+  elastic:
+    mount_ca_secret: true
+    ca_secret_name: "ralph-es-ca"
+
+ralph_lrs:
+  host: ralph.example.com
+  port: 8080
+  auth_secret_name: "ralph-lrs-auth"
+  command:
+    - uvicorn
+    - "ralph.api:app"
+    - "--proxy-headers"
+    - "--host"
+    - "0.0.0.0"
+    - "--port"
+    - "8080"
+
+# ralph_cronjobs: []
+ralph_cronjobs:
+  - name: daily-ldp-to-es
+    schedule: "30 2 * * *"
+    command:
+      - ralph list --backend ldp --new |
+        xargs -I {} -n 1 bash -c "
+        ralph fetch --backend ldp {} |
+        gunzip |
+        ralph extract -p gelf |
+        ralph push \
+        --backend es \
+        --es-client-options ca_certs=/usr/local/share/ca-certificates/es-cluster.pem"
