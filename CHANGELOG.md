@@ -11,6 +11,7 @@ and this project adheres to
 ### Added
 
 - Add a new `auth` subcommand to generate required credentials file for the LRS
+- Add an official Helm Chart (experimental)
 
 ### Changed
 

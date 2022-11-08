@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ralph-pvc-history
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "ralph.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.ralph.volume_history.access_modes }}
+  resources:
+    requests:
+      storage: {{ .Values.ralph.volume_history.size }}
+  storageClassName: {{ .Values.ralph.volume_history.storage_class }}

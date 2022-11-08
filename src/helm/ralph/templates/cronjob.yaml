@@ -1,0 +1,74 @@
+{{- if .Values.ralph_cronjobs }}
+{{- range $job := .Values.ralph_cronjobs }}
+{{- with $ -}}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: "ralph-job-{{ $job.name }}"
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "ralph.labels" . | nindent 4 }}
+    type: job
+spec:
+  schedule: {{ $job.schedule | quote }}
+  successfulJobsHistoryLimit: 2
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 1
+  suspend: false
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          name: "ralph-job-{{ $job.name }}"
+          labels:
+            {{- include "ralph.labels" . | nindent 12 }}
+            type: job
+        spec:
+          restartPolicy: Never
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          containers:
+            - name: "ralph-job-{{ $job.name }}"
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              command:
+                - bash
+                - "-c"
+              {{- with $job.command }}
+                {{ toYaml . | nindent 16 }}
+              {{- end }}
+              env:
+                - name: RALPH_APP_DIR
+                  value: "/app/.ralph"
+              envFrom:
+                - secretRef:
+                    name: {{ .Values.ralph.secret_name }}
+              volumeMounts:
+                - name: ralph-v-history
+                  mountPath: /app/.ralph
+                {{- if .Values.ralph.elastic.mount_ca_secret }}
+                - name: es-ca-certificate
+                  mountPath: /usr/local/share/ca-certificates/
+                {{- end }}
+                - name: lrs-auth
+                  mountPath: /var/run/ralph/
+          volumes:
+            - name: ralph-v-history
+              persistentVolumeClaim:
+                claimName: ralph-pvc-history
+            {{- if .Values.ralph.elastic.mount_ca_secret }}
+            - name: es-ca-certificate
+              secret:
+                secretName: {{ .Values.ralph.elastic.ca_secret_name }}
+            {{- end }}
+            - name: lrs-auth
+              secret:
+                secretName: {{ .Values.ralph_lrs.auth_secret_name }}
+{{- end }}
+{{- end }}
+{{- end }}
