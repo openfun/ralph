@@ -12,7 +12,7 @@ and this project adheres to
 
 - Improve Ralph's library integration by unpinning dependencies (and prefer
   ranges)
-- Upgrade `fastapi` to `0.86.0`
+- Upgrade `fastapi` to `0.87.0`
 
 ### Removed
 
