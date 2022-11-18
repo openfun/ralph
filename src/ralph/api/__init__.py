@@ -9,7 +9,7 @@ from .auth import AuthenticatedUser, authenticated_user
 from .routers import health, statements
 
 if settings.SENTRY_DSN is not None:
-    sentry_sdk.init(
+    sentry_sdk.init(  # noqa: F821 # pylint: disable=undefined-variable
         dsn=settings.SENTRY_DSN,
         traces_sample_rate=1.0,
         release=__version__,
