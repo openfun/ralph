@@ -1641,8 +1641,15 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ralph.models.edx.video.fields.events.VideoTranscriptEventField" class="md-nav__link">
-    VideoTranscriptEventField
+  <a href="#ralph.models.edx.video.fields.events.VideoHideTranscriptEventField" class="md-nav__link">
+    VideoHideTranscriptEventField
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ralph.models.edx.video.fields.events.VideoShowTranscriptEventField" class="md-nav__link">
+    VideoShowTranscriptEventField
   </a>
   
 </li>
@@ -3164,8 +3171,15 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ralph.models.edx.video.fields.events.VideoTranscriptEventField" class="md-nav__link">
-    VideoTranscriptEventField
+  <a href="#ralph.models.edx.video.fields.events.VideoHideTranscriptEventField" class="md-nav__link">
+    VideoHideTranscriptEventField
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ralph.models.edx.video.fields.events.VideoShowTranscriptEventField" class="md-nav__link">
+    VideoShowTranscriptEventField
   </a>
   
 </li>
@@ -3295,7 +3309,7 @@
 <a id="ralph.models.edx"></a>
     <div class="doc doc-contents first">
 
-      <p>edX pydantic models</p>
+      <p>edX pydantic models.</p>
 
 
 
@@ -3323,7 +3337,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>Base event model definitions</p>
+      <p>Base event model definitions.</p>
 
 
 
@@ -3353,14 +3367,14 @@ AbstractBaseEventField            (<a class="autorefs autorefs-internal" title="
 
     <div class="doc doc-contents ">
 
-      <p>Represents the base model inherited by all <code>event</code> fields.</p>
+      <p>Pydantic model for core <code>event</code> fields.</p>
 <p>The base model does not have any attributes as event field does not have common
 sub-fields.</p>
 
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/base.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">AbstractBaseEventField</span><span class="p">(</span><span class="n">BaseModelWithConfig</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the base model inherited by all `event` fields.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for core `event` fields.</span>
 
 <span class="sd">    The base model does not have any attributes as event field does not have common</span>
 <span class="sd">    sub-fields.</span>
@@ -3410,7 +3424,7 @@ BaseContextField            (<a class="autorefs autorefs-internal" title="ralph.
 
     <div class="doc doc-contents ">
 
-      <p>Represents the base model inherited by all event <code>context</code> fields.</p>
+      <p>Pydantic model for core <code>context</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -3483,7 +3497,7 @@ Retrieved with:
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/base.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BaseContextField</span><span class="p">(</span><span class="n">BaseModelWithConfig</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the base model inherited by all event `context` fields.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for core `context` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        course_user_tags (dict of str): Content from `user_api_usercoursetag` table.</span>
@@ -3581,7 +3595,7 @@ BaseEdxModel            (<a class="autorefs autorefs-internal" title="ralph.mode
 
     <div class="doc doc-contents ">
 
-      <p>Represents the base model all statements inherit from.</p>
+      <p>Pydantic model for core statement.</p>
 <p>WARNING: it does not define the <code>event</code>, <code>event_type</code> and <code>event_source</code> fields.</p>
 
 <p><strong>Attributes:</strong></p>
@@ -3681,7 +3695,7 @@ Note:
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/base.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BaseEdxModel</span><span class="p">(</span><span class="n">BaseModelWithConfig</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the base model all statements inherit from.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for core statement.</span>
 
 <span class="sd">    WARNING: it does not define the `event`, `event_type` and `event_source` fields.</span>
 
@@ -3797,14 +3811,14 @@ BaseModelWithConfig            (<span title="pydantic.main.BaseModel">BaseModel<
 
     <div class="doc doc-contents ">
 
-      <p>Base model defining configuration shared among all models.</p>
+      <p>Pydantic model for base configuration shared among all models.</p>
 
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/base.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BaseModelWithConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Base model defining configuration shared among all models.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for base configuration shared among all models.&quot;&quot;&quot;</span>
 
-    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>  <span class="c1"># pylint: disable=missing-class-docstring</span>
+    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>  <span class="c1"># pylint: disable=missing-class-docstring # noqa: D106</span>
         <span class="n">extra</span> <span class="o">=</span> <span class="s2">&quot;forbid&quot;</span>
 </code></pre></div>
         </details>
@@ -3852,7 +3866,7 @@ ContextModuleField            (<a class="autorefs autorefs-internal" title="ralp
 
     <div class="doc doc-contents ">
 
-      <p>Represents the context <code>module</code> field.</p>
+      <p>Pydantic model for <code>context</code>.<code>module</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -3879,7 +3893,7 @@ ContextModuleField            (<a class="autorefs autorefs-internal" title="ralp
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/base.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ContextModuleField</span><span class="p">(</span><span class="n">BaseModelWithConfig</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the context `module` field.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `context`.`module` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        usage_key (str): Consists of a block ID of the current component.</span>
@@ -3950,7 +3964,7 @@ ContextModuleField            (<a class="autorefs autorefs-internal" title="ralp
 
     <div class="doc doc-contents ">
 
-      <p>Browser event model definitions</p>
+      <p>Browser event model definitions.</p>
 
 
 
@@ -3980,7 +3994,7 @@ BaseBrowserModel            (<a class="autorefs autorefs-internal" title="ralph.
 
     <div class="doc doc-contents ">
 
-      <p>Represents the base model all browser statements inherit from.</p>
+      <p>Pydantic model for core browser statements.</p>
 <p>This type of event is triggered on (XHR) POST/GET requests to the <code>/event</code> URL.</p>
 
 <p><strong>Attributes:</strong></p>
@@ -4016,7 +4030,7 @@ string.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/browser.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BaseBrowserModel</span><span class="p">(</span><span class="n">BaseEdxModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the base model all browser statements inherit from.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for core browser statements.</span>
 
 <span class="sd">    This type of event is triggered on (XHR) POST/GET requests to the `/event` URL.</span>
 
@@ -4119,7 +4133,7 @@ string.</p></td>
 
     <div class="doc doc-contents ">
 
-      <p>edX to xAPI conversion sets</p>
+      <p>edX to xAPI conversion sets.</p>
 
 
 
@@ -4147,7 +4161,7 @@ string.</p></td>
 
     <div class="doc doc-contents ">
 
-      <p>Base xAPI Converter</p>
+      <p>Base xAPI Converter.</p>
 
 
 
@@ -4198,7 +4212,6 @@ contain sensitive data: <code>username</code>, <code>referer</code>, <code>event
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid_namespace</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">platform_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initializes BaseXapiConverter.&quot;&quot;&quot;</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">platform_url</span> <span class="o">=</span> <span class="n">platform_url</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">uuid_namespace</span> <span class="o">=</span> <span class="n">UUID</span><span class="p">(</span><span class="n">uuid_namespace</span><span class="p">)</span>
@@ -4208,7 +4221,6 @@ contain sensitive data: <code>username</code>, <code>referer</code>, <code>event
 
     <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
-
         <span class="k">return</span> <span class="p">{</span>
             <span class="n">ConversionItem</span><span class="p">(</span>
                 <span class="s2">&quot;id&quot;</span><span class="p">,</span>
@@ -4243,10 +4255,10 @@ contain sensitive data: <code>username</code>, <code>referer</code>, <code>event
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">parse_course_id</span><span class="p">(</span><span class="n">course_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a dictionary with `course` and `module` of edX event&#39;s</span>
-<span class="sd">        `context.course_id`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Parses edX event&#39;s `context`.`course_id`.</span>
 
+<span class="sd">        Returns a dictionary with `course` and `module`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^course-v1:.+\+(.+)\+(.+)$&quot;</span><span class="p">,</span> <span class="n">course_id</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;course&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;module&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
@@ -4287,7 +4299,6 @@ contain sensitive data: <code>username</code>, <code>referer</code>, <code>event
           <summary>Source code in <code>ralph/models/edx/converters/xapi/base.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid_namespace</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">platform_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Initializes BaseXapiConverter.&quot;&quot;&quot;</span>
-
     <span class="bp">self</span><span class="o">.</span><span class="n">platform_url</span> <span class="o">=</span> <span class="n">platform_url</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">uuid_namespace</span> <span class="o">=</span> <span class="n">UUID</span><span class="p">(</span><span class="n">uuid_namespace</span><span class="p">)</span>
@@ -4317,17 +4328,17 @@ contain sensitive data: <code>username</code>, <code>referer</code>, <code>event
 
     <div class="doc doc-contents ">
 
-      <p>Returns a dictionary with <code>course</code> and <code>module</code> of edX event&rsquo;s
-<code>context.course_id</code>.</p>
+      <p>Parses edX event&rsquo;s <code>context</code>.<code>course_id</code>.</p>
+<p>Returns a dictionary with <code>course</code> and <code>module</code>.</p>
 
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/base.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@staticmethod</span>
 <span class="k">def</span> <span class="nf">parse_course_id</span><span class="p">(</span><span class="n">course_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns a dictionary with `course` and `module` of edX event&#39;s</span>
-<span class="sd">    `context.course_id`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Parses edX event&#39;s `context`.`course_id`.</span>
 
+<span class="sd">    Returns a dictionary with `course` and `module`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^course-v1:.+\+(.+)\+(.+)$&quot;</span><span class="p">,</span> <span class="n">course_id</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;course&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;module&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
@@ -4375,7 +4386,7 @@ contain sensitive data: <code>username</code>, <code>referer</code>, <code>event
 
     <div class="doc doc-contents ">
 
-      <p>Navigational event xAPI Converter</p>
+      <p>Navigational event xAPI Converter.</p>
 
 
 
@@ -4423,7 +4434,6 @@ because the <code>platform_url</code> is present in the edX&rsquo;s event <code>
 
     <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
-
         <span class="n">conversion_items</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_conversion_items</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="n">ConversionItem</span><span class="p">(</span><span class="s2">&quot;object__id&quot;</span><span class="p">,</span> <span class="s2">&quot;page&quot;</span><span class="p">)})</span>
 </code></pre></div>
@@ -4457,7 +4467,7 @@ __dest__            (<span title="ralph.models.xapi.base.BaseXapiModel">BaseXapi
 
     <div class="doc doc-contents ">
 
-      <p>Represents a page terminated xAPI statement.</p>
+      <p>Pydantic model for page terminated statement.</p>
 <p>Example: John terminated the https://www.fun-mooc.fr/ page.</p>
 
 <p><strong>Attributes:</strong></p>
@@ -4485,7 +4495,7 @@ __dest__            (<span title="ralph.models.xapi.base.BaseXapiModel">BaseXapi
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/navigational.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">PageTerminated</span><span class="p">(</span><span class="n">BaseXapiModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents a page terminated xAPI statement.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for page terminated statement.</span>
 
 <span class="sd">    Example: John terminated the https://www.fun-mooc.fr/ page.</span>
 
@@ -4547,8 +4557,8 @@ __src__            (<a class="autorefs autorefs-internal" title="ralph.models.ed
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>page_close</code> browser statement.</p>
-<p>This type of statement is triggered when the user navigates to the next page
+      <p>Pydantic model for <code>page_close</code> statement.</p>
+<p>The browser emits this statement when the user navigates to the next page
 or closes the browser window (when the JavaScript <code>window.onunload</code> event
 is called).</p>
 
@@ -4582,9 +4592,9 @@ is called).</p>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/navigational.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UIPageClose</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `page_close` browser statement.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `page_close` statement.</span>
 
-<span class="sd">    This type of statement is triggered when the user navigates to the next page</span>
+<span class="sd">    The browser emits this statement when the user navigates to the next page</span>
 <span class="sd">    or closes the browser window (when the JavaScript `window.onunload` event</span>
 <span class="sd">    is called).</span>
 
@@ -4668,7 +4678,7 @@ is called).</p>
 
     <div class="doc doc-contents ">
 
-      <p>Server event xAPI Converter</p>
+      <p>Server event xAPI Converter.</p>
 
 
 
@@ -4711,7 +4721,6 @@ ServerEventToPageViewed            (<a class="autorefs autorefs-internal" title=
 
     <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
-
         <span class="n">conversion_items</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_conversion_items</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
             <span class="p">{</span>
@@ -4753,7 +4762,7 @@ __dest__            (<span title="ralph.models.xapi.base.BaseXapiModel">BaseXapi
 
     <div class="doc doc-contents ">
 
-      <p>Represents a page viewed xAPI statement.</p>
+      <p>Pydantic model for page viewed statement.</p>
 <p>Example: John viewed the https://www.fun-mooc.fr/ page.</p>
 
 <p><strong>Attributes:</strong></p>
@@ -4781,7 +4790,7 @@ __dest__            (<span title="ralph.models.xapi.base.BaseXapiModel">BaseXapi
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/server.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">PageViewed</span><span class="p">(</span><span class="n">BaseXapiModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents a page viewed xAPI statement.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for page viewed statement.</span>
 
 <span class="sd">    Example: John viewed the https://www.fun-mooc.fr/ page.</span>
 
@@ -4843,7 +4852,7 @@ __src__            (<a class="autorefs autorefs-internal" title="ralph.models.ed
 
     <div class="doc doc-contents ">
 
-      <p>Represents a common server statement.</p>
+      <p>Pydantic model for common server statement.</p>
 <p>This type of event is triggered from the django middleware on each request
 excluding: <code>/event</code>, <code>login</code>, <code>heartbeat</code>, <code>/segmentio/event</code> and <code>/performance</code>.</p>
 
@@ -4889,7 +4898,7 @@ Note:
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/server.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">Server</span><span class="p">(</span><span class="n">BaseServerModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents a common server statement.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for common server statement.</span>
 
 <span class="sd">    This type of event is triggered from the django middleware on each request</span>
 <span class="sd">    excluding: `/event`, `login`, `heartbeat`, `/segmentio/event` and `/performance`.</span>
@@ -4990,7 +4999,7 @@ Note:
 
     <div class="doc doc-contents ">
 
-      <p>Video event xAPI Converter</p>
+      <p>Video event xAPI Converter.</p>
 
 
 
@@ -5029,7 +5038,6 @@ UILoadVideoToVideoInitialized            (<a class="autorefs autorefs-internal" 
 
     <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
-
         <span class="n">conversion_items</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_conversion_items</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
             <span class="p">{</span>
@@ -5081,7 +5089,7 @@ __dest__            (<span title="ralph.models.xapi.video.statements.BaseVideoSt
 
     <div class="doc doc-contents ">
 
-      <p>Represents a video initialized xAPI statement.</p>
+      <p>Pydantic model for video initialized statement.</p>
 <p>Example: A video has been fully initialized.</p>
 
 <p><strong>Attributes:</strong></p>
@@ -5109,7 +5117,7 @@ __dest__            (<span title="ralph.models.xapi.video.statements.BaseVideoSt
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/video.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VideoInitialized</span><span class="p">(</span><span class="n">BaseVideoStatement</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents a video initialized xAPI statement.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for video initialized statement.</span>
 
 <span class="sd">    Example: A video has been fully initialized.</span>
 
@@ -5171,7 +5179,9 @@ __src__            (<a class="autorefs autorefs-internal" title="ralph.models.ed
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>load_video</code> event model.</p>
+      <p>Pydantic model for <code>load_video</code> statement.</p>
+<p>The browser emits this statement when the video is fully rendered and ready to
+play.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -5203,7 +5213,10 @@ __src__            (<a class="autorefs autorefs-internal" title="ralph.models.ed
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/video.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UILoadVideo</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `load_video` event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `load_video` statement.</span>
+
+<span class="sd">    The browser emits this statement when the video is fully rendered and ready to</span>
+<span class="sd">    play.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (VideoBaseEventField): See VideoBaseEventField.</span>
@@ -5289,7 +5302,6 @@ UIPauseVideoToVideoPaused            (<a class="autorefs autorefs-internal" titl
 
     <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
-
         <span class="n">conversion_items</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_conversion_items</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
             <span class="p">{</span>
@@ -5342,7 +5354,7 @@ __dest__            (<span title="ralph.models.xapi.video.statements.BaseVideoSt
 
     <div class="doc doc-contents ">
 
-      <p>Represents a video paused xAPI statement.</p>
+      <p>Pydantic model for video paused statement.</p>
 <p>Example: John paused the video or clicked the pause button.</p>
 
 <p><strong>Attributes:</strong></p>
@@ -5375,7 +5387,7 @@ __dest__            (<span title="ralph.models.xapi.video.statements.BaseVideoSt
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/video.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VideoPaused</span><span class="p">(</span><span class="n">BaseVideoStatement</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents a video paused xAPI statement.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for video paused statement.</span>
 
 <span class="sd">    Example: John paused the video or clicked the pause button.</span>
 
@@ -5439,7 +5451,9 @@ __src__            (<a class="autorefs autorefs-internal" title="ralph.models.ed
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>pause_video</code> event model.</p>
+      <p>Pydantic model for <code>pause_video</code> statement.</p>
+<p>The browser emits this statement when a user selects the video player&rsquo;s pause
+control.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -5471,7 +5485,10 @@ __src__            (<a class="autorefs autorefs-internal" title="ralph.models.ed
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/video.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UIPauseVideo</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `pause_video` event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `pause_video` statement.</span>
+
+<span class="sd">    The browser emits this statement when a user selects the video player&#39;s pause</span>
+<span class="sd">    control.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (PauseVideoEventField): See PauseVideoEventField.</span>
@@ -5557,7 +5574,6 @@ UIPlayVideoToVideoPlayed            (<a class="autorefs autorefs-internal" title
 
     <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
-
         <span class="n">conversion_items</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_conversion_items</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
             <span class="p">{</span>
@@ -5602,7 +5618,7 @@ __dest__            (<span title="ralph.models.xapi.video.statements.BaseVideoSt
 
     <div class="doc doc-contents ">
 
-      <p>Represents a video played xAPI statement.</p>
+      <p>Pydantic model for video played statement.</p>
 <p>Example: John played the video or clicked the play button.</p>
 
 <p><strong>Attributes:</strong></p>
@@ -5635,7 +5651,7 @@ __dest__            (<span title="ralph.models.xapi.video.statements.BaseVideoSt
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/video.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VideoPlayed</span><span class="p">(</span><span class="n">BaseVideoStatement</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents a video played xAPI statement.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for video played statement.</span>
 
 <span class="sd">    Example: John played the video or clicked the play button.</span>
 
@@ -5699,7 +5715,9 @@ __src__            (<a class="autorefs autorefs-internal" title="ralph.models.ed
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>play_video</code> event model.</p>
+      <p>Pydantic model for <code>play_video</code> statement.</p>
+<p>The browser emits this statement when a user selects the video player&rsquo;s play
+control.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -5731,7 +5749,10 @@ __src__            (<a class="autorefs autorefs-internal" title="ralph.models.ed
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/video.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UIPlayVideo</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `play_video` event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `play_video` statement.</span>
+
+<span class="sd">    The browser emits this statement when a user selects the video player&#39;s play</span>
+<span class="sd">    control.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (PlayVideoEventField): See PlayVideoEventField.</span>
@@ -5817,7 +5838,6 @@ UISeekVideoToVideoSeeked            (<a class="autorefs autorefs-internal" title
 
     <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
-
         <span class="n">conversion_items</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_conversion_items</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
             <span class="p">{</span>
@@ -5866,7 +5886,7 @@ __dest__            (<span title="ralph.models.xapi.video.statements.BaseVideoSt
 
     <div class="doc doc-contents ">
 
-      <p>Represents a video seeked xAPI statement.</p>
+      <p>Pydantic model for video seeked statement.</p>
 <p>!!! example &ldquo;John moved the progress bar forward or backward to a specific time in the&rdquo;
     video.</p>
 
@@ -5900,7 +5920,7 @@ __dest__            (<span title="ralph.models.xapi.video.statements.BaseVideoSt
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/video.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VideoSeeked</span><span class="p">(</span><span class="n">BaseVideoStatement</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents a video seeked xAPI statement.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for video seeked statement.</span>
 
 <span class="sd">    Example: John moved the progress bar forward or backward to a specific time in the</span>
 <span class="sd">        video.</span>
@@ -5965,7 +5985,9 @@ __src__            (<a class="autorefs autorefs-internal" title="ralph.models.ed
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>seek_video</code> event model.</p>
+      <p>Pydantic model for <code>seek_video</code> statement.</p>
+<p>The browser emits this statement when a user selects a user interface control to go
+to a different point in the video file.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -5998,7 +6020,10 @@ __src__            (<a class="autorefs autorefs-internal" title="ralph.models.ed
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/video.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UISeekVideo</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `seek_video` event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `seek_video` statement.</span>
+
+<span class="sd">    The browser emits this statement when a user selects a user interface control to go</span>
+<span class="sd">    to a different point in the video file.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (SeekVideoEventField): See SeekVideoEventField.</span>
@@ -6085,7 +6110,6 @@ UIStopVideoToVideoTerminated            (<a class="autorefs autorefs-internal" t
 
     <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
-
         <span class="n">conversion_items</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_conversion_items</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
             <span class="p">{</span>
@@ -6146,7 +6170,7 @@ __dest__            (<span title="ralph.models.xapi.video.statements.BaseVideoSt
 
     <div class="doc doc-contents ">
 
-      <p>Represents a video terminated xAPI statement.</p>
+      <p>Pydantic model for video terminated statement.</p>
 <p>Example: John ended a video (quit the player).</p>
 
 <p><strong>Attributes:</strong></p>
@@ -6179,7 +6203,7 @@ __dest__            (<span title="ralph.models.xapi.video.statements.BaseVideoSt
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/video.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VideoTerminated</span><span class="p">(</span><span class="n">BaseVideoStatement</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents a video terminated xAPI statement.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for video terminated statement.</span>
 
 <span class="sd">    Example: John ended a video (quit the player).</span>
 
@@ -6243,7 +6267,9 @@ __src__            (<a class="autorefs autorefs-internal" title="ralph.models.ed
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>stop_video</code> event model.</p>
+      <p>Pydantic model for <code>stop_video</code> statement.</p>
+<p>The browser emits this statement when the video player reaches the end of the video
+file and play automatically stops.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -6275,7 +6301,10 @@ __src__            (<a class="autorefs autorefs-internal" title="ralph.models.ed
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/video.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UIStopVideo</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `stop_video` event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `stop_video` statement.</span>
+
+<span class="sd">    The browser emits this statement when the video player reaches the end of the video</span>
+<span class="sd">    file and play automatically stops.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (StopVideoEventField): See StopVideoEventField.</span>
@@ -6358,7 +6387,6 @@ VideoBaseXapiConverter            (<a class="autorefs autorefs-internal" title="
 
     <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
-
         <span class="n">conversion_items</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_conversion_items</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
             <span class="p">{</span>
@@ -6495,7 +6523,7 @@ VideoBaseXapiConverter            (<a class="autorefs autorefs-internal" title="
 
     <div class="doc doc-contents ">
 
-      <p>Enrollment event models context fields definitions</p>
+      <p>Enrollment event models context fields definitions.</p>
 
 
 
@@ -6525,8 +6553,7 @@ EdxCourseEnrollmentUpgradeClickedContextField            (<a class="autorefs aut
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>context</code> field of the <code>edx.course.enrollment.upgrade_clicked</code>
-server statement.</p>
+      <p>Pydantic model for <code>edx.course.enrollment.upgrade_clicked</code>.<code>context</code> field.</p>
 <p>In addition to the common context member fields, this statement also comprises the
 <code>mode</code> context member field.</p>
 
@@ -6551,8 +6578,7 @@ enrollment mode when the user clicked <kbd>Challenge Yourself</kbd>.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/enrollment/fields/contexts.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">EdxCourseEnrollmentUpgradeClickedContextField</span><span class="p">(</span><span class="n">BaseContextField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `context` field of the `edx.course.enrollment.upgrade_clicked`</span>
-<span class="sd">    server statement.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `edx.course.enrollment.upgrade_clicked`.`context` field.</span>
 
 <span class="sd">    In addition to the common context member fields, this statement also comprises the</span>
 <span class="sd">    `mode` context member field.</span>
@@ -6609,8 +6635,7 @@ EdxCourseEnrollmentUpgradeSucceededContextField            (<a class="autorefs a
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>context</code> field of the <code>edx.course.enrollment.upgrade.succeeded</code>
-server statement.</p>
+      <p>Pydantic model for <code>edx.course.enrollment.upgrade.succeeded</code>.<code>context</code> field.</p>
 <p>In addition to the common context member fields, this statement also comprises the
 <code>mode</code> context member field.</p>
 
@@ -6634,8 +6659,7 @@ server statement.</p>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/enrollment/fields/contexts.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">EdxCourseEnrollmentUpgradeSucceededContextField</span><span class="p">(</span><span class="n">BaseContextField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `context` field of the `edx.course.enrollment.upgrade.succeeded`</span>
-<span class="sd">    server statement.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `edx.course.enrollment.upgrade.succeeded`.`context` field.</span>
 
 <span class="sd">    In addition to the common context member fields, this statement also comprises the</span>
 <span class="sd">    `mode` context member field.</span>
@@ -6698,7 +6722,7 @@ server statement.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Enrollment models event field definition</p>
+      <p>Enrollment models event field definition.</p>
 
 
 
@@ -6728,7 +6752,7 @@ EnrollmentEventField            (<a class="autorefs autorefs-internal" title="ra
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>event</code> field for enrollment statements.</p>
+      <p>Pydantic model for enrollment <code>event</code> field.</p>
 <p>Note: Only server enrollment statements require an <code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
@@ -6763,7 +6787,7 @@ It identifies the student’s enrollment mode.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/enrollment/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">EnrollmentEventField</span><span class="p">(</span><span class="n">AbstractBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `event` field for enrollment statements.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for enrollment `event` field.</span>
 
 <span class="sd">    Note: Only server enrollment statements require an `event` field.</span>
 
@@ -6844,7 +6868,7 @@ It identifies the student’s enrollment mode.</p></td>
 
     <div class="doc doc-contents ">
 
-      <p>Enrollment event model definitions</p>
+      <p>Enrollment event model definitions.</p>
 
 
 
@@ -6874,8 +6898,8 @@ EdxCourseEnrollmentActivated            (<a class="autorefs autorefs-internal" t
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>edx.course.enrollment.activated</code> server statement.</p>
-<p>The server emits it when a student enrolls in a course.</p>
+      <p>Pydantic model for <code>edx.course.enrollment.activated</code> statement.</p>
+<p>The server emits this statement when a student enrolls in a course.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -6907,9 +6931,9 @@ EdxCourseEnrollmentActivated            (<a class="autorefs autorefs-internal" t
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/enrollment/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">EdxCourseEnrollmentActivated</span><span class="p">(</span><span class="n">BaseServerModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `edx.course.enrollment.activated` server statement.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `edx.course.enrollment.activated` statement.</span>
 
-<span class="sd">    The server emits it when a student enrolls in a course.</span>
+<span class="sd">    The server emits this statement when a student enrolls in a course.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (EnrollmentEventField): See EnrollmentEventField.</span>
@@ -6976,8 +7000,8 @@ EdxCourseEnrollmentDeactivated            (<a class="autorefs autorefs-internal"
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>edx.course.enrollment.deactivated</code> server statement.</p>
-<p>The server emits it when a student unenrolls from a course.</p>
+      <p>Pydantic model for <code>edx.course.enrollment.deactivated</code> statement.</p>
+<p>The server emits this statement when a student unenrolls from a course.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -7009,9 +7033,9 @@ EdxCourseEnrollmentDeactivated            (<a class="autorefs autorefs-internal"
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/enrollment/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">EdxCourseEnrollmentDeactivated</span><span class="p">(</span><span class="n">BaseServerModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `edx.course.enrollment.deactivated` server statement.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `edx.course.enrollment.deactivated` statement.</span>
 
-<span class="sd">    The server emits it when a student unenrolls from a course.</span>
+<span class="sd">    The server emits this statement when a student unenrolls from a course.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (EnrollmentEventField): See EnrollmentEventField.</span>
@@ -7078,8 +7102,8 @@ EdxCourseEnrollmentModeChanged            (<a class="autorefs autorefs-internal"
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>edx.course.enrollment.mode_changed</code> server statement.</p>
-<p>The server emits it when the process of changing a student’s
+      <p>Pydantic model for <code>edx.course.enrollment.mode_changed</code> statement.</p>
+<p>The server emits this statement when the process of changing a student’s
 student_courseenrollment.mode to a different mode is complete.</p>
 
 <p><strong>Attributes:</strong></p>
@@ -7112,9 +7136,9 @@ student_courseenrollment.mode to a different mode is complete.</p>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/enrollment/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">EdxCourseEnrollmentModeChanged</span><span class="p">(</span><span class="n">BaseServerModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `edx.course.enrollment.mode_changed` server statement.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `edx.course.enrollment.mode_changed` statement.</span>
 
-<span class="sd">    The server emits it when the process of changing a student’s</span>
+<span class="sd">    The server emits this statement when the process of changing a student’s</span>
 <span class="sd">    student_courseenrollment.mode to a different mode is complete.</span>
 
 <span class="sd">    Attributes:</span>
@@ -7182,8 +7206,8 @@ EdxCourseEnrollmentUpgradeSucceeded            (<a class="autorefs autorefs-inte
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>edx.course.enrollment.upgrade.succeeded</code> server statement.</p>
-<p>The server emits it when the process of upgrading a student’s
+      <p>Pydantic model for <code>edx.course.enrollment.upgrade.succeeded</code> statement.</p>
+<p>The server emits this statement when the process of upgrading a student’s
 student_courseenrollment.mode from <code>audit</code> or <code>honor</code> to <code>verified</code> is complete.</p>
 
 <p><strong>Attributes:</strong></p>
@@ -7217,9 +7241,9 @@ student_courseenrollment.mode from <code>audit</code> or <code>honor</code> to <
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/enrollment/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">EdxCourseEnrollmentUpgradeSucceeded</span><span class="p">(</span><span class="n">BaseServerModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `edx.course.enrollment.upgrade.succeeded` server statement.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `edx.course.enrollment.upgrade.succeeded` statement.</span>
 
-<span class="sd">    The server emits it when the process of upgrading a student’s</span>
+<span class="sd">    The server emits this statement when the process of upgrading a student’s</span>
 <span class="sd">    student_courseenrollment.mode from `audit` or `honor` to `verified` is complete.</span>
 
 <span class="sd">    Attributes:</span>
@@ -7285,10 +7309,10 @@ UIEdxCourseEnrollmentUpgradeClicked            (<a class="autorefs autorefs-inte
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>edx.course.enrollment.upgrade_clicked</code> browser statement.</p>
-<p>The browser emits it when a student clicks <kbd>ChallengeYourself</kbd> option,
-and the process of upgrading the student_courseenrollment.mode for the student
-to <code>verified</code> begins.</p>
+      <p>Pydantic model for <code>edx.course.enrollment.upgrade_clicked</code> statement.</p>
+<p>The browser emits this statement when a student clicks <kbd>ChallengeYourself</kbd>
+option, and the process of upgrading the student_courseenrollment.mode for the
+student to <code>verified</code> begins.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -7320,11 +7344,11 @@ to <code>verified</code> begins.</p>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/enrollment/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UIEdxCourseEnrollmentUpgradeClicked</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `edx.course.enrollment.upgrade_clicked` browser statement.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `edx.course.enrollment.upgrade_clicked` statement.</span>
 
-<span class="sd">    The browser emits it when a student clicks &lt;kbd&gt;ChallengeYourself&lt;/kbd&gt; option,</span>
-<span class="sd">    and the process of upgrading the student_courseenrollment.mode for the student</span>
-<span class="sd">    to `verified` begins.</span>
+<span class="sd">    The browser emits this statement when a student clicks &lt;kbd&gt;ChallengeYourself&lt;/kbd&gt;</span>
+<span class="sd">    option, and the process of upgrading the student_courseenrollment.mode for the</span>
+<span class="sd">    student to `verified` begins.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        context (EdxCourseEnrollmentUpgradeClickedContextField):</span>
@@ -7464,7 +7488,7 @@ to <code>verified</code> begins.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Navigational event field definition</p>
+      <p>Navigational event field definition.</p>
 
 
 
@@ -7494,7 +7518,7 @@ NavigationalEventField            (<a class="autorefs autorefs-internal" title="
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>event</code> field of navigational statements.</p>
+      <p>Pydantic model for navigational <code>event</code> field.</p>
 <p>Note: All navigational statements are emitted from the browser.</p>
 
 <p><strong>Attributes:</strong></p>
@@ -7531,7 +7555,7 @@ being navigated away from.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/navigational/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">NavigationalEventField</span><span class="p">(</span><span class="n">AbstractBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `event` field of navigational statements.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for navigational `event` field.</span>
 
 <span class="sd">    Note: All navigational statements are emitted from the browser.</span>
 
@@ -7617,7 +7641,7 @@ being navigated away from.</p></td>
 
     <div class="doc doc-contents ">
 
-      <p>Navigational event model definitions</p>
+      <p>Navigational event model definitions.</p>
 
 
 
@@ -7647,8 +7671,8 @@ UIPageClose            (<a class="autorefs autorefs-internal" title="ralph.model
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>page_close</code> browser statement.</p>
-<p>This type of statement is triggered when the user navigates to the next page
+      <p>Pydantic model for <code>page_close</code> statement.</p>
+<p>The browser emits this statement when the user navigates to the next page
 or closes the browser window (when the JavaScript <code>window.onunload</code> event
 is called).</p>
 
@@ -7682,9 +7706,9 @@ is called).</p>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/navigational/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UIPageClose</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `page_close` browser statement.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `page_close` statement.</span>
 
-<span class="sd">    This type of statement is triggered when the user navigates to the next page</span>
+<span class="sd">    The browser emits this statement when the user navigates to the next page</span>
 <span class="sd">    or closes the browser window (when the JavaScript `window.onunload` event</span>
 <span class="sd">    is called).</span>
 
@@ -7749,9 +7773,8 @@ UISeqGoto            (<a class="autorefs autorefs-internal" title="ralph.models.
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>seq_goto</code> browser statement.</p>
-<p>The browser emits such statement when a user selects a navigational control.
-<code>seq_goto</code> is emitted when a user jumps between units in a sequence.</p>
+      <p>Pydantic model for <code>seq_goto</code> statement.</p>
+<p>The browser emits this statement when a user jumps between units in a sequence.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -7783,10 +7806,9 @@ UISeqGoto            (<a class="autorefs autorefs-internal" title="ralph.models.
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/navigational/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UISeqGoto</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `seq_goto` browser statement.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `seq_goto` statement.</span>
 
-<span class="sd">    The browser emits such statement when a user selects a navigational control.</span>
-<span class="sd">    `seq_goto` is emitted when a user jumps between units in a sequence.</span>
+<span class="sd">    The browser emits this statement when a user jumps between units in a sequence.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (obj): Consists of member fields that identify specifics triggered event.</span>
@@ -7849,9 +7871,9 @@ UISeqNext            (<a class="autorefs autorefs-internal" title="ralph.models.
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>seq_next</code> browser statement.</p>
-<p>The browser emits such statement when a user selects a navigational control.
-<code>seq_next</code> is emitted when a user navigates to the next unit in a sequence.</p>
+      <p>Pydantic model for <code>seq_next</code> statement.</p>
+<p>The browser emits this statement when a user navigates to the next unit in a
+sequence.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -7883,10 +7905,10 @@ UISeqNext            (<a class="autorefs autorefs-internal" title="ralph.models.
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/navigational/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UISeqNext</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `seq_next` browser statement.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `seq_next` statement.</span>
 
-<span class="sd">    The browser emits such statement when a user selects a navigational control.</span>
-<span class="sd">    `seq_next` is emitted when a user navigates to the next unit in a sequence.</span>
+<span class="sd">    The browser emits this statement when a user navigates to the next unit in a</span>
+<span class="sd">    sequence.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (obj): Consists of member fields that identify specifics triggered event.</span>
@@ -7905,7 +7927,6 @@ UISeqNext            (<a class="autorefs autorefs-internal" title="ralph.models.
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">validate_next_jump_event_field</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Checks that event.new is equal to event.old + 1.&quot;&quot;&quot;</span>
-
         <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">new</span> <span class="o">!=</span> <span class="n">value</span><span class="o">.</span><span class="n">old</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;event.new - event.old should be equal to 1&quot;</span><span class="p">)</span>
 
@@ -7954,7 +7975,6 @@ UISeqNext            (<a class="autorefs autorefs-internal" title="ralph.models.
 <span class="nd">@classmethod</span>
 <span class="k">def</span> <span class="nf">validate_next_jump_event_field</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Checks that event.new is equal to event.old + 1.&quot;&quot;&quot;</span>
-
     <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">new</span> <span class="o">!=</span> <span class="n">value</span><span class="o">.</span><span class="n">old</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;event.new - event.old should be equal to 1&quot;</span><span class="p">)</span>
 
@@ -7995,9 +8015,9 @@ UISeqPrev            (<a class="autorefs autorefs-internal" title="ralph.models.
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>seq_prev</code> browser statement.</p>
-<p>The browser emits such statement when a user selects a navigational control.
-<code>seq_prev</code> is emitted when a user navigates to the previous unit in a sequence.</p>
+      <p>Pydantic model for <code>seq_prev</code> statement.</p>
+<p>The browser emits this statement when a user navigates to the previous unit in a
+sequence.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -8029,10 +8049,10 @@ UISeqPrev            (<a class="autorefs autorefs-internal" title="ralph.models.
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/navigational/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UISeqPrev</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `seq_prev` browser statement.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `seq_prev` statement.</span>
 
-<span class="sd">    The browser emits such statement when a user selects a navigational control.</span>
-<span class="sd">    `seq_prev` is emitted when a user navigates to the previous unit in a sequence.</span>
+<span class="sd">    The browser emits this statement when a user navigates to the previous unit in a</span>
+<span class="sd">    sequence.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (obj): Consists of member fields that identify specifics triggered event.</span>
@@ -8052,7 +8072,6 @@ UISeqPrev            (<a class="autorefs autorefs-internal" title="ralph.models.
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">validate_prev_jump_event_field</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Checks that event.new is equal to event.old - 1.&quot;&quot;&quot;</span>
-
         <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">new</span> <span class="o">!=</span> <span class="n">value</span><span class="o">.</span><span class="n">old</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;event.old - event.new should be equal to 1&quot;</span><span class="p">)</span>
 
@@ -8101,7 +8120,6 @@ UISeqPrev            (<a class="autorefs autorefs-internal" title="ralph.models.
 <span class="nd">@classmethod</span>
 <span class="k">def</span> <span class="nf">validate_prev_jump_event_field</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Checks that event.new is equal to event.old - 1.&quot;&quot;&quot;</span>
-
     <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">new</span> <span class="o">!=</span> <span class="n">value</span><span class="o">.</span><span class="n">old</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;event.old - event.new should be equal to 1&quot;</span><span class="p">)</span>
 
@@ -8218,7 +8236,7 @@ UISeqPrev            (<a class="autorefs autorefs-internal" title="ralph.models.
 
     <div class="doc doc-contents ">
 
-      <p>Problem interaction events model event fields definitions</p>
+      <p>Problem interaction events model event fields definitions.</p>
 
 
 
@@ -8248,7 +8266,7 @@ CorrectMap            (<a class="autorefs autorefs-internal" title="ralph.models
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>correct_map</code> sub-field.</p>
+      <p>Pydantic model for problem interaction <code>event</code>.<code>correct_map</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -8301,7 +8319,7 @@ optionresponse provided with variables.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">CorrectMap</span><span class="p">(</span><span class="n">BaseModelWithConfig</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `correct_map` sub-field.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for problem interaction `event`.`correct_map` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        answervariable (str): Consists of the variable chosen in answer in the case of</span>
@@ -8373,7 +8391,7 @@ EdxProblemHintDemandhintDisplayedEventField            (<a class="autorefs autor
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>event</code> field of <code>EdxProblemHintDemandhintDisplayed</code> model.</p>
+      <p>Pydantic model for <code>edx.problem.hint.demandhint_displayed</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -8413,7 +8431,7 @@ the user requested the hint.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">EdxProblemHintDemandhintDisplayedEventField</span><span class="p">(</span><span class="n">AbstractBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `event` field of `EdxProblemHintDemandhintDisplayed` model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `edx.problem.hint.demandhint_displayed`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        hint_index (int): Consists of the identifier for the hint that was displayed to</span>
@@ -8478,7 +8496,7 @@ EdxProblemHintFeedbackDisplayedEventField            (<a class="autorefs autoref
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>event</code> field of <code>EdxProblemHintFeedbackDisplayed</code> model.</p>
+      <p>Pydantic model for <code>edx.problem.hint.feedback_displayed</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -8547,7 +8565,7 @@ the user.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">EdxProblemHintFeedbackDisplayedEventField</span><span class="p">(</span><span class="n">AbstractBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `event` field of `EdxProblemHintFeedbackDisplayed` model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `edx.problem.hint.feedback_displayed`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        choice_all (list): Lists all of the answer choices for problems with multiple</span>
@@ -8637,7 +8655,7 @@ ProblemCheckEventField            (<a class="autorefs autorefs-internal" title="
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>event</code> field of <code>ProblemCheck</code> model.</p>
+      <p>Pydantic model for <code>problem_check</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -8701,7 +8719,7 @@ the problem.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ProblemCheckEventField</span><span class="p">(</span><span class="n">AbstractBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `event` field of `ProblemCheck` model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `problem_check`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        answers (dict): Consists of a dictionary of problem ID and the corresponding</span>
@@ -8792,7 +8810,7 @@ ProblemCheckFailEventField            (<a class="autorefs autorefs-internal" tit
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>event</code> field of <code>ProblemCheckFail</code> model.</p>
+      <p>Pydantic model for <code>problem_check_fail</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -8830,7 +8848,7 @@ identifier for each problem.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ProblemCheckFailEventField</span><span class="p">(</span><span class="n">AbstractBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `event` field of `ProblemCheckFail` model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `problem_check_fail`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        answers (dict): Consists of a dictionary of problem ID and the internal answer</span>
@@ -8899,7 +8917,7 @@ ProblemRescoreEventField            (<a class="autorefs autorefs-internal" title
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>event</code> field of <code>ProblemRescore</code> model.</p>
+      <p>Pydantic model for <code>problem_rescore</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -8956,7 +8974,7 @@ ProblemRescoreEventField            (<a class="autorefs autorefs-internal" title
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ProblemRescoreEventField</span><span class="p">(</span><span class="n">AbstractBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `event` field of `ProblemRescore` model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `problem_rescore`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        attempts (int): Consists of the number of attempts of rescoring.</span>
@@ -9035,7 +9053,7 @@ ProblemRescoreFailEventField            (<a class="autorefs autorefs-internal" t
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>event</code> field of <code>ProblemRescoreFail</code> model.</p>
+      <p>Pydantic model for <code>problem_rescore_fail</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -9067,7 +9085,7 @@ ProblemRescoreFailEventField            (<a class="autorefs autorefs-internal" t
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ProblemRescoreFailEventField</span><span class="p">(</span><span class="n">AbstractBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `event` field of `ProblemRescoreFail` model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `problem_rescore_fail`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        failure (str): Consists either of the `closed` or `unreset` value.</span>
@@ -9129,7 +9147,7 @@ QueueState            (<a class="autorefs autorefs-internal" title="ralph.models
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>queuestate</code> sub-field.</p>
+      <p>Pydantic model for problem interaction <code>event</code>.<code>correct_map</code>.<code>queuestate</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -9157,7 +9175,7 @@ QueueState            (<a class="autorefs autorefs-internal" title="ralph.models
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">QueueState</span><span class="p">(</span><span class="n">BaseModelWithConfig</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `queuestate` sub-field.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for problem interaction `event`.`correct_map`.`queuestate` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        key (str): Consists of a secret string.</span>
@@ -9214,7 +9232,7 @@ ResetProblemEventField            (<a class="autorefs autorefs-internal" title="
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>event</code> field of <code>ResetProblem</code> model.</p>
+      <p>Pydantic model for <code>reset_problem</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -9246,7 +9264,7 @@ ResetProblemEventField            (<a class="autorefs autorefs-internal" title="
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ResetProblemEventField</span><span class="p">(</span><span class="n">AbstractBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `event` field of `ResetProblem` model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `reset_problem`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        new_state (json): see StateField.</span>
@@ -9308,7 +9326,7 @@ ResetProblemFailEventField            (<a class="autorefs autorefs-internal" tit
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>event</code> field of <code>ResetProblemFail</code> model.</p>
+      <p>Pydantic model for <code>reset_problem_fail</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -9340,7 +9358,7 @@ ResetProblemFailEventField            (<a class="autorefs autorefs-internal" tit
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ResetProblemFailEventField</span><span class="p">(</span><span class="n">AbstractBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `event` field of `ResetProblemFail` model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `reset_problem_fail`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        failure (str): Consists either of `closed` or `not_done` value.</span>
@@ -9402,7 +9420,7 @@ SaveProblemFailEventField            (<a class="autorefs autorefs-internal" titl
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>event</code> field of <code>SaveProblemFail</code> model.</p>
+      <p>Pydantic model for <code>save_problem_fail</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -9440,7 +9458,7 @@ the answer strings if multiple choices are allowed.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">SaveProblemFailEventField</span><span class="p">(</span><span class="n">AbstractBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `event` field of `SaveProblemFail` model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `save_problem_fail`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        answers (dict): Consists of a dict of the answer string or a list or a dict of</span>
@@ -9506,7 +9524,7 @@ SaveProblemSuccessEventField            (<a class="autorefs autorefs-internal" t
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>event</code> field of <code>SaveProblemSuccess</code> model.</p>
+      <p>Pydantic model for <code>save_problem_success</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -9539,7 +9557,7 @@ the answer strings if multiple choices are allowed.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">SaveProblemSuccessEventField</span><span class="p">(</span><span class="n">AbstractBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `event` field of `SaveProblemSuccess` model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `save_problem_success`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        answers (dict): Consists of a dict of the answer string or a list or a dict of</span>
@@ -9602,7 +9620,7 @@ ShowAnswerEventField            (<a class="autorefs autorefs-internal" title="ra
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>event</code> field of <code>ShowAnswer</code> model.</p>
+      <p>Pydantic model for <code>show_answer</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -9624,7 +9642,7 @@ ShowAnswerEventField            (<a class="autorefs autorefs-internal" title="ra
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ShowAnswerEventField</span><span class="p">(</span><span class="n">AbstractBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `event` field of `ShowAnswer` model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `show_answer`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        problem_id (str): Consists of the ID of the problem being shown.</span>
@@ -9680,7 +9698,7 @@ State            (<a class="autorefs autorefs-internal" title="ralph.models.edx.
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>state</code> sub-field.</p>
+      <p>Pydantic modelfor problem interaction <code>event</code>.<code>state</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -9722,7 +9740,7 @@ State            (<a class="autorefs autorefs-internal" title="ralph.models.edx.
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">State</span><span class="p">(</span><span class="n">BaseModelWithConfig</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `state` sub-field.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic modelfor problem interaction `event`.`state` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        correct_map (dict): see CorrectMapSubFields.</span>
@@ -9790,7 +9808,7 @@ SubmissionAnswerField            (<a class="autorefs autorefs-internal" title="r
 
     <div class="doc doc-contents ">
 
-      <p>Represents the information in a problem of <code>submission</code> field.</p>
+      <p>Pydantic model for <code>problem_check</code>.<code>event</code>.<code>submission</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -9840,7 +9858,7 @@ this user.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">SubmissionAnswerField</span><span class="p">(</span><span class="n">BaseModelWithConfig</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the information in a problem of `submission` field.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `problem_check`.`event`.`submission` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        answer (str, list): Consists of the answer string or a list of the answer</span>
@@ -9911,7 +9929,7 @@ UIProblemResetEventField            (<a class="autorefs autorefs-internal" title
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>event</code> field of <code>ProblemReset</code> model.</p>
+      <p>Pydantic model for <code>problem_reset</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -9934,7 +9952,7 @@ strings if multiple choices are allowed.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UIProblemResetEventField</span><span class="p">(</span><span class="n">AbstractBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `event` field of `ProblemReset` model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `problem_reset`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        answers (str, list): Consists of the answer string or a list of the answer</span>
@@ -9988,7 +10006,7 @@ UIProblemShowEventField            (<a class="autorefs autorefs-internal" title=
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>event</code> field of <code>ProblemShow</code> model.</p>
+      <p>Pydantic model for <code>problem_show</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -10011,7 +10029,7 @@ supply or the system-generated hash code for the problem being shown.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UIProblemShowEventField</span><span class="p">(</span><span class="n">AbstractBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `event` field of `ProblemShow` model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `problem_show`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        problem (str): Consists of the optional name value that the course creators</span>
@@ -10081,7 +10099,7 @@ supply or the system-generated hash code for the problem being shown.</p></td>
 
     <div class="doc doc-contents ">
 
-      <p>Problem interaction events model definitions</p>
+      <p>Problem interaction events model definitions.</p>
 
 
 
@@ -10111,8 +10129,8 @@ EdxProblemHintDemandhintDisplayed            (<a class="autorefs autorefs-intern
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>edx.problem.hint.demandhint_displayed</code> server event.</p>
-<p>This event is triggered when a user requests a hint for a problem.</p>
+      <p>Pydantic model for <code>edx.problem.hint.demandhint_displayed</code> statement.</p>
+<p>The server emits this statement when a user requests a hint for a problem.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -10144,9 +10162,9 @@ EdxProblemHintDemandhintDisplayed            (<a class="autorefs autorefs-intern
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">EdxProblemHintDemandhintDisplayed</span><span class="p">(</span><span class="n">BaseServerModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `edx.problem.hint.demandhint_displayed` server event.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `edx.problem.hint.demandhint_displayed` statement.</span>
 
-<span class="sd">    This event is triggered when a user requests a hint for a problem.</span>
+<span class="sd">    The server emits this statement when a user requests a hint for a problem.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (dict): See EdxProblemHintDemandhintDisplayedEventField.</span>
@@ -10209,8 +10227,8 @@ EdxProblemHintFeedbackDisplayed            (<a class="autorefs autorefs-internal
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>edx.problem.hint.feedback_displayed</code> server event.</p>
-<p>This event is triggered when a user receives a hint after answering a problem.</p>
+      <p>Pydantic model for <code>edx.problem.hint.feedback_displayed</code> statement.</p>
+<p>The server emits this event when a user receives a hint after answering a problem.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -10242,9 +10260,9 @@ EdxProblemHintFeedbackDisplayed            (<a class="autorefs autorefs-internal
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">EdxProblemHintFeedbackDisplayed</span><span class="p">(</span><span class="n">BaseServerModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `edx.problem.hint.feedback_displayed` server event.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `edx.problem.hint.feedback_displayed` statement.</span>
 
-<span class="sd">    This event is triggered when a user receives a hint after answering a problem.</span>
+<span class="sd">    The server emits this event when a user receives a hint after answering a problem.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (dict): See EdxProblemHintFeedbackDisplayedEventField.</span>
@@ -10307,8 +10325,8 @@ ProblemCheck            (<a class="autorefs autorefs-internal" title="ralph.mode
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>problem_check</code> server event.</p>
-<p>This event is triggered when a user checks a problem.</p>
+      <p>Pydantic model for <code>problem_check</code> statement.</p>
+<p>The server emits this event when a user checks a problem.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -10340,9 +10358,9 @@ ProblemCheck            (<a class="autorefs autorefs-internal" title="ralph.mode
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ProblemCheck</span><span class="p">(</span><span class="n">BaseServerModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `problem_check` server event.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `problem_check` statement.</span>
 
-<span class="sd">    This event is triggered when a user checks a problem.</span>
+<span class="sd">    The server emits this event when a user checks a problem.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (dict): See ProblemCheckEventField.</span>
@@ -10403,8 +10421,8 @@ ProblemCheckFail            (<a class="autorefs autorefs-internal" title="ralph.
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>problem_check_fail</code> server event.</p>
-<p>This event is triggered when a user checks a problem and a failure prevents the
+      <p>Pydantic model for <code>problem_check_fail</code> statement.</p>
+<p>The server emits this event when a user checks a problem and a failure prevents the
 problem from being checked successfully.</p>
 
 <p><strong>Attributes:</strong></p>
@@ -10437,9 +10455,9 @@ problem from being checked successfully.</p>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ProblemCheckFail</span><span class="p">(</span><span class="n">BaseServerModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `problem_check_fail` server event.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `problem_check_fail` statement.</span>
 
-<span class="sd">    This event is triggered when a user checks a problem and a failure prevents the</span>
+<span class="sd">    The server emits this event when a user checks a problem and a failure prevents the</span>
 <span class="sd">    problem from being checked successfully.</span>
 
 <span class="sd">    Attributes:</span>
@@ -10501,7 +10519,8 @@ ProblemRescore            (<a class="autorefs autorefs-internal" title="ralph.mo
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>problem_rescore</code> server event.</p>
+      <p>Pydantic model for <code>problem_rescore</code> statement.</p>
+<p>The server emits this statement when a problem is successfully rescored.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -10533,7 +10552,9 @@ ProblemRescore            (<a class="autorefs autorefs-internal" title="ralph.mo
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ProblemRescore</span><span class="p">(</span><span class="n">BaseServerModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `problem_rescore` server event.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `problem_rescore` statement.</span>
+
+<span class="sd">    The server emits this statement when a problem is successfully rescored.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (dict): See ProblemRescoreEventField.</span>
@@ -10594,7 +10615,8 @@ ProblemRescoreFail            (<a class="autorefs autorefs-internal" title="ralp
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>problem_rescore_fail</code> server event.</p>
+      <p>Pydantic model for <code>problem_rescore_fail</code> statement.</p>
+<p>The server emits this statement when a problem cannot be successfully rescored.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -10626,7 +10648,9 @@ ProblemRescoreFail            (<a class="autorefs autorefs-internal" title="ralp
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ProblemRescoreFail</span><span class="p">(</span><span class="n">BaseServerModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `problem_rescore_fail` server event.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `problem_rescore_fail` statement.</span>
+
+<span class="sd">    The server emits this statement when a problem cannot be successfully rescored.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (dict): See ProblemRescoreFailEventField.</span>
@@ -10687,7 +10711,8 @@ ResetProblem            (<a class="autorefs autorefs-internal" title="ralph.mode
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>reset_problem</code> server event.</p>
+      <p>Pydantic model for <code>reset_problem</code> statement.</p>
+<p>The server emits this statement when a problem has been reset successfully.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -10719,7 +10744,9 @@ ResetProblem            (<a class="autorefs autorefs-internal" title="ralph.mode
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ResetProblem</span><span class="p">(</span><span class="n">BaseServerModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `reset_problem` server event.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `reset_problem` statement.</span>
+
+<span class="sd">    The server emits this statement when a problem has been reset successfully.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (dict): See ResetProblemEventField.</span>
@@ -10780,7 +10807,8 @@ ResetProblemFail            (<a class="autorefs autorefs-internal" title="ralph.
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>reset_problem_fail</code> server event.</p>
+      <p>Pydantic model for <code>reset_problem_fail</code> statement.</p>
+<p>The server emits this statement when a problem cannot be reset successfully.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -10812,7 +10840,9 @@ ResetProblemFail            (<a class="autorefs autorefs-internal" title="ralph.
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ResetProblemFail</span><span class="p">(</span><span class="n">BaseServerModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `reset_problem_fail` server event.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `reset_problem_fail` statement.</span>
+
+<span class="sd">    The server emits this statement when a problem cannot be reset successfully.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (dict): See ResetProblemFailEventField.</span>
@@ -10873,7 +10903,8 @@ SaveProblemFail            (<a class="autorefs autorefs-internal" title="ralph.m
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>save_problem_fail</code> server event.</p>
+      <p>Pydantic model for <code>save_problem_fail</code> statement.</p>
+<p>The server emits this statement when a problem cannot be saved successfully.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -10905,7 +10936,9 @@ SaveProblemFail            (<a class="autorefs autorefs-internal" title="ralph.m
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">SaveProblemFail</span><span class="p">(</span><span class="n">BaseServerModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `save_problem_fail` server event.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `save_problem_fail` statement.</span>
+
+<span class="sd">    The server emits this statement when a problem cannot be saved successfully.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (dict): See SaveProblemFailEventField.</span>
@@ -10966,7 +10999,8 @@ SaveProblemSuccess            (<a class="autorefs autorefs-internal" title="ralp
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>save_problem_success</code> server event.</p>
+      <p>Pydantic model for <code>save_problem_success</code> statement.</p>
+<p>The server emits this statement when a problem is saved successfully.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -10998,7 +11032,9 @@ SaveProblemSuccess            (<a class="autorefs autorefs-internal" title="ralp
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">SaveProblemSuccess</span><span class="p">(</span><span class="n">BaseServerModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `save_problem_success` server event.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `save_problem_success` statement.</span>
+
+<span class="sd">    The server emits this statement when a problem is saved successfully.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (dict): See SaveProblemSuccessEventField.</span>
@@ -11059,7 +11095,8 @@ ShowAnswer            (<a class="autorefs autorefs-internal" title="ralph.models
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>showanswer</code> server event.</p>
+      <p>Pydantic model for <code>showanswer</code> statement.</p>
+<p>The server emits this statement when the answer to a problem is shown.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -11091,7 +11128,9 @@ ShowAnswer            (<a class="autorefs autorefs-internal" title="ralph.models
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ShowAnswer</span><span class="p">(</span><span class="n">BaseServerModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `showanswer` server event.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `showanswer` statement.</span>
+
+<span class="sd">    The server emits this statement when the answer to a problem is shown.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (dict): See ShowAnswerEventField.</span>
@@ -11152,7 +11191,7 @@ UIProblemCheck            (<a class="autorefs autorefs-internal" title="ralph.mo
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>problem_check</code> browser event.</p>
+      <p>Pydantic model for <code>problem_check</code> statement.</p>
 <p>The browser emits this event when a user checks a problem.</p>
 
 <p><strong>Attributes:</strong></p>
@@ -11186,7 +11225,7 @@ parameters.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UIProblemCheck</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `problem_check` browser event.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `problem_check` statement.</span>
 
 <span class="sd">    The browser emits this event when a user checks a problem.</span>
 
@@ -11251,7 +11290,9 @@ UIProblemGraded            (<a class="autorefs autorefs-internal" title="ralph.m
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>problem_graded</code> browser event.</p>
+      <p>Pydantic model for <code>problem_graded</code> statement.</p>
+<p>The server emits this statement each time a user clicks <kbd>Check</kbd> for a
+problem and it is graded successfully.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -11283,7 +11324,10 @@ UIProblemGraded            (<a class="autorefs autorefs-internal" title="ralph.m
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UIProblemGraded</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `problem_graded` browser event.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `problem_graded` statement.</span>
+
+<span class="sd">    The server emits this statement each time a user clicks &lt;kbd&gt;Check&lt;/kbd&gt; for a</span>
+<span class="sd">    problem and it is graded successfully.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (list): See ProblemGradedEventField.</span>
@@ -11345,7 +11389,9 @@ UIProblemReset            (<a class="autorefs autorefs-internal" title="ralph.mo
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>problem_reset</code> browser event.</p>
+      <p>Pydantic model for <code>problem_reset</code> statement.</p>
+<p>The browser emits problem_reset events when a user clicks <kbd>Reset</kbd> to reset
+the problem answer.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -11377,7 +11423,10 @@ UIProblemReset            (<a class="autorefs autorefs-internal" title="ralph.mo
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UIProblemReset</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `problem_reset` browser event.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `problem_reset` statement.</span>
+
+<span class="sd">    The browser emits problem_reset events when a user clicks &lt;kbd&gt;Reset&lt;/kbd&gt; to reset</span>
+<span class="sd">    the problem answer.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (json): See ProblemResetEventField.</span>
@@ -11443,7 +11492,8 @@ UIProblemSave            (<a class="autorefs autorefs-internal" title="ralph.mod
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>problem_save</code> browser event.</p>
+      <p>Pydantic model for <code>problem_save</code> statement.</p>
+<p>The browser emits this statement when a user saves a problem.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -11475,7 +11525,9 @@ UIProblemSave            (<a class="autorefs autorefs-internal" title="ralph.mod
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UIProblemSave</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `problem_save` browser event.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `problem_save` statement.</span>
+
+<span class="sd">    The browser emits this statement when a user saves a problem.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (str): Consists of all the answers saved for the problem.</span>
@@ -11537,7 +11589,9 @@ UIProblemShow            (<a class="autorefs autorefs-internal" title="ralph.mod
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>problem_show</code> browser event.</p>
+      <p>Pydantic model for <code>problem_show</code> statement.</p>
+<p>The browser emits this statement when the answer clicks <kbd>Show Answer</kbd> to
+show the problem answer.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -11569,7 +11623,10 @@ UIProblemShow            (<a class="autorefs autorefs-internal" title="ralph.mod
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UIProblemShow</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `problem_show` browser event.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `problem_show` statement.</span>
+
+<span class="sd">    The browser emits this statement when the answer clicks &lt;kbd&gt;Show Answer&lt;/kbd&gt; to</span>
+<span class="sd">    show the problem answer.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (json): See ProblemShowEventField.</span>
@@ -11650,7 +11707,7 @@ UIProblemShow            (<a class="autorefs autorefs-internal" title="ralph.mod
 
     <div class="doc doc-contents ">
 
-      <p>Server event model definitions</p>
+      <p>Server event model definitions.</p>
 
 
 
@@ -11680,12 +11737,12 @@ BaseServerModel            (<a class="autorefs autorefs-internal" title="ralph.m
 
     <div class="doc doc-contents ">
 
-      <p>Represents the base model all server statements inherit from.</p>
+      <p>Pydantic model for core server statement.</p>
 
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/server.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BaseServerModel</span><span class="p">(</span><span class="n">BaseEdxModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the base model all server statements inherit from.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for core server statement.&quot;&quot;&quot;</span>
 
     <span class="n">event_source</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;server&quot;</span><span class="p">]</span>
 </code></pre></div>
@@ -11734,7 +11791,7 @@ Server            (<a class="autorefs autorefs-internal" title="ralph.models.edx
 
     <div class="doc doc-contents ">
 
-      <p>Represents a common server statement.</p>
+      <p>Pydantic model for common server statement.</p>
 <p>This type of event is triggered from the django middleware on each request
 excluding: <code>/event</code>, <code>login</code>, <code>heartbeat</code>, <code>/segmentio/event</code> and <code>/performance</code>.</p>
 
@@ -11780,7 +11837,7 @@ Note:
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/server.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">Server</span><span class="p">(</span><span class="n">BaseServerModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents a common server statement.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for common server statement.</span>
 
 <span class="sd">    This type of event is triggered from the django middleware on each request</span>
 <span class="sd">    excluding: `/event`, `login`, `heartbeat`, `/segmentio/event` and `/performance`.</span>
@@ -11862,12 +11919,12 @@ ServerEventField            (<a class="autorefs autorefs-internal" title="ralph.
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>event</code> field of the ServerEventModel.</p>
+      <p>Pydantic model for common server <code>event</code> field.</p>
 
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/server.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ServerEventField</span><span class="p">(</span><span class="n">AbstractBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `event` field of the ServerEventModel.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for common server `event` field.&quot;&quot;&quot;</span>
 
     <span class="n">GET</span><span class="p">:</span> <span class="nb">dict</span>
     <span class="n">POST</span><span class="p">:</span> <span class="nb">dict</span>
@@ -11985,7 +12042,7 @@ ServerEventField            (<a class="autorefs autorefs-internal" title="ralph.
 
     <div class="doc doc-contents ">
 
-      <p>Textbook interaction event fields definitions</p>
+      <p>Textbook interaction event fields definitions.</p>
 
 
 
@@ -12015,7 +12072,7 @@ BookEventField            (<a class="autorefs autorefs-internal" title="ralph.mo
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>book</code> event field.</p>
+      <p>Pydantic model for <code>book</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -12063,7 +12120,7 @@ clicked or <code>nextpage</code> value when the previous page button is clicked.
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BookEventField</span><span class="p">(</span><span class="n">AbstractBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `book` event field.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `book`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        chapter (str): Consists of the name of the PDF file.</span>
@@ -12142,8 +12199,7 @@ TextbookInteractionBaseEventField            (<a class="autorefs autorefs-intern
 
     <div class="doc doc-contents ">
 
-      <p>Represents the event field which attributes are common to most of the textbook
-interaction events.</p>
+      <p>Pydantic model for textbook interaction core <code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -12171,8 +12227,7 @@ It begins with the <code>block_id</code> value and ends with the <code>.pdf</cod
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">TextbookInteractionBaseEventField</span><span class="p">(</span><span class="n">AbstractBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the event field which attributes are common to most of the textbook</span>
-<span class="sd">    interaction events.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for textbook interaction core `event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        chapter (str): Consists of the name of the PDF file.</span>
@@ -12233,7 +12288,7 @@ TextbookPdfChapterNavigatedEventField            (<a class="autorefs autorefs-in
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>textbook.pdf.chapter.navigated</code> event field.</p>
+      <p>Pydantic model for <code>textbook.pdf.chapter.navigated</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -12261,7 +12316,7 @@ It begins with the <code>block_id</code> value and ends with the <code>.pdf</cod
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">TextbookPdfChapterNavigatedEventField</span><span class="p">(</span><span class="n">AbstractBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `textbook.pdf.chapter.navigated` event field.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `textbook.pdf.chapter.navigated`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        name (str): Consists of the value `textbook.pdf.chapter.navigated`.</span>
@@ -12324,7 +12379,7 @@ TextbookPdfDisplayScaledEventField            (<a class="autorefs autorefs-inter
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>textbook.pdf.display.scaled</code> event field.</p>
+      <p>Pydantic model for <code>textbook.pdf.display.scaled</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -12351,7 +12406,7 @@ TextbookPdfDisplayScaledEventField            (<a class="autorefs autorefs-inter
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">TextbookPdfDisplayScaledEventField</span><span class="p">(</span><span class="n">TextbookInteractionBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `textbook.pdf.display.scaled` event field.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `textbook.pdf.display.scaled`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        name (str): Consists of the value `textbook.pdf.display.scaled`.</span>
@@ -12407,7 +12462,7 @@ TextbookPdfOutlineToggledEventField            (<a class="autorefs autorefs-inte
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>textbook.pdf.outline.toggled</code> event field.</p>
+      <p>Pydantic model for <code>textbook.pdf.outline.toggled</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -12429,7 +12484,7 @@ TextbookPdfOutlineToggledEventField            (<a class="autorefs autorefs-inte
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">TextbookPdfOutlineToggledEventField</span><span class="p">(</span><span class="n">TextbookInteractionBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `textbook.pdf.outline.toggled` event field.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `textbook.pdf.outline.toggled`.`event` field.</span>
 
 <span class="sd">    Attribute:</span>
 <span class="sd">        name (str): Consists of the value `textbook.pdf.outline.toggled`.</span>
@@ -12482,7 +12537,7 @@ TextbookPdfPageNavigatedEventField            (<a class="autorefs autorefs-inter
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>textbook.pdf.page.navigated</code> event field.</p>
+      <p>Pydantic model for <code>textbook.pdf.page.navigated</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -12504,7 +12559,7 @@ TextbookPdfPageNavigatedEventField            (<a class="autorefs autorefs-inter
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">TextbookPdfPageNavigatedEventField</span><span class="p">(</span><span class="n">TextbookInteractionBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `textbook.pdf.page.navigated` event field.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `textbook.pdf.page.navigated`.`event` field.</span>
 
 <span class="sd">    Attribute:</span>
 <span class="sd">        name (str): Consists of the value `textbook.pdf.page.navigated`.</span>
@@ -12557,7 +12612,7 @@ TextbookPdfPageScrolledEventField            (<a class="autorefs autorefs-intern
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>textbook.pdf.page.scrolled</code> event field.</p>
+      <p>Pydantic model for <code>textbook.pdf.page.scrolled</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -12584,7 +12639,7 @@ TextbookPdfPageScrolledEventField            (<a class="autorefs autorefs-intern
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">TextbookPdfPageScrolledEventField</span><span class="p">(</span><span class="n">TextbookInteractionBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `textbook.pdf.page.scrolled` event field.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `textbook.pdf.page.scrolled`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        name (str): Consists of the value `textbook.pdf.page.scrolled`.</span>
@@ -12640,7 +12695,7 @@ TextbookPdfSearchCaseSensitivityToggledEventField            (<a class="autorefs
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>textbook.pdf.searchcasesensitivity.toggled</code> event field.</p>
+      <p>Pydantic model for <code>textbook.pdf.searchcasesensitivity.toggled</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -12687,7 +12742,7 @@ is unsuccessful or blank for successful search strings.</p></td>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">TextbookPdfSearchCaseSensitivityToggledEventField</span><span class="p">(</span>
     <span class="n">TextbookInteractionBaseEventField</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `textbook.pdf.searchcasesensitivity.toggled` event field.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `textbook.pdf.searchcasesensitivity.toggled`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        name (str): Consists of the value `textbook.pdf.searchcasesensitivity.toggled`.</span>
@@ -12755,7 +12810,7 @@ TextbookPdfSearchExecutedEventField            (<a class="autorefs autorefs-inte
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>textbook.pdf.search.executed</code> event field.</p>
+      <p>Pydantic model for <code>textbook.pdf.search.executed</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -12800,7 +12855,7 @@ is unsuccessful or blank for successful search strings.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">TextbookPdfSearchExecutedEventField</span><span class="p">(</span><span class="n">TextbookInteractionBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `textbook.pdf.search.executed` event field.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `textbook.pdf.search.executed`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        name (str): Consists of the value `textbook.pdf.search.executed`.</span>
@@ -12868,7 +12923,7 @@ TextbookPdfSearchHighlightToggledEventField            (<a class="autorefs autor
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>textbook.pdf.search.highlight.toggled</code> event field.</p>
+      <p>Pydantic model for <code>textbook.pdf.search.highlight.toggled</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -12913,7 +12968,7 @@ is unsuccessful or blank for successful search strings.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">TextbookPdfSearchHighlightToggledEventField</span><span class="p">(</span><span class="n">TextbookInteractionBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `textbook.pdf.search.highlight.toggled` event field.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `textbook.pdf.search.highlight.toggled`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        name (str): Consists of the value `textbook.pdf.search.highlight.toggled`.</span>
@@ -12981,7 +13036,7 @@ TextbookPdfSearchNavigatedNextEventField            (<a class="autorefs autorefs
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>textbook.pdf.search.navigatednext</code> event field.</p>
+      <p>Pydantic model for <code>textbook.pdf.search.navigatednext</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -13033,7 +13088,7 @@ is unsuccessful or blank for successful search strings.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">TextbookPdfSearchNavigatedNextEventField</span><span class="p">(</span><span class="n">TextbookInteractionBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `textbook.pdf.search.navigatednext` event field.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `textbook.pdf.search.navigatednext`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        name (str): Consists of the value `textbook.pdf.search.navigatednext`.</span>
@@ -13106,7 +13161,7 @@ TextbookPdfThumbnailNavigatedEventField            (<a class="autorefs autorefs-
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>textbook.pdf.thumbnail.navigated</code> event field.</p>
+      <p>Pydantic model for <code>textbook.pdf.thumbnail.navigated</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -13133,7 +13188,7 @@ TextbookPdfThumbnailNavigatedEventField            (<a class="autorefs autorefs-
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">TextbookPdfThumbnailNavigatedEventField</span><span class="p">(</span><span class="n">TextbookInteractionBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `textbook.pdf.thumbnail.navigated` event field.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `textbook.pdf.thumbnail.navigated`.`event` field.</span>
 
 <span class="sd">    Attribute:</span>
 <span class="sd">        name (str): Consists of the value `textbook.pdf.thumbnail.navigated`.</span>
@@ -13189,7 +13244,7 @@ TextbookPdfThumbnailsToggledEventField            (<a class="autorefs autorefs-i
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>textbook.pdf.thumbnails.toggled</code> event field.</p>
+      <p>Pydantic model for <code>textbook.pdf.thumbnails.toggled</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -13211,7 +13266,7 @@ TextbookPdfThumbnailsToggledEventField            (<a class="autorefs autorefs-i
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">TextbookPdfThumbnailsToggledEventField</span><span class="p">(</span><span class="n">TextbookInteractionBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `textbook.pdf.thumbnails.toggled` event field.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `textbook.pdf.thumbnails.toggled`.`event` field.</span>
 
 <span class="sd">    Attribute:</span>
 <span class="sd">        name (str): Consists of the value `textbook.pdf.thumbnails.toggled`.</span>
@@ -13264,7 +13319,7 @@ TextbookPdfZoomButtonsChangedEventField            (<a class="autorefs autorefs-
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>textbook.pdf.zoom.buttons.changed</code> event field.</p>
+      <p>Pydantic model for <code>textbook.pdf.zoom.buttons.changed</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -13291,7 +13346,7 @@ TextbookPdfZoomButtonsChangedEventField            (<a class="autorefs autorefs-
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">TextbookPdfZoomButtonsChangedEventField</span><span class="p">(</span><span class="n">TextbookInteractionBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `textbook.pdf.zoom.buttons.changed` event field.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `textbook.pdf.zoom.buttons.changed`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        name (str): Consists of the value `textbook.pdf.zoom.buttons.changed`.</span>
@@ -13347,7 +13402,7 @@ TextbookPdfZoomMenuChangedEventField            (<a class="autorefs autorefs-int
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>textbook.pdf.zoom.menu.changed</code> event field.</p>
+      <p>Pydantic model for <code>textbook.pdf.zoom.menu.changed</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -13375,7 +13430,7 @@ TextbookPdfZoomMenuChangedEventField            (<a class="autorefs autorefs-int
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">TextbookPdfZoomMenuChangedEventField</span><span class="p">(</span><span class="n">TextbookInteractionBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `textbook.pdf.zoom.menu.changed` event field.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `textbook.pdf.zoom.menu.changed`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        name (str): Consists of the value `textbook.pdf.zoom.menu.changed`.</span>
@@ -13462,7 +13517,7 @@ TextbookPdfZoomMenuChangedEventField            (<a class="autorefs autorefs-int
 
     <div class="doc doc-contents ">
 
-      <p>Textbook interaction event model definitions</p>
+      <p>Textbook interaction event model definitions.</p>
 
 
 
@@ -13492,8 +13547,8 @@ UIBook            (<a class="autorefs autorefs-internal" title="ralph.models.edx
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>book</code> browser event model.</p>
-<p>The browser emits this event when a user navigates within the PDF Viewer or the
+      <p>Pydantic model for <code>book</code> statement.</p>
+<p>The browser emits this statement when a user navigates within the PDF Viewer or the
 PNG Viewer.</p>
 
 <p><strong>Attributes:</strong></p>
@@ -13526,9 +13581,9 @@ PNG Viewer.</p>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UIBook</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `book` browser event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `book` statement.</span>
 
-<span class="sd">    The browser emits this event when a user navigates within the PDF Viewer or the</span>
+<span class="sd">    The browser emits this statement when a user navigates within the PDF Viewer or the</span>
 <span class="sd">    PNG Viewer.</span>
 
 <span class="sd">    Attributes:</span>
@@ -13593,9 +13648,9 @@ UITextbookPdfChapterNavigated            (<a class="autorefs autorefs-internal" 
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>textbook.pdf.chapter.navigated</code> browser event model.</p>
-<p>The browser emits this event when a user clicks on a link in the outline to navigate
-to a chapter.</p>
+      <p>Pydantic model for <code>textbook.pdf.chapter.navigated</code> statement.</p>
+<p>The browser emits this statement when a user clicks on a link in the outline to
+navigate to a chapter.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -13627,10 +13682,10 @@ to a chapter.</p>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UITextbookPdfChapterNavigated</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `textbook.pdf.chapter.navigated` browser event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `textbook.pdf.chapter.navigated` statement.</span>
 
-<span class="sd">    The browser emits this event when a user clicks on a link in the outline to navigate</span>
-<span class="sd">    to a chapter.</span>
+<span class="sd">    The browser emits this statement when a user clicks on a link in the outline to</span>
+<span class="sd">    navigate to a chapter.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (json): See TextbookPdfChapterNavigatedEventField.</span>
@@ -13699,9 +13754,9 @@ UITextbookPdfDisplayScaled            (<a class="autorefs autorefs-internal" tit
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>textbook.pdf.display.scaled</code> browser event model.</p>
-<p>The browser emits this event when the display magnification changes or the first
-page is shown.</p>
+      <p>Pydantic model for <code>textbook.pdf.display.scaled</code> statement.</p>
+<p>The browser emits this statement when the display magnification changes or the
+first page is shown.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -13733,10 +13788,10 @@ page is shown.</p>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UITextbookPdfDisplayScaled</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `textbook.pdf.display.scaled` browser event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `textbook.pdf.display.scaled` statement.</span>
 
-<span class="sd">    The browser emits this event when the display magnification changes or the first</span>
-<span class="sd">    page is shown.</span>
+<span class="sd">    The browser emits this statement when the display magnification changes or the</span>
+<span class="sd">    first page is shown.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (json): See TextbookPdfDisplayScaledEventField.</span>
@@ -13805,9 +13860,9 @@ UITextbookPdfOutlineToggled            (<a class="autorefs autorefs-internal" ti
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>textbook.pdf.outline.toggled</code> browser event model.</p>
-<p>The browser emits this event when a user clicks the outline icon to show or hide
-a list of the book’s chapters.</p>
+      <p>Pydantic model for <code>textbook.pdf.outline.toggled</code> statement.</p>
+<p>The browser emits this statement when a user clicks the outline icon to show or
+hide a list of the book’s chapters.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -13839,10 +13894,10 @@ a list of the book’s chapters.</p>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UITextbookPdfOutlineToggled</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `textbook.pdf.outline.toggled` browser event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `textbook.pdf.outline.toggled` statement.</span>
 
-<span class="sd">    The browser emits this event when a user clicks the outline icon to show or hide</span>
-<span class="sd">    a list of the book’s chapters.</span>
+<span class="sd">    The browser emits this statement when a user clicks the outline icon to show or</span>
+<span class="sd">    hide a list of the book’s chapters.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (json): See TextbookPdfOutlineToggledEventField.</span>
@@ -13911,8 +13966,8 @@ UITextbookPdfPageNavigated            (<a class="autorefs autorefs-internal" tit
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>textbook.pdf.page.navigated</code> browser event model.</p>
-<p>The browser emits this event when a user manually enters a page number.</p>
+      <p>Pydantic model for <code>textbook.pdf.page.navigated</code> statement.</p>
+<p>The browser emits this statement when a user manually enters a page number.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -13944,9 +13999,9 @@ UITextbookPdfPageNavigated            (<a class="autorefs autorefs-internal" tit
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UITextbookPdfPageNavigated</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `textbook.pdf.page.navigated` browser event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `textbook.pdf.page.navigated` statement.</span>
 
-<span class="sd">    The browser emits this event when a user manually enters a page number.</span>
+<span class="sd">    The browser emits this statement when a user manually enters a page number.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (json): See TextbookPdfPageNavigatedEventField.</span>
@@ -14015,9 +14070,9 @@ UITextbookPdfPageScrolled            (<a class="autorefs autorefs-internal" titl
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>textbook.pdf.page.scrolled</code> browser event model.</p>
-<p>The browser emits this event when the user scrolls to the next or previous page and
-the transition takes less than 50 milliseconds.</p>
+      <p>Pydantic model for <code>textbook.pdf.page.scrolled</code> statement.</p>
+<p>The browser emits this statement when the user scrolls to the next or previous page
+and the transition takes less than 50 milliseconds.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -14049,10 +14104,10 @@ the transition takes less than 50 milliseconds.</p>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UITextbookPdfPageScrolled</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `textbook.pdf.page.scrolled` browser event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `textbook.pdf.page.scrolled` statement.</span>
 
-<span class="sd">    The browser emits this event when the user scrolls to the next or previous page and</span>
-<span class="sd">    the transition takes less than 50 milliseconds.</span>
+<span class="sd">    The browser emits this statement when the user scrolls to the next or previous page</span>
+<span class="sd">    and the transition takes less than 50 milliseconds.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (json): See TextbookPdfPageScrolledEventField.</span>
@@ -14121,8 +14176,8 @@ UITextbookPdfSearchCaseSensitivityToggled            (<a class="autorefs autoref
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>textbook.pdf.searchcasesensitivity.toggled</code> browser event model.</p>
-<p>The browser emits this event when a user selects or clears the
+      <p>Pydantic model for <code>textbook.pdf.searchcasesensitivity.toggled</code> statement.</p>
+<p>The browser emits this statement when a user selects or clears the
 <kbd>Match Case</kbd> option.</p>
 
 <p><strong>Attributes:</strong></p>
@@ -14156,9 +14211,9 @@ UITextbookPdfSearchCaseSensitivityToggled            (<a class="autorefs autoref
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UITextbookPdfSearchCaseSensitivityToggled</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `textbook.pdf.searchcasesensitivity.toggled` browser event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `textbook.pdf.searchcasesensitivity.toggled` statement.</span>
 
-<span class="sd">    The browser emits this event when a user selects or clears the</span>
+<span class="sd">    The browser emits this statement when a user selects or clears the</span>
 <span class="sd">    &lt;kbd&gt;Match Case&lt;/kbd&gt; option.</span>
 
 <span class="sd">    Attributes:</span>
@@ -14229,8 +14284,8 @@ UITextbookPdfSearchExecuted            (<a class="autorefs autorefs-internal" ti
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>textbook.pdf.search.executed</code> browser event model.</p>
-<p>The browser emits this event when a user searches for a text value in the file.</p>
+      <p>Pydantic model for <code>textbook.pdf.search.executed</code> statement.</p>
+<p>The browser emits this statement when a user searches for a text value in the file.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -14262,9 +14317,9 @@ UITextbookPdfSearchExecuted            (<a class="autorefs autorefs-internal" ti
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UITextbookPdfSearchExecuted</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `textbook.pdf.search.executed` browser event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `textbook.pdf.search.executed` statement.</span>
 
-<span class="sd">    The browser emits this event when a user searches for a text value in the file.</span>
+<span class="sd">    The browser emits this statement when a user searches for a text value in the file.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (json): See TextbookPdfSearchExecutedEventField.</span>
@@ -14333,8 +14388,8 @@ UITextbookPdfSearchHighlightToggled            (<a class="autorefs autorefs-inte
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>textbook.pdf.search.highlight.toggled</code> browser event model.</p>
-<p>The browser emits this event when a user selects or clears the
+      <p>Pydantic model for <code>textbook.pdf.search.highlight.toggled</code> statement.</p>
+<p>The browser emits this statement when a user selects or clears the
 <kbd>Highlight All</kbd> option.</p>
 
 <p><strong>Attributes:</strong></p>
@@ -14367,9 +14422,9 @@ UITextbookPdfSearchHighlightToggled            (<a class="autorefs autorefs-inte
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UITextbookPdfSearchHighlightToggled</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `textbook.pdf.search.highlight.toggled` browser event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `textbook.pdf.search.highlight.toggled` statement.</span>
 
-<span class="sd">    The browser emits this event when a user selects or clears the</span>
+<span class="sd">    The browser emits this statement when a user selects or clears the</span>
 <span class="sd">    &lt;kbd&gt;Highlight All&lt;/kbd&gt; option.</span>
 
 <span class="sd">    Attributes:</span>
@@ -14439,8 +14494,8 @@ UITextbookPdfSearchNavigatedNext            (<a class="autorefs autorefs-interna
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>textbook.pdf.search.navigatednext</code> browser event model.</p>
-<p>The browser emits this event when a user clicks on the <kbd>Find Next</kbd> or
+      <p>Pydantic model for <code>textbook.pdf.search.navigatednext</code> statement.</p>
+<p>The browser emits this statement when a user clicks on the <kbd>Find Next</kbd> or
 <kbd>Find Previous</kbd> icons for an entered search string.</p>
 
 <p><strong>Attributes:</strong></p>
@@ -14473,9 +14528,9 @@ UITextbookPdfSearchNavigatedNext            (<a class="autorefs autorefs-interna
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UITextbookPdfSearchNavigatedNext</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `textbook.pdf.search.navigatednext` browser event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `textbook.pdf.search.navigatednext` statement.</span>
 
-<span class="sd">    The browser emits this event when a user clicks on the &lt;kbd&gt;Find Next&lt;/kbd&gt; or</span>
+<span class="sd">    The browser emits this statement when a user clicks on the &lt;kbd&gt;Find Next&lt;/kbd&gt; or</span>
 <span class="sd">    &lt;kbd&gt;Find Previous&lt;/kbd&gt; icons for an entered search string.</span>
 
 <span class="sd">    Attributes:</span>
@@ -14545,9 +14600,9 @@ UITextbookPdfThumbnailNavigated            (<a class="autorefs autorefs-internal
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>textbook.pdf.thumbnail.navigated</code> browser event model.</p>
-<p>The browser emits this event when a user clicks on a thumbnail image to navigate
-to a page.</p>
+      <p>Pydantic model for <code>textbook.pdf.thumbnail.navigated</code> statement.</p>
+<p>The browser emits this statement when a user clicks on a thumbnail image to
+navigate to a page.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -14579,10 +14634,10 @@ to a page.</p>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UITextbookPdfThumbnailNavigated</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `textbook.pdf.thumbnail.navigated` browser event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `textbook.pdf.thumbnail.navigated` statement.</span>
 
-<span class="sd">    The browser emits this event when a user clicks on a thumbnail image to navigate</span>
-<span class="sd">    to a page.</span>
+<span class="sd">    The browser emits this statement when a user clicks on a thumbnail image to</span>
+<span class="sd">    navigate to a page.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (json): See TextbookPdfThumbnailNavigatedEventField.</span>
@@ -14651,9 +14706,9 @@ UITextbookPdfThumbnailsToggled            (<a class="autorefs autorefs-internal"
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>textbook.pdf.thumbnails.toggled</code> browser event model.</p>
-<p>The browser emits this event when a user clicks on the icon to show or hide page
-thumbnails.</p>
+      <p>Pydantic model for <code>textbook.pdf.thumbnails.toggled</code> statement.</p>
+<p>The browser emits this statement when a user clicks on the icon to show or hide
+page thumbnails.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -14685,10 +14740,10 @@ thumbnails.</p>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UITextbookPdfThumbnailsToggled</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `textbook.pdf.thumbnails.toggled` browser event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `textbook.pdf.thumbnails.toggled` statement.</span>
 
-<span class="sd">    The browser emits this event when a user clicks on the icon to show or hide page</span>
-<span class="sd">    thumbnails.</span>
+<span class="sd">    The browser emits this statement when a user clicks on the icon to show or hide</span>
+<span class="sd">    page thumbnails.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (json): See TextbookPdfThumbnailsToggledEventField.</span>
@@ -14757,8 +14812,8 @@ UITextbookPdfZoomButtonsChanged            (<a class="autorefs autorefs-internal
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>textbook.pdf.zoom.buttons.changed</code> browser event model.</p>
-<p>The browser emits this event when a user clicks either the <kbd>Zoom In</kbd>
+      <p>Pydantic model for <code>textbook.pdf.zoom.buttons.changed</code> statement.</p>
+<p>The browser emits this statement when a user clicks either the <kbd>Zoom In</kbd>
 or <kbd>Zoom Out</kbd> icon.</p>
 
 <p><strong>Attributes:</strong></p>
@@ -14791,9 +14846,9 @@ or <kbd>Zoom Out</kbd> icon.</p>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UITextbookPdfZoomButtonsChanged</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `textbook.pdf.zoom.buttons.changed` browser event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `textbook.pdf.zoom.buttons.changed` statement.</span>
 
-<span class="sd">    The browser emits this event when a user clicks either the &lt;kbd&gt;Zoom In&lt;/kbd&gt;</span>
+<span class="sd">    The browser emits this statement when a user clicks either the &lt;kbd&gt;Zoom In&lt;/kbd&gt;</span>
 <span class="sd">    or &lt;kbd&gt;Zoom Out&lt;/kbd&gt; icon.</span>
 
 <span class="sd">    Attributes:</span>
@@ -14863,8 +14918,8 @@ UITextbookPdfZoomMenuChanged            (<a class="autorefs autorefs-internal" t
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>textbook.pdf.zoom.menu.changed</code> browser event model.</p>
-<p>The browser emits this event when a user selects a magnification setting.</p>
+      <p>Pydantic model for <code>textbook.pdf.zoom.menu.changed</code> statement.</p>
+<p>The browser emits this statement when a user selects a magnification setting.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -14896,9 +14951,9 @@ UITextbookPdfZoomMenuChanged            (<a class="autorefs autorefs-internal" t
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/textbook_interaction/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UITextbookPdfZoomMenuChanged</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `textbook.pdf.zoom.menu.changed` browser event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `textbook.pdf.zoom.menu.changed` statement.</span>
 
-<span class="sd">    The browser emits this event when a user selects a magnification setting.</span>
+<span class="sd">    The browser emits this statement when a user selects a magnification setting.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (json): See TextbookPdfZoomMenuChangedEventField.</span>
@@ -15043,7 +15098,7 @@ UITextbookPdfZoomMenuChanged            (<a class="autorefs autorefs-internal" t
 
     <div class="doc doc-contents ">
 
-      <p>Video event fields definitions</p>
+      <p>Video event fields definitions.</p>
 
 
 
@@ -15073,7 +15128,7 @@ PauseVideoEventField            (<a class="autorefs autorefs-internal" title="ra
 
     <div class="doc doc-contents ">
 
-      <p>Represents the event field of <code>pause_video</code> statement.</p>
+      <p>Pydantic model for <code>pause_video</code>.<code>event</code>.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -15096,7 +15151,7 @@ the statement was emitted.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/video/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">PauseVideoEventField</span><span class="p">(</span><span class="n">VideoBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the event field of `pause_video` statement.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `pause_video`.`event`.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        currentTime (float): Consists of the time in the video at which</span>
@@ -15150,7 +15205,7 @@ PlayVideoEventField            (<a class="autorefs autorefs-internal" title="ral
 
     <div class="doc doc-contents ">
 
-      <p>Represents the event field of <code>play_video</code> statement.</p>
+      <p>Pydantic model for <code>play_video</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -15173,7 +15228,7 @@ the statement was emitted.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/video/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">PlayVideoEventField</span><span class="p">(</span><span class="n">VideoBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the event field of `play_video` statement.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `play_video`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        currentTime (float): Consists of the time in the video at which</span>
@@ -15227,7 +15282,7 @@ SeekVideoEventField            (<a class="autorefs autorefs-internal" title="ral
 
     <div class="doc doc-contents ">
 
-      <p>Represents the event field of <code>seek_video</code> statement.</p>
+      <p>Pydantic model for <code>seek_video</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -15262,7 +15317,7 @@ within the video, either <code>onCaptionSeek</code> or <code>onSlideSeek</code> 
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/video/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">SeekVideoEventField</span><span class="p">(</span><span class="n">VideoBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the event field of `seek_video` statement.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `seek_video`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        new_time (float): Consists of the point in time the actor changed to in a media</span>
@@ -15324,7 +15379,7 @@ SpeedChangeVideoEventField            (<a class="autorefs autorefs-internal" tit
 
     <div class="doc doc-contents ">
 
-      <p>Represents the event field of <code>speed_change_video</code> statement.</p>
+      <p>Pydantic model for <code>speed_change_video</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -15347,7 +15402,7 @@ the statement was emitted.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/video/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">SpeedChangeVideoEventField</span><span class="p">(</span><span class="n">VideoBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the event field of `speed_change_video` statement.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `speed_change_video`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        currentTime (float): Consists of the time in the video at which</span>
@@ -15405,7 +15460,7 @@ StopVideoEventField            (<a class="autorefs autorefs-internal" title="ral
 
     <div class="doc doc-contents ">
 
-      <p>Represents the event field of <code>stop_video</code> statement.</p>
+      <p>Pydantic model for <code>stop_video</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -15428,7 +15483,7 @@ the statement was emitted.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/video/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">StopVideoEventField</span><span class="p">(</span><span class="n">VideoBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the event field of `stop_video` statement.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `stop_video`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        currentTime (float): Consists of the time in the video at which</span>
@@ -15482,8 +15537,7 @@ VideoBaseEventField            (<a class="autorefs autorefs-internal" title="ral
 
     <div class="doc doc-contents ">
 
-      <p>Represents the event field which attributes are common to most
-of the video statements.</p>
+      <p>Pydantic model for video core <code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -15512,8 +15566,7 @@ course creators, or the system-generated hash code otherwise.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/video/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VideoBaseEventField</span><span class="p">(</span><span class="n">AbstractBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the event field which attributes are common to most</span>
-<span class="sd">    of the video statements.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for video core `event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        code (str): Consists of the `html5` value for browser-played</span>
@@ -15522,7 +15575,7 @@ course creators, or the system-generated hash code otherwise.</p></td>
 <span class="sd">            course creators, or the system-generated hash code otherwise.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>  <span class="c1"># pylint: disable=missing-class-docstring</span>
+    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>  <span class="c1"># pylint: disable=missing-class-docstring # noqa: D106</span>
         <span class="n">extra</span> <span class="o">=</span> <span class="s2">&quot;allow&quot;</span>
 
     <span class="n">code</span><span class="p">:</span> <span class="nb">str</span>
@@ -15561,9 +15614,9 @@ course creators, or the system-generated hash code otherwise.</p></td>
 
 
 
-<h5 id="ralph.models.edx.video.fields.events.VideoTranscriptEventField" class="doc doc-heading">
+<h5 id="ralph.models.edx.video.fields.events.VideoHideTranscriptEventField" class="doc doc-heading">
         <code>
-VideoTranscriptEventField            (<a class="autorefs autorefs-internal" title="ralph.models.edx.video.fields.events.VideoBaseEventField" href="#ralph.models.edx.video.fields.events.VideoBaseEventField">VideoBaseEventField</a>)
+VideoHideTranscriptEventField            (<a class="autorefs autorefs-internal" title="ralph.models.edx.video.fields.events.VideoBaseEventField" href="#ralph.models.edx.video.fields.events.VideoBaseEventField">VideoBaseEventField</a>)
         </code>
 
 
@@ -15571,12 +15624,11 @@ VideoTranscriptEventField            (<a class="autorefs autorefs-internal" titl
       <small class="doc doc-property doc-property-pydantic-model"><code>pydantic-model</code></small>
   </span>
 
-<a href="#ralph.models.edx.video.fields.events.VideoTranscriptEventField" class="headerlink" title="Permanent link">&para;</a></h5>
+<a href="#ralph.models.edx.video.fields.events.VideoHideTranscriptEventField" class="headerlink" title="Permanent link">&para;</a></h5>
 
     <div class="doc doc-contents ">
 
-      <p>Represents the event field of <code>hide_transcript</code> and <code>show_transcript</code>
-statement.</p>
+      <p>Pydantic model for <code>hide_transcript</code>.<code>event</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -15598,9 +15650,85 @@ the statement was emitted.</p></td>
 </table>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/video/fields/events.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VideoTranscriptEventField</span><span class="p">(</span><span class="n">VideoBaseEventField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the event field of `hide_transcript` and `show_transcript`</span>
-<span class="sd">    statement.</span>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VideoHideTranscriptEventField</span><span class="p">(</span><span class="n">VideoBaseEventField</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `hide_transcript`.`event` field.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        current_time (float): Consists of the time in the video at which</span>
+<span class="sd">            the statement was emitted.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">current_time</span><span class="p">:</span> <span class="nb">float</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h5 id="ralph.models.edx.video.fields.events.VideoShowTranscriptEventField" class="doc doc-heading">
+        <code>
+VideoShowTranscriptEventField            (<a class="autorefs autorefs-internal" title="ralph.models.edx.video.fields.events.VideoBaseEventField" href="#ralph.models.edx.video.fields.events.VideoBaseEventField">VideoBaseEventField</a>)
+        </code>
+
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-model"><code>pydantic-model</code></small>
+  </span>
+
+<a href="#ralph.models.edx.video.fields.events.VideoShowTranscriptEventField" class="headerlink" title="Permanent link">&para;</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Pydantic model for <code>show_transcript</code>.<code>event</code> field.</p>
+
+<p><strong>Attributes:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>current_time</code></td>
+        <td><code>float</code></td>
+        <td><p>Consists of the time in the video at which
+the statement was emitted.</p></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>ralph/models/edx/video/fields/events.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VideoShowTranscriptEventField</span><span class="p">(</span><span class="n">VideoBaseEventField</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `show_transcript`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        current_time (float): Consists of the time in the video at which</span>
@@ -15670,7 +15798,7 @@ the statement was emitted.</p></td>
 
     <div class="doc doc-contents ">
 
-      <p>Video event model definitions</p>
+      <p>Video event model definitions.</p>
 
 
 
@@ -15700,7 +15828,9 @@ UIHideTranscript            (<a class="autorefs autorefs-internal" title="ralph.
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>hide_transcript</code> event model.</p>
+      <p>Pydantic model for <code>hide_transcript</code> statement.</p>
+<p>The browser emits this statement when a user selects <kbd>CC</kbd> to suppress
+display of the video transcript.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -15733,7 +15863,10 @@ UIHideTranscript            (<a class="autorefs autorefs-internal" title="ralph.
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/video/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UIHideTranscript</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `hide_transcript` event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `hide_transcript` statement.</span>
+
+<span class="sd">    The browser emits this statement when a user selects &lt;kbd&gt;CC&lt;/kbd&gt; to suppress</span>
+<span class="sd">    display of the video transcript.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (VideoTranscriptEventField): See VideoTranscriptEventField.</span>
@@ -15745,8 +15878,8 @@ UIHideTranscript            (<a class="autorefs autorefs-internal" title="ralph.
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span><span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;hide_transcript&quot;</span><span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">VideoTranscriptEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
-        <span class="n">VideoTranscriptEventField</span><span class="p">,</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">VideoHideTranscriptEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+        <span class="n">VideoHideTranscriptEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;hide_transcript&quot;</span><span class="p">]</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;hide_transcript&quot;</span><span class="p">,</span> <span class="s2">&quot;edx.video.transcript.hidden&quot;</span><span class="p">]</span>
@@ -15799,7 +15932,9 @@ UILoadVideo            (<a class="autorefs autorefs-internal" title="ralph.model
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>load_video</code> event model.</p>
+      <p>Pydantic model for <code>load_video</code> statement.</p>
+<p>The browser emits this statement when the video is fully rendered and ready to
+play.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -15831,7 +15966,10 @@ UILoadVideo            (<a class="autorefs autorefs-internal" title="ralph.model
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/video/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UILoadVideo</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `load_video` event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `load_video` statement.</span>
+
+<span class="sd">    The browser emits this statement when the video is fully rendered and ready to</span>
+<span class="sd">    play.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (VideoBaseEventField): See VideoBaseEventField.</span>
@@ -15896,7 +16034,9 @@ UIPauseVideo            (<a class="autorefs autorefs-internal" title="ralph.mode
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>pause_video</code> event model.</p>
+      <p>Pydantic model for <code>pause_video</code> statement.</p>
+<p>The browser emits this statement when a user selects the video player&rsquo;s pause
+control.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -15928,7 +16068,10 @@ UIPauseVideo            (<a class="autorefs autorefs-internal" title="ralph.mode
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/video/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UIPauseVideo</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `pause_video` event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `pause_video` statement.</span>
+
+<span class="sd">    The browser emits this statement when a user selects the video player&#39;s pause</span>
+<span class="sd">    control.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (PauseVideoEventField): See PauseVideoEventField.</span>
@@ -15993,7 +16136,9 @@ UIPlayVideo            (<a class="autorefs autorefs-internal" title="ralph.model
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>play_video</code> event model.</p>
+      <p>Pydantic model for <code>play_video</code> statement.</p>
+<p>The browser emits this statement when a user selects the video player&rsquo;s play
+control.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -16025,7 +16170,10 @@ UIPlayVideo            (<a class="autorefs autorefs-internal" title="ralph.model
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/video/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UIPlayVideo</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `play_video` event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `play_video` statement.</span>
+
+<span class="sd">    The browser emits this statement when a user selects the video player&#39;s play</span>
+<span class="sd">    control.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (PlayVideoEventField): See PlayVideoEventField.</span>
@@ -16090,7 +16238,9 @@ UISeekVideo            (<a class="autorefs autorefs-internal" title="ralph.model
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>seek_video</code> event model.</p>
+      <p>Pydantic model for <code>seek_video</code> statement.</p>
+<p>The browser emits this statement when a user selects a user interface control to go
+to a different point in the video file.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -16123,7 +16273,10 @@ UISeekVideo            (<a class="autorefs autorefs-internal" title="ralph.model
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/video/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UISeekVideo</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `seek_video` event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `seek_video` statement.</span>
+
+<span class="sd">    The browser emits this statement when a user selects a user interface control to go</span>
+<span class="sd">    to a different point in the video file.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (SeekVideoEventField): See SeekVideoEventField.</span>
@@ -16189,7 +16342,9 @@ UIShowTranscript            (<a class="autorefs autorefs-internal" title="ralph.
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>show_transcript</code> event model.</p>
+      <p>Pydantic model for <code>show_transcript</code> statement.</p>
+<p>The browser emits this statement when a user selects <kbd>CC</kbd> to display the
+video transcript.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -16222,7 +16377,10 @@ UIShowTranscript            (<a class="autorefs autorefs-internal" title="ralph.
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/video/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UIShowTranscript</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `show_transcript` event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `show_transcript` statement.</span>
+
+<span class="sd">    The browser emits this statement when a user selects &lt;kbd&gt;CC&lt;/kbd&gt; to display the</span>
+<span class="sd">    video transcript.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (VideoTranscriptEventField): See VideoTranscriptEventField.</span>
@@ -16234,8 +16392,8 @@ UIShowTranscript            (<a class="autorefs autorefs-internal" title="ralph.
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span><span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;show_transcript&quot;</span><span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">VideoTranscriptEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
-        <span class="n">VideoTranscriptEventField</span><span class="p">,</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">VideoShowTranscriptEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+        <span class="n">VideoShowTranscriptEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;show_transcript&quot;</span><span class="p">]</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;show_transcript&quot;</span><span class="p">,</span> <span class="s2">&quot;edx.video.transcript.shown&quot;</span><span class="p">]</span>
@@ -16288,7 +16446,9 @@ UISpeedChangeVideo            (<a class="autorefs autorefs-internal" title="ralp
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>speed_change_video</code> event model.</p>
+      <p>Pydantic model for <code>speed_change_video</code> statement.</p>
+<p>The browser emits this statement when a user selects a different playing speed for
+the video.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -16315,7 +16475,10 @@ UISpeedChangeVideo            (<a class="autorefs autorefs-internal" title="ralp
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/video/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UISpeedChangeVideo</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `speed_change_video` event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `speed_change_video` statement.</span>
+
+<span class="sd">    The browser emits this statement when a user selects a different playing speed for</span>
+<span class="sd">    the video.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (SpeedChangeVideoEventField): See SpeedChangeVideoEventField.</span>
@@ -16379,7 +16542,9 @@ UIStopVideo            (<a class="autorefs autorefs-internal" title="ralph.model
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>stop_video</code> event model.</p>
+      <p>Pydantic model for <code>stop_video</code> statement.</p>
+<p>The browser emits this statement when the video player reaches the end of the video
+file and play automatically stops.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -16411,7 +16576,10 @@ UIStopVideo            (<a class="autorefs autorefs-internal" title="ralph.model
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/video/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UIStopVideo</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `stop_video` event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `stop_video` statement.</span>
+
+<span class="sd">    The browser emits this statement when the video player reaches the end of the video</span>
+<span class="sd">    file and play automatically stops.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (StopVideoEventField): See StopVideoEventField.</span>
@@ -16476,7 +16644,9 @@ UIVideoHideCCMenu            (<a class="autorefs autorefs-internal" title="ralph
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>video_hide_cc_menu</code> event model.</p>
+      <p>Pydantic model for <code>video_hide_cc_menu</code> statement.</p>
+<p>The browser emits this statement when a user selects a language from the CC menu
+for a video that has transcripts in multiple languages</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -16503,7 +16673,10 @@ UIVideoHideCCMenu            (<a class="autorefs autorefs-internal" title="ralph
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/video/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UIVideoHideCCMenu</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `video_hide_cc_menu` event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `video_hide_cc_menu` statement.</span>
+
+<span class="sd">    The browser emits this statement when a user selects a language from the CC menu</span>
+<span class="sd">    for a video that has transcripts in multiple languages</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (VideoBaseEventField): See VideoBaseEventField.</span>
@@ -16567,7 +16740,10 @@ UIVideoShowCCMenu            (<a class="autorefs autorefs-internal" title="ralph
 
     <div class="doc doc-contents ">
 
-      <p>Represents the <code>video_show_cc_menu</code> event model.</p>
+      <p>Pydantic model for <code>video_show_cc_menu</code> statement.</p>
+<p>The browser emits this statement when a user selects CC for a video that has
+transcripts in multiple languages.</p>
+<p>Note: This statement is emitted in addition to the show_transcript event.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -16594,7 +16770,12 @@ UIVideoShowCCMenu            (<a class="autorefs autorefs-internal" title="ralph
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/video/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UIVideoShowCCMenu</span><span class="p">(</span><span class="n">BaseBrowserModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Represents the `video_show_cc_menu` event model.</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic model for `video_show_cc_menu` statement.</span>
+
+<span class="sd">    The browser emits this statement when a user selects CC for a video that has</span>
+<span class="sd">    transcripts in multiple languages.</span>
+
+<span class="sd">    Note: This statement is emitted in addition to the show_transcript event.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        event (VideoBaseEventField): See VideoBaseEventField.</span>
