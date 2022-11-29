@@ -74,6 +74,10 @@ spec:
               value: "/app/.ralph"
             - name: RALPH_AUTH_FILE
               value: "/var/run/ralph/auth.json"
+{% if ralph_mount_es_ca_secret %}
+            - name: RALPH_BACKENDS__DATABASE__ES__CLIENT_OPTIONS__ca_certs
+              value: "/usr/local/share/ca-certificates/es-cluster.pem"
+{% endif %}
           envFrom:
             - secretRef:
                 name: "{{ ralph_secret_name }}"
