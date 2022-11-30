@@ -50,6 +50,7 @@ nav:
         - 'Development - Contributing': tutorials/development_contributing.md
         - 'Use Ralph as a CLI': tutorials/cli.md
         - 'Use Ralph as a library': tutorials/library.md
+        - 'Deploy Ralph': tutorials/helm.md
     - 'Contributing': contribute.md
     - 'Migration': UPGRADE.md
     - 'About the project':
