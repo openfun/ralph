@@ -11,7 +11,7 @@ from .routers import health, statements
 if settings.SENTRY_DSN is not None:
     sentry_sdk.init(  # noqa: F821 # pylint: disable=undefined-variable
         dsn=settings.SENTRY_DSN,
-        traces_sample_rate=1.0,
+        traces_sample_rate=settings.SENTRY_LRS_TRACES_SAMPLE_RATE,
         release=__version__,
         environment=settings.EXECUTION_ENVIRONMENT,
         max_breadcrumbs=50,
