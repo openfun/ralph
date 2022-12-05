@@ -15,6 +15,7 @@ and this project adheres to
 - Upgrade `sentry_sdk` to `1.11.1`
 - Upgrade `uvicorn` to `0.20.0`
 - Tray: add the `ca_certs` path for the ES backend client option (LRS)
+- Improve Sentry integration for the LRS
 
 ## [3.1.0] - 2022-11-17
 

@@ -271,6 +271,8 @@ class Settings(BaseSettings):
     RUNSERVER_POINT_IN_TIME_KEEP_ALIVE: str = "1m"
     RUNSERVER_PORT: int = 8100
     SENTRY_DSN: str = None
+    SENTRY_CLI_TRACES_SAMPLE_RATE = 1.0
+    SENTRY_LRS_TRACES_SAMPLE_RATE = 0.1
     XAPI_FORWARDINGS: list[XapiForwardingConfigurationSettings] = []
 
     @property

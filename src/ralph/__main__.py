@@ -14,7 +14,7 @@ from . import __version__, cli
 if settings.SENTRY_DSN is not None:
     sentry_sdk.init(  # pylint: disable=abstract-class-instantiated
         dsn=settings.SENTRY_DSN,
-        traces_sample_rate=1.0,
+        traces_sample_rate=settings.SENTRY_CLI_TRACES_SAMPLE_RATE,
         release=__version__,
         environment=settings.EXECUTION_ENVIRONMENT,
         max_breadcrumbs=50,
