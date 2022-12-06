@@ -161,6 +161,140 @@ def test_cli_help_option():
     ) in result.output
 
 
+def test_cli_auth_command_usage():
+    """Test ralph auth command usage."""
+    runner = CliRunner()
+    result = runner.invoke(cli, ["auth", "--help"])
+
+    assert result.exit_code == 0
+    assert (
+        "Options:\n"
+        "  -u, --username TEXT  The user for which we generate credentials.  "
+        "[required]\n"
+        "  -p, --password TEXT  The password to encrypt for this user. Will be "
+        "prompted\n"
+        "                       if missing.  [required]\n"
+        "  -s, --scope TEXT     The user scope(s). This option can be provided "
+        "multiple\n"
+        "                       times.  [required]\n"
+        "  -w, --write          Write new credentials to the LRS authentication file.\n"
+    ) in result.output
+
+    result = runner.invoke(cli, ["auth"])
+    assert result.exit_code > 0
+    assert "Error: Missing option '-u' / '--username'." in result.output
+
+
+def test_cli_auth_command_without_writing_auth_file():
+    """Test ralph auth command when credentials are displayed in the tty."""
+    runner = CliRunner()
+    result = runner.invoke(cli, ["auth", "-u", "foo", "-p", "bar", "-s", "foo_scope"])
+
+    assert result.exit_code == 0
+
+    credentials = json.loads("".join(result.output.split("\n")[-8:-1]))
+    assert credentials["username"] == "foo"
+    assert "hash" in credentials
+    assert len(credentials["scopes"]) == 1
+    assert credentials["scopes"][0] == "foo_scope"
+
+    # Test multiple scopes
+    result = runner.invoke(
+        cli, ["auth", "-u", "foo", "-p", "bar", "-s", "foo_scope", "-s", "admin_scope"]
+    )
+
+    assert result.exit_code == 0
+
+    credentials = json.loads("".join(result.output.split("\n")[-9:-1]))
+    assert credentials["username"] == "foo"
+    assert "hash" in credentials
+    assert len(credentials["scopes"]) == 2
+    assert credentials["scopes"][0] == "foo_scope"
+    assert credentials["scopes"][1] == "admin_scope"
+
+
+# pylint: disable=invalid-name,unused-argument
+def test_cli_auth_command_when_writing_auth_file(fs):
+    """Test ralph auth command when credentials are written in the authentication
+    file.
+    """
+    runner = CliRunner()
+
+    # The authentication file does not exist
+    assert Path(settings.AUTH_FILE).exists() is False
+    result = runner.invoke(
+        cli, ["auth", "-u", "foo", "-p", "bar", "-s", "foo_scope", "-w"]
+    )
+    assert result.exit_code == 0
+    assert Path(settings.AUTH_FILE).exists() is True
+    with Path(settings.AUTH_FILE).open(encoding="utf-8") as auth_file:
+        all_credentials = json.loads("\n".join(auth_file.readlines()))
+    assert len(all_credentials) == 1
+    credentials = all_credentials[0]
+    assert credentials["username"] == "foo"
+    assert "hash" in credentials
+    assert len(credentials["scopes"]) == 1
+    assert credentials["scopes"][0] == "foo_scope"
+
+    # Add a new user
+    result = runner.invoke(
+        cli,
+        [
+            "auth",
+            "-u",
+            "lol",
+            "-p",
+            "baz",
+            "-s",
+            "lol_scope",
+            "-s",
+            "admin_scope",
+            "-w",
+        ],
+    )
+    assert result.exit_code == 0
+    with Path(settings.AUTH_FILE).open(encoding="utf-8") as auth_file:
+        all_credentials = json.loads("\n".join(auth_file.readlines()))
+    assert len(all_credentials) == 2
+    credentials = all_credentials[0]
+    assert credentials["username"] == "foo"
+    assert "hash" in credentials
+    assert len(credentials["scopes"]) == 1
+    assert credentials["scopes"][0] == "foo_scope"
+    credentials = all_credentials[1]
+    assert credentials["username"] == "lol"
+    assert "hash" in credentials
+    assert len(credentials["scopes"]) == 2
+    assert credentials["scopes"][0] == "lol_scope"
+    assert credentials["scopes"][1] == "admin_scope"
+
+
+# pylint: disable=invalid-name
+def test_cli_auth_command_when_writing_auth_file_whith_incorrect_auth_file(fs):
+    """Test ralph auth command when credentials are written in the authentication
+    file with a badly formatted original authentication file.
+    """
+    runner = CliRunner()
+
+    # Create the base auth file path in the fake fs with badly formatted JSON
+    # file content
+    contents = (
+        "{\n"
+        ' "username": "johndoe",\n'
+        ' "hash": "secretlynothashed",\n'
+        ' "scope": ["johndoe_scope"]\n'
+    )
+    fs.create_file(settings.AUTH_FILE, contents=contents)
+
+    result = runner.invoke(
+        cli, ["auth", "-u", "foo", "-p", "bar", "-s", "foo_scope", "-w"]
+    )
+    assert result.exit_code > 0
+    auth_file = Path(settings.AUTH_FILE)
+    assert auth_file.exists() is True
+    assert auth_file.read_text(encoding="utf-8") == contents
+
+
 def test_cli_extract_command_usage():
     """Tests ralph extract command usage."""
     runner = CliRunner()

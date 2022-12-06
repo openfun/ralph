@@ -1,7 +1,7 @@
 # API Server
 
-Ralph comes with an API server that aims to implement the Learning Record Store (LRS)
-specification (still a work in progress).
+Ralph comes with an API server that aims to implement the Learning Record Store
+(LRS) specification (still a work in progress).
 
 ## Getting started
 
@@ -11,18 +11,24 @@ The API server can be started up with the following command:
 $ ralph runserver --backend es
 ```
 
-The `--backend` (or `-b`) option specifies which database backend to use for LRS data
-storage and retrieval. See Ralph's [backends documentation](./backends.md) for more
-details.
+The `--backend` (or `-b`) option specifies which database backend to use for
+LRS data storage and retrieval. See Ralph's [backends
+documentation](./backends.md) for more details.
 
-However, before you can start your API server and make requests against it, you need to
-set up your credentials.
+However, before you can start your API server and make requests against it, you
+need to set up your credentials.
 
 ### Creating a credentials file
 
-The credentials file is expected to be a valid JSON file. Its location is specified by the `RALPH_AUTH_FILE` configuration value. By default, `ralph` will look for the `auth.json` file in the application directory (see [click documentation for details](https://click.palletsprojects.com/en/8.0.x/api/#click.get_app_dir)).
+The credentials file is expected to be a valid JSON file. Its location is
+specified by the `RALPH_AUTH_FILE` configuration value. By default, `ralph`
+will look for the `auth.json` file in the application directory (see [click
+documentation for
+details](https://click.palletsprojects.com/en/8.0.x/api/#click.get_app_dir)).
 
-The expected format is a list of entries (JSON objects) each containing the username, the user's `bcrypt` hashed+salted password and scopes they can access:
+The expected format is a list of entries (JSON objects) each containing the
+username, the user's `bcrypt` hashed+salted password and scopes they can
+access:
 
 ```json
 [
@@ -39,14 +45,21 @@ The expected format is a list of entries (JSON objects) each containing the user
 ]
 ```
 
-The hash can be generated with a python script executed directly in the command line:
+To create a new user credentials, Ralph's CLI provides a dedicated command:
 
 ```bash
-# Install bcrypt
-$ python3 -m pip install bcrypt
-# Generate the hash and print it to console
-$ python3 -c 'import bcrypt; print(bcrypt.hashpw(b"PASSWORD", bcrypt.gensalt()).decode("ascii"))'
+$ ralph auth \
+    --user janedoe \
+    --password supersecret \
+    --scope janedoe_scope \
+    -w
 ```
+
+This command updates your credentials file with the new `janedoe` user.
+
+> Note that running this command requires that you installed Ralph with the CLI
+> optional dependencies, _e.g._ `pip install ralph-malph[cli]` (which we highly
+> recommend).
 
 ### Making a GET request
 
