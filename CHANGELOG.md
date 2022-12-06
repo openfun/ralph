@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Add a new `auth` subcommand to generate required credentials file for the LRS
+
 ### Changed
 
 - Upgrade `fastapi` to `0.88.0`

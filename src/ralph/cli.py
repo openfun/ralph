@@ -4,7 +4,10 @@ import json
 import logging
 import re
 import sys
+from pathlib import Path
 from tempfile import NamedTemporaryFile
+
+import bcrypt
 
 try:
     import click
@@ -29,7 +32,12 @@ from ralph.logger import configure_logging
 from ralph.models.converter import Converter
 from ralph.models.selector import ModelSelector
 from ralph.models.validator import Validator
-from ralph.utils import get_backend_instance, get_backend_type, get_root_logger
+from ralph.utils import (
+    get_backend_instance,
+    get_backend_type,
+    get_root_logger,
+    import_string,
+)
 
 # cli module logger
 logger = logging.getLogger(__name__)
@@ -175,6 +183,86 @@ def backends_options(name=None, backend_types: list[BaseModel] = None):
         return command
 
     return wrapper
+
+
+@cli.command()
+@click.option(
+    "-u",
+    "--username",
+    type=str,
+    required=True,
+    help="The user for which we generate credentials.",
+)
+@click.password_option(
+    "-p",
+    "--password",
+    type=str,
+    required=True,
+    help="The password to encrypt for this user. Will be prompted if missing.",
+)
+@click.option(
+    "-s",
+    "--scope",
+    type=str,
+    required=True,
+    multiple=True,
+    default=[],
+    help="The user scope(s). This option can be provided multiple times.",
+)
+@click.option(
+    "-w",
+    "--write",
+    is_flag=True,
+    default=False,
+    help="Write new credentials to the LRS authentication file.",
+)
+def auth(username, password, scope, write):
+    """Generate credentials for LRS HTTP basic authentification."""
+    logger.info("Will generate credentials for user: %s", username)
+
+    # Import required Pydantic models dynamically so that we don't create a
+    # direct dependency between the CLI and the LRS
+    # pylint: disable=invalid-name
+    ServerUsersCredentials = import_string("ralph.api.auth.ServerUsersCredentials")
+    UserCredentials = import_string("ralph.api.auth.UserCredentials")
+
+    credentials = UserCredentials(
+        username=username,
+        hash=bcrypt.hashpw(
+            bytes(password, encoding=settings.LOCALE_ENCODING), bcrypt.gensalt()
+        ).decode("ascii"),
+        scopes=scope,
+    )
+
+    if write:
+        logger.info("Will append new credentials to: %s", settings.AUTH_FILE)
+
+        # Force Path object instantiation so that the file creation can be
+        # faked in a test environment.
+        auth_file = Path(settings.AUTH_FILE)
+        # Create the authentication file if it does not exist
+        auth_file.parent.mkdir(parents=True, exist_ok=True)
+        auth_file.touch()
+
+        users = ServerUsersCredentials.parse_obj([])
+        # Parse credentials file if not empty
+        if auth_file.stat().st_size:
+            users = ServerUsersCredentials.parse_file(auth_file)
+        users += ServerUsersCredentials.parse_obj(
+            [
+                credentials,
+            ]
+        )
+        auth_file.write_text(users.json(indent=2), encoding=settings.LOCALE_ENCODING)
+        logger.info("User %s has been added to: %s", username, settings.AUTH_FILE)
+    else:
+        click.echo(
+            (
+                f"Copy/paste the following credentials to your LRS authentication "
+                f"file located in: {settings.AUTH_FILE}\n"
+                f"{credentials.json(indent=2)}"
+            )
+        )
 
 
 @cli.command()
