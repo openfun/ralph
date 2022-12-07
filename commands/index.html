@@ -335,6 +335,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ralph-auth" class="md-nav__link">
+    auth
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ralph-convert" class="md-nav__link">
     convert
   </a>
@@ -637,6 +644,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ralph-auth" class="md-nav__link">
+    auth
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ralph-convert" class="md-nav__link">
     convert
   </a>
@@ -720,6 +734,26 @@
 <div class="highlight"><pre><span></span><code>  -v, --verbosity LVL  Either CRITICAL, ERROR,
                        WARNING, INFO (default) or
                        DEBUG
+  --help               Show this message and exit.
+</code></pre></div>
+<h3 id="ralph-auth">ralph auth<a class="headerlink" href="#ralph-auth" title="Permanent link">&para;</a></h3>
+<p>Generate credentials for LRS HTTP basic authentification.</p>
+<p><strong>Usage:</strong></p>
+<div class="highlight"><pre><span></span><code>ralph auth [OPTIONS]
+</code></pre></div>
+<p><strong>Options:</strong></p>
+<div class="highlight"><pre><span></span><code>  -u, --username TEXT  The user for which we
+                       generate credentials.
+                       [required]
+  -p, --password TEXT  The password to encrypt for
+                       this user. Will be prompted
+                       if missing.  [required]
+  -s, --scope TEXT     The user scope(s). This
+                       option can be provided
+                       multiple times.  [required]
+  -w, --write          Write new credentials to
+                       the LRS authentication
+                       file.
   --help               Show this message and exit.
 </code></pre></div>
 <h3 id="ralph-convert">ralph convert<a class="headerlink" href="#ralph-convert" title="Permanent link">&para;</a></h3>

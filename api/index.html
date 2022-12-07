@@ -655,20 +655,26 @@
 
 
 <h1 id="api_server">API Server<a class="headerlink" href="#api_server" title="Permanent link">&para;</a></h1>
-<p>Ralph comes with an API server that aims to implement the Learning Record Store (LRS)
-specification (still a work in progress).</p>
+<p>Ralph comes with an API server that aims to implement the Learning Record Store
+(LRS) specification (still a work in progress).</p>
 <h2 id="getting_started">Getting started<a class="headerlink" href="#getting_started" title="Permanent link">&para;</a></h2>
 <p>The API server can be started up with the following command:</p>
 <div class="highlight"><pre><span></span><code>$ ralph runserver --backend es
 </code></pre></div>
-<p>The <code>--backend</code> (or <code>-b</code>) option specifies which database backend to use for LRS data
-storage and retrieval. See Ralph&rsquo;s <a href="../backends/">backends documentation</a> for more
-details.</p>
-<p>However, before you can start your API server and make requests against it, you need to
-set up your credentials.</p>
+<p>The <code>--backend</code> (or <code>-b</code>) option specifies which database backend to use for
+LRS data storage and retrieval. See Ralph&rsquo;s <a href="../backends/">backends
+documentation</a> for more details.</p>
+<p>However, before you can start your API server and make requests against it, you
+need to set up your credentials.</p>
 <h3 id="creating_a_credentials_file">Creating a credentials file<a class="headerlink" href="#creating_a_credentials_file" title="Permanent link">&para;</a></h3>
-<p>The credentials file is expected to be a valid JSON file. Its location is specified by the <code>RALPH_AUTH_FILE</code> configuration value. By default, <code>ralph</code> will look for the <code>auth.json</code> file in the application directory (see <a href="https://click.palletsprojects.com/en/8.0.x/api/#click.get_app_dir">click documentation for details</a>).</p>
-<p>The expected format is a list of entries (JSON objects) each containing the username, the user&rsquo;s <code>bcrypt</code> hashed+salted password and scopes they can access:</p>
+<p>The credentials file is expected to be a valid JSON file. Its location is
+specified by the <code>RALPH_AUTH_FILE</code> configuration value. By default, <code>ralph</code>
+will look for the <code>auth.json</code> file in the application directory (see <a href="https://click.palletsprojects.com/en/8.0.x/api/#click.get_app_dir">click
+documentation for
+details</a>).</p>
+<p>The expected format is a list of entries (JSON objects) each containing the
+username, the user&rsquo;s <code>bcrypt</code> hashed+salted password and scopes they can
+access:</p>
 <div class="highlight"><pre><span></span><code><span class="p">[</span><span class="w"></span>
 <span class="w">  </span><span class="p">{</span><span class="w"></span>
 <span class="w">    </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;john.doe@example.com&quot;</span><span class="p">,</span><span class="w"></span>
@@ -682,12 +688,19 @@ set up your credentials.</p>
 <span class="w">  </span><span class="p">}</span><span class="w"></span>
 <span class="p">]</span><span class="w"></span>
 </code></pre></div>
-<p>The hash can be generated with a python script executed directly in the command line:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Install bcrypt</span>
-$ python3 -m pip install bcrypt
-<span class="c1"># Generate the hash and print it to console</span>
-$ python3 -c <span class="s1">&#39;import bcrypt; print(bcrypt.hashpw(b&quot;PASSWORD&quot;, bcrypt.gensalt()).decode(&quot;ascii&quot;))&#39;</span>
+<p>To create a new user credentials, Ralph&rsquo;s CLI provides a dedicated command:</p>
+<div class="highlight"><pre><span></span><code>$ ralph auth <span class="se">\</span>
+    --user janedoe <span class="se">\</span>
+    --password supersecret <span class="se">\</span>
+    --scope janedoe_scope <span class="se">\</span>
+    -w
 </code></pre></div>
+<p>This command updates your credentials file with the new <code>janedoe</code> user.</p>
+<blockquote>
+<p>Note that running this command requires that you installed Ralph with the CLI
+optional dependencies, <em>e.g.</em> <code>pip install ralph-malph[cli]</code> (which we highly
+recommend).</p>
+</blockquote>
 <h3 id="making_a_get_request">Making a GET request<a class="headerlink" href="#making_a_get_request" title="Permanent link">&para;</a></h3>
 <p>The first request that can be answered by the ralph API server is a <code>whoami</code> request, which checks if the user is authenticated and returns their username and permission scopes.</p>
 <p>Use curl to get <code>http://localhost:8100/whoami</code>:</p>
