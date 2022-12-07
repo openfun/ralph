@@ -1,5 +1,6 @@
 """Authentication & authorization related tools for the Ralph API."""
 
+import logging
 from functools import lru_cache
 from pathlib import Path
 
@@ -18,6 +19,9 @@ UNUSED_PASSWORD = bcrypt.hashpw(b"ralph", bcrypt.gensalt())
 
 
 security = HTTPBasic()
+
+# API auth logger
+logger = logging.getLogger(__name__)
 
 
 class AuthenticatedUser(BaseModel):
@@ -90,7 +94,9 @@ def get_stored_credentials(auth_file: Path) -> ServerUsersCredentials:
     """
     auth_file = Path(auth_file)
     if not auth_file.exists():
-        raise AuthenticationError(f"Credentials file {auth_file} not found.")
+        msg = "Credentials file <%s> not found."
+        logger.warning(msg, auth_file)
+        raise AuthenticationError(msg.format(auth_file))
     return ServerUsersCredentials.parse_file(auth_file)
 
 
@@ -113,8 +119,12 @@ def authenticated_user(credentials: HTTPBasicCredentials = Depends(security)):
         )
         hashed_password = user.hash
     except StopIteration:
-        # next() gets the first item in the enumerable; if there is none, it raises
-        # a StopIteration error as it is out of bounds.
+        # next() gets the first item in the enumerable; if there is none, it
+        # raises a StopIteration error as it is out of bounds.
+        logger.warning(
+            "User %s tried to authenticate but this account does not exists",
+            credentials.username,
+        )
         hashed_password = None
     except AuthenticationError as exc:
         raise HTTPException(
@@ -122,8 +132,8 @@ def authenticated_user(credentials: HTTPBasicCredentials = Depends(security)):
         ) from exc
 
     if not hashed_password:
-        # We're doing a bogus password check anyway to avoid
-        # timing attacks on usernames
+        # We're doing a bogus password check anyway to avoid timing attacks on
+        # usernames
         bcrypt.checkpw(
             credentials.password.encode(settings.LOCALE_ENCODING), UNUSED_PASSWORD
         )
@@ -137,6 +147,10 @@ def authenticated_user(credentials: HTTPBasicCredentials = Depends(security)):
         credentials.password.encode(settings.LOCALE_ENCODING),
         hashed_password.encode(settings.LOCALE_ENCODING),
     ):
+        logger.warning(
+            "Authentication failed for user %s",
+            credentials.username,
+        )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials",
