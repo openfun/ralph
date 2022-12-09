@@ -460,12 +460,19 @@ def test_cli_fetch_command_usage():
     result = runner.invoke(cli, ["fetch", "--help"])
 
     assert result.exit_code == 0
+
     assert (
         "Options:\n"
-        "  -b, --backend [es|mongo|ldp|fs|swift|ws]\n"
+        "  -b, --backend [es|mongo|ldp|fs|swift|s3|ws]\n"
         "                                  Backend  [required]\n"
         "  ws backend: \n"
         "    --ws-uri TEXT\n"
+        "  s3 backend: \n"
+        "    --s3-bucket-name TEXT\n"
+        "    --s3-default-region TEXT\n"
+        "    --s3-session-token TEXT\n"
+        "    --s3-secret-access-key TEXT\n"
+        "    --s3-access-key-id TEXT\n"
         "  swift backend: \n"
         "    --swift-os-identity-api-version TEXT\n"
         "    --swift-os-auth-url TEXT\n"
@@ -506,7 +513,7 @@ def test_cli_fetch_command_usage():
     assert result.exit_code > 0
     assert (
         "Error: Missing option '-b' / '--backend'. "
-        "Choose from:\n\tes,\n\tmongo,\n\tldp,\n\tfs,\n\tswift,\n\tws\n"
+        "Choose from:\n\tes,\n\tmongo,\n\tldp,\n\tfs,\n\tswift,\n\ts3,\n\tws\n"
     ) in result.output
 
 
@@ -666,7 +673,14 @@ def test_cli_list_command_usage():
     assert result.exit_code == 0
     assert (
         "Options:\n"
-        "  -b, --backend [ldp|fs|swift]    Backend  [required]\n"
+        "  -b, --backend [ldp|fs|swift|s3]\n"
+        "                                  Backend  [required]\n"
+        "  s3 backend: \n"
+        "    --s3-bucket-name TEXT\n"
+        "    --s3-default-region TEXT\n"
+        "    --s3-session-token TEXT\n"
+        "    --s3-secret-access-key TEXT\n"
+        "    --s3-access-key-id TEXT\n"
         "  swift backend: \n"
         "    --swift-os-identity-api-version TEXT\n"
         "    --swift-os-auth-url TEXT\n"
@@ -695,7 +709,7 @@ def test_cli_list_command_usage():
     assert result.exit_code > 0
     assert (
         "Error: Missing option '-b' / '--backend'. Choose from:\n\tldp,\n\tfs,\n\t"
-        "swift\n"
+        "swift,\n\ts3\n"
     ) in result.output
 
 

@@ -9,7 +9,10 @@ from contextlib import asynccontextmanager
 from enum import Enum
 from functools import lru_cache
 from multiprocessing import Process
+from pathlib import Path
 
+import boto3
+import botocore
 import pytest
 import uvicorn
 import websockets
@@ -20,6 +23,7 @@ from pymongo.errors import CollectionInvalid
 
 from ralph.backends.database.es import ESDatabase
 from ralph.backends.database.mongo import MongoDatabase
+from ralph.backends.storage.s3 import S3Storage
 from ralph.backends.storage.swift import SwiftStorage
 
 # Elasticsearch backend defaults
@@ -230,6 +234,35 @@ def swift():
         )
 
     return get_swift_storage
+
+
+@pytest.fixture()
+def moto_fs(fs):
+    """Fix the incompatibility between moto and pyfakefs"""
+    # pylint:disable=invalid-name
+
+    for module in [boto3, botocore]:
+        module_dir = Path(module.__file__).parent
+        fs.add_real_directory(module_dir, lazy_read=False)
+
+
+@pytest.fixture
+def s3():
+    """Returns get_s3_storage function."""
+    # pylint:disable=invalid-name
+
+    def get_s3_storage():
+        """Returns an instance of S3Storage."""
+
+        return S3Storage(
+            access_key_id="access_key_id",
+            secret_access_key="secret_access_key",
+            session_token="session_token",
+            default_region="default-region",
+            bucket_name="bucket_name",
+        )
+
+    return get_s3_storage
 
 
 @pytest.fixture

@@ -13,6 +13,8 @@ from .fixtures.backends import (  # noqa: F401
     lrs,
     mongo,
     mongo_forwarding,
+    moto_fs,
+    s3,
     swift,
     ws,
 )

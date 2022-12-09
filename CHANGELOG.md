@@ -12,6 +12,7 @@ and this project adheres to
 
 - Add a new `auth` subcommand to generate required credentials file for the LRS
 - Add an official Helm Chart (experimental)
+- Implement support for AWS S3 storage backend
 
 ### Changed
 
