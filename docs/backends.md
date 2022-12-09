@@ -100,6 +100,25 @@ Secondary parameters are required to work with the target container:
 - `os_tenant_name`: the name of the tenant of your container
 - `os_tenant_id`: the identifier of the tenant of your container
 
+### Amazon S3
+
+S3 is the Amazon Simple Storage Service. This storage backend is fully
+supported (read and write operations) to stream and store log archives.
+
+#### Backend parameters
+
+Primarily required parameters correspond to a standard authentication with AWS CLI:
+
+- `access_key_id`: the access key for your AWS account
+- `secret_access_key`: the secret key for your AWS account
+- `session_token`: the session key for your AWS account (only needed when you are using
+temporary credentials).
+
+Secondary parameters are required to work with the target bucket:
+
+- `default_region`: the region where your bucket is
+- `bucket_name`: the name of your S3 bucket
+
 ### File system
 
 The file system backend is a dummy template that can be used to develop your

@@ -145,12 +145,25 @@ class SWIFTStorageBackendSettings(InstantiableSettingsItem):
     OS_IDENTITY_API_VERSION: str = "3"
 
 
+class S3StorageBackendSettings(InstantiableSettingsItem):
+    """Represents the S3 storage backend configuration settings."""
+
+    _class_path: str = "ralph.backends.storage.s3.S3Storage"
+
+    ACCESS_KEY_ID: str = None
+    SECRET_ACCESS_KEY: str = None
+    SESSION_TOKEN: str = None
+    DEFAULT_REGION: str = None
+    BUCKET_NAME: str = None
+
+
 class StorageBackendSettings(BaseModel):
     """Pydantic model for storage backend configuration settings."""
 
     LDP: LDPStorageBackendSettings = LDPStorageBackendSettings()
     FS: FSStorageBackendSettings = FSStorageBackendSettings()
     SWIFT: SWIFTStorageBackendSettings = SWIFTStorageBackendSettings()
+    S3: S3StorageBackendSettings = S3StorageBackendSettings()
 
 
 # Active storage backend Settings.
