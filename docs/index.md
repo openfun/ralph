@@ -111,7 +111,7 @@ decisions.
 
 We try to raise our code quality standards and expect contributors to follow
 the recommendations from our
-[handbook](https://openfun.gitbooks.io/handbook/content).
+[handbook](https://handbook.openfun.fr).
 
 ## License
 
