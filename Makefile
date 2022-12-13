@@ -30,6 +30,9 @@ ARNOLD_ENVIRONMENT ?= development
 RALPH_IMAGE_NAME         ?= ralph
 RALPH_IMAGE_TAG          ?= development
 RALPH_IMAGE_BUILD_TARGET ?= development
+RALPH_LRS_AUTH_USER_NAME  = ralph
+RALPH_LRS_AUTH_USER_PWD   = secret
+RALPH_LRS_AUTH_USER_SCOPE = ralph_scope
 
 # -- K3D
 K3D_CLUSTER_NAME              ?= ralph
@@ -55,6 +58,15 @@ bin/init-cluster:
 
 .env:
 	cp .env.dist .env
+
+.ralph/auth.json:
+	@$(COMPOSE_RUN) app ralph \
+		auth \
+		-u $(RALPH_LRS_AUTH_USER_NAME) \
+		-p $(RALPH_LRS_AUTH_USER_PWD) \
+		-s $(RALPH_LRS_AUTH_USER_SCOPE) \
+		-w
+
 
 # -- Docker/compose
 arnold-bootstrap: ## bootstrap arnold's project
@@ -100,6 +112,7 @@ bootstrap: \
   .env \
   build \
   dev \
+  .ralph/auth.json \
   es-index
 .PHONY: bootstrap
 
