@@ -136,10 +136,12 @@ down: ## stop and remove backend containers
 	@$(COMPOSE) down
 .PHONY: down
 
-es-index: ## create elasticsearch index and sample documents
+es-index: ## create elasticsearch index
 es-index: run-es
-	@echo "Creating $(ES_INDEX) index"
-	bin/es index $(ES_INDEX)
+	@echo "Creating $(ES_INDEX) index..."
+	curl -X PUT $(ES_URL)/$(ES_INDEX)
+	@echo -e "\nConfiguring $(ES_INDEX) index..."
+	curl -X PUT $(ES_URL)/$(ES_INDEX)/_settings -H 'Content-Type: application/json' -d '{"index": {"number_of_replicas": 0}}'
 .PHONY: es-index
 
 k3d-cluster: ## boot a k3d cluster for k8s-related development
