@@ -49,21 +49,28 @@ class UserCredentials(AuthenticatedUser):
 
 
 class ServerUsersCredentials(BaseModel):
-    """Custom root pydantic model describing expected list of all server users
-    credentials as stored in the credentials file."""
+    """Custom root pydantic model.
+
+    Describes expected list of all server users credentials as stored in
+    the credentials file.
+
+    Attributes:
+        __root__ (List): Custom root consisting of the
+                        list of all server users credentials.
+    """
 
     __root__: list[UserCredentials]
 
-    def __add__(self, other):
+    def __add__(self, other):  # noqa: D105
         return ServerUsersCredentials.parse_obj(self.__root__ + other.__root__)
 
-    def __getitem__(self, item: int):
+    def __getitem__(self, item: int):  # noqa: D105
         return self.__root__[item]
 
-    def __len__(self):
+    def __len__(self):  # noqa: D105
         return len(self.__root__)
 
-    def __iter__(self):
+    def __iter__(self):  # noqa: D105
         return iter(self.__root__)
 
     @root_validator
