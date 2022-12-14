@@ -6,7 +6,7 @@ SHELL := /bin/bash
 DOCKER_UID           = $(shell id -u)
 DOCKER_GID           = $(shell id -g)
 DOCKER_USER          = $(DOCKER_UID):$(DOCKER_GID)
-COMPOSE              = DOCKER_USER=$(DOCKER_USER) docker-compose
+COMPOSE              = DOCKER_USER=$(DOCKER_USER) docker compose
 COMPOSE_RUN          = $(COMPOSE) run --rm
 COMPOSE_TEST_RUN     = $(COMPOSE_RUN)
 COMPOSE_TEST_RUN_APP = $(COMPOSE_TEST_RUN) app
@@ -125,7 +125,7 @@ build: .env
 .PHONY: build
 
 dev: ## perform editable install from mounted project sources
-	DOCKER_USER=0 docker-compose run --rm app pip install -e ".[dev]"
+	DOCKER_USER=0 docker compose run --rm app pip install -e ".[dev]"
 .PHONY: dev
 
 docker-hub:  ## Publish locally built image
@@ -262,7 +262,7 @@ run-swift: ## start swift backend
 	@$(COMPOSE_RUN) dockerize -wait tcp://swift:8080 -wait tcp://swift:35357 -timeout 60s
 .PHONY: run-swift
 
-status: ## an alias for "docker-compose ps"
+status: ## an alias for "docker compose ps"
 	@$(COMPOSE) ps
 .PHONY: status
 
