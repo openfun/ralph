@@ -1,4 +1,4 @@
-"""S3 storage backend for Ralph"""
+"""S3 storage backend for Ralph."""
 
 import logging
 
@@ -34,7 +34,6 @@ class S3Storage(
         bucket_name: str = s3_settings.BUCKET_NAME,
     ):
         """Instantiates the AWS S3 client."""
-
         self.access_key_id = access_key_id
         self.secret_access_key = secret_access_key
         self.session_token = session_token
@@ -60,7 +59,6 @@ class S3Storage(
 
     def list(self, details=False, new=False):
         """Lists archives in the storage backend."""
-
         archives_to_skip = set()
         if new:
             archives_to_skip = set(self.get_command_history(self.name, "fetch"))
@@ -89,12 +87,10 @@ class S3Storage(
 
     def url(self, name):
         """Gets `name` file absolute URL."""
-
         return f"{self.bucket_name}.s3.{self.default_region}.amazonaws.com/{name}"
 
     def read(self, name, chunk_size: int = 4096):
         """Reads `name` file and yields its content by chunks of a given size."""
-
         logger.debug("Getting archive: %s", name)
 
         try:
@@ -124,7 +120,6 @@ class S3Storage(
 
     def write(self, stream, name, overwrite=False):
         """Writes data from `stream` to the `name` target."""
-
         if not overwrite and name in list(self.list()):
             msg = "%s already exists and overwrite is not allowed"
             logger.error(msg, name)
