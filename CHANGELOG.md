@@ -17,7 +17,7 @@ and this project adheres to
 
 - Upgrade `fastapi` to `0.88.0`
 - Upgrade `httpx` to `0.23.1`
-- Upgrade `sentry_sdk` to `1.11.1`
+- Upgrade `sentry_sdk` to `1.12.0`
 - Upgrade `uvicorn` to `0.20.0`
 - Tray: add the `ca_certs` path for the ES backend client option (LRS)
 - Improve Sentry integration for the LRS
