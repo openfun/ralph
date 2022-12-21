@@ -50,6 +50,17 @@ FROM core as development
 # Copy all sources, not only runtime-required files
 COPY . /app/
 
+# Only the M1 Mac images need these packages installed
+ARG TARGETPLATFORM
+RUN if [ "$TARGETPLATFORM" = "linux/arm64" ]; \
+    then apt-get update && \
+        apt-get install -y \
+            build-essential \
+            gcc \
+            python-dev && \
+        rm -rf /var/lib/apt/lists/*; \
+    fi;
+
 # Uninstall ralph and re-install it in editable mode along with development
 # dependencies
 RUN pip uninstall -y ralph-malph
