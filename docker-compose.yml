@@ -40,6 +40,22 @@ services:
     ports:
       - "27017:27017"
 
+  clickhouse:
+      image: clickhouse/clickhouse-server:23.1.1.3077-alpine
+      environment:
+          CLICKHOUSE_DB: xapi
+          CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+      ports:
+          - 8123:8123
+          - 9000:9000
+      # ClickHouse needs to maintain a lot of open files, so they
+      # suggest running the container with increased limits:
+      # https://hub.docker.com/r/clickhouse/clickhouse-server/#!
+      ulimits:
+          nofile:
+              soft: 262144
+              hard: 262144
+
   swift:
     image: kklopfenstein/openstack-swift-keystone-docker
     ports:

@@ -1,5 +1,4 @@
 """Tests for Ralph cli."""
-
 import json
 import logging
 from pathlib import Path
@@ -161,30 +160,6 @@ def test_cli_help_option():
     ) in result.output
 
 
-def test_cli_auth_command_usage():
-    """Test ralph auth command usage."""
-    runner = CliRunner()
-    result = runner.invoke(cli, ["auth", "--help"])
-
-    assert result.exit_code == 0
-    assert (
-        "Options:\n"
-        "  -u, --username TEXT  The user for which we generate credentials.  "
-        "[required]\n"
-        "  -p, --password TEXT  The password to encrypt for this user. Will be "
-        "prompted\n"
-        "                       if missing.  [required]\n"
-        "  -s, --scope TEXT     The user scope(s). This option can be provided "
-        "multiple\n"
-        "                       times.  [required]\n"
-        "  -w, --write          Write new credentials to the LRS authentication file.\n"
-    ) in result.output
-
-    result = runner.invoke(cli, ["auth"])
-    assert result.exit_code > 0
-    assert "Error: Missing option '-u' / '--username'." in result.output
-
-
 def test_cli_auth_command_without_writing_auth_file():
     """Test ralph auth command when credentials are displayed in the tty."""
     runner = CliRunner()
@@ -295,25 +270,6 @@ def test_cli_auth_command_when_writing_auth_file_whith_incorrect_auth_file(fs):
     assert auth_file.read_text(encoding="utf-8") == contents
 
 
-def test_cli_extract_command_usage():
-    """Tests ralph extract command usage."""
-    runner = CliRunner()
-    result = runner.invoke(cli, ["extract", "--help"])
-
-    assert result.exit_code == 0
-    assert (
-        "Options:\n"
-        "  -p, --parser [gelf|es]  Container format parser used to extract events\n"
-        "                          [required]\n"
-    ) in result.output
-
-    result = runner.invoke(cli, ["extract"])
-    assert result.exit_code > 0
-    assert (
-        "Error: Missing option '-p' / '--parser'. Choose from:\n\tgelf,\n\tes\n"
-    ) in result.output
-
-
 def test_cli_extract_command_with_gelf_parser(gelf_logger):
     """Tests the extract command using the GELF parser."""
     gelf_logger.info('{"username": "foo"}')
@@ -353,26 +309,6 @@ def test_cli_extract_command_with_es_parser():
     assert "\n".join([json.dumps({"id": idx}) for idx in range(10)]) in result.output
 
 
-def test_cli_validate_command_usage():
-    """Tests ralph validate command usage."""
-    runner = CliRunner()
-    result = runner.invoke(cli, ["validate", "--help"])
-
-    assert result.exit_code == 0
-    assert (
-        "Options:\n"
-        "  -f, --format [edx|xapi]  Input events format to validate  [required]\n"
-        "  -I, --ignore-errors      Continue validating regardless of raised errors\n"
-        "  -F, --fail-on-unknown    Stop validating at first unknown event\n"
-    ) in result.output
-
-    result = runner.invoke(cli, ["validate"])
-    assert result.exit_code > 0
-    assert (
-        "Error: Missing option '-f' / '--format'. Choose from:\n\tedx,\n\txapi\n"
-    ) in result.output
-
-
 @custom_given(UIPageClose)
 def test_cli_validate_command_with_edx_format(event):
     """Tests the validate command using the edx format."""
@@ -380,32 +316,6 @@ def test_cli_validate_command_with_edx_format(event):
     runner = CliRunner()
     result = runner.invoke(cli, ["validate", "-f", "edx"], input=event_str)
     assert event_str in result.output
-
-
-def test_cli_convert_command_usage():
-    """Tests ralph convert command usage."""
-    runner = CliRunner()
-    result = runner.invoke(cli, ["convert", "--help"])
-
-    assert result.exit_code == 0
-    assert (
-        "Options:\n"
-        "  From edX to xAPI converter options: \n"
-        "    -u, --uuid-namespace TEXT     The UUID namespace to use for the `ID` "
-        "field\n"
-        "                                  generation\n"
-        "    -p, --platform-url TEXT       The `actor.account.homePage` to use in the\n"
-        "                                  xAPI statements  [required]\n"
-        "  -f, --from [edx]                Input events format to convert  [required]\n"
-        "  -t, --to [xapi]                 Output events format  [required]\n"
-        "  -I, --ignore-errors             Continue writing regardless of raised "
-        "errors\n"
-        "  -F, --fail-on-unknown           Stop converting at first unknown event\n"
-    ) in result.output
-
-    result = runner.invoke(cli, ["convert"])
-    assert result.exit_code > 0
-    assert "Error: Missing option '-p' / '--platform-url'" in result.output
 
 
 @custom_given(UIPageClose)
@@ -452,69 +362,6 @@ def test_cli_verbosity_option_should_impact_logging_behaviour(verbosity):
     runner = CliRunner()
     result = runner.invoke(cli, ["-v", verbosity, "dummy-verbosity-check"])
     assert verbosity in result.output
-
-
-def test_cli_fetch_command_usage():
-    """Tests ralph fetch command usage."""
-    runner = CliRunner()
-    result = runner.invoke(cli, ["fetch", "--help"])
-
-    assert result.exit_code == 0
-
-    assert (
-        "Options:\n"
-        "  -b, --backend [es|mongo|ldp|fs|swift|s3|ws]\n"
-        "                                  Backend  [required]\n"
-        "  ws backend: \n"
-        "    --ws-uri TEXT\n"
-        "  s3 backend: \n"
-        "    --s3-bucket-name TEXT\n"
-        "    --s3-default-region TEXT\n"
-        "    --s3-session-token TEXT\n"
-        "    --s3-secret-access-key TEXT\n"
-        "    --s3-access-key-id TEXT\n"
-        "  swift backend: \n"
-        "    --swift-os-identity-api-version TEXT\n"
-        "    --swift-os-auth-url TEXT\n"
-        "    --swift-os-project-domain-name TEXT\n"
-        "    --swift-os-user-domain-name TEXT\n"
-        "    --swift-os-storage-url TEXT\n"
-        "    --swift-os-region-name TEXT\n"
-        "    --swift-os-password TEXT\n"
-        "    --swift-os-username TEXT\n"
-        "    --swift-os-tenant-name TEXT\n"
-        "    --swift-os-tenant-id TEXT\n"
-        "  fs backend: \n"
-        "    --fs-path TEXT\n"
-        "  ldp backend: \n"
-        "    --ldp-stream-id TEXT\n"
-        "    --ldp-service-name TEXT\n"
-        "    --ldp-consumer-key TEXT\n"
-        "    --ldp-application-secret TEXT\n"
-        "    --ldp-application-key TEXT\n"
-        "    --ldp-endpoint TEXT\n"
-        "  mongo backend: \n"
-        "    --mongo-client-options KEY=VALUE,KEY=VALUE\n"
-        "    --mongo-collection TEXT\n"
-        "    --mongo-database TEXT\n"
-        "    --mongo-connection-uri TEXT\n"
-        "  es backend: \n"
-        "    --es-op-type TEXT\n"
-        "    --es-client-options KEY=VALUE,KEY=VALUE\n"
-        "    --es-index TEXT\n"
-        "    --es-hosts VALUE1,VALUE2,VALUE3\n"
-        "  -c, --chunk-size INTEGER        Get events by chunks of size #\n"
-        '  -q, --query \'{"KEY": "VALUE", "KEY": "VALUE"}\'\n'
-        "                                  Query object as a JSON string (database\n"
-        "                                  backends ONLY)\n"
-    ) in result.output
-
-    result = runner.invoke(cli, ["fetch"])
-    assert result.exit_code > 0
-    assert (
-        "Error: Missing option '-b' / '--backend'. "
-        "Choose from:\n\tes,\n\tmongo,\n\tldp,\n\tfs,\n\tswift,\n\ts3,\n\tws\n"
-    ) in result.output
 
 
 def test_cli_fetch_command_with_ldp_backend(monkeypatch):
@@ -678,54 +525,6 @@ def test_cli_fetch_command_with_ws_backend(events, ws):
         ["fetch", "-b", "ws", "--ws-uri", f"ws://{WS_TEST_HOST}:{WS_TEST_PORT}"],
     )
     assert "\n".join([json.dumps(event) for event in events]) in result.output
-
-
-def test_cli_list_command_usage():
-    """Tests ralph list command usage."""
-    runner = CliRunner()
-    result = runner.invoke(cli, ["list", "--help"])
-
-    assert result.exit_code == 0
-    assert (
-        "Options:\n"
-        "  -b, --backend [ldp|fs|swift|s3]\n"
-        "                                  Backend  [required]\n"
-        "  s3 backend: \n"
-        "    --s3-bucket-name TEXT\n"
-        "    --s3-default-region TEXT\n"
-        "    --s3-session-token TEXT\n"
-        "    --s3-secret-access-key TEXT\n"
-        "    --s3-access-key-id TEXT\n"
-        "  swift backend: \n"
-        "    --swift-os-identity-api-version TEXT\n"
-        "    --swift-os-auth-url TEXT\n"
-        "    --swift-os-project-domain-name TEXT\n"
-        "    --swift-os-user-domain-name TEXT\n"
-        "    --swift-os-storage-url TEXT\n"
-        "    --swift-os-region-name TEXT\n"
-        "    --swift-os-password TEXT\n"
-        "    --swift-os-username TEXT\n"
-        "    --swift-os-tenant-name TEXT\n"
-        "    --swift-os-tenant-id TEXT\n"
-        "  fs backend: \n"
-        "    --fs-path TEXT\n"
-        "  ldp backend: \n"
-        "    --ldp-stream-id TEXT\n"
-        "    --ldp-service-name TEXT\n"
-        "    --ldp-consumer-key TEXT\n"
-        "    --ldp-application-secret TEXT\n"
-        "    --ldp-application-key TEXT\n"
-        "    --ldp-endpoint TEXT\n"
-        "  -n, --new / -a, --all           List not fetched (or all) archives\n"
-        "  -D, --details / -I, --ids       Get archives detailed output (JSON)\n"
-    ) in result.output
-
-    result = runner.invoke(cli, ["list"])
-    assert result.exit_code > 0
-    assert (
-        "Error: Missing option '-b' / '--backend'. Choose from:\n\tldp,\n\tfs,\n\t"
-        "swift,\n\ts3\n"
-    ) in result.output
 
 
 def test_cli_list_command_with_ldp_backend(monkeypatch):
@@ -922,30 +721,6 @@ def test_cli_push_command_with_es_backend(es):
     assert [document.get("_source") for document in documents] == records
 
 
-def test_cli_runserver_command_usage():
-    """Tests ralph runserver command usage."""
-    runner = CliRunner()
-    result = runner.invoke(cli, ["runserver", "--help"])
-
-    assert result.exit_code == 0
-    assert (
-        "Options:\n"
-        "  -b, --backend [es|mongo]        Backend  [required]\n"
-        "  mongo backend: \n"
-        "    --mongo-client-options KEY=VALUE,KEY=VALUE\n"
-        "    --mongo-collection TEXT\n"
-        "    --mongo-database TEXT\n"
-        "    --mongo-connection-uri TEXT\n"
-        "  es backend: \n"
-        "    --es-op-type TEXT\n"
-        "    --es-client-options KEY=VALUE,KEY=VALUE\n"
-        "    --es-index TEXT\n"
-        "    --es-hosts VALUE1,VALUE2,VALUE3\n"
-        "  -h, --host TEXT                 LRS server host name\n"
-        "  -p, --port INTEGER              LRS server port\n"
-    ) in result.output
-
-
 @pytest.mark.parametrize("host_,port_", [("0.0.0.0", "8000"), ("127.0.0.1", "80")])
 def test_cli_runserver_command_with_host_and_port_arguments(host_, port_, monkeypatch):
     """Tests the ralph runserver command should consider the host and port arguments."""
@@ -969,10 +744,18 @@ def test_cli_runserver_command_environment_file_generation(monkeypatch):
     def mock_uvicorn_run(_, env_file=None, **kwargs):
         """Mocks uvicorn.run asserting environment file content."""
         with open(env_file, mode="r", encoding=settings.LOCALE_ENCODING) as file:
-            assert file.readlines() == [
+            env_lines = [
                 f"RALPH_RUNSERVER_BACKEND={settings.RUNSERVER_BACKEND}\n",
                 "RALPH_BACKENDS__DATABASE__ES__INDEX=foo\n",
                 "RALPH_BACKENDS__DATABASE__ES__CLIENT_OPTIONS__verify_certs=True\n",
+                "RALPH_BACKENDS__DATABASE__CLICKHOUSE__EVENT_TABLE_NAME="
+                f"{settings.BACKENDS.DATABASE.CLICKHOUSE.EVENT_TABLE_NAME}\n",
+                "RALPH_BACKENDS__DATABASE__CLICKHOUSE__DATABASE="
+                f"{settings.BACKENDS.DATABASE.CLICKHOUSE.DATABASE}\n",
+                "RALPH_BACKENDS__DATABASE__CLICKHOUSE__PORT="
+                f"{settings.BACKENDS.DATABASE.CLICKHOUSE.PORT}\n",
+                "RALPH_BACKENDS__DATABASE__CLICKHOUSE__HOST="
+                f"{settings.BACKENDS.DATABASE.CLICKHOUSE.HOST}\n",
                 "RALPH_BACKENDS__DATABASE__MONGO__COLLECTION="
                 f"{settings.BACKENDS.DATABASE.MONGO.COLLECTION}\n",
                 "RALPH_BACKENDS__DATABASE__MONGO__DATABASE="
@@ -984,6 +767,7 @@ def test_cli_runserver_command_environment_file_generation(monkeypatch):
                 "RALPH_BACKENDS__DATABASE__ES__HOSTS="
                 f"{','.join(settings.BACKENDS.DATABASE.ES.HOSTS)}\n",
             ]
+            assert file.readlines() == env_lines
 
     monkeypatch.setattr("ralph.cli.uvicorn.run", mock_uvicorn_run)
     runner = CliRunner()
