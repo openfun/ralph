@@ -117,7 +117,7 @@ def test_converter_convert_dict_event_with_empty_conversion_set(event):
             """Returns a set of ConversionItems used for conversion."""
             return set()
 
-    assert convert_dict_event(event, "", DummyBaseConversionSet()).dict() == {}
+    assert not convert_dict_event(event, "", DummyBaseConversionSet()).dict()
 
 
 @pytest.mark.parametrize("event", [{"foo": "foo_value", "bar": "bar_value"}])

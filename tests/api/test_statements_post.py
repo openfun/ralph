@@ -21,6 +21,7 @@ from tests.fixtures.backends import (
     MONGO_TEST_FORWARDING_COLLECTION,
     RUNSERVER_TEST_HOST,
     RUNSERVER_TEST_PORT,
+    get_clickhouse_test_backend,
     get_es_test_backend,
     get_mongo_test_backend,
 )
@@ -28,9 +29,13 @@ from tests.fixtures.backends import (
 client = TestClient(app)
 
 
-@pytest.mark.parametrize("backend", [get_es_test_backend, get_mongo_test_backend])
+@pytest.mark.parametrize(
+    "backend",
+    [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
+)
+# pylint: disable=too-many-arguments
 def test_api_statements_post_single_statement_directly(
-    backend, monkeypatch, auth_credentials, es, mongo
+    backend, monkeypatch, auth_credentials, es, mongo, clickhouse
 ):
     """Tests the post statements API route with one statement."""
     # pylint: disable=invalid-name,unused-argument
@@ -68,9 +73,13 @@ def test_api_statements_post_single_statement_directly(
     assert response.json() == {"statements": [statement]}
 
 
-@pytest.mark.parametrize("backend", [get_es_test_backend, get_mongo_test_backend])
+@pytest.mark.parametrize(
+    "backend",
+    [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
+)
+# pylint: disable=too-many-arguments
 def test_api_statements_post_statements_list_of_one(
-    backend, monkeypatch, auth_credentials, es, mongo
+    backend, monkeypatch, auth_credentials, es, mongo, clickhouse
 ):
     """Tests the post statements API route with one statement in a list."""
     # pylint: disable=invalid-name,unused-argument
@@ -107,9 +116,13 @@ def test_api_statements_post_statements_list_of_one(
     assert response.json() == {"statements": [statement]}
 
 
-@pytest.mark.parametrize("backend", [get_es_test_backend, get_mongo_test_backend])
+@pytest.mark.parametrize(
+    "backend",
+    [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
+)
+# pylint: disable=too-many-arguments
 def test_api_statements_post_statements_list(
-    backend, monkeypatch, auth_credentials, es, mongo
+    backend, monkeypatch, auth_credentials, es, mongo, clickhouse
 ):
     """Tests the post statements API route with two statements in a list."""
     # pylint: disable=invalid-name,unused-argument
@@ -166,9 +179,17 @@ def test_api_statements_post_statements_list(
     assert get_response.json() == {"statements": statements}
 
 
-@pytest.mark.parametrize("backend", [get_es_test_backend, get_mongo_test_backend])
+@pytest.mark.parametrize(
+    "backend",
+    [
+        get_es_test_backend,
+        get_clickhouse_test_backend,
+        get_mongo_test_backend,
+    ],
+)
+# pylint: disable=too-many-arguments
 def test_api_statements_post_statements_list_with_duplicates(
-    backend, monkeypatch, auth_credentials, es_data_stream, mongo
+    backend, monkeypatch, auth_credentials, es_data_stream, mongo, clickhouse
 ):
     """Tests the post statements API route with duplicate statement IDs should fail."""
     # pylint: disable=invalid-name,unused-argument
@@ -207,9 +228,13 @@ def test_api_statements_post_statements_list_with_duplicates(
     assert response.json() == {"statements": []}
 
 
-@pytest.mark.parametrize("backend", [get_es_test_backend, get_mongo_test_backend])
+@pytest.mark.parametrize(
+    "backend",
+    [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
+)
+# pylint: disable=too-many-arguments
 def test_api_statements_post_statements_list_with_duplicate_of_existing_statement(
-    backend, monkeypatch, auth_credentials, es, mongo
+    backend, monkeypatch, auth_credentials, es, mongo, clickhouse
 ):
     """Tests the post statements API route, given a statement that already exist in the
     database (has the same ID), should fail.
@@ -258,9 +283,12 @@ def test_api_statements_post_statements_list_with_duplicate_of_existing_statemen
     assert response.json() == {"statements": [statement]}
 
 
-@pytest.mark.parametrize("backend", [get_es_test_backend, get_mongo_test_backend])
+@pytest.mark.parametrize(
+    "backend",
+    [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
+)
 def test_api_statements_post_statements_with_a_failure_during_storage(
-    backend, monkeypatch, auth_credentials, es, mongo
+    backend, monkeypatch, auth_credentials, es, mongo, clickhouse
 ):
     """Tests the post statements API route with a failure happening during storage."""
     # pylint: disable=invalid-name,unused-argument, too-many-arguments
@@ -298,9 +326,12 @@ def test_api_statements_post_statements_with_a_failure_during_storage(
     assert response.json() == {"detail": "Statements bulk indexation failed"}
 
 
-@pytest.mark.parametrize("backend", [get_es_test_backend, get_mongo_test_backend])
+@pytest.mark.parametrize(
+    "backend",
+    [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
+)
 def test_api_statements_post_statements_with_a_failure_during_id_query(
-    backend, monkeypatch, auth_credentials, es, mongo
+    backend, monkeypatch, auth_credentials, es, mongo, clickhouse
 ):
     """Tests the post statements API route with a failure during query execution."""
     # pylint: disable=invalid-name,unused-argument,too-many-arguments
@@ -340,9 +371,13 @@ def test_api_statements_post_statements_with_a_failure_during_id_query(
     assert response.json() == {"detail": "xAPI statements query failed"}
 
 
-@pytest.mark.parametrize("backend", [get_es_test_backend, get_mongo_test_backend])
+@pytest.mark.parametrize(
+    "backend",
+    [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
+)
+# pylint: disable=too-many-arguments
 def test_post_statements_list_without_statement_forwarding(
-    backend, auth_credentials, monkeypatch, es, mongo
+    backend, auth_credentials, monkeypatch, es, mongo, clickhouse
 ):
     """Tests the post statements API route, given an empty forwarding configuration,
     should not start the forwarding background task.

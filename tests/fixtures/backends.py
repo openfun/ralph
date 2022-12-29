@@ -13,6 +13,7 @@ from pathlib import Path
 
 import boto3
 import botocore
+import clickhouse_connect
 import pytest
 import uvicorn
 import websockets
@@ -21,11 +22,26 @@ from httpx import AsyncClient, ConnectError
 from pymongo import MongoClient
 from pymongo.errors import CollectionInvalid
 
+from ralph.backends.database.clickhouse import ClickHouseDatabase
 from ralph.backends.database.es import ESDatabase
 from ralph.backends.database.mongo import MongoDatabase
 from ralph.backends.storage.s3 import S3Storage
 from ralph.backends.storage.swift import SwiftStorage
 from ralph.conf import Settings, settings
+
+# ClickHouse backend defaults
+CLICKHOUSE_TEST_DATABASE = os.environ.get(
+    "RALPH_BACKENDS__DATABASE__CLICKHOUSE__TEST_DATABASE", "test_statements"
+)
+CLICKHOUSE_TEST_HOST = os.environ.get(
+    "RALPH_BACKENDS__DATABASE__CLICKHOUSE__TEST_HOST", "localhost"
+)
+CLICKHOUSE_TEST_PORT = os.environ.get(
+    "RALPH_BACKENDS__DATABASE__CLICKHOUSE__TEST_PORT", 8123
+)
+CLICKHOUSE_TEST_TABLE_NAME = os.environ.get(
+    "RALPH_BACKENDS__DATABASE__CLICKHOUSE__TEST_TABLE_NAME", "test_xapi_events_all"
+)
 
 # Elasticsearch backend defaults
 ES_TEST_INDEX = os.environ.get(
@@ -63,6 +79,17 @@ RUNSERVER_TEST_PORT = int(os.environ.get("RALPH_RUNSERVER_TEST_PORT", 8101))
 # Websocket test backend defaults
 WS_TEST_HOST = "localhost"
 WS_TEST_PORT = 8765
+
+
+@lru_cache()
+def get_clickhouse_test_backend():
+    """Returns a ClickHouseDatabase backend instance using test defaults."""
+    return ClickHouseDatabase(
+        host=CLICKHOUSE_TEST_HOST,
+        port=CLICKHOUSE_TEST_PORT,
+        database=CLICKHOUSE_TEST_DATABASE,
+        event_table_name=CLICKHOUSE_TEST_TABLE_NAME,
+    )
 
 
 @lru_cache
@@ -164,6 +191,63 @@ def mongo_forwarding():
     """Yields a second Mongo test client. See get_mongo_fixture above."""
     for mongo_client in get_mongo_fixture(collection=MONGO_TEST_FORWARDING_COLLECTION):
         yield mongo_client
+
+
+def get_clickhouse_fixture(
+    host=CLICKHOUSE_TEST_HOST,
+    port=CLICKHOUSE_TEST_PORT,
+    database=CLICKHOUSE_TEST_DATABASE,
+    event_table_name=CLICKHOUSE_TEST_TABLE_NAME,
+):
+    """Creates / deletes a ClickHouse test database + table and yields an
+    instantiated client.
+    """
+    client_options = {
+        "date_time_input_format": "best_effort",  # Allows RFC dates
+        "allow_experimental_object_type": 1,  # Allows JSON data type
+    }
+
+    client = clickhouse_connect.get_client(
+        host=host,
+        port=port,
+        settings=client_options,
+    )
+
+    sql = f"""CREATE DATABASE IF NOT EXISTS {database}"""
+    client.command(sql)
+
+    # Now get a client with the correct database
+    client = clickhouse_connect.get_client(
+        host=host,
+        port=port,
+        database=database,
+        settings=client_options,
+    )
+
+    sql = f"""DROP TABLE IF EXISTS {event_table_name}"""
+    client.command(sql)
+
+    sql = f"""
+        CREATE TABLE IF NOT EXISTS {event_table_name} (
+        event_id UUID NOT NULL,
+        emission_time DateTime64(6) NOT NULL,
+        event JSON NOT NULL,
+        event_str String NOT NULL
+        )
+        ENGINE MergeTree ORDER BY (emission_time, event_id)
+        PRIMARY KEY (emission_time, event_id)
+    """
+
+    client.command(sql)
+    yield client
+    client.command(f"DROP DATABASE {database}")
+
+
+@pytest.fixture
+def clickhouse():
+    """Yields a ClickHouse test client. See get_clickhouse_fixture above."""
+    for clickhouse_client in get_clickhouse_fixture():
+        yield clickhouse_client
 
 
 @pytest.fixture

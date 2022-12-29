@@ -23,7 +23,8 @@ and this project adheres to
 
 ### Added
 
-- Restored python 3.7+ support for library usage (models)
+- Restore python 3.7+ support for library usage (models)
+- Add ClickHouse database backend support
 
 ### Changed
 

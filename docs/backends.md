@@ -181,3 +181,32 @@ MongoDB backend parameters required to connect to a cluster are:
 The MongoDB client options supported in Ralph are:
 - `document_class`: default class to use for documents returned from queries
 - `tz_aware`: if True, datetime instances returned as values in a document will be timezone aware (otherwise they will be naive)
+
+
+### ClickHouse
+
+The ClickHouse backend can be used as a data lake and to fetch collections of
+documents from it.
+
+#### Backend parameters
+
+ClickHouse parameters required to connect are:
+        host: str = clickhouse_settings.HOST,
+        port: int = clickhouse_settings.PORT,
+        database: str = clickhouse_settings.DATABASE,
+        event_table_name: str = clickhouse_settings.EVENT_TABLE_NAME,
+        client_options: dict = clickhouse_settings.CLIENT_OPTIONS,
+- `host`: the connection hostname to connect to (_e.g._ `"clickhouse.yourhost.com"`)
+- `port`: the port to the ClickHouse HTTPS interface (_e.g._ `8123`)
+- `database`: the name of the database to connect to
+- `event_table_name`: the name of the table to write statements to
+- `client_options`: a comma separated key=value list of ClickHouse client options
+
+By default, the following client options are set, if you override the default 
+client options you must also set these:
+- `"date_time_input_format": "best_effort"` allows RFC date parsing
+- `"allow_experimental_object_type": 1` allows the JSON data type we use to store statements
+
+The ClickHouse client options supported in Ralph can be found in these locations:
+- [Python driver specific](https://clickhouse.com/docs/en/integrations/language-clients/python/driver-api#settings-argument)
+- [General ClickHouse client settings](https://clickhouse.com/docs/en/operations/settings/settings/)

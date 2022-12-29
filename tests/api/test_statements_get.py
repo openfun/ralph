@@ -9,13 +9,19 @@ from elasticsearch.helpers import bulk
 from fastapi.testclient import TestClient
 
 from ralph.api import app
+from ralph.backends.database.clickhouse import ClickHouseDatabase
 from ralph.backends.database.mongo import MongoDatabase
 from ralph.exceptions import BackendException
 
 from tests.fixtures.backends import (
+    CLICKHOUSE_TEST_DATABASE,
+    CLICKHOUSE_TEST_HOST,
+    CLICKHOUSE_TEST_PORT,
+    CLICKHOUSE_TEST_TABLE_NAME,
     ES_TEST_INDEX,
     MONGO_TEST_COLLECTION,
     MONGO_TEST_DATABASE,
+    get_clickhouse_test_backend,
     get_es_test_backend,
     get_mongo_test_backend,
 )
@@ -47,17 +53,39 @@ def insert_mongo_statements(mongo_client, statements):
     collection.insert_many(list(MongoDatabase.to_documents(statements)))
 
 
-@pytest.fixture(params=["es", "mongo"])
-def insert_statements_and_monkeypatch_backend(request, es, mongo, monkeypatch):
-    """Retuns a function that inserts statements into Elasticsearch and MongoDB."""
+def insert_clickhouse_statements(statements):
+    """Inserts a bunch of example statements into ClickHouse for testing."""
+    backend = ClickHouseDatabase(
+        host=CLICKHOUSE_TEST_HOST,
+        port=CLICKHOUSE_TEST_PORT,
+        database=CLICKHOUSE_TEST_DATABASE,
+        event_table_name=CLICKHOUSE_TEST_TABLE_NAME,
+    )
+    # documents = list(ClickHouseDatabase.to_documents(statements))
+    success = backend.put(statements)
+    assert success == len(statements)
+
+
+@pytest.fixture(params=["es", "mongo", "clickhouse"])
+# pylint: disable=unused-argument
+def insert_statements_and_monkeypatch_backend(
+    request, es, mongo, clickhouse, monkeypatch
+):
+    """Retuns a function that inserts statements into each backend."""
     # pylint: disable=invalid-name
 
     def _insert_statements_and_monkeypatch_backend(statements):
-        """Inserts statements once into Elasticsearch and once into MongoDB."""
+        """Inserts statements once into each backend."""
         database_client_class_path = "ralph.api.routers.statements.DATABASE_CLIENT"
         if request.param == "mongo":
             insert_mongo_statements(mongo, statements)
             monkeypatch.setattr(database_client_class_path, get_mongo_test_backend())
+            return
+        if request.param == "clickhouse":
+            insert_clickhouse_statements(statements)
+            monkeypatch.setattr(
+                database_client_class_path, get_clickhouse_test_backend()
+            )
             return
         insert_es_statements(es, statements)
         monkeypatch.setattr(database_client_class_path, get_es_test_backend())
@@ -377,7 +405,7 @@ def test_api_statements_get_statements_with_no_matching_statement(
     insert_statements_and_monkeypatch_backend(statements)
 
     response = client.get(
-        "/xAPI/statements/?statementId=foo",
+        "/xAPI/statements/?statementId=66c81e98-1763-4730-8cfc-f5ab34f1bad5",
         headers={"Authorization": f"Basic {auth_credentials}"},
     )
 

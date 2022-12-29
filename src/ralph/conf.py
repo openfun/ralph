@@ -80,6 +80,18 @@ class InstantiableSettingsItem(BaseModel):
 # Active database backend Settings.
 
 
+class ClickhouseDatabaseBackendSettings(InstantiableSettingsItem):
+    """Pydantic model for ClickHouse database backend configuration settings."""
+
+    _class_path: str = "ralph.backends.database.clickhouse.ClickHouseDatabase"
+
+    HOST: str = "localhost"
+    PORT: int = 8123
+    DATABASE: str = "xapi"
+    EVENT_TABLE_NAME: str = "xapi_events_all"
+    CLIENT_OPTIONS: dict = None
+
+
 class ClientOptions(BaseModel):
     """Pydantic model for additionnal client options."""
 
@@ -128,6 +140,7 @@ class DatabaseBackendSettings(BaseModel):
 
     ES: ESDatabaseBackendSettings = ESDatabaseBackendSettings()
     MONGO: MongoDatabaseBackendSettings = MongoDatabaseBackendSettings()
+    CLICKHOUSE: ClickhouseDatabaseBackendSettings = ClickhouseDatabaseBackendSettings()
 
 
 # Active storage backend Settings.
@@ -304,7 +317,7 @@ class Settings(BaseSettings):
         },
     }
     PARSERS: ParserSettings = ParserSettings()
-    RUNSERVER_BACKEND: Literal["es", "mongo"] = "es"
+    RUNSERVER_BACKEND: Literal["clickhouse", "es", "mongo"] = "es"
     RUNSERVER_HOST: str = "0.0.0.0"  # nosec
     RUNSERVER_MAX_SEARCH_HITS_COUNT: int = 100
     RUNSERVER_POINT_IN_TIME_KEEP_ALIVE: str = "1m"

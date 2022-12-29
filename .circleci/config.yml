@@ -140,7 +140,7 @@ jobs:
             - v1-dependencies-<< parameters.python-image >>-{{ .Revision }}
       - run:
           name: Install development dependencies
-          command: pip install --user .[backend-es,backend-ldp,backend-mongo,backend-swift,backend-ws,cli,dev,lrs]
+          command: pip install --user .[backend-clickhouse,backend-es,backend-ldp,backend-mongo,backend-swift,backend-ws,cli,dev,lrs]
       - save_cache:
           paths:
             - ~/.local
@@ -199,6 +199,10 @@ jobs:
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
+      - image: clickhouse/clickhouse-server:23.1.1.3077-alpine
+        auth:
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
     working_directory: ~/fun
     steps:
       - checkout
@@ -211,6 +215,7 @@ jobs:
             dockerize \
               -wait tcp://${HOSTNAME}:9200 \
               -wait tcp://${HOSTNAME}:27017 \
+              -wait tcp://${HOSTNAME}:9000 \
               -timeout 60s \
               ~/.local/bin/pytest
 
