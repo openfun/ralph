@@ -690,9 +690,9 @@ traces in xAPI format:</p>
 <p>At first, Ralph has been designed as a CLI to batch process your logs using
 base commands and UNIX standard streams (<code>stdin</code>, <code>stdout</code>) to connect them in
 a pipeline. A base example pipeline may be:</p>
-<div class="highlight"><pre><span></span><code>$ ralph fetch --backend swift my_archive.gzip <span class="p">|</span> <span class="se">\</span>
-    gunzip <span class="p">|</span> <span class="se">\</span>
-    ralph push --backend es
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>ralph<span class="w"> </span>fetch<span class="w"> </span>--backend<span class="w"> </span>swift<span class="w"> </span>my_archive.gzip<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>gunzip<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>ralph<span class="w"> </span>push<span class="w"> </span>--backend<span class="w"> </span>es
 </code></pre></div>
 <p>In this small pipeline, we stream <code>my_archive.gzip</code> content from a Swift
 container to the standard output (using the <code>fetch</code> command), uncompress the
@@ -711,33 +711,33 @@ python distribution).</p>
 </blockquote>
 <p>Ralph package can be installed from PyPI using the <code>pip</code> tool:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Create a new virtualenv (optional)</span>
-$ python3.9 -m venv venv
-$ <span class="nb">source</span> venv/bin/activate
+$<span class="w"> </span>python3.9<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>venv
+$<span class="w"> </span><span class="nb">source</span><span class="w"> </span>venv/bin/activate
 
 <span class="c1"># Install the full package (in a virtualenv)</span>
-<span class="o">(</span>venv<span class="o">)</span> $ pip install <span class="se">\</span>
-    ralph-malph<span class="o">[</span>backend-es,backend-ldp,backend-mongo,backend-swift,backend-ws,cli,lrs<span class="o">]</span>
+<span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>ralph-malph<span class="o">[</span>backend-es,backend-ldp,backend-mongo,backend-swift,backend-ws,cli,lrs<span class="o">]</span>
 
 <span class="c1"># Install only the core package with the Elasticsearch backend and the LRS (in</span>
 <span class="c1"># a virtualenv)</span>
-<span class="o">(</span>venv<span class="o">)</span> $ pip install ralph-malph<span class="o">[</span>backend-es,lrs<span class="o">]</span>
+<span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>ralph-malph<span class="o">[</span>backend-es,lrs<span class="o">]</span>
 
 <span class="c1"># Test the ralph command (it should be in your PATH)</span>
-<span class="o">(</span>venv<span class="o">)</span> $ ralph --help
+<span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>$<span class="w"> </span>ralph<span class="w"> </span>--help
 </code></pre></div>
 <p>If you only need to integrate <code>ralph</code> models in your project, you don&rsquo;t need to
 install the <code>backends</code>, <code>cli</code> or <code>lrs</code> extra dependencies, the core package is
 what you need:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Install the core library (in a virtualenv)</span>
-<span class="o">(</span>venv<span class="o">)</span> $ pip install ralph-malph
+<span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>ralph-malph
 </code></pre></div>
 <p>Alternatively, Docker users can pull the latest <code>ralph</code> image and start playing
 with it:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Pull latest docker image and get usage</span>
-$ docker run --rm -i fundocker/ralph:latest ralph --help
+$<span class="w"> </span>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-i<span class="w"> </span>fundocker/ralph:latest<span class="w"> </span>ralph<span class="w"> </span>--help
 
 <span class="c1"># Pro tip: define an alias to ease your life</span>
-$ <span class="nb">alias</span> <span class="nv">ralph</span><span class="o">=</span><span class="s2">&quot;docker run --rm -i fundocker/ralph:latest ralph&quot;</span>
+$<span class="w"> </span><span class="nb">alias</span><span class="w"> </span><span class="nv">ralph</span><span class="o">=</span><span class="s2">&quot;docker run --rm -i fundocker/ralph:latest ralph&quot;</span>
 </code></pre></div>
 <p>Now that <code>ralph</code> can be run from your system, we invite you to explore
 <a href="commands/">available commands</a>.</p>

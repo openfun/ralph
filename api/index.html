@@ -659,7 +659,7 @@
 (LRS) specification (still a work in progress).</p>
 <h2 id="getting_started">Getting started<a class="headerlink" href="#getting_started" title="Permanent link">&para;</a></h2>
 <p>The API server can be started up with the following command:</p>
-<div class="highlight"><pre><span></span><code>$ ralph runserver --backend es
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>ralph<span class="w"> </span>runserver<span class="w"> </span>--backend<span class="w"> </span>es
 </code></pre></div>
 <p>The <code>--backend</code> (or <code>-b</code>) option specifies which database backend to use for
 LRS data storage and retrieval. See Ralph&rsquo;s <a href="../backends/">backends
@@ -675,25 +675,25 @@ details</a>).</p>
 <p>The expected format is a list of entries (JSON objects) each containing the
 username, the user&rsquo;s <code>bcrypt</code> hashed+salted password and scopes they can
 access:</p>
-<div class="highlight"><pre><span></span><code><span class="p">[</span><span class="w"></span>
-<span class="w">  </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;john.doe@example.com&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;hash&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;$2b$12$yBXrzIuRIk6yaft5KUgVFOIPv0PskCCh9PXmF2t7pno.qUZ5LK0D2&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;scopes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;example_scope&quot;</span><span class="p">]</span><span class="w"></span>
-<span class="w">  </span><span class="p">},</span><span class="w"></span>
-<span class="w">  </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;simon.says@example.com&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;hash&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;$2b$12$yBXrzIuRIk6yaft5KUgVFOIPv0PskCCh9PXmF2t7pno.qUZ5LK0D2&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;scopes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;second_scope&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;third_scope&quot;</span><span class="p">]</span><span class="w"></span>
-<span class="w">  </span><span class="p">}</span><span class="w"></span>
-<span class="p">]</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="p">[</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;john.doe@example.com&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;hash&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;$2b$12$yBXrzIuRIk6yaft5KUgVFOIPv0PskCCh9PXmF2t7pno.qUZ5LK0D2&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;scopes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;example_scope&quot;</span><span class="p">]</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;simon.says@example.com&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;hash&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;$2b$12$yBXrzIuRIk6yaft5KUgVFOIPv0PskCCh9PXmF2t7pno.qUZ5LK0D2&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;scopes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;second_scope&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;third_scope&quot;</span><span class="p">]</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">]</span>
 </code></pre></div>
 <p>To create a new user credentials, Ralph&rsquo;s CLI provides a dedicated command:</p>
-<div class="highlight"><pre><span></span><code>$ ralph auth <span class="se">\</span>
-    --user janedoe <span class="se">\</span>
-    --password supersecret <span class="se">\</span>
-    --scope janedoe_scope <span class="se">\</span>
-    -w
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>ralph<span class="w"> </span>auth<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--user<span class="w"> </span>janedoe<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--password<span class="w"> </span>supersecret<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--scope<span class="w"> </span>janedoe_scope<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-w
 </code></pre></div>
 <p>This command updates your credentials file with the new <code>janedoe</code> user.</p>
 <blockquote>
@@ -704,14 +704,14 @@ recommend).</p>
 <h3 id="making_a_get_request">Making a GET request<a class="headerlink" href="#making_a_get_request" title="Permanent link">&para;</a></h3>
 <p>The first request that can be answered by the ralph API server is a <code>whoami</code> request, which checks if the user is authenticated and returns their username and permission scopes.</p>
 <p>Use curl to get <code>http://localhost:8100/whoami</code>:</p>
-<div class="highlight"><pre><span></span><code>$ curl http://localhost:8100/whoami
-&lt; HTTP/1.1 <span class="m">401</span> Unauthorized
-&lt; <span class="o">{</span><span class="s2">&quot;error&quot;</span>:<span class="s2">&quot;Not authenticated&quot;</span><span class="o">}</span>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>curl<span class="w"> </span>http://localhost:8100/whoami
+&lt;<span class="w"> </span>HTTP/1.1<span class="w"> </span><span class="m">401</span><span class="w"> </span>Unauthorized
+&lt;<span class="w"> </span><span class="o">{</span><span class="s2">&quot;error&quot;</span>:<span class="s2">&quot;Not authenticated&quot;</span><span class="o">}</span>
 </code></pre></div>
 <p>Send your username and password to the API server through HTTP Basic Auth:</p>
-<div class="highlight"><pre><span></span><code>$ curl --user john.doe@example.com:PASSWORD http://localhost:8100/whoami
-&lt; HTTP/1.1 <span class="m">200</span> OK
-&lt; <span class="o">{</span><span class="s2">&quot;username&quot;</span>:<span class="s2">&quot;john.doe@example.com&quot;</span>,<span class="s2">&quot;scopes&quot;</span>:<span class="o">[</span><span class="s2">&quot;authenticated&quot;</span>,<span class="s2">&quot;example_scope&quot;</span><span class="o">]}</span>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>curl<span class="w"> </span>--user<span class="w"> </span>john.doe@example.com:PASSWORD<span class="w"> </span>http://localhost:8100/whoami
+&lt;<span class="w"> </span>HTTP/1.1<span class="w"> </span><span class="m">200</span><span class="w"> </span>OK
+&lt;<span class="w"> </span><span class="o">{</span><span class="s2">&quot;username&quot;</span>:<span class="s2">&quot;john.doe@example.com&quot;</span>,<span class="s2">&quot;scopes&quot;</span>:<span class="o">[</span><span class="s2">&quot;authenticated&quot;</span>,<span class="s2">&quot;example_scope&quot;</span><span class="o">]}</span>
 </code></pre></div>
 <h3 id="forwarding_statements">Forwarding statements<a class="headerlink" href="#forwarding_statements" title="Permanent link">&para;</a></h3>
 <p>Ralph&rsquo;s API server can be configured to forward xAPI statements it receives to other

@@ -396,6 +396,26 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#amazon_s3" class="md-nav__link">
+    Amazon S3
+  </a>
+  
+    <nav class="md-nav" aria-label="Amazon S3">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend_parameters_2" class="md-nav__link">
+    Backend parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#file_system" class="md-nav__link">
     File system
   </a>
@@ -404,7 +424,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#backend_parameters_2" class="md-nav__link">
+  <a href="#backend_parameters_3" class="md-nav__link">
     Backend parameters
   </a>
   
@@ -437,7 +457,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#backend_parameters_3" class="md-nav__link">
+  <a href="#backend_parameters_4" class="md-nav__link">
     Backend parameters
   </a>
   
@@ -470,7 +490,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#backend_parameters_4" class="md-nav__link">
+  <a href="#backend_parameters_5" class="md-nav__link">
     Backend parameters
   </a>
   
@@ -768,6 +788,26 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#amazon_s3" class="md-nav__link">
+    Amazon S3
+  </a>
+  
+    <nav class="md-nav" aria-label="Amazon S3">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend_parameters_2" class="md-nav__link">
+    Backend parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#file_system" class="md-nav__link">
     File system
   </a>
@@ -776,7 +816,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#backend_parameters_2" class="md-nav__link">
+  <a href="#backend_parameters_3" class="md-nav__link">
     Backend parameters
   </a>
   
@@ -809,7 +849,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#backend_parameters_3" class="md-nav__link">
+  <a href="#backend_parameters_4" class="md-nav__link">
     Backend parameters
   </a>
   
@@ -842,7 +882,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#backend_parameters_4" class="md-nav__link">
+  <a href="#backend_parameters_5" class="md-nav__link">
     Backend parameters
   </a>
   
@@ -894,12 +934,12 @@ later is the <strong>recommended solution</strong> for sensible data such as ser
 credentials. If we consider the <code>os_username</code> (OpenStack user name) parameter
 of the OpenStack Swift backend, it can be set as a command line option using
 <code>swift</code> as the option prefix (and replacing underscores in its name by dashes):</p>
-<div class="highlight"><pre><span></span><code>$ ralph list --backend swift --swift-os-username johndoe <span class="c1"># [...] more options</span>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>ralph<span class="w"> </span>list<span class="w"> </span>--backend<span class="w"> </span>swift<span class="w"> </span>--swift-os-username<span class="w"> </span>johndoe<span class="w"> </span><span class="c1"># [...] more options</span>
 </code></pre></div>
 <p>Alternatively, this parameter can be set as an environment variable (in upper
 case, prefixed by the program name, <em>e.g.</em> <code>RALPH_</code>):</p>
-<div class="highlight"><pre><span></span><code>$ <span class="nb">export</span> <span class="nv">RALPH_BACKENDS__STORAGE__SWIFT__OS_USERNAME</span><span class="o">=</span><span class="s2">&quot;johndoe&quot;</span>
-$ ralph list --backend swift <span class="c1"># [...] more options</span>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">RALPH_BACKENDS__STORAGE__SWIFT__OS_USERNAME</span><span class="o">=</span><span class="s2">&quot;johndoe&quot;</span>
+$<span class="w"> </span>ralph<span class="w"> </span>list<span class="w"> </span>--backend<span class="w"> </span>swift<span class="w"> </span><span class="c1"># [...] more options</span>
 </code></pre></div>
 <p>The general patterns for backend parameters are:</p>
 <ul>
@@ -962,12 +1002,28 @@ OpenStack Keystone service:</p>
 <li><code>os_tenant_name</code>: the name of the tenant of your container</li>
 <li><code>os_tenant_id</code>: the identifier of the tenant of your container</li>
 </ul>
+<h3 id="amazon_s3">Amazon S3<a class="headerlink" href="#amazon_s3" title="Permanent link">&para;</a></h3>
+<p>S3 is the Amazon Simple Storage Service. This storage backend is fully
+supported (read and write operations) to stream and store log archives.</p>
+<h4 id="backend_parameters_2">Backend parameters<a class="headerlink" href="#backend_parameters_2" title="Permanent link">&para;</a></h4>
+<p>Primarily required parameters correspond to a standard authentication with AWS CLI:</p>
+<ul>
+<li><code>access_key_id</code>: the access key for your AWS account</li>
+<li><code>secret_access_key</code>: the secret key for your AWS account</li>
+<li><code>session_token</code>: the session key for your AWS account (only needed when you are using
+temporary credentials).</li>
+</ul>
+<p>Secondary parameters are required to work with the target bucket:</p>
+<ul>
+<li><code>default_region</code>: the region where your bucket is</li>
+<li><code>bucket_name</code>: the name of your S3 bucket</li>
+</ul>
 <h3 id="file_system">File system<a class="headerlink" href="#file_system" title="Permanent link">&para;</a></h3>
 <p>The file system backend is a dummy template that can be used to develop your
 own backend. It&rsquo;s a &ldquo;dummy&rdquo; backend as it&rsquo;s not required in a UNIX Shell
 context, the <code>ls</code> and <code>cat</code> commands used along with UNIX streams will do a
 better job.</p>
-<h4 id="backend_parameters_2">Backend parameters<a class="headerlink" href="#backend_parameters_2" title="Permanent link">&para;</a></h4>
+<h4 id="backend_parameters_3">Backend parameters<a class="headerlink" href="#backend_parameters_3" title="Permanent link">&para;</a></h4>
 <p>The only required parameter is the <code>path</code> we want to list or stream content
 from.</p>
 <h2 id="stream_backends">Stream backends<a class="headerlink" href="#stream_backends" title="Permanent link">&para;</a></h2>
@@ -978,7 +1034,7 @@ from.</p>
 data stream by following instructions from the
 <a href="https://docs.ovh.com/gb/en/logs-data-platform/ldp-tail/#retrieve-your-websocket-address">official documentation</a>.</p>
 </blockquote>
-<h4 id="backend_parameters_3">Backend parameters<a class="headerlink" href="#backend_parameters_3" title="Permanent link">&para;</a></h4>
+<h4 id="backend_parameters_4">Backend parameters<a class="headerlink" href="#backend_parameters_4" title="Permanent link">&para;</a></h4>
 <ul>
 <li><code>ws_uri</code>: the WebSocket uri (<em>e.g.</em> <code>wss://example.com/websocket</code>)</li>
 </ul>
@@ -986,7 +1042,7 @@ data stream by following instructions from the
 <h3 id="elasticsearch">Elasticsearch<a class="headerlink" href="#elasticsearch" title="Permanent link">&para;</a></h3>
 <p>Elasticsearch backend is mostly used for indexation purpose (as a datalake) but
 it can also be used to fetch indexed data from it.</p>
-<h4 id="backend_parameters_4">Backend parameters<a class="headerlink" href="#backend_parameters_4" title="Permanent link">&para;</a></h4>
+<h4 id="backend_parameters_5">Backend parameters<a class="headerlink" href="#backend_parameters_5" title="Permanent link">&para;</a></h4>
 <p>Elasticsearch backend parameters required to connect to a cluster are:</p>
 <ul>
 <li><code>hosts</code>: a list of cluster hosts to connect to (<em>e.g.</em> <code>["http://elasticsearch-node:9200"]</code>)</li>

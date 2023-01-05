@@ -762,24 +762,24 @@ have no effect while running Ralph.</p>
 </code></pre></div>
 <p>To lint your code, either use the <code>lint</code> meta target or one of the linting tools we use:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Run all linters</span>
-$ make lint
+$<span class="w"> </span>make<span class="w"> </span>lint
 
 <span class="c1"># Run pylint</span>
-$ make lint-pylint
+$<span class="w"> </span>make<span class="w"> </span>lint-pylint
 
 <span class="c1"># List available linters</span>
-$ make <span class="nb">help</span> <span class="p">|</span> grep lint-
+$<span class="w"> </span>make<span class="w"> </span><span class="nb">help</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>lint-
 </code></pre></div>
 <p>To run tests on your code, either use the <code>test</code> Make target or the
 <code>bin/pytest</code> script to pass specific arguments to the test runner:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Run all tests</span>
-$ make <span class="nb">test</span>
+$<span class="w"> </span>make<span class="w"> </span><span class="nb">test</span>
 
 <span class="c1"># Run pytest with options</span>
-$ bin/pytest -x -k mixins
+$<span class="w"> </span>bin/pytest<span class="w"> </span>-x<span class="w"> </span>-k<span class="w"> </span>mixins
 
 <span class="c1"># Run pytest with options and more debugging logs</span>
-$ bin/pytest -x -vvv -s --log-level<span class="o">=</span>DEBUG -k mixins
+$<span class="w"> </span>bin/pytest<span class="w"> </span>-x<span class="w"> </span>-vvv<span class="w"> </span>-s<span class="w"> </span>--log-level<span class="o">=</span>DEBUG<span class="w"> </span>-k<span class="w"> </span>mixins
 </code></pre></div>
 <h3 id="working_with_local_backends">Working with local backends<a class="headerlink" href="#working_with_local_backends" title="Permanent link">&para;</a></h3>
 <p>Not all backends are accessible in a local environment development; for now
@@ -798,34 +798,34 @@ them (temporally) if needed by typing this command from your terminal (as
 https://www.elastic.co/guide/en/elasticsearch/reference/master/vm-max-map-count.html</p>
 </blockquote>
 <p>Once configured, start available backends using:</p>
-<div class="highlight"><pre><span></span><code>$ make run-<span class="o">[</span>BACKEND<span class="o">]</span>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>make<span class="w"> </span>run-<span class="o">[</span>BACKEND<span class="o">]</span>
 </code></pre></div>
 <p>Substitute <code>[BACKEND]</code> by the backend name, <em>e.g.</em> <code>es</code> for Elasticsearch or
 <code>swift</code> for OpenStack Swift:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Start Elasticsearch local backend</span>
-$ make run-es
+$<span class="w"> </span>make<span class="w"> </span>run-es
 <span class="c1"># Start Swift local backend</span>
-$ make run-swift
+$<span class="w"> </span>make<span class="w"> </span>run-swift
 <span class="c1"># Start all local backends</span>
-$ make run-all
+$<span class="w"> </span>make<span class="w"> </span>run-all
 </code></pre></div>
 <p>Now that you have started at least the <code>elasticsearch</code> and <code>swift</code> backends,
 it&rsquo;s time to play with them:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Store a JSON file in the Swift backend</span>
-$ <span class="nb">echo</span> <span class="s1">&#39;{&quot;id&quot;: 1, &quot;foo&quot;: &quot;bar&quot;}&#39;</span> <span class="p">|</span> <span class="se">\</span>
-    ./bin/ralph push -b swift -f foo.json
+$<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;{&quot;id&quot;: 1, &quot;foo&quot;: &quot;bar&quot;}&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>./bin/ralph<span class="w"> </span>push<span class="w"> </span>-b<span class="w"> </span>swift<span class="w"> </span>-f<span class="w"> </span>foo.json
 
 <span class="c1"># Check that we have created a new JSON file in the Swift backend</span>
-$ bin/ralph list -b swift
+$<span class="w"> </span>bin/ralph<span class="w"> </span>list<span class="w"> </span>-b<span class="w"> </span>swift
 foo.json
 
 <span class="c1"># Fetch the content of the JSON file and index it in Elasticsearch</span>
-$ bin/ralph fetch -b swift foo.json <span class="p">|</span> <span class="se">\</span>
-    bin/ralph push -b es
+$<span class="w"> </span>bin/ralph<span class="w"> </span>fetch<span class="w"> </span>-b<span class="w"> </span>swift<span class="w"> </span>foo.json<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>bin/ralph<span class="w"> </span>push<span class="w"> </span>-b<span class="w"> </span>es
 
 <span class="c1"># Check that we have properly indexed the JSON file in Elasticsearch</span>
-$ bin/ralph fetch -b es
-<span class="o">{</span><span class="s2">&quot;id&quot;</span>: <span class="m">1</span>, <span class="s2">&quot;foo&quot;</span>: <span class="s2">&quot;bar&quot;</span><span class="o">}</span>
+$<span class="w"> </span>bin/ralph<span class="w"> </span>fetch<span class="w"> </span>-b<span class="w"> </span>es
+<span class="o">{</span><span class="s2">&quot;id&quot;</span>:<span class="w"> </span><span class="m">1</span>,<span class="w"> </span><span class="s2">&quot;foo&quot;</span>:<span class="w"> </span><span class="s2">&quot;bar&quot;</span><span class="o">}</span>
 </code></pre></div>
 <h2 id="ralphs_tray">Ralph&rsquo;s tray<a class="headerlink" href="#ralphs_tray" title="Permanent link">&para;</a></h2>
 <p>Ralph is distributed along with its tray (a deployable package for Kubernetes
@@ -847,7 +847,7 @@ work on this tray, please refer to Arnold&rsquo;s documentation first.</p>
 <h3 id="create_a_local_k3d_cluster">Create a local <code>k3d</code> cluster<a class="headerlink" href="#create_a_local_k3d_cluster" title="Permanent link">&para;</a></h3>
 <p>To create (or run) a local kubernetes cluster, we use <code>k3d</code>. The cluster&rsquo;s
 bootstrapping should be run <em>via</em>:</p>
-<div class="highlight"><pre><span></span><code>$ make k3d-cluster
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>make<span class="w"> </span>k3d-cluster
 </code></pre></div>
 <blockquote>
 <p>Running a k3d-cluster locally supposes that the 80 and 443 ports of your
@@ -856,115 +856,115 @@ responds properly. If one or both ports are already used by another service
 running on your machine, the <code>make k3d-cluster</code> command may fail.</p>
 </blockquote>
 <p>You can check that your cluster is running using the <code>k3d cluster</code> command:</p>
-<div class="highlight"><pre><span></span><code>$ k3d cluster list
-NAME     SERVERS   AGENTS   LOADBALANCER
-ralph    <span class="m">1</span>/1       <span class="m">0</span>/0      <span class="nb">true</span>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>k3d<span class="w"> </span>cluster<span class="w"> </span>list
+NAME<span class="w">     </span>SERVERS<span class="w">   </span>AGENTS<span class="w">   </span>LOADBALANCER
+ralph<span class="w">    </span><span class="m">1</span>/1<span class="w">       </span><span class="m">0</span>/0<span class="w">      </span><span class="nb">true</span>
 </code></pre></div>
 <p>As you can see, we are running a single node cluster called <code>ralph</code>.</p>
 <h3 id="bootstrap_an_arnold_project">Bootstrap an Arnold project<a class="headerlink" href="#bootstrap_an_arnold_project" title="Permanent link">&para;</a></h3>
 <p>Once your Kubernetes cluster is running, you need to create a standard Arnold
 project describing applications and environments you need to deploy:</p>
-<div class="highlight"><pre><span></span><code>$ make arnold-bootstrap
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>make<span class="w"> </span>arnold-bootstrap
 </code></pre></div>
 <p>Once bootstrapped, Arnold should have created a <code>group_vars</code> directory
 containing the following files:</p>
-<div class="highlight"><pre><span></span><code>$ tree group_vars
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>tree<span class="w"> </span>group_vars
 group_vars
-├── common
-└── customer
-    └── ralph
-        ├── development
-        │   ├── main.yml
-        │   └── secrets
-        │       ├── databases.vault.yml
-        │       ├── elasticsearch.vault.yml
-        │       └── ralph.vault.yml
-        └── main.yml
+├──<span class="w"> </span>common
+└──<span class="w"> </span>customer
+<span class="w">    </span>└──<span class="w"> </span>ralph
+<span class="w">        </span>├──<span class="w"> </span>development
+<span class="w">        </span>│<span class="w">   </span>├──<span class="w"> </span>main.yml
+<span class="w">        </span>│<span class="w">   </span>└──<span class="w"> </span>secrets
+<span class="w">        </span>│<span class="w">       </span>├──<span class="w"> </span>databases.vault.yml
+<span class="w">        </span>│<span class="w">       </span>├──<span class="w"> </span>elasticsearch.vault.yml
+<span class="w">        </span>│<span class="w">       </span>└──<span class="w"> </span>ralph.vault.yml
+<span class="w">        </span>└──<span class="w"> </span>main.yml
 
-<span class="m">5</span> directories, <span class="m">5</span> files
+<span class="m">5</span><span class="w"> </span>directories,<span class="w"> </span><span class="m">5</span><span class="w"> </span>files
 </code></pre></div>
 <p>To create the LRS credentials file, you need to provide a list of accounts
 allowed to request the LRS in Ralph&rsquo;s vault:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Setup your kubernetes environment</span>
-$ <span class="nb">source</span> .k3d-cluster.env.sh
+$<span class="w"> </span><span class="nb">source</span><span class="w"> </span>.k3d-cluster.env.sh
 
 <span class="c1"># Decrypt the vault</span>
-$ bin/arnold -d -c ralph -e development -- vault -a ralph decrypt
+$<span class="w"> </span>bin/arnold<span class="w"> </span>-d<span class="w"> </span>-c<span class="w"> </span>ralph<span class="w"> </span>-e<span class="w"> </span>development<span class="w"> </span>--<span class="w"> </span>vault<span class="w"> </span>-a<span class="w"> </span>ralph<span class="w"> </span>decrypt
 </code></pre></div>
 <p>Edit the vault file to add a new account for the <code>foo</code> user with the <code>bar</code>
 password and a relevant scope:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># group_vars/customer/ralph/development/secrets/ralph.vault.yml</span><span class="w"></span>
-<span class="c1">#</span><span class="w"></span>
-<span class="c1"># [...]</span><span class="w"></span>
-<span class="c1">#</span><span class="w"></span>
-<span class="c1"># LRS</span><span class="w"></span>
-<span class="nt">LRS_AUTH</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;foo&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;$2b$12$lCggI749U6TrzK7Qyr7xGe1KVSAXdPjtkMew.BD6lzIk//T5YSb72&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">scopes</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;foo_scope&quot;</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1"># group_vars/customer/ralph/development/secrets/ralph.vault.yml</span>
+<span class="c1">#</span>
+<span class="c1"># [...]</span>
+<span class="c1">#</span>
+<span class="c1"># LRS</span>
+<span class="nt">LRS_AUTH</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;foo&quot;</span>
+<span class="w">    </span><span class="nt">hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;$2b$12$lCggI749U6TrzK7Qyr7xGe1KVSAXdPjtkMew.BD6lzIk//T5YSb72&quot;</span>
+<span class="w">    </span><span class="nt">scopes</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;foo_scope&quot;</span>
 </code></pre></div>
 <p>The password hash has been generated using <code>bcrypt</code> as explained in the <a href="./api/#creating_a_credentials_file">API
 user guide</a>.</p>
 <p>And finally (re-)encrypt Ralph&rsquo;s vault:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Encrypt the vault</span>
-$ bin/arnold -d -c ralph -e development -- vault -a ralph encrypt
+$<span class="w"> </span>bin/arnold<span class="w"> </span>-d<span class="w"> </span>-c<span class="w"> </span>ralph<span class="w"> </span>-e<span class="w"> </span>development<span class="w"> </span>--<span class="w"> </span>vault<span class="w"> </span>-a<span class="w"> </span>ralph<span class="w"> </span>encrypt
 </code></pre></div>
 <p>You are now ready to create the related Kubernetes Secret while initializing
 Arnold project in the next step.</p>
 <h3 id="prepare_working_namespace">Prepare working namespace<a class="headerlink" href="#prepare_working_namespace" title="Permanent link">&para;</a></h3>
 <p>You are now ready to create required Kubernetes objects to start working on
 Ralph&rsquo;s deployment:</p>
-<div class="highlight"><pre><span></span><code>$ make arnold-init
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>make<span class="w"> </span>arnold-init
 </code></pre></div>
 <p>At this point an Elasticsearch cluster should be running on your Kubernetes
 cluster:</p>
-<div class="highlight"><pre><span></span><code>$ kubectl -n development-ralph get -l <span class="nv">app</span><span class="o">=</span>elasticsearch pod
-NAME                                         READY   STATUS      RESTARTS   AGE
-elasticsearch-node-0                         <span class="m">1</span>/1     Running     <span class="m">0</span>          69s
-elasticsearch-node-1                         <span class="m">1</span>/1     Running     <span class="m">0</span>          69s
-elasticsearch-node-2                         <span class="m">1</span>/1     Running     <span class="m">0</span>          69s
-es-index-template-j-221010-09h25m24s-nx5qz   <span class="m">0</span>/1     Completed   <span class="m">0</span>          49s
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>kubectl<span class="w"> </span>-n<span class="w"> </span>development-ralph<span class="w"> </span>get<span class="w"> </span>-l<span class="w"> </span><span class="nv">app</span><span class="o">=</span>elasticsearch<span class="w"> </span>pod
+NAME<span class="w">                                         </span>READY<span class="w">   </span>STATUS<span class="w">      </span>RESTARTS<span class="w">   </span>AGE
+elasticsearch-node-0<span class="w">                         </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">     </span><span class="m">0</span><span class="w">          </span>69s
+elasticsearch-node-1<span class="w">                         </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">     </span><span class="m">0</span><span class="w">          </span>69s
+elasticsearch-node-2<span class="w">                         </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">     </span><span class="m">0</span><span class="w">          </span>69s
+es-index-template-j-221010-09h25m24s-nx5qz<span class="w">   </span><span class="m">0</span>/1<span class="w">     </span>Completed<span class="w">   </span><span class="m">0</span><span class="w">          </span>49s
 </code></pre></div>
 <p>We are now ready to deploy Ralph to Kubernetes!</p>
 <h3 id="deploy_code_repeat">Deploy, code, repeat<a class="headerlink" href="#deploy_code_repeat" title="Permanent link">&para;</a></h3>
 <p>To test your local docker image, you need to build it and publish it to the
 local kubernetes cluster docker registry using the <code>k3d-push</code> Makefile rule:</p>
-<div class="highlight"><pre><span></span><code>$ make k3d-push
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>make<span class="w"> </span>k3d-push
 </code></pre></div>
 <blockquote>
 <p>Note that each time you modify Ralph&rsquo;s application or its Docker image, you
 will need to make this update.</p>
 </blockquote>
 <p>Now that your Docker image is published, it&rsquo;s time to deploy it!</p>
-<div class="highlight"><pre><span></span><code>$ make arnold-deploy
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>make<span class="w"> </span>arnold-deploy
 </code></pre></div>
 <p>To test this deployment, let&rsquo;s try to make an authenticated request to the LRS:</p>
-<div class="highlight"><pre><span></span><code>$ curl -sLk <span class="se">\</span>
-    --user foo:bar <span class="se">\</span>
-    <span class="s2">&quot;https://</span><span class="k">$(</span><span class="se">\</span>
-        kubectl -n development-ralph <span class="se">\</span>
-        get <span class="se">\</span>
-        ingress/ralph-app-current <span class="se">\</span>
-        -o <span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.spec.rules[0].host}&#39;</span><span class="k">)</span><span class="s2">/whoami&quot;</span>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>curl<span class="w"> </span>-sLk<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--user<span class="w"> </span>foo:bar<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="s2">&quot;https://</span><span class="k">$(</span><span class="se">\</span>
+<span class="w">        </span>kubectl<span class="w"> </span>-n<span class="w"> </span>development-ralph<span class="w"> </span><span class="se">\</span>
+<span class="w">        </span>get<span class="w"> </span><span class="se">\</span>
+<span class="w">        </span>ingress/ralph-app-current<span class="w"> </span><span class="se">\</span>
+<span class="w">        </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.spec.rules[0].host}&#39;</span><span class="k">)</span><span class="s2">/whoami&quot;</span>
 </code></pre></div>
 <p>And why not send test statements from Potsie&rsquo;s repository:</p>
-<div class="highlight"><pre><span></span><code>$ curl -sL <span class="se">\</span>
-    https://github.com/openfun/potsie/raw/main/fixtures/elasticsearch/lrs.json.gz <span class="p">|</span> <span class="se">\</span>
-  gunzip <span class="p">|</span> <span class="se">\</span>
-  head -n <span class="m">100</span> <span class="p">|</span> <span class="se">\</span>
-  jq -s . <span class="p">|</span> <span class="se">\</span>
-  sed <span class="s2">&quot;s/@timestamp/timestamp/g&quot;</span> <span class="p">|</span> <span class="se">\</span>
-  curl -sLk <span class="se">\</span>
-    --user foo:bar <span class="se">\</span>
-    -X POST <span class="se">\</span>
-    -H <span class="s2">&quot;Content-Type: application/json&quot;</span> <span class="se">\</span>
-    <span class="s2">&quot;https://</span><span class="k">$(</span><span class="se">\</span>
-        kubectl -n development-ralph <span class="se">\</span>
-        get <span class="se">\</span>
-        ingress/ralph-app-current <span class="se">\</span>
-        -o <span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.spec.rules[0].host}&#39;</span><span class="k">)</span><span class="s2">/xAPI/statements/&quot;</span> <span class="se">\</span>
-    -d @-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>curl<span class="w"> </span>-sL<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>https://github.com/openfun/potsie/raw/main/fixtures/elasticsearch/lrs.json.gz<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>gunzip<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>head<span class="w"> </span>-n<span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>jq<span class="w"> </span>-s<span class="w"> </span>.<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>sed<span class="w"> </span><span class="s2">&quot;s/@timestamp/timestamp/g&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>curl<span class="w"> </span>-sLk<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--user<span class="w"> </span>foo:bar<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="s2">&quot;https://</span><span class="k">$(</span><span class="se">\</span>
+<span class="w">        </span>kubectl<span class="w"> </span>-n<span class="w"> </span>development-ralph<span class="w"> </span><span class="se">\</span>
+<span class="w">        </span>get<span class="w"> </span><span class="se">\</span>
+<span class="w">        </span>ingress/ralph-app-current<span class="w"> </span><span class="se">\</span>
+<span class="w">        </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.spec.rules[0].host}&#39;</span><span class="k">)</span><span class="s2">/xAPI/statements/&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-d<span class="w"> </span>@-
 </code></pre></div>
 <blockquote>
 <p>This example command requires <a href="https://stedolan.github.io/jq/"><code>jq</code></a> to
@@ -975,12 +975,12 @@ we strongly recommend to install it to manipulate them from the command line.</p
 <p>If you want to run the <code>bin/arnold</code> script to run specific Arnold commands, you
 must ensure that your environment is properly set and that Arnold runs in
 development mode (<em>i.e.</em> using the <code>-d</code> flag):</p>
-<div class="highlight"><pre><span></span><code>$ <span class="nb">source</span> .k3d-cluster.env.sh
-$ bin/arnold -d -c ralph -e development -- vault -a ralph view
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nb">source</span><span class="w"> </span>.k3d-cluster.env.sh
+$<span class="w"> </span>bin/arnold<span class="w"> </span>-d<span class="w"> </span>-c<span class="w"> </span>ralph<span class="w"> </span>-e<span class="w"> </span>development<span class="w"> </span>--<span class="w"> </span>vault<span class="w"> </span>-a<span class="w"> </span>ralph<span class="w"> </span>view
 </code></pre></div>
 <h3 id="stop_k3d_cluster">Stop <code>k3d</code> cluster<a class="headerlink" href="#stop_k3d_cluster" title="Permanent link">&para;</a></h3>
 <p>When finished to work on the Tray, you can stop the <code>k3d</code> cluster using the <code>k3d-stop</code> helper:</p>
-<div class="highlight"><pre><span></span><code>$ make k3d-stop
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>make<span class="w"> </span>k3d-stop
 </code></pre></div>
 
 
