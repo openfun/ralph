@@ -11,7 +11,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch.client import CatClient
 from elasticsearch.helpers import BulkIndexError, scan, streaming_bulk
 
-from ralph.conf import settings
+from ralph.conf import ESClientOptions, settings
 from ralph.exceptions import BackendException, BackendParameterException
 
 from .base import (
@@ -52,7 +52,7 @@ class ESDatabase(BaseDatabase):
         self,
         hosts: list = es_settings.HOSTS,
         index: str = es_settings.INDEX,
-        client_options: dict = es_settings.CLIENT_OPTIONS,
+        client_options: ESClientOptions = es_settings.CLIENT_OPTIONS,
         op_type: str = es_settings.OP_TYPE,
     ):
         """Instantiates the Elasticsearch client.
@@ -65,12 +65,10 @@ class ESDatabase(BaseDatabase):
             op_type (str): The Elasticsearch operation type for every document sent to
                 Elasticsearch (should be one of: index, create, delete, update).
         """
-        if client_options is None:
-            client_options = {}
-
         self._hosts = hosts
         self.index = index
-        self.client = Elasticsearch(self._hosts, **client_options)
+
+        self.client = Elasticsearch(self._hosts, **client_options.dict())
         if op_type not in [op.value for op in OpType]:
             raise BackendParameterException(
                 f"{op_type} is not an allowed operation type"

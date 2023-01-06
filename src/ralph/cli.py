@@ -4,6 +4,7 @@ import json
 import logging
 import re
 import sys
+from inspect import isclass
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
@@ -27,7 +28,7 @@ from click_option_group import optgroup
 from pydantic import BaseModel
 
 from ralph import __version__ as ralph_version
-from ralph.conf import CommaSeparatedTuple, settings
+from ralph.conf import ClientOptions, CommaSeparatedTuple, settings
 from ralph.exceptions import UnsupportedBackendException
 from ralph.logger import configure_logging
 from ralph.models.converter import Converter
@@ -106,6 +107,28 @@ class CommaSeparatedKeyValueParamType(click.ParamType):
         return options
 
 
+class ClientOptionsParamType(CommaSeparatedKeyValueParamType):
+    """Comma separated key=value parameter type for client options."""
+
+    def __init__(self, client_options_type):
+        """Instantiates ClientOptionsParamType for a client_options_type.
+
+        Args:
+            client_options_type (any): Pydantic model used for client options.
+        """
+        self.client_options_type = client_options_type
+
+    def convert(self, value, param, ctx):
+        """Splits the values by comma and equal sign.
+
+        Returns an instance of client_options_type build with key/value pairs.
+        """
+        if isinstance(value, self.client_options_type):
+            return value
+
+        return self.client_options_type(**super().convert(value, param, ctx))
+
+
 class JSONStringParamType(click.ParamType):
     """JSON string parameter type."""
 
@@ -166,6 +189,8 @@ def backends_options(name=None, backend_types: list[BaseModel] = None):
                         option_kwargs["type"] = CommaSeparatedKeyValueParamType()
                     elif field_type is CommaSeparatedTuple:
                         option_kwargs["type"] = CommaSeparatedTupleParamType()
+                    elif isclass(field_type) and issubclass(field_type, ClientOptions):
+                        option_kwargs["type"] = ClientOptionsParamType(field_type)
 
                     command = optgroup.option(
                         option.lower(), default=field, **option_kwargs
@@ -562,9 +587,18 @@ def runserver(backend: str, host: str, port: int, **options):
             key = f"RALPH_BACKENDS__DATABASE__{backend_name}__{field_name}".upper()
             if isinstance(value, tuple):
                 value = ",".join(value)
+            if issubclass(type(value), ClientOptions):
+                for key_dict, value_dict in value.dict().items():
+                    if value_dict is None:
+                        continue
+                    key_dict = f"{key}__{key_dict}"
+                    logger.debug(
+                        "Setting environment variable %s to '%s'", key_dict, value_dict
+                    )
+                    env_file.write(f"{key_dict}={value_dict}\n")
+                continue
             logger.debug("Setting environment variable %s to '%s'", key, value)
             env_file.write(f"{key}={value}\n")
-
         env_file.seek(0)
         try:
             uvicorn.run(

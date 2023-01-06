@@ -27,6 +27,10 @@ and this project adheres to
 - Upgrade base python version to 3.11 for the development stack and Docker
   image
 
+### Fixed
+
+- Restore ES and Mongo backends ability to use client options
+
 ## [3.1.0] - 2022-11-17
 
 ### Added
