@@ -11,7 +11,7 @@ from dateutil.parser import isoparse
 from pymongo import ASCENDING, DESCENDING, MongoClient
 from pymongo.errors import BulkWriteError, ConnectionFailure, PyMongoError
 
-from ralph.conf import settings
+from ralph.conf import MongoClientOptions, settings
 from ralph.exceptions import BackendException, BadFormatException
 
 from .base import (
@@ -45,7 +45,7 @@ class MongoDatabase(BaseDatabase):
         connection_uri: str = mongo_settings.CONNECTION_URI,
         database: str = mongo_settings.DATABASE,
         collection: str = mongo_settings.COLLECTION,
-        client_options: dict = mongo_settings.CLIENT_OPTIONS,
+        client_options: MongoClientOptions = mongo_settings.CLIENT_OPTIONS,
     ):
         """Instantiates the Mongo client.
 
@@ -53,13 +53,10 @@ class MongoDatabase(BaseDatabase):
             connection_uri (str): MongoDB connection URI.
             database (str): MongoDB database to connect to.
             collection (str): MongoDB database collection to get objects from.
-            client_options (dict): A dictionary of valid options for the MongoClient
-                class initialization.
+            client_options (MongoClientOptions): A dictionary of valid options
+            for the MongoClient class initialization.
         """
-        if client_options is None:
-            client_options = {}
-
-        self.client = MongoClient(connection_uri, **client_options)
+        self.client = MongoClient(connection_uri, **client_options.dict())
         self.database = getattr(self.client, database)
         self.collection = getattr(self.database, collection)
 

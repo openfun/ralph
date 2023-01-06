@@ -13,7 +13,7 @@ except ImportError:
     from unittest.mock import Mock
 
     get_app_dir = Mock(return_value=".")
-from pydantic import AnyUrl, BaseModel, BaseSettings
+from pydantic import AnyUrl, BaseModel, BaseSettings, Extra
 
 from .utils import import_string
 
@@ -75,6 +75,27 @@ class InstantiableSettingsItem(BaseModel):
 # Active database backend Settings.
 
 
+class ClientOptions(BaseModel):
+    """Pydantic model for additionnal client options."""
+
+    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
+        extra = Extra.forbid
+
+
+class ESClientOptions(ClientOptions):
+    """Pydantic model for Elasticsearch additionnal client options."""
+
+    ca_certs: Path = None
+    verify_certs: bool = None
+
+
+class MongoClientOptions(ClientOptions):
+    """Pydantic model for MongoDB additionnal client options."""
+
+    document_class: str = None
+    tz_aware: bool = None
+
+
 class ESDatabaseBackendSettings(InstantiableSettingsItem):
     """Pydantic modelf for Elasticsearch database backend configuration settings."""
 
@@ -82,7 +103,7 @@ class ESDatabaseBackendSettings(InstantiableSettingsItem):
 
     HOSTS: CommaSeparatedTuple = ("http://localhost:9200",)
     INDEX: str = "statements"
-    CLIENT_OPTIONS: dict = None
+    CLIENT_OPTIONS: ESClientOptions = ESClientOptions()
     OP_TYPE: Literal["index", "create", "delete", "update"] = "index"
 
 
@@ -94,7 +115,7 @@ class MongoDatabaseBackendSettings(InstantiableSettingsItem):
     CONNECTION_URI: str = "mongodb://localhost:27017/"
     DATABASE: str = "statements"
     COLLECTION: str = "marsha"
-    CLIENT_OPTIONS: dict = None
+    CLIENT_OPTIONS: MongoClientOptions = MongoClientOptions()
 
 
 class DatabaseBackendSettings(BaseModel):

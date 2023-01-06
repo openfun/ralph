@@ -158,9 +158,26 @@ Elasticsearch backend parameters required to connect to a cluster are:
 
 - `hosts`: a list of cluster hosts to connect to (_e.g._ `["http://elasticsearch-node:9200"]`)
 - `index`: the elasticsearch index where to get/put documents
-- `client_options`: all options from the official client are supported and can
-  be specified as a python `dict` object (_e.g._ `{'use_ssl': True, 'verify_certs': True}`)
+- `client_options`: a comma separated key=value list of Elasticsearch client options
 
-> For a complete list of supported `client_options`, please refer to the
-> [official client's
-> documentation](https://elasticsearch-py.readthedocs.io/en/latest/api.html#elasticsearch).
+The Elasticsearch client options supported in Ralph are:
+- `ca_certs`: the path to the CA certificate file.
+- `verify_certs`: enable or disable the certificate verification. Note that it should be enabled in production. Default to `True`
+
+### MongoDB
+
+MongoDB backend is mostly used for indexation purpose (as a datalake) but
+it can also be used to fetch collections of documents from it.
+
+#### Backend parameters
+
+MongoDB backend parameters required to connect to a cluster are:
+
+- `connection_uri`: the connection URI to connect to (_e.g._ `["mongodb://mongo:27017/"]`)
+- `database`: the database to connect to
+- `collection`: the collection to get/put objects to
+- `client_options`: a comma separated key=value list of MongoDB client options
+
+The MongoDB client options supported in Ralph are:
+- `document_class`: default class to use for documents returned from queries
+- `tz_aware`: if True, datetime instances returned as values in a document will be timezone aware (otherwise they will be naive)

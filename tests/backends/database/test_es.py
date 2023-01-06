@@ -19,7 +19,7 @@ from elasticsearch.helpers import bulk
 
 from ralph.backends.database.base import DatabaseStatus, StatementParameters
 from ralph.backends.database.es import ESDatabase, ESQuery
-from ralph.conf import settings
+from ralph.conf import ESClientOptions, settings
 from ralph.exceptions import BackendException, BackendParameterException
 
 from tests.fixtures.backends import (
@@ -77,13 +77,16 @@ def test_backends_database_es_client_kwargs(es):
             "https://elasticsearch:9200",
         ],
         index=ES_TEST_INDEX,
-        client_options={"ca_certs": "/path/to/ca/bundle"},
+        client_options=ESClientOptions(
+            ca_certs="/path/to/ca/bundle", verify_certs=True
+        ),
     )
 
-    assert (
-        database.client.transport.node_pool.get().config.ca_certs
-        == "/path/to/ca/bundle"
+    assert database.client.transport.node_pool.get().config.ca_certs == Path(
+        "/path/to/ca/bundle"
     )
+
+    assert database.client.transport.node_pool.get().config.verify_certs is True
 
 
 def test_backends_database_es_to_documents_method(es):

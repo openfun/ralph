@@ -2,8 +2,10 @@
 
 from importlib import reload
 from inspect import signature
+from pathlib import PosixPath
 
 import pytest
+from pydantic import ValidationError
 
 from ralph import conf
 from ralph.conf import CommaSeparatedTuple, Settings, settings
@@ -52,6 +54,104 @@ def test_conf_comma_separated_list_with_invalid_values(value):
     """Tests the CommaSeparatedTuple pydantic data type with invalid values."""
     with pytest.raises(TypeError, match="Invalid comma separated list"):
         next(CommaSeparatedTuple.__get_validators__())(value)
+
+
+@pytest.mark.parametrize(
+    "ca_certs,verify_certs,expected",
+    [
+        ("/path", "True", {"ca_certs": PosixPath("/path"), "verify_certs": True}),
+        ("/path2", "f", {"ca_certs": PosixPath("/path2"), "verify_certs": False}),
+        (None, None, {"ca_certs": None, "verify_certs": None}),
+    ],
+)
+def test_conf_es_client_options_with_valid_values(
+    ca_certs, verify_certs, expected, monkeypatch
+):
+    """Tests the ESClientOptions pydantic data type with valid values."""
+    # Using None here as in "not set by user"
+    if ca_certs is not None:
+        monkeypatch.setenv(
+            "RALPH_BACKENDS__DATABASE__ES__CLIENT_OPTIONS__ca_certs", f"{ca_certs}"
+        )
+    # Using None here as in "not set by user"
+    if verify_certs is not None:
+        monkeypatch.setenv(
+            "RALPH_BACKENDS__DATABASE__ES__CLIENT_OPTIONS__verify_certs",
+            f"{verify_certs}",
+        )
+    assert Settings().BACKENDS.DATABASE.ES.CLIENT_OPTIONS.dict() == expected
+
+
+@pytest.mark.parametrize(
+    "ca_certs,verify_certs",
+    [
+        ("/path", 3),
+        ("/path", None),
+    ],
+)
+def test_conf_es_client_options_with_invalid_values(
+    ca_certs, verify_certs, monkeypatch
+):
+    """Tests the ESClientOptions pydantic data type with invalid values."""
+    monkeypatch.setenv(
+        "RALPH_BACKENDS__DATABASE__ES__CLIENT_OPTIONS__ca_certs", f"{ca_certs}"
+    )
+    monkeypatch.setenv(
+        "RALPH_BACKENDS__DATABASE__ES__CLIENT_OPTIONS__verify_certs",
+        f"{verify_certs}",
+    )
+    with pytest.raises(ValidationError, match="1 validation error for"):
+        Settings().BACKENDS.DATABASE.ES.CLIENT_OPTIONS.dict()
+
+
+@pytest.mark.parametrize(
+    "document_class,tz_aware,expected",
+    [
+        ("dict", "True", {"document_class": "dict", "tz_aware": True}),
+        ("str", "f", {"document_class": "str", "tz_aware": False}),
+        (None, None, {"document_class": None, "tz_aware": None}),
+    ],
+)
+def test_conf_mongo_client_options_with_valid_values(
+    document_class, tz_aware, expected, monkeypatch
+):
+    """Tests the MongoClientOptions pydantic data type with valid values."""
+    # Using None here as in "not set by user"
+    if document_class is not None:
+        monkeypatch.setenv(
+            "RALPH_BACKENDS__DATABASE__MONGO__CLIENT_OPTIONS__document_class",
+            f"{document_class}",
+        )
+    # Using None here as in "not set by user"
+    if tz_aware is not None:
+        monkeypatch.setenv(
+            "RALPH_BACKENDS__DATABASE__MONGO__CLIENT_OPTIONS__tz_aware",
+            f"{tz_aware}",
+        )
+    assert Settings().BACKENDS.DATABASE.MONGO.CLIENT_OPTIONS.dict() == expected
+
+
+@pytest.mark.parametrize(
+    "document_class,tz_aware",
+    [
+        ("dict", 3),
+        ("str", None),
+    ],
+)
+def test_conf_mongo_client_options_with_invalid_values(
+    document_class, tz_aware, monkeypatch
+):
+    """Tests the MongoClientOptions pydantic data type with invalid values."""
+    monkeypatch.setenv(
+        "RALPH_BACKENDS__DATABASE__MONGO__CLIENT_OPTIONS__document_class",
+        f"{document_class}",
+    )
+    monkeypatch.setenv(
+        "RALPH_BACKENDS__DATABASE__MONGO__CLIENT_OPTIONS__tz_aware",
+        f"{tz_aware}",
+    )
+    with pytest.raises(ValidationError, match="1 validation error for"):
+        Settings().BACKENDS.DATABASE.MONGO.CLIENT_OPTIONS.dict()
 
 
 def test_conf_settings_should_define_all_backends_options():

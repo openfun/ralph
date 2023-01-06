@@ -576,7 +576,9 @@ def test_cli_fetch_command_with_es_backend(es):
 
     runner = CliRunner()
     es_hosts = ",".join(ES_TEST_HOSTS)
-    command = f"-v ERROR fetch -b es --es-hosts {es_hosts} --es-index {ES_TEST_INDEX}"
+    es_client_options = "verify_certs=True"
+    command = f"""-v ERROR fetch -b es --es-hosts {es_hosts} --es-index {ES_TEST_INDEX}
+        --es-client-options {es_client_options}"""
     result = runner.invoke(cli, command.split())
     assert result.exit_code == 0
     expected = (
@@ -598,6 +600,18 @@ def test_cli_fetch_command_with_es_backend(es):
     )
 
     assert expected == result.output
+
+
+def test_cli_fetch_command_client_options_with_es_backend(es):
+    """Tests ralph fetch command with multiple client options using the es backend."""
+    # pylint: disable=invalid-name
+
+    runner = CliRunner()
+    es_client_options = "ca_certs=/path/,verify_certs=True"
+    command = f"""-v ERROR fetch -b es --es-client-options {es_client_options}"""
+    result = runner.invoke(cli, command.split())
+    assert result.exit_code == 1
+    assert "TLS options require scheme to be 'https'" in str(result.exception)
 
 
 def test_cli_fetch_command_with_es_backend_query(es):
@@ -624,6 +638,7 @@ def test_cli_fetch_command_with_es_backend_query(es):
     es_hosts = ",".join(ES_TEST_HOSTS)
     query = {"query": {"query": {"term": {"modulo": 0}}}}
     query_str = json.dumps(query, separators=(",", ":"))
+
     command = (
         "-v ERROR "
         "fetch "
@@ -957,6 +972,7 @@ def test_cli_runserver_command_environment_file_generation(monkeypatch):
             assert file.readlines() == [
                 f"RALPH_RUNSERVER_BACKEND={settings.RUNSERVER_BACKEND}\n",
                 "RALPH_BACKENDS__DATABASE__ES__INDEX=foo\n",
+                "RALPH_BACKENDS__DATABASE__ES__CLIENT_OPTIONS__verify_certs=True\n",
                 "RALPH_BACKENDS__DATABASE__MONGO__COLLECTION="
                 f"{settings.BACKENDS.DATABASE.MONGO.COLLECTION}\n",
                 "RALPH_BACKENDS__DATABASE__MONGO__DATABASE="
@@ -971,5 +987,8 @@ def test_cli_runserver_command_environment_file_generation(monkeypatch):
 
     monkeypatch.setattr("ralph.cli.uvicorn.run", mock_uvicorn_run)
     runner = CliRunner()
-    result = runner.invoke(cli, "runserver -b es --es-index foo".split())
+    result = runner.invoke(
+        cli,
+        "runserver -b es --es-index foo --es-client-options verify_certs=True".split(),
+    )
     assert result.exit_code == 0
