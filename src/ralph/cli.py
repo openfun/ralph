@@ -276,7 +276,7 @@ def auth(username, password, scope, write):
     help="Container format parser used to extract events",
 )
 def extract(parser):
-    """Extracts input events from a container format using a dedicated parser."""
+    """Extract input events from a container format using a dedicated parser."""
     logger.info("Extracting events using the %s parser", parser)
 
     parser = getattr(settings.PARSERS, parser.upper()).get_instance()
@@ -309,7 +309,7 @@ def extract(parser):
     help="Stop validating at first unknown event",
 )
 def validate(format_, ignore_errors, fail_on_unknown):
-    """Validates input events of given format."""
+    """Validate input events of given format."""
     logger.info(
         "Validating %s events (ignore_errors=%s | fail-on-unknown=%s)",
         format_,
@@ -371,7 +371,7 @@ def validate(format_, ignore_errors, fail_on_unknown):
     help="Stop converting at first unknown event",
 )
 def convert(from_, to_, ignore_errors, fail_on_unknown, **conversion_set_kwargs):
-    """Converts input events to a given format."""
+    """Convert input events to a given format."""
     logger.info(
         "Converting %s events to %s format (ignore_errors=%s | fail-on-unknown=%s)",
         from_,
@@ -537,7 +537,7 @@ def list_(details, new, backend, **options):
     help="LRS server port",
 )
 def runserver(backend: str, host: str, port: int, **options):
-    """Runs the API server for the development environment.
+    """Run the API server for the development environment.
 
     Starts uvicorn programmatically for convenience and documentation.
     """
