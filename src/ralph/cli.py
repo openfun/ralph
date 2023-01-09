@@ -26,6 +26,7 @@ except ModuleNotFoundError:
 from click_option_group import optgroup
 from pydantic import BaseModel
 
+from ralph import __version__ as ralph_version
 from ralph.conf import CommaSeparatedTuple, settings
 from ralph.exceptions import UnsupportedBackendException
 from ralph.logger import configure_logging
@@ -132,6 +133,7 @@ class JSONStringParamType(click.ParamType):
     required=False,
     help="Either CRITICAL, ERROR, WARNING, INFO (default) or DEBUG",
 )
+@click.version_option(version=ralph_version)
 def cli(verbosity=None):
     """Ralph is a stream-based tool to play with your logs."""
     configure_logging()
