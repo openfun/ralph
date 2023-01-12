@@ -736,8 +736,7 @@
 <div class="highlight"><pre><span></span><code>ralph [OPTIONS] COMMAND [ARGS]...
 </code></pre></div>
 <p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  -v, --verbosity LVL  Either CRITICAL, ERROR,
-                       WARNING, INFO (default) or
+<div class="highlight"><pre><span></span><code>  -v, --verbosity LVL  Either CRITICAL, ERROR, WARNING, INFO (default) or
                        DEBUG
   --version            Show the version and exit.
   --help               Show this message and exit.
@@ -748,18 +747,12 @@
 <div class="highlight"><pre><span></span><code>ralph auth [OPTIONS]
 </code></pre></div>
 <p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  -u, --username TEXT  The user for which we
-                       generate credentials.
-                       [required]
-  -p, --password TEXT  The password to encrypt for
-                       this user. Will be prompted
+<div class="highlight"><pre><span></span><code>  -u, --username TEXT  The user for which we generate credentials.  [required]
+  -p, --password TEXT  The password to encrypt for this user. Will be prompted
                        if missing.  [required]
-  -s, --scope TEXT     The user scope(s). This
-                       option can be provided
-                       multiple times.  [required]
-  -w, --write          Write new credentials to
-                       the LRS authentication
-                       file.
+  -s, --scope TEXT     The user scope(s). This option can be provided multiple
+                       times.  [required]
+  -w, --write          Write new credentials to the LRS authentication file.
   --help               Show this message and exit.
 </code></pre></div>
 <h3 id="ralph-convert">ralph convert<a class="headerlink" href="#ralph-convert" title="Permanent link">&para;</a></h3>
@@ -769,31 +762,15 @@
 </code></pre></div>
 <p><strong>Options:</strong></p>
 <div class="highlight"><pre><span></span><code>  From edX to xAPI converter options: 
-    -u, --uuid-namespace TEXT     The UUID
-                                  namespace to use
-                                  for the `ID`
-                                  field generation
-    -p, --platform-url TEXT       The `actor.accou
-                                  nt.homePage` to
-                                  use in the xAPI
-                                  statements
-                                  [required]
-  -f, --from [edx]                Input events
-                                  format to
-                                  convert
-                                  [required]
-  -t, --to [xapi]                 Output events
-                                  format
-                                  [required]
-  -I, --ignore-errors             Continue writing
-                                  regardless of
-                                  raised errors
-  -F, --fail-on-unknown           Stop converting
-                                  at first unknown
-                                  event
-  --help                          Show this
-                                  message and
-                                  exit.
+    -u, --uuid-namespace TEXT     The UUID namespace to use for the `ID` field
+                                  generation
+    -p, --platform-url TEXT       The `actor.account.homePage` to use in the
+                                  xAPI statements  [required]
+  -f, --from [edx]                Input events format to convert  [required]
+  -t, --to [xapi]                 Output events format  [required]
+  -I, --ignore-errors             Continue writing regardless of raised errors
+  -F, --fail-on-unknown           Stop converting at first unknown event
+  --help                          Show this message and exit.
 </code></pre></div>
 <h3 id="ralph-extract">ralph extract<a class="headerlink" href="#ralph-extract" title="Permanent link">&para;</a></h3>
 <p>Extract input events from a container format using a dedicated parser.</p>
@@ -801,11 +778,9 @@
 <div class="highlight"><pre><span></span><code>ralph extract [OPTIONS]
 </code></pre></div>
 <p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  -p, --parser [gelf|es]  Container format parser
-                          used to extract events
+<div class="highlight"><pre><span></span><code>  -p, --parser [gelf|es]  Container format parser used to extract events
                           [required]
-  --help                  Show this message and
-                          exit.
+  --help                  Show this message and exit.
 </code></pre></div>
 <h3 id="ralph-fetch">ralph fetch<a class="headerlink" href="#ralph-fetch" title="Permanent link">&para;</a></h3>
 <p>Fetch an archive or records from a configured backend.</p>
@@ -814,8 +789,7 @@
 </code></pre></div>
 <p><strong>Options:</strong></p>
 <div class="highlight"><pre><span></span><code>  -b, --backend [es|mongo|ldp|fs|swift|s3|ws]
-                                  Backend
-                                  [required]
+                                  Backend  [required]
   ws backend: 
     --ws-uri TEXT
   s3 backend: 
@@ -854,16 +828,11 @@
     --es-client-options KEY=VALUE,KEY=VALUE
     --es-index TEXT
     --es-hosts VALUE1,VALUE2,VALUE3
-  -c, --chunk-size INTEGER        Get events by
-                                  chunks of size #
+  -c, --chunk-size INTEGER        Get events by chunks of size #
   -q, --query &#39;{&quot;KEY&quot;: &quot;VALUE&quot;, &quot;KEY&quot;: &quot;VALUE&quot;}&#39;
-                                  Query object as
-                                  a JSON string
-                                  (database
+                                  Query object as a JSON string (database
                                   backends ONLY)
-  --help                          Show this
-                                  message and
-                                  exit.
+  --help                          Show this message and exit.
 </code></pre></div>
 <h3 id="ralph-list">ralph list<a class="headerlink" href="#ralph-list" title="Permanent link">&para;</a></h3>
 <p>List available archives from a configured storage backend.</p>
@@ -872,8 +841,7 @@
 </code></pre></div>
 <p><strong>Options:</strong></p>
 <div class="highlight"><pre><span></span><code>  -b, --backend [ldp|fs|swift|s3]
-                                  Backend
-                                  [required]
+                                  Backend  [required]
   s3 backend: 
     --s3-bucket-name TEXT
     --s3-default-region TEXT
@@ -900,15 +868,9 @@
     --ldp-application-secret TEXT
     --ldp-application-key TEXT
     --ldp-endpoint TEXT
-  -n, --new / -a, --all           List not fetched
-                                  (or all)
-                                  archives
-  -D, --details / -I, --ids       Get archives
-                                  detailed output
-                                  (JSON)
-  --help                          Show this
-                                  message and
-                                  exit.
+  -n, --new / -a, --all           List not fetched (or all) archives
+  -D, --details / -I, --ids       Get archives detailed output (JSON)
+  --help                          Show this message and exit.
 </code></pre></div>
 <h3 id="ralph-push">ralph push<a class="headerlink" href="#ralph-push" title="Permanent link">&para;</a></h3>
 <p>Push an archive to a configured backend.</p>
@@ -917,8 +879,7 @@
 </code></pre></div>
 <p><strong>Options:</strong></p>
 <div class="highlight"><pre><span></span><code>  -b, --backend [es|mongo|ldp|fs|swift|s3]
-                                  Backend
-                                  [required]
+                                  Backend  [required]
   s3 backend: 
     --s3-bucket-name TEXT
     --s3-default-region TEXT
@@ -955,18 +916,10 @@
     --es-client-options KEY=VALUE,KEY=VALUE
     --es-index TEXT
     --es-hosts VALUE1,VALUE2,VALUE3
-  -c, --chunk-size INTEGER        Get events by
-                                  chunks of size #
-  -f, --force                     Overwrite
-                                  existing
-                                  archives or
-                                  records
-  -I, --ignore-errors             Continue writing
-                                  regardless of
-                                  raised errors
-  --help                          Show this
-                                  message and
-                                  exit.
+  -c, --chunk-size INTEGER        Get events by chunks of size #
+  -f, --force                     Overwrite existing archives or records
+  -I, --ignore-errors             Continue writing regardless of raised errors
+  --help                          Show this message and exit.
 </code></pre></div>
 <h3 id="ralph-runserver">ralph runserver<a class="headerlink" href="#ralph-runserver" title="Permanent link">&para;</a></h3>
 <p>Run the API server for the development environment.</p>
@@ -975,8 +928,7 @@
 <div class="highlight"><pre><span></span><code>ralph runserver [OPTIONS]
 </code></pre></div>
 <p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  -b, --backend [es|mongo]        Backend
-                                  [required]
+<div class="highlight"><pre><span></span><code>  -b, --backend [es|mongo]        Backend  [required]
   mongo backend: 
     --mongo-client-options KEY=VALUE,KEY=VALUE
     --mongo-collection TEXT
@@ -987,12 +939,9 @@
     --es-client-options KEY=VALUE,KEY=VALUE
     --es-index TEXT
     --es-hosts VALUE1,VALUE2,VALUE3
-  -h, --host TEXT                 LRS server host
-                                  name
+  -h, --host TEXT                 LRS server host name
   -p, --port INTEGER              LRS server port
-  --help                          Show this
-                                  message and
-                                  exit.
+  --help                          Show this message and exit.
 </code></pre></div>
 <h3 id="ralph-validate">ralph validate<a class="headerlink" href="#ralph-validate" title="Permanent link">&para;</a></h3>
 <p>Validate input events of given format.</p>
@@ -1000,15 +949,10 @@
 <div class="highlight"><pre><span></span><code>ralph validate [OPTIONS]
 </code></pre></div>
 <p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  -f, --format [edx|xapi]  Input events format to
-                           validate  [required]
-  -I, --ignore-errors      Continue validating
-                           regardless of raised
-                           errors
-  -F, --fail-on-unknown    Stop validating at
-                           first unknown event
-  --help                   Show this message and
-                           exit.
+<div class="highlight"><pre><span></span><code>  -f, --format [edx|xapi]  Input events format to validate  [required]
+  -I, --ignore-errors      Continue validating regardless of raised errors
+  -F, --fail-on-unknown    Stop validating at first unknown event
+  --help                   Show this message and exit.
 </code></pre></div>
 
 
