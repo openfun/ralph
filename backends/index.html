@@ -504,6 +504,26 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#mongodb" class="md-nav__link">
+    MongoDB
+  </a>
+  
+    <nav class="md-nav" aria-label="MongoDB">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend_parameters_6" class="md-nav__link">
+    Backend parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -899,6 +919,26 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#mongodb" class="md-nav__link">
+    MongoDB
+  </a>
+  
+    <nav class="md-nav" aria-label="MongoDB">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend_parameters_6" class="md-nav__link">
+    Backend parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1052,14 +1092,25 @@ it can also be used to fetch indexed data from it.</p>
 <ul>
 <li><code>hosts</code>: a list of cluster hosts to connect to (<em>e.g.</em> <code>["http://elasticsearch-node:9200"]</code>)</li>
 <li><code>index</code>: the elasticsearch index where to get/put documents</li>
-<li><code>client_options</code>: all options from the official client are supported and can
-  be specified as a python <code>dict</code> object (<em>e.g.</em> <code>{'use_ssl': True, 'verify_certs': True}</code>)</li>
+<li><code>client_options</code>: a comma separated key=value list of Elasticsearch client options</li>
 </ul>
-<blockquote>
-<p>For a complete list of supported <code>client_options</code>, please refer to the
-<a href="https://elasticsearch-py.readthedocs.io/en/latest/api.html#elasticsearch">official client&rsquo;s
-documentation</a>.</p>
-</blockquote>
+<p>The Elasticsearch client options supported in Ralph are:
+- <code>ca_certs</code>: the path to the CA certificate file.
+- <code>verify_certs</code>: enable or disable the certificate verification. Note that it should be enabled in production. Default to <code>True</code></p>
+<h3 id="mongodb">MongoDB<a class="headerlink" href="#mongodb" title="Permanent link">&para;</a></h3>
+<p>MongoDB backend is mostly used for indexation purpose (as a datalake) but
+it can also be used to fetch collections of documents from it.</p>
+<h4 id="backend_parameters_6">Backend parameters<a class="headerlink" href="#backend_parameters_6" title="Permanent link">&para;</a></h4>
+<p>MongoDB backend parameters required to connect to a cluster are:</p>
+<ul>
+<li><code>connection_uri</code>: the connection URI to connect to (<em>e.g.</em> <code>["mongodb://mongo:27017/"]</code>)</li>
+<li><code>database</code>: the database to connect to</li>
+<li><code>collection</code>: the collection to get/put objects to</li>
+<li><code>client_options</code>: a comma separated key=value list of MongoDB client options</li>
+</ul>
+<p>The MongoDB client options supported in Ralph are:
+- <code>document_class</code>: default class to use for documents returned from queries
+- <code>tz_aware</code>: if True, datetime instances returned as values in a document will be timezone aware (otherwise they will be naive)</p>
 
 
 
