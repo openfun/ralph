@@ -4,7 +4,7 @@ import json
 from uuid import UUID, uuid5
 
 import pytest
-from hypothesis import provisional
+from hypothesis import provisional, settings
 
 from ralph.models.converter import convert_dict_event, convert_str_event
 from ralph.models.edx.converters.xapi.server import ServerEventToPageViewed
@@ -73,6 +73,7 @@ def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_with_val
 
 
 # pylint: disable=line-too-long
+@settings(deadline=None)
 @custom_given(Server, provisional.urls())
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_with_anonymous_user(  # noqa

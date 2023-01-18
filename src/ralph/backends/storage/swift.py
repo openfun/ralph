@@ -50,7 +50,9 @@ class SwiftStorage(
         self.os_auth_url = os_auth_url
         self.os_identity_api_version = os_identity_api_version
         self.container = urlparse(os_storage_url).path.rpartition("/")[-1]
-        self.os_storage_url = os_storage_url.removesuffix(f"/{self.container}")
+        self.os_storage_url = os_storage_url
+        if os_storage_url.endswith(f"/{self.container}"):
+            self.os_storage_url = os_storage_url[: -len(f"/{self.container}")]
 
         with SwiftService(self.options) as swift:
             stats = swift.stat()

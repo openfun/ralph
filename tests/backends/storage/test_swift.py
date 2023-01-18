@@ -50,8 +50,8 @@ def test_backends_storage_swift_storage_instantiation_should_not_raise_exception
 
 @pytest.mark.parametrize("pages_count", [1, 2])
 def test_backends_storage_swift_list_should_yield_archive_names(
-    pages_count, swift, monkeypatch, fs
-):  # pylint:disable=invalid-name
+    pages_count, swift, monkeypatch, fs, settings_fs
+):  # pylint:disable=invalid-name,unused-argument
     """Tests that given SwiftService.list method successfully connects to the Swift
     storage, the SwiftStorage list method should yield the archives.
     """
@@ -82,8 +82,8 @@ def test_backends_storage_swift_list_should_yield_archive_names(
 
 @pytest.mark.parametrize("pages_count", [1, 2])
 def test_backends_storage_swift_list_with_failed_connection_should_log_the_error(
-    pages_count, swift, monkeypatch, fs, caplog
-):  # pylint:disable=invalid-name
+    pages_count, swift, monkeypatch, fs, caplog, settings_fs
+):  # pylint:disable=invalid-name,unused-argument,too-many-arguments
     """Tests that given SwiftService.list method fails to retrieve the list of archives,
     the SwiftStorage list method should log the error and raise a BackendException.
     """
@@ -117,8 +117,8 @@ def test_backends_storage_swift_list_with_failed_connection_should_log_the_error
 
 
 def test_backends_storage_swift_read_with_valid_name_should_write_to_history(
-    swift, monkeypatch, fs
-):  # pylint:disable=invalid-name
+    swift, monkeypatch, fs, settings_fs
+):  # pylint:disable=invalid-name,unused-argument
     """Tests that given SwiftService.download method successfully retrieves from the
     Swift storage the object with the provided name (the object exists),
     the SwiftStorage read method should write the entry to the history.
@@ -150,8 +150,8 @@ def test_backends_storage_swift_read_with_valid_name_should_write_to_history(
 
 
 def test_backends_storage_swift_read_with_invalid_name_should_log_the_error(
-    swift, monkeypatch, fs, caplog
-):  # pylint:disable=invalid-name
+    swift, monkeypatch, fs, caplog, settings_fs
+):  # pylint:disable=invalid-name,unused-argument
     """Tests that given SwiftService.download method fails to retrieve from the Swift
     storage the object with the provided name (the object does not exists on Swift),
     the SwiftStorage read method should log the error, not write to history and raise a
@@ -183,8 +183,8 @@ def test_backends_storage_swift_read_with_invalid_name_should_log_the_error(
 @pytest.mark.parametrize("overwrite", [False, True])
 @pytest.mark.parametrize("new_archive", [False, True])
 def test_backends_storage_swift_write_should_write_to_history_new_or_overwriten_archives(  # noqa
-    overwrite, new_archive, swift, monkeypatch, fs, caplog
-):  # pylint:disable=invalid-name, too-many-arguments, too-many-locals
+    overwrite, new_archive, swift, monkeypatch, fs, caplog, settings_fs
+):  # pylint:disable=invalid-name, too-many-arguments, too-many-locals,unused-argument
     """Tests that given SwiftService list/upload method successfully connects to the
     Swift storage, the SwiftStorage write method should update the history file when
     overwrite is True or when the name of the archive is not in the history.
@@ -241,8 +241,8 @@ def test_backends_storage_swift_write_should_write_to_history_new_or_overwriten_
 
 
 def test_backends_storage_swift_write_should_log_the_error(
-    swift, monkeypatch, fs, caplog
-):  # pylint:disable=invalid-name
+    swift, monkeypatch, fs, caplog, settings_fs
+):  # pylint:disable=invalid-name,unused-argument
     """Tests that given SwiftService.upload method fails to write the archive,
     the SwiftStorage write method should log the error, raise a BackendException
     and not write to history.

@@ -63,7 +63,7 @@ def custom_builds(
 
     for special_class, special_kwargs in OVERWRITTEN_STRATEGIES.items():
         if issubclass(klass, special_class):
-            kwargs = special_kwargs | kwargs
+            kwargs = dict(special_kwargs, **kwargs)
             break
     optional = {}
     required = {}

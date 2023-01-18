@@ -7,6 +7,7 @@ import sys
 from inspect import isclass
 from pathlib import Path
 from tempfile import NamedTemporaryFile
+from typing import List
 
 import bcrypt
 
@@ -167,7 +168,7 @@ def cli(verbosity=None):
             handler.setLevel(level)
 
 
-def backends_options(name=None, backend_types: list[BaseModel] = None):
+def backends_options(name=None, backend_types: List[BaseModel] = None):
     """Backend-related options decorator for Ralph commands."""
 
     def wrapper(command):

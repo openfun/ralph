@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum, unique
-from typing import BinaryIO, Literal, Optional, TextIO, Union
+from typing import BinaryIO, List, Literal, Optional, TextIO, Union
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -29,7 +29,7 @@ class BaseQuery(BaseModel):
 class StatementQueryResult:
     """Represents a common interface for results of an LRS statements query."""
 
-    statements: list[dict]
+    statements: List[dict]
     pit_id: str
     search_after: str
 
@@ -129,5 +129,5 @@ class BaseDatabase(ABC):
         """Returns the statements query payload using xAPI parameters."""
 
     @abstractmethod
-    def query_statements_by_ids(self, ids: list[str]) -> list:
+    def query_statements_by_ids(self, ids: List[str]) -> List:
         """Returns the list of matching statement IDs from the database."""

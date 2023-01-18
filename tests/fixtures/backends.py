@@ -25,6 +25,7 @@ from ralph.backends.database.es import ESDatabase
 from ralph.backends.database.mongo import MongoDatabase
 from ralph.backends.storage.s3 import S3Storage
 from ralph.backends.storage.swift import SwiftStorage
+from ralph.conf import Settings, settings
 
 # Elasticsearch backend defaults
 ES_TEST_INDEX = os.environ.get(
@@ -216,6 +217,17 @@ def es_data_stream():
 
     client.indices.delete_data_stream(name=ES_TEST_INDEX)
     client.indices.delete_index_template(name=ES_TEST_INDEX_TEMPLATE)
+
+
+@pytest.fixture
+def settings_fs(fs, monkeypatch):
+    """Forces Path instantiation with fake FS in Ralph's Settings."""
+    # pylint:disable=invalid-name,unused-argument
+
+    monkeypatch.setattr(
+        "ralph.backends.mixins.settings",
+        Settings(HISTORY_FILE=Path(settings.APP_DIR / "history.json")),
+    )
 
 
 @pytest.fixture

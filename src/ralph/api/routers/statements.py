@@ -2,7 +2,7 @@
 
 import logging
 from datetime import datetime
-from typing import Literal, Optional, Union
+from typing import List, Literal, Optional, Union
 from uuid import UUID, uuid4
 
 from fastapi import (
@@ -226,7 +226,7 @@ async def get(
 )
 # pylint: disable=unused-argument
 async def post(
-    statements: Union[LaxStatement, list[LaxStatement]],
+    statements: Union[LaxStatement, List[LaxStatement]],
     background_tasks: BackgroundTasks,
 ):
     """Stores a set of statements (or a single statement as a single member of a set).
