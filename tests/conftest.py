@@ -15,6 +15,7 @@ from .fixtures.backends import (  # noqa: F401
     mongo_forwarding,
     moto_fs,
     s3,
+    settings_fs,
     swift,
     ws,
 )

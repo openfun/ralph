@@ -501,8 +501,8 @@ def test_backends_database_es_query_statements_by_ids_with_multiple_indexes(
     database_2 = ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_FORWARDING_INDEX)
 
     # Check the expected search query results
-    index_1_document = index_1_document | {"_score": 1.0}
-    index_2_document = index_2_document | {"_score": 1.0}
+    index_1_document = dict(index_1_document, **{"_score": 1.0})
+    index_2_document = dict(index_2_document, **{"_score": 1.0})
     assert database.query_statements_by_ids(["1"]) == [index_1_document]
     assert database.query_statements_by_ids(["2"]) == []
     assert database_2.query_statements_by_ids(["1"]) == []

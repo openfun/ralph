@@ -3,6 +3,7 @@
 import json
 
 import pytest
+from hypothesis import settings
 from hypothesis import strategies as st
 
 from ralph.models.selector import ModelSelector
@@ -22,6 +23,7 @@ from ralph.models.xapi.video.statements import (
 from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 
 
+@settings(deadline=None)
 @pytest.mark.parametrize(
     "class_",
     [
@@ -43,6 +45,7 @@ def test_models_xapi_video_selectors_with_valid_statements(class_, data):
     assert model is class_
 
 
+@settings(deadline=None)
 @pytest.mark.parametrize(
     "class_",
     [

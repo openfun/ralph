@@ -124,8 +124,11 @@ jobs:
   # ---- Backend jobs ----
   # Build backend development environment
   build:
+    parameters:
+      python-image:
+        type: string
     docker:
-      - image: cimg/python:3.11
+      - image: cimg/<< parameters.python-image >>
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -134,14 +137,14 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-dependencies-{{ .Revision }}
+            - v1-dependencies-<< parameters.python-image >>-{{ .Revision }}
       - run:
           name: Install development dependencies
           command: pip install --user .[backend-es,backend-ldp,backend-mongo,backend-swift,backend-ws,cli,dev,lrs]
       - save_cache:
           paths:
             - ~/.local
-          key: v1-dependencies-{{ .Revision }}
+          key: v1-dependencies-<< parameters.python-image >>-{{ .Revision }}
 
   lint:
     docker:
@@ -154,7 +157,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-dependencies-{{ .Revision }}
+            - v1-dependencies-python:3.11-{{ .Revision }}
       - run:
           name: Lint code with flake8
           command: ~/.local/bin/flake8
@@ -175,8 +178,11 @@ jobs:
           command: ~/.local/bin/pydocstyle
 
   test:
+    parameters:
+      python-image:
+        type: string
     docker:
-      - image: cimg/python:3.11
+      - image: cimg/<< parameters.python-image >>
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -198,7 +204,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-dependencies-{{ .Revision }}
+            - v1-dependencies-<< parameters.python-image >>-{{ .Revision }}
       - run:
           name: Run tests
           command: |
@@ -439,7 +445,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-dependencies-{{ .Revision }}
+            - v1-dependencies-python:3.11-{{ .Revision }}
       - run:
           name: Build documentation
           command: ~/.local/bin/mkdocs build
@@ -456,7 +462,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-dependencies-{{ .Revision }}
+            - v1-dependencies-python:3.11-{{ .Revision }}
       - add_ssh_keys:
           fingerprints:
             - "43:a9:5b:a0:b5:8b:f5:b4:6d:73:66:a0:27:b1:ce:92"
@@ -506,6 +512,9 @@ workflows:
       # Build, lint and test production and development Docker images
       # (debian-based)
       - build:
+          matrix:
+            parameters:
+              python-image: [python:3.8, python:3.9, python:3.10, python:3.11]
           filters:
             tags:
               only: /.*/
@@ -516,6 +525,9 @@ workflows:
             tags:
               only: /.*/
       - test:
+          matrix:
+            parameters:
+              python-image: [python:3.8, python:3.9, python:3.10, python:3.11]
           requires:
             - build
           filters:

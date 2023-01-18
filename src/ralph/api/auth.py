@@ -3,6 +3,7 @@
 import logging
 from functools import lru_cache
 from pathlib import Path
+from typing import List
 
 import bcrypt
 from fastapi import Depends, HTTPException, status
@@ -29,11 +30,11 @@ class AuthenticatedUser(BaseModel):
 
     Attributes:
         username (str): Consists of the username of the current user.
-        scopes (list): Consists of the scopes the user has access to.
+        scopes (List): Consists of the scopes the user has access to.
     """
 
     username: str
-    scopes: list[str]
+    scopes: List[str]
 
 
 class UserCredentials(AuthenticatedUser):
@@ -42,7 +43,7 @@ class UserCredentials(AuthenticatedUser):
     Attributes:
         username (str): Consists of the username for a declared user.
         hash (str): Consists of the hashed password for a declared user.
-        scopes (list): Consists of the scopes a declared has access to.
+        scopes (List): Consists of the scopes a declared has access to.
     """
 
     hash: str
@@ -59,7 +60,7 @@ class ServerUsersCredentials(BaseModel):
                         list of all server users credentials.
     """
 
-    __root__: list[UserCredentials]
+    __root__: List[UserCredentials]
 
     def __add__(self, other):  # noqa: D105
         return ServerUsersCredentials.parse_obj(self.__root__ + other.__root__)

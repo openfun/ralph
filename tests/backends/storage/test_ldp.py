@@ -200,9 +200,11 @@ def test_backends_storage_ldp_list_method(monkeypatch):
     ]
 
 
-def test_backends_storage_ldp_list_method_history_management(monkeypatch, fs):
+def test_backends_storage_ldp_list_method_history_management(
+    monkeypatch, fs, settings_fs
+):
     """Tests the LDPStorage list method with an history."""
-    # pylint: disable=invalid-name
+    # pylint: disable=invalid-name,unused-argument
 
     def mock_list(url):
         """Mocks the OVH client list stream archives get request."""
@@ -324,9 +326,9 @@ def test_backends_storage_ldp_list_method_with_details(monkeypatch):
     assert list(archives) == details_responses
 
 
-def test_backends_storage_ldp_read_method(monkeypatch, fs):
+def test_backends_storage_ldp_read_method(monkeypatch, fs, settings_fs):
     """Tests the LDPStorage read method with detailed output."""
-    # pylint: disable=invalid-name
+    # pylint: disable=invalid-name,unused-argument
 
     # Create fake archive to stream
     archive_path = Path("/tmp/2020-06-16.gz")

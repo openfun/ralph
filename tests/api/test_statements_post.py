@@ -162,7 +162,7 @@ def test_api_statements_post_statements_list(
     )
     assert get_response.status_code == 200
     # Update statements with the generated id.
-    statements[1] = statements[1] | {"id": generated_id}
+    statements[1] = dict(statements[1], **{"id": generated_id})
     assert get_response.json() == {"statements": statements}
 
 
@@ -245,7 +245,7 @@ def test_api_statements_post_statements_list_with_duplicate_of_existing_statemen
     response = client.post(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {auth_credentials}"},
-        json=[statement | {"version": "1.0.0"}],
+        json=[dict(statement, **{"version": "1.0.0"})],
     )
 
     assert response.status_code == 409

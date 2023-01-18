@@ -2,6 +2,7 @@
 
 import logging
 from functools import lru_cache
+from typing import List
 
 from httpx import AsyncClient, AsyncHTTPTransport, HTTPStatusError, RequestError
 
@@ -11,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 @lru_cache
-def get_active_xapi_forwardings() -> list[XapiForwardingConfigurationSettings]:
+def get_active_xapi_forwardings() -> List[XapiForwardingConfigurationSettings]:
     """Returns a list of active xAPI forwarding configuration settings."""
     active_forwardings = []
     if not settings.XAPI_FORWARDINGS:
@@ -31,7 +32,7 @@ def get_active_xapi_forwardings() -> list[XapiForwardingConfigurationSettings]:
     return active_forwardings
 
 
-async def forward_xapi_statements(statements: list[dict]):
+async def forward_xapi_statements(statements: List[dict]):
     """Forwards xAPI statements."""
     for forwarding in get_active_xapi_forwardings():
         transport = AsyncHTTPTransport(retries=forwarding.max_retries)

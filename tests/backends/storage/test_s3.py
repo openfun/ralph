@@ -61,7 +61,7 @@ def test_backends_storage_s3_storage_instantiation_failure_should_not_raise_exce
 
 @mock_s3
 def test_backends_storage_s3_list_should_yield_archive_names(
-    moto_fs, s3, fs
+    moto_fs, s3, fs, settings_fs
 ):  # pylint:disable=unused-argument, invalid-name
     """S3 backend list test.
 
@@ -150,7 +150,7 @@ def test_backends_storage_s3_list_on_empty_bucket_should_do_nothing(
 
 @mock_s3
 def test_backends_storage_s3_list_with_failed_connection_should_log_the_error(
-    moto_fs, s3, fs, caplog
+    moto_fs, s3, fs, caplog, settings_fs
 ):  # pylint:disable=unused-argument, invalid-name
     """S3 backend list test.
 
@@ -189,7 +189,7 @@ def test_backends_storage_s3_list_with_failed_connection_should_log_the_error(
 
 @mock_s3
 def test_backends_storage_s3_read_with_valid_name_should_write_to_history(
-    moto_fs, s3, monkeypatch, fs
+    moto_fs, s3, monkeypatch, fs, settings_fs
 ):  # pylint:disable=unused-argument, invalid-name
     """S3 backend read test.
 
@@ -234,7 +234,7 @@ def test_backends_storage_s3_read_with_valid_name_should_write_to_history(
 
 @mock_s3
 def test_backends_storage_s3_read_with_invalid_name_should_log_the_error(
-    moto_fs, s3, fs, caplog
+    moto_fs, s3, fs, caplog, settings_fs
 ):  # pylint:disable=unused-argument, invalid-name
     """S3 backend read test.
 
@@ -275,7 +275,7 @@ def test_backends_storage_s3_read_with_invalid_name_should_log_the_error(
 @pytest.mark.parametrize("new_archive", [False, True])
 @mock_s3
 def test_backends_storage_s3_write_should_write_to_history_new_or_overwritten_archives(  # noqa
-    moto_fs, overwrite, new_archive, s3, monkeypatch, fs, caplog
+    moto_fs, overwrite, new_archive, s3, monkeypatch, fs, caplog, settings_fs
 ):  # pylint:disable=unused-argument, invalid-name, too-many-arguments, too-many-locals
     """S3 backend write test.
 
@@ -336,8 +336,8 @@ def test_backends_storage_s3_write_should_write_to_history_new_or_overwritten_ar
 
 @mock_s3
 def test_backends_storage_s3_write_should_log_the_error(
-    moto_fs, s3, monkeypatch, fs, caplog
-):  # pylint:disable=unused-argument, invalid-name
+    moto_fs, s3, monkeypatch, fs, caplog, settings_fs
+):  # pylint:disable=unused-argument, invalid-name,too-many-arguments
     """S3 backend write test.
 
     Tests that given S3Service.upload method fails to write the archive,

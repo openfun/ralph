@@ -69,7 +69,7 @@ def test_backends_storage_fs_url(fs):
 
 # pylint: disable=invalid-name
 # pylint: disable=unused-argument
-def test_backends_storage_fs_list(fs):
+def test_backends_storage_fs_list(fs, settings_fs):
     """Tests archives listing in FSStorage."""
     fs.create_dir(settings.APP_DIR)
 

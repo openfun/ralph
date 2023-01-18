@@ -3,7 +3,7 @@
 import json
 import logging
 from enum import Enum
-from typing import Callable, Generator, Optional, TextIO
+from typing import Callable, Generator, List, Optional, TextIO
 
 from elasticsearch import ApiError
 from elasticsearch import ConnectionError as ESConnectionError
@@ -214,7 +214,7 @@ class ESDatabase(BaseDatabase):
             search_after=search_after,
         )
 
-    def query_statements_by_ids(self, ids: list[str]) -> list:
+    def query_statements_by_ids(self, ids: List[str]) -> List:
         """Returns the list of matching statement IDs from the database."""
         body = {"query": {"terms": {"_id": ids}}}
         return self._search(index=self.index, body=body)["hits"]["hits"]

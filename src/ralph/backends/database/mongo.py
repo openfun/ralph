@@ -4,7 +4,7 @@ import hashlib
 import json
 import logging
 import struct
-from typing import Generator, Optional, TextIO, Union
+from typing import Generator, List, Optional, TextIO, Union
 
 from bson.objectid import ObjectId
 from dateutil.parser import isoparse
@@ -237,7 +237,7 @@ class MongoDatabase(BaseDatabase):
             search_after=search_after,
         )
 
-    def query_statements_by_ids(self, ids: list[str]) -> list:
+    def query_statements_by_ids(self, ids: List[str]) -> List:
         """Returns the list of matching statement IDs from the database."""
         return self._find(filter={"_source.id": {"$in": ids}})
 

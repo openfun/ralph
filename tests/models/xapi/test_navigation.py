@@ -3,6 +3,7 @@
 import json
 
 import pytest
+from hypothesis import settings
 from hypothesis import strategies as st
 
 from ralph.models.selector import ModelSelector
@@ -11,6 +12,7 @@ from ralph.models.xapi.navigation.statements import PageTerminated, PageViewed
 from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 
 
+@settings(deadline=None)
 @pytest.mark.parametrize("class_", [PageTerminated, PageViewed])
 @custom_given(st.data())
 def test_models_xapi_navigational_selectors_with_valid_statements(class_, data):

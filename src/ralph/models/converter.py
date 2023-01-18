@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from importlib import import_module
 from inspect import getmembers, isclass
 from types import ModuleType
-from typing import Any, Callable, TextIO, Union
+from typing import Any, Callable, Set, TextIO, Tuple, Union
 
 from pydantic import BaseModel, ValidationError
 
@@ -29,9 +29,9 @@ logger = logging.getLogger(__name__)
 class ConversionItem:
     """Conversion set item."""
 
-    dest: tuple[str]
-    src: Union[tuple[str], str, None]
-    transformers: tuple[Callable[[Any], Any]]
+    dest: Tuple[str]
+    src: Union[Tuple[str], str, None]
+    transformers: Tuple[Callable[[Any], Any]]
     raw_input: bool
 
     def __init__(self, dest: str, src=None, transformers=lambda _: _, raw_input=False):
@@ -89,7 +89,7 @@ class BaseConversionSet(ABC):
         self._conversion_items = self._get_conversion_items()
 
     @abstractmethod
-    def _get_conversion_items(self) -> set[ConversionItem]:
+    def _get_conversion_items(self) -> Set[ConversionItem]:
         """Returns a set of ConversionItems used for conversion."""
 
     def __iter__(self):  # noqa: D105
