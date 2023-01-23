@@ -5,7 +5,7 @@ from typing import Literal, Optional
 
 from pydantic import Field, NonNegativeFloat
 
-from ...base import BaseModelWithConfig
+from ...config import BaseExtensionModelWithConfig
 from ...fields.results import ResultField
 from ..constants import (
     VIDEO_EXTENSION_CC_ENABLED,
@@ -17,7 +17,7 @@ from ..constants import (
 )
 
 
-class VideoResultExtensionsField(BaseModelWithConfig):
+class VideoResultExtensionsField(BaseExtensionModelWithConfig):
     """Pydantic model for video `result`.`extensions` field.
 
     Attributes:
@@ -40,11 +40,8 @@ class VideoPausedResultExtensionsField(VideoResultExtensionsField):
 
     progress: Optional[NonNegativeFloat] = Field(alias=VIDEO_EXTENSION_PROGRESS)
 
-    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
-        min_anystr_length = 0
 
-
-class VideoSeekedResultExtensionsField(BaseModelWithConfig):
+class VideoSeekedResultExtensionsField(BaseExtensionModelWithConfig):
     """Pydantic model for video seeked `result`.`extensions` field.
 
     Attributes:
@@ -57,9 +54,6 @@ class VideoSeekedResultExtensionsField(BaseModelWithConfig):
     timeFrom: NonNegativeFloat = Field(alias=VIDEO_EXTENSION_TIME_FROM)
     timeTo: NonNegativeFloat = Field(alias=VIDEO_EXTENSION_TIME_TO)
 
-    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
-        min_anystr_length = 0
-
 
 class VideoCompletedResultExtensionsField(VideoResultExtensionsField):
     """Pydantic model for video completed `result`.`extensions` field.
@@ -69,9 +63,6 @@ class VideoCompletedResultExtensionsField(VideoResultExtensionsField):
     """
 
     progress: NonNegativeFloat = Field(alias=VIDEO_EXTENSION_PROGRESS)
-
-    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
-        min_anystr_length = 0
 
 
 class VideoTerminatedResultExtensionsField(VideoResultExtensionsField):
@@ -83,9 +74,6 @@ class VideoTerminatedResultExtensionsField(VideoResultExtensionsField):
 
     progress: NonNegativeFloat = Field(alias=VIDEO_EXTENSION_PROGRESS)
 
-    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
-        min_anystr_length = 0
-
 
 class VideoEnableClosedCaptioningResultExtensionsField(VideoResultExtensionsField):
     """Pydantic model for video enable closed captioning `result`.`extensions` field.
@@ -95,9 +83,6 @@ class VideoEnableClosedCaptioningResultExtensionsField(VideoResultExtensionsFiel
     """
 
     ccEnabled: bool = Field(alias=VIDEO_EXTENSION_CC_ENABLED)
-
-    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
-        min_anystr_length = 0
 
 
 class VideoPlayedResultField(ResultField):
