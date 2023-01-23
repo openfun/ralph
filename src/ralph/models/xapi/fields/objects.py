@@ -8,7 +8,7 @@ from typing import Literal, Optional, Union
 
 from pydantic import Field
 
-from ..config import BaseModelWithConfig
+from ..config import BaseExtensionModelWithConfig, BaseModelWithConfig
 from ..constants import EXTENSION_COURSE_ID, EXTENSION_MODULE_ID, EXTENSION_SCHOOL_ID
 from .actors import ActorField
 from .attachments import AttachmentField
@@ -42,7 +42,7 @@ class SubStatementObjectField(BaseModelWithConfig):
 ObjectField = Union[UnnestedObjectField, SubStatementObjectField]
 
 
-class ObjectDefinitionExtensionsField(BaseModelWithConfig):
+class ObjectDefinitionExtensionsField(BaseExtensionModelWithConfig):
     """Pydantic model for `object.definition.extensions` field.
 
     Attributes:

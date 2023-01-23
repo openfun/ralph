@@ -5,7 +5,7 @@ from uuid import UUID
 
 from pydantic import Field, NonNegativeFloat
 
-from ...base import BaseModelWithConfig
+from ...config import BaseExtensionModelWithConfig
 from ...fields.contexts import ContextActivitiesContextField, ContextField
 from ..constants import (
     VIDEO_CONTEXT_CATEGORY,
@@ -46,7 +46,7 @@ class BaseVideoContextField(ContextField):
     contextActivities: Optional[VideoContextActivitiesField]
 
 
-class VideoContextExtensionsField(BaseModelWithConfig):
+class VideoContextExtensionsField(BaseExtensionModelWithConfig):
     """Pydantic model for video core `context`.`extensions` field.
 
     Attributes:

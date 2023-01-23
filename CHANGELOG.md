@@ -8,6 +8,9 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+- Allow xAPI extra fields in `extensions` fields
+
 ## [3.2.1] - 2023-02-01
 
 ### Changed
