@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [3.2.0] - 2023-01-25
+
 ### Added
 
 - Add a new `auth` subcommand to generate required credentials file for the LRS
@@ -219,7 +221,8 @@ and this project adheres to
 - Add optional sentry integration
 - Distribute Arnold's tray to deploy Ralph in a k8s cluster as cronjobs
 
-[unreleased]: https://github.com/openfun/ralph/compare/v3.1.0...master
+[unreleased]: https://github.com/openfun/ralph/compare/v3.2.0...master
+[3.2.0]: https://github.com/openfun/ralph/compare/v3.1.0...v3.2.0
 [3.1.0]: https://github.com/openfun/ralph/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/openfun/ralph/compare/v2.1.0...v3.0.0
 [2.1.0]: https://github.com/openfun/ralph/compare/v2.0.1...v2.1.0
