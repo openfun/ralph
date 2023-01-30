@@ -18,6 +18,7 @@ from fastapi import (
 from pydantic import parse_raw_as
 from pydantic.types import Json
 
+from ralph.api.auth import get_authenticated_user
 from ralph.api.forwarding import forward_xapi_statements, get_active_xapi_forwardings
 from ralph.backends.database.base import BaseDatabase, StatementParameters
 from ralph.conf import settings
@@ -30,14 +31,13 @@ from ralph.models.xapi.base.agents import (
     BaseXapiAgentWithOpenId,
 )
 
-from ..auth import authenticated_user
 from ..models import ErrorDetail, LaxStatement
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(
     prefix="/xAPI/statements",
-    dependencies=[Depends(authenticated_user)],
+    dependencies=[Depends(get_authenticated_user)],
 )
 
 
