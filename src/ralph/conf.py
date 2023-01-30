@@ -270,11 +270,6 @@ class Settings(BaseSettings):
     LOGGING: dict = {
         "version": 1,
         "propagate": True,
-        "formatters": {
-            "ralph": {
-                "format": "%(asctime)-23s %(levelname)-8s %(name)-8s %(message)s"
-            },
-        },
         "handlers": {
             "console": {
                 "class": "rich.logging.RichHandler",
