@@ -277,8 +277,10 @@ def auth(username, password, scope, write):
     # Import required Pydantic models dynamically so that we don't create a
     # direct dependency between the CLI and the LRS
     # pylint: disable=invalid-name
-    ServerUsersCredentials = import_string("ralph.api.auth.ServerUsersCredentials")
-    UserCredentials = import_string("ralph.api.auth.UserCredentials")
+    ServerUsersCredentials = import_string(
+        "ralph.api.auth.basic.ServerUsersCredentials"
+    )
+    UserCredentials = import_string("ralph.api.auth.basic.UserCredentials")
 
     credentials = UserCredentials(
         username=username,

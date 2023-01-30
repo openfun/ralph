@@ -128,7 +128,9 @@ def test_api_forwarding_get_active_xapi_forwardings_with_inactive_forwardings(
 
 
 @pytest.mark.anyio
-@hypothesis_settings(suppress_health_check=(HealthCheck.function_scoped_fixture,))
+@hypothesis_settings(
+    deadline=None, suppress_health_check=(HealthCheck.function_scoped_fixture,)
+)
 @pytest.mark.parametrize("statements", [[{}, {"id": 1}]])
 @custom_given(
     custom_builds(

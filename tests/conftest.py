@@ -4,7 +4,14 @@
 
 from .fixtures import hypothesis_configuration  # noqa: F401
 from .fixtures import hypothesis_strategies  # noqa: F401
-from .fixtures.auth import auth_credentials  # noqa: F401
+from .fixtures.auth import (  # noqa: F401
+    auth_credentials,
+    basic_auth_test_client,
+    encoded_token,
+    mock_discovery_response,
+    mock_oidc_jwks,
+    oidc_auth_test_client,
+)
 from .fixtures.backends import (  # noqa: F401
     clickhouse,
     es,

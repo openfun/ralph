@@ -1,10 +1,10 @@
-"""Authentication & authorization related tools for the Ralph API."""
+"""Basic authentication & authorization related tools for the Ralph API."""
 
 import logging
 from functools import lru_cache
 from pathlib import Path
 from threading import Lock
-from typing import List
+from typing import List, Union
 
 import bcrypt
 from cachetools import TTLCache, cached
@@ -13,6 +13,7 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel, root_validator
 from starlette.authentication import AuthenticationError
 
+from ralph.api.auth.user import AuthenticatedUser
 from ralph.conf import settings
 
 # Unused password used to avoid timing attacks, by comparing passwords supplied
@@ -21,22 +22,10 @@ from ralph.conf import settings
 UNUSED_PASSWORD = bcrypt.hashpw(b"ralph", bcrypt.gensalt())
 
 
-security = HTTPBasic()
+security = HTTPBasic(auto_error=False)
 
 # API auth logger
 logger = logging.getLogger(__name__)
-
-
-class AuthenticatedUser(BaseModel):
-    """Pydantic model for user authentication.
-
-    Attributes:
-        username (str): Consists of the username of the current user.
-        scopes (List): Consists of the scopes the user has access to.
-    """
-
-    username: str
-    scopes: List[str]
 
 
 class UserCredentials(AuthenticatedUser):
@@ -116,9 +105,13 @@ def get_stored_credentials(auth_file: Path) -> ServerUsersCredentials:
     key=lambda credentials: (
         credentials.username,
         credentials.password,
-    ),
+    )
+    if credentials is not None
+    else None,
 )
-def authenticated_user(credentials: HTTPBasicCredentials = Depends(security)):
+def get_authenticated_user(
+    credentials: Union[HTTPBasicCredentials, None] = Depends(security),
+) -> AuthenticatedUser:
     """Checks valid auth parameters.
 
     Gets the basic auth parameters from the Authorization header, and checks them
@@ -127,7 +120,21 @@ def authenticated_user(credentials: HTTPBasicCredentials = Depends(security)):
     Args:
         credentials (iterator): auth parameters from the Authorization header
 
+    Return:
+        AuthenticatedUser (AuthenticatedUser)
+
+    Raises:
+        HTTPException
+
     """
+    if not credentials:
+        logger.error("The basic authentication mode requires a Basic Auth header")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+
     try:
         user = next(
             filter(
