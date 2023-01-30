@@ -276,12 +276,6 @@ class Settings(BaseSettings):
             },
         },
         "handlers": {
-            # "console": {
-            #     "class": "logging.StreamHandler",
-            #     "level": "INFO",
-            #     "stream": "ext://sys.stderr",
-            #     "formatter": "ralph",
-            # },
             "console": {
                 "class": "rich.logging.RichHandler",
                 "level": "INFO",
