@@ -45,4 +45,9 @@
          <lastmod>2023-02-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
+    <url>
+         <loc>https://openfun.github.io/ralph/models/xapi/</loc>
+         <lastmod>2023-02-01</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
 </urlset>
