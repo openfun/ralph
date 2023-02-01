@@ -12,5 +12,5 @@ Data validation and serialisation/de-serialisation are achieved using
 [pydantics](https://pydantic-docs.helpmanual.io) models that are documented in
 the following subsections:
 
-- [Open edX](./models/edx/)
-- xAPI (work in progress)
+- [Open edX events](./edx/)
+- [xAPI events](./xapi/)
