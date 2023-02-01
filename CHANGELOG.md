@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [3.2.1] - 2023-02-01
+
 ### Changed
 
 - Relax required Python version to `3.7`+
@@ -225,7 +227,8 @@ and this project adheres to
 - Add optional sentry integration
 - Distribute Arnold's tray to deploy Ralph in a k8s cluster as cronjobs
 
-[unreleased]: https://github.com/openfun/ralph/compare/v3.2.0...master
+[unreleased]: https://github.com/openfun/ralph/compare/v3.2.1...master
+[3.2.1]: https://github.com/openfun/ralph/compare/v3.2.0...v3.2.1
 [3.2.0]: https://github.com/openfun/ralph/compare/v3.1.0...v3.2.0
 [3.1.0]: https://github.com/openfun/ralph/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/openfun/ralph/compare/v2.1.0...v3.0.0
