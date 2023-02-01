@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Relax required Python version to `3.7`+
+
 ## [3.2.0] - 2023-01-25
 
 ### Added
