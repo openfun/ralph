@@ -4,7 +4,12 @@
 # because of the circular dependency : objects -> context -> objects.
 
 from datetime import datetime
-from typing import Literal, Optional, Union
+from typing import List, Optional, Union
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 from pydantic import Field
 
@@ -36,7 +41,7 @@ class SubStatementObjectField(BaseModelWithConfig):
     result: Optional[ResultField]
     context: Optional[ContextField]
     timestamp: Optional[datetime]
-    attachments: Optional[list[AttachmentField]]
+    attachments: Optional[List[AttachmentField]]
 
 
 ObjectField = Union[UnnestedObjectField, SubStatementObjectField]

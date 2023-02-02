@@ -1,6 +1,6 @@
 """Navigation xAPI events object fields definitions."""
 
-from typing import Optional
+from typing import Dict, Optional
 
 from ...constants import ACTIVITY_PAGE_DISPLAY, ACTIVITY_PAGE_ID, LANG_EN_US_DISPLAY
 from ...fields.objects import ObjectDefinitionExtensionsField
@@ -16,7 +16,7 @@ class PageObjectDefinitionField(ObjectDefinitionField):
        extensions (dict): See ObjectDefinitionExtensionsField.
     """
 
-    name: dict[LANG_EN_US_DISPLAY, ACTIVITY_PAGE_DISPLAY] = {
+    name: Dict[LANG_EN_US_DISPLAY, ACTIVITY_PAGE_DISPLAY] = {
         LANG_EN_US_DISPLAY.__args__[0]: ACTIVITY_PAGE_DISPLAY.__args__[0]
     }
     type: ACTIVITY_PAGE_ID = ACTIVITY_PAGE_ID.__args__[0]

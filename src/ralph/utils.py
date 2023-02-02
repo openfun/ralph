@@ -5,6 +5,7 @@ import logging
 import operator
 from functools import reduce
 from importlib import import_module
+from typing import List
 
 from pydantic import BaseModel
 
@@ -64,12 +65,12 @@ def now():
     return datetime.datetime.now(tz=datetime.timezone.utc).isoformat()
 
 
-def get_dict_value_from_path(dict_: dict, path: list[str]):
+def get_dict_value_from_path(dict_: dict, path: List[str]):
     """Gets a nested dictionary value.
 
     Args:
         dict_ (dict): #FIXME I miss the info for this argument.
-        path (list): array of keys representing the path to the value
+        path (List): array of keys representing the path to the value
     """
     if path is None:
         return None
@@ -79,12 +80,12 @@ def get_dict_value_from_path(dict_: dict, path: list[str]):
         return None
 
 
-def set_dict_value_from_path(dict_: dict, path: list[str], value: any):
+def set_dict_value_from_path(dict_: dict, path: List[str], value: any):
     """Sets a nested dictionary value.
 
     Args:
         dict_ (dict): #FIXME I miss the info for this argument.
-        path (list): array of keys representing the path to the value
+        path (List): array of keys representing the path to the value
         value: #FIXME I miss the info for this argument.
     """
     for key in path[:-1]:

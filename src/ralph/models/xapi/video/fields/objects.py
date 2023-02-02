@@ -1,6 +1,6 @@
 """Video xAPI events object fields definitions."""
 
-from typing import Optional
+from typing import Dict, Optional
 
 from ...constants import LANG_EN_US_DISPLAY
 from ...fields.objects import ObjectDefinitionExtensionsField
@@ -32,5 +32,5 @@ class VideoObjectField(ActivityObjectField):
         definition (dict): See VideoObjectDefinitionField.
     """
 
-    name: Optional[dict[LANG_EN_US_DISPLAY, str]]
+    name: Optional[Dict[LANG_EN_US_DISPLAY, str]]
     definition: VideoObjectDefinitionField = VideoObjectDefinitionField()

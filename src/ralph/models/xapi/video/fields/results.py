@@ -1,7 +1,12 @@
 """Video xAPI events result fields definitions."""
 
 from datetime import timedelta
-from typing import Literal, Optional
+from typing import Optional
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 from pydantic import Field, NonNegativeFloat
 

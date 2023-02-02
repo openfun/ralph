@@ -3,7 +3,12 @@
 from datetime import datetime
 from ipaddress import IPv4Address
 from pathlib import Path
-from typing import Literal, Optional, Union
+from typing import Dict, Optional, Union
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 from pydantic import AnyHttpUrl, BaseModel, constr
 
@@ -37,7 +42,7 @@ class BaseContextField(BaseModelWithConfig):
     """Pydantic model for core `context` field.
 
     Attributes:
-        course_user_tags (dict of str): Content from `user_api_usercoursetag` table.
+        course_user_tags (Dict of str): Content from `user_api_usercoursetag` table.
             Retrieved with:
                 `dict(
                     UserCourseTag.objects.filter(
@@ -76,7 +81,7 @@ class BaseContextField(BaseModelWithConfig):
     """
 
     course_id: constr(regex=r"^$|^course-v1:.+\+.+\+.+$")  # noqa:F722
-    course_user_tags: Optional[dict[str, str]]
+    course_user_tags: Optional[Dict[str, str]]
     module: Optional[ContextModuleField]
     org_id: str
     path: Path

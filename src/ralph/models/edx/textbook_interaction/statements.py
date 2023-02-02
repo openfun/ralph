@@ -1,6 +1,11 @@
 """Textbook interaction event model definitions."""
 
-from typing import Literal, Union
+from typing import Union
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 from pydantic import Json
 

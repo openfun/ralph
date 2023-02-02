@@ -1,6 +1,9 @@
 """Constants for xAPI specifications."""
 
-from typing import Literal
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 # Languages
 LANG_EN_US_DISPLAY = Literal["en-US"]  # pylint:disable=invalid-name

@@ -8,7 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Restored python 3.7+ support for library usage (models)
+
 ### Changed
+
 - Allow xAPI extra fields in `extensions` fields
 
 ## [3.2.1] - 2023-02-01

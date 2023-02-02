@@ -27,7 +27,7 @@ docker-login: &docker-login
         echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USER" --password-stdin ||
         echo "Docker Hub anonymous mode"
 
-version: 2
+version: 2.1
 jobs:
   # Git jobs
   # Check that the git history is clean and complies with our expectations
@@ -209,8 +209,11 @@ jobs:
               ~/.local/bin/pytest
 
   test-library:
+    parameters:
+      python-image:
+        type: string
     docker:
-      - image: cimg/python:3.11
+      - image: cimg/<< parameters.python-image >>
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -519,6 +522,9 @@ workflows:
             tags:
               only: /.*/
       - test-library:
+          matrix:
+            parameters:
+              python-image: [python:3.7, python:3.8, python:3.9, python:3.10, python:3.11]
           filters:
             tags:
               only: /.*/

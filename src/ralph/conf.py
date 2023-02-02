@@ -2,7 +2,12 @@
 
 import io
 from pathlib import Path
-from typing import Literal, Union
+from typing import List, Tuple, Union
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 try:
     from click import get_app_dir
@@ -46,7 +51,7 @@ class CommaSeparatedTuple(str):
 
     @classmethod
     def __get_validators__(cls):  # noqa: D105
-        def validate(value: Union[str, tuple[str]]) -> tuple[str]:
+        def validate(value: Union[str, Tuple[str]]) -> Tuple[str]:
             """Checks whether the value is a comma separated string or a tuple."""
             if isinstance(value, tuple):
                 return value
@@ -307,7 +312,7 @@ class Settings(BaseSettings):
     SENTRY_DSN: str = None
     SENTRY_CLI_TRACES_SAMPLE_RATE = 1.0
     SENTRY_LRS_TRACES_SAMPLE_RATE = 0.1
-    XAPI_FORWARDINGS: list[XapiForwardingConfigurationSettings] = []
+    XAPI_FORWARDINGS: List[XapiForwardingConfigurationSettings] = []
 
     @property
     def APP_DIR(self) -> Path:  # pylint: disable=invalid-name
