@@ -1,5 +1,7 @@
 """Video xAPI events verb fields definitions."""
 
+from typing import Dict
+
 from ...constants import (
     LANG_EN_US_DISPLAY,
     VERB_COMPLETED_DISPLAY,
@@ -23,11 +25,11 @@ class VideoInitializedVerbField(VerbField):
 
     Attributes:
         id (str): Consists of the value `http://adlnet.gov/expapi/verbs/initialized`.
-        display (dict): Consists of the dictionary `{"en-US": "initialized"}`.
+        display (Dict): Consists of the dictionary `{"en-US": "initialized"}`.
     """
 
     id: VERB_INITIALIZED_ID = VERB_INITIALIZED_ID.__args__[0]
-    display: dict[LANG_EN_US_DISPLAY, VERB_INITIALIZED_DISPLAY] = {
+    display: Dict[LANG_EN_US_DISPLAY, VERB_INITIALIZED_DISPLAY] = {
         LANG_EN_US_DISPLAY.__args__[0]: VERB_INITIALIZED_DISPLAY.__args__[0]
     }
 
@@ -41,7 +43,7 @@ class VideoPlayedVerbField(VerbField):
     """
 
     id: VERB_VIDEO_PLAYED_ID = VERB_VIDEO_PLAYED_ID.__args__[0]
-    display: dict[LANG_EN_US_DISPLAY, VERB_PLAYED_DISPLAY] = {
+    display: Dict[LANG_EN_US_DISPLAY, VERB_PLAYED_DISPLAY] = {
         LANG_EN_US_DISPLAY.__args__[0]: VERB_PLAYED_DISPLAY.__args__[0]
     }
 
@@ -55,7 +57,7 @@ class VideoPausedVerbField(VerbField):
     """
 
     id: VERB_VIDEO_PAUSED_ID = VERB_VIDEO_PAUSED_ID.__args__[0]
-    display: dict[LANG_EN_US_DISPLAY, VERB_PAUSED_DISPLAY] = {
+    display: Dict[LANG_EN_US_DISPLAY, VERB_PAUSED_DISPLAY] = {
         LANG_EN_US_DISPLAY.__args__[0]: VERB_PAUSED_DISPLAY.__args__[0]
     }
 
@@ -69,7 +71,7 @@ class VideoSeekedVerbField(VerbField):
     """
 
     id: VERB_VIDEO_SEEKED_ID = VERB_VIDEO_SEEKED_ID.__args__[0]
-    display: dict[LANG_EN_US_DISPLAY, VERB_SEEKED_DISPLAY] = {
+    display: Dict[LANG_EN_US_DISPLAY, VERB_SEEKED_DISPLAY] = {
         LANG_EN_US_DISPLAY.__args__[0]: VERB_SEEKED_DISPLAY.__args__[0]
     }
 
@@ -83,7 +85,7 @@ class VideoCompletedVerbField(VerbField):
     """
 
     id: VERB_COMPLETED_ID = VERB_COMPLETED_ID.__args__[0]
-    display: dict[LANG_EN_US_DISPLAY, VERB_COMPLETED_DISPLAY] = {
+    display: Dict[LANG_EN_US_DISPLAY, VERB_COMPLETED_DISPLAY] = {
         LANG_EN_US_DISPLAY.__args__[0]: VERB_COMPLETED_DISPLAY.__args__[0]
     }
 
@@ -97,7 +99,7 @@ class VideoTerminatedVerbField(VerbField):
     """
 
     id: VERB_TERMINATED_ID = VERB_TERMINATED_ID.__args__[0]
-    display: dict[LANG_EN_US_DISPLAY, VERB_TERMINATED_DISPLAY] = {
+    display: Dict[LANG_EN_US_DISPLAY, VERB_TERMINATED_DISPLAY] = {
         LANG_EN_US_DISPLAY.__args__[0]: VERB_TERMINATED_DISPLAY.__args__[0]
     }
 
@@ -111,6 +113,6 @@ class VideoInteractedVerbField(VerbField):
     """
 
     id: VERB_INTERACTED_ID = VERB_INTERACTED_ID.__args__[0]
-    display: dict[LANG_EN_US_DISPLAY, VERB_INTERACTED_DISPLAY] = {
+    display: Dict[LANG_EN_US_DISPLAY, VERB_INTERACTED_DISPLAY] = {
         LANG_EN_US_DISPLAY.__args__[0]: VERB_INTERACTED_DISPLAY.__args__[0]
     }

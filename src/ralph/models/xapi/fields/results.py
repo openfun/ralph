@@ -2,7 +2,7 @@
 
 from datetime import timedelta
 from decimal import Decimal
-from typing import Optional, Union
+from typing import Dict, Optional, Union
 
 from pydantic import StrictBool, StrictStr, conint, root_validator
 
@@ -62,4 +62,4 @@ class ResultField(BaseModelWithConfig):
     completion: Optional[StrictBool]
     response: Optional[StrictStr]
     duration: Optional[timedelta]
-    extensions: Optional[dict[IRI, Union[str, int, bool, list, dict, None]]]
+    extensions: Optional[Dict[IRI, Union[str, int, bool, list, dict, None]]]

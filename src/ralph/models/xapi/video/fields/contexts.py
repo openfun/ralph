@@ -1,6 +1,12 @@
 """Video xAPI events context fields definitions."""
 
-from typing import Literal, Optional
+from typing import Dict, List, Optional
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
+
 from uuid import UUID
 
 from pydantic import Field, NonNegativeFloat
@@ -27,11 +33,11 @@ class VideoContextActivitiesField(ContextActivitiesContextField):
     """Pydantic model for video `contextActivities` field.
 
     Attributes:
-        category (list): Consists of a list containing the dictionary
+        category (List): Consists of a list containing the dictionary
             {"id": "https://w3id.org/xapi/video"}.
     """
 
-    category: list[dict[Literal["id"], VIDEO_CONTEXT_CATEGORY]] = [
+    category: List[Dict[Literal["id"], VIDEO_CONTEXT_CATEGORY]] = [
         {"id": VIDEO_CONTEXT_CATEGORY.__args__[0]}
     ]
 

@@ -1,6 +1,12 @@
 """Common xAPI object field definitions."""
 
-from typing import Literal, Optional, Union
+from typing import Dict, List, Optional, Union
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
+
 from uuid import UUID
 
 from pydantic import AnyUrl, StrictStr, constr, validator
@@ -17,14 +23,14 @@ class ObjectDefinitionField(BaseModelWithConfig):
         description (LanguageMap): Consists of a description of the Activity.
         type (IRI): Consists of the type of the Activity.
         moreInfo (URL): Consists of an URL to a document about the Activity.
-        extensions (dict): Consists of a dictionary of other properties as needed.
+        extensions (Dict): Consists of a dictionary of other properties as needed.
     """
 
     name: Optional[LanguageMap]
     description: Optional[LanguageMap]
     type: Optional[IRI]
     moreInfo: Optional[AnyUrl]
-    extensions: Optional[dict[IRI, Union[str, int, bool, list, dict, None]]]
+    extensions: Optional[Dict[IRI, Union[str, int, bool, list, dict, None]]]
 
 
 class InteractionComponent(BaseModelWithConfig):
@@ -66,12 +72,12 @@ class InteractionObjectDefinitionField(ObjectDefinitionField):
         "numeric",
         "other",
     ]
-    correctResponsesPattern: Optional[list[StrictStr]]
-    choices: Optional[list[InteractionComponent]]
-    scale: Optional[list[InteractionComponent]]
-    source: Optional[list[InteractionComponent]]
-    target: Optional[list[InteractionComponent]]
-    steps: Optional[list[InteractionComponent]]
+    correctResponsesPattern: Optional[List[StrictStr]]
+    choices: Optional[List[InteractionComponent]]
+    scale: Optional[List[InteractionComponent]]
+    source: Optional[List[InteractionComponent]]
+    target: Optional[List[InteractionComponent]]
+    steps: Optional[List[InteractionComponent]]
 
     @validator("choices", "scale", "source", "target", "steps")
     @classmethod

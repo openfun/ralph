@@ -1,6 +1,9 @@
 """Constants for xAPI video specifications."""
 
-from typing import Literal
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 # xAPI video extensions
 VIDEO_EXTENSION_CC_SUBTITLE_LANG = (

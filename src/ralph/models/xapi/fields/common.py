@@ -1,5 +1,7 @@
 """Common xAPI field definitions."""
 
+from typing import Dict
+
 from langcodes import tag_is_valid
 from pydantic import StrictStr, validate_email
 from rfc3987 import parse
@@ -32,7 +34,7 @@ class LanguageTag(str):
         yield validate
 
 
-LanguageMap = dict[LanguageTag, StrictStr]
+LanguageMap = Dict[LanguageTag, StrictStr]
 
 
 class MailtoEmail(str):

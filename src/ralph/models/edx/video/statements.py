@@ -1,6 +1,11 @@
 """Video event model definitions."""
 
-from typing import Literal, Optional, Union
+from typing import Optional, Union
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 from pydantic import Json
 

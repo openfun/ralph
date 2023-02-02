@@ -1,6 +1,11 @@
 """Common xAPI actor field definitions."""
 
-from typing import Literal, Optional, Union
+from typing import List, Optional, Union
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 from pydantic import AnyUrl, StrictStr, constr
 
@@ -98,7 +103,7 @@ class AnonymousGroupActorField(BaseActorField):
     """
 
     objectType: Literal["Group"]
-    member: list[AgentActorField]
+    member: List[AgentActorField]
 
 
 class BaseIdentifiedGroupActorField(AnonymousGroupActorField):
@@ -110,7 +115,7 @@ class BaseIdentifiedGroupActorField(AnonymousGroupActorField):
         member (list): Consist of a list of the members of this Group.
     """
 
-    member: Optional[list[AgentActorField]]
+    member: Optional[List[AgentActorField]]
 
 
 class MboxGroupActorField(BaseIdentifiedGroupActorField, MboxActorField):

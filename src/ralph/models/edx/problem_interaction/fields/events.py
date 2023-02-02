@@ -1,7 +1,12 @@
 """Problem interaction events model event fields definitions."""
 
 from datetime import datetime
-from typing import Literal, Optional, Union
+from typing import Dict, List, Optional, Union
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 from pydantic import constr
 
@@ -55,7 +60,7 @@ class State(BaseModelWithConfig):
         student_answers (dict): Consists of the answer(s) given by the user.
     """
 
-    correct_map: dict[
+    correct_map: Dict[
         constr(regex=r"^[a-f0-9]{32}_[0-9]_[0-9]$"),  # noqa : F722
         CorrectMap,
     ]
@@ -80,7 +85,7 @@ class SubmissionAnswerField(BaseModelWithConfig):
             this user.
     """
 
-    answer: Union[str, list[str]]
+    answer: Union[str, List[str]]
     correct: bool
     input_type: str
     question: str
@@ -129,10 +134,10 @@ class EdxProblemHintFeedbackDisplayedEventField(AbstractBaseEventField):
             `student_answer` response. Consists either of `single` or `compound` value.
     """
 
-    choice_all: Optional[list[str]]
+    choice_all: Optional[List[str]]
     correctness: bool
     hint_label: str
-    hints: list[dict]
+    hints: List[dict]
     module_id: str
     problem_part_id: str
     question_type: Union[
@@ -142,7 +147,7 @@ class EdxProblemHintFeedbackDisplayedEventField(AbstractBaseEventField):
         Literal["numericalresponse"],
         Literal["optionresponse"],
     ]
-    student_answer: list[str]
+    student_answer: List[str]
     trigger_type: Union[Literal["single"], Literal["compound"]]
 
 
@@ -163,12 +168,12 @@ class ProblemCheckEventField(AbstractBaseEventField):
         success (str): Consists of either the `correct` or `incorrect` value.
     """
 
-    answers: dict[
+    answers: Dict[
         constr(regex=r"^[a-f0-9]{32}_[0-9]_[0-9]$"),  # noqa : F722
-        Union[list[str], str],
+        Union[List[str], str],
     ]
     attempts: int
-    correct_map: dict[
+    correct_map: Dict[
         constr(regex=r"^[a-f0-9]{32}_[0-9]_[0-9]$"),  # noqa : F722
         CorrectMap,
     ]
@@ -179,7 +184,7 @@ class ProblemCheckEventField(AbstractBaseEventField):
         r"type@problem\+block@[a-f0-9]{32}$"  # noqa : F722
     )
     state: State
-    submission: dict[
+    submission: Dict[
         constr(regex=r"^[a-f0-9]{32}_[0-9]_[0-9]$"),  # noqa : F722
         SubmissionAnswerField,
     ]
@@ -197,9 +202,9 @@ class ProblemCheckFailEventField(AbstractBaseEventField):
         state (dict): Consists of the current problem state.
     """
 
-    answers: dict[
+    answers: Dict[
         constr(regex=r"^[a-f0-9]{32}_[0-9]_[0-9]$"),  # noqa : F722
-        Union[list[str], str],
+        Union[List[str], str],
     ]
     failure: Union[Literal["closed"], Literal["unreset"]]
     problem_id: constr(
@@ -262,7 +267,7 @@ class UIProblemResetEventField(AbstractBaseEventField):
             strings if multiple choices are allowed.
     """
 
-    answers: Union[str, list[str]]
+    answers: Union[str, List[str]]
 
 
 class UIProblemShowEventField(AbstractBaseEventField):
@@ -321,7 +326,7 @@ class SaveProblemFailEventField(AbstractBaseEventField):
         state (json): see StateField.
     """
 
-    answers: dict[str, Union[int, str, list, dict]]
+    answers: Dict[str, Union[int, str, list, dict]]
     failure: Union[Literal["closed"], Literal["done"]]
     problem_id: constr(
         regex=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"  # noqa : F722
@@ -340,7 +345,7 @@ class SaveProblemSuccessEventField(AbstractBaseEventField):
         state (json): see StateField.
     """
 
-    answers: dict[str, Union[int, str, list, dict]]
+    answers: Dict[str, Union[int, str, list, dict]]
     problem_id: constr(
         regex=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"  # noqa : F722
         r"type@problem\+block@[a-f0-9]{32}$"  # noqa : F722

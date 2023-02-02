@@ -1,6 +1,6 @@
 """Common xAPI verb field definitions."""
 
-from typing import Optional
+from typing import Dict, Optional
 
 from ..config import BaseModelWithConfig
 from ..constants import (
@@ -34,7 +34,7 @@ class ViewedVerbField(VerbField):
     """
 
     id: VERB_VIEWED_ID = VERB_VIEWED_ID.__args__[0]
-    display: dict[LANG_EN_US_DISPLAY, VERB_VIEWED_DISPLAY] = {
+    display: Dict[LANG_EN_US_DISPLAY, VERB_VIEWED_DISPLAY] = {
         LANG_EN_US_DISPLAY.__args__[0]: VERB_VIEWED_DISPLAY.__args__[0]
     }
 
@@ -48,6 +48,6 @@ class TerminatedVerbField(VerbField):
     """
 
     id: VERB_TERMINATED_ID = VERB_TERMINATED_ID.__args__[0]
-    display: dict[LANG_EN_US_DISPLAY, VERB_TERMINATED_DISPLAY] = {
+    display: Dict[LANG_EN_US_DISPLAY, VERB_TERMINATED_DISPLAY] = {
         LANG_EN_US_DISPLAY.__args__[0]: VERB_TERMINATED_DISPLAY.__args__[0]
     }

@@ -1,7 +1,7 @@
 """Base xAPI model definition."""
 
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 from uuid import UUID
 
 from pydantic import constr, root_validator
@@ -29,7 +29,7 @@ class BaseXapiModel(BaseModelWithConfig):
         stored (datetime): Consists of the timestamp of when the event was recorded.
         authority (ActorField): Consists of the Actor asserting this Statement is true.
         version (str): Consists of the associated xAPI version of the Statement.
-        attachments (list): Consists of a list of Attachments.
+        attachments (List): Consists of a list of Attachments.
     """
 
     id: Optional[UUID]
@@ -42,7 +42,7 @@ class BaseXapiModel(BaseModelWithConfig):
     stored: Optional[datetime]
     authority: Optional[ActorField]
     version: constr(regex=r"^1\.0\.[0-9]+$") = "1.0.0"  # noqa:F722
-    attachments: Optional[list[AttachmentField]]
+    attachments: Optional[List[AttachmentField]]
 
     @root_validator(pre=True)
     @classmethod

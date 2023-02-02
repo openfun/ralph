@@ -1,6 +1,11 @@
 """Problem interaction events model definitions."""
 
-from typing import Literal, Union
+from typing import List, Union
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 from pydantic import Json
 
@@ -135,7 +140,7 @@ class UIProblemGraded(BaseBrowserModel):
 
     __selector__ = selector(event_source="browser", event_type="problem_graded")
 
-    event: list[Union[str, Literal[None], None]]
+    event: List[Union[str, Literal[None], None]]
     event_type: Literal["problem_graded"]
     name: Literal["problem_graded"]
 

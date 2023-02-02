@@ -6,7 +6,7 @@ from importlib import import_module
 from inspect import getmembers, isclass
 from itertools import chain
 from types import ModuleType
-from typing import Any, Union
+from typing import Any, Tuple, Union
 
 from pydantic import BaseModel
 
@@ -19,7 +19,7 @@ from ralph.utils import get_dict_value_from_path
 class LazyModelField:
     """Model field."""
 
-    path: tuple[str]
+    path: Tuple[str]
 
     def __init__(self, path: str):
         """Initalizes Lazy Model Field."""

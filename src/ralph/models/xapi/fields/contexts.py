@@ -1,6 +1,6 @@
 """Common xAPI context field definitions."""
 
-from typing import Optional, Union
+from typing import Dict, List, Optional, Union
 from uuid import UUID
 
 from pydantic import StrictStr
@@ -15,17 +15,17 @@ class ContextActivitiesContextField(BaseModelWithConfig):
     """Pydantic model for `context.contextActivities` field.
 
     Attributes:
-        parent (list): An Activity with a direct relation to the statement's Activity.
-        grouping (list): An Activity with an indirect relation to the statement's
+        parent (List): An Activity with a direct relation to the statement's Activity.
+        grouping (List): An Activity with an indirect relation to the statement's
             Activity.
-        category (list): An Activity used to categorize the Statement.
-        other (list): A contextActivity that doesn't fit one of the other properties.
+        category (List): An Activity used to categorize the Statement.
+        other (List): A contextActivity that doesn't fit one of the other properties.
     """
 
-    parent: Optional[Union[ActivityObjectField, list[ActivityObjectField]]]
-    grouping: Optional[Union[ActivityObjectField, list[ActivityObjectField]]]
-    category: Optional[Union[ActivityObjectField, list[ActivityObjectField]]]
-    other: Optional[Union[ActivityObjectField, list[ActivityObjectField]]]
+    parent: Optional[Union[ActivityObjectField, List[ActivityObjectField]]]
+    grouping: Optional[Union[ActivityObjectField, List[ActivityObjectField]]]
+    category: Optional[Union[ActivityObjectField, List[ActivityObjectField]]]
+    other: Optional[Union[ActivityObjectField, List[ActivityObjectField]]]
 
 
 class ContextField(BaseModelWithConfig):
@@ -51,4 +51,4 @@ class ContextField(BaseModelWithConfig):
     platform: Optional[StrictStr]
     language: Optional[LanguageTag]
     statement: Optional[StatementRefObjectField]
-    extensions: Optional[dict[IRI, Union[str, int, bool, list, dict, None]]]
+    extensions: Optional[Dict[IRI, Union[str, int, bool, list, dict, None]]]
