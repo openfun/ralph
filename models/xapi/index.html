@@ -459,6 +459,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ralph.models.xapi.config.BaseExtensionModelWithConfig" class="md-nav__link">
+    BaseExtensionModelWithConfig
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ralph.models.xapi.config.BaseModelWithConfig" class="md-nav__link">
     BaseModelWithConfig
   </a>
@@ -1577,6 +1584,13 @@
   
     <nav class="md-nav" aria-label="config">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.models.xapi.config.BaseExtensionModelWithConfig" class="md-nav__link">
+    BaseExtensionModelWithConfig
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#ralph.models.xapi.config.BaseModelWithConfig" class="md-nav__link">
@@ -2813,6 +2827,62 @@ only if the <code>object.objectType</code> property is equal to <code>Activity</
 
 
 
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h3 id="ralph.models.xapi.config.BaseExtensionModelWithConfig" class="doc doc-heading">
+        <code>
+BaseExtensionModelWithConfig            (<span title="pydantic.main.BaseModel">BaseModel</span>)
+        </code>
+
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-model"><code>pydantic-model</code></small>
+  </span>
+
+<a href="#ralph.models.xapi.config.BaseExtensionModelWithConfig" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Pydantic model for extension configuration shared among all models.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>ralph/models/xapi/config.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BaseExtensionModelWithConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for extension configuration shared among all models.&quot;&quot;&quot;</span>
+
+    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>  <span class="c1"># pylint: disable=missing-class-docstring # noqa: D106</span>
+        <span class="n">extra</span> <span class="o">=</span> <span class="n">Extra</span><span class="o">.</span><span class="n">allow</span>
+        <span class="n">min_anystr_length</span> <span class="o">=</span> <span class="mi">0</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
 
 
 
@@ -4551,7 +4621,7 @@ ContextField            (<a class="autorefs autorefs-internal" title="ralph.mode
 
 <h4 id="ralph.models.xapi.fields.objects.ObjectDefinitionExtensionsField" class="doc doc-heading">
         <code>
-ObjectDefinitionExtensionsField            (<a class="autorefs autorefs-internal" title="ralph.models.xapi.config.BaseModelWithConfig" href="#ralph.models.xapi.config.BaseModelWithConfig">BaseModelWithConfig</a>)
+ObjectDefinitionExtensionsField            (<a class="autorefs autorefs-internal" title="ralph.models.xapi.config.BaseExtensionModelWithConfig" href="#ralph.models.xapi.config.BaseExtensionModelWithConfig">BaseExtensionModelWithConfig</a>)
         </code>
 
 
@@ -4594,7 +4664,7 @@ ObjectDefinitionExtensionsField            (<a class="autorefs autorefs-internal
 </table>
         <details class="quote">
           <summary>Source code in <code>ralph/models/xapi/fields/objects.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ObjectDefinitionExtensionsField</span><span class="p">(</span><span class="n">BaseModelWithConfig</span><span class="p">):</span>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ObjectDefinitionExtensionsField</span><span class="p">(</span><span class="n">BaseExtensionModelWithConfig</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for `object.definition.extensions` field.</span>
 
 <span class="sd">    Attributes:</span>
@@ -6911,7 +6981,7 @@ VideoContextActivitiesField            (<a class="autorefs autorefs-internal" ti
 
 <h5 id="ralph.models.xapi.video.fields.contexts.VideoContextExtensionsField" class="doc doc-heading">
         <code>
-VideoContextExtensionsField            (<a class="autorefs autorefs-internal" title="ralph.models.xapi.config.BaseModelWithConfig" href="#ralph.models.xapi.config.BaseModelWithConfig">BaseModelWithConfig</a>)
+VideoContextExtensionsField            (<a class="autorefs autorefs-internal" title="ralph.models.xapi.config.BaseExtensionModelWithConfig" href="#ralph.models.xapi.config.BaseExtensionModelWithConfig">BaseExtensionModelWithConfig</a>)
         </code>
 
 
@@ -6944,7 +7014,7 @@ VideoContextExtensionsField            (<a class="autorefs autorefs-internal" ti
 </table>
         <details class="quote">
           <summary>Source code in <code>ralph/models/xapi/video/fields/contexts.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VideoContextExtensionsField</span><span class="p">(</span><span class="n">BaseModelWithConfig</span><span class="p">):</span>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VideoContextExtensionsField</span><span class="p">(</span><span class="n">BaseExtensionModelWithConfig</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for video core `context`.`extensions` field.</span>
 
 <span class="sd">    Attributes:</span>
@@ -8269,16 +8339,12 @@ VideoCompletedResultExtensionsField            (<a class="autorefs autorefs-inte
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">progress</span><span class="p">:</span> <span class="n">NonNegativeFloat</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">alias</span><span class="o">=</span><span class="n">VIDEO_EXTENSION_PROGRESS</span><span class="p">)</span>
-
-    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>  <span class="c1"># pylint: disable=missing-class-docstring # noqa: D106</span>
-        <span class="n">min_anystr_length</span> <span class="o">=</span> <span class="mi">0</span>
 </code></pre></div>
         </details>
 
 
 
   <div class="doc doc-children">
-
 
 
 
@@ -8438,16 +8504,12 @@ VideoEnableClosedCaptioningResultExtensionsField            (<a class="autorefs 
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">ccEnabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">alias</span><span class="o">=</span><span class="n">VIDEO_EXTENSION_CC_ENABLED</span><span class="p">)</span>
-
-    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>  <span class="c1"># pylint: disable=missing-class-docstring # noqa: D106</span>
-        <span class="n">min_anystr_length</span> <span class="o">=</span> <span class="mi">0</span>
 </code></pre></div>
         </details>
 
 
 
   <div class="doc doc-children">
-
 
 
 
@@ -8591,16 +8653,12 @@ VideoPausedResultExtensionsField            (<a class="autorefs autorefs-interna
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">progress</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NonNegativeFloat</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">alias</span><span class="o">=</span><span class="n">VIDEO_EXTENSION_PROGRESS</span><span class="p">)</span>
-
-    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>  <span class="c1"># pylint: disable=missing-class-docstring # noqa: D106</span>
-        <span class="n">min_anystr_length</span> <span class="o">=</span> <span class="mi">0</span>
 </code></pre></div>
         </details>
 
 
 
   <div class="doc doc-children">
-
 
 
 
@@ -8777,7 +8835,7 @@ VideoPlayedResultField            (<a class="autorefs autorefs-internal" title="
 
 <h5 id="ralph.models.xapi.video.fields.results.VideoResultExtensionsField" class="doc doc-heading">
         <code>
-VideoResultExtensionsField            (<a class="autorefs autorefs-internal" title="ralph.models.xapi.config.BaseModelWithConfig" href="#ralph.models.xapi.config.BaseModelWithConfig">BaseModelWithConfig</a>)
+VideoResultExtensionsField            (<a class="autorefs autorefs-internal" title="ralph.models.xapi.config.BaseExtensionModelWithConfig" href="#ralph.models.xapi.config.BaseExtensionModelWithConfig">BaseExtensionModelWithConfig</a>)
         </code>
 
 
@@ -8817,7 +8875,7 @@ current registration in chronological order (for example,
 </table>
         <details class="quote">
           <summary>Source code in <code>ralph/models/xapi/video/fields/results.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VideoResultExtensionsField</span><span class="p">(</span><span class="n">BaseModelWithConfig</span><span class="p">):</span>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VideoResultExtensionsField</span><span class="p">(</span><span class="n">BaseExtensionModelWithConfig</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for video `result`.`extensions` field.</span>
 
 <span class="sd">    Attributes:</span>
@@ -8938,7 +8996,7 @@ VideoScreenChangeInteractionResultField            (<a class="autorefs autorefs-
 
 <h5 id="ralph.models.xapi.video.fields.results.VideoSeekedResultExtensionsField" class="doc doc-heading">
         <code>
-VideoSeekedResultExtensionsField            (<a class="autorefs autorefs-internal" title="ralph.models.xapi.config.BaseModelWithConfig" href="#ralph.models.xapi.config.BaseModelWithConfig">BaseModelWithConfig</a>)
+VideoSeekedResultExtensionsField            (<a class="autorefs autorefs-internal" title="ralph.models.xapi.config.BaseExtensionModelWithConfig" href="#ralph.models.xapi.config.BaseExtensionModelWithConfig">BaseExtensionModelWithConfig</a>)
         </code>
 
 
@@ -8978,7 +9036,7 @@ object during a seek operation.</p></td>
 </table>
         <details class="quote">
           <summary>Source code in <code>ralph/models/xapi/video/fields/results.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VideoSeekedResultExtensionsField</span><span class="p">(</span><span class="n">BaseModelWithConfig</span><span class="p">):</span>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VideoSeekedResultExtensionsField</span><span class="p">(</span><span class="n">BaseExtensionModelWithConfig</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for video seeked `result`.`extensions` field.</span>
 
 <span class="sd">    Attributes:</span>
@@ -8990,16 +9048,12 @@ object during a seek operation.</p></td>
 
     <span class="n">timeFrom</span><span class="p">:</span> <span class="n">NonNegativeFloat</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">alias</span><span class="o">=</span><span class="n">VIDEO_EXTENSION_TIME_FROM</span><span class="p">)</span>
     <span class="n">timeTo</span><span class="p">:</span> <span class="n">NonNegativeFloat</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">alias</span><span class="o">=</span><span class="n">VIDEO_EXTENSION_TIME_TO</span><span class="p">)</span>
-
-    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>  <span class="c1"># pylint: disable=missing-class-docstring # noqa: D106</span>
-        <span class="n">min_anystr_length</span> <span class="o">=</span> <span class="mi">0</span>
 </code></pre></div>
         </details>
 
 
 
   <div class="doc doc-children">
-
 
 
 
@@ -9144,16 +9198,12 @@ VideoTerminatedResultExtensionsField            (<a class="autorefs autorefs-int
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">progress</span><span class="p">:</span> <span class="n">NonNegativeFloat</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">alias</span><span class="o">=</span><span class="n">VIDEO_EXTENSION_PROGRESS</span><span class="p">)</span>
-
-    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>  <span class="c1"># pylint: disable=missing-class-docstring # noqa: D106</span>
-        <span class="n">min_anystr_length</span> <span class="o">=</span> <span class="mi">0</span>
 </code></pre></div>
         </details>
 
 
 
   <div class="doc doc-children">
-
 
 
 
