@@ -2640,7 +2640,7 @@ BaseXapiModel            (<a class="autorefs autorefs-internal" title="ralph.mod
       </tr>
       <tr>
         <td><code>attachments</code></td>
-        <td><code>list</code></td>
+        <td><code>List</code></td>
         <td><p>Consists of a list of Attachments.</p></td>
       </tr>
   </tbody>
@@ -2661,7 +2661,7 @@ BaseXapiModel            (<a class="autorefs autorefs-internal" title="ralph.mod
 <span class="sd">        stored (datetime): Consists of the timestamp of when the event was recorded.</span>
 <span class="sd">        authority (ActorField): Consists of the Actor asserting this Statement is true.</span>
 <span class="sd">        version (str): Consists of the associated xAPI version of the Statement.</span>
-<span class="sd">        attachments (list): Consists of a list of Attachments.</span>
+<span class="sd">        attachments (List): Consists of a list of Attachments.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nb">id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">UUID</span><span class="p">]</span>
@@ -2674,7 +2674,7 @@ BaseXapiModel            (<a class="autorefs autorefs-internal" title="ralph.mod
     <span class="n">stored</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span>
     <span class="n">authority</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ActorField</span><span class="p">]</span>
     <span class="n">version</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^1\.0\.[0-9]+$&quot;</span><span class="p">)</span> <span class="o">=</span> <span class="s2">&quot;1.0.0&quot;</span>  <span class="c1"># noqa:F722</span>
-    <span class="n">attachments</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">AttachmentField</span><span class="p">]]</span>
+    <span class="n">attachments</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">AttachmentField</span><span class="p">]]</span>
 
     <span class="nd">@root_validator</span><span class="p">(</span><span class="n">pre</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
@@ -3340,7 +3340,7 @@ AnonymousGroupActorField            (<a class="autorefs autorefs-internal" title
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">objectType</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;Group&quot;</span><span class="p">]</span>
-    <span class="n">member</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AgentActorField</span><span class="p">]</span>
+    <span class="n">member</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">AgentActorField</span><span class="p">]</span>
 </code></pre></div>
         </details>
 
@@ -3504,7 +3504,7 @@ BaseIdentifiedGroupActorField            (<a class="autorefs autorefs-internal" 
 <span class="sd">        member (list): Consist of a list of the members of this Group.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">member</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">AgentActorField</span><span class="p">]]</span>
+    <span class="n">member</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">AgentActorField</span><span class="p">]]</span>
 </code></pre></div>
         </details>
 
@@ -4369,23 +4369,23 @@ ContextActivitiesContextField            (<a class="autorefs autorefs-internal" 
   <tbody>
       <tr>
         <td><code>parent</code></td>
-        <td><code>list</code></td>
+        <td><code>List</code></td>
         <td><p>An Activity with a direct relation to the statement&rsquo;s Activity.</p></td>
       </tr>
       <tr>
         <td><code>grouping</code></td>
-        <td><code>list</code></td>
+        <td><code>List</code></td>
         <td><p>An Activity with an indirect relation to the statement&rsquo;s
 Activity.</p></td>
       </tr>
       <tr>
         <td><code>category</code></td>
-        <td><code>list</code></td>
+        <td><code>List</code></td>
         <td><p>An Activity used to categorize the Statement.</p></td>
       </tr>
       <tr>
         <td><code>other</code></td>
-        <td><code>list</code></td>
+        <td><code>List</code></td>
         <td><p>A contextActivity that doesn&rsquo;t fit one of the other properties.</p></td>
       </tr>
   </tbody>
@@ -4396,17 +4396,17 @@ Activity.</p></td>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for `context.contextActivities` field.</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        parent (list): An Activity with a direct relation to the statement&#39;s Activity.</span>
-<span class="sd">        grouping (list): An Activity with an indirect relation to the statement&#39;s</span>
+<span class="sd">        parent (List): An Activity with a direct relation to the statement&#39;s Activity.</span>
+<span class="sd">        grouping (List): An Activity with an indirect relation to the statement&#39;s</span>
 <span class="sd">            Activity.</span>
-<span class="sd">        category (list): An Activity used to categorize the Statement.</span>
-<span class="sd">        other (list): A contextActivity that doesn&#39;t fit one of the other properties.</span>
+<span class="sd">        category (List): An Activity used to categorize the Statement.</span>
+<span class="sd">        other (List): A contextActivity that doesn&#39;t fit one of the other properties.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">parent</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">ActivityObjectField</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">ActivityObjectField</span><span class="p">]]]</span>
-    <span class="n">grouping</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">ActivityObjectField</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">ActivityObjectField</span><span class="p">]]]</span>
-    <span class="n">category</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">ActivityObjectField</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">ActivityObjectField</span><span class="p">]]]</span>
-    <span class="n">other</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">ActivityObjectField</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">ActivityObjectField</span><span class="p">]]]</span>
+    <span class="n">parent</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">ActivityObjectField</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">ActivityObjectField</span><span class="p">]]]</span>
+    <span class="n">grouping</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">ActivityObjectField</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">ActivityObjectField</span><span class="p">]]]</span>
+    <span class="n">category</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">ActivityObjectField</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">ActivityObjectField</span><span class="p">]]]</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">ActivityObjectField</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">ActivityObjectField</span><span class="p">]]]</span>
 </code></pre></div>
         </details>
 
@@ -4540,7 +4540,7 @@ ContextField            (<a class="autorefs autorefs-internal" title="ralph.mode
     <span class="n">platform</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">StrictStr</span><span class="p">]</span>
     <span class="n">language</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">LanguageTag</span><span class="p">]</span>
     <span class="n">statement</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">StatementRefObjectField</span><span class="p">]</span>
-    <span class="n">extensions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">IRI</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]]</span>
+    <span class="n">extensions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">IRI</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]]</span>
 </code></pre></div>
         </details>
 
@@ -4774,7 +4774,7 @@ SubStatementObjectField            (<a class="autorefs autorefs-internal" title=
     <span class="n">result</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ResultField</span><span class="p">]</span>
     <span class="n">context</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ContextField</span><span class="p">]</span>
     <span class="n">timestamp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span>
-    <span class="n">attachments</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">AttachmentField</span><span class="p">]]</span>
+    <span class="n">attachments</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">AttachmentField</span><span class="p">]]</span>
 </code></pre></div>
         </details>
 
@@ -4928,7 +4928,7 @@ ResultField            (<a class="autorefs autorefs-internal" title="ralph.model
     <span class="n">completion</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">StrictBool</span><span class="p">]</span>
     <span class="n">response</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">StrictStr</span><span class="p">]</span>
     <span class="n">duration</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">timedelta</span><span class="p">]</span>
-    <span class="n">extensions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">IRI</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]]</span>
+    <span class="n">extensions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">IRI</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]]</span>
 </code></pre></div>
         </details>
 
@@ -5437,12 +5437,12 @@ InteractionObjectDefinitionField            (<a class="autorefs autorefs-interna
         <span class="s2">&quot;numeric&quot;</span><span class="p">,</span>
         <span class="s2">&quot;other&quot;</span><span class="p">,</span>
     <span class="p">]</span>
-    <span class="n">correctResponsesPattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">StrictStr</span><span class="p">]]</span>
-    <span class="n">choices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">InteractionComponent</span><span class="p">]]</span>
-    <span class="n">scale</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">InteractionComponent</span><span class="p">]]</span>
-    <span class="n">source</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">InteractionComponent</span><span class="p">]]</span>
-    <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">InteractionComponent</span><span class="p">]]</span>
-    <span class="n">steps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">InteractionComponent</span><span class="p">]]</span>
+    <span class="n">correctResponsesPattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">StrictStr</span><span class="p">]]</span>
+    <span class="n">choices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">InteractionComponent</span><span class="p">]]</span>
+    <span class="n">scale</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">InteractionComponent</span><span class="p">]]</span>
+    <span class="n">source</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">InteractionComponent</span><span class="p">]]</span>
+    <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">InteractionComponent</span><span class="p">]]</span>
+    <span class="n">steps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">InteractionComponent</span><span class="p">]]</span>
 
     <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;choices&quot;</span><span class="p">,</span> <span class="s2">&quot;scale&quot;</span><span class="p">,</span> <span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="s2">&quot;steps&quot;</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
@@ -5569,7 +5569,7 @@ ObjectDefinitionField            (<a class="autorefs autorefs-internal" title="r
       </tr>
       <tr>
         <td><code>extensions</code></td>
-        <td><code>dict</code></td>
+        <td><code>Dict</code></td>
         <td><p>Consists of a dictionary of other properties as needed.</p></td>
       </tr>
   </tbody>
@@ -5584,14 +5584,14 @@ ObjectDefinitionField            (<a class="autorefs autorefs-internal" title="r
 <span class="sd">        description (LanguageMap): Consists of a description of the Activity.</span>
 <span class="sd">        type (IRI): Consists of the type of the Activity.</span>
 <span class="sd">        moreInfo (URL): Consists of an URL to a document about the Activity.</span>
-<span class="sd">        extensions (dict): Consists of a dictionary of other properties as needed.</span>
+<span class="sd">        extensions (Dict): Consists of a dictionary of other properties as needed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">LanguageMap</span><span class="p">]</span>
     <span class="n">description</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">LanguageMap</span><span class="p">]</span>
     <span class="nb">type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">IRI</span><span class="p">]</span>
     <span class="n">moreInfo</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AnyUrl</span><span class="p">]</span>
-    <span class="n">extensions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">IRI</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]]</span>
+    <span class="n">extensions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">IRI</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]]</span>
 </code></pre></div>
         </details>
 
@@ -5800,7 +5800,7 @@ TerminatedVerbField            (<a class="autorefs autorefs-internal" title="ral
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nb">id</span><span class="p">:</span> <span class="n">VERB_TERMINATED_ID</span> <span class="o">=</span> <span class="n">VERB_TERMINATED_ID</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">display</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">LANG_EN_US_DISPLAY</span><span class="p">,</span> <span class="n">VERB_TERMINATED_DISPLAY</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">display</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">LANG_EN_US_DISPLAY</span><span class="p">,</span> <span class="n">VERB_TERMINATED_DISPLAY</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">LANG_EN_US_DISPLAY</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">VERB_TERMINATED_DISPLAY</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="p">}</span>
 </code></pre></div>
@@ -5966,7 +5966,7 @@ ViewedVerbField            (<a class="autorefs autorefs-internal" title="ralph.m
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nb">id</span><span class="p">:</span> <span class="n">VERB_VIEWED_ID</span> <span class="o">=</span> <span class="n">VERB_VIEWED_ID</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">display</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">LANG_EN_US_DISPLAY</span><span class="p">,</span> <span class="n">VERB_VIEWED_DISPLAY</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">display</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">LANG_EN_US_DISPLAY</span><span class="p">,</span> <span class="n">VERB_VIEWED_DISPLAY</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">LANG_EN_US_DISPLAY</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">VERB_VIEWED_DISPLAY</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="p">}</span>
 </code></pre></div>
@@ -6160,7 +6160,7 @@ PageObjectDefinitionField            (<a class="autorefs autorefs-internal" titl
 <span class="sd">       extensions (dict): See ObjectDefinitionExtensionsField.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">name</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">LANG_EN_US_DISPLAY</span><span class="p">,</span> <span class="n">ACTIVITY_PAGE_DISPLAY</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">name</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">LANG_EN_US_DISPLAY</span><span class="p">,</span> <span class="n">ACTIVITY_PAGE_DISPLAY</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">LANG_EN_US_DISPLAY</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">ACTIVITY_PAGE_DISPLAY</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="p">}</span>
     <span class="nb">type</span><span class="p">:</span> <span class="n">ACTIVITY_PAGE_ID</span> <span class="o">=</span> <span class="n">ACTIVITY_PAGE_ID</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -6929,7 +6929,7 @@ VideoContextActivitiesField            (<a class="autorefs autorefs-internal" ti
   <tbody>
       <tr>
         <td><code>category</code></td>
-        <td><code>list</code></td>
+        <td><code>List</code></td>
         <td><p>Consists of a list containing the dictionary
 {&ldquo;id&rdquo;: &ldquo;https://w3id.org/xapi/video&rdquo;}.</p></td>
       </tr>
@@ -6941,11 +6941,11 @@ VideoContextActivitiesField            (<a class="autorefs autorefs-internal" ti
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for video `contextActivities` field.</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        category (list): Consists of a list containing the dictionary</span>
+<span class="sd">        category (List): Consists of a list containing the dictionary</span>
 <span class="sd">            {&quot;id&quot;: &quot;https://w3id.org/xapi/video&quot;}.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">category</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="n">VIDEO_CONTEXT_CATEGORY</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">category</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="n">VIDEO_CONTEXT_CATEGORY</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">VIDEO_CONTEXT_CATEGORY</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]}</span>
     <span class="p">]</span>
 </code></pre></div>
@@ -8225,7 +8225,7 @@ conformity but goes against xAPI specification recommendations.</p>
 <span class="sd">        definition (dict): See VideoObjectDefinitionField.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">LANG_EN_US_DISPLAY</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>
+    <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">LANG_EN_US_DISPLAY</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>
     <span class="n">definition</span><span class="p">:</span> <span class="n">VideoObjectDefinitionField</span> <span class="o">=</span> <span class="n">VideoObjectDefinitionField</span><span class="p">()</span>
 </code></pre></div>
         </details>
@@ -9464,7 +9464,7 @@ VideoCompletedVerbField            (<a class="autorefs autorefs-internal" title=
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nb">id</span><span class="p">:</span> <span class="n">VERB_COMPLETED_ID</span> <span class="o">=</span> <span class="n">VERB_COMPLETED_ID</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">display</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">LANG_EN_US_DISPLAY</span><span class="p">,</span> <span class="n">VERB_COMPLETED_DISPLAY</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">display</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">LANG_EN_US_DISPLAY</span><span class="p">,</span> <span class="n">VERB_COMPLETED_DISPLAY</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">LANG_EN_US_DISPLAY</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">VERB_COMPLETED_DISPLAY</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="p">}</span>
 </code></pre></div>
@@ -9531,7 +9531,7 @@ VideoInitializedVerbField            (<a class="autorefs autorefs-internal" titl
       </tr>
       <tr>
         <td><code>display</code></td>
-        <td><code>dict</code></td>
+        <td><code>Dict</code></td>
         <td><p>Consists of the dictionary <code>{"en-US": "initialized"}</code>.</p></td>
       </tr>
   </tbody>
@@ -9543,11 +9543,11 @@ VideoInitializedVerbField            (<a class="autorefs autorefs-internal" titl
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        id (str): Consists of the value `http://adlnet.gov/expapi/verbs/initialized`.</span>
-<span class="sd">        display (dict): Consists of the dictionary `{&quot;en-US&quot;: &quot;initialized&quot;}`.</span>
+<span class="sd">        display (Dict): Consists of the dictionary `{&quot;en-US&quot;: &quot;initialized&quot;}`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nb">id</span><span class="p">:</span> <span class="n">VERB_INITIALIZED_ID</span> <span class="o">=</span> <span class="n">VERB_INITIALIZED_ID</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">display</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">LANG_EN_US_DISPLAY</span><span class="p">,</span> <span class="n">VERB_INITIALIZED_DISPLAY</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">display</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">LANG_EN_US_DISPLAY</span><span class="p">,</span> <span class="n">VERB_INITIALIZED_DISPLAY</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">LANG_EN_US_DISPLAY</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">VERB_INITIALIZED_DISPLAY</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="p">}</span>
 </code></pre></div>
@@ -9630,7 +9630,7 @@ VideoInteractedVerbField            (<a class="autorefs autorefs-internal" title
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nb">id</span><span class="p">:</span> <span class="n">VERB_INTERACTED_ID</span> <span class="o">=</span> <span class="n">VERB_INTERACTED_ID</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">display</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">LANG_EN_US_DISPLAY</span><span class="p">,</span> <span class="n">VERB_INTERACTED_DISPLAY</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">display</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">LANG_EN_US_DISPLAY</span><span class="p">,</span> <span class="n">VERB_INTERACTED_DISPLAY</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">LANG_EN_US_DISPLAY</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">VERB_INTERACTED_DISPLAY</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="p">}</span>
 </code></pre></div>
@@ -9713,7 +9713,7 @@ VideoPausedVerbField            (<a class="autorefs autorefs-internal" title="ra
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nb">id</span><span class="p">:</span> <span class="n">VERB_VIDEO_PAUSED_ID</span> <span class="o">=</span> <span class="n">VERB_VIDEO_PAUSED_ID</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">display</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">LANG_EN_US_DISPLAY</span><span class="p">,</span> <span class="n">VERB_PAUSED_DISPLAY</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">display</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">LANG_EN_US_DISPLAY</span><span class="p">,</span> <span class="n">VERB_PAUSED_DISPLAY</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">LANG_EN_US_DISPLAY</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">VERB_PAUSED_DISPLAY</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="p">}</span>
 </code></pre></div>
@@ -9796,7 +9796,7 @@ VideoPlayedVerbField            (<a class="autorefs autorefs-internal" title="ra
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nb">id</span><span class="p">:</span> <span class="n">VERB_VIDEO_PLAYED_ID</span> <span class="o">=</span> <span class="n">VERB_VIDEO_PLAYED_ID</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">display</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">LANG_EN_US_DISPLAY</span><span class="p">,</span> <span class="n">VERB_PLAYED_DISPLAY</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">display</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">LANG_EN_US_DISPLAY</span><span class="p">,</span> <span class="n">VERB_PLAYED_DISPLAY</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">LANG_EN_US_DISPLAY</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">VERB_PLAYED_DISPLAY</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="p">}</span>
 </code></pre></div>
@@ -9879,7 +9879,7 @@ VideoSeekedVerbField            (<a class="autorefs autorefs-internal" title="ra
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nb">id</span><span class="p">:</span> <span class="n">VERB_VIDEO_SEEKED_ID</span> <span class="o">=</span> <span class="n">VERB_VIDEO_SEEKED_ID</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">display</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">LANG_EN_US_DISPLAY</span><span class="p">,</span> <span class="n">VERB_SEEKED_DISPLAY</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">display</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">LANG_EN_US_DISPLAY</span><span class="p">,</span> <span class="n">VERB_SEEKED_DISPLAY</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">LANG_EN_US_DISPLAY</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">VERB_SEEKED_DISPLAY</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="p">}</span>
 </code></pre></div>
@@ -9962,7 +9962,7 @@ VideoTerminatedVerbField            (<a class="autorefs autorefs-internal" title
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nb">id</span><span class="p">:</span> <span class="n">VERB_TERMINATED_ID</span> <span class="o">=</span> <span class="n">VERB_TERMINATED_ID</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">display</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">LANG_EN_US_DISPLAY</span><span class="p">,</span> <span class="n">VERB_TERMINATED_DISPLAY</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">display</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">LANG_EN_US_DISPLAY</span><span class="p">,</span> <span class="n">VERB_TERMINATED_DISPLAY</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">LANG_EN_US_DISPLAY</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">VERB_TERMINATED_DISPLAY</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="p">}</span>
 </code></pre></div>

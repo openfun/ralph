@@ -3457,7 +3457,7 @@ BaseContextField            (<a class="autorefs autorefs-internal" title="ralph.
   <tbody>
       <tr>
         <td><code>course_user_tags</code></td>
-        <td><code>dict of str</code></td>
+        <td><code>Dict of str</code></td>
         <td><p>Content from <code>user_api_usercoursetag</code> table.
 Retrieved with:
     <code>dict(
@@ -3519,7 +3519,7 @@ Retrieved with:
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for core `context` field.</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        course_user_tags (dict of str): Content from `user_api_usercoursetag` table.</span>
+<span class="sd">        course_user_tags (Dict of str): Content from `user_api_usercoursetag` table.</span>
 <span class="sd">            Retrieved with:</span>
 <span class="sd">                `dict(</span>
 <span class="sd">                    UserCourseTag.objects.filter(</span>
@@ -3558,7 +3558,7 @@ Retrieved with:
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">course_id</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^$|^course-v1:.+\+.+\+.+$&quot;</span><span class="p">)</span>  <span class="c1"># noqa:F722</span>
-    <span class="n">course_user_tags</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>
+    <span class="n">course_user_tags</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>
     <span class="n">module</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ContextModuleField</span><span class="p">]</span>
     <span class="n">org_id</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">path</span><span class="p">:</span> <span class="n">Path</span>
@@ -8605,10 +8605,10 @@ the user.</p></td>
 <span class="sd">            `student_answer` response. Consists either of `single` or `compound` value.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">choice_all</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+    <span class="n">choice_all</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
     <span class="n">correctness</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="n">hint_label</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">hints</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>
+    <span class="n">hints</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>
     <span class="n">module_id</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">problem_part_id</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">question_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
@@ -8618,7 +8618,7 @@ the user.</p></td>
         <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;numericalresponse&quot;</span><span class="p">],</span>
         <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;optionresponse&quot;</span><span class="p">],</span>
     <span class="p">]</span>
-    <span class="n">student_answer</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">student_answer</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="n">trigger_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;single&quot;</span><span class="p">],</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;compound&quot;</span><span class="p">]]</span>
 </code></pre></div>
         </details>
@@ -8754,12 +8754,12 @@ the problem.</p></td>
 <span class="sd">        success (str): Consists of either the `correct` or `incorrect` value.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">answers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span>
+    <span class="n">answers</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span>
         <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[a-f0-9]</span><span class="si">{32}</span><span class="s2">_[0-9]_[0-9]$&quot;</span><span class="p">),</span>  <span class="c1"># noqa : F722</span>
-        <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">],</span>
+        <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">],</span>
     <span class="p">]</span>
     <span class="n">attempts</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">correct_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span>
+    <span class="n">correct_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span>
         <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[a-f0-9]</span><span class="si">{32}</span><span class="s2">_[0-9]_[0-9]$&quot;</span><span class="p">),</span>  <span class="c1"># noqa : F722</span>
         <span class="n">CorrectMap</span><span class="p">,</span>
     <span class="p">]</span>
@@ -8770,7 +8770,7 @@ the problem.</p></td>
         <span class="sa">r</span><span class="s2">&quot;type@problem\+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span>  <span class="c1"># noqa : F722</span>
     <span class="p">)</span>
     <span class="n">state</span><span class="p">:</span> <span class="n">State</span>
-    <span class="n">submission</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span>
+    <span class="n">submission</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span>
         <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[a-f0-9]</span><span class="si">{32}</span><span class="s2">_[0-9]_[0-9]$&quot;</span><span class="p">),</span>  <span class="c1"># noqa : F722</span>
         <span class="n">SubmissionAnswerField</span><span class="p">,</span>
     <span class="p">]</span>
@@ -8877,9 +8877,9 @@ identifier for each problem.</p></td>
 <span class="sd">        state (dict): Consists of the current problem state.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">answers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span>
+    <span class="n">answers</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span>
         <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[a-f0-9]</span><span class="si">{32}</span><span class="s2">_[0-9]_[0-9]$&quot;</span><span class="p">),</span>  <span class="c1"># noqa : F722</span>
-        <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">],</span>
+        <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">],</span>
     <span class="p">]</span>
     <span class="n">failure</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;closed&quot;</span><span class="p">],</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;unreset&quot;</span><span class="p">]]</span>
     <span class="n">problem_id</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span>
@@ -9487,7 +9487,7 @@ the answer strings if multiple choices are allowed.</p></td>
 <span class="sd">        state (json): see StateField.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">answers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]]</span>
+    <span class="n">answers</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]]</span>
     <span class="n">failure</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;closed&quot;</span><span class="p">],</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;done&quot;</span><span class="p">]]</span>
     <span class="n">problem_id</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span>
         <span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+&quot;</span>  <span class="c1"># noqa : F722</span>
@@ -9585,7 +9585,7 @@ the answer strings if multiple choices are allowed.</p></td>
 <span class="sd">        state (json): see StateField.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">answers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]]</span>
+    <span class="n">answers</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]]</span>
     <span class="n">problem_id</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span>
         <span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+&quot;</span>  <span class="c1"># noqa : F722</span>
         <span class="sa">r</span><span class="s2">&quot;type@problem\+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span>  <span class="c1"># noqa : F722</span>
@@ -9769,7 +9769,7 @@ State            (<a class="autorefs autorefs-internal" title="ralph.models.edx.
 <span class="sd">        student_answers (dict): Consists of the answer(s) given by the user.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">correct_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span>
+    <span class="n">correct_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span>
         <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[a-f0-9]</span><span class="si">{32}</span><span class="s2">_[0-9]_[0-9]$&quot;</span><span class="p">),</span>  <span class="c1"># noqa : F722</span>
         <span class="n">CorrectMap</span><span class="p">,</span>
     <span class="p">]</span>
@@ -9891,7 +9891,7 @@ this user.</p></td>
 <span class="sd">            this user.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">answer</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+    <span class="n">answer</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
     <span class="n">correct</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="n">input_type</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">question</span><span class="p">:</span> <span class="nb">str</span>
@@ -9978,7 +9978,7 @@ strings if multiple choices are allowed.</p></td>
 <span class="sd">            strings if multiple choices are allowed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">answers</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+    <span class="n">answers</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
 </code></pre></div>
         </details>
 
@@ -11356,7 +11356,7 @@ problem and it is graded successfully.</p>
 
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span><span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;problem_graded&quot;</span><span class="p">)</span>
 
-    <span class="n">event</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">None</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span>
+    <span class="n">event</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">None</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;problem_graded&quot;</span><span class="p">]</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;problem_graded&quot;</span><span class="p">]</span>
 </code></pre></div>
