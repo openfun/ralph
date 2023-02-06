@@ -170,7 +170,6 @@ class MongoDatabase(BaseDatabase):
         success = 0
         batch = []
         for document in self.to_documents(stream, ignore_errors=ignore_errors):
-
             batch.append(document)
             if len(batch) < chunk_size:
                 continue
