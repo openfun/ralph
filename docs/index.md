@@ -18,7 +18,7 @@ backends:
 - [Elasticsearch](https://www.elastic.co/elasticsearch/)
 - [MongoDB](https://www.mongodb.com/)
 - [OpenStack Swift](https://wiki.openstack.org/wiki/Swift)
-- [AWS S3](https://aws.amazon.com/s3/) (_WIP_)
+- [AWS S3](https://aws.amazon.com/s3/)
 - [OVH Logs Data Platform](https://docs.ovh.com/gb/en/logs-data-platform/)\*
 - [WebSocket](https://en.wikipedia.org/wiki/WebSocket)
 - File system
