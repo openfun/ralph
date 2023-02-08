@@ -24,7 +24,7 @@ The credentials file is expected to be a valid JSON file. Its location is
 specified by the `RALPH_AUTH_FILE` configuration value. By default, `ralph`
 will look for the `auth.json` file in the application directory (see [click
 documentation for
-details](https://click.palletsprojects.com/en/8.0.x/api/#click.get_app_dir)).
+details](https://click.palletsprojects.com/en/8.1.x/api/#click.get_app_dir)).
 
 The expected format is a list of entries (JSON objects) each containing the
 username, the user's `bcrypt` hashed+salted password and scopes they can
@@ -49,7 +49,7 @@ To create a new user credentials, Ralph's CLI provides a dedicated command:
 
 ```bash
 $ ralph auth \
-    --user janedoe \
+    --username janedoe \
     --password supersecret \
     --scope janedoe_scope \
     -w
