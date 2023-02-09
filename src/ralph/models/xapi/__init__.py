@@ -3,6 +3,12 @@
 # flake8: noqa
 
 from .navigation.statements import PageTerminated, PageViewed
+from .quiz.statements import (
+    QuizCompleted,
+    QuizInitialized,
+    QuizLaunched,
+    QuizTerminated,
+)
 from .video.statements import (
     VideoCompleted,
     VideoEnableClosedCaptioning,
