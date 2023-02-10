@@ -6,7 +6,7 @@ site_author: Open FUN (France Universite Numerique)
 repo_name: openfun/ralph
 repo_url: https://github.com/openfun/ralph/
 
-copyright: 2020-present GIP FUN MOOC
+copyright: 2020-present France Université Numérique
 
 theme:
     name: material
