@@ -10,7 +10,7 @@ and this project adheres to
 
 ### Changed
 
-- Upgrade `fastapi` to `0.91.0`
+- Upgrade `fastapi` to `0.92.0`
 - Upgrade `sentry_sdk` to `1.15.0`
 
 ## [3.3.0] - 2023-02-03
