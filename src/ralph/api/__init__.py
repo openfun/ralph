@@ -1,5 +1,5 @@
 """Main module for Ralph's LRS API."""
-
+import sentry_sdk
 from fastapi import Depends, FastAPI
 
 from ralph.conf import settings
@@ -9,7 +9,7 @@ from .auth import AuthenticatedUser, authenticated_user
 from .routers import health, statements
 
 if settings.SENTRY_DSN is not None:
-    sentry_sdk.init(  # noqa: F821 # pylint: disable=undefined-variable
+    sentry_sdk.init(
         dsn=settings.SENTRY_DSN,
         traces_sample_rate=settings.SENTRY_LRS_TRACES_SAMPLE_RATE,
         release=__version__,
