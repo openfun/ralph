@@ -89,6 +89,8 @@ class ClickhouseDatabaseBackendSettings(InstantiableSettingsItem):
     PORT: int = 8123
     DATABASE: str = "xapi"
     EVENT_TABLE_NAME: str = "xapi_events_all"
+    USERNAME: str = None
+    PASSWORD: str = None
     CLIENT_OPTIONS: dict = None
 
 
