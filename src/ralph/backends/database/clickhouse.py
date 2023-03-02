@@ -52,6 +52,8 @@ class ClickHouseDatabase(BaseDatabase):
         port: int = clickhouse_settings.PORT,
         database: str = clickhouse_settings.DATABASE,
         event_table_name: str = clickhouse_settings.EVENT_TABLE_NAME,
+        username: str = clickhouse_settings.USERNAME,
+        password: str = clickhouse_settings.PASSWORD,
         client_options: dict = clickhouse_settings.CLIENT_OPTIONS,
     ):
         """Instantiates the ClickHouse client.
@@ -61,8 +63,13 @@ class ClickHouseDatabase(BaseDatabase):
             port (int): ClickHouse server port to connect to.
             database (str): ClickHouse database to connect to.
             event_table_name (str): Table where events live.
+            username (str): ClickHouse username to connect as (optional).
+            password (str): Password for the given ClickHouse username (optional).
             client_options (dict): A dictionary of valid options for the ClickHouse
                 client connection.
+
+        If username and password are None, we will try to connect as the ClickHouse
+        user "default".
         """
         if client_options is None:
             client_options = {
@@ -74,11 +81,15 @@ class ClickHouseDatabase(BaseDatabase):
         self.port = port
         self.database = database
         self.event_table_name = event_table_name
+        self.username = username
+        self.password = password
 
         self.client = clickhouse_connect.get_client(
             host=self.host,
             port=self.port,
             database=self.database,
+            username=self.username,
+            password=self.password,
             settings=client_options,
         )
 

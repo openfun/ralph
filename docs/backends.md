@@ -191,16 +191,15 @@ documents from it.
 #### Backend parameters
 
 ClickHouse parameters required to connect are:
-        host: str = clickhouse_settings.HOST,
-        port: int = clickhouse_settings.PORT,
-        database: str = clickhouse_settings.DATABASE,
-        event_table_name: str = clickhouse_settings.EVENT_TABLE_NAME,
-        client_options: dict = clickhouse_settings.CLIENT_OPTIONS,
 - `host`: the connection hostname to connect to (_e.g._ `"clickhouse.yourhost.com"`)
 - `port`: the port to the ClickHouse HTTPS interface (_e.g._ `8123`)
 - `database`: the name of the database to connect to
 - `event_table_name`: the name of the table to write statements to
 - `client_options`: a comma separated key=value list of ClickHouse client options
+
+Secondary parameters are needed if not using the default ClickHouse user:
+- `username`: the username to connect as
+- `password`: the password for the given ClickHouse username
 
 By default, the following client options are set, if you override the default 
 client options you must also set these:
