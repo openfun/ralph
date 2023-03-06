@@ -35,7 +35,19 @@ DATABASE_CLIENT: BaseDatabase = getattr(
     settings.BACKENDS.DATABASE, settings.RUNSERVER_BACKEND.upper()
 ).get_instance()
 
+POST_PUT_RESPONSES = {
+    400: {
+        "model": ErrorDetail,
+        "description": "The request was invalid.",
+    },
+    409: {
+        "model": ErrorDetail,
+        "description": "Statements had a conflict with existing statements.",
+    },
+}
 
+
+@router.get("")
 @router.get("/")
 # pylint: disable=too-many-arguments, too-many-locals
 async def get(
@@ -211,20 +223,71 @@ async def get(
     return {**response, "statements": query_result.statements}
 
 
-@router.post(
-    "/",
-    responses={
-        400: {
-            "model": ErrorDetail,
-            "description": "The request was invalid.",
-        },
-        409: {
-            "model": ErrorDetail,
-            "description": "Statements had a conflict with existing statements.",
-        },
-    },
-)
+@router.put("/", responses=POST_PUT_RESPONSES, status_code=status.HTTP_204_NO_CONTENT)
+@router.put("", responses=POST_PUT_RESPONSES, status_code=status.HTTP_204_NO_CONTENT)
 # pylint: disable=unused-argument
+async def put(
+    # pylint: disable=invalid-name
+    statementId: str,
+    statement: LaxStatement,
+    background_tasks: BackgroundTasks,
+):
+    """Stores a single statement as a single member of a set.
+
+    LRS Specification:
+    https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#211-put-statements
+    """
+    statement_dict = {statementId: statement.dict(exclude_unset=True)}
+
+    # Force the UUID id in the statement to string, make sure it matches the
+    # statementId given in the URL.
+    statement_dict[statementId]["id"] = str(statement_dict[statementId]["id"])
+
+    if not statementId == statement_dict[statementId]["id"]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="xAPI statement id does not match given statementId",
+        )
+
+    if get_active_xapi_forwardings():
+        background_tasks.add_task(
+            forward_xapi_statements, list(statement_dict.values())
+        )
+
+    try:
+        statements_ids_result = DATABASE_CLIENT.query_statements_by_ids([statementId])
+    except BackendException as error:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="xAPI statements query failed",
+        ) from error
+
+    if len(statements_ids_result) > 0:
+        # NB: LRS specification calls for performing a deep comparison of incoming
+        # statements and existing statements with the same ID.
+        # This seems too costly for performance and was not implemented for this POC.
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Statement already exists with the same ID",
+        )
+
+    # For valid requests, perform the bulk indexing of all incoming statements
+    try:
+        success_count = DATABASE_CLIENT.put(
+            statement_dict.values(), ignore_errors=False
+        )
+    except (BackendException, BadFormatException) as exc:
+        logger.error("Failed to index submitted statement")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Statement indexation failed",
+        ) from exc
+
+    logger.info("Indexed %d statements with success", success_count)
+
+
+@router.post("/", responses=POST_PUT_RESPONSES)
+@router.post("", responses=POST_PUT_RESPONSES)
 async def post(
     statements: Union[LaxStatement, List[LaxStatement]],
     background_tasks: BackgroundTasks,
