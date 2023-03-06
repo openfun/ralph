@@ -8,6 +8,15 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Implement PUT verb on statements endpoint
+- Add ClickHouse database backend support
+
+### Changed
+
+- Make trailing slashes optional on statements endpoint
+
 ## [3.4.0] - 2023-03-01
 
 ### Changed
@@ -24,7 +33,6 @@ and this project adheres to
 ### Added
 
 - Restore python 3.7+ support for library usage (models)
-- Add ClickHouse database backend support
 
 ### Changed
 

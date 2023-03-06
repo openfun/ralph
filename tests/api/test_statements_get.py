@@ -61,7 +61,6 @@ def insert_clickhouse_statements(statements):
         database=CLICKHOUSE_TEST_DATABASE,
         event_table_name=CLICKHOUSE_TEST_TABLE_NAME,
     )
-    # documents = list(ClickHouseDatabase.to_documents(statements))
     success = backend.put(statements)
     assert success == len(statements)
 
@@ -111,12 +110,14 @@ def test_api_statements_get_statements(
     ]
     insert_statements_and_monkeypatch_backend(statements)
 
-    response = client.get(
-        "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
-    )
+    # Confirm that calling this with and without the trailing slash both work
+    for path in ("/xAPI/statements", "/xAPI/statements/"):
+        response = client.get(
+            path, headers={"Authorization": f"Basic {auth_credentials}"}
+        )
 
-    assert response.status_code == 200
-    assert response.json() == {"statements": [statements[1], statements[0]]}
+        assert response.status_code == 200
+        assert response.json() == {"statements": [statements[1], statements[0]]}
 
 
 def test_api_statements_get_statements_ascending(
