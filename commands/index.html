@@ -801,7 +801,7 @@
 <div class="highlight"><pre><span></span><code>ralph fetch [OPTIONS] [ARCHIVE]
 </code></pre></div>
 <p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  -b, --backend [es|mongo|ldp|fs|swift|s3|ws]
+<div class="highlight"><pre><span></span><code>  -b, --backend [es|mongo|clickhouse|ldp|fs|swift|s3|ws]
                                   Backend  [required]
   ws backend: 
     --ws-uri TEXT
@@ -831,6 +831,14 @@
     --ldp-application-secret TEXT
     --ldp-application-key TEXT
     --ldp-endpoint TEXT
+  clickhouse backend: 
+    --clickhouse-client-options KEY=VALUE,KEY=VALUE
+    --clickhouse-password TEXT
+    --clickhouse-username TEXT
+    --clickhouse-event-table-name TEXT
+    --clickhouse-database TEXT
+    --clickhouse-port INTEGER
+    --clickhouse-host TEXT
   mongo backend: 
     --mongo-client-options KEY=VALUE,KEY=VALUE
     --mongo-collection TEXT
@@ -891,7 +899,7 @@
 <div class="highlight"><pre><span></span><code>ralph push [OPTIONS] [ARCHIVE]
 </code></pre></div>
 <p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  -b, --backend [es|mongo|ldp|fs|swift|s3]
+<div class="highlight"><pre><span></span><code>  -b, --backend [es|mongo|clickhouse|ldp|fs|swift|s3]
                                   Backend  [required]
   s3 backend: 
     --s3-bucket-name TEXT
@@ -919,6 +927,14 @@
     --ldp-application-secret TEXT
     --ldp-application-key TEXT
     --ldp-endpoint TEXT
+  clickhouse backend: 
+    --clickhouse-client-options KEY=VALUE,KEY=VALUE
+    --clickhouse-password TEXT
+    --clickhouse-username TEXT
+    --clickhouse-event-table-name TEXT
+    --clickhouse-database TEXT
+    --clickhouse-port INTEGER
+    --clickhouse-host TEXT
   mongo backend: 
     --mongo-client-options KEY=VALUE,KEY=VALUE
     --mongo-collection TEXT
@@ -941,7 +957,16 @@
 <div class="highlight"><pre><span></span><code>ralph runserver [OPTIONS]
 </code></pre></div>
 <p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  -b, --backend [es|mongo]        Backend  [required]
+<div class="highlight"><pre><span></span><code>  -b, --backend [es|mongo|clickhouse]
+                                  Backend  [required]
+  clickhouse backend: 
+    --clickhouse-client-options KEY=VALUE,KEY=VALUE
+    --clickhouse-password TEXT
+    --clickhouse-username TEXT
+    --clickhouse-event-table-name TEXT
+    --clickhouse-database TEXT
+    --clickhouse-port INTEGER
+    --clickhouse-host TEXT
   mongo backend: 
     --mongo-client-options KEY=VALUE,KEY=VALUE
     --mongo-collection TEXT

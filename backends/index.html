@@ -524,6 +524,26 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#clickhouse" class="md-nav__link">
+    ClickHouse
+  </a>
+  
+    <nav class="md-nav" aria-label="ClickHouse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend_parameters_7" class="md-nav__link">
+    Backend parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -953,6 +973,26 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#clickhouse" class="md-nav__link">
+    ClickHouse
+  </a>
+  
+    <nav class="md-nav" aria-label="ClickHouse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend_parameters_7" class="md-nav__link">
+    Backend parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1124,6 +1164,26 @@ it can also be used to fetch collections of documents from it.</p>
 <p>The MongoDB client options supported in Ralph are:
 - <code>document_class</code>: default class to use for documents returned from queries
 - <code>tz_aware</code>: if True, datetime instances returned as values in a document will be timezone aware (otherwise they will be naive)</p>
+<h3 id="clickhouse">ClickHouse<a class="headerlink" href="#clickhouse" title="Permanent link">&para;</a></h3>
+<p>The ClickHouse backend can be used as a data lake and to fetch collections of
+documents from it.</p>
+<h4 id="backend_parameters_7">Backend parameters<a class="headerlink" href="#backend_parameters_7" title="Permanent link">&para;</a></h4>
+<p>ClickHouse parameters required to connect are:
+- <code>host</code>: the connection hostname to connect to (<em>e.g.</em> <code>"clickhouse.yourhost.com"</code>)
+- <code>port</code>: the port to the ClickHouse HTTPS interface (<em>e.g.</em> <code>8123</code>)
+- <code>database</code>: the name of the database to connect to
+- <code>event_table_name</code>: the name of the table to write statements to
+- <code>client_options</code>: a comma separated key=value list of ClickHouse client options</p>
+<p>Secondary parameters are needed if not using the default ClickHouse user:
+- <code>username</code>: the username to connect as
+- <code>password</code>: the password for the given ClickHouse username</p>
+<p>By default, the following client options are set, if you override the default 
+client options you must also set these:
+- <code>"date_time_input_format": "best_effort"</code> allows RFC date parsing
+- <code>"allow_experimental_object_type": 1</code> allows the JSON data type we use to store statements</p>
+<p>The ClickHouse client options supported in Ralph can be found in these locations:
+- <a href="https://clickhouse.com/docs/en/integrations/language-clients/python/driver-api#settings-argument">Python driver specific</a>
+- <a href="https://clickhouse.com/docs/en/operations/settings/settings/">General ClickHouse client settings</a></p>
 
 
 
