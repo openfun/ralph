@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- An issue with starting Ralph in pre-built Docker containers
+
 ## [3.5.0] - 2023-03-08
 
 ### Added
