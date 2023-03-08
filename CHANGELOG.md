@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [3.5.0] - 2023-03-08
+
 ### Added
 
 - Implement PUT verb on statements endpoint
@@ -16,13 +18,14 @@ and this project adheres to
 ### Changed
 
 - Make trailing slashes optional on statements endpoint
+- Upgrade `sentry_sdk` to `1.16.0`
 
 ## [3.4.0] - 2023-03-01
 
 ### Changed
 
 - Upgrade `fastapi` to `0.92.0`
-- Upgrade `sentry_sdk` to `1.16.0`
+- Upgrade `sentry_sdk` to `1.15.0`
 
 ### Fixed
 
@@ -257,7 +260,8 @@ and this project adheres to
 - Add optional sentry integration
 - Distribute Arnold's tray to deploy Ralph in a k8s cluster as cronjobs
 
-[unreleased]: https://github.com/openfun/ralph/compare/v3.4.0...master
+[unreleased]: https://github.com/openfun/ralph/compare/v3.5.0...master
+[3.5.0]: https://github.com/openfun/ralph/compare/v3.4.0...v3.5.0
 [3.4.0]: https://github.com/openfun/ralph/compare/v3.3.0...v3.4.0
 [3.3.0]: https://github.com/openfun/ralph/compare/v3.2.1...v3.3.0
 [3.2.1]: https://github.com/openfun/ralph/compare/v3.2.0...v3.2.1
