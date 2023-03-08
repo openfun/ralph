@@ -20,4 +20,5 @@ if settings.SENTRY_DSN is not None:
         max_breadcrumbs=50,
     )
 
-cli.cli()
+if __name__ == "__main__":
+    cli.cli()
