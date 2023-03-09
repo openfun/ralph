@@ -289,7 +289,7 @@ class MongoDataBackend(BaseDataBackend):
                 count += self._bulk_delete(batch, ignore_errors, collection)
             logger.info("Deleted %d documents with success", count)
         else:
-            data = self.to_documents(data, ignore_errors, operation_type)
+            data = self.to_documents(data, ignore_errors, operation_type, logger)
             for batch in self.iter_by_batch(data, chunk_size):
                 count += self._bulk_import(batch, ignore_errors, collection)
             logger.info("Inserted %d documents with success", count)
@@ -325,7 +325,10 @@ class MongoDataBackend(BaseDataBackend):
 
     @staticmethod
     def to_documents(
-        data: Iterable[dict], ignore_errors: bool, operation_type: BaseOperationType
+        data: Iterable[dict],
+        ignore_errors: bool,
+        operation_type: BaseOperationType,
+        logger_class: logging.Logger,
     ) -> Generator[dict, None, None]:
         """Convert `data` statements to MongoDB documents.
 
@@ -337,25 +340,25 @@ class MongoDataBackend(BaseDataBackend):
             if "id" not in statement and operation_type == BaseOperationType.INDEX:
                 msg = "statement %s has no 'id' field"
                 if ignore_errors:
-                    logger.warning("statement %s has no 'id' field", statement)
+                    logger_class.warning("statement %s has no 'id' field", statement)
                     continue
-                logger.error(msg, statement)
+                logger_class.error(msg, statement)
                 raise BackendException(msg % statement)
             if "timestamp" not in statement:
                 msg = "statement %s has no 'timestamp' field"
                 if ignore_errors:
-                    logger.warning(msg, statement)
+                    logger_class.warning(msg, statement)
                     continue
-                logger.error(msg, statement)
+                logger_class.error(msg, statement)
                 raise BackendException(msg % statement)
             try:
                 timestamp = int(isoparse(statement["timestamp"]).timestamp())
             except ValueError as err:
                 msg = "statement %s has an invalid 'timestamp' field"
                 if ignore_errors:
-                    logger.warning(msg, statement)
+                    logger_class.warning(msg, statement)
                     continue
-                logger.error(msg, statement)
+                logger_class.error(msg, statement)
                 raise BackendException(msg % statement) from err
             document = {
                 "_id": ObjectId(
