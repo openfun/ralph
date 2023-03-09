@@ -22,6 +22,7 @@ from pymongo import MongoClient
 from pymongo.errors import CollectionInvalid
 
 from ralph.backends.data.async_es import AsyncESDataBackend
+from ralph.backends.data.async_mongo import AsyncMongoDataBackend
 from ralph.backends.data.clickhouse import ClickHouseDataBackend
 from ralph.backends.data.es import ESDataBackend
 from ralph.backends.data.fs import FSDataBackend, FSDataBackendSettings
@@ -33,6 +34,7 @@ from ralph.backends.database.clickhouse import ClickHouseDatabase
 from ralph.backends.database.es import ESDatabase
 from ralph.backends.database.mongo import MongoDatabase
 from ralph.backends.lrs.async_es import AsyncESLRSBackend
+from ralph.backends.lrs.async_mongo import AsyncMongoLRSBackend
 from ralph.backends.lrs.clickhouse import ClickHouseLRSBackend
 from ralph.backends.lrs.es import ESLRSBackend
 from ralph.backends.lrs.fs import FSLRSBackend
@@ -185,6 +187,58 @@ def fs_lrs_backend(fs, settings_fs):
         return FSLRSBackend(settings)
 
     return get_fs_lrs_backend
+
+
+@pytest.fixture
+def anyio_backend():
+    """Select asyncio backend for pytest anyio."""
+    return "asyncio"
+
+
+@pytest.fixture
+def async_mongo_backend():
+    """Return the `get_mongo_data_backend` function."""
+
+    def get_mongo_data_backend(
+        connection_uri: str = MONGO_TEST_CONNECTION_URI,
+        default_collection: str = MONGO_TEST_COLLECTION,
+        client_options: dict = None,
+    ):
+        """Return an instance of `MongoDataBackend`."""
+        settings = AsyncMongoDataBackend.settings_class(
+            CONNECTION_URI=connection_uri,
+            DEFAULT_DATABASE=MONGO_TEST_DATABASE,
+            DEFAULT_COLLECTION=default_collection,
+            CLIENT_OPTIONS=client_options if client_options else {},
+            DEFAULT_CHUNK_SIZE=500,
+            LOCALE_ENCODING="utf8",
+        )
+        return AsyncMongoDataBackend(settings)
+
+    return get_mongo_data_backend
+
+
+@pytest.fixture
+def async_mongo_lrs_backend():
+    """Return the `async_get_mongo_lrs_backend` function."""
+
+    def async_get_mongo_lrs_backend(
+        connection_uri: str = MONGO_TEST_CONNECTION_URI,
+        default_collection: str = MONGO_TEST_COLLECTION,
+        client_options: dict = None,
+    ):
+        """Return an instance of AsyncMongoLRSBackend."""
+        settings = AsyncMongoLRSBackend.settings_class(
+            CONNECTION_URI=connection_uri,
+            DEFAULT_DATABASE=MONGO_TEST_DATABASE,
+            DEFAULT_COLLECTION=default_collection,
+            CLIENT_OPTIONS=client_options if client_options else {},
+            DEFAULT_CHUNK_SIZE=500,
+            LOCALE_ENCODING="utf8",
+        )
+        return AsyncMongoLRSBackend(settings)
+
+    return async_get_mongo_lrs_backend
 
 
 def get_mongo_fixture(
@@ -701,9 +755,3 @@ def lrs():
             process.terminate()
 
     return runserver
-
-
-@pytest.fixture
-def anyio_backend():
-    """Select asyncio backend for pytest anyio."""
-    return "asyncio"
