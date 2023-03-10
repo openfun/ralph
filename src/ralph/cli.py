@@ -168,7 +168,9 @@ def cli(verbosity=None):
             handler.setLevel(level)
 
 
-def backends_options(name=None, backend_types: List[BaseModel] = None):
+def backends_options(
+    name=None, backend_types: List[BaseModel] = None, include_async: bool = False
+):
     """Backend-related options decorator for Ralph commands."""
 
     def wrapper(command):
@@ -176,6 +178,8 @@ def backends_options(name=None, backend_types: List[BaseModel] = None):
         for backend_type in backend_types:
             for backend_name, backend in backend_type:
                 backend_name = backend_name.lower()
+                if not include_async and "async" in backend_name:
+                    continue
                 backend_names.append(backend_name)
                 for field_name, field in backend:
                     field_type = backend.__fields__[field_name].type_
@@ -545,7 +549,11 @@ def list_(details, new, backend, **options):
         logger.warning("Configured %s backend contains no archive", backend)
 
 
-@backends_options(name="runserver", backend_types=[settings.BACKENDS.DATABASE])
+@backends_options(
+    name="runserver",
+    backend_types=[settings.BACKENDS.DATABASE],
+    include_async=True,
+)
 @click.option(
     "-h",
     "--host",
@@ -582,10 +590,12 @@ def runserver(backend: str, host: str, port: int, **options):
     with NamedTemporaryFile(mode="w", encoding=settings.LOCALE_ENCODING) as env_file:
         env_file.write(f"RALPH_RUNSERVER_BACKEND={backend}\n")
         for key, value in options.items():
-            if value is None:
+            if not key.startswith(backend) or value is None:
                 continue
-            backend_name, field_name = key.split(sep="_", maxsplit=1)
-            key = f"RALPH_BACKENDS__DATABASE__{backend_name}__{field_name}".upper()
+            field_name = key.replace(
+                f"{backend}_", ""
+            )  # key.split(sep="_", maxsplit=1)
+            key = f"RALPH_BACKENDS__DATABASE__{backend}__{field_name}".upper()
             if isinstance(value, tuple):
                 value = ",".join(value)
             if issubclass(type(value), ClientOptions):

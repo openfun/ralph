@@ -1,20 +1,16 @@
 """API routes related to application health checking."""
 
 import logging
+from inspect import iscoroutinefunction
 
 from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse
 
-from ralph.backends.database.base import BaseDatabase
-from ralph.conf import settings
+from . import DATABASE_CLIENT
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
-
-DATABASE_CLIENT: BaseDatabase = getattr(
-    settings.BACKENDS.DATABASE, settings.RUNSERVER_BACKEND.upper()
-).get_instance()
 
 
 @router.get("/__lbheartbeat__")
@@ -32,7 +28,11 @@ async def heartbeat():
 
     Returns a 200 if all checks are successful.
     """
-    content = {"database": DATABASE_CLIENT.status().value}
+    content = {
+        "database": (await DATABASE_CLIENT.status()).value
+        if iscoroutinefunction(DATABASE_CLIENT.status)
+        else DATABASE_CLIENT.status().value
+    }
     status_code = (
         status.HTTP_200_OK
         if all(v == "ok" for v in content.values())

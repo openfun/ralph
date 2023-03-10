@@ -2,6 +2,7 @@
 
 import logging
 from datetime import datetime
+from inspect import iscoroutinefunction
 from typing import List, Literal, Optional, Union
 from uuid import UUID, uuid4
 
@@ -16,12 +17,13 @@ from fastapi import (
 )
 
 from ralph.api.forwarding import forward_xapi_statements, get_active_xapi_forwardings
-from ralph.backends.database.base import BaseDatabase, StatementParameters
+from ralph.backends.database.base import StatementParameters
 from ralph.conf import settings
 from ralph.exceptions import BackendException, BadFormatException
 
 from ..auth import authenticated_user
 from ..models import ErrorDetail, LaxStatement
+from . import DATABASE_CLIENT
 
 logger = logging.getLogger(__name__)
 
@@ -30,10 +32,6 @@ router = APIRouter(
     dependencies=[Depends(authenticated_user)],
 )
 
-
-DATABASE_CLIENT: BaseDatabase = getattr(
-    settings.BACKENDS.DATABASE, settings.RUNSERVER_BACKEND.upper()
-).get_instance()
 
 POST_PUT_RESPONSES = {
     400: {
@@ -192,8 +190,14 @@ async def get(
     limit = min(limit, settings.RUNSERVER_MAX_SEARCH_HITS_COUNT)
 
     try:
-        query_result = DATABASE_CLIENT.query_statements(
-            StatementParameters(**{**request.query_params, "limit": limit})
+        query_result = (
+            await DATABASE_CLIENT.query_statements(
+                StatementParameters(**{**request.query_params, "limit": limit})
+            )
+            if iscoroutinefunction(DATABASE_CLIENT.query_statements)
+            else DATABASE_CLIENT.query_statements(
+                StatementParameters(**{**request.query_params, "limit": limit})
+            )
         )
     except BackendException as error:
         raise HTTPException(
@@ -255,7 +259,11 @@ async def put(
         )
 
     try:
-        statements_ids_result = DATABASE_CLIENT.query_statements_by_ids([statementId])
+        statements_ids_result = (
+            await DATABASE_CLIENT.query_statements_by_ids([statementId])
+            if iscoroutinefunction(DATABASE_CLIENT.query_statements_by_ids)
+            else DATABASE_CLIENT.query_statements_by_ids([statementId])
+        )
     except BackendException as error:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -273,8 +281,10 @@ async def put(
 
     # For valid requests, perform the bulk indexing of all incoming statements
     try:
-        success_count = DATABASE_CLIENT.put(
-            statement_dict.values(), ignore_errors=False
+        success_count = (
+            await DATABASE_CLIENT.put(statement_dict.values(), ignore_errors=False)
+            if iscoroutinefunction(DATABASE_CLIENT.put)
+            else DATABASE_CLIENT.put(statement_dict.values(), ignore_errors=False)
         )
     except (BackendException, BadFormatException) as exc:
         logger.error("Failed to index submitted statement")
@@ -328,7 +338,11 @@ async def post(
         )
 
     try:
-        statements_ids_result = DATABASE_CLIENT.query_statements_by_ids(statements_ids)
+        statements_ids_result = (
+            await DATABASE_CLIENT.query_statements_by_ids(statements_ids)
+            if iscoroutinefunction(DATABASE_CLIENT.query_statements_by_ids)
+            else DATABASE_CLIENT.query_statements_by_ids(statements_ids)
+        )
     except BackendException as error:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -346,8 +360,10 @@ async def post(
 
     # For valid requests, perform the bulk indexing of all incoming statements
     try:
-        success_count = DATABASE_CLIENT.put(
-            statements_dict.values(), ignore_errors=False
+        success_count = (
+            await DATABASE_CLIENT.put(statements_dict.values(), ignore_errors=False)
+            if iscoroutinefunction(DATABASE_CLIENT.put)
+            else DATABASE_CLIENT.put(statements_dict.values(), ignore_errors=False)
         )
     except (BackendException, BadFormatException) as exc:
         logger.error("Failed to index submitted statements")

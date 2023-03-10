@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Add asynchronous Elasticsearch backend
+- Fix deprecated `body` for elasticsearch.search
+
 ## [3.5.1] - 2023-04-18
 
 ### Changed

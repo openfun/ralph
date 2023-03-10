@@ -131,3 +131,75 @@ class BaseDatabase(ABC):
     @abstractmethod
     def query_statements_by_ids(self, ids: List[str]) -> List:
         """Returns the list of matching statement IDs from the database."""
+
+
+def async_enforce_query_checks(method):
+    """Enforce query argument type checking for methods using it."""
+
+    @functools.wraps(method)
+    async def wrapper(*args, **kwargs):
+        """Wrap method execution."""
+        query = kwargs.pop("query", None)
+        self_ = args[0]
+
+        return await method(*args, query=self_.validate_query(query), **kwargs)
+
+    return wrapper
+
+
+class BaseAsyncDatabase(ABC):
+    """Base database backend interface."""
+
+    name = "base"
+    query_model = BaseQuery
+
+    def validate_query(self, query: BaseQuery = None):
+        """Validate database query."""
+        if query is None:
+            query = self.query_model()
+
+        if not isinstance(query, self.query_model):
+            raise BackendParameterException(
+                "'query' argument is expected to be a "
+                f"{self.query_model().__class__.__name__} instance."
+            )
+
+        logger.debug("Query: %s", str(query))
+
+        return query
+
+    @abstractmethod
+    async def status(self) -> DatabaseStatus:
+        """Implements database checks (e.g. connection, cluster status)."""
+
+    @abstractmethod
+    @async_enforce_query_checks
+    async def get(self, query: BaseQuery = None, chunk_size: int = 10):
+        """Yields `chunk_size` records read from the database query results."""
+
+    @abstractmethod
+    async def put(
+        self,
+        stream: Union[BinaryIO, TextIO],
+        chunk_size: int = 10,
+        ignore_errors: bool = False,
+    ) -> int:
+        """Writes `chunk_size` records from the `stream` to the database.
+
+        Returns:
+            int: The count of successfully written records.
+        """
+
+    @abstractmethod
+    async def query_statements(
+        self, params: StatementParameters
+    ) -> StatementQueryResult:
+        """Returns the statements query payload using xAPI parameters."""
+
+    @abstractmethod
+    async def query_statements_by_ids(self, ids: List[str]) -> List:
+        """Returns the list of matching statement IDs from the database."""
+
+    @abstractmethod
+    async def close(self):
+        """Close the database connection."""

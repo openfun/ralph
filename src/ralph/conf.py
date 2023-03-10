@@ -116,7 +116,7 @@ class MongoClientOptions(ClientOptions):
 
 
 class ESDatabaseBackendSettings(InstantiableSettingsItem):
-    """Pydantic modelf for Elasticsearch database backend configuration settings."""
+    """Pydantic model for Elasticsearch database backend configuration settings."""
 
     _class_path: str = "ralph.backends.database.es.ESDatabase"
 
@@ -124,6 +124,12 @@ class ESDatabaseBackendSettings(InstantiableSettingsItem):
     INDEX: str = "statements"
     CLIENT_OPTIONS: ESClientOptions = ESClientOptions()
     OP_TYPE: Literal["index", "create", "delete", "update"] = "index"
+
+
+class AsyncESDatabaseBackendSettings(ESDatabaseBackendSettings):
+    """Pydantic model for AsyncElasticsearch database backend configuration settings."""
+
+    _class_path: str = "ralph.backends.database.async_es.AsyncESDatabase"
 
 
 class MongoDatabaseBackendSettings(InstantiableSettingsItem):
@@ -140,6 +146,7 @@ class MongoDatabaseBackendSettings(InstantiableSettingsItem):
 class DatabaseBackendSettings(BaseModel):
     """Pydantic model for database backend configuration settings."""
 
+    ASYNC_ES: AsyncESDatabaseBackendSettings = AsyncESDatabaseBackendSettings()
     ES: ESDatabaseBackendSettings = ESDatabaseBackendSettings()
     MONGO: MongoDatabaseBackendSettings = MongoDatabaseBackendSettings()
     CLICKHOUSE: ClickhouseDatabaseBackendSettings = ClickhouseDatabaseBackendSettings()
@@ -319,7 +326,7 @@ class Settings(BaseSettings):
         },
     }
     PARSERS: ParserSettings = ParserSettings()
-    RUNSERVER_BACKEND: Literal["clickhouse", "es", "mongo"] = "es"
+    RUNSERVER_BACKEND: Literal["async_es", "clickhouse", "es", "mongo"] = "es"
     RUNSERVER_HOST: str = "0.0.0.0"  # nosec
     RUNSERVER_MAX_SEARCH_HITS_COUNT: int = 100
     RUNSERVER_POINT_IN_TIME_KEEP_ALIVE: str = "1m"
