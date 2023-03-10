@@ -53,7 +53,7 @@ $ docker compose ps
 You may now start the LRS server using:
 
 ```
-$ make run-lrs
+$ make run
 ```
 
 The server should be up and running at
