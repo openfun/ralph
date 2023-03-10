@@ -28,7 +28,7 @@ backends:
 The LRS server currently supports the following backends to store learning
 traces in xAPI format:
 
-- Elasticsearch
+- Elasticsearch (both synchronous and asynchronous)
 - MongoDB
 
 ## CLI key concepts

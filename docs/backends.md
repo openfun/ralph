@@ -149,7 +149,7 @@ The webSocket backend is **read-only** and can be used to get real-time events.
 
 ### Elasticsearch
 
-Elasticsearch backend is mostly used for indexation purpose (as a datalake) but
+For a CLI usage, a synchronous Elasticsearch backend is available, which is mostly used for indexation purpose (as a datalake) but
 it can also be used to fetch indexed data from it.
 
 #### Backend parameters
