@@ -224,18 +224,15 @@ logs: ## display app logs (follow mode)
 	@$(COMPOSE) logs -f app
 .PHONY: logs
 
-run: ## alias for run-es run-mongo run-clickhouse
+run: ## run LRS server with the runserver backends (development mode)
 run: \
-	run-es \
-	run-mongo \
-	run-clickhouse
+	run-databases
+	@$(COMPOSE) up -d app
 .PHONY: run
 
 run-all: ## start all supported local backends
 run-all: \
-	run-clickhouse \
-	run-es \
-	run-mongo \
+	run-databases \
 	run-swift
 .PHONY: run-all
 
@@ -245,19 +242,18 @@ run-clickhouse: ## start clickhouse backend
 	@$(COMPOSE_RUN) dockerize -wait tcp://clickhouse:9000 -timeout 60s
 .PHONY: run-clickhouse
 
+run-databases: ## alias for running database services
+run-databases: \
+	run-es \
+	run-mongo \
+	run-clickhouse
+.PHONY: run-databases
+
 run-es: ## start elasticsearch backend
 	@$(COMPOSE) up -d elasticsearch
 	@echo "Waiting for elasticsearch to be up and running..."
 	@$(COMPOSE_RUN) dockerize -wait tcp://elasticsearch:9200 -timeout 60s
 .PHONY: run-es
-
-run-lrs: ## run LRS server with the runserver backends (development mode)
-run-lrs: \
-	run-es \
-	run-mongo \
-	run-clickhouse
-	@$(COMPOSE) up -d app
-.PHONY: run-lrs
 
 run-mongo: ## start mongodb backend
 	@$(COMPOSE) up -d mongo
@@ -280,7 +276,7 @@ stop: ## stops backend servers
 .PHONY: stop
 
 test: ## run back-end tests
-test: run-lrs
+test: run
 	bin/pytest
 .PHONY: test
 
