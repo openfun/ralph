@@ -3,16 +3,18 @@
 from uuid import uuid4
 
 import pytest
-from fastapi.testclient import TestClient
+from asgi_lifespan import LifespanManager
 from httpx import AsyncClient
 
 from ralph.api import app
+from ralph.backends.database.async_es import AsyncESDatabase
 from ralph.backends.database.es import ESDatabase
 from ralph.backends.database.mongo import MongoDatabase
 from ralph.conf import XapiForwardingConfigurationSettings
 from ralph.exceptions import BackendException
 
 from tests.fixtures.backends import (
+    ASYNC_ES_TEST_FORWARDING_INDEX,
     ES_TEST_FORWARDING_INDEX,
     ES_TEST_HOSTS,
     MONGO_TEST_CONNECTION_URI,
@@ -20,21 +22,26 @@ from tests.fixtures.backends import (
     MONGO_TEST_FORWARDING_COLLECTION,
     RUNSERVER_TEST_HOST,
     RUNSERVER_TEST_PORT,
+    get_async_es_test_backend,
     get_clickhouse_test_backend,
     get_es_test_backend,
     get_mongo_test_backend,
 )
 
-client = TestClient(app)
 
-
+@pytest.mark.anyio
 @pytest.mark.parametrize(
     "backend",
-    [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
+    [
+        get_async_es_test_backend,
+        get_es_test_backend,
+        get_clickhouse_test_backend,
+        get_mongo_test_backend,
+    ],
 )
 # pylint: disable=too-many-arguments
-def test_api_statements_put_single_statement_directly(
-    backend, monkeypatch, auth_credentials, es, mongo, clickhouse
+async def test_api_statements_put_single_statement_directly(
+    backend, monkeypatch, auth_credentials, async_es, es, mongo, clickhouse
 ):
     """Tests the put statements API route with one statement."""
     # pylint: disable=invalid-name,unused-argument
@@ -54,30 +61,43 @@ def test_api_statements_put_single_statement_directly(
         "verb": {"id": "https://example.com/verb-id/1/"},
     }
 
-    response = client.put(
-        f"/xAPI/statements/?statementId={statement['id']}",
-        headers={"Authorization": f"Basic {auth_credentials}"},
-        json=statement,
-    )
+    async with AsyncClient(app=app, base_url="http://test") as client, LifespanManager(
+        app
+    ):
+        response = await client.put(
+            f"/xAPI/statements/?statementId={statement['id']}",
+            headers={"Authorization": f"Basic {auth_credentials}"},
+            json=statement,
+        )
 
     assert response.status_code == 204
 
     es.indices.refresh()
+    await async_es.indices.refresh()
 
-    response = client.get(
-        "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
-    )
+    async with AsyncClient(app=app, base_url="http://test") as client, LifespanManager(
+        app
+    ):
+        response = await client.get(
+            "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
+        )
     assert response.status_code == 200
     assert response.json() == {"statements": [statement]}
 
 
+@pytest.mark.anyio
 @pytest.mark.parametrize(
     "backend",
-    [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
+    [
+        get_async_es_test_backend,
+        get_es_test_backend,
+        get_clickhouse_test_backend,
+        get_mongo_test_backend,
+    ],
 )
 # pylint: disable=too-many-arguments
-def test_api_statements_put_single_statement_no_trailing_slash(
-    backend, monkeypatch, auth_credentials, es, mongo, clickhouse
+async def test_api_statements_put_single_statement_no_trailing_slash(
+    backend, monkeypatch, auth_credentials, async_es, es, mongo, clickhouse
 ):
     """Tests that the statements endpoint also works without the trailing slash."""
     # pylint: disable=invalid-name,unused-argument
@@ -97,22 +117,31 @@ def test_api_statements_put_single_statement_no_trailing_slash(
         "verb": {"id": "https://example.com/verb-id/1/"},
     }
 
-    response = client.put(
-        f"/xAPI/statements?statementId={statement['id']}",
-        headers={"Authorization": f"Basic {auth_credentials}"},
-        json=statement,
-    )
+    async with AsyncClient(app=app, base_url="http://test") as client, LifespanManager(
+        app
+    ):
+        response = await client.put(
+            f"/xAPI/statements?statementId={statement['id']}",
+            headers={"Authorization": f"Basic {auth_credentials}"},
+            json=statement,
+        )
 
     assert response.status_code == 204
 
 
+@pytest.mark.anyio
 @pytest.mark.parametrize(
     "backend",
-    [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
+    [
+        get_async_es_test_backend,
+        get_es_test_backend,
+        get_clickhouse_test_backend,
+        get_mongo_test_backend,
+    ],
 )
 # pylint: disable=too-many-arguments
-def test_api_statements_put_statement_id_mismatch(
-    backend, monkeypatch, auth_credentials, es, mongo, clickhouse
+async def test_api_statements_put_statement_id_mismatch(
+    backend, monkeypatch, auth_credentials, async_es, es, mongo, clickhouse
 ):
     # pylint: disable=invalid-name,unused-argument
     """Tests the put statements API route when the statementId doesn't match."""
@@ -132,11 +161,14 @@ def test_api_statements_put_statement_id_mismatch(
     }
 
     different_statement_id = str(uuid4())
-    response = client.put(
-        f"/xAPI/statements/?statementId={different_statement_id}",
-        headers={"Authorization": f"Basic {auth_credentials}"},
-        json=statement,
-    )
+    async with AsyncClient(app=app, base_url="http://test") as client, LifespanManager(
+        app
+    ):
+        response = await client.put(
+            f"/xAPI/statements/?statementId={different_statement_id}",
+            headers={"Authorization": f"Basic {auth_credentials}"},
+            json=statement,
+        )
 
     assert response.status_code == 400
     assert response.json() == {
@@ -144,13 +176,19 @@ def test_api_statements_put_statement_id_mismatch(
     }
 
 
+@pytest.mark.anyio
 @pytest.mark.parametrize(
     "backend",
-    [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
+    [
+        get_async_es_test_backend,
+        get_es_test_backend,
+        get_clickhouse_test_backend,
+        get_mongo_test_backend,
+    ],
 )
 # pylint: disable=too-many-arguments
-def test_api_statements_put_statements_list_of_one(
-    backend, monkeypatch, auth_credentials, es, mongo, clickhouse
+async def test_api_statements_put_statements_list_of_one(
+    backend, monkeypatch, auth_credentials, async_es, es, mongo, clickhouse
 ):
     # pylint: disable=invalid-name,unused-argument
     """Tests that we fail on PUTs with a list, even if it's one statement."""
@@ -169,22 +207,31 @@ def test_api_statements_put_statements_list_of_one(
         "verb": {"id": "https://example.com/verb-id/1/"},
     }
 
-    response = client.put(
-        f"/xAPI/statements/?statementId={statement['id']}",
-        headers={"Authorization": f"Basic {auth_credentials}"},
-        json=[statement],
-    )
+    async with AsyncClient(app=app, base_url="http://test") as client, LifespanManager(
+        app
+    ):
+        response = await client.put(
+            f"/xAPI/statements/?statementId={statement['id']}",
+            headers={"Authorization": f"Basic {auth_credentials}"},
+            json=[statement],
+        )
 
     assert response.status_code == 422
 
 
+@pytest.mark.anyio
 @pytest.mark.parametrize(
     "backend",
-    [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
+    [
+        get_async_es_test_backend,
+        get_es_test_backend,
+        get_clickhouse_test_backend,
+        get_mongo_test_backend,
+    ],
 )
 # pylint: disable=too-many-arguments
-def test_api_statements_put_statement_duplicate_of_existing_statement(
-    backend, monkeypatch, auth_credentials, es, mongo, clickhouse
+async def test_api_statements_put_statement_duplicate_of_existing_statement(
+    backend, monkeypatch, auth_credentials, async_es, es, mongo, clickhouse
 ):
     """Tests the put statements API route, given a statement that already exist in the
     database (has the same ID), should fail.
@@ -207,39 +254,55 @@ def test_api_statements_put_statement_duplicate_of_existing_statement(
     }
 
     # Put the statement once.
-    response = client.put(
-        f"/xAPI/statements/?statementId={statement['id']}",
-        headers={"Authorization": f"Basic {auth_credentials}"},
-        json=statement,
-    )
+    async with AsyncClient(app=app, base_url="http://test") as client, LifespanManager(
+        app
+    ):
+        response = await client.put(
+            f"/xAPI/statements/?statementId={statement['id']}",
+            headers={"Authorization": f"Basic {auth_credentials}"},
+            json=statement,
+        )
     assert response.status_code == 204
 
     es.indices.refresh()
+    await async_es.indices.refresh()
 
     # Put the statement twice, trying to change the version field which is not allowed.
-    response = client.put(
-        f"/xAPI/statements/?statementId={statement['id']}",
-        headers={"Authorization": f"Basic {auth_credentials}"},
-        json=dict(statement, **{"version": "1.0.0"}),
-    )
+    async with AsyncClient(app=app, base_url="http://test") as client, LifespanManager(
+        app
+    ):
+        response = await client.put(
+            f"/xAPI/statements/?statementId={statement['id']}",
+            headers={"Authorization": f"Basic {auth_credentials}"},
+            json=dict(statement, **{"version": "1.0.0"}),
+        )
 
     assert response.status_code == 409
     assert response.json() == {"detail": "Statement already exists with the same ID"}
 
-    response = client.get(
-        f"/xAPI/statements/?statementId={statement['id']}",
-        headers={"Authorization": f"Basic {auth_credentials}"},
-    )
+    async with AsyncClient(app=app, base_url="http://test") as client, LifespanManager(
+        app
+    ):
+        response = await client.get(
+            f"/xAPI/statements/?statementId={statement['id']}",
+            headers={"Authorization": f"Basic {auth_credentials}"},
+        )
     assert response.status_code == 200
     assert response.json() == {"statements": [statement]}
 
 
+@pytest.mark.anyio
 @pytest.mark.parametrize(
     "backend",
-    [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
+    [
+        get_async_es_test_backend,
+        get_es_test_backend,
+        get_clickhouse_test_backend,
+        get_mongo_test_backend,
+    ],
 )
-def test_api_statement_put_statements_with_a_failure_during_storage(
-    backend, monkeypatch, auth_credentials, es, mongo, clickhouse
+async def test_api_statement_put_statements_with_a_failure_during_storage(
+    backend, monkeypatch, auth_credentials, async_es, es, mongo, clickhouse
 ):
     """Tests the put statements API route with a failure happening during storage."""
     # pylint: disable=invalid-name,unused-argument, too-many-arguments
@@ -267,21 +330,30 @@ def test_api_statement_put_statements_with_a_failure_during_storage(
         "verb": {"id": "https://example.com/verb-id/1/"},
     }
 
-    response = client.put(
-        f"/xAPI/statements/?statementId={statement['id']}",
-        headers={"Authorization": f"Basic {auth_credentials}"},
-        json=statement,
-    )
+    async with AsyncClient(app=app, base_url="http://test") as client, LifespanManager(
+        app
+    ):
+        response = await client.put(
+            f"/xAPI/statements/?statementId={statement['id']}",
+            headers={"Authorization": f"Basic {auth_credentials}"},
+            json=statement,
+        )
 
     assert response.status_code == 500
     assert response.json() == {"detail": "Statement indexation failed"}
 
 
+@pytest.mark.anyio
 @pytest.mark.parametrize(
     "backend",
-    [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
+    [
+        get_async_es_test_backend,
+        get_es_test_backend,
+        get_clickhouse_test_backend,
+        get_mongo_test_backend,
+    ],
 )
-def test_api_statements_put_statement_with_a_failure_during_id_query(
+async def test_api_statements_put_statement_with_a_failure_during_id_query(
     backend, monkeypatch, auth_credentials, es, mongo, clickhouse
 ):
     """Tests the put statements API route with a failure during query execution."""
@@ -312,23 +384,32 @@ def test_api_statements_put_statement_with_a_failure_during_id_query(
         "verb": {"id": "https://example.com/verb-id/1/"},
     }
 
-    response = client.put(
-        f"/xAPI/statements/?statementId={statement['id']}",
-        headers={"Authorization": f"Basic {auth_credentials}"},
-        json=statement,
-    )
+    async with AsyncClient(app=app, base_url="http://test") as client, LifespanManager(
+        app
+    ):
+        response = await client.put(
+            f"/xAPI/statements/?statementId={statement['id']}",
+            headers={"Authorization": f"Basic {auth_credentials}"},
+            json=statement,
+        )
 
     assert response.status_code == 500
     assert response.json() == {"detail": "xAPI statements query failed"}
 
 
+@pytest.mark.anyio
 @pytest.mark.parametrize(
     "backend",
-    [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
+    [
+        get_async_es_test_backend,
+        get_es_test_backend,
+        get_clickhouse_test_backend,
+        get_mongo_test_backend,
+    ],
 )
 # pylint: disable=too-many-arguments
-def test_put_statement_without_statement_forwarding(
-    backend, auth_credentials, monkeypatch, es, mongo, clickhouse
+async def test_put_statement_without_statement_forwarding(
+    backend, auth_credentials, monkeypatch, async_es, es, mongo, clickhouse
 ):
     """Tests the put statements API route, given an empty forwarding configuration,
     should not start the forwarding background task.
@@ -364,22 +445,29 @@ def test_put_statement_without_statement_forwarding(
         "verb": {"id": "https://example.com/verb-id/1/"},
     }
 
-    response = client.put(
-        f"/xAPI/statements/?statementId={statement['id']}",
-        headers={"Authorization": f"Basic {auth_credentials}"},
-        json=statement,
-    )
+    async with AsyncClient(app=app, base_url="http://test") as client, LifespanManager(
+        app
+    ):
+        response = await client.put(
+            f"/xAPI/statements/?statementId={statement['id']}",
+            headers={"Authorization": f"Basic {auth_credentials}"},
+            json=statement,
+        )
 
     assert response.status_code == 204
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 @pytest.mark.parametrize(
-    "receiving_backend", [get_es_test_backend, get_mongo_test_backend]
+    "receiving_backend",
+    [get_async_es_test_backend, get_es_test_backend, get_mongo_test_backend],
 )
 @pytest.mark.parametrize(
     "forwarding_backend",
     [
+        lambda: AsyncESDatabase(
+            hosts=ES_TEST_HOSTS, index=ASYNC_ES_TEST_FORWARDING_INDEX
+        ),
         lambda: ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_FORWARDING_INDEX),
         lambda: MongoDatabase(
             connection_uri=MONGO_TEST_CONNECTION_URI,
@@ -393,6 +481,8 @@ async def test_put_statement_with_statement_forwarding(
     forwarding_backend,
     monkeypatch,
     auth_credentials,
+    async_es,
+    async_es_forwarding,
     es,
     es_forwarding,
     mongo,
@@ -463,10 +553,11 @@ async def test_put_statement_with_statement_forwarding(
         forwarding_patch.setattr(
             "ralph.api.routers.statements.DATABASE_CLIENT", forwarding_backend()
         )
+
         # Start forwarding LRS client
         async with AsyncClient(
             app=app, base_url="http://testserver"
-        ) as forwarding_client:
+        ) as forwarding_client, LifespanManager(app):
             # Send an xAPI statement to the forwarding client
             response = await forwarding_client.put(
                 f"/xAPI/statements/?statementId={statement['id']}",
@@ -477,6 +568,8 @@ async def test_put_statement_with_statement_forwarding(
 
             es.indices.refresh()
             es_forwarding.indices.refresh()
+            await async_es.indices.refresh()
+            await async_es_forwarding.indices.refresh()
 
             # The statement should be stored on the forwarding client
             response = await forwarding_client.get(
@@ -487,7 +580,7 @@ async def test_put_statement_with_statement_forwarding(
             assert response.json() == {"statements": [statement]}
 
     # The statement should also be stored on the receiving client
-    async with AsyncClient() as receiving_client:
+    async with AsyncClient() as receiving_client, LifespanManager(app):
         response = await receiving_client.get(
             f"http://{RUNSERVER_TEST_HOST}:{RUNSERVER_TEST_PORT}/xAPI/statements/",
             headers={"Authorization": f"Basic {auth_credentials}"},

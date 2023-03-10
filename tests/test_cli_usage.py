@@ -223,7 +223,7 @@ def test_cli_runserver_command_usage():
 
     expected_output = (
         "Options:\n"
-        "  -b, --backend [es|mongo|clickhouse]\n"
+        "  -b, --backend [async_es|es|mongo|clickhouse]\n"
         "                                  Backend  [required]\n"
         "  clickhouse backend: \n"
         "    --clickhouse-client-options KEY=VALUE,KEY=VALUE\n"
@@ -243,6 +243,11 @@ def test_cli_runserver_command_usage():
         "    --es-client-options KEY=VALUE,KEY=VALUE\n"
         "    --es-index TEXT\n"
         "    --es-hosts VALUE1,VALUE2,VALUE3\n"
+        "  async_es backend: \n"
+        "    --async-es-op-type TEXT\n"
+        "    --async-es-client-options KEY=VALUE,KEY=VALUE\n"
+        "    --async-es-index TEXT\n"
+        "    --async-es-hosts VALUE1,VALUE2,VALUE3\n"
         "  -h, --host TEXT                 LRS server host name\n"
         "  -p, --port INTEGER              LRS server port\n"
     )

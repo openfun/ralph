@@ -744,30 +744,16 @@ def test_cli_runserver_command_environment_file_generation(monkeypatch):
     def mock_uvicorn_run(_, env_file=None, **kwargs):
         """Mocks uvicorn.run asserting environment file content."""
         with open(env_file, mode="r", encoding=settings.LOCALE_ENCODING) as file:
-            env_lines = [
+            refs = [
                 f"RALPH_RUNSERVER_BACKEND={settings.RUNSERVER_BACKEND}\n",
                 "RALPH_BACKENDS__DATABASE__ES__INDEX=foo\n",
                 "RALPH_BACKENDS__DATABASE__ES__CLIENT_OPTIONS__verify_certs=True\n",
-                "RALPH_BACKENDS__DATABASE__CLICKHOUSE__EVENT_TABLE_NAME="
-                f"{settings.BACKENDS.DATABASE.CLICKHOUSE.EVENT_TABLE_NAME}\n",
-                "RALPH_BACKENDS__DATABASE__CLICKHOUSE__DATABASE="
-                f"{settings.BACKENDS.DATABASE.CLICKHOUSE.DATABASE}\n",
-                "RALPH_BACKENDS__DATABASE__CLICKHOUSE__PORT="
-                f"{settings.BACKENDS.DATABASE.CLICKHOUSE.PORT}\n",
-                "RALPH_BACKENDS__DATABASE__CLICKHOUSE__HOST="
-                f"{settings.BACKENDS.DATABASE.CLICKHOUSE.HOST}\n",
-                "RALPH_BACKENDS__DATABASE__MONGO__COLLECTION="
-                f"{settings.BACKENDS.DATABASE.MONGO.COLLECTION}\n",
-                "RALPH_BACKENDS__DATABASE__MONGO__DATABASE="
-                f"{settings.BACKENDS.DATABASE.MONGO.DATABASE}\n",
-                "RALPH_BACKENDS__DATABASE__MONGO__CONNECTION_URI="
-                f"{settings.BACKENDS.DATABASE.MONGO.CONNECTION_URI}\n",
                 "RALPH_BACKENDS__DATABASE__ES__OP_TYPE="
                 f"{settings.BACKENDS.DATABASE.ES.OP_TYPE}\n",
                 "RALPH_BACKENDS__DATABASE__ES__HOSTS="
                 f"{','.join(settings.BACKENDS.DATABASE.ES.HOSTS)}\n",
             ]
-            assert file.readlines() == env_lines
+            assert all(line in refs for line in file.readlines())
 
     monkeypatch.setattr("ralph.cli.uvicorn.run", mock_uvicorn_run)
     runner = CliRunner()

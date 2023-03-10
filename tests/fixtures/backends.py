@@ -17,11 +17,12 @@ import clickhouse_connect
 import pytest
 import uvicorn
 import websockets
-from elasticsearch import BadRequestError, Elasticsearch
+from elasticsearch import AsyncElasticsearch, BadRequestError, Elasticsearch
 from httpx import AsyncClient, ConnectError
 from pymongo import MongoClient
 from pymongo.errors import CollectionInvalid
 
+from ralph.backends.database.async_es import AsyncESDatabase
 from ralph.backends.database.clickhouse import ClickHouseDatabase
 from ralph.backends.database.es import ESDatabase
 from ralph.backends.database.mongo import MongoDatabase
@@ -60,6 +61,23 @@ ES_TEST_HOSTS = os.environ.get(
     "RALPH_BACKENDS__DATABASE__ES__TEST_HOSTS", "http://localhost:9200"
 ).split(",")
 
+# Async Elasticsearch backend defaults
+ASYNC_ES_TEST_INDEX = os.environ.get(
+    "RALPH_BACKENDS__DATABASE__ASYNC_ES__TEST_INDEX", "async-index-foo"
+)
+ASYNC_ES_TEST_FORWARDING_INDEX = os.environ.get(
+    "RALPH_BACKENDS__DATABASE__ASYNC_ES__TEST_FORWARDING_INDEX", "async-index-foo-2"
+)
+ASYNC_ES_TEST_INDEX_TEMPLATE = os.environ.get(
+    "RALPH_BACKENDS__DATABASE__ASYNC_ES__INDEX_TEMPLATE", "async-index"
+)
+ASYNC_ES_TEST_INDEX_PATTERN = os.environ.get(
+    "RALPH_BACKENDS__DATABASE__ASYNC_ES__TEST_INDEX_PATTERN", "async-index*"
+)
+ASYNC_ES_TEST_HOSTS = os.environ.get(
+    "RALPH_BACKENDS__DATABASE__ASYNC_ES__TEST_HOSTS", "http://localhost:9200"
+).split(",")
+
 MONGO_TEST_COLLECTION = os.environ.get(
     "RALPH_BACKENDS__DATABASE__MONGO__TEST_COLLECTION", "marsha"
 )
@@ -90,6 +108,18 @@ def get_clickhouse_test_backend():
         database=CLICKHOUSE_TEST_DATABASE,
         event_table_name=CLICKHOUSE_TEST_TABLE_NAME,
     )
+
+
+@pytest.fixture
+def anyio_backend():
+    """Select asyncio backend for pytest anyio."""
+    return "asyncio"
+
+
+@pytest.mark.anyio
+def get_async_es_test_backend():
+    """Returns a AsyncESDatabase backend instance using test defaults."""
+    return AsyncESDatabase(hosts=ASYNC_ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX)
 
 
 @lru_cache
@@ -127,6 +157,44 @@ class NamedClassEnum(Enum):
     B = "tests.fixtures.backends.NamedClassB"
 
 
+@pytest.mark.anyio
+async def get_async_es_fixture(host=ASYNC_ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX):
+    """Creates / deletes an AsyncElasticSearch test index and yields an instantiated
+    client.
+    """
+    client = AsyncElasticsearch(host)
+    try:
+        await client.indices.create(index=index)
+    except BadRequestError:
+        # The index might already exist
+        await client.indices.delete(index=index)
+        await client.indices.create(index=index)
+    yield client
+    await client.indices.delete(index=index)
+    await client.close()
+
+
+@pytest.mark.anyio
+@pytest.fixture
+async def async_es():
+    """Yields an AsyncElasticSearch test client. See get_async_es_fixture above."""
+    # pylint: disable=invalid-name
+
+    async for async_es_client in get_async_es_fixture():
+        yield async_es_client
+
+
+@pytest.mark.anyio
+@pytest.fixture
+async def async_es_forwarding():
+    """Yields a second AsyncElasticSearch test client.
+    See get_async_es_fixture above."""
+    async for async_es_client in get_async_es_fixture(
+        index=ASYNC_ES_TEST_FORWARDING_INDEX
+    ):
+        yield async_es_client
+
+
 def get_es_fixture(host=ES_TEST_HOSTS, index=ES_TEST_INDEX):
     """Creates / deletes an ElasticSearch test index and yields an instantiated
     client.
@@ -139,7 +207,9 @@ def get_es_fixture(host=ES_TEST_HOSTS, index=ES_TEST_INDEX):
         client.indices.delete(index=index)
         client.indices.create(index=index)
     yield client
+
     client.indices.delete(index=index)
+    client.close()
 
 
 @pytest.fixture
@@ -250,6 +320,61 @@ def clickhouse():
         yield clickhouse_client
 
 
+@pytest.mark.anyio
+@pytest.fixture
+async def async_es_data_stream():
+    """Creates / deletes an AsyncElasticSearch test datastream and
+    yields an instantiated client.
+    """
+    client = AsyncElasticsearch(ASYNC_ES_TEST_HOSTS)
+
+    # Create statements index template with enabled data stream
+    index_patterns = [ASYNC_ES_TEST_INDEX_PATTERN]
+    data_stream = {}
+    template = {
+        "mappings": {
+            "dynamic": True,
+            "dynamic_date_formats": [
+                "strict_date_optional_time",
+                "yyyy/MM/dd HH:mm:ss Z||yyyy/MM/dd Z",
+            ],
+            "dynamic_templates": [],
+            "date_detection": True,
+            "numeric_detection": True,
+            # Note: We define an explicit mapping of the `timestamp` field to allow the
+            # ElasticSearch database to be queried even if no document has been inserted
+            # before.
+            "properties": {
+                "timestamp": {
+                    "type": "date",
+                    "index": True,
+                }
+            },
+        },
+        "settings": {
+            "index": {
+                "number_of_shards": "1",
+                "number_of_replicas": "1",
+            }
+        },
+    }
+    await client.indices.put_index_template(
+        name=ASYNC_ES_TEST_INDEX_TEMPLATE,
+        index_patterns=index_patterns,
+        data_stream=data_stream,
+        template=template,
+    )
+
+    # Create a datastream matching the index template
+    await client.indices.create_data_stream(name=ASYNC_ES_TEST_INDEX)
+
+    yield client
+
+    await client.indices.delete_data_stream(name=ASYNC_ES_TEST_INDEX)
+    await client.indices.delete_index_template(name=ASYNC_ES_TEST_INDEX_TEMPLATE)
+    await client.close()
+
+
 @pytest.fixture
 def es_data_stream():
     """Creates / deletes an ElasticSearch test datastream and yields an instantiated
@@ -301,6 +426,7 @@ def es_data_stream():
 
     client.indices.delete_data_stream(name=ES_TEST_INDEX)
     client.indices.delete_index_template(name=ES_TEST_INDEX_TEMPLATE)
+    client.close()
 
 
 @pytest.fixture
@@ -386,6 +512,8 @@ def ws(events):
     yield server
 
     server.ws_server.close()
+    asyncio.get_event_loop().run_until_complete(server.ws_server.wait_closed())
+    loop.close()
 
 
 @pytest.fixture
@@ -403,6 +531,7 @@ def lrs():
         )
         try:
             process.start()
+            response = None
             async with AsyncClient() as client:
                 server_ready = False
                 while not server_ready:

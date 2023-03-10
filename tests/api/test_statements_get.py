@@ -5,8 +5,8 @@ from datetime import datetime, timedelta
 from urllib.parse import quote_plus
 
 import pytest
-from elasticsearch.helpers import bulk
-from fastapi.testclient import TestClient
+from elasticsearch.helpers import async_bulk, bulk
+from httpx import AsyncClient
 
 from ralph.api import app
 from ralph.backends.database.clickhouse import ClickHouseDatabase
@@ -14,6 +14,7 @@ from ralph.backends.database.mongo import MongoDatabase
 from ralph.exceptions import BackendException
 
 from tests.fixtures.backends import (
+    ASYNC_ES_TEST_INDEX,
     CLICKHOUSE_TEST_DATABASE,
     CLICKHOUSE_TEST_HOST,
     CLICKHOUSE_TEST_PORT,
@@ -21,12 +22,29 @@ from tests.fixtures.backends import (
     ES_TEST_INDEX,
     MONGO_TEST_COLLECTION,
     MONGO_TEST_DATABASE,
+    get_async_es_test_backend,
     get_clickhouse_test_backend,
     get_es_test_backend,
     get_mongo_test_backend,
 )
 
-client = TestClient(app)
+
+@pytest.mark.anyio
+async def insert_async_es_statements(async_es_client, statements):
+    """Inserts a bunch of example statements into async Elasticsearch for testing."""
+    await async_bulk(
+        async_es_client,
+        [
+            {
+                "_index": ASYNC_ES_TEST_INDEX,
+                "_id": statement["id"],
+                "_op_type": "index",
+                "_source": statement,
+            }
+            for statement in statements
+        ],
+    )
+    await async_es_client.indices.refresh()
 
 
 def insert_es_statements(es_client, statements):
@@ -65,16 +83,17 @@ def insert_clickhouse_statements(statements):
     assert success == len(statements)
 
 
-@pytest.fixture(params=["es", "mongo", "clickhouse"])
-# pylint: disable=unused-argument
-def insert_statements_and_monkeypatch_backend(
-    request, es, mongo, clickhouse, monkeypatch
+@pytest.mark.anyio
+@pytest.fixture(params=["async_es", "es", "mongo", "clickhouse"])
+# pylint: disable=too-many-arguments, unused-argument
+async def insert_statements_and_monkeypatch_backend(
+    request, async_es, es, mongo, clickhouse, monkeypatch
 ):
-    """Retuns a function that inserts statements into each backend."""
+    """Retuns a function that inserts statements into Elasticsearch and MongoDB."""
     # pylint: disable=invalid-name
 
-    def _insert_statements_and_monkeypatch_backend(statements):
-        """Inserts statements once into each backend."""
+    async def _insert_statements_and_monkeypatch_backend(statements):
+        """Inserts statements once into Elasticsearch and once into MongoDB."""
         database_client_class_path = "ralph.api.routers.statements.DATABASE_CLIENT"
         if request.param == "mongo":
             insert_mongo_statements(mongo, statements)
@@ -85,14 +104,18 @@ def insert_statements_and_monkeypatch_backend(
             monkeypatch.setattr(
                 database_client_class_path, get_clickhouse_test_backend()
             )
-            return
-        insert_es_statements(es, statements)
-        monkeypatch.setattr(database_client_class_path, get_es_test_backend())
+        if request.param == "es":
+            insert_es_statements(es, statements)
+            monkeypatch.setattr(database_client_class_path, get_es_test_backend())
+        if request.param == "async_es":
+            await insert_async_es_statements(async_es, statements)
+            monkeypatch.setattr(database_client_class_path, get_async_es_test_backend())
 
     return _insert_statements_and_monkeypatch_backend
 
 
-def test_api_statements_get_statements(
+@pytest.mark.anyio
+async def test_api_statements_get_statements(
     insert_statements_and_monkeypatch_backend, auth_credentials
 ):
     """Tests the get statements API route without any filters set up."""
@@ -108,19 +131,20 @@ def test_api_statements_get_statements(
             "timestamp": datetime.now().isoformat(),
         },
     ]
-    insert_statements_and_monkeypatch_backend(statements)
+    await insert_statements_and_monkeypatch_backend(statements)
 
-    # Confirm that calling this with and without the trailing slash both work
-    for path in ("/xAPI/statements", "/xAPI/statements/"):
-        response = client.get(
-            path, headers={"Authorization": f"Basic {auth_credentials}"}
-        )
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        for path in ("/xAPI/statements", "/xAPI/statements/"):
+            response = await client.get(
+                path, headers={"Authorization": f"Basic {auth_credentials}"}
+            )
 
         assert response.status_code == 200
         assert response.json() == {"statements": [statements[1], statements[0]]}
 
 
-def test_api_statements_get_statements_ascending(
+@pytest.mark.anyio
+async def test_api_statements_get_statements_ascending(
     insert_statements_and_monkeypatch_backend, auth_credentials
 ):
     """Tests the get statements API route, given an "ascending" query parameter, should
@@ -138,18 +162,20 @@ def test_api_statements_get_statements_ascending(
             "timestamp": datetime.now().isoformat(),
         },
     ]
-    insert_statements_and_monkeypatch_backend(statements)
+    await insert_statements_and_monkeypatch_backend(statements)
 
-    response = client.get(
-        "/xAPI/statements/?ascending=true",
-        headers={"Authorization": f"Basic {auth_credentials}"},
-    )
+    async with AsyncClient(app=app, base_url="http://test") as aclient:
+        response = await aclient.get(
+            "/xAPI/statements/?ascending=true",
+            headers={"Authorization": f"Basic {auth_credentials}"},
+        )
 
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[0], statements[1]]}
 
 
-def test_api_statements_get_statements_by_statement_id(
+@pytest.mark.anyio
+async def test_api_statements_get_statements_by_statement_id(
     insert_statements_and_monkeypatch_backend, auth_credentials
 ):
     """Tests the get statements API route, given a "statementId" query parameter, should
@@ -167,18 +193,20 @@ def test_api_statements_get_statements_by_statement_id(
             "timestamp": datetime.now().isoformat(),
         },
     ]
-    insert_statements_and_monkeypatch_backend(statements)
+    await insert_statements_and_monkeypatch_backend(statements)
 
-    response = client.get(
-        f"/xAPI/statements/?statementId={statements[1]['id']}",
-        headers={"Authorization": f"Basic {auth_credentials}"},
-    )
+    async with AsyncClient(app=app, base_url="http://test") as aclient:
+        response = await aclient.get(
+            f"/xAPI/statements/?statementId={statements[1]['id']}",
+            headers={"Authorization": f"Basic {auth_credentials}"},
+        )
 
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[1]]}
 
 
-def test_api_statements_get_statements_by_agent(
+@pytest.mark.anyio
+async def test_api_statements_get_statements_by_agent(
     insert_statements_and_monkeypatch_backend, auth_credentials
 ):
     """Tests the get statements API route, given an "agent" query parameter, should
@@ -198,18 +226,20 @@ def test_api_statements_get_statements_by_agent(
             "actor": {"account": {"name": "cdcb1c95-dd5b-4085-8236-9c1580051155"}},
         },
     ]
-    insert_statements_and_monkeypatch_backend(statements)
+    await insert_statements_and_monkeypatch_backend(statements)
 
-    response = client.get(
-        "/xAPI/statements/?agent=96d61e6c-9cdb-4926-9cff-d3a15c662999",
-        headers={"Authorization": f"Basic {auth_credentials}"},
-    )
+    async with AsyncClient(app=app, base_url="http://test") as aclient:
+        response = await aclient.get(
+            "/xAPI/statements/?agent=96d61e6c-9cdb-4926-9cff-d3a15c662999",
+            headers={"Authorization": f"Basic {auth_credentials}"},
+        )
 
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[0]]}
 
 
-def test_api_statements_get_statements_by_verb(
+@pytest.mark.anyio
+async def test_api_statements_get_statements_by_verb(
     insert_statements_and_monkeypatch_backend, auth_credentials
 ):
     """Tests the get statements API route, given a "verb" query parameter, should
@@ -229,18 +259,21 @@ def test_api_statements_get_statements_by_verb(
             "verb": {"id": "http://adlnet.gov/expapi/verbs/played"},
         },
     ]
-    insert_statements_and_monkeypatch_backend(statements)
+    await insert_statements_and_monkeypatch_backend(statements)
 
-    response = client.get(
-        "/xAPI/statements/?verb=" + quote_plus("http://adlnet.gov/expapi/verbs/played"),
-        headers={"Authorization": f"Basic {auth_credentials}"},
-    )
+    async with AsyncClient(app=app, base_url="http://test") as aclient:
+        response = await aclient.get(
+            "/xAPI/statements/?verb="
+            + quote_plus("http://adlnet.gov/expapi/verbs/played"),
+            headers={"Authorization": f"Basic {auth_credentials}"},
+        )
 
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[1]]}
 
 
-def test_api_statements_get_statements_by_activity(
+@pytest.mark.anyio
+async def test_api_statements_get_statements_by_activity(
     insert_statements_and_monkeypatch_backend, auth_credentials
 ):
     """Tests the get statements API route, given an "activity" query parameter, should
@@ -266,18 +299,20 @@ def test_api_statements_get_statements_by_activity(
             },
         },
     ]
-    insert_statements_and_monkeypatch_backend(statements)
+    await insert_statements_and_monkeypatch_backend(statements)
 
-    response = client.get(
-        "/xAPI/statements/?activity=a2956991-200b-40a7-9548-293cdcc06c4b",
-        headers={"Authorization": f"Basic {auth_credentials}"},
-    )
+    async with AsyncClient(app=app, base_url="http://test") as aclient:
+        response = await aclient.get(
+            "/xAPI/statements/?activity=a2956991-200b-40a7-9548-293cdcc06c4b",
+            headers={"Authorization": f"Basic {auth_credentials}"},
+        )
 
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[1]]}
 
 
-def test_api_statements_get_statements_since_timestamp(
+@pytest.mark.anyio
+async def test_api_statements_get_statements_since_timestamp(
     insert_statements_and_monkeypatch_backend, auth_credentials
 ):
     """Tests the get statements API route, given a "since" query parameter, should
@@ -295,19 +330,21 @@ def test_api_statements_get_statements_since_timestamp(
             "timestamp": datetime.now().isoformat(),
         },
     ]
-    insert_statements_and_monkeypatch_backend(statements)
+    await insert_statements_and_monkeypatch_backend(statements)
 
     since = (datetime.now() - timedelta(minutes=30)).isoformat()
-    response = client.get(
-        f"/xAPI/statements/?since={since}",
-        headers={"Authorization": f"Basic {auth_credentials}"},
-    )
+    async with AsyncClient(app=app, base_url="http://test") as aclient:
+        response = await aclient.get(
+            f"/xAPI/statements/?since={since}",
+            headers={"Authorization": f"Basic {auth_credentials}"},
+        )
 
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[1]]}
 
 
-def test_api_statements_get_statements_until_timestamp(
+@pytest.mark.anyio
+async def test_api_statements_get_statements_until_timestamp(
     insert_statements_and_monkeypatch_backend, auth_credentials
 ):
     """Tests the get statements API route, given an "until" query parameter,
@@ -325,19 +362,21 @@ def test_api_statements_get_statements_until_timestamp(
             "timestamp": datetime.now().isoformat(),
         },
     ]
-    insert_statements_and_monkeypatch_backend(statements)
+    await insert_statements_and_monkeypatch_backend(statements)
 
     until = (datetime.now() - timedelta(minutes=30)).isoformat()
-    response = client.get(
-        f"/xAPI/statements/?until={until}",
-        headers={"Authorization": f"Basic {auth_credentials}"},
-    )
+    async with AsyncClient(app=app, base_url="http://test") as aclient:
+        response = await aclient.get(
+            f"/xAPI/statements/?until={until}",
+            headers={"Authorization": f"Basic {auth_credentials}"},
+        )
 
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[0]]}
 
 
-def test_api_statements_get_statements_with_pagination(
+@pytest.mark.anyio
+async def test_api_statements_get_statements_with_pagination(
     monkeypatch, insert_statements_and_monkeypatch_backend, auth_credentials
 ):
     """Tests the get statements API route, given a request leading to more results than
@@ -364,28 +403,31 @@ def test_api_statements_get_statements_with_pagination(
             "timestamp": datetime.now().isoformat(),
         },
     ]
-    insert_statements_and_monkeypatch_backend(statements)
+    await insert_statements_and_monkeypatch_backend(statements)
 
     # First response gets the first two results, with a "more" entry as
     # we have more results to return on a later page.
-    first_response = client.get(
-        "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
-    )
+    async with AsyncClient(app=app, base_url="http://test") as aclient:
+        first_response = await aclient.get(
+            "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
+        )
     assert first_response.status_code == 200
     assert first_response.json()["statements"] == [statements[2], statements[1]]
     more_regex = re.compile(r"^/xAPI/statements/\?pit_id=.*&search_after=.*$")
     assert more_regex.match(first_response.json()["more"])
 
     # Second response gets the missing result from the first response.
-    second_response = client.get(
-        first_response.json()["more"],
-        headers={"Authorization": f"Basic {auth_credentials}"},
-    )
+    async with AsyncClient(app=app, base_url="http://test") as aclient:
+        second_response = await aclient.get(
+            first_response.json()["more"],
+            headers={"Authorization": f"Basic {auth_credentials}"},
+        )
     assert second_response.status_code == 200
     assert second_response.json() == {"statements": [statements[0]]}
 
 
-def test_api_statements_get_statements_with_no_matching_statement(
+@pytest.mark.anyio
+async def test_api_statements_get_statements_with_no_matching_statement(
     insert_statements_and_monkeypatch_backend, auth_credentials
 ):
     """Tests the get statements API route, given a query yielding no matching statement,
@@ -403,18 +445,20 @@ def test_api_statements_get_statements_with_no_matching_statement(
             "timestamp": datetime.now().isoformat(),
         },
     ]
-    insert_statements_and_monkeypatch_backend(statements)
+    await insert_statements_and_monkeypatch_backend(statements)
 
-    response = client.get(
-        "/xAPI/statements/?statementId=66c81e98-1763-4730-8cfc-f5ab34f1bad5",
-        headers={"Authorization": f"Basic {auth_credentials}"},
-    )
+    async with AsyncClient(app=app, base_url="http://test") as aclient:
+        response = await aclient.get(
+            "/xAPI/statements/?statementId=66c81e98-1763-4730-8cfc-f5ab34f1bad5",
+            headers={"Authorization": f"Basic {auth_credentials}"},
+        )
 
     assert response.status_code == 200
     assert response.json() == {"statements": []}
 
 
-def test_api_statements_get_statements_with_database_query_failure(
+@pytest.mark.anyio
+async def test_api_statements_get_statements_with_database_query_failure(
     auth_credentials, monkeypatch
 ):
     """Tests the get statements API route, given a query raising a BackendException,
@@ -431,9 +475,10 @@ def test_api_statements_get_statements_with_database_query_failure(
         mock_query_statements,
     )
 
-    response = client.get(
-        "/xAPI/statements/",
-        headers={"Authorization": f"Basic {auth_credentials}"},
-    )
+    async with AsyncClient(app=app, base_url="http://test") as aclient:
+        response = await aclient.get(
+            "/xAPI/statements/",
+            headers={"Authorization": f"Basic {auth_credentials}"},
+        )
     assert response.status_code == 500
     assert response.json() == {"detail": "xAPI statements query failed"}
