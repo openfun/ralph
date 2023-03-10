@@ -45,14 +45,14 @@ ralph    1/1       0/0      true
 
 We will now create a new namespace to work on:
 
-```
+```sh
 kubectl create namespace development-ralph
 ```
 
 And we will set this namespace as the default namespace for future `kubectl`
 commands:
 
-```
+```sh
 kubectl config set-context --current --namespace=development-ralph
 ```
 
@@ -96,7 +96,7 @@ helm install \
 Once installed, you can check pods status using the following command (and wait
 for them to get ready):
 
-```
+```sh
 kubectl get pods -l app=elasticsearch-master -w
 ```
 
@@ -107,7 +107,7 @@ service.
 For this tutorial, we will fetch `elastic` user's password using the following
 command:
 
-```
+```sh
 kubectl get secrets \
   elasticsearch-master-credentials \
   -ojsonpath='{.data.password}' | \
@@ -123,7 +123,7 @@ Helm chart created a self-generated root certificate used to sign Elasticsearch
 cluster node SSL certificates. We will need to provide this certificate to our
 applications that connect to the cluster. It can be fetched using:
 
-```
+```sh
 kubectl get secrets elasticsearch-master-certs -ojson | \
   jq -r ".data.\"ca.crt\"" | \
   base64 -d
@@ -154,11 +154,20 @@ curl -k -X PUT https://elastic:<PASTE PASSWORD HERE>@localhost:9200/statements
 
 ### Ralph
 
-**FIXME**: as long as Ralph Helm chart is not published in a public repository,
-one will need to clone Ralph's project first (and possibly checkout the
-`add-helm-chart` branch).
+As long as Ralph Helm chart is not published in a public repository,
+one will need to clone Ralph's project first.
 
-Edit Ralph's vault to define the following values:
+Next step is to add a new user to be able to log in the LRS server. 
+Create credentials for a new user with the following command:
+
+```sh
+docker run --rm fundocker/ralph:3.5.0 ralph auth \
+    --username janedoe \
+    --password supersecret \
+    --scope janedoe_scope
+```
+
+Edit Ralph's vault (src/helm/ralph/vault.yml) to define the following values:
 
 ```yaml
 # Elasticsearch cluster connection URL
@@ -172,17 +181,11 @@ ES_CA_CERTIFICATE: |
 
 # LRS client credentials
 LRS_AUTH:
-  - username: "johndoe"
-    hash: "$2b$12$iKUYWtRYSxAUf19DUvvh9O1NOzKMyjV2GrMBBqktdRUAJOYimWrRi"
+  - username: "janedoe"
+    hash: "<PASTE HASH HERE>"
     scopes:
-      - "johndoe_scope"
+      - "janedoe_scope"
 ```
-
-**FIXME** add an utility to encrypt LRS users password instead and describe its
-usage below.
-
-> To generate LRS client credentials, see:
-> https://openfun.github.io/ralph/api/#creating_a_credentials_file
 
 Edit your `dev-values.yml` (default Helm chart values override).
 
@@ -202,7 +205,7 @@ kubectl port-forward svc/ralph-app-traefik 8080
 
 Send one hundred (100) example statements to the LRS:
 
-```
+```sh
 curl -sL https://github.com/openfun/potsie/raw/main/fixtures/elasticsearch/lrs.json.gz | \
   gunzip | \
   head -n 100 | \
@@ -216,11 +219,11 @@ curl -sL https://github.com/openfun/potsie/raw/main/fixtures/elasticsearch/lrs.j
 
 And fetch them back:
 
-```
+```sh
 curl -Lk --user johndoe:password http://localhost:8080/xAPI/statements/ | \
   jq
 ```
 
-### Grafana
+### Apache Superset
 
 TODO.
