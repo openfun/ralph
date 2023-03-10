@@ -172,20 +172,19 @@ class ESDatabase(BaseDatabase):
             es_query_filters += [{"range": {"timestamp": {"lte": params.until}}}]
 
         if len(es_query_filters) > 0:
-            es_query = {"query": {"bool": {"filter": es_query_filters}}}
+            es_query = {"bool": {"filter": es_query_filters}}
         else:
-            es_query = {"query": {"match_all": {}}}
+            es_query = {"match_all": {}}
 
         # Honor the "ascending" parameter, otherwise show most recent statements first
-        es_query.update(
-            {"sort": [{"timestamp": {"order": "asc" if params.ascending else "desc"}}]}
-        )
+        es_sort = [{"timestamp": {"order": "asc" if params.ascending else "desc"}}]
 
+        es_search_after = None
         if params.search_after:
-            es_query.update({"search_after": params.search_after.split("|")})
+            es_search_after = params.search_after.split("|")
 
         # Disable total hits counting for performance as we're not using it.
-        es_query.update({"track_total_hits": False})
+        es_track_total_hits = False
 
         if not params.pit_id:
             pit_response = self._open_point_in_time(
@@ -193,16 +192,20 @@ class ESDatabase(BaseDatabase):
             )
             params.pit_id = pit_response["id"]
 
-        es_query.update(
-            {
-                "pit": {
-                    "id": params.pit_id,
-                    # extend duration of PIT whenever it is used
-                    "keep_alive": settings.RUNSERVER_POINT_IN_TIME_KEEP_ALIVE,
-                }
-            }
+        es_pit = {
+            "id": params.pit_id,
+            # extend duration of PIT whenever it is used
+            "keep_alive": settings.RUNSERVER_POINT_IN_TIME_KEEP_ALIVE,
+        }
+
+        es_response = self._search(
+            query=es_query,
+            sort=es_sort,
+            search_after=es_search_after,
+            track_total_hits=es_track_total_hits,
+            pit=es_pit,
+            size=params.limit,
         )
-        es_response = self._search(body=es_query, size=params.limit)
         es_documents = es_response["hits"]["hits"]
         search_after = None
         if es_documents:
@@ -216,8 +219,8 @@ class ESDatabase(BaseDatabase):
 
     def query_statements_by_ids(self, ids: List[str]) -> List:
         """Returns the list of matching statement IDs from the database."""
-        body = {"query": {"terms": {"_id": ids}}}
-        return self._search(index=self.index, body=body)["hits"]["hits"]
+        query = {"terms": {"_id": ids}}
+        return self._search(index=self.index, query=query)["hits"]["hits"]
 
     def _search(self, **kwargs):
         """Wraps the ElasticSearch.search method.
