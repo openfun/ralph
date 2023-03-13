@@ -48,6 +48,10 @@ jobs:
           command: |
             ! git diff origin/master..HEAD -- . ':(exclude).circleci' | grep "print("
       - run:
+          name: enforce absence of FIXME in code
+          command: |
+            ! git diff origin/master..HEAD -- . ':(exclude).circleci' | grep "FIXME"
+      - run:
           name: Check absence of fixup commits
           command: |
             ! git log --pretty=format:%s | grep 'fixup!'
