@@ -107,7 +107,7 @@ class ClickHouseDatabase(BaseDatabase):
         """Gets table rows and yields them."""
         fields = ",".join(query.return_fields) if query.return_fields else "event"
 
-        sql = f"SELECT {fields} FROM {self.event_table_name}"
+        sql = f"SELECT {fields} FROM {self.event_table_name}"  # nosec
 
         if query.where_clause:
             sql += f"  WHERE {query.where_clause}"

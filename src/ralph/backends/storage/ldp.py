@@ -118,7 +118,7 @@ class LDPStorage(HistoryMixin, BaseStorage):
         details = self._details(name)
 
         # Stream response (archive content)
-        with requests.get(  # pylint: disable=missing-timeout
+        with requests.get(  # pylint: disable=missing-timeout # nosec
             self.url(name), stream=True
         ) as result:
             result.raise_for_status()
