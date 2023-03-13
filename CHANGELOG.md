@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade `fastapi` to `0.94.0`
+- Upgrade `uvicorn` to `0.21.0`
+
 ### Fixed
 
 - An issue with starting Ralph in pre-built Docker containers
