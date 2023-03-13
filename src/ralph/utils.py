@@ -69,7 +69,8 @@ def get_dict_value_from_path(dict_: dict, path: List[str]):
     """Gets a nested dictionary value.
 
     Args:
-        dict_ (dict): #FIXME I miss the info for this argument.
+        dict_ (dict): dictionnary of values to which the reduction is
+            applied
         path (List): array of keys representing the path to the value
     """
     if path is None:
@@ -84,9 +85,9 @@ def set_dict_value_from_path(dict_: dict, path: List[str], value: any):
     """Sets a nested dictionary value.
 
     Args:
-        dict_ (dict): #FIXME I miss the info for this argument.
+        dict_ (dict): dictionnary where the given value is set
         path (List): array of keys representing the path to the value
-        value: #FIXME I miss the info for this argument.
+        value: value to be set
     """
     for key in path[:-1]:
         dict_ = dict_.setdefault(key, {})
