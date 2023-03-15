@@ -74,9 +74,7 @@ ASYNC_ES_TEST_INDEX_TEMPLATE = os.environ.get(
 ASYNC_ES_TEST_INDEX_PATTERN = os.environ.get(
     "RALPH_BACKENDS__DATABASE__ASYNC_ES__TEST_INDEX_PATTERN", "async-index*"
 )
-ASYNC_ES_TEST_HOSTS = os.environ.get(
-    "RALPH_BACKENDS__DATABASE__ASYNC_ES__TEST_HOSTS", "http://localhost:9200"
-).split(",")
+
 
 MONGO_TEST_COLLECTION = os.environ.get(
     "RALPH_BACKENDS__DATABASE__MONGO__TEST_COLLECTION", "marsha"
@@ -119,7 +117,7 @@ def anyio_backend():
 @pytest.mark.anyio
 def get_async_es_test_backend():
     """Returns a AsyncESDatabase backend instance using test defaults."""
-    return AsyncESDatabase(hosts=ASYNC_ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX)
+    return AsyncESDatabase(hosts=ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX)
 
 
 @lru_cache
@@ -158,7 +156,7 @@ class NamedClassEnum(Enum):
 
 
 @pytest.mark.anyio
-async def get_async_es_fixture(host=ASYNC_ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX):
+async def get_async_es_fixture(host=ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX):
     """Creates / deletes an AsyncElasticSearch test index and yields an instantiated
     client.
     """
@@ -326,7 +324,7 @@ async def async_es_data_stream():
     """Creates / deletes an AsyncElasticSearch test datastream and
     yields an instantiated client.
     """
-    client = AsyncElasticsearch(ASYNC_ES_TEST_HOSTS)
+    client = AsyncElasticsearch(ES_TEST_HOSTS)
 
     # Create statements index template with enabled data stream
     index_patterns = [ASYNC_ES_TEST_INDEX_PATTERN]
@@ -497,6 +495,8 @@ def events():
 def ws(events):
     """Returns a websocket server instance."""
     # pylint: disable=invalid-name,redefined-outer-name
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
 
     async def forward(websocket, path):
         """Stupid test server that sends events."""

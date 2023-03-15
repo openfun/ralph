@@ -4,9 +4,9 @@ import re
 from uuid import uuid4
 
 import pytest
+from asgi_lifespan import LifespanManager
 from httpx import AsyncClient
 
-from asgi_lifespan import LifespanManager
 from ralph.api import app
 from ralph.backends.database.async_es import AsyncESDatabase
 from ralph.backends.database.es import ESDatabase
@@ -16,7 +16,6 @@ from ralph.exceptions import BackendException
 
 from tests.fixtures.backends import (
     ASYNC_ES_TEST_FORWARDING_INDEX,
-    ASYNC_ES_TEST_HOSTS,
     ES_TEST_FORWARDING_INDEX,
     ES_TEST_HOSTS,
     MONGO_TEST_CONNECTION_URI,
@@ -565,7 +564,7 @@ async def test_post_statements_list_without_statement_forwarding(
     "forwarding_backend",
     [
         lambda: AsyncESDatabase(
-            hosts=ASYNC_ES_TEST_HOSTS, index=ASYNC_ES_TEST_FORWARDING_INDEX
+            hosts=ES_TEST_HOSTS, index=ASYNC_ES_TEST_FORWARDING_INDEX
         ),
         lambda: ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_FORWARDING_INDEX),
         lambda: MongoDatabase(
@@ -652,7 +651,7 @@ async def test_post_statements_list_with_statement_forwarding(
         # Start forwarding LRS client
         async with AsyncClient(
             app=app, base_url="http://testserver"
-        ) as forwarding_client:
+        ) as forwarding_client, LifespanManager(app):
             # Send an xAPI statement to the forwarding client
             response = await forwarding_client.post(
                 "/xAPI/statements/",
@@ -675,7 +674,7 @@ async def test_post_statements_list_with_statement_forwarding(
             assert response.json() == {"statements": [statement]}
 
     # The statement should also be stored on the receiving client
-    async with AsyncClient() as receiving_client:
+    async with AsyncClient() as receiving_client, LifespanManager(app):
         response = await receiving_client.get(
             f"http://{RUNSERVER_TEST_HOST}:{RUNSERVER_TEST_PORT}/xAPI/statements/",
             headers={"Authorization": f"Basic {auth_credentials}"},

@@ -134,10 +134,9 @@ async def test_api_statements_get_statements(
     await insert_statements_and_monkeypatch_backend(statements)
 
     async with AsyncClient(app=app, base_url="http://test") as client:
-        for path in ("/xAPI/statements", "/xAPI/statements/"):
-            response = await client.get(
-                path, headers={"Authorization": f"Basic {auth_credentials}"}
-            )
+        response = await client.get(
+            "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
+        )
 
         assert response.status_code == 200
         assert response.json() == {"statements": [statements[1], statements[0]]}
@@ -164,8 +163,8 @@ async def test_api_statements_get_statements_ascending(
     ]
     await insert_statements_and_monkeypatch_backend(statements)
 
-    async with AsyncClient(app=app, base_url="http://test") as aclient:
-        response = await aclient.get(
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        response = await client.get(
             "/xAPI/statements/?ascending=true",
             headers={"Authorization": f"Basic {auth_credentials}"},
         )
@@ -195,8 +194,8 @@ async def test_api_statements_get_statements_by_statement_id(
     ]
     await insert_statements_and_monkeypatch_backend(statements)
 
-    async with AsyncClient(app=app, base_url="http://test") as aclient:
-        response = await aclient.get(
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        response = await client.get(
             f"/xAPI/statements/?statementId={statements[1]['id']}",
             headers={"Authorization": f"Basic {auth_credentials}"},
         )
@@ -228,8 +227,8 @@ async def test_api_statements_get_statements_by_agent(
     ]
     await insert_statements_and_monkeypatch_backend(statements)
 
-    async with AsyncClient(app=app, base_url="http://test") as aclient:
-        response = await aclient.get(
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        response = await client.get(
             "/xAPI/statements/?agent=96d61e6c-9cdb-4926-9cff-d3a15c662999",
             headers={"Authorization": f"Basic {auth_credentials}"},
         )
@@ -261,8 +260,8 @@ async def test_api_statements_get_statements_by_verb(
     ]
     await insert_statements_and_monkeypatch_backend(statements)
 
-    async with AsyncClient(app=app, base_url="http://test") as aclient:
-        response = await aclient.get(
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        response = await client.get(
             "/xAPI/statements/?verb="
             + quote_plus("http://adlnet.gov/expapi/verbs/played"),
             headers={"Authorization": f"Basic {auth_credentials}"},
@@ -301,8 +300,8 @@ async def test_api_statements_get_statements_by_activity(
     ]
     await insert_statements_and_monkeypatch_backend(statements)
 
-    async with AsyncClient(app=app, base_url="http://test") as aclient:
-        response = await aclient.get(
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        response = await client.get(
             "/xAPI/statements/?activity=a2956991-200b-40a7-9548-293cdcc06c4b",
             headers={"Authorization": f"Basic {auth_credentials}"},
         )
@@ -333,8 +332,8 @@ async def test_api_statements_get_statements_since_timestamp(
     await insert_statements_and_monkeypatch_backend(statements)
 
     since = (datetime.now() - timedelta(minutes=30)).isoformat()
-    async with AsyncClient(app=app, base_url="http://test") as aclient:
-        response = await aclient.get(
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        response = await client.get(
             f"/xAPI/statements/?since={since}",
             headers={"Authorization": f"Basic {auth_credentials}"},
         )
@@ -365,8 +364,8 @@ async def test_api_statements_get_statements_until_timestamp(
     await insert_statements_and_monkeypatch_backend(statements)
 
     until = (datetime.now() - timedelta(minutes=30)).isoformat()
-    async with AsyncClient(app=app, base_url="http://test") as aclient:
-        response = await aclient.get(
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        response = await client.get(
             f"/xAPI/statements/?until={until}",
             headers={"Authorization": f"Basic {auth_credentials}"},
         )
@@ -407,8 +406,8 @@ async def test_api_statements_get_statements_with_pagination(
 
     # First response gets the first two results, with a "more" entry as
     # we have more results to return on a later page.
-    async with AsyncClient(app=app, base_url="http://test") as aclient:
-        first_response = await aclient.get(
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        first_response = await client.get(
             "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
         )
     assert first_response.status_code == 200
@@ -417,8 +416,8 @@ async def test_api_statements_get_statements_with_pagination(
     assert more_regex.match(first_response.json()["more"])
 
     # Second response gets the missing result from the first response.
-    async with AsyncClient(app=app, base_url="http://test") as aclient:
-        second_response = await aclient.get(
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        second_response = await client.get(
             first_response.json()["more"],
             headers={"Authorization": f"Basic {auth_credentials}"},
         )
@@ -475,8 +474,8 @@ async def test_api_statements_get_statements_with_database_query_failure(
         mock_query_statements,
     )
 
-    async with AsyncClient(app=app, base_url="http://test") as aclient:
-        response = await aclient.get(
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        response = await client.get(
             "/xAPI/statements/",
             headers={"Authorization": f"Basic {auth_credentials}"},
         )

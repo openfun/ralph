@@ -24,8 +24,8 @@ from ralph.exceptions import BackendException, BackendParameterException
 
 from tests.fixtures.backends import (
     ASYNC_ES_TEST_FORWARDING_INDEX,
-    ASYNC_ES_TEST_HOSTS,
     ASYNC_ES_TEST_INDEX,
+    ES_TEST_HOSTS,
 )
 
 
@@ -38,7 +38,7 @@ async def test_backends_database_async_es_database_instantiation(async_es):
     assert AsyncESDatabase.query_model == ESQuery
 
     database = AsyncESDatabase(
-        hosts=ASYNC_ES_TEST_HOSTS,
+        hosts=ES_TEST_HOSTS,
         index=ASYNC_ES_TEST_INDEX,
     )
 
@@ -47,7 +47,7 @@ async def test_backends_database_async_es_database_instantiation(async_es):
     assert any(
         (
             "http://elasticsearch:9200" in database._hosts,
-            "http://localhost:9201" in database._hosts,
+            "http://localhost:9200" in database._hosts,
         )
     )
     assert database.index == ASYNC_ES_TEST_INDEX
@@ -56,7 +56,7 @@ async def test_backends_database_async_es_database_instantiation(async_es):
 
     for op_type in ("index", "create", "delete", "update"):
         database = AsyncESDatabase(
-            hosts=ASYNC_ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX, op_type=op_type
+            hosts=ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX, op_type=op_type
         )
         assert database.op_type == op_type
 
@@ -72,7 +72,7 @@ async def test_backends_database_async_es_database_instantiation_with_forbidden_
 
     with pytest.raises(BackendParameterException):
         database = AsyncESDatabase(
-            hosts=ASYNC_ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX, op_type="foo"
+            hosts=ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX, op_type="foo"
         )
         await database.close()
 
@@ -117,7 +117,7 @@ async def test_backends_database_async_es_to_documents_method(async_es):
     stream.seek(0)
 
     database = AsyncESDatabase(
-        hosts=ASYNC_ES_TEST_HOSTS,
+        hosts=ES_TEST_HOSTS,
         index=ASYNC_ES_TEST_INDEX,
     )
     documents = database.to_documents(stream, lambda item: item.get("id"))
@@ -150,7 +150,7 @@ async def test_backends_database_async_es_to_documents_method_with_create_op_typ
     stream.seek(0)
 
     database = AsyncESDatabase(
-        hosts=ASYNC_ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX, op_type="create"
+        hosts=ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX, op_type="create"
     )
     documents = database.to_documents(stream, lambda item: item.get("id"))
     assert isinstance(documents, Iterable)
@@ -188,7 +188,7 @@ async def test_backends_database_async_es_get_method(async_es):
     await async_es.indices.refresh(index=ASYNC_ES_TEST_INDEX)
 
     database = AsyncESDatabase(
-        hosts=ASYNC_ES_TEST_HOSTS,
+        hosts=ES_TEST_HOSTS,
         index=ASYNC_ES_TEST_INDEX,
     )
 
@@ -220,7 +220,7 @@ async def test_backends_database_async_es_get_method_with_a_custom_query(async_e
     await async_es.indices.refresh(index=ASYNC_ES_TEST_INDEX)
 
     database = AsyncESDatabase(
-        hosts=ASYNC_ES_TEST_HOSTS,
+        hosts=ES_TEST_HOSTS,
         index=ASYNC_ES_TEST_INDEX,
     )
 
@@ -262,7 +262,7 @@ async def test_backends_database_async_es_put_method(async_es, fs, monkeypatch):
     assert len((await async_es.search(index=ASYNC_ES_TEST_INDEX))["hits"]["hits"]) == 0
 
     database = AsyncESDatabase(
-        hosts=ASYNC_ES_TEST_HOSTS,
+        hosts=ES_TEST_HOSTS,
         index=ASYNC_ES_TEST_INDEX,
     )
     success_count = await database.put(sys.stdin, chunk_size=5)
@@ -301,7 +301,7 @@ async def test_backends_database_async_es_put_method_with_update_op_type(
 
     assert len((await async_es.search(index=ASYNC_ES_TEST_INDEX))["hits"]["hits"]) == 0
 
-    database = AsyncESDatabase(hosts=ASYNC_ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX)
+    database = AsyncESDatabase(hosts=ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX)
     await database.put(sys.stdin, chunk_size=5)
 
     # As we async_bulk insert documents, the index needs to be refreshed before making
@@ -327,7 +327,7 @@ async def test_backends_database_async_es_put_method_with_update_op_type(
     await database.close()
 
     database = AsyncESDatabase(
-        hosts=ASYNC_ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX, op_type="update"
+        hosts=ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX, op_type="update"
     )
     success_count = await database.put(sys.stdin, chunk_size=5)
 
@@ -365,7 +365,7 @@ async def test_backends_database_async_es_put_with_bad_data_raises_a_backend_exc
     assert len((await async_es.search(index=ASYNC_ES_TEST_INDEX))["hits"]["hits"]) == 0
 
     database = AsyncESDatabase(
-        hosts=ASYNC_ES_TEST_HOSTS,
+        hosts=ES_TEST_HOSTS,
         index=ASYNC_ES_TEST_INDEX,
     )
 
@@ -403,7 +403,7 @@ async def test_backends_database_async_es_put_with_badly_formatted_data_in_force
     assert len((await async_es.search(index=ASYNC_ES_TEST_INDEX))["hits"]["hits"]) == 0
 
     database = AsyncESDatabase(
-        hosts=ASYNC_ES_TEST_HOSTS,
+        hosts=ES_TEST_HOSTS,
         index=ASYNC_ES_TEST_INDEX,
     )
     # When forcing import, We expect the record with non expected type to have
@@ -448,7 +448,7 @@ async def test_backends_database_async_es_put_with_datastream(
     )
 
     database = AsyncESDatabase(
-        hosts=ASYNC_ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX, op_type="create"
+        hosts=ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX, op_type="create"
     )
     await database.put(sys.stdin, chunk_size=5)
 
@@ -478,7 +478,7 @@ async def test_backends_database_async_es_query_statements_with_pit_query_failur
         """Mocks the AsyncElasticsearch.open_point_in_time method."""
         raise ValueError("ES failure")
 
-    database = AsyncESDatabase(hosts=ASYNC_ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX)
+    database = AsyncESDatabase(hosts=ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX)
     monkeypatch.setattr(database.client, "open_point_in_time", mock_open_point_in_time)
 
     caplog.set_level(logging.ERROR)
@@ -507,7 +507,7 @@ async def test_backends_database_async_es_query_statements_with_search_query_fai
         """Mocks the AsyncElasticsearch.search method."""
         raise ApiError("Something is wrong", ApiResponseMeta(*([None] * 5)), None)
 
-    database = AsyncESDatabase(hosts=ASYNC_ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX)
+    database = AsyncESDatabase(hosts=ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX)
     monkeypatch.setattr(database.client, "search", mock_search)
 
     caplog.set_level(logging.ERROR)
@@ -539,7 +539,7 @@ async def test_backends_database_async_es_query_stat_by_ids_with_search_query_fa
         """Mocks the AsyncElasticsearch.search method."""
         raise ApiError("Something is wrong", ApiResponseMeta(*([None] * 5)), None)
 
-    database = AsyncESDatabase(hosts=ASYNC_ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX)
+    database = AsyncESDatabase(hosts=ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX)
     monkeypatch.setattr(database.client, "search", mock_search)
 
     caplog.set_level(logging.ERROR)
@@ -588,9 +588,9 @@ async def test_backends_database_async_es_query_statements_by_ids_with_multiple_
     await async_es_forwarding.indices.refresh(index=ASYNC_ES_TEST_FORWARDING_INDEX)
 
     # Instantiate ES Databases
-    database = AsyncESDatabase(hosts=ASYNC_ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX)
+    database = AsyncESDatabase(hosts=ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX)
     database_2 = AsyncESDatabase(
-        hosts=ASYNC_ES_TEST_HOSTS, index=ASYNC_ES_TEST_FORWARDING_INDEX
+        hosts=ES_TEST_HOSTS, index=ASYNC_ES_TEST_FORWARDING_INDEX
     )
 
     # Check the expected search query results
@@ -610,7 +610,7 @@ async def test_backends_database_async_es_status(async_es, monkeypatch):
     """Test the async ES status method."""
     # pylint: disable=invalid-name,unused-argument
 
-    database = AsyncESDatabase(hosts=ASYNC_ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX)
+    database = AsyncESDatabase(hosts=ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX)
 
     with monkeypatch.context() as mkpch:
 
@@ -645,7 +645,7 @@ async def test_backends_database_async_es_close(async_es, monkeypatch, caplog):
     """Test the async ES close method."""
     # pylint: disable=invalid-name,unused-argument
 
-    database = AsyncESDatabase(hosts=ASYNC_ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX)
+    database = AsyncESDatabase(hosts=ES_TEST_HOSTS, index=ASYNC_ES_TEST_INDEX)
 
     await database.close()
 
