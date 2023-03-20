@@ -2,52 +2,52 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://openfun.github.io/ralph/</loc>
-         <lastmod>2023-03-14</lastmod>
+         <lastmod>2023-03-20</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://openfun.github.io/ralph/CHANGELOG/</loc>
-         <lastmod>2023-03-14</lastmod>
+         <lastmod>2023-03-20</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://openfun.github.io/ralph/LICENSE/</loc>
-         <lastmod>2023-03-14</lastmod>
+         <lastmod>2023-03-20</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://openfun.github.io/ralph/api/</loc>
-         <lastmod>2023-03-14</lastmod>
+         <lastmod>2023-03-20</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://openfun.github.io/ralph/backends/</loc>
-         <lastmod>2023-03-14</lastmod>
+         <lastmod>2023-03-20</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://openfun.github.io/ralph/commands/</loc>
-         <lastmod>2023-03-14</lastmod>
+         <lastmod>2023-03-20</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://openfun.github.io/ralph/contribute/</loc>
-         <lastmod>2023-03-14</lastmod>
+         <lastmod>2023-03-20</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://openfun.github.io/ralph/models/</loc>
-         <lastmod>2023-03-14</lastmod>
+         <lastmod>2023-03-20</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://openfun.github.io/ralph/models/edx/</loc>
-         <lastmod>2023-03-14</lastmod>
+         <lastmod>2023-03-20</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://openfun.github.io/ralph/models/xapi/</loc>
-         <lastmod>2023-03-14</lastmod>
+         <lastmod>2023-03-20</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
