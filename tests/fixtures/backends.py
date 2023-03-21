@@ -60,6 +60,7 @@ ES_TEST_HOSTS = os.environ.get(
     "RALPH_BACKENDS__DATABASE__ES__TEST_HOSTS", "http://localhost:9200"
 ).split(",")
 
+# Mongo backend defaults
 MONGO_TEST_COLLECTION = os.environ.get(
     "RALPH_BACKENDS__DATABASE__MONGO__TEST_COLLECTION", "marsha"
 )
