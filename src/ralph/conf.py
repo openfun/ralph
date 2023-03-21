@@ -18,7 +18,7 @@ except ImportError:
     from unittest.mock import Mock
 
     get_app_dir = Mock(return_value=".")
-from pydantic import AnyUrl, BaseModel, BaseSettings, Extra
+from pydantic import AnyHttpUrl, AnyUrl, BaseModel, BaseSettings, Extra, Field
 
 from .utils import import_string
 
@@ -101,6 +101,13 @@ class ClientOptions(BaseModel):
         extra = Extra.forbid
 
 
+class ClickhouseClientOptions(ClientOptions):
+    """Pydantic model for `clickhouse` client options."""
+
+    date_time_input_format: str = "best_effort"
+    allow_experimental_object_type: Literal[0, 1] = 1
+
+
 class ESClientOptions(ClientOptions):
     """Pydantic model for Elasticsearch additionnal client options."""
 
@@ -143,6 +150,42 @@ class DatabaseBackendSettings(BaseModel):
     ES: ESDatabaseBackendSettings = ESDatabaseBackendSettings()
     MONGO: MongoDatabaseBackendSettings = MongoDatabaseBackendSettings()
     CLICKHOUSE: ClickhouseDatabaseBackendSettings = ClickhouseDatabaseBackendSettings()
+
+
+# Active HTTP backend Settings.
+
+
+class HeadersParameters(BaseModel):
+    """Pydantic model for headers parameters."""
+
+    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
+        extra = Extra.allow
+
+
+class LRSHeaders(HeadersParameters):
+    """Pydantic model for LRS headers."""
+
+    X_EXPERIENCE_API_VERSION: str = "1.0.3"
+    CONTENT_TYPE: str = "application/json"
+
+
+class LRSHTTPBackendSettings(InstantiableSettingsItem):
+    """Pydantic model for LRS HTTP backend configuration settings."""
+
+    _class_path: str = "ralph.backends.http.lrs.LRSHTTP"
+
+    BASE_URL: AnyHttpUrl = Field("http://0.0.0.0:8100")
+    USERNAME: str = "ralph"
+    PASSWORD: str = "secret"
+    HEADERS: LRSHeaders = LRSHeaders()
+    STATUS_ENDPOINT: str = "/__heartbeat__"
+    STATEMENTS_ENDPOINT: str = "/xAPI/statements"
+
+
+class HTTPBackendSettings(BaseModel):
+    """Pydantic model for HTTP backend configuration settings."""
+
+    LRS: LRSHTTPBackendSettings = LRSHTTPBackendSettings()
 
 
 # Active storage backend Settings.
@@ -232,6 +275,7 @@ class BackendSettings(BaseModel):
     """Pydantic model for backends configuration settings."""
 
     DATABASE: DatabaseBackendSettings = DatabaseBackendSettings()
+    HTTP: HTTPBackendSettings = HTTPBackendSettings()
     STORAGE: StorageBackendSettings = StorageBackendSettings()
     STREAM: StreamBackendSettings = StreamBackendSettings()
 
