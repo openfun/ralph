@@ -29,7 +29,7 @@ from click_option_group import optgroup
 from pydantic import BaseModel
 
 from ralph import __version__ as ralph_version
-from ralph.conf import ClientOptions, CommaSeparatedTuple, settings
+from ralph.conf import ClientOptions, CommaSeparatedTuple, HeadersParameters, settings
 from ralph.exceptions import UnsupportedBackendException
 from ralph.logger import configure_logging
 from ralph.models.converter import Converter
@@ -130,6 +130,28 @@ class ClientOptionsParamType(CommaSeparatedKeyValueParamType):
         return self.client_options_type(**super().convert(value, param, ctx))
 
 
+class HeadersParametersParamType(CommaSeparatedKeyValueParamType):
+    """Comma separated key=value parameter type for headers parameters."""
+
+    def __init__(self, headers_parameters_type):
+        """Instantiates HeadersParametersParamType for a headers_paramters_type.
+
+        Args:
+            headers_parameters_type (any): Pydantic model used for headers parameters.
+        """
+        self.headers_parameters_type = headers_parameters_type
+
+    def convert(self, value, param, ctx):
+        """Splits the values by comma and equal sign.
+
+        Returns an instance of headers_parameters_type build with key/value pairs.
+        """
+        if isinstance(value, self.headers_parameters_type):
+            return value
+
+        return self.headers_parameters_type(**super().convert(value, param, ctx))
+
+
 class JSONStringParamType(click.ParamType):
     """JSON string parameter type."""
 
@@ -192,6 +214,10 @@ def backends_options(name=None, backend_types: List[BaseModel] = None):
                         option_kwargs["type"] = CommaSeparatedTupleParamType()
                     elif isclass(field_type) and issubclass(field_type, ClientOptions):
                         option_kwargs["type"] = ClientOptionsParamType(field_type)
+                    elif isclass(field_type) and issubclass(
+                        field_type, HeadersParameters
+                    ):
+                        option_kwargs["type"] = HeadersParametersParamType(field_type)
 
                     command = optgroup.option(
                         option.lower(), default=field, **option_kwargs
@@ -427,22 +453,30 @@ def convert(from_, to_, ignore_errors, fail_on_unknown, **conversion_set_kwargs)
     help="Get events by chunks of size #",
 )
 @click.option(
+    "-t",
+    "--target",
+    type=str,
+    default=None,
+    help="Endpoint from which to fetch events (e.g. `/statements`)",
+)
+@click.option(
     "-q",
     "--query",
     type=JSONStringParamType(),
     default=None,
     help="Query object as a JSON string (database backends ONLY)",
 )
-def fetch(backend, archive, chunk_size, query, **options):
+def fetch(backend, archive, chunk_size, target, query, **options):
     """Fetch an archive or records from a configured backend."""
     logger.info(
         (
             "Fetching data from the configured %s backend "
-            "(archive: %s | chunk size: %s | query: %s)"
+            "(archive: %s | chunk size: %s | target: %s | query: %s)"
         ),
         backend,
         archive,
         chunk_size,
+        target,
         query,
     )
     logger.debug("Backend parameters: %s", options)
@@ -465,15 +499,29 @@ def fetch(backend, archive, chunk_size, query, **options):
             )
     elif backend_type == settings.BACKENDS.STREAM:
         backend.stream(sys.stdout.buffer)
+    elif backend_type == settings.BACKENDS.HTTP:
+        for statement in backend.read(target=target, chunk_size=chunk_size):
+            click.echo(
+                bytes(
+                    json.dumps(statement) if isinstance(statement, dict) else statement,
+                    encoding="utf-8",
+                )
+            )
     elif backend_type is None:
         msg = "Cannot find an implemented backend type for backend %s"
         logger.error(msg, backend)
         raise UnsupportedBackendException(msg, backend)
 
 
-# pylint: disable=unnecessary-direct-lambda-call
+# pylint: disable=unnecessary-direct-lambda-call, too-many-arguments
 @click.argument("archive", required=False)
-@backends_options(backend_types=[settings.BACKENDS.DATABASE, settings.BACKENDS.STORAGE])
+@backends_options(
+    backend_types=[
+        settings.BACKENDS.DATABASE,
+        settings.BACKENDS.STORAGE,
+        settings.BACKENDS.HTTP,
+    ]
+)
 @click.option(
     "-c",
     "--chunk-size",
@@ -495,7 +543,14 @@ def fetch(backend, archive, chunk_size, query, **options):
     is_flag=True,
     help="Continue writing regardless of raised errors",
 )
-def push(backend, archive, chunk_size, force, ignore_errors, **options):
+@click.option(
+    "-t",
+    "--target",
+    type=str,
+    default=None,
+    help="Endpoint in which to push events (e.g. `statements`)",
+)
+def push(backend, archive, chunk_size, force, ignore_errors, target, **options):
     """Push an archive to a configured backend."""
     logger.info("Pushing archive %s to the configured %s backend", archive, backend)
     logger.debug("Backend parameters: %s", options)
@@ -507,6 +562,13 @@ def push(backend, archive, chunk_size, force, ignore_errors, **options):
         backend.write(sys.stdin.buffer, archive, overwrite=force)
     elif backend_type == settings.BACKENDS.DATABASE:
         backend.put(sys.stdin, chunk_size=chunk_size, ignore_errors=ignore_errors)
+    elif backend_type == settings.BACKENDS.HTTP:
+        backend.write(
+            target=target,
+            data=sys.stdin.buffer,
+            chunk_size=chunk_size,
+            ignore_errors=ignore_errors,
+        )
     elif backend_type is None:
         msg = "Cannot find an implemented backend type for backend %s"
         logger.error(msg, backend)
