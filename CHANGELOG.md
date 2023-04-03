@@ -11,7 +11,7 @@ and this project adheres to
 ### Changed
 
 - Upgrade `fastapi` to `0.95.0`
-- Upgrade `sentry_sdk` to `1.17.0`
+- Upgrade `sentry_sdk` to `1.18.0`
 - Upgrade `uvicorn` to `0.21.1`
 
 ### Fixed
