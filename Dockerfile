@@ -25,7 +25,7 @@ RUN apt-get update && \
         libffi-dev && \
     rm -rf /var/lib/apt/lists/*
 
-RUN pip install .[backend-clickhouse,backend-es,backend-ldp,backend-lrs,backend-mongo,backend-swift,backend-ws,cli,lrs]
+RUN pip install .[backend-clickhouse,backend-es,backend-ldp,backend-lrs,backend-mongo,backend-s3,backend-swift,backend-ws,cli,lrs]
 
 
 # -- Core --
