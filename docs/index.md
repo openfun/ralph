@@ -70,7 +70,7 @@ $ source venv/bin/activate
 
 # Install the full package (in a virtualenv)
 (venv) $ pip install \
-    ralph-malph[backend-es,backend-ldp,backend-mongo,backend-swift,backend-ws,cli,lrs]
+    ralph-malph[backend-es,backend-ldp,backend-lrs,backend-mongo,backend-swift,backend-ws,cli,lrs]
 
 # Install only the core package with the Elasticsearch backend and the LRS (in
 # a virtualenv)

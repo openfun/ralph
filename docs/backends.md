@@ -183,7 +183,6 @@ The MongoDB client options supported in Ralph are:
 - `document_class`: default class to use for documents returned from queries
 - `tz_aware`: if True, datetime instances returned as values in a document will be timezone aware (otherwise they will be naive)
 
-
 ### ClickHouse
 
 The ClickHouse backend can be used as a data lake and to fetch collections of
@@ -192,6 +191,7 @@ documents from it.
 #### Backend parameters
 
 ClickHouse parameters required to connect are:
+
 - `host`: the connection hostname to connect to (_e.g._ `"clickhouse.yourhost.com"`)
 - `port`: the port to the ClickHouse HTTPS interface (_e.g._ `8123`)
 - `database`: the name of the database to connect to
@@ -199,14 +199,34 @@ ClickHouse parameters required to connect are:
 - `client_options`: a comma separated key=value list of ClickHouse client options
 
 Secondary parameters are needed if not using the default ClickHouse user:
+
 - `username`: the username to connect as
 - `password`: the password for the given ClickHouse username
 
 By default, the following client options are set, if you override the default 
 client options you must also set these:
+
 - `"date_time_input_format": "best_effort"` allows RFC date parsing
 - `"allow_experimental_object_type": 1` allows the JSON data type we use to store statements
 
 The ClickHouse client options supported in Ralph can be found in these locations:
 - [Python driver specific](https://clickhouse.com/docs/en/integrations/language-clients/python/driver-api#settings-argument)
 - [General ClickHouse client settings](https://clickhouse.com/docs/en/operations/settings/settings/)
+
+## HTTP backends
+
+### LRS
+
+The LRS backend is used to store and retrieve xAPI statements from various systems mostly used in e-learning infrastructures.
+
+#### Backend parameters
+
+LRS parameters required to connect are: 
+
+- `url`: the URL to connect to the server (_e.g._ [`http://ralph:secret@lrs:8100`])
+- `username`: the username to connect as
+- `password`: the password for the given LRS username
+
+Optional parameters can be configured if necessary: 
+
+- `headers`: a comma-separated key=value list of LRS server headers
