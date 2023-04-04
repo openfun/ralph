@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added 
+
+- Implement asynchronous part of `lrs` backend
+- Define new `http` backend type 
+
 ### Changed
 
 - Upgrade `fastapi` to `0.95.0`
