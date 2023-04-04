@@ -18,7 +18,7 @@ except ImportError:
     from unittest.mock import Mock
 
     get_app_dir = Mock(return_value=".")
-from pydantic import AnyUrl, BaseModel, BaseSettings, Extra
+from pydantic import AnyUrl, BaseModel, BaseSettings, Extra, Field, HttpUrl
 
 from .utils import import_string
 
@@ -145,6 +145,24 @@ class DatabaseBackendSettings(BaseModel):
     CLICKHOUSE: ClickhouseDatabaseBackendSettings = ClickhouseDatabaseBackendSettings()
 
 
+# Active HTTP backend Settings.
+
+
+class LRSHTTPBackendSettings(InstantiableSettingsItem):
+    """Pydantic model for LRS HTTP backend configuration settings."""
+
+    _class_path: str = "ralph.backends.http.lrs.LRSHTTP"
+
+    CONNECTION_URL: HttpUrl = Field("http://ralph:secret@0.0.0.0:8100")
+    HEADERS: dict = None
+
+
+class HTTPBackendSettings(BaseModel):
+    """Pydantic model for HTTP backend configuration settings."""
+
+    LRS: LRSHTTPBackendSettings = LRSHTTPBackendSettings()
+
+
 # Active storage backend Settings.
 
 
@@ -231,6 +249,7 @@ class BackendSettings(BaseModel):
     """Pydantic model for backends configuration settings."""
 
     DATABASE: DatabaseBackendSettings = DatabaseBackendSettings()
+    HTTP: HTTPBackendSettings = HTTPBackendSettings()
     STORAGE: StorageBackendSettings = StorageBackendSettings()
     STREAM: StreamBackendSettings = StreamBackendSettings()
 
