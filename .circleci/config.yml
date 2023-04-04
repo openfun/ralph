@@ -144,7 +144,7 @@ jobs:
             - v1-dependencies-<< parameters.python-image >>-{{ .Revision }}
       - run:
           name: Install development dependencies
-          command: pip install --user .[backend-clickhouse,backend-es,backend-ldp,backend-lrs,backend-mongo,backend-swift,backend-ws,cli,dev,lrs]
+          command: pip install --user .[backend-clickhouse,backend-es,backend-ldp,backend-lrs,backend-mongo,backend-s3,backend-swift,backend-ws,cli,dev,lrs]
       - save_cache:
           paths:
             - ~/.local
