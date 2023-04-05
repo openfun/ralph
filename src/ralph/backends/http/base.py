@@ -15,7 +15,7 @@ class BaseHTTP(ABC):
     @abstractmethod
     def async_get_statements(
         self, target: str, chunk_size: Union[None, int] = None
-    ) -> Iterator[Union[bytes, dict]]:
+    ) -> Iterator[dict]:
         """Yields records read from the HTTP response results."""
 
     @abstractmethod

@@ -2,7 +2,7 @@
 
 import logging
 import json
-from typing import Iterable, Union, List
+from typing import Iterable, Union, Iterator
 from urllib.parse import urlparse
 from more_itertools import chunked
 
@@ -54,7 +54,7 @@ class LRSHTTP(BaseHTTP):
             logger.error("%s. %s", msg, error)
             raise BackendException(msg, *error.args) from error
 
-    def async_get_statements(self, target: str, chunk_size: Union[None, int] = None):
+    def async_get_statements(self, target: str) -> Iterator[dict]:
         """Get statements asynchronously from LRS.
         The `get` method defined in the LRS spefication returns `statements` array and
         `more` IRL. This method returns an asynchronous generator of statements."""
@@ -81,7 +81,7 @@ class LRSHTTP(BaseHTTP):
         target: str,
         data: Union[dict, Iterable[dict]],
         chunk_size: Union[None, int] = None,
-    ) -> List[dict]:
+    ) -> int:
         """Post statements asynchronously to LRS asynchronously.
         Stores in an LRS a statement or a set of statements. Returns a list of responses."""
 
