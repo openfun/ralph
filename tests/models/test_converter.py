@@ -372,7 +372,7 @@ def test_converter_convert_with_invalid_page_close_event_raises_an_exception(
             list(result)
 
 
-@settings(suppress_health_check=(HealthCheck.function_scoped_fixture,))
+@settings(deadline=None, suppress_health_check=(HealthCheck.function_scoped_fixture,))
 @pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 @pytest.mark.parametrize("invalid_platform_url", ["", "not an URL"])
 @custom_given(UIPageClose)

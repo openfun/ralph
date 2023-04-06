@@ -17,6 +17,7 @@ and this project adheres to
 ### Fixed
 
 - An issue with starting Ralph in pre-built Docker containers
+- Fix double quoting in ClickHouse backend server parameters
 
 ## [3.5.0] - 2023-03-08
 
