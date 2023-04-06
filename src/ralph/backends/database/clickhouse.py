@@ -224,7 +224,6 @@ class ClickHouseDatabase(BaseDatabase):
 
     def query_statements_by_ids(self, ids: List[str]) -> List:
         """Returns the list of matching statement IDs from the database."""
-        ids = [f"'{id}'" for id in ids]
 
         def chunk_id_list(chunk_size=10000):
             for i in range(0, len(ids), chunk_size):
