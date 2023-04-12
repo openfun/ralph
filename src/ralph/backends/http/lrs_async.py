@@ -66,8 +66,11 @@ class LRSHTTP(BaseHTTP):
                 response = await client.get(url=url)
                 self._raise_for_status(response)
                 statements = response.json()["statements"]
-                for statement in statements:
-                    yield statement
+                if isinstance(statements, list):
+                    for statement in statements:
+                        yield statement
+                else:
+                    yield statements
 
                 if "more" in response.json() and response.json()["more"]:
                     # yield from is not authorized in async function
@@ -103,6 +106,7 @@ class LRSHTTP(BaseHTTP):
                 num_requests += 1
                 logger.debug("Made %d POST requests", num_requests)
 
+        # Todo: change so as to return number of statements inserted ?
         return num_requests
     
         

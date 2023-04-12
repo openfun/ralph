@@ -42,7 +42,7 @@ async def test_backends_http_lrs_async_get_http_exceptions(httpx_mock: HTTPXMock
     with pytest.raises(BackendException):
         await _async_gen_to_list(backend.async_get_statements(endpoint))
 
-    # with pytest.raises(BackendException):
+    # with pytest.raises(BackendException): 
     # httpx_mock.add_exception(httpx.ReadTimeout("Mocking: Unable to read within timeout"))
     # await _async_gen_to_list(backend.async_get_statements(endpoint))
 
@@ -52,23 +52,30 @@ async def test_backends_http_lrs_async_get_method_without_more_property(httpx_mo
     """Test the LRS backend get method."""
 
     fake_connection_url = parse_obj_as(HttpUrl, "http://user:password@0.0.0.0:3000")
-    endpoint = "http://0.0.0.0:3000/xAPI/statements"
+    endpoint_multiple = "http://0.0.0.0:3000/xAPI/statements_multiple"
+    endpoint_single = "http://0.0.0.0:3000/xAPI/statements_single"
     backend = LRSHTTP(fake_connection_url)
 
-    statements = {
+    statements_multiple = {
         "statements": [
             {"id": str(uuid4()), "timestamp": "2022-06-22T08:31:38"},
             {"id": str(uuid4()), "timestamp": "2022-07-22T08:31:38"},
             {"id": str(uuid4()), "timestamp": "2022-08-22T08:31:38"},
         ]
     }
+    statements_single = {
+        "statements":{"id": str(uuid4()), "timestamp": "2022-06-22T08:31:38"}
+    }
 
-    # Mock GET response of HTTPX
-    httpx_mock.add_response(url=endpoint, method="GET", json=statements)
+    # Mock GET response of HTTPX: Multiple statmements returned
+    httpx_mock.add_response(url=endpoint_multiple, method="GET", json=statements_multiple)
+    result = await _async_gen_to_list(backend.async_get_statements(endpoint_multiple))
+    assert result == statements_multiple["statements"]
 
-    result = await _async_gen_to_list(backend.async_get_statements(endpoint))
-    assert result == statements["statements"]
-
+    # Mock GET response of HTTPX: Single statmement returned
+    httpx_mock.add_response(url=endpoint_single, method="GET", json=statements_single)
+    result = await _async_gen_to_list(backend.async_get_statements(endpoint_single))
+    assert result == [statements_single["statements"]]
 
 @pytest.mark.skip(reason="Performance is tested using https://github.com/openfun/lbt")
 @pytest.mark.asyncio
@@ -95,8 +102,6 @@ async def test_backends_http_lrs_async_get_method_performance(httpx_mock: HTTPXM
     backend = LRSHTTP(fake_connection_url)
 
     httpx_mock.add_callback(simulate_network_latency)
-
-
 
     t1 = time.time()
     responses = await asyncio.gather(
