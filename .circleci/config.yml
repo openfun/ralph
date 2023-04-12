@@ -208,6 +208,7 @@ jobs:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
     working_directory: ~/fun
+    resource_class: large
     steps:
       - checkout
       - restore_cache:
@@ -545,7 +546,8 @@ workflows:
       - test-library:
           matrix:
             parameters:
-              python-image: [python:3.7, python:3.8, python:3.9, python:3.10, python:3.11]
+              python-image:
+                [python:3.7, python:3.8, python:3.9, python:3.10, python:3.11]
           filters:
             tags:
               only: /.*/
