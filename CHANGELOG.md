@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- An issue Ralph starting when ClickHouse is down
+
 ### Changed
 
 - Upgrade `httpx` to `0.24.0`
