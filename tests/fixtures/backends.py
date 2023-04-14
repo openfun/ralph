@@ -27,7 +27,7 @@ from ralph.backends.database.es import ESDatabase
 from ralph.backends.database.mongo import MongoDatabase
 from ralph.backends.storage.s3 import S3Storage
 from ralph.backends.storage.swift import SwiftStorage
-from ralph.conf import Settings, settings
+from ralph.conf import ClickhouseClientOptions, Settings, settings
 
 # ClickHouse backend defaults
 CLICKHOUSE_TEST_DATABASE = os.environ.get(
@@ -203,10 +203,10 @@ def get_clickhouse_fixture(
     """Creates / deletes a ClickHouse test database + table and yields an
     instantiated client.
     """
-    client_options = {
-        "date_time_input_format": "best_effort",  # Allows RFC dates
-        "allow_experimental_object_type": 1,  # Allows JSON data type
-    }
+    client_options = ClickhouseClientOptions(
+        date_time_input_format="best_effort",  # Allows RFC dates
+        allow_experimental_object_type=1,  # Allows JSON data type
+    ).dict()
 
     client = clickhouse_connect.get_client(
         host=host,

@@ -10,7 +10,7 @@ import clickhouse_connect
 from clickhouse_connect.driver.exceptions import ClickHouseError
 from pydantic import BaseModel, ValidationError
 
-from ralph.conf import settings
+from ralph.conf import ClickhouseClientOptions, settings
 from ralph.exceptions import BackendException, BadFormatException
 
 from .base import (
@@ -54,7 +54,7 @@ class ClickHouseDatabase(BaseDatabase):  # pylint: disable=too-many-instance-att
         event_table_name: str = clickhouse_settings.EVENT_TABLE_NAME,
         username: str = clickhouse_settings.USERNAME,
         password: str = clickhouse_settings.PASSWORD,
-        client_options: dict = clickhouse_settings.CLIENT_OPTIONS,
+        client_options: ClickhouseClientOptions = clickhouse_settings.CLIENT_OPTIONS,
     ):
         """Instantiates the ClickHouse configuration.
 
@@ -76,6 +76,8 @@ class ClickHouseDatabase(BaseDatabase):  # pylint: disable=too-many-instance-att
                 "date_time_input_format": "best_effort",  # Allows RFC dates
                 "allow_experimental_object_type": 1,  # Allows JSON data type
             }
+        else:
+            client_options = client_options.dict()
 
         self.host = host
         self.port = port

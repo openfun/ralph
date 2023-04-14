@@ -80,20 +80,6 @@ class InstantiableSettingsItem(BaseModel):
 # Active database backend Settings.
 
 
-class ClickhouseDatabaseBackendSettings(InstantiableSettingsItem):
-    """Pydantic model for ClickHouse database backend configuration settings."""
-
-    _class_path: str = "ralph.backends.database.clickhouse.ClickHouseDatabase"
-
-    HOST: str = "localhost"
-    PORT: int = 8123
-    DATABASE: str = "xapi"
-    EVENT_TABLE_NAME: str = "xapi_events_all"
-    USERNAME: str = None
-    PASSWORD: str = None
-    CLIENT_OPTIONS: dict = None
-
-
 class ClientOptions(BaseModel):
     """Pydantic model for additionnal client options."""
 
@@ -105,7 +91,7 @@ class ClickhouseClientOptions(ClientOptions):
     """Pydantic model for `clickhouse` client options."""
 
     date_time_input_format: str = "best_effort"
-    allow_experimental_object_type: Literal[0, 1] = 1
+    allow_experimental_object_type: Literal[0, 1] = None
 
 
 class ESClientOptions(ClientOptions):
@@ -113,6 +99,20 @@ class ESClientOptions(ClientOptions):
 
     ca_certs: Path = None
     verify_certs: bool = None
+
+
+class ClickhouseDatabaseBackendSettings(InstantiableSettingsItem):
+    """Pydantic model for ClickHouse database backend configuration settings."""
+
+    _class_path: str = "ralph.backends.database.clickhouse.ClickHouseDatabase"
+
+    HOST: str = "localhost"
+    PORT: int = 8123
+    DATABASE: str = "xapi"
+    EVENT_TABLE_NAME: str = "xapi_events_all"
+    USERNAME: str = None
+    PASSWORD: str = None
+    CLIENT_OPTIONS: ClickhouseClientOptions = None
 
 
 class MongoClientOptions(ClientOptions):

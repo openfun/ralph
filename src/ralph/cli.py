@@ -134,7 +134,7 @@ class HeadersParametersParamType(CommaSeparatedKeyValueParamType):
     """Comma separated key=value parameter type for headers parameters."""
 
     def __init__(self, headers_parameters_type):
-        """Instantiates HeadersParametersParamType for a headers_paramters_type.
+        """Instantiates HeadersParametersParamType for a headers_parameters_type.
 
         Args:
             headers_parameters_type (any): Pydantic model used for headers parameters.
