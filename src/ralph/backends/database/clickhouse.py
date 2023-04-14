@@ -40,7 +40,7 @@ class ClickHouseQuery(BaseQuery):
     return_fields: Optional[List[str]]
 
 
-class ClickHouseDatabase(BaseDatabase):
+class ClickHouseDatabase(BaseDatabase):  # pylint: disable=too-many-instance-attributes
     """ClickHouse database backend."""
 
     name = "clickhouse"
@@ -56,7 +56,7 @@ class ClickHouseDatabase(BaseDatabase):
         password: str = clickhouse_settings.PASSWORD,
         client_options: dict = clickhouse_settings.CLIENT_OPTIONS,
     ):
-        """Instantiates the ClickHouse client.
+        """Instantiates the ClickHouse configuration.
 
         Args:
             host (str): ClickHouse server host to connect to.
@@ -83,15 +83,29 @@ class ClickHouseDatabase(BaseDatabase):
         self.event_table_name = event_table_name
         self.username = username
         self.password = password
+        self.client_options = client_options
+        self._client = None
 
-        self.client = clickhouse_connect.get_client(
-            host=self.host,
-            port=self.port,
-            database=self.database,
-            username=self.username,
-            password=self.password,
-            settings=client_options,
-        )
+    @property
+    def client(self):
+        """Creates a ClickHouse client if it doesn't exist.
+
+        We do this here so that we don't interrupt initialization in the case
+        where ClickHouse is not running when Ralph starts up, which will cause
+        Ralph to hang. This client is HTTP, so not actually stateful. Ralph
+        should be able to gracefully deal with ClickHouse outages at all other
+        times.
+        """
+        if not self._client:
+            self._client = clickhouse_connect.get_client(
+                host=self.host,
+                port=self.port,
+                database=self.database,
+                username=self.username,
+                password=self.password,
+                settings=self.client_options,
+            )
+        return self._client
 
     def status(self) -> DatabaseStatus:
         """Checks ClickHouse connection status."""
