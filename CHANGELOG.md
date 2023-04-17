@@ -10,7 +10,8 @@ and this project adheres to
 
 ### Changed
 
-- Upgrade `fastapi` to `0.95.0`
+- Upgrade `httpx` to `0.24.0`
+- Upgrade `fastapi` to `0.95.1`
 - Upgrade `sentry_sdk` to `1.19.1`
 - Upgrade `uvicorn` to `0.21.1`
 
