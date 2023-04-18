@@ -8,9 +8,7 @@ and this project adheres to
 
 ## [Unreleased]
 
-### Fixed
-
-- An issue Ralph starting when ClickHouse is down
+## [3.5.1] - 2023-04-18
 
 ### Changed
 
@@ -23,6 +21,7 @@ and this project adheres to
 
 - An issue with starting Ralph in pre-built Docker containers
 - Fix double quoting in ClickHouse backend server parameters
+- An issue Ralph starting when ClickHouse is down
 
 ## [3.5.0] - 2023-03-08
 
@@ -276,7 +275,8 @@ and this project adheres to
 - Add optional sentry integration
 - Distribute Arnold's tray to deploy Ralph in a k8s cluster as cronjobs
 
-[unreleased]: https://github.com/openfun/ralph/compare/v3.5.0...master
+[unreleased]: https://github.com/openfun/ralph/compare/v3.5.1...master
+[3.5.1]: https://github.com/openfun/ralph/compare/v3.5.0...v3.5.1
 [3.5.0]: https://github.com/openfun/ralph/compare/v3.4.0...v3.5.0
 [3.4.0]: https://github.com/openfun/ralph/compare/v3.3.0...v3.4.0
 [3.3.0]: https://github.com/openfun/ralph/compare/v3.2.1...v3.3.0
