@@ -127,6 +127,7 @@ def test_api_forwarding_get_active_xapi_forwardings_with_inactive_forwardings(
     assert caplog.record_tuples[1][2] == msg
 
 
+@pytest.mark.anyio
 @hypothesis_settings(suppress_health_check=(HealthCheck.function_scoped_fixture,))
 @pytest.mark.parametrize("statements", [[{}, {"id": 1}]])
 @custom_given(
@@ -157,16 +158,22 @@ def test_api_forwarding_forward_xapi_statements_with_successful_request(
     monkeypatch.setattr("ralph.api.forwarding.AsyncClient.post", post_success)
     monkeypatch.setenv("RALPH_XAPI_FORWARDINGS", f"[{forwarding.json()}]")
     monkeypatch.setattr("ralph.api.forwarding.settings", Settings())
+    get_active_xapi_forwardings.cache_clear()
 
     caplog.clear()
     with caplog.at_level(logging.DEBUG):
-        asyncio.get_event_loop().run_until_complete(forward_xapi_statements(statements))
+        asyncio.run(forward_xapi_statements(statements))
 
     assert [
         f"Forwarded {len(statements)} statements to {forwarding.url} with success."
-    ] == [message for source, _, message in caplog.record_tuples if source != "asyncio"]
+    ] == [
+        message
+        for source, _, message in caplog.record_tuples
+        if source == "ralph.api.forwarding"
+    ]
 
 
+@pytest.mark.anyio
 @hypothesis_settings(suppress_health_check=(HealthCheck.function_scoped_fixture,))
 @pytest.mark.parametrize("statements", [[{}, {"id": 1}]])
 @custom_given(
@@ -198,10 +205,14 @@ def test_api_forwarding_forward_xapi_statements_with_unsuccessful_request(
     monkeypatch.setattr("ralph.api.forwarding.AsyncClient.post", post_fail)
     monkeypatch.setenv("RALPH_XAPI_FORWARDINGS", f"[{forwarding.json()}]")
     monkeypatch.setattr("ralph.api.forwarding.settings", Settings())
+    get_active_xapi_forwardings.cache_clear()
 
+    caplog.clear()
     with caplog.at_level(logging.ERROR):
-        asyncio.get_event_loop().run_until_complete(forward_xapi_statements(statements))
+        asyncio.run(forward_xapi_statements(statements))
 
     assert ["Failed to forward xAPI statements. Failure during request."] == [
-        message for source, _, message in caplog.record_tuples if source != "asyncio"
+        message
+        for source, _, message in caplog.record_tuples
+        if source == "ralph.api.forwarding"
     ]
