@@ -524,19 +524,24 @@ async def test_post_statements_list_with_statement_forwarding(
     with monkeypatch.context() as forwarding_patch:
         # Forwarding client should forward statements to receiving client.
         url = f"http://{RUNSERVER_TEST_HOST}:{RUNSERVER_TEST_PORT}/xAPI/statements/"
+        forwarding_config = XapiForwardingConfigurationSettings(
+            url=url,
+            is_active=True,
+            basic_username="ralph",
+            basic_password="admin",
+            max_retries=1,
+            timeout=10,
+        )
         forwarding_patch.setattr(
             "ralph.api.forwarding.get_active_xapi_forwardings",
-            lambda: [
-                XapiForwardingConfigurationSettings(
-                    url=url,
-                    is_active=True,
-                    basic_username="ralph",
-                    basic_password="admin",
-                    max_retries=1,
-                    timeout=10,
-                )
-            ],
+            lambda: [forwarding_config],
         )
+        # Trigger addition of background tasks
+        forwarding_patch.setattr(
+            "ralph.api.routers.statements.get_active_xapi_forwardings",
+            lambda: [forwarding_config],
+        )
+
         # Forwarding client should use the forwarding Elasticsearch client for storage
         forwarding_patch.setattr(
             "ralph.api.routers.statements.DATABASE_CLIENT", forwarding_backend()
@@ -574,4 +579,4 @@ async def test_post_statements_list_with_statement_forwarding(
         assert response.json() == {"statements": [statement]}
 
     # Stop receiving LRS client
-    lrs_context.__aexit__(None, None, None)
+    await lrs_context.__aexit__(None, None, None)
