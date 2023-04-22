@@ -11,6 +11,7 @@ from .fixtures.backends import (  # noqa: F401
     async_es_data_stream,
     async_es_forwarding,
     clickhouse,
+    clickhouse_forwarding,
     es,
     es_data_stream,
     es_forwarding,

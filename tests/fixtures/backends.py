@@ -43,7 +43,10 @@ CLICKHOUSE_TEST_PORT = os.environ.get(
 CLICKHOUSE_TEST_TABLE_NAME = os.environ.get(
     "RALPH_BACKENDS__DATABASE__CLICKHOUSE__TEST_TABLE_NAME", "test_xapi_events_all"
 )
-
+CLICKHOUSE_TEST_FORWARDING_TABLE_NAME = os.environ.get(
+    "RALPH_BACKENDS__DATABASE__CLICKHOUSE__TEST_FORWARDING_TABLE_NAME",
+    "test_xapi_events_all_2",
+)
 # Elasticsearch backend defaults
 ES_TEST_INDEX = os.environ.get(
     "RALPH_BACKENDS__DATABASE__ES__TEST_INDEX", "test-index-foo"
@@ -282,7 +285,7 @@ def get_clickhouse_fixture(
     )
 
     sql = f"""CREATE DATABASE IF NOT EXISTS {database}"""
-    client.command(sql)
+    client.command(sql, use_database=False)
 
     # Now get a client with the correct database
     client = clickhouse_connect.get_client(
@@ -308,13 +311,22 @@ def get_clickhouse_fixture(
 
     client.command(sql)
     yield client
-    client.command(f"DROP DATABASE {database}")
+    client.command(f"DROP DATABASE IF EXISTS {database}", use_database=False)
 
 
 @pytest.fixture
 def clickhouse():
     """Yields a ClickHouse test client. See get_clickhouse_fixture above."""
     for clickhouse_client in get_clickhouse_fixture():
+        yield clickhouse_client
+
+
+@pytest.fixture
+def clickhouse_forwarding():
+    """Yields a second ClickHouse test client. See get_clickhouse_fixture above."""
+    for clickhouse_client in get_clickhouse_fixture(
+        event_table_name=CLICKHOUSE_TEST_FORWARDING_TABLE_NAME,
+    ):
         yield clickhouse_client
 
 

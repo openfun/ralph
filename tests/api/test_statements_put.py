@@ -8,6 +8,7 @@ from httpx import AsyncClient
 
 from ralph.api import app
 from ralph.backends.database.async_es import AsyncESDatabase
+from ralph.backends.database.clickhouse import ClickHouseDatabase
 from ralph.backends.database.es import ESDatabase
 from ralph.backends.database.mongo import MongoDatabase
 from ralph.conf import XapiForwardingConfigurationSettings
@@ -15,6 +16,10 @@ from ralph.exceptions import BackendException
 
 from tests.fixtures.backends import (
     ASYNC_ES_TEST_FORWARDING_INDEX,
+    CLICKHOUSE_TEST_DATABASE,
+    CLICKHOUSE_TEST_FORWARDING_TABLE_NAME,
+    CLICKHOUSE_TEST_HOST,
+    CLICKHOUSE_TEST_PORT,
     ES_TEST_FORWARDING_INDEX,
     ES_TEST_HOSTS,
     MONGO_TEST_CONNECTION_URI,
@@ -460,13 +465,24 @@ async def test_put_statement_without_statement_forwarding(
 @pytest.mark.anyio
 @pytest.mark.parametrize(
     "receiving_backend",
-    [get_async_es_test_backend, get_es_test_backend, get_mongo_test_backend],
+    [
+        get_async_es_test_backend,
+        get_clickhouse_test_backend,
+        get_es_test_backend,
+        get_mongo_test_backend,
+    ],
 )
 @pytest.mark.parametrize(
     "forwarding_backend",
     [
         lambda: AsyncESDatabase(
             hosts=ES_TEST_HOSTS, index=ASYNC_ES_TEST_FORWARDING_INDEX
+        ),
+        lambda: ClickHouseDatabase(
+            host=CLICKHOUSE_TEST_HOST,
+            port=CLICKHOUSE_TEST_PORT,
+            database=CLICKHOUSE_TEST_DATABASE,
+            event_table_name=CLICKHOUSE_TEST_FORWARDING_TABLE_NAME,
         ),
         lambda: ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_FORWARDING_INDEX),
         lambda: MongoDatabase(
@@ -483,6 +499,8 @@ async def test_put_statement_with_statement_forwarding(
     auth_credentials,
     async_es,
     async_es_forwarding,
+    clickhouse,
+    clickhouse_forwarding,
     es,
     es_forwarding,
     mongo,
