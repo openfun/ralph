@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade `sentry_sdk` to `1.20.0`
+
 ## [3.5.1] - 2023-04-18
 
 ### Changed
