@@ -51,9 +51,6 @@ venv.bak/
 .pylint.d
 .pytest_cache
 
-# Test fixtures
-data/
-
 # Documentation site
 site/
 
