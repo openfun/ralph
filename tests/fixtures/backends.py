@@ -22,12 +22,13 @@ from httpx import AsyncClient, ConnectError
 from pymongo import MongoClient
 from pymongo.errors import CollectionInvalid
 
+from ralph.backends.data.fs import FSDataBackend, FSDataBackendSettings
 from ralph.backends.database.clickhouse import ClickHouseDatabase
 from ralph.backends.database.es import ESDatabase
 from ralph.backends.database.mongo import MongoDatabase
 from ralph.backends.storage.s3 import S3Storage
 from ralph.backends.storage.swift import SwiftStorage
-from ralph.conf import ClickhouseClientOptions, Settings, settings
+from ralph.conf import ClickhouseClientOptions, Settings, core_settings
 
 # ClickHouse backend defaults
 CLICKHOUSE_TEST_DATABASE = os.environ.get(
@@ -157,6 +158,25 @@ def es_forwarding():
     """Yield a second ElasticSearch test client. See get_es_fixture above."""
     for es_client in get_es_fixture(index=ES_TEST_FORWARDING_INDEX):
         yield es_client
+
+
+@pytest.fixture
+def fs_backend(fs, settings_fs):
+    """Returns the `get_fs_data_backend` function."""
+    # pylint: disable=invalid-name,redefined-outer-name,unused-argument
+    fs.create_dir("foo")
+
+    def get_fs_data_backend(path: str = "foo"):
+        """Returns an instance of FSDataBackend."""
+        settings = FSDataBackendSettings(
+            DEFAULT_CHUNK_SIZE=1024,
+            DEFAULT_DIRECTORY_PATH=path,
+            DEFAULT_QUERY_STRING="*",
+            LOCALE_ENCODING="utf8",
+        )
+        return FSDataBackend(settings)
+
+    return get_fs_data_backend
 
 
 def get_mongo_fixture(
@@ -311,7 +331,7 @@ def settings_fs(fs, monkeypatch):
 
     monkeypatch.setattr(
         "ralph.backends.mixins.settings",
-        Settings(HISTORY_FILE=Path(settings.APP_DIR / "history.json")),
+        Settings(HISTORY_FILE=Path(core_settings.APP_DIR / "history.json")),
     )
 
 
