@@ -11,6 +11,8 @@ and this project adheres to
 ### Changed
 
 - Upgrade `sentry_sdk` to `1.20.0`
+- LRS `/statements` `GET` method returns a code 400 with certain parameters
+as per the xAPI specification
 
 ## [3.5.1] - 2023-04-18
 

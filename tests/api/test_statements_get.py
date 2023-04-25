@@ -437,3 +437,36 @@ def test_api_statements_get_statements_with_database_query_failure(
     )
     assert response.status_code == 500
     assert response.json() == {"detail": "xAPI statements query failed"}
+
+
+@pytest.mark.parametrize("id_param", ["statementId", "voidedStatementId"])
+def test_api_statements_get_statements_invalid_query_parameters(
+    auth_credentials, id_param
+):
+    """Test error response for invalid query parametrs"""
+
+    id_1 = "be67b160-d958-4f51-b8b8-1892002dbac6"
+    id_2 = "66c81e98-1763-4730-8cfc-f5ab34f1bad5"
+
+    # Test error when both statementId and voidedStatementId are provided
+    response = client.get(
+        f"/xAPI/statements/?statementId={id_1}&voidedStatementId={id_2}",
+        headers={"Authorization": f"Basic {auth_credentials}"},
+    )
+    assert response.status_code == 400
+
+    # Check for error when invalid parameters are provided with a statementId
+    for invalid_param in ["activity", "agent", "verb"]:
+        response = client.get(
+            f"/xAPI/statements/?{id_param}={id_1}&{invalid_param}={id_2}",
+            headers={"Authorization": f"Basic {auth_credentials}"},
+        )
+        assert response.status_code == 400
+
+    # Check for NO 400 when statementId is passed with authorized parameters
+    for valid_param, value in [("format", "ids"), ("attachments", "true")]:
+        response = client.get(
+            f"/xAPI/statements/?{id_param}={id_1}&{valid_param}={value}",
+            headers={"Authorization": f"Basic {auth_credentials}"},
+        )
+        assert response.status_code != 400
