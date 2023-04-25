@@ -191,6 +191,43 @@ async def get(
     # Make sure the limit does not go above max from settings
     limit = min(limit, settings.RUNSERVER_MAX_SEARCH_HITS_COUNT)
 
+    # 400 Bad Request for requests using both `statementId` and `voidedStatementId`
+    if (statementId is not None) and (voidedStatementId is not None):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=(
+                "Query parameters cannot include both `statementId`"
+                "and `voidedStatementId`"
+            ),
+        )
+
+    # 400 Bad Request for any request containing `statementId` or
+    # `voidedStatementId` and any other parameter besides `attachments` or `format`.
+    # NB: `limit` and `ascending` are not handled to simplify implementation, and as it
+    # has no incidence on UX, when fetching a single statement
+    excluded_params = [
+        agent,
+        verb,
+        activity,
+        registration,
+        related_activities,
+        related_agents,
+        since,
+        until,
+    ]
+    # NB: bool(param) relies on all defaults being None, 0, or False
+    if (statementId or voidedStatementId) and any(
+        bool(param) for param in excluded_params
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=(
+                "Querying by id only accepts `attachments` and `format` as extra"
+                "parameters"
+            ),
+        )
+
+    # Query Database
     try:
         query_result = DATABASE_CLIENT.query_statements(
             StatementParameters(**{**request.query_params, "limit": limit})
