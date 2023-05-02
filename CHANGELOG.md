@@ -20,8 +20,8 @@ as per the xAPI specification
 
 - Upgrade `httpx` to `0.24.0`
 - Upgrade `fastapi` to `0.95.1`
-- Upgrade `sentry_sdk` to `1.19.1`
-- Upgrade `uvicorn` to `0.21.1`
+- Upgrade `sentry_sdk` to `1.21.1`
+- Upgrade `uvicorn` to `0.22.0`
 
 ### Fixed
 
