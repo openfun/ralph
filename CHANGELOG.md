@@ -17,6 +17,10 @@ as per the xAPI specification
 - Use batch/v1 api in cronjob_pipeline manifest
 - Use autoscaling/v2 in HorizontalPodAutoscaler manifest
 
+### Fixed
+
+- Fix the `more` IRL building in LRS `/statements` GET requests
+
 ## [3.5.1] - 2023-04-18
 
 ### Changed

@@ -1,8 +1,7 @@
 """Tests for the GET statements endpoint of the Ralph API."""
 
-import re
 from datetime import datetime, timedelta
-from urllib.parse import quote_plus
+from urllib.parse import parse_qs, quote_plus, urlparse
 
 import pytest
 from elasticsearch.helpers import bulk
@@ -353,10 +352,18 @@ def test_api_statements_get_statements_with_pagination(
     statements = [
         {
             "id": "5d345b99-517c-4b54-848e-45010904b177",
-            "timestamp": (datetime.now() - timedelta(hours=2)).isoformat(),
+            "timestamp": (datetime.now() - timedelta(hours=4)).isoformat(),
         },
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
+            "timestamp": (datetime.now() - timedelta(hours=3)).isoformat(),
+        },
+        {
+            "id": "be67b160-d958-4f51-b8b8-1892002dbac5",
+            "timestamp": (datetime.now() - timedelta(hours=2)).isoformat(),
+        },
+        {
+            "id": "be67b160-d958-4f51-b8b8-1892002dbac4",
             "timestamp": (datetime.now() - timedelta(hours=1)).isoformat(),
         },
         {
@@ -372,9 +379,88 @@ def test_api_statements_get_statements_with_pagination(
         "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
     )
     assert first_response.status_code == 200
+    assert first_response.json()["statements"] == [statements[4], statements[3]]
+    more = urlparse(first_response.json()["more"])
+    more_query_params = parse_qs(more.query)
+    assert more.path == "/xAPI/statements/"
+    assert all(key in more_query_params for key in ("pit_id", "search_after"))
+
+    # Second response gets the missing result from the first response.
+    second_response = client.get(
+        first_response.json()["more"],
+        headers={"Authorization": f"Basic {auth_credentials}"},
+    )
+    assert second_response.status_code == 200
+    assert second_response.json()["statements"] == [statements[2], statements[1]]
+    more = urlparse(first_response.json()["more"])
+    more_query_params = parse_qs(more.query)
+    assert more.path == "/xAPI/statements/"
+    assert all(key in more_query_params for key in ("pit_id", "search_after"))
+
+    # Third response gets the missing result from the first response
+    third_response = client.get(
+        second_response.json()["more"],
+        headers={"Authorization": f"Basic {auth_credentials}"},
+    )
+    assert third_response.status_code == 200
+    assert third_response.json() == {"statements": [statements[0]]}
+
+
+def test_api_statements_get_statements_with_pagination_and_query(
+    monkeypatch, insert_statements_and_monkeypatch_backend, auth_credentials
+):
+    """Tests the get statements API route, given a request with a query parameter
+    leading to more results than can fit on the first page, should return a list
+    of statements non exceeding the page limit and include a "more" property with
+    a link to get the next page of results.
+    """
+    # pylint: disable=redefined-outer-name
+
+    monkeypatch.setattr(
+        "ralph.api.routers.statements.settings.RUNSERVER_MAX_SEARCH_HITS_COUNT", 2
+    )
+
+    statements = [
+        {
+            "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
+            "verb": {
+                "id": "https://w3id.org/xapi/video/verbs/played",
+                "display": {"en-US": "played"},
+            },
+            "timestamp": (datetime.now() - timedelta(hours=2)).isoformat(),
+        },
+        {
+            "id": "be67b160-d958-4f51-b8b8-1892002dbac1",
+            "verb": {
+                "id": "https://w3id.org/xapi/video/verbs/played",
+                "display": {"en-US": "played"},
+            },
+            "timestamp": (datetime.now() - timedelta(hours=1)).isoformat(),
+        },
+        {
+            "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
+            "verb": {
+                "id": "https://w3id.org/xapi/video/verbs/played",
+                "display": {"en-US": "played"},
+            },
+            "timestamp": datetime.now().isoformat(),
+        },
+    ]
+    insert_statements_and_monkeypatch_backend(statements)
+
+    # First response gets the first two results, with a "more" entry as
+    # we have more results to return on a later page.
+    first_response = client.get(
+        "/xAPI/statements/?verb="
+        + quote_plus("https://w3id.org/xapi/video/verbs/played"),
+        headers={"Authorization": f"Basic {auth_credentials}"},
+    )
+    assert first_response.status_code == 200
     assert first_response.json()["statements"] == [statements[2], statements[1]]
-    more_regex = re.compile(r"^/xAPI/statements/\?pit_id=.*&search_after=.*$")
-    assert more_regex.match(first_response.json()["more"])
+    more = urlparse(first_response.json()["more"])
+    more_query_params = parse_qs(more.query)
+    assert more.path == "/xAPI/statements/"
+    assert all(key in more_query_params for key in ("verb", "pit_id", "search_after"))
 
     # Second response gets the missing result from the first response.
     second_response = client.get(
