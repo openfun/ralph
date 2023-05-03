@@ -3,6 +3,7 @@
 import logging
 from datetime import datetime
 from typing import List, Literal, Optional, Union
+from urllib.parse import ParseResult, urlencode
 from uuid import UUID, uuid4
 
 from fastapi import (
@@ -246,14 +247,26 @@ async def get(
     response = {}
     if len(query_result.statements) == limit:
         # Search after relies on sorting info located in the last hit
-        path = request.url.components.path
-        query = request.url.components.query
+        path = request.url.path
+        query = dict(request.query_params)
+
+        query.update(
+            {
+                "pit_id": query_result.pit_id,
+                "search_after": query_result.search_after,
+            }
+        )
+
         response.update(
             {
-                "more": (
-                    f"{path}{query + '&' if query else '?'}pit_id={query_result.pit_id}"
-                    f"&search_after={query_result.search_after}"
-                )
+                "more": ParseResult(
+                    scheme="",
+                    netloc="",
+                    path=path,
+                    params="",
+                    query=urlencode(query),
+                    fragment="",
+                ).geturl(),
             }
         )
 
