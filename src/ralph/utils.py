@@ -1,6 +1,7 @@
 """Utilities for Ralph."""
 
 import datetime
+from dateutil.parser import parse
 import logging
 import operator
 from functools import reduce
@@ -92,3 +93,42 @@ def set_dict_value_from_path(dict_: dict, path: List[str], value: any):
     for key in path[:-1]:
         dict_ = dict_.setdefault(key, {})
     dict_[path[-1]] = value
+
+
+def _assert_statements_are_equivalent(statement_1: dict, statement_2: dict):  
+    """Check if statements are identical on fields not modified on input by the LRS.
+    
+    Fields not being compared are: "timestamp", "stored", "authority".
+    """
+    fields = ["actor", "verb", "object", "id", "result", "context", "attachements"]
+    assert all(statement_1.get(field) == statement_2.get(field) for field in fields)
+
+def assert_statement_get_responses_are_equivalent(response_1: dict, response_2: dict):
+    """Check if responses to GET /statements are equivalent.
+    
+    Compare if all statements in response are equivelent, meaning that all
+    fields not modified by the LRS are equal.
+    """
+
+    assert response_1.keys() == response_2.keys()
+
+    def _all_but_statements(response):
+        return {key: val for key, val in response.items() if key != "statements"}
+    
+    print('yolo yolo')
+    print(_all_but_statements(response_1))
+    print(_all_but_statements(response_2))
+    assert _all_but_statements(response_1) == _all_but_statements(response_2)
+
+    # Assert the statements part of the response is equivalent
+    assert "statements" in response_1.keys()
+    assert len(response_1["statements"]) == len(response_2["statements"])
+    for statement_1, statement_2 in zip(response_1["statements"], response_2["statements"]):
+        _assert_statements_are_equivalent(statement_1, statement_2)
+    
+def string_is_date(string):
+    try: 
+        parse(string)
+        return True
+    except:
+        return False
