@@ -104,9 +104,13 @@ def test_api_statements_get_statements(
             "timestamp": (datetime.now() - timedelta(hours=1)).isoformat(),
         },
         {
+            "id": "a2956991-200b-40a7-9548-293cdcc06c4b",
+            "timestamp": (datetime.now() - timedelta(hours=2)).isoformat(),
+        },
+        {
             "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
             "timestamp": datetime.now().isoformat(),
-        },
+        }
     ]
     insert_statements_and_monkeypatch_backend(statements)
 
@@ -117,7 +121,8 @@ def test_api_statements_get_statements(
         )
 
         assert response.status_code == 200
-        assert response.json() == {"statements": [statements[1], statements[0]]}
+        # Confirm that results are in descending order
+        assert response.json() == {"statements": [statements[2], statements[0], statements[1]]}
 
 
 def test_api_statements_get_statements_ascending(
@@ -134,6 +139,10 @@ def test_api_statements_get_statements_ascending(
             "timestamp": (datetime.now() - timedelta(hours=1)).isoformat(),
         },
         {
+            "id": "a2956991-200b-40a7-9548-293cdcc06c4b",
+            "timestamp": (datetime.now() - timedelta(hours=2)).isoformat(),
+        },
+        {
             "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
             "timestamp": datetime.now().isoformat(),
         },
@@ -146,7 +155,7 @@ def test_api_statements_get_statements_ascending(
     )
 
     assert response.status_code == 200
-    assert response.json() == {"statements": [statements[0], statements[1]]}
+    assert response.json() == {"statements": [statements[1], statements[0], statements[2]]}
 
 
 def test_api_statements_get_statements_by_statement_id(
