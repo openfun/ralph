@@ -1,5 +1,7 @@
 # Ralph
 
+[![Discord](https://img.shields.io/discord/1082704478463082496?label=discord&logo=discord&style=for-the-badge)](https://discord.gg/vYx6YWxJCS)
+
 Ralph is a toolbox for your learning analytics, it can be used as a:
 
 - **library**, to fetch learning events from various backends, (de)serialize or
