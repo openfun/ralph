@@ -3,11 +3,11 @@
 import logging
 from functools import lru_cache
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 
 import bcrypt
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.security import HTTPBasic, HTTPBasicCredentials, SecurityScopes
 from pydantic import BaseModel, root_validator
 from starlette.authentication import AuthenticationError
 
@@ -17,7 +17,6 @@ from ralph.conf import settings
 # with invalid credentials to something innocuous with the same method as if
 # it were a legitimate user.
 UNUSED_PASSWORD = bcrypt.hashpw(b"ralph", bcrypt.gensalt())
-
 
 security = HTTPBasic()
 
@@ -107,8 +106,50 @@ def get_stored_credentials(auth_file: Path) -> ServerUsersCredentials:
         raise AuthenticationError(msg.format(auth_file))
     return ServerUsersCredentials.parse_file(auth_file)
 
+@lru_cache()
+def _scope_is_authorized(requested_scope, user_scopes: Tuple):
+    """Check if the requested scope can be accessed"""
 
-def authenticated_user(credentials: HTTPBasicCredentials = Depends(security)):
+    # List of all expanded scopes
+    expanded_scopes = {
+        'statements/read': {
+            'statements/read/mine', 
+            'statements/read'
+        },
+        'all/read': {
+            'statements/read/mine', 
+            'statements/read',
+            'state/read', 
+            'define', 
+            'profile/read', 
+            'all/read'
+        },
+        'all': {
+            'statements/write', 
+            'statements/read/mine', 
+            'statements/read',
+            'state/read', 
+            'state/write', 
+            'define', 
+            'profile/read', 
+            'profile/write', 
+            'all/read', 
+            'all'
+        }
+    }
+
+    # Create a set with all the scopes available to the user
+    expanded_user_scopes = set()
+    for scope in user_scopes:
+        expanded_user_scopes.update(expanded_scopes.get(scope, {scope}))
+    
+    return requested_scope in expanded_user_scopes
+
+
+def authenticate_user(
+        security_scopes: SecurityScopes,
+        credentials: HTTPBasicCredentials = Depends(security)
+    ):
     """Checks valid auth parameters.
 
     Gets the basic auth parameters from the Authorization header, and checks them
@@ -165,4 +206,14 @@ def authenticated_user(credentials: HTTPBasicCredentials = Depends(security)):
             headers={"WWW-Authenticate": "Basic"},
         )
 
+    for requested_scope in security_scopes.scopes:
+        if not _scope_is_authorized(requested_scope, tuple(user.scopes)):
+            #print(f"Requested scope `{requested_scope}` is not authorized for this user ({user.scopes})")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=f"Access not authorized to scope: \"{requested_scope}\".",
+                headers={"WWW-Authenticate": "Basic"},
+            )
+
     return AuthenticatedUser(username=credentials.username, scopes=user.scopes)
+ 
