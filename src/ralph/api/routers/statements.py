@@ -13,21 +13,23 @@ from fastapi import (
     Query,
     Request,
     status,
+    Security
 )
 
 from ralph.api.forwarding import forward_xapi_statements, get_active_xapi_forwardings
 from ralph.backends.database.base import BaseDatabase, StatementParameters
 from ralph.conf import settings
 from ralph.exceptions import BackendException, BadFormatException
+from typing_extensions import Annotated
+from ralph.utils import now
 
-from ..auth import authenticated_user
+from ..auth import authenticate_user, AuthenticatedUser
 from ..models import ErrorDetail, LaxStatement
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(
     prefix="/xAPI/statements",
-    dependencies=[Depends(authenticated_user)],
 )
 
 
@@ -47,10 +49,56 @@ POST_PUT_RESPONSES = {
 }
 
 
+def _pre_process_statement(current_user: AuthenticatedUser, statement: dict):#, authority: Authority):
+    """Enrich LRS statement according to specifications.
+
+    args:
+        statement: statement being passed on to the LRS. Modified by this function.
+    """
+
+    # id: UUID
+    # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#24-statement-properties
+    statement_id = str(statement.get("id", uuid4()))
+    statement["id"] = statement_id
+
+    # authority: Information about whom or what has asserted that this statement is true
+    # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#249-authority
+    # if "authority" in statement and statement["authority"] != authority:
+    #     logger.error(
+    #         "Failed to index submitted statements. Submitted authority does not match."
+    #     )
+    #     raise HTTPException(
+    #         status_code=status.HTTP_403_FORBIDDEN,
+    #         detail=(
+    #             "Stated authority does not match credentials. Change or remove"
+    #              "`authority`.",
+    #         )
+    #     )
+    # else:
+    #     statement["authority"] = current_user.get_authority()
+
+    # stored: The time at which a Statement is stored by the LRS
+    # https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Data.md#248-stored
+    statement["stored"] = now()
+
+    # timestamp: If not provided, same value as stored
+    # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#247-timestamp
+    statement["timestamp"] = statement.get("timestamp", statement["stored"])
+
+    # Setting "version" property is not recommended
+    # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#24-statement-properties
+
+    return statement_id
+
+
 @router.get("")
 @router.get("/")
 # pylint: disable=too-many-arguments, too-many-locals
 async def get(
+    current_user: Annotated[
+        AuthenticatedUser, 
+        Security(authenticate_user, scopes=["statements/read/mine"])
+        ],
     request: Request,
     ###
     # Query string parameters defined by the LRS specification
@@ -181,13 +229,16 @@ async def get(
             "multiple pages."
             "NB: for internal use, not part of the LRS specification."
         ),
-    ),
+    )
 ):
     """Fetches a single xAPI Statement or multiple xAPI Statements.
 
     LRS Specification:
     https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#213-get-statements
     """
+
+    ### Input parameter checks
+
     # Make sure the limit does not go above max from settings
     limit = min(limit, settings.RUNSERVER_MAX_SEARCH_HITS_COUNT)
 
@@ -226,6 +277,10 @@ async def get(
                 "parameters"
             ),
         )
+    
+    ### Scope validation
+
+    # If widest scope is /statements/read/mine, force user to specify authority
 
     # Query Database
     try:
@@ -260,11 +315,16 @@ async def get(
     return {**response, "statements": query_result.statements}
 
 
+
 @router.put("/", responses=POST_PUT_RESPONSES, status_code=status.HTTP_204_NO_CONTENT)
 @router.put("", responses=POST_PUT_RESPONSES, status_code=status.HTTP_204_NO_CONTENT)
 # pylint: disable=unused-argument
 async def put(
     # pylint: disable=invalid-name
+    current_user: Annotated[
+        AuthenticatedUser, 
+        Security(authenticate_user, scopes=["statements/write"])
+        ],
     statementId: str,
     statement: LaxStatement,
     background_tasks: BackgroundTasks,
@@ -274,13 +334,11 @@ async def put(
     LRS Specification:
     https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#211-put-statements
     """
-    statement_dict = {statementId: statement.dict(exclude_unset=True)}
 
-    # Force the UUID id in the statement to string, make sure it matches the
-    # statementId given in the URL.
-    statement_dict[statementId]["id"] = str(statement_dict[statementId]["id"])
+    statement_as_dict = statement.dict(exclude_unset=True)
+    _pre_process_statement(current_user, statement_as_dict)
 
-    if not statementId == statement_dict[statementId]["id"]:
+    if not statementId == statement_as_dict['id']:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="xAPI statement id does not match given statementId",
@@ -288,7 +346,7 @@ async def put(
 
     if get_active_xapi_forwardings():
         background_tasks.add_task(
-            forward_xapi_statements, list(statement_dict.values())
+            forward_xapi_statements, [statement_as_dict]
         )
 
     try:
@@ -311,7 +369,7 @@ async def put(
     # For valid requests, perform the bulk indexing of all incoming statements
     try:
         success_count = DATABASE_CLIENT.put(
-            statement_dict.values(), ignore_errors=False
+            [statement_as_dict], ignore_errors=False
         )
     except (BackendException, BadFormatException) as exc:
         logger.error("Failed to index submitted statement")
@@ -326,6 +384,10 @@ async def put(
 @router.post("/", responses=POST_PUT_RESPONSES)
 @router.post("", responses=POST_PUT_RESPONSES)
 async def post(
+    current_user: Annotated[
+        AuthenticatedUser, 
+        Security(authenticate_user, scopes=["statements/write"])
+        ],
     statements: Union[LaxStatement, List[LaxStatement]],
     background_tasks: BackgroundTasks,
 ):
@@ -346,8 +408,7 @@ async def post(
     # - provide an iterable containing both the statements and generated IDs for bulk.
     statements_dict = {}
     for statement in map(lambda x: x.dict(exclude_unset=True), statements):
-        statement_id = str(statement.get("id", uuid4()))
-        statement["id"] = statement_id
+        statement_id = _pre_process_statement(current_user, statement)
         statements_dict[statement_id] = statement
 
     # Requests with duplicate statement IDs are considered invalid
