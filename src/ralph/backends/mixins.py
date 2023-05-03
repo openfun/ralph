@@ -2,10 +2,28 @@
 
 import json
 import logging
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Literal, Optional
 
+from fastapi.encoders import jsonable_encoder
+
+from ralph.backends.data.base import BaseOperationType
 from ralph.conf import settings
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class HistoryEntry:
+    """Class for a history entry."""
+
+    backend: str
+    action: Literal["read", "write"]
+    id: str
+    size: int
+    timestamp: datetime
+    operation_type: Optional[BaseOperationType] = None
 
 
 class HistoryMixin:
@@ -54,9 +72,9 @@ class HistoryMixin:
         self._history = list(filter(lambda event: not selector(event), self.history))
         self.write_history(self._history)
 
-    def append_to_history(self, event):
+    def append_to_history(self, event: HistoryEntry):
         """Append event to history."""
-        self.write_history(self.history + [event])
+        self.write_history(self.history + [jsonable_encoder(event, exclude_unset=True)])
 
     def get_command_history(self, backend_name, command):
         """Extracts entry ids from the history for a given command and backend_name."""
@@ -64,7 +82,7 @@ class HistoryMixin:
         def filter_by_name_and_command(entry):
             """Checks whether the history entry matches the backend_name and command."""
             return entry.get("backend") == backend_name and (
-                command in [entry.get("command"), entry.get("action")]
+                command in entry.get("action")
             )
 
         return [

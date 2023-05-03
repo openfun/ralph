@@ -10,6 +10,7 @@ import pytest
 
 from ralph.backends.data.base import BaseOperationType, BaseQuery, DataBackendStatus
 from ralph.backends.data.fs import FSDataBackend, FSDataBackendSettings
+from ralph.backends.mixins import HistoryEntry
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import now
 
@@ -214,7 +215,6 @@ def test_backends_data_fs_data_backend_list_method_with_history(fs_backend, fs):
             "backend": "fs",
             "action": "read",
             "id": "/foo/file_1",
-            "filename": "file_1",
             "size": 0,
             "timestamp": "2020-10-07T16:37:25.887664+00:00",
         }
@@ -233,7 +233,6 @@ def test_backends_data_fs_data_backend_list_method_with_history(fs_backend, fs):
             "backend": "fs",
             "action": "read",
             "id": "/foo/file_2",
-            "filename": "file_2",
             "size": 0,
             "timestamp": "2020-10-07T16:37:25.887664+00:00",
         }
@@ -252,7 +251,6 @@ def test_backends_data_fs_data_backend_list_method_with_history(fs_backend, fs):
             "backend": "fs",
             "action": "read",
             "id": "/foo/file_3",
-            "filename": "file_3",
             "size": 0,
             "timestamp": "2020-10-07T16:37:25.887664+00:00",
         }
@@ -298,7 +296,6 @@ def test_backends_data_fs_data_backend_list_method_with_history_and_details(
             "backend": "fs",
             "action": "read",
             "id": "/foo/file_1",
-            "filename": "file_1",
             "size": 0,
             "timestamp": "1970-01-01T00:00:01+00:00",
         }
@@ -321,7 +318,6 @@ def test_backends_data_fs_data_backend_list_method_with_history_and_details(
             "backend": "fs",
             "action": "read",
             "id": "/foo/file_2",
-            "filename": "file_2",
             "size": 0,
             "timestamp": "1970-01-01T00:00:01+00:00",
         }
@@ -344,7 +340,6 @@ def test_backends_data_fs_data_backend_list_method_with_history_and_details(
             "backend": "fs",
             "action": "read",
             "id": "/foo/file_3",
-            "filename": "file_3",
             "size": 0,
             "timestamp": "1970-01-01T00:00:01+00:00",
         }
@@ -392,9 +387,9 @@ def test_backends_data_fs_data_backend_read_method_with_raw_ouput(
             "backend": "fs",
             "action": "read",
             "id": "/foo/file_3.txt",
-            "filename": "file_3.txt",
             "size": 3,
             "timestamp": frozen_now,
+            "operation_type": None,
         }
     ]
 
@@ -411,17 +406,17 @@ def test_backends_data_fs_data_backend_read_method_with_raw_ouput(
             "backend": "fs",
             "action": "read",
             "id": "/tmp/test_fs/file_1.txt",
-            "filename": "file_1.txt",
             "size": 3,
             "timestamp": frozen_now,
+            "operation_type": None,
         },
         {
             "backend": "fs",
             "action": "read",
             "id": "/tmp/test_fs/file_2.txt",
-            "filename": "file_2.txt",
             "size": 3,
             "timestamp": frozen_now,
+            "operation_type": None,
         },
     ]
 
@@ -438,10 +433,10 @@ def test_backends_data_fs_data_backend_read_method_with_raw_ouput(
             "backend": "fs",
             "action": "read",
             "id": "/foo/bar/file_4.txt",
-            "filename": "file_4.txt",
             "size": 3,
             "timestamp": frozen_now,
-        },
+            "operation_type": None,
+        }
     ]
 
     # Given a `chunk_size` and an absolute `target` path,
@@ -458,17 +453,17 @@ def test_backends_data_fs_data_backend_read_method_with_raw_ouput(
             "backend": "fs",
             "action": "read",
             "id": "/tmp/test_fs/file_1.txt",
-            "filename": "file_1.txt",
             "size": 3,
             "timestamp": frozen_now,
+            "operation_type": None,
         },
         {
             "backend": "fs",
             "action": "read",
             "id": "/tmp/test_fs/file_2.txt",
-            "filename": "file_2.txt",
             "size": 3,
             "timestamp": frozen_now,
+            "operation_type": None,
         },
     ]
 
@@ -512,9 +507,9 @@ def test_backends_data_fs_data_backend_read_method_without_raw_output(
             "backend": "fs",
             "action": "read",
             "id": "/foo/file_2.txt",
-            "filename": "file_2.txt",
             "size": 29,
             "timestamp": frozen_now,
+            "operation_type": None,
         }
     ]
 
@@ -531,9 +526,9 @@ def test_backends_data_fs_data_backend_read_method_without_raw_output(
             "backend": "fs",
             "action": "read",
             "id": "/tmp/test_fs/file_1.txt",
-            "filename": "file_1.txt",
             "size": 14,
             "timestamp": frozen_now,
+            "operation_type": None,
         }
     ]
 
@@ -550,9 +545,9 @@ def test_backends_data_fs_data_backend_read_method_without_raw_output(
             "backend": "fs",
             "action": "read",
             "id": "/foo/bar/file_3.txt",
-            "filename": "file_3.txt",
             "size": 44,
             "timestamp": frozen_now,
+            "operation_type": None,
         }
     ]
 
@@ -664,9 +659,9 @@ def test_backends_data_fs_data_backend_read_method_without_ignore_errors(
             "backend": "fs",
             "action": "read",
             "id": "/tmp/test_fs/file_1.txt",
-            "filename": "file_1.txt",
             "size": 14,
             "timestamp": frozen_now,
+            "operation_type": None,
         }
     ]
 
@@ -810,17 +805,17 @@ def test_backends_data_fs_data_backend_write_method_with_update_operation(
             "backend": "fs",
             "action": "read",
             "id": "/foo/foo.txt",
-            "filename": "foo.txt",
             "size": 7,
             "timestamp": frozen_now,
+            "operation_type": None,
         },
         {
             "backend": "fs",
             "action": "write",
             "id": "/foo/foo.txt",
-            "filename": "foo.txt",
             "size": 3,
             "timestamp": frozen_now,
+            "operation_type": BaseOperationType.UPDATE.value,
         },
     ]
     assert list(backend.read(query="foo.txt", raw_output=True)) == [b"bar"]
@@ -836,17 +831,17 @@ def test_backends_data_fs_data_backend_write_method_with_update_operation(
             "backend": "fs",
             "action": "write",
             "id": "/foo/foo.txt",
-            "filename": "foo.txt",
             "size": 0,
             "timestamp": frozen_now,
+            "operation_type": BaseOperationType.UPDATE.value,
         },
         {
             "backend": "fs",
             "action": "read",
             "id": "/foo/foo.txt",
-            "filename": "foo.txt",
             "size": 0,
             "timestamp": frozen_now,
+            "operation_type": None,
         },
     ]
 
@@ -861,17 +856,17 @@ def test_backends_data_fs_data_backend_write_method_with_update_operation(
             "backend": "fs",
             "action": "write",
             "id": "/foo/bar.txt",
-            "filename": "bar.txt",
             "size": 3,
             "timestamp": frozen_now,
+            "operation_type": BaseOperationType.UPDATE.value,
         },
         {
             "backend": "fs",
             "action": "read",
             "id": "/foo/bar.txt",
-            "filename": "bar.txt",
             "size": 3,
             "timestamp": frozen_now,
+            "operation_type": None,
         },
     ]
 
@@ -919,25 +914,25 @@ def test_backends_data_fs_data_backend_write_method_with_append_operation(
             "backend": "fs",
             "action": "read",
             "id": "/foo/foo.txt",
-            "filename": "foo.txt",
             "size": 3,
             "timestamp": frozen_now,
+            "operation_type": None,
         },
         {
             "backend": "fs",
             "action": "write",
             "id": "/foo/foo.txt",
-            "filename": "foo.txt",
             "size": len(expected[0]),
             "timestamp": frozen_now,
+            "operation_type": BaseOperationType.APPEND.value,
         },
         {
             "backend": "fs",
             "action": "read",
             "id": "/foo/foo.txt",
-            "filename": "foo.txt",
             "size": len(expected[0]),
             "timestamp": frozen_now,
+            "operation_type": None,
         },
     ]
 
@@ -973,16 +968,16 @@ def test_backends_data_fs_data_backend_write_method_without_target(
             "backend": "fs",
             "action": "write",
             "id": f"/{expected_filename}",
-            "filename": expected_filename,
             "size": 6,
             "timestamp": frozen_now,
+            "operation_type": BaseOperationType.CREATE.value,
         },
         {
             "backend": "fs",
             "action": "read",
             "id": f"/{expected_filename}",
-            "filename": expected_filename,
             "size": 6,
             "timestamp": frozen_now,
+            "operation_type": None,
         },
     ]

@@ -18,7 +18,7 @@ from ralph.backends.data.base import (
     DataBackendStatus,
     enforce_query_checks,
 )
-from ralph.backends.mixins import HistoryMixin
+from ralph.backends.mixins import HistoryEntry, HistoryMixin
 from ralph.conf import BaseSettingsConfig
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import now
@@ -196,17 +196,13 @@ class FSDataBackend(HistoryMixin, BaseDataBackend):
 
             # The file has been read, add a new entry to the history.
             self.append_to_history(
-                {
-                    "backend": self.name,
-                    "action": "read",
-                    # WARNING: previously only the file name was used as the ID
-                    # By changing this to the absolute file path, previously fetched
-                    # files will not be marked as read anymore.
-                    "id": str(path.absolute()),
-                    "filename": path.name,
-                    "size": path.stat().st_size,
-                    "timestamp": now(),
-                }
+                HistoryEntry(
+                    backend=self.name,
+                    action="read",
+                    id=str(path.absolute()),
+                    size=path.stat().st_size,
+                    timestamp=now(),
+                )
             )
 
     def write(  # pylint: disable=too-many-arguments
@@ -289,17 +285,14 @@ class FSDataBackend(HistoryMixin, BaseDataBackend):
 
         # The file has been created, add a new entry to the history.
         self.append_to_history(
-            {
-                "backend": self.name,
-                "action": "write",
-                # WARNING: previously only the file name was used as the ID
-                # By changing this to the absolute file path, previously written
-                # files will not be marked as written anymore.
-                "id": str(path.absolute()),
-                "filename": path.name,
-                "size": path.stat().st_size,
-                "timestamp": now(),
-            }
+            HistoryEntry(
+                backend=self.name,
+                action="write",
+                id=str(path.absolute()),
+                size=path.stat().st_size,
+                timestamp=now(),
+                operation_type=operation_type,
+            )
         )
         return 1
 

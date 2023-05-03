@@ -4,8 +4,9 @@ import json
 import os.path
 from pathlib import Path
 
-from ralph.backends.mixins import HistoryMixin
+from ralph.backends.mixins import HistoryEntry, HistoryMixin
 from ralph.conf import Settings, settings
+from ralph.utils import now
 
 
 def test_backends_mixins_history_mixin_empty_history(settings_fs):
@@ -84,19 +85,18 @@ def test_backends_mixins_history_mixin_clean_history(fs, settings_fs):
 
     # Add history events
     events = [
-        {"command": "foo"},
-        {"command": "bar"},
-        {"command": "foo"},
-        {"command": "lol"},
-        {"command": "bar"},
+        {"action": "read"},
+        {"action": "write"},
+        {"action": "read"},
+        {"action": "write"},
+        {"action": "read"},
     ]
     fs.create_file(settings.HISTORY_FILE, contents=json.dumps(events))
 
-    history.clean_history(lambda event: event.get("command") == "foo")
+    history.clean_history(lambda event: event.get("action") == "read")
     assert history.history == [
-        {"command": "bar"},
-        {"command": "lol"},
-        {"command": "bar"},
+        {"action": "write"},
+        {"action": "write"},
     ]
 
 
@@ -111,12 +111,45 @@ def test_backends_mixins_history_mixin_append_to_history(fs):
     fs.create_dir(str(settings.APP_DIR))
 
     # Write history
-    events = [{"event": "foo"}]
+    timestamp_foo = now()
+    events = [
+        {
+            "backend": "foo",
+            "action": "read",
+            "id": "foo_id",
+            "size": 3,
+            "timestamp": timestamp_foo,
+        }
+    ]
     history.write_history(events)
 
     # Append new event
-    history.append_to_history({"event": "bar"})
-    expected = [{"event": "foo"}, {"event": "bar"}]
+    timestamp_bar = now()
+    history.append_to_history(
+        {
+            "backend": "bar",
+            "action": "read",
+            "id": "bar_id",
+            "size": 3,
+            "timestamp": timestamp_bar,
+        }
+    )
+    expected = [
+        {
+            "backend": "foo",
+            "action": "read",
+            "id": "foo_id",
+            "size": 3,
+            "timestamp": timestamp_foo,
+        },
+        {
+            "backend": "bar",
+            "action": "read",
+            "id": "bar_id",
+            "size": 3,
+            "timestamp": timestamp_bar,
+        },
+    ]
     assert settings.HISTORY_FILE.read_text(
         encoding=settings.LOCALE_ENCODING
     ) == json.dumps(expected)

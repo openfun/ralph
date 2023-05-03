@@ -607,12 +607,12 @@ def test_cli_list_command_with_fs_backend(fs, monkeypatch):
     ]
     archive_list_details = [
         {
-            "filename": "file1",
+            "id": "file1",
             "modified_at": "1604661859",
             "size": 350,
         },
         {
-            "filename": "file2",
+            "id": "file2",
             "created_at": "1604935848",
             "size": 25000,
         },
