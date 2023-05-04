@@ -13,6 +13,7 @@ and this project adheres to
 - Upgrade `sentry_sdk` to `1.20.0`
 - LRS `/statements` `GET` method returns a code 400 with certain parameters
 as per the xAPI specification
+- Use batch/v1 api in cronjob_pipeline manifest
 
 ## [3.5.1] - 2023-04-18
 
