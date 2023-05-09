@@ -120,9 +120,14 @@ def test_utils_set_dict_value_from_path_updating_fields():
 
 
 def test_utils_assert_statement_get_responses_are_equivalent():
-    """Test the equivalency assertion for get responses."""
+    """Test the equivalency assertion for get responses.
+    
+    Equivalency (term NOT in specifaction) means that two statements have 
+    identical values on all fields except `authority`, `stored` and `timestamp`
+    (where the value may or may not be identical).
+    """
     statement_1 = {
-        "actor": "actor_1",
+        "actor": {"actor_field": "actor_1"},
         "verb": "verb_1",
         "object": "object_1",
         "id": "id_1",
@@ -136,7 +141,7 @@ def test_utils_assert_statement_get_responses_are_equivalent():
     }
 
     statement_2 = {
-        "actor": "actor_1",
+        "actor": {"actor_field": "actor_1"},
         "verb": "verb_1",
         "object": "object_1",
         "id": "id_1",
@@ -150,7 +155,7 @@ def test_utils_assert_statement_get_responses_are_equivalent():
     }
 
     statement_3 = {
-        "actor": "actor_3",
+        "actor": {"actor_field": "actor_3"},
         "verb": "verb_1",
         "object": "object_1",
         "id": "id_1",
