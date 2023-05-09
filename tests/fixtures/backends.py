@@ -21,6 +21,7 @@ from httpx import AsyncClient, ConnectError
 from pymongo import MongoClient
 from pymongo.errors import CollectionInvalid
 
+from ralph.backends.data.clickhouse import ClickHouseDataBackend
 from ralph.backends.data.fs import FSDataBackend, FSDataBackendSettings
 from ralph.backends.data.ldp import LDPDataBackend
 from ralph.backends.data.s3 import S3DataBackend, S3DataBackendSettings
@@ -28,6 +29,7 @@ from ralph.backends.data.swift import SwiftDataBackend, SwiftDataBackendSettings
 from ralph.backends.database.clickhouse import ClickHouseDatabase
 from ralph.backends.database.es import ESDatabase
 from ralph.backends.database.mongo import MongoDatabase
+from ralph.backends.lrs.clickhouse import ClickHouseLRSBackend
 from ralph.backends.storage.s3 import S3Storage
 from ralph.backends.storage.swift import SwiftStorage
 from ralph.conf import ClickhouseClientOptions, Settings, core_settings
@@ -337,6 +339,59 @@ def ldp_backend(settings_fs):
         return LDPDataBackend(settings)
 
     return get_ldp_data_backend
+
+
+@pytest.fixture
+def clickhouse_backend():
+    """Return the `get_clickhouse_data_backend` function."""
+    # pylint: disable=invalid-name,redefined-outer-name
+
+    def get_clickhouse_data_backend():
+        """Return an instance of ClickHouseDataBackend."""
+        settings = ClickHouseDataBackend.settings_class(
+            HOST=CLICKHOUSE_TEST_HOST,
+            PORT=CLICKHOUSE_TEST_PORT,
+            DATABASE=CLICKHOUSE_TEST_DATABASE,
+            EVENT_TABLE_NAME=CLICKHOUSE_TEST_TABLE_NAME,
+            USERNAME="default",
+            PASSWORD="",
+            CLIENT_OPTIONS={
+                "date_time_input_format": "best_effort",
+                "allow_experimental_object_type": 1,
+            },
+            DEFAULT_CHUNK_SIZE=500,
+            LOCALE_ENCODING="utf8",
+        )
+        return ClickHouseDataBackend(settings)
+
+    return get_clickhouse_data_backend
+
+
+@pytest.fixture
+def clickhouse_lrs_backend():
+    """Return the `get_clickhouse_lrs_backend` function."""
+    # pylint: disable=invalid-name,redefined-outer-name
+
+    def get_clickhouse_lrs_backend():
+        """Return an instance of ClickHouseLRSBackend."""
+        settings = ClickHouseLRSBackend.settings_class(
+            HOST=CLICKHOUSE_TEST_HOST,
+            PORT=CLICKHOUSE_TEST_PORT,
+            DATABASE=CLICKHOUSE_TEST_DATABASE,
+            EVENT_TABLE_NAME=CLICKHOUSE_TEST_TABLE_NAME,
+            USERNAME="default",
+            PASSWORD="",
+            CLIENT_OPTIONS={
+                "date_time_input_format": "best_effort",
+                "allow_experimental_object_type": 1,
+            },
+            DEFAULT_CHUNK_SIZE=500,
+            LOCALE_ENCODING="utf8",
+            IDS_CHUNK_SIZE=10000,
+        )
+        return ClickHouseLRSBackend(settings)
+
+    return get_clickhouse_lrs_backend
 
 
 @pytest.fixture
