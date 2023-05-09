@@ -10,7 +10,8 @@ and this project adheres to
 
 ### Changed
 
-- Upgrade `sentry_sdk` to `1.20.0`
+- Upgrade `sentry_sdk` to `1.22.2`
+- Upgrade `uvicorn` to `0.22.0`
 - LRS `/statements` `GET` method returns a code 400 with certain parameters
 as per the xAPI specification
 - Use batch/v1 api in cronjob_pipeline manifest
@@ -22,8 +23,8 @@ as per the xAPI specification
 
 - Upgrade `httpx` to `0.24.0`
 - Upgrade `fastapi` to `0.95.1`
-- Upgrade `sentry_sdk` to `1.21.1`
-- Upgrade `uvicorn` to `0.22.0`
+- Upgrade `sentry_sdk` to `1.19.1`
+- Upgrade `uvicorn` to `0.21.1`
 
 ### Fixed
 
