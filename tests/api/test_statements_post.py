@@ -118,10 +118,12 @@ def test_api_statements_post_pre_processing(
     assert "id" in response.json()['statements'][0]
 
     # Test pre-processing: timestamp
-    assert string_is_date(response.json()["statements"][0].get("timestamp"))
+    assert "timestamp" in response.json()["statements"][0]
+    assert string_is_date(response.json()["statements"][0]["timestamp"])
 
     # Test pre-processing: stored
-    assert string_is_date(response.json()["statements"][0].get("stored"))
+    assert "stored" in response.json()["statements"][0]
+    assert string_is_date(response.json()["statements"][0]["stored"])
 
     # Test pre-processing: authority
     # TODO
