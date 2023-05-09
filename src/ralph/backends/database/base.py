@@ -63,6 +63,7 @@ class StatementParameters:
     format: Optional[Literal["ids", "exact", "canonical"]] = "exact"
     attachments: Optional[bool] = False
     ascending: Optional[bool] = False
+    mine: Optional[bool] = True
     search_after: Optional[str] = None
     pit_id: Optional[str] = None
 

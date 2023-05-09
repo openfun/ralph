@@ -63,6 +63,7 @@ def _pre_process_statement(current_user: AuthenticatedUser, statement: dict):#, 
 
     # authority: Information about whom or what has asserted that this statement is true
     # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#249-authority
+    # authority = current_user.infer_authority()
     # if "authority" in statement and statement["authority"] != authority:
     #     logger.error(
     #         "Failed to index submitted statements. Submitted authority does not match."
@@ -75,7 +76,7 @@ def _pre_process_statement(current_user: AuthenticatedUser, statement: dict):#, 
     #         )
     #     )
     # else:
-    #     statement["authority"] = current_user.get_authority()
+    #     statement["authority"] = authority
 
     # stored: The time at which a Statement is stored by the LRS
     # https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Data.md#248-stored
@@ -212,6 +213,14 @@ async def get(
     ascending: Optional[bool] = Query(
         False, description='If "true", return results in ascending order of stored time'
     ),
+    mine: Optional[bool] = Query(
+        False, description=(
+            'If "true", add an `authority` filter matching the current user to the '
+            'query. This option must be set to "true" for users that do not have '
+            'scopes "/statements/read" or "/all/read", or "/all".'
+         ),
+    ),
+
     ###
     # Private use query string parameters
     ###
@@ -279,10 +288,26 @@ async def get(
         )
     
     ### Scope validation
+    # If widest scope is "/statements/read/mine", force user to use "mine"
+    # This allows `GET /statements` to be deterministic
+    # NB: This custom logic is NOT in the xAPI specification
+    if not mine:
+        if all(scope not in current_user.scopes for scope in ["all", "all/read", "statements/read"]):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=(
+                    "Scope `/statements/read/mine` only allows access to own statements. "
+                    "To use this endpoint, your query must include the option `mine=True`. "
+                    "This will add a filter to query statements matching your authority:"
+                    # TODO: print user authority
+                ),
+            )        
+       
+    # TODO: Add `authority` if using `mine`
+    if mine:
+        pass
 
-    # If widest scope is /statements/read/mine, force user to specify authority
-
-    # Query Database
+    ### Query Database
     try:
         query_result = DATABASE_CLIENT.query_statements(
             StatementParameters(**{**request.query_params, "limit": limit})

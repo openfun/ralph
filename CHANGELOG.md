@@ -6,13 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
 
 ### Changed
+
+- Add pre-processing to enrich incoming statements
+- Changed `authenticated_user` to `authenticate_user`
 
 - Upgrade `sentry_sdk` to `1.20.0`
 - LRS `/statements` `GET` method returns a code 400 with certain parameters
 as per the xAPI specification
+
+- Add `mine` option to `GET /statements`
+- Add scope mechanism to restrict endpoint access
 
 ## [3.5.1] - 2023-04-18
 
