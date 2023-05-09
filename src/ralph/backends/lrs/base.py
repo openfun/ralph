@@ -1,46 +1,64 @@
-"""Base data backend for Ralph."""
+"""Base LRS backend for Ralph."""
 
 from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Literal, Optional
+from typing import Iterator, List, Literal, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
 
-from ralph.backends.data.base import BaseDataBackend
+from ralph.backends.data.base import BaseDataBackend, BaseDataBackendSettings
+
+
+class BaseLRSBackendSettings(BaseDataBackendSettings):
+    """LRS backend default configuration."""
 
 
 @dataclass
 class StatementQueryResult:
-    """Represents a common interface for results of an LRS statements query."""
+    """Result of an LRS statements query."""
 
     statements: List[dict]
     pit_id: str
     search_after: str
 
 
+class AgentParameters(BaseModel):
+    """LRS query parameters for query on type Agent.
+
+    NB: Agent refers to the data structure, NOT to the LRS query parameter.
+    """
+
+    mbox: Optional[str]
+    mbox_sha1sum: Optional[str]
+    openid: Optional[str]
+    account__name: Optional[str]
+    account__home_page: Optional[str]
+
+
 class StatementParameters(BaseModel):
-    """Represents a dictionary of possible LRS query parameters."""
+    """LRS statements query parameters."""
 
     # pylint: disable=too-many-instance-attributes
 
-    statementId: Optional[str] = None  # pylint: disable=invalid-name
-    voidedStatementId: Optional[str] = None  # pylint: disable=invalid-name
-    agent: Optional[str] = None
-    verb: Optional[str] = None
-    activity: Optional[str] = None
-    registration: Optional[UUID] = None
-    related_activities: Optional[bool] = False
-    related_agents: Optional[bool] = False
-    since: Optional[datetime] = None
-    until: Optional[datetime] = None
-    limit: Optional[int] = None
+    statementId: Optional[str]  # pylint: disable=invalid-name
+    voidedStatementId: Optional[str]  # pylint: disable=invalid-name
+    agent: Optional[AgentParameters]
+    verb: Optional[str]
+    activity: Optional[str]
+    registration: Optional[UUID]
+    related_activities: Optional[bool]
+    related_agents: Optional[bool]
+    since: Optional[datetime]
+    until: Optional[datetime]
+    limit: Optional[int]
     format: Optional[Literal["ids", "exact", "canonical"]] = "exact"
-    attachments: Optional[bool] = False
-    ascending: Optional[bool] = False
-    search_after: Optional[str] = None
-    pit_id: Optional[str] = None
+    attachments: Optional[bool]
+    ascending: Optional[bool]
+    search_after: Optional[str]
+    pit_id: Optional[str]
+    authority: Optional[AgentParameters]
 
 
 class BaseLRSBackend(BaseDataBackend):
@@ -48,8 +66,8 @@ class BaseLRSBackend(BaseDataBackend):
 
     @abstractmethod
     def query_statements(self, params: StatementParameters) -> StatementQueryResult:
-        """Returns the statements query payload using xAPI parameters."""
+        """Return the statements query payload using xAPI parameters."""
 
     @abstractmethod
-    def query_statements_by_ids(self, ids: List[str]) -> list:
-        """Returns the list of matching statement IDs from the database."""
+    def query_statements_by_ids(self, ids: List[str]) -> Iterator[dict]:
+        """Yield statements with matching ids from the backend."""
