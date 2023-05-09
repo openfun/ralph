@@ -222,6 +222,11 @@ lint-pydocstyle: ## lint Python docstrings with pydocstyle
 	@$(COMPOSE_TEST_RUN_APP) pydocstyle
 .PHONY: lint-pydocstyle
 
+lint-mypy: ## lint back-end python sources with mypy
+	@echo 'lint:mypy started…'
+	@$(COMPOSE_TEST_RUN_APP) mypy
+.PHONY: lint-mypy
+
 logs: ## display app logs (follow mode)
 	@$(COMPOSE) logs -f app
 .PHONY: logs
