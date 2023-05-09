@@ -15,6 +15,8 @@ from .fixtures.auth import (  # noqa: F401
 from .fixtures.backends import (  # noqa: F401
     anyio_backend,
     clickhouse,
+    clickhouse_backend,
+    clickhouse_lrs_backend,
     es,
     es_data_stream,
     es_forwarding,
