@@ -84,6 +84,7 @@ ralph:
   prefix: "traefik"
   acme_enabled_route_prefix: "traefik.acme"
   secret_name: "secret-ralph"
+  sentry_ignore_health_checks: false
   volume_history:
     size: 2Gi
     access_modes: ReadWriteMany
