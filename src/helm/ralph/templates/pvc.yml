@@ -1,14 +1,16 @@
+{{- if and .Values.persistence.enabled (not .Values.persistence.existingClaim) -}}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: ralph-pvc-history
+  name: {{ printf "%s-pvc" (include "ralph.fullname" .) }}
   namespace: {{ .Values.namespace }}
   labels:
     {{- include "ralph.labels" . | nindent 4 }}
 spec:
   accessModes:
-    - {{ .Values.ralph.volume_history.access_modes }}
+    - {{ .Values.persistence.accessModes }}
   resources:
     requests:
-      storage: {{ .Values.ralph.volume_history.size }}
-  storageClassName: {{ .Values.ralph.volume_history.storage_class }}
+      storage: {{ .Values.persistence.size }}
+  storageClassName: {{ .Values.persistence.storageClass }}
+{{- end -}}

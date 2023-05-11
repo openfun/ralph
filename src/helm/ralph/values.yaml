@@ -20,6 +20,14 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+dependencies:
+  mongodb:
+    enabled: false
+  clickhouse:
+    enabled: false
+  elasticsearch:
+    enabled: false
+
 podAnnotations: {}
 
 securityContext:
@@ -36,6 +44,14 @@ ingress:
   annotations:
     # kubernetes.io/ingress.class: traefik
     cert-manager.io/issuer: letsencrypt
+
+persistence:
+  enabled: true
+  storageClass: "local-storage"
+  accessModes:
+    - ReadWriteMany
+  size: 2Gi
+  existingClaim: ""
 
 affinity:
   podAntiAffinity:

@@ -76,8 +76,12 @@ spec:
               mountPath: /var/run/ralph/
       volumes:
         - name: ralph-v-history
+        {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: ralph-pvc-history
+            claimName: {{ .Values.persistence.existingClaim | default (printf "%s-pvc" (include "ralph.fullname" .)) }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
         {{- if .Values.ralph.elastic.mount_ca_secret }}
         - name: es-ca-certificate
           secret:

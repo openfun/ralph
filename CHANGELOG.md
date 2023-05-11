@@ -9,6 +9,15 @@ and this project adheres to
 ## [Unreleased]
 
 ### Changed
+General improvement for the Helm Chart:
+- add dependencies for MongoDB and Clickhouse
+- make persistence optional
+- allow use existing PVC
+- remove prefix label from ingress object name
+- add missing namespace label
+- make object name consistent
+
+### Changed
 
 - Upgrade `fastapi` to `0.98.0`
 - Upgrade `sentry_sdk` to `1.26.0`

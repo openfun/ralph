@@ -2,17 +2,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  labels:
-    {{- include "ralph.labels" . | nindent 4 }}
-    service_prefix: {{ .Values.ralph.prefix }}
-  name: "ralph-app-{{ .Values.ralph.prefix }}"
-  namespace: {{ .Values.namespace }}
+  labels: {{- include "ralph.labels" . | nindent 4}}
+  name: {{include "ralph.fullname" .}}
+  namespace: {{.Values.namespace}}
 spec:
   ports:
-  - name: "{{ .Values.ralph_lrs.port }}-tcp"
-    port: {{ .Values.ralph_lrs.port }}
-    protocol: TCP
-    targetPort: {{ .Values.ralph_lrs.port }}
+    - name: "{{ .Values.ralph_lrs.port }}-tcp"
+      port: {{.Values.ralph_lrs.port}}
+      protocol: TCP
+      targetPort: {{.Values.ralph_lrs.port}}
   type: ClusterIP
-  selector:
-    {{- include "ralph.selectorLabels" . | nindent 4 }}
+  selector: {{- include "ralph.selectorLabels" . | nindent 4}}
