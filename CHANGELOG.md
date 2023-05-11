@@ -16,6 +16,7 @@ and this project adheres to
 as per the xAPI specification
 - Use batch/v1 api in cronjob_pipeline manifest
 - Use autoscaling/v2 in HorizontalPodAutoscaler manifest
+- Add the ability to ignore health check routes for Sentry transactions
 
 ### Fixed
 
