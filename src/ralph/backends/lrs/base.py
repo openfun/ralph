@@ -3,7 +3,7 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Literal, Optional
+from typing import List, Literal, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -15,7 +15,7 @@ from ralph.backends.data.base import BaseDataBackend
 class StatementQueryResult:
     """Represents a common interface for results of an LRS statements query."""
 
-    statements: list[dict]
+    statements: List[dict]
     pit_id: str
     search_after: str
 
@@ -51,5 +51,5 @@ class BaseLRSBackend(BaseDataBackend):
         """Returns the statements query payload using xAPI parameters."""
 
     @abstractmethod
-    def query_statements_by_ids(self, ids: list[str]) -> list:
+    def query_statements_by_ids(self, ids: List[str]) -> list:
         """Returns the list of matching statement IDs from the database."""
