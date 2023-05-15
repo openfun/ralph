@@ -26,6 +26,7 @@ from .fixtures.backends import (  # noqa: F401
     s3,
     settings_fs,
     swift,
+    swift_backend,
     ws,
 )
 from .fixtures.logs import gelf_logger  # noqa: F401
