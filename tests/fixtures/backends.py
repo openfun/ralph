@@ -23,6 +23,7 @@ from pymongo import MongoClient
 from pymongo.errors import CollectionInvalid
 
 from ralph.backends.data.fs import FSDataBackend, FSDataBackendSettings
+from ralph.backends.data.swift import SwiftDataBackend, SwiftDataBackendSettings
 from ralph.backends.database.clickhouse import ClickHouseDatabase
 from ralph.backends.database.es import ESDatabase
 from ralph.backends.database.mongo import MongoDatabase
@@ -351,6 +352,31 @@ def swift():
         )
 
     return get_swift_storage
+
+
+@pytest.fixture
+def swift_backend():
+    """Returns get_swift_data_backend function."""
+
+    def get_swift_data_backend():
+        """Returns an instance of SwiftDataBackend."""
+        settings = SwiftDataBackendSettings(
+            AUTH_URL="https://auth.cloud.ovh.net/",
+            USERNAME="os_username",
+            PASSWORD="os_password",
+            IDENTITY_API_VERSION="3",
+            TENANT_ID="os_tenant_id",
+            TENANT_NAME="os_tenant_name",
+            PROJECT_DOMAIN_NAME="Default",
+            REGION_NAME="os_region_name",
+            OBJECT_STORAGE_URL="os_storage_url/ralph_logs_container",
+            USER_DOMAIN_NAME="Default",
+            DEFAULT_CONTAINER="container_name",
+            LOCALE_ENCODING="utf8",
+        )
+        return SwiftDataBackend(settings)
+
+    return get_swift_data_backend
 
 
 @pytest.fixture()
