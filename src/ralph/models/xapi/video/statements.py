@@ -3,48 +3,46 @@
 from typing import Optional
 
 from ...selector import selector
-from ..base import BaseXapiModel
-from .fields.contexts import (
-    VideoCompletedContextField,
-    VideoEnableClosedCaptioningContextField,
-    VideoInitializedContextField,
-    VideoPausedContextField,
-    VideoPlayedContextField,
-    VideoScreenChangeInteractionContextField,
-    VideoSeekedContextField,
-    VideoTerminatedContextField,
-    VideoVolumeChangeInteractionContextField,
+from ..base.statements import BaseXapiStatement
+from ..concepts.activity_types.video import VideoActivity
+from ..concepts.verbs.scorm_profile import (
+    CompletedVerb,
+    InitializedVerb,
+    InteractedVerb,
+    TerminatedVerb,
 )
-from .fields.objects import VideoObjectField
-from .fields.results import (
-    VideoCompletedResultField,
-    VideoEnableClosedCaptioningResultField,
-    VideoPausedResultField,
-    VideoPlayedResultField,
-    VideoScreenChangeInteractionResultField,
-    VideoSeekedResultField,
-    VideoTerminatedResultField,
-    VideoVolumeChangeInteractionResultField,
+from ..concepts.verbs.video import PausedVerb, PlayedVerb, SeekedVerb
+from .contexts import (
+    VideoCompletedContext,
+    VideoEnableClosedCaptioningContext,
+    VideoInitializedContext,
+    VideoPausedContext,
+    VideoPlayedContext,
+    VideoScreenChangeInteractionContext,
+    VideoSeekedContext,
+    VideoTerminatedContext,
+    VideoVolumeChangeInteractionContext,
 )
-from .fields.verbs import (
-    VideoCompletedVerbField,
-    VideoInitializedVerbField,
-    VideoInteractedVerbField,
-    VideoPausedVerbField,
-    VideoPlayedVerbField,
-    VideoSeekedVerbField,
-    VideoTerminatedVerbField,
+from .results import (
+    VideoCompletedResult,
+    VideoEnableClosedCaptioningResult,
+    VideoPausedResult,
+    VideoPlayedResult,
+    VideoScreenChangeInteractionResult,
+    VideoSeekedResult,
+    VideoTerminatedResult,
+    VideoVolumeChangeInteractionResult,
 )
 
 
-class BaseVideoStatement(BaseXapiModel):
+class BaseVideoStatement(BaseXapiStatement):
     """Pydantic model for video core statements.
 
     Attributes:
-        object (dict): See VideoObjectField.
+        object (dict): See VideoActivity.
     """
 
-    object: VideoObjectField
+    object: VideoActivity
 
 
 class VideoInitialized(BaseVideoStatement):
@@ -53,8 +51,8 @@ class VideoInitialized(BaseVideoStatement):
     Example: A video has been fully initialized.
 
     Attributes:
-        verb (dict): See VideoInitializedVerbField.
-        context (dict): See VideoInitializedContextField.
+        verb (dict): See InitializedVerb.
+        context (dict): See VideoInitializedContext.
     """
 
     __selector__ = selector(
@@ -62,8 +60,8 @@ class VideoInitialized(BaseVideoStatement):
         verb__id="http://adlnet.gov/expapi/verbs/initialized",
     )
 
-    verb: VideoInitializedVerbField = VideoInitializedVerbField()
-    context: VideoInitializedContextField
+    verb: InitializedVerb = InitializedVerb()
+    context: VideoInitializedContext
 
 
 class VideoPlayed(BaseVideoStatement):
@@ -72,9 +70,9 @@ class VideoPlayed(BaseVideoStatement):
     Example: John played the video or clicked the play button.
 
     Attributes:
-        verb (dict): See VideoPlayedVerbField.
-        result (dict): See VideoPlayedResultField.
-        context (dict): See VideoPlayedContextField.
+        verb (dict): See PlayedVerb.
+        result (dict): See VideoPlayedResult.
+        context (dict): See VideoPlayedContext.
     """
 
     __selector__ = selector(
@@ -82,9 +80,9 @@ class VideoPlayed(BaseVideoStatement):
         verb__id="https://w3id.org/xapi/video/verbs/played",
     )
 
-    verb: VideoPlayedVerbField = VideoPlayedVerbField()
-    result: VideoPlayedResultField
-    context: Optional[VideoPlayedContextField]
+    verb: PlayedVerb = PlayedVerb()
+    result: VideoPlayedResult
+    context: Optional[VideoPlayedContext]
 
 
 class VideoPaused(BaseVideoStatement):
@@ -93,9 +91,9 @@ class VideoPaused(BaseVideoStatement):
     Example: John paused the video or clicked the pause button.
 
     Attributes:
-        verb (dict): See VideoPausedVerbField.
-        result (dict): See VideoPausedResultField.
-        context (dict): See VideoPausedContextField.
+        verb (dict): See PausedVerb.
+        result (dict): See VideoPausedResult.
+        context (dict): See VideoPausedContext.
     """
 
     __selector__ = selector(
@@ -103,9 +101,9 @@ class VideoPaused(BaseVideoStatement):
         verb__id="https://w3id.org/xapi/video/verbs/paused",
     )
 
-    verb: VideoPausedVerbField = VideoPausedVerbField()
-    result: VideoPausedResultField
-    context: VideoPausedContextField
+    verb: PausedVerb = PausedVerb()
+    result: VideoPausedResult
+    context: VideoPausedContext
 
 
 class VideoSeeked(BaseVideoStatement):
@@ -115,9 +113,9 @@ class VideoSeeked(BaseVideoStatement):
         video.
 
     Attributes:
-        verb (dict): See VideoSeekedVerbField.
-        result (dict): See VideoSeekedResultField.
-        context (dict): See VideoSeekedContextField.
+        verb (dict): See SeekedVerb.
+        result (dict): See VideoSeekedResult.
+        context (dict): See VideoSeekedContext.
     """
 
     __selector__ = selector(
@@ -125,9 +123,9 @@ class VideoSeeked(BaseVideoStatement):
         verb__id="https://w3id.org/xapi/video/verbs/seeked",
     )
 
-    verb: VideoSeekedVerbField = VideoSeekedVerbField()
-    result: VideoSeekedResultField
-    context: Optional[VideoSeekedContextField]
+    verb: SeekedVerb = SeekedVerb()
+    result: VideoSeekedResult
+    context: Optional[VideoSeekedContext]
 
 
 class VideoCompleted(BaseVideoStatement):
@@ -136,9 +134,9 @@ class VideoCompleted(BaseVideoStatement):
     Example: John completed a video by watching major parts of the video at least once.
 
     Attributes:
-        verb (dict): See VideoCompletedVerbField.
-        result (dict): See VideoCompletedResultField.
-        context (dict): See VideoCompletedContextField.
+        verb (dict): See CompletedVerb.
+        result (dict): See VideoCompletedResult.
+        context (dict): See VideoCompletedContext.
     """
 
     __selector__ = selector(
@@ -146,9 +144,9 @@ class VideoCompleted(BaseVideoStatement):
         verb__id="http://adlnet.gov/expapi/verbs/completed",
     )
 
-    verb: VideoCompletedVerbField = VideoCompletedVerbField()
-    result: VideoCompletedResultField
-    context: VideoCompletedContextField
+    verb: CompletedVerb = CompletedVerb()
+    result: VideoCompletedResult
+    context: VideoCompletedContext
 
 
 class VideoTerminated(BaseVideoStatement):
@@ -157,9 +155,9 @@ class VideoTerminated(BaseVideoStatement):
     Example: John ended a video (quit the player).
 
     Attributes:
-        verb (dict): See VideoTerminatedVerbField.
-        result (dict): See VideoTerminatedResultField.
-        context (dict): See VideoTerminatedContextField.
+        verb (dict): See TerminatedVerb.
+        result (dict): See VideoTerminatedResult.
+        context (dict): See VideoTerminatedContext.
     """
 
     __selector__ = selector(
@@ -167,9 +165,9 @@ class VideoTerminated(BaseVideoStatement):
         verb__id="http://adlnet.gov/expapi/verbs/terminated",
     )
 
-    verb: VideoTerminatedVerbField = VideoTerminatedVerbField()
-    result: VideoTerminatedResultField
-    context: VideoTerminatedContextField
+    verb: TerminatedVerb = TerminatedVerb()
+    result: VideoTerminatedResult
+    context: VideoTerminatedContext
 
 
 class VideoEnableClosedCaptioning(BaseVideoStatement):
@@ -178,9 +176,9 @@ class VideoEnableClosedCaptioning(BaseVideoStatement):
     Example: John interacted with the player to enable closed captioning.
 
     Attributes:
-        verb (dict): See VideoInteractedVerbField.
-        result (dict): See VideoEnableClosedCaptioningResultField.
-        context (dict): See VideoEnableClosedCaptioningContextField.
+        verb (dict): See InteractedVerb.
+        result (dict): See VideoEnableClosedCaptioningResult.
+        context (dict): See VideoEnableClosedCaptioningContext.
     """
 
     __selector__ = selector(
@@ -188,9 +186,9 @@ class VideoEnableClosedCaptioning(BaseVideoStatement):
         verb__id="http://adlnet.gov/expapi/verbs/interacted",
     )
 
-    verb: VideoInteractedVerbField = VideoInteractedVerbField()
-    result: VideoEnableClosedCaptioningResultField
-    context: VideoEnableClosedCaptioningContextField
+    verb: InteractedVerb = InteractedVerb()
+    result: VideoEnableClosedCaptioningResult
+    context: VideoEnableClosedCaptioningContext
 
 
 class VideoVolumeChangeInteraction(BaseVideoStatement):
@@ -198,10 +196,10 @@ class VideoVolumeChangeInteraction(BaseVideoStatement):
 
     Example: John interacted with the player to change the volume.
 
-    Attributes:
-        verb (dict): See VideoInteractedVerbField.
-        result (dict): See VideoVolumeChangeInteractionResultField.
-        context (dict): See VideoVolumeChangeInteractionContextField.
+    Attributes :
+        verb (dict): See InteractedVerb.
+        result (dict): See VideoVolumeChangeInteractionResult.
+        context (dict): See VideoVolumeChangeInteractionContext.
     """
 
     __selector__ = selector(
@@ -209,9 +207,9 @@ class VideoVolumeChangeInteraction(BaseVideoStatement):
         verb__id="http://adlnet.gov/expapi/verbs/interacted",
     )
 
-    verb: VideoInteractedVerbField = VideoInteractedVerbField()
-    result: VideoVolumeChangeInteractionResultField
-    context: VideoVolumeChangeInteractionContextField
+    verb: InteractedVerb = InteractedVerb()
+    result: VideoVolumeChangeInteractionResult
+    context: VideoVolumeChangeInteractionContext
 
 
 class VideoScreenChangeInteraction(BaseVideoStatement):
@@ -220,9 +218,9 @@ class VideoScreenChangeInteraction(BaseVideoStatement):
     Example: John interacted with the player to activate or deactivate full screen.
 
     Attributes:
-        verb (dict): See VideoInteractedVerbField.
-        result (dict): See VideoScreenChangeInteractionResultField.
-        context (dict): See VideoScreenChangeInteractionContextField.
+        verb (dict): See InteractedVerb.
+        result (dict): See VideoScreenChangeInteractionResult.
+        context (dict): See VideoScreenChangeInteractionContext.
     """
 
     __selector__ = selector(
@@ -230,6 +228,6 @@ class VideoScreenChangeInteraction(BaseVideoStatement):
         verb__id="http://adlnet.gov/expapi/verbs/interacted",
     )
 
-    verb: VideoInteractedVerbField = VideoInteractedVerbField()
-    result: VideoScreenChangeInteractionResultField
-    context: VideoScreenChangeInteractionContextField
+    verb: InteractedVerb = InteractedVerb()
+    result: VideoScreenChangeInteractionResult
+    context: VideoScreenChangeInteractionContext

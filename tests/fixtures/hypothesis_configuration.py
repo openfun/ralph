@@ -6,7 +6,7 @@ from hypothesis import provisional, settings
 from hypothesis import strategies as st
 from pydantic import AnyHttpUrl, AnyUrl, StrictStr
 
-from ralph.models.xapi.fields.common import IRI, LanguageTag, MailtoEmail
+from ralph.models.xapi.base.common import IRI, LanguageTag, MailtoEmail
 
 settings.register_profile("development", max_examples=1)
 settings.load_profile("development")

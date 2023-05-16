@@ -22,12 +22,12 @@ from ralph.api.forwarding import forward_xapi_statements, get_active_xapi_forwar
 from ralph.backends.database.base import BaseDatabase, StatementParameters
 from ralph.conf import settings
 from ralph.exceptions import BackendException, BadFormatException
-from ralph.models.xapi.fields.actors import (
-    AccountActorField,
-    AgentActorField,
-    MboxActorField,
-    MboxSha1SumActorField,
-    OpenIdActorField,
+from ralph.models.xapi.base.agents import (
+    BaseXapiAgent,
+    BaseXapiAgentWithAccount,
+    BaseXapiAgentWithMbox,
+    BaseXapiAgentWithMboxSha1Sum,
+    BaseXapiAgentWithOpenId,
 )
 
 from ..auth import authenticated_user
@@ -240,17 +240,17 @@ async def get(
     query_params = dict(request.query_params)
     if query_params.get("agent") is not None:
         # Transform agent to `dict` as FastAPI cannot parse JSON (seen as string)
-        agent = parse_raw_as(AgentActorField, query_params["agent"])
+        agent = parse_raw_as(BaseXapiAgent, query_params["agent"])
 
         query_params.pop("agent")
 
-        if isinstance(agent, MboxActorField):
+        if isinstance(agent, BaseXapiAgentWithMbox):
             query_params["agent__mbox"] = agent.mbox
-        elif isinstance(agent, MboxSha1SumActorField):
+        elif isinstance(agent, BaseXapiAgentWithMboxSha1Sum):
             query_params["agent__mbox_sha1sum"] = agent.mbox_sha1sum
-        elif isinstance(agent, OpenIdActorField):
+        elif isinstance(agent, BaseXapiAgentWithOpenId):
             query_params["agent__openid"] = agent.openid
-        elif isinstance(agent, AccountActorField):
+        elif isinstance(agent, BaseXapiAgentWithAccount):
             query_params["agent__account__name"] = agent.account.name
             query_params["agent__account__home_page"] = agent.account.homePage
 

@@ -1,4 +1,4 @@
-"""Tests for the xAPI played statement."""
+"""Tests for the `video` xAPI profile."""
 
 import json
 
@@ -73,59 +73,115 @@ def test_models_xapi_video_interaction_validator_with_valid_statements(class_, d
 
 @custom_given(VideoInitialized)
 def test_models_xapi_video_initialized_with_valid_statement(statement):
-    """Tests that a video initialized statement has the expected verb.id."""
+    """Tests that a valid video initialized statement has the expected `verb`.`id` and
+    `object`.`definition`.`type` property values.
+    """
+
     assert statement.verb.id == "http://adlnet.gov/expapi/verbs/initialized"
+    assert (
+        statement.object.definition.type
+        == "https://w3id.org/xapi/video/activity-type/video"
+    )
 
 
 @custom_given(VideoPlayed)
 def test_models_xapi_video_played_with_valid_statement(statement):
-    """Tests that a video played statement has the expected verb.id."""
+    """Tests that a valid video played statement has the expected `verb`.`id` and
+    `object`.`definition`.`type` property values.
+    """
+
     assert statement.verb.id == "https://w3id.org/xapi/video/verbs/played"
+    assert (
+        statement.object.definition.type
+        == "https://w3id.org/xapi/video/activity-type/video"
+    )
 
 
 @custom_given(VideoPaused)
 def test_models_xapi_video_paused_with_valid_statement(statement):
-    """Tests that a video paused statement has the expected verb.id."""
+    """Tests that a video paused statement has the expected `verb`.`id` and
+    `object`.`definition`.`type` property values.
+    """
+
     assert statement.verb.id == "https://w3id.org/xapi/video/verbs/paused"
+    assert (
+        statement.object.definition.type
+        == "https://w3id.org/xapi/video/activity-type/video"
+    )
 
 
 @custom_given(VideoSeeked)
 def test_models_xapi_video_seeked_with_valid_statement(statement):
-    """Tests that a video seeked statement has the expected verb.id."""
+    """Tests that a video seeked statement has the expected `verb`.`id` and
+    `object`.`definition`.`type` property values."""
+
     assert statement.verb.id == "https://w3id.org/xapi/video/verbs/seeked"
+    assert (
+        statement.object.definition.type
+        == "https://w3id.org/xapi/video/activity-type/video"
+    )
 
 
 @custom_given(VideoCompleted)
 def test_models_xapi_video_completed_with_valid_statement(statement):
-    """Tests that a video completed statement has the expected verb.id."""
+    """Tests that a video completed statement has the expected `verb`.`id` and
+    `object`.`definition`.`type` property values.
+    """
+
     assert statement.verb.id == "http://adlnet.gov/expapi/verbs/completed"
+    assert (
+        statement.object.definition.type
+        == "https://w3id.org/xapi/video/activity-type/video"
+    )
 
 
 @custom_given(VideoTerminated)
 def test_models_xapi_video_terminated_with_valid_statement(statement):
-    """Tests that a video terminated statement has the expected verb.id."""
+    """Tests that a video terminated statement has the expected `verb`.`id` and
+    `object`.`definition`.`type` property values.
+    """
+
     assert statement.verb.id == "http://adlnet.gov/expapi/verbs/terminated"
+    assert (
+        statement.object.definition.type
+        == "https://w3id.org/xapi/video/activity-type/video"
+    )
 
 
 @custom_given(VideoEnableClosedCaptioning)
 def test_models_xapi_video_enable_closed_captioning_with_valid_statement(statement):
     """Tests that a video enable closed captioning statement has the expected
-    verb.id."""
+    `verb`.`id` and `object`.`definition`.`type` property values.
+    """
 
     assert statement.verb.id == "http://adlnet.gov/expapi/verbs/interacted"
+    assert (
+        statement.object.definition.type
+        == "https://w3id.org/xapi/video/activity-type/video"
+    )
 
 
 @custom_given(VideoVolumeChangeInteraction)
 def test_models_xapi_video_volume_change_interaction_with_valid_statement(statement):
     """Tests that a video volume change interaction statement has the expected
-    verb.id."""
+    `verb`.`id` and `object`.`definition`.`type` property values.
+    """
 
     assert statement.verb.id == "http://adlnet.gov/expapi/verbs/interacted"
+    assert (
+        statement.object.definition.type
+        == "https://w3id.org/xapi/video/activity-type/video"
+    )
 
 
 @custom_given(VideoScreenChangeInteraction)
 def test_models_xapi_video_screen_change_interaction_with_valid_statement(statement):
     """Tests that a video screen change interaction statement has the expected
-    verb.id."""
+    `verb`.`id` and `object`.`definition`.`type` property values.
+    """
 
     assert statement.verb.id == "http://adlnet.gov/expapi/verbs/interacted"
+    assert (
+        statement.object.definition.type
+        == "https://w3id.org/xapi/video/activity-type/video"
+    )

@@ -5,10 +5,12 @@ from uuid import UUID, uuid5
 
 from ralph.exceptions import ConfigurationException
 from ralph.models.converter import BaseConversionSet, ConversionItem
-from ralph.models.xapi.constants import (
-    EXTENSION_COURSE_ID,
-    EXTENSION_MODULE_ID,
-    EXTENSION_SCHOOL_ID,
+from ralph.models.xapi.concepts.constants.acrossx_profile import (
+    CONTEXT_EXTENSION_SCHOOL_ID,
+)
+from ralph.models.xapi.concepts.constants.scorm_profile import (
+    CONTEXT_EXTENSION_COURSE_ID,
+    CONTEXT_EXTENSION_MODULE_ID,
 )
 
 
@@ -51,16 +53,16 @@ class BaseXapiConverter(BaseConversionSet):
                 lambda user_id: str(user_id) if user_id else "anonymous",
             ),
             ConversionItem(
-                "object__definition__extensions__" + EXTENSION_SCHOOL_ID,
+                "object__definition__extensions__" + CONTEXT_EXTENSION_SCHOOL_ID,
                 "context__org_id",
             ),
             ConversionItem(
-                "object__definition__extensions__" + EXTENSION_COURSE_ID,
+                "object__definition__extensions__" + CONTEXT_EXTENSION_COURSE_ID,
                 "context__course_id",
                 (self.parse_course_id, lambda x: x["course"]),
             ),
             ConversionItem(
-                "object__definition__extensions__" + EXTENSION_MODULE_ID,
+                "object__definition__extensions__" + CONTEXT_EXTENSION_MODULE_ID,
                 "context__course_id",
                 (self.parse_course_id, lambda x: x["module"]),
             ),
