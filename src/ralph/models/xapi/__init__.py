@@ -14,3 +14,20 @@ from .video.statements import (
     VideoTerminated,
     VideoVolumeChangeInteraction,
 )
+from .virtual_classroom.statements import (
+    VirtualClassroomAnsweredPoll,
+    VirtualClassroomInitialized,
+    VirtualClassroomJoined,
+    VirtualClassroomLeft,
+    VirtualClassroomLoweredHand,
+    VirtualClassroomMuted,
+    VirtualClassroomPostedPublicMessage,
+    VirtualClassroomRaisedHand,
+    VirtualClassroomSharedScreen,
+    VirtualClassroomStartedCamera,
+    VirtualClassroomStartedPoll,
+    VirtualClassroomStoppedCamera,
+    VirtualClassroomTerminated,
+    VirtualClassroomUnmuted,
+    VirtualClassroomUnsharedScreen,
+)

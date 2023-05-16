@@ -8,8 +8,9 @@ and this project adheres to
 
 ## [Unreleased]
 
-## Added
+### Added
 
+- Implement xAPI virtual classroom pydantic models
 - Allow to insert custom endpoint url for S3 service
 
 ### Changed
