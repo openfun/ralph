@@ -8,16 +8,16 @@ from ralph.models.edx.video.statements import (
     UISeekVideo,
     UIStopVideo,
 )
-from ralph.models.xapi.constants import LANG_EN_US_DISPLAY
-from ralph.models.xapi.video.constants import (
-    VIDEO_EXTENSION_LENGTH,
-    VIDEO_EXTENSION_PROGRESS,
-    VIDEO_EXTENSION_SESSION_ID,
-    VIDEO_EXTENSION_TIME,
-    VIDEO_EXTENSION_TIME_FROM,
-    VIDEO_EXTENSION_TIME_TO,
-    VIDEO_EXTENSION_USER_AGENT,
+from ralph.models.xapi.concepts.constants.video import (
+    CONTEXT_EXTENSION_LENGTH,
+    CONTEXT_EXTENSION_SESSION_ID,
+    CONTEXT_EXTENSION_USER_AGENT,
+    RESULT_EXTENSION_PROGRESS,
+    RESULT_EXTENSION_TIME,
+    RESULT_EXTENSION_TIME_FROM,
+    RESULT_EXTENSION_TIME_TO,
 )
+from ralph.models.xapi.constants import LANG_EN_US_DISPLAY
 from ralph.models.xapi.video.statements import (
     VideoInitialized,
     VideoPaused,
@@ -40,7 +40,7 @@ class VideoBaseXapiConverter(BaseXapiConverter):
                 ConversionItem(
                     "object__definition__name",
                     "event__id",
-                    lambda id: {LANG_EN_US_DISPLAY.__args__[0]: id},
+                    lambda id: {LANG_EN_US_DISPLAY: id},
                 ),
                 ConversionItem(
                     "object__id",
@@ -52,7 +52,7 @@ class VideoBaseXapiConverter(BaseXapiConverter):
                     + event["event"]["id"],
                 ),
                 ConversionItem(
-                    "context__extensions__" + VIDEO_EXTENSION_SESSION_ID,
+                    "context__extensions__" + CONTEXT_EXTENSION_SESSION_ID,
                     "session",
                 ),
             },
@@ -71,7 +71,7 @@ class UILoadVideoToVideoInitialized(VideoBaseXapiConverter):
         return conversion_items.union(
             {
                 ConversionItem(
-                    "context__extensions__" + VIDEO_EXTENSION_LENGTH,
+                    "context__extensions__" + CONTEXT_EXTENSION_LENGTH,
                     None,
                     # Set the video length to null by default.
                     # This information is mandatory in the xAPI template
@@ -79,11 +79,11 @@ class UILoadVideoToVideoInitialized(VideoBaseXapiConverter):
                     lambda _: 0.0,
                 ),
                 ConversionItem(
-                    "context__extensions__" + VIDEO_EXTENSION_SESSION_ID,
+                    "context__extensions__" + CONTEXT_EXTENSION_SESSION_ID,
                     "session",
                 ),
                 ConversionItem(
-                    "context__extensions__" + VIDEO_EXTENSION_USER_AGENT, "agent"
+                    "context__extensions__" + CONTEXT_EXTENSION_USER_AGENT, "agent"
                 ),
             },
         )
@@ -101,11 +101,11 @@ class UIPlayVideoToVideoPlayed(VideoBaseXapiConverter):
         return conversion_items.union(
             {
                 ConversionItem(
-                    "result__extensions__" + VIDEO_EXTENSION_TIME,
+                    "result__extensions__" + RESULT_EXTENSION_TIME,
                     "event__currentTime",
                 ),
                 ConversionItem(
-                    "context__extensions__" + VIDEO_EXTENSION_SESSION_ID,
+                    "context__extensions__" + CONTEXT_EXTENSION_SESSION_ID,
                     "session",
                 ),
             },
@@ -124,11 +124,11 @@ class UIPauseVideoToVideoPaused(VideoBaseXapiConverter):
         return conversion_items.union(
             {
                 ConversionItem(
-                    "result__extensions__" + VIDEO_EXTENSION_TIME,
+                    "result__extensions__" + RESULT_EXTENSION_TIME,
                     "event__currentTime",
                 ),
                 ConversionItem(
-                    "context__extensions__" + VIDEO_EXTENSION_LENGTH,
+                    "context__extensions__" + CONTEXT_EXTENSION_LENGTH,
                     None,
                     # Set the video length to null by default.
                     # This information is mandatory in the xAPI template
@@ -136,7 +136,7 @@ class UIPauseVideoToVideoPaused(VideoBaseXapiConverter):
                     lambda _: 0.0,
                 ),
                 ConversionItem(
-                    "context__extensions__" + VIDEO_EXTENSION_SESSION_ID,
+                    "context__extensions__" + CONTEXT_EXTENSION_SESSION_ID,
                     "session",
                 ),
             },
@@ -155,11 +155,11 @@ class UIStopVideoToVideoTerminated(VideoBaseXapiConverter):
         return conversion_items.union(
             {
                 ConversionItem(
-                    "result__extensions__" + VIDEO_EXTENSION_TIME,
+                    "result__extensions__" + RESULT_EXTENSION_TIME,
                     "event__currentTime",
                 ),
                 ConversionItem(
-                    "result__extensions__" + VIDEO_EXTENSION_PROGRESS,
+                    "result__extensions__" + RESULT_EXTENSION_PROGRESS,
                     None,
                     # Set the video progress to null by default.
                     # This information is mandatory in the xAPI template
@@ -167,7 +167,7 @@ class UIStopVideoToVideoTerminated(VideoBaseXapiConverter):
                     lambda _: 0.0,
                 ),
                 ConversionItem(
-                    "context__extensions__" + VIDEO_EXTENSION_LENGTH,
+                    "context__extensions__" + CONTEXT_EXTENSION_LENGTH,
                     None,
                     # Set the video length to null by default.
                     # This information is mandatory in the xAPI template
@@ -175,7 +175,7 @@ class UIStopVideoToVideoTerminated(VideoBaseXapiConverter):
                     lambda _: 0.0,
                 ),
                 ConversionItem(
-                    "context__extensions__" + VIDEO_EXTENSION_SESSION_ID,
+                    "context__extensions__" + CONTEXT_EXTENSION_SESSION_ID,
                     "session",
                 ),
             },
@@ -194,15 +194,15 @@ class UISeekVideoToVideoSeeked(VideoBaseXapiConverter):
         return conversion_items.union(
             {
                 ConversionItem(
-                    "result__extensions__" + VIDEO_EXTENSION_TIME_FROM,
+                    "result__extensions__" + RESULT_EXTENSION_TIME_FROM,
                     "event__old_time",
                 ),
                 ConversionItem(
-                    "result__extensions__" + VIDEO_EXTENSION_TIME_TO,
+                    "result__extensions__" + RESULT_EXTENSION_TIME_TO,
                     "event__new_time",
                 ),
                 ConversionItem(
-                    "context__extensions__" + VIDEO_EXTENSION_SESSION_ID,
+                    "context__extensions__" + CONTEXT_EXTENSION_SESSION_ID,
                     "session",
                 ),
             },

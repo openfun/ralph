@@ -45,10 +45,7 @@ def test_ui_load_video_to_video_initialized(uuid_namespace, event, platform_url)
     assert xapi_event_dict == {
         "id": str(uuid5(UUID(uuid_namespace), event_str)),
         "actor": {"account": {"homePage": platform_url, "name": "1"}},
-        "verb": {
-            "id": "http://adlnet.gov/expapi/verbs/initialized",
-            "display": {"en-US": "initialized"},
-        },
+        "verb": {"id": "http://adlnet.gov/expapi/verbs/initialized"},
         "context": {
             "extensions": {
                 "https://w3id.org/xapi/video/extensions/length": 0.0,
@@ -93,10 +90,7 @@ def test_ui_play_video_to_video_played(uuid_namespace, event, platform_url):
     assert xapi_event_dict == {
         "id": str(uuid5(UUID(uuid_namespace), event_str)),
         "actor": {"account": {"homePage": platform_url, "name": "1"}},
-        "verb": {
-            "id": "https://w3id.org/xapi/video/verbs/played",
-            "display": {"en-US": "played"},
-        },
+        "verb": {"id": "https://w3id.org/xapi/video/verbs/played"},
         "object": {
             "id": platform_url
             + "/xblock/block-v1:"
@@ -146,10 +140,7 @@ def test_ui_pause_video_to_video_paused(uuid_namespace, event, platform_url):
     assert xapi_event_dict == {
         "id": str(uuid5(UUID(uuid_namespace), event_str)),
         "actor": {"account": {"homePage": platform_url, "name": "1"}},
-        "verb": {
-            "id": "https://w3id.org/xapi/video/verbs/paused",
-            "display": {"en-US": "paused"},
-        },
+        "verb": {"id": "https://w3id.org/xapi/video/verbs/paused"},
         "object": {
             "id": platform_url
             + "/xblock/block-v1:"
@@ -200,10 +191,7 @@ def test_ui_stop_video_to_video_terminated(uuid_namespace, event, platform_url):
     assert xapi_event_dict == {
         "id": str(uuid5(UUID(uuid_namespace), event_str)),
         "actor": {"account": {"homePage": platform_url, "name": "1"}},
-        "verb": {
-            "id": "http://adlnet.gov/expapi/verbs/terminated",
-            "display": {"en-US": "terminated"},
-        },
+        "verb": {"id": "http://adlnet.gov/expapi/verbs/terminated"},
         "object": {
             "id": platform_url
             + "/xblock/block-v1:"
@@ -255,10 +243,7 @@ def test_ui_seek_video_to_video_seeked(uuid_namespace, event, platform_url):
     assert xapi_event_dict == {
         "id": str(uuid5(UUID(uuid_namespace), event_str)),
         "actor": {"account": {"homePage": platform_url, "name": "1"}},
-        "verb": {
-            "id": "https://w3id.org/xapi/video/verbs/seeked",
-            "display": {"en-US": "seeked"},
-        },
+        "verb": {"id": "https://w3id.org/xapi/video/verbs/seeked"},
         "object": {
             "id": platform_url
             + "/xblock/block-v1:"

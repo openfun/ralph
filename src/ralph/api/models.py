@@ -3,12 +3,13 @@
 Allows to be exactly as lax as we want when it comes to exact object shape and
 validation.
 """
-from typing import Optional
+from typing import Optional, Union
 from uuid import UUID
 
 from pydantic import AnyUrl, BaseModel, Extra
 
-from ..models.xapi.fields.actors import ActorField
+from ..models.xapi.base.agents import BaseXapiAgent
+from ..models.xapi.base.groups import BaseXapiGroup
 
 
 class ErrorDetail(BaseModel):
@@ -62,7 +63,7 @@ class LaxStatement(BaseModelWithLaxConfig):
     qualify an object as an XAPI statement.
     """
 
-    actor: ActorField
+    actor: Union[BaseXapiAgent, BaseXapiGroup]
     id: Optional[UUID]
     object: LaxObjectField
     verb: LaxVerbField

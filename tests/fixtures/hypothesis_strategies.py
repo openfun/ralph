@@ -9,8 +9,8 @@ from pydantic import BaseModel
 
 from ralph.models.edx.navigational.fields.events import NavigationalEventField
 from ralph.models.edx.navigational.statements import UISeqNext, UISeqPrev
-from ralph.models.xapi.fields.contexts import ContextField
-from ralph.models.xapi.fields.results import ScoreResultField
+from ralph.models.xapi.base.contexts import BaseXapiContext
+from ralph.models.xapi.base.results import BaseXapiResultScore
 
 OVERWRITTEN_STRATEGIES = {}
 
@@ -98,11 +98,11 @@ OVERWRITTEN_STRATEGIES = {
     UISeqNext: {  # pylint: disable=unhashable-member
         "event": custom_builds(NavigationalEventField, old=st.just(0), new=st.just(1))
     },
-    ContextField: {  # pylint: disable=unhashable-member
+    BaseXapiContext: {  # pylint: disable=unhashable-member
         "revision": False,
         "platform": False,
     },
-    ScoreResultField: {  # pylint: disable=unhashable-member
+    BaseXapiResultScore: {  # pylint: disable=unhashable-member
         "raw": False,
         "min": False,
         "max": False,

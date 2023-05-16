@@ -23,7 +23,6 @@ from ralph.models.converter import (
 )
 from ralph.models.edx.converters.xapi.base import BaseConversionSet
 from ralph.models.edx.navigational.statements import UIPageClose
-from ralph.models.xapi.constants import VERB_TERMINATED_ID
 
 from tests.fixtures.hypothesis_strategies import custom_given
 
@@ -425,7 +424,10 @@ def test_converter_convert_with_valid_events(
     result = Converter(
         platform_url="https://fun-mooc.fr", uuid_namespace=valid_uuid
     ).convert([event_str], ignore_errors, fail_on_unknown)
-    assert json.loads(next(result))["verb"]["id"] == VERB_TERMINATED_ID.__args__[0]
+    assert (
+        json.loads(next(result))["verb"]["id"]
+        == "http://adlnet.gov/expapi/verbs/terminated"
+    )
 
 
 @settings(suppress_health_check=(HealthCheck.function_scoped_fixture,))
