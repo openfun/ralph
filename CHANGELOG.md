@@ -8,6 +8,13 @@ and this project adheres to
 
 ## [Unreleased]
 
+
+## [3.6.0] - 2023-05-17
+
+### Added
+
+- Allow to ignore health check routes for Sentry transactions
+
 ### Changed
 
 - Upgrade `sentry_sdk` to `1.22.2`
@@ -16,7 +23,6 @@ and this project adheres to
 as per the xAPI specification
 - Use batch/v1 api in cronjob_pipeline manifest
 - Use autoscaling/v2 in HorizontalPodAutoscaler manifest
-- Add the ability to ignore health check routes for Sentry transactions
 
 ### Fixed
 
@@ -289,7 +295,8 @@ as per the xAPI specification
 - Add optional sentry integration
 - Distribute Arnold's tray to deploy Ralph in a k8s cluster as cronjobs
 
-[unreleased]: https://github.com/openfun/ralph/compare/v3.5.1...master
+[unreleased]: https://github.com/openfun/ralph/compare/v3.6.0...master
+[3.6.0]: https://github.com/openfun/ralph/compare/v3.5.1...v3.6.0
 [3.5.1]: https://github.com/openfun/ralph/compare/v3.5.0...v3.5.1
 [3.5.0]: https://github.com/openfun/ralph/compare/v3.4.0...v3.5.0
 [3.4.0]: https://github.com/openfun/ralph/compare/v3.3.0...v3.4.0
