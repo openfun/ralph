@@ -15,11 +15,20 @@ from fastapi import (
     Request,
     status,
 )
+from pydantic import parse_raw_as
+from pydantic.types import Json
 
 from ralph.api.forwarding import forward_xapi_statements, get_active_xapi_forwardings
 from ralph.backends.database.base import BaseDatabase, StatementParameters
 from ralph.conf import settings
 from ralph.exceptions import BackendException, BadFormatException
+from ralph.models.xapi.fields.actors import (
+    AccountActorField,
+    AgentActorField,
+    MboxActorField,
+    MboxSha1SumActorField,
+    OpenIdActorField,
+)
 
 from ..auth import authenticated_user
 from ..models import ErrorDetail, LaxStatement
@@ -62,8 +71,7 @@ async def get(
     voidedStatementId: Optional[str] = Query(
         None, description="**Not implemented** Id of voided Statement to fetch"
     ),
-    # NB: ActorField, which is the specific type expected, is not valid as a query param
-    agent: Optional[str] = Query(
+    agent: Optional[Json] = Query(
         None,
         description=(
             "Filter, only return Statements for which the specified "
@@ -228,10 +236,28 @@ async def get(
             ),
         )
 
+    # Parse the agent parameter (JSON) into multiple string parameters
+    query_params = dict(request.query_params)
+    if query_params.get("agent") is not None:
+        # Transform agent to `dict` as FastAPI cannot parse JSON (seen as string)
+        agent = parse_raw_as(AgentActorField, query_params["agent"])
+
+        query_params.pop("agent")
+
+        if isinstance(agent, MboxActorField):
+            query_params["agent__mbox"] = agent.mbox
+        elif isinstance(agent, MboxSha1SumActorField):
+            query_params["agent__mbox_sha1sum"] = agent.mbox_sha1sum
+        elif isinstance(agent, OpenIdActorField):
+            query_params["agent__openid"] = agent.openid
+        elif isinstance(agent, AccountActorField):
+            query_params["agent__account__name"] = agent.account.name
+            query_params["agent__account__home_page"] = agent.account.homePage
+
     # Query Database
     try:
         query_result = DATABASE_CLIENT.query_statements(
-            StatementParameters(**{**request.query_params, "limit": limit})
+            StatementParameters(**{**query_params, "limit": limit})
         )
     except BackendException as error:
         raise HTTPException(

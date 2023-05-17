@@ -148,13 +148,35 @@ class ESDatabase(BaseDatabase):
 
     def query_statements(self, params: StatementParameters) -> StatementQueryResult:
         """Returns the results of a statements query using xAPI parameters."""
+        # pylint: disable=too-many-branches
+
         es_query_filters = []
 
         if params.statementId:
             es_query_filters += [{"term": {"_id": params.statementId}}]
 
-        if params.agent:
-            es_query_filters += [{"term": {"actor.account.name.keyword": params.agent}}]
+        if params.agent__mbox:
+            es_query_filters += [{"term": {"actor.mbox.keyword": params.agent__mbox}}]
+
+        if params.agent__mbox_sha1sum:
+            es_query_filters += [
+                {"term": {"actor.mbox_sha1sum.keyword": params.agent__mbox_sha1sum}}
+            ]
+
+        if params.agent__openid:
+            es_query_filters += [
+                {"term": {"actor.openid.keyword": params.agent__openid}}
+            ]
+
+        if params.agent__account__name:
+            es_query_filters += [
+                {"term": {"actor.account.name.keyword": params.agent__account__name}},
+                {
+                    "term": {
+                        "actor.account.homePage.keyword": params.agent__account__home_page  # pylint: disable=line-too-long # noqa: E501
+                    }
+                },
+            ]
 
         if params.verb:
             es_query_filters += [{"term": {"verb.id.keyword": params.verb}}]

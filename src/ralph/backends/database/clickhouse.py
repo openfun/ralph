@@ -277,8 +277,24 @@ class ClickHouseDatabase(BaseDatabase):  # pylint: disable=too-many-instance-att
         if params["statementId"]:
             where_clauses.append("event_id = {statementId:UUID}")
 
-        if params["agent"]:
-            where_clauses.append("event.actor.account.name = {agent:String}")
+        if params["agent__mbox"]:
+            where_clauses.append("event.actor.mbox = {agent__mbox:String}")
+
+        if params["agent__mbox_sha1sum"]:
+            where_clauses.append(
+                "event.actor.mbox_sha1sum = {agent__mbox_sha1sum:String}"
+            )
+
+        if params["agent__openid"]:
+            where_clauses.append("event.actor.openid = {agent__openid:String}")
+
+        if params["agent__account__name"]:
+            where_clauses.append(
+                "event.actor.account.name = {agent__account__name:String}"
+            )
+            where_clauses.append(
+                "event.actor.account.homePage = {agent__account__home_page:String}"
+            )
 
         if params["verb"]:
             where_clauses.append("event.verb.id = {verb:String}")

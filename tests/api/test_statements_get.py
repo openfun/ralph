@@ -1,5 +1,8 @@
 """Tests for the GET statements endpoint of the Ralph API."""
 
+
+import hashlib
+import json
 from datetime import datetime, timedelta
 from urllib.parse import parse_qs, quote_plus, urlparse
 
@@ -62,6 +65,45 @@ def insert_clickhouse_statements(statements):
     )
     success = backend.put(statements)
     assert success == len(statements)
+
+
+def create_mock_agent(ifi: str, id_: int, home_page_id=None):
+    """Create distinct mock agents with a given Inverse Functional Identifier.
+
+    args:
+        ifi: Inverse Functional Identifier. Possible values are:
+            'mbox', 'mbox_sha1sum', 'openid' and 'account'.
+        id_: An integer used to uniquely identify the created agent.
+            If ifi=="account", agent equality requires same (id_, home_page_id)
+        home_page (optional): The value of homePage, if ifi=="account"
+    """
+
+    if ifi == "mbox":
+        return {"objectType": "Agent", "mbox": f"mailto:user_{id_}@testmail.com"}
+
+    if ifi == "mbox_sha1sum":
+        hash_object = hashlib.sha1(f"mailto:user_{id_}@testmail.com".encode("utf-8"))
+        mail_hash = hash_object.hexdigest()
+        return {"objectType": "Agent", "mbox_sha1sum": mail_hash}
+
+    if ifi == "openid":
+        return {"objectType": "Agent", "openid": f"http://user_{id_}.openid.exmpl.org"}
+
+    if ifi == "account":
+        if home_page_id is None:
+            raise ValueError(
+                "home_page_id must be defined if using create_mock_agent if "
+                "using ifi=='account'"
+            )
+        return {
+            "objectType": "Agent",
+            "account": {
+                "homePage": f"http://example_{home_page_id}.com",
+                "name": f"username_{id_}",
+            },
+        }
+
+    raise ValueError("No valid ifi was provided to create_mock_agent")
 
 
 @pytest.fixture(params=["es", "mongo", "clickhouse"])
@@ -177,30 +219,51 @@ def test_api_statements_get_statements_by_statement_id(
     assert response.json() == {"statements": [statements[1]]}
 
 
+@pytest.mark.parametrize(
+    "ifi",
+    [
+        "mbox",
+        "mbox_sha1sum",
+        "openid",
+        "account_same_home_page",
+        "account_different_home_page",
+    ],
+)
 def test_api_statements_get_statements_by_agent(
-    insert_statements_and_monkeypatch_backend, auth_credentials
+    ifi, insert_statements_and_monkeypatch_backend, auth_credentials
 ):
     """Tests the get statements API route, given an "agent" query parameter, should
     return a list of statements filtered by the given agent.
     """
     # pylint: disable=redefined-outer-name
 
+    # Create two distinct agents
+    if ifi == "account_same_home_page":
+        agent_1 = create_mock_agent("account", 1, home_page_id=1)
+        agent_2 = create_mock_agent("account", 2, home_page_id=1)
+    elif ifi == "account_different_home_page":
+        agent_1 = create_mock_agent("account", 1, home_page_id=1)
+        agent_2 = create_mock_agent("account", 1, home_page_id=2)
+    else:
+        agent_1 = create_mock_agent(ifi, 1)
+        agent_2 = create_mock_agent(ifi, 2)
+
     statements = [
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
             "timestamp": datetime.now().isoformat(),
-            "actor": {"account": {"name": "96d61e6c-9cdb-4926-9cff-d3a15c662999"}},
+            "actor": agent_1,
         },
         {
             "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
             "timestamp": datetime.now().isoformat(),
-            "actor": {"account": {"name": "cdcb1c95-dd5b-4085-8236-9c1580051155"}},
+            "actor": agent_2,
         },
     ]
     insert_statements_and_monkeypatch_backend(statements)
 
     response = client.get(
-        "/xAPI/statements/?agent=96d61e6c-9cdb-4926-9cff-d3a15c662999",
+        f"/xAPI/statements/?agent={quote_plus(json.dumps(agent_1))}",
         headers={"Authorization": f"Basic {auth_credentials}"},
     )
 
@@ -542,9 +605,13 @@ def test_api_statements_get_statements_invalid_query_parameters(
     assert response.status_code == 400
 
     # Check for error when invalid parameters are provided with a statementId
-    for invalid_param in ["activity", "agent", "verb"]:
+    for invalid_param, value in [
+        ("activity", "activity_1"),
+        ("agent", json.dumps(create_mock_agent("mbox", 1))),
+        ("verb", "verb_1"),
+    ]:
         response = client.get(
-            f"/xAPI/statements/?{id_param}={id_1}&{invalid_param}={id_2}",
+            f"/xAPI/statements/?{id_param}={id_1}&{invalid_param}={value}",
             headers={"Authorization": f"Basic {auth_credentials}"},
         )
         assert response.status_code == 400

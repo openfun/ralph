@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Force a valid (JSON-formatted) IFI to be passed for the `/statements` 
+GET query `agent` filtering
 
 ## [3.6.0] - 2023-05-17
 
