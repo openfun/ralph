@@ -466,6 +466,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#sentry_configuration" class="md-nav__link">
+    Sentry configuration
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -653,6 +660,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#sentry_configuration" class="md-nav__link">
+    Sentry configuration
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -811,6 +825,23 @@ pairs are defined.</p>
 <span class="s1">]</span>
 <span class="s1">&#39;</span>
 </code></pre></div>
+<h3 id="sentry_configuration">Sentry configuration<a class="headerlink" href="#sentry_configuration" title="Permanent link">&para;</a></h3>
+<p>Ralph provides Sentry integration to monitor its LRS server and its CLI.
+To activate Sentry integration, one should define the following environment variables:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">RALPH_SENTRY_DSN</span><span class="o">={</span>PROTOCOL<span class="o">}</span>://<span class="o">{</span>PUBLIC_KEY<span class="o">}</span>:<span class="o">{</span>SECRET_KEY<span class="o">}</span>@<span class="o">{</span>HOST<span class="o">}{</span>PATH<span class="o">}</span>/<span class="o">{</span>PROJECT_ID<span class="o">}</span>
+<span class="nv">RALPH_EXECUTION_ENVIRONMENT</span><span class="o">=</span>development
+</code></pre></div>
+<p>The Sentry DSN (Data Source Name) can be found in your project settings from Sentry application. The execution environment should reflect the environment Ralph has been deployed in (<em>e.g.</em> <code>production</code>).</p>
+<p>You may also want to <a href="https://develop.sentry.dev/sdk/performance/">monitor the performance</a> of Ralph by configuring the CLI and LRS traces sample rates:
+<div class="highlight"><pre><span></span><code><span class="nv">RALPH_SENTRY_CLI_TRACES_SAMPLE_RATE</span><span class="o">=</span><span class="m">0</span>.1
+<span class="nv">RALPH_SENTRY_LRS_TRACES_SAMPLE_RATE</span><span class="o">=</span><span class="m">0</span>.3
+</code></pre></div></p>
+<blockquote>
+<p>Note that a sampling rate of <code>1.0</code> means 100% of transactions are sent to sentry and <code>0.1</code> only 10%.</p>
+</blockquote>
+<p>If you want to lower noisy transactions (<em>e.g.</em> in a Kubernetes cluster), you can disable health checks related ones:
+<div class="highlight"><pre><span></span><code><span class="nv">RALPH_SENTRY_IGNORE_HEALTH_CHECKS</span><span class="o">=</span>True
+</code></pre></div></p>
 
 
 
