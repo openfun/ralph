@@ -51,7 +51,11 @@ class StatementParameters:
 
     statementId: Optional[str] = None  # pylint: disable=invalid-name
     voidedStatementId: Optional[str] = None  # pylint: disable=invalid-name
-    agent: Optional[str] = None
+    agent__mbox: Optional[str] = None
+    agent__mbox_sha1sum: Optional[str] = None
+    agent__openid: Optional[str] = None
+    agent__account__name: Optional[str] = None
+    agent__account__home_page: Optional[str] = None
     verb: Optional[str] = None
     activity: Optional[str] = None
     registration: Optional[UUID] = None
@@ -65,6 +69,33 @@ class StatementParameters:
     ascending: Optional[bool] = False
     search_after: Optional[str] = None
     pit_id: Optional[str] = None
+
+    def __post_init__(self):
+        """Perform additional conformity verifications on parameters."""
+        # Check that both `homePage` and `name` are provided if `account` is being used
+        if (self.agent__account__name is not None) != (
+            self.agent__account__home_page is not None
+        ):
+            raise BackendParameterException(
+                "Invalid agent parameters: home_page and name are both required"
+            )
+
+        # Check that no more than one Inverse Functional Identifier is provided
+        if (
+            sum(
+                x is not None
+                for x in [
+                    self.agent__mbox,
+                    self.agent__mbox_sha1sum,
+                    self.agent__openid,
+                    self.agent__account__name,
+                ]
+            )
+            > 1
+        ):
+            raise BackendParameterException(
+                "Invalid agent parameters: Only one identifier can be used"
+            )
 
 
 def enforce_query_checks(method):
