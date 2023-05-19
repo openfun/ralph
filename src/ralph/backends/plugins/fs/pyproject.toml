@@ -1,0 +1,40 @@
+#
+# Ralph fs package
+#
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ralph-fs"
+description = "FileSystem backend for Ralph"
+readme = "README.md"
+authors = [
+  { name="Open FUN (France Universite Numerique)", email="fun.dev@fun-mooc.fr" },
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+requires-python = ">=3.7"
+license = {file = "LICENSE.md"}
+keywords = ["Analytics", "xAPI", "LRS", "Backend", "fs"]
+dependencies = [
+    "ralph-malph",
+]
+dynamic = ["version"]
+
+[project.urls]
+"Homepage" = "https://github.com/openfun/ralph"
+"Bug Tracker" = "https://github.com/openfun/ralph/issues"
+
+[tool.setuptools.dynamic]
+version = { attr = "source.__version__" }

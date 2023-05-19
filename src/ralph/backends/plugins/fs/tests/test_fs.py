@@ -8,11 +8,10 @@ from uuid import uuid4
 
 import pytest
 
-from ralph.backends.data.base import BaseOperationType, BaseQuery, DataBackendStatus
-from ralph.backends.data.fs import FSDataBackend, FSDataBackendSettings
+from ralph.factories.base import BaseOperationType, BaseQuery, DataBackendStatus
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import now
-
+from ..source.fs import FSDataBackend, FSDataBackendSettings
 
 def test_backends_data_fs_data_backend_default_instantiation(monkeypatch, fs):
     """Tests the `FSDataBackend` default instantiation."""

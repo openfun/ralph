@@ -3,4 +3,4 @@
 declare DOCKER_USER
 DOCKER_USER="$(id -u):$(id -g)"
 
-DOCKER_USER=${DOCKER_USER} docker compose run --rm app pytest "$@"
+DOCKER_USER=${DOCKER_USER} docker compose run --rm app pytest -c pyproject.toml "$@"

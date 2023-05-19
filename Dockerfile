@@ -26,8 +26,8 @@ RUN apt-get update && \
         python-dev && \
     rm -rf /var/lib/apt/lists/*
 
-RUN pip install .[backend-clickhouse,backend-es,backend-ldp,backend-mongo,backend-swift,backend-ws,cli,lrs]
-
+#RUN pip install .[backend-clickhouse,backend-es,backend-ldp,backend-mongo,backend-swift,backend-ws,cli,lrs]
+RUN pip install . ./src/ralph/backends/plugins/*
 
 # -- Core --
 FROM base as core
@@ -65,6 +65,13 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ]; \
 # dependencies
 RUN pip uninstall -y ralph-malph
 RUN pip install -e .[dev]
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+RUN pip uninstall -y $(pip list | cut -f1 -d " " | grep ralph-malph)
+RUN pip install -e .[dev] && \
+    for plugin in ./src/ralph/backends/plugins/*; do \
+        pip install -e "${plugin}[dev]"; \
+    done
 
 # Un-privileged user running the application
 USER ${DOCKER_USER:-1000}

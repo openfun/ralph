@@ -144,7 +144,13 @@ jobs:
             - v1-dependencies-<< parameters.python-image >>-{{ .Revision }}
       - run:
           name: Install development dependencies
-          command: pip install --user .[backend-clickhouse,backend-es,backend-ldp,backend-mongo,backend-swift,backend-ws,cli,dev,lrs]
+          #command: pip install --user .[backend-clickhouse,backend-es,backend-ldp,backend-mongo,backend-swift,backend-ws,cli,dev,lrs]
+          command: |
+            pip install --user .[dev];
+            for plugin in ./src/ralph/backends/plugins/*; do \
+              pip install --user "${plugin}[dev]"; \
+            done
+
       - save_cache:
           paths:
             - ~/.local
@@ -164,22 +170,26 @@ jobs:
             - v1-dependencies-python:3.11-{{ .Revision }}
       - run:
           name: Lint code with flake8
-          command: ~/.local/bin/flake8
+          command: ~/.local/bin/flake8 --toml-config pyproject.toml core plugins
+
       - run:
           name: Lint code with isort
-          command: ~/.local/bin/isort --recursive --check-only .
+          command: ~/.local/bin/isort --recursive --check-only --settings-file pyproject.toml core plugins
       - run:
           name: Lint code with black
-          command: ~/.local/bin/black src/ralph tests --check
+          command: ~/.local/bin/black --check --config pyproject.toml core plugins
+
       - run:
           name: Lint code with pylint
-          command: ~/.local/bin/pylint src/ralph tests
+          command: ~/.local/bin/pylint core plugins
+
       - run:
           name: Lint code with bandit
-          command: ~/.local/bin/bandit -qr src/ralph
+          command: ~/.local/bin/bandit -c pyproject.toml -qr src/ralph/backends/data plugins
+
       - run:
           name: Lint code with pydocstyle
-          command: ~/.local/bin/pydocstyle
+          command: ~/.local/bin/pydocstyle --config pyproject.toml core plugins
 
   test:
     parameters:
@@ -222,7 +232,7 @@ jobs:
               -wait tcp://${HOSTNAME}:27017 \
               -wait tcp://${HOSTNAME}:9000 \
               -timeout 60s \
-              ~/.local/bin/pytest
+              ~/.local/bin/pytest -c pyproject.toml
 
   test-library:
     parameters:

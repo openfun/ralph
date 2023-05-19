@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import IO, Iterable, Iterator, Union
 from uuid import uuid4
 
-from ralph.backends.data.base import (
+from ralph.factories.base import (
     BaseDataBackend,
     BaseDataBackendSettings,
     BaseOperationType,
