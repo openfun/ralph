@@ -29,11 +29,18 @@ services:
   elasticsearch:
     image: elasticsearch:8.1.0
     environment:
+      bootstrap.memory_lock: true
       discovery.type: single-node
       xpack.security.enabled: "false"
     ports:
       - "9200:9200"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
     mem_limit: 2g
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
 
   mongo:
     image: mongo:5.0.9
@@ -67,3 +74,7 @@ services:
   # -- tools
   dockerize:
     image: jwilder/dockerize
+
+volumes:
+  esdata:
+    driver: local
