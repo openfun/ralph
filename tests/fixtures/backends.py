@@ -22,6 +22,7 @@ from pymongo import MongoClient
 from pymongo.errors import CollectionInvalid
 
 from ralph.backends.data.clickhouse import ClickHouseDataBackend
+from ralph.backends.data.es import ESDataBackend
 from ralph.backends.data.fs import FSDataBackend, FSDataBackendSettings
 from ralph.backends.data.ldp import LDPDataBackend
 from ralph.backends.data.s3 import S3DataBackend, S3DataBackendSettings
@@ -30,6 +31,7 @@ from ralph.backends.database.clickhouse import ClickHouseDatabase
 from ralph.backends.database.es import ESDatabase
 from ralph.backends.database.mongo import MongoDatabase
 from ralph.backends.lrs.clickhouse import ClickHouseLRSBackend
+from ralph.backends.lrs.es import ESLRSBackend
 from ralph.backends.storage.s3 import S3Storage
 from ralph.backends.storage.swift import SwiftStorage
 from ralph.conf import ClickhouseClientOptions, Settings, core_settings
@@ -115,9 +117,7 @@ def get_mongo_test_backend():
 
 
 def get_es_fixture(host=ES_TEST_HOSTS, index=ES_TEST_INDEX):
-    """Creates / deletes an ElasticSearch test index and yields an instantiated
-    client.
-    """
+    """Create / delete an Elasticsearch test index and yield an instantiated client."""
     client = Elasticsearch(host)
     try:
         client.indices.create(index=index)
@@ -131,16 +131,15 @@ def get_es_fixture(host=ES_TEST_HOSTS, index=ES_TEST_INDEX):
 
 @pytest.fixture
 def es():
-    """Yields an ElasticSearch test client. See get_es_fixture above."""
+    """Yield an Elasticsearch test client. See get_es_fixture above."""
     # pylint: disable=invalid-name
-
     for es_client in get_es_fixture():
         yield es_client
 
 
 @pytest.fixture
 def es_forwarding():
-    """Yields a second ElasticSearch test client. See get_es_fixture above."""
+    """Yield a second Elasticsearch test client. See get_es_fixture above."""
     for es_client in get_es_fixture(index=ES_TEST_FORWARDING_INDEX):
         yield es_client
 
@@ -258,7 +257,7 @@ def clickhouse():
 
 @pytest.fixture
 def es_data_stream():
-    """Creates / deletes an ElasticSearch test datastream and yields an instantiated
+    """Create / delete an Elasticsearch test datastream and yield an instantiated
     client.
     """
     client = Elasticsearch(ES_TEST_HOSTS)
@@ -277,7 +276,7 @@ def es_data_stream():
             "date_detection": True,
             "numeric_detection": True,
             # Note: We define an explicit mapping of the `timestamp` field to allow the
-            # ElasticSearch database to be queried even if no document has been inserted
+            # Elasticsearch database to be queried even if no document has been inserted
             # before.
             "properties": {
                 "timestamp": {
@@ -392,6 +391,47 @@ def clickhouse_lrs_backend():
         return ClickHouseLRSBackend(settings)
 
     return get_clickhouse_lrs_backend
+
+
+@pytest.fixture
+def es_backend():
+    """Return the `get_es_data_backend` function."""
+
+    def get_es_data_backend():
+        """Return an instance of ESDataBackend."""
+        settings = ESDataBackend.settings_class(
+            ALLOW_YELLOW_STATUS=False,
+            CLIENT_OPTIONS={"ca_certs": None, "verify_certs": None},
+            DEFAULT_CHUNK_SIZE=500,
+            DEFAULT_INDEX=ES_TEST_INDEX,
+            HOSTS=ES_TEST_HOSTS,
+            LOCALE_ENCODING="utf8",
+            REFRESH_AFTER_WRITE=True,
+        )
+        return ESDataBackend(settings)
+
+    return get_es_data_backend
+
+
+@pytest.fixture
+def es_lrs_backend():
+    """Return the `get_es_lrs_backend` function."""
+
+    def get_es_lrs_backend(index: str = ES_TEST_INDEX):
+        """Return an instance of ESLRSBackend."""
+        settings = ESLRSBackend.settings_class(
+            ALLOW_YELLOW_STATUS=False,
+            CLIENT_OPTIONS={"ca_certs": None, "verify_certs": None},
+            DEFAULT_CHUNK_SIZE=500,
+            DEFAULT_INDEX=index,
+            HOSTS=ES_TEST_HOSTS,
+            LOCALE_ENCODING="utf8",
+            POINT_IN_TIME_KEEP_ALIVE="1m",
+            REFRESH_AFTER_WRITE=True,
+        )
+        return ESLRSBackend(settings)
+
+    return get_es_lrs_backend
 
 
 @pytest.fixture

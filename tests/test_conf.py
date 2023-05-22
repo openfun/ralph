@@ -40,7 +40,12 @@ def test_conf_settings_field_value_priority(fs, monkeypatch):
 
 @pytest.mark.parametrize(
     "value,expected",
-    [("foo", ("foo",)), (("foo",), ("foo",)), ("foo,bar,baz", ("foo", "bar", "baz"))],
+    [
+        ("foo", ("foo",)),
+        (("foo",), ("foo",)),
+        (["foo"], ("foo",)),
+        ("foo,bar,baz", ("foo", "bar", "baz")),
+    ],
 )
 def test_conf_comma_separated_list_with_valid_values(value, expected, monkeypatch):
     """Tests the CommaSeparatedTuple pydantic data type with valid values."""
@@ -49,7 +54,7 @@ def test_conf_comma_separated_list_with_valid_values(value, expected, monkeypatc
     assert Settings().BACKENDS.DATABASE.ES.HOSTS == expected
 
 
-@pytest.mark.parametrize("value", [{}, [], None])
+@pytest.mark.parametrize("value", [{}, None])
 def test_conf_comma_separated_list_with_invalid_values(value):
     """Tests the CommaSeparatedTuple pydantic data type with invalid values."""
     with pytest.raises(TypeError, match="Invalid comma separated list"):
