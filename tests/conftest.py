@@ -20,6 +20,7 @@ from .fixtures.backends import (  # noqa: F401
     es_forwarding,
     events,
     fs_backend,
+    ldp_backend,
     lrs,
     mongo,
     mongo_forwarding,
