@@ -48,14 +48,14 @@ core_settings = CoreSettings()
 
 
 class CommaSeparatedTuple(str):
-    """Pydantic field type validating comma separated strings or tuples."""
+    """Pydantic field type validating comma separated strings or lists/tuples."""
 
     @classmethod
     def __get_validators__(cls):  # noqa: D105
-        def validate(value: Union[str, Tuple[str]]) -> Tuple[str]:
-            """Checks whether the value is a comma separated string or a tuple."""
-            if isinstance(value, tuple):
-                return value
+        def validate(value: Union[str, Tuple[str], List[str]]) -> Tuple[str]:
+            """Check whether the value is a comma separated string or a list/tuple."""
+            if isinstance(value, (tuple, list)):
+                return tuple(value)
 
             if isinstance(value, str):
                 return tuple(value.split(","))

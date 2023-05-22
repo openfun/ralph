@@ -1,4 +1,5 @@
 """Tests for the base data backend"""
+import logging
 
 import pytest
 
@@ -41,8 +42,21 @@ def test_backends_data_base_enforce_query_checks_with_valid_input(value, expecte
     MockBaseDataBackend().read(query=value)
 
 
-@pytest.mark.parametrize("value", [[], {"foo": "bar"}])
-def test_backends_data_base_enforce_query_checks_with_invalid_input(value):
+@pytest.mark.parametrize(
+    "value,error",
+    [
+        ([], r"The 'query' argument is expected to be a BaseQuery instance."),
+        (
+            {"foo": "bar"},
+            r"The 'query' argument is expected to be a BaseQuery instance. "
+            r"\[\{'loc': \('foo',\), 'msg': 'extra fields not permitted', "
+            r"'type': 'value_error.extra'\}\]",
+        ),
+    ],
+)
+def test_backends_data_base_enforce_query_checks_with_invalid_input(
+    value, error, caplog
+):
     """Tests the enforce_query_checks function given invalid input."""
 
     class MockBaseDataBackend(BaseDataBackend):
@@ -66,6 +80,9 @@ def test_backends_data_base_enforce_query_checks_with_invalid_input(value):
         def write(self):  # pylint: disable=arguments-differ,missing-function-docstring
             pass
 
-    error = "The 'query' argument is expected to be a BaseQuery instance."
     with pytest.raises(BackendParameterException, match=error):
-        MockBaseDataBackend().read(query=value)
+        with caplog.at_level(logging.ERROR):
+            MockBaseDataBackend().read(query=value)
+
+    error = error.replace("\\", "")
+    assert ("ralph.backends.data.base", logging.ERROR, error) in caplog.record_tuples
