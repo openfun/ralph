@@ -59,10 +59,13 @@ class StatementParameters(BaseModel):
     search_after: Optional[str]
     pit_id: Optional[str]
     authority: Optional[AgentParameters]
+    ignore_order: Optional[bool]
 
 
 class BaseLRSBackend(BaseDataBackend):
     """Base LRS backend interface."""
+
+    settings_class = BaseLRSBackendSettings
 
     @abstractmethod
     def query_statements(self, params: StatementParameters) -> StatementQueryResult:
