@@ -107,17 +107,18 @@ class BaseDataBackend(ABC):
         if isinstance(query, dict):
             try:
                 query = self.query_model(**query)
-            except ValidationError as err:
+            except ValidationError as error:
+                msg = "The 'query' argument is expected to be a %s instance. %s"
+                errors = error.errors()
+                logger.error(msg, self.query_model.__name__, errors)
                 raise BackendParameterException(
-                    "The 'query' argument is expected to be a "
-                    f"{self.query_model.__name__} instance. {err.errors()}"
-                ) from err
+                    msg % (self.query_model.__name__, errors)
+                ) from error
 
         if not isinstance(query, self.query_model):
-            raise BackendParameterException(
-                "The 'query' argument is expected to be a "
-                f"{self.query_model.__name__} instance."
-            )
+            msg = "The 'query' argument is expected to be a %s instance."
+            logger.error(msg, self.query_model.__name__)
+            raise BackendParameterException(msg % (self.query_model.__name__,))
 
         logger.debug("Query: %s", str(query))
 
