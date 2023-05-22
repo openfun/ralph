@@ -6,7 +6,6 @@ import os
 import random
 import time
 from contextlib import asynccontextmanager
-from enum import Enum
 from functools import lru_cache
 from multiprocessing import Process
 from pathlib import Path
@@ -23,6 +22,7 @@ from pymongo import MongoClient
 from pymongo.errors import CollectionInvalid
 
 from ralph.backends.data.fs import FSDataBackend, FSDataBackendSettings
+from ralph.backends.data.ldp import LDPDataBackend
 from ralph.backends.data.swift import SwiftDataBackend, SwiftDataBackendSettings
 from ralph.backends.database.clickhouse import ClickHouseDatabase
 from ralph.backends.database.es import ESDatabase
@@ -109,25 +109,6 @@ def get_mongo_test_backend():
         database=MONGO_TEST_DATABASE,
         collection=MONGO_TEST_COLLECTION,
     )
-
-
-class NamedClassA:
-    """An example named class."""
-
-    name = "A"
-
-
-class NamedClassB:
-    """A second example named class."""
-
-    name = "B"
-
-
-class NamedClassEnum(Enum):
-    """A named test classes Enum."""
-
-    A = "tests.fixtures.backends.NamedClassA"
-    B = "tests.fixtures.backends.NamedClassB"
 
 
 def get_es_fixture(host=ES_TEST_HOSTS, index=ES_TEST_INDEX):
@@ -334,6 +315,27 @@ def settings_fs(fs, monkeypatch):
         "ralph.backends.mixins.settings",
         Settings(HISTORY_FILE=Path(core_settings.APP_DIR / "history.json")),
     )
+
+
+@pytest.fixture
+def ldp_backend(settings_fs):
+    """Returns the `get_ldp_data_backend` function."""
+    # pylint: disable=invalid-name,redefined-outer-name,unused-argument
+
+    def get_ldp_data_backend(service_name: str = "foo", stream_id: str = "bar"):
+        """Returns an instance of LDPDataBackend."""
+        settings = LDPDataBackend.settings_class(
+            APPLICATION_KEY="fake_key",
+            APPLICATION_SECRET="fake_secret",
+            CONSUMER_KEY="another_fake_key",
+            DEFAULT_STREAM_ID=stream_id,
+            ENDPOINT="ovh-eu",
+            SERVICE_NAME=service_name,
+            REQUEST_TIMEOUT=None,
+        )
+        return LDPDataBackend(settings)
+
+    return get_ldp_data_backend
 
 
 @pytest.fixture
