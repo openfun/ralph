@@ -21,7 +21,7 @@ def test_api_statements_backend_instance_with_runserver_backend_env(monkeypatch)
     reload(conf)
     assert isinstance(reload(statements).DATABASE_CLIENT, MongoDatabase)
 
-    # Elastisearch backend
+    # Elasticsearch backend
     monkeypatch.setenv("RALPH_RUNSERVER_BACKEND", "es")
     reload(conf)
     assert isinstance(reload(statements).DATABASE_CLIENT, ESDatabase)
