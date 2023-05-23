@@ -4,9 +4,11 @@ import base64
 import json
 
 import bcrypt
+from fastapi.security import HTTPBasicCredentials
 from fastapi.testclient import TestClient
 
 from ralph.api import app
+from ralph.api.auth import AuthenticatedUser, authenticated_user
 from ralph.conf import settings
 
 client = TestClient(app)
@@ -98,3 +100,20 @@ def test_get_whoami_correct_credentials(fs):
         "username": "ralph",
         "scopes": ["ralph_test_scope"],
     }
+
+
+def test_api_auth_caching_credentials(fs):
+    """Test the caching of HTTP basic auth credentials."""
+
+    auth_file_path = settings.APP_DIR / "auth.json"
+    fs.create_file(auth_file_path, contents=STORED_CREDENTIALS)
+
+    credentials = HTTPBasicCredentials(username="ralph", password="admin")
+
+    # Call function as in a first request with these credentials
+    authenticated_user(credentials)
+
+    assert authenticated_user.cache.popitem() == (
+        ("ralph", "admin"),
+        AuthenticatedUser(username="ralph", scopes=["ralph_test_scope"]),
+    )
