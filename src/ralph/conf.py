@@ -283,6 +283,8 @@ class Settings(BaseSettings):
 
     _CORE: CoreSettings = core_settings
     AUTH_FILE: Path = _CORE.APP_DIR / "auth.json"
+    AUTH_CACHE_MAX_SIZE = 100
+    AUTH_CACHE_TTL = 3600
     BACKENDS: BackendSettings = BackendSettings()
     CONVERTER_EDX_XAPI_UUID_NAMESPACE: str = None
     DEFAULT_BACKEND_CHUNK_SIZE: int = 500

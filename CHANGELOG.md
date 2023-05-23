@@ -12,6 +12,7 @@ and this project adheres to
 
 - Implement xAPI virtual classroom pydantic models
 - Allow to insert custom endpoint url for S3 service
+- Cache the HTTP Basic auth credentials to improve API response time   
 
 ### Changed
 
