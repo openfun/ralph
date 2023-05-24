@@ -7,7 +7,18 @@ from dataclasses import dataclass
 from importlib import import_module
 from inspect import getmembers, isclass
 from types import ModuleType
-from typing import Any, Callable, Set, TextIO, Tuple, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generator,
+    Iterator,
+    Optional,
+    Set,
+    TextIO,
+    Tuple,
+    Union,
+)
 
 from pydantic import BaseModel, ValidationError
 
@@ -34,7 +45,13 @@ class ConversionItem:
     transformers: Tuple[Callable[[Any], Any]]
     raw_input: bool
 
-    def __init__(self, dest: str, src=None, transformers=lambda _: _, raw_input=False):
+    def __init__(
+        self,
+        dest: str,
+        src: Optional[str] = None,
+        transformers=lambda _: _,
+        raw_input: bool = False,
+    ) -> None:
         """Initialize ConversionItem.
 
         Args:
@@ -55,7 +72,7 @@ class ConversionItem:
         object.__setattr__(self, "transformers", transformers)
         object.__setattr__(self, "raw_input", raw_input)
 
-    def get_value(self, data: Union[dict, str]):
+    def get_value(self, data: Union[Dict, str]) -> Union[Dict, str]:
         """Return fetched source value after having applied all transformers to it.
 
         Args:
@@ -84,7 +101,7 @@ class BaseConversionSet(ABC):
     __src__: BaseModel
     __dest__: BaseModel
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initializes BaseConversionSet."""
         self._conversion_items = self._get_conversion_items()
 
@@ -92,13 +109,13 @@ class BaseConversionSet(ABC):
     def _get_conversion_items(self) -> Set[ConversionItem]:
         """Returns a set of ConversionItems used for conversion."""
 
-    def __iter__(self):  # noqa: D105
+    def __iter__(self) -> Iterator[ConversionItem]:  # noqa: D105
         return iter(self._conversion_items)
 
 
 def convert_dict_event(
     event: dict, event_str: str, conversion_set: BaseConversionSet
-) -> BaseModel:
+) -> Any:
     """Convert the event dictionary with a conversion_set.
 
     Args:
@@ -151,10 +168,10 @@ class Converter:
 
     def __init__(
         self,
-        model_selector=ModelSelector(),
-        module="ralph.models.edx.converters.xapi",
-        **conversion_set_kwargs,
-    ):
+        model_selector: ModelSelector = ModelSelector(),
+        module: str = "ralph.models.edx.converters.xapi",
+        **conversion_set_kwargs: Any,
+    ) -> None:
         """Initializes the Converter."""
         self.model_selector = model_selector
         self.src_conversion_set = self.get_src_conversion_set(
@@ -162,7 +179,9 @@ class Converter:
         )
 
     @staticmethod
-    def get_src_conversion_set(module: ModuleType, **conversion_set_kwargs):
+    def get_src_conversion_set(
+        module: ModuleType, **conversion_set_kwargs: Any
+    ) -> dict:
         """Return a dictionary of initialized conversion_sets defined in the module."""
         src_conversion_set = {}
         for _, class_ in getmembers(module, isclass):
@@ -170,7 +189,9 @@ class Converter:
                 src_conversion_set[class_.__src__] = class_(**conversion_set_kwargs)
         return src_conversion_set
 
-    def convert(self, input_file: TextIO, ignore_errors: bool, fail_on_unknown: bool):
+    def convert(
+        self, input_file: TextIO, ignore_errors: bool, fail_on_unknown: bool
+    ) -> Generator:
         """Convert JSON event strings line by line."""
         total = 0
         success = 0
@@ -201,7 +222,7 @@ class Converter:
                     raise err
         logger.info("Total events: %d, Invalid events: %d", total, total - success)
 
-    def _convert_event(self, event_str: str):
+    def _convert_event(self, event_str: str) -> Any:
         """Convert a single JSON string event.
 
         Args:
@@ -219,7 +240,7 @@ class Converter:
             ConversionException: When a field transformation fails.
             ValidationError: When the final converted event is invalid.
         """
-        error = None
+        error: Optional[BaseException] = None
         event = json.loads(event_str)
         for model in self.model_selector.get_models(event):
             conversion_set = self.src_conversion_set.get(model, None)
@@ -236,6 +257,8 @@ class Converter:
         raise error
 
     @staticmethod
-    def _log_error(message, event_str, error=None):
+    def _log_error(
+        message: object, event_str: str, error: Optional[BaseException] = None
+    ) -> None:
         logger.error(message)
         logger.debug("Raised error: %s, for event : %s", error, event_str)

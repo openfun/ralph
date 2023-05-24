@@ -1,4 +1,5 @@
 """Navigational event xAPI Converter."""
+from typing import Set
 
 from ralph.models.converter import ConversionItem
 from ralph.models.edx.navigational.statements import UIPageClose
@@ -19,7 +20,7 @@ class UIPageCloseToPageTerminated(BaseXapiConverter):
     __src__ = UIPageClose
     __dest__ = PageTerminated
 
-    def _get_conversion_items(self):
+    def _get_conversion_items(self) -> Set[ConversionItem]:
         """Return a set of ConversionItems used for conversion."""
         conversion_items = super()._get_conversion_items()
         return conversion_items.union({ConversionItem("object__id", "page")})

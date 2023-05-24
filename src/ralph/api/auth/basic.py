@@ -4,7 +4,7 @@ import logging
 from functools import lru_cache
 from pathlib import Path
 from threading import Lock
-from typing import List, Union
+from typing import Any, Iterator, List, Optional
 
 import bcrypt
 from cachetools import TTLCache, cached
@@ -53,21 +53,21 @@ class ServerUsersCredentials(BaseModel):
 
     __root__: List[UserCredentials]
 
-    def __add__(self, other):  # noqa: D105
+    def __add__(self, other) -> Any:  # noqa: D105
         return ServerUsersCredentials.parse_obj(self.__root__ + other.__root__)
 
-    def __getitem__(self, item: int):  # noqa: D105
+    def __getitem__(self, item: int) -> UserCredentials:  # noqa: D105
         return self.__root__[item]
 
-    def __len__(self):  # noqa: D105
+    def __len__(self) -> int:  # noqa: D105
         return len(self.__root__)
 
-    def __iter__(self):  # noqa: D105
+    def __iter__(self) -> Iterator[UserCredentials]:  # noqa: D105
         return iter(self.__root__)
 
     @root_validator
     @classmethod
-    def ensure_unique_username(cls, values):
+    def ensure_unique_username(cls, values: Any) -> Any:
         """Every username should be unique among registered users."""
         usernames = [entry.username for entry in values.get("__root__")]
         if len(usernames) != len(set(usernames)):
@@ -111,7 +111,7 @@ def get_stored_credentials(auth_file: Path) -> ServerUsersCredentials:
     else None,
 )
 def get_basic_auth_user(
-    credentials: Union[HTTPBasicCredentials, None] = Depends(security),
+    credentials: Optional[HTTPBasicCredentials] = Depends(security),
     security_scopes: SecurityScopes = SecurityScopes([]),
 ) -> AuthenticatedUser:
     """Checks valid auth parameters.

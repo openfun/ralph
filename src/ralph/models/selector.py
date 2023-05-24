@@ -6,7 +6,7 @@ from importlib import import_module
 from inspect import getmembers, isclass
 from itertools import chain
 from types import ModuleType
-from typing import Any, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 
 from pydantic import BaseModel
 
@@ -21,7 +21,7 @@ class LazyModelField:
 
     path: Tuple[str]
 
-    def __init__(self, path: str):
+    def __init__(self, path: str) -> None:
         """Initialize Lazy Model Field."""
         object.__setattr__(self, "path", tuple(path.split(MODEL_PATH_SEPARATOR)))
 
@@ -33,7 +33,7 @@ class Rule:
     field: LazyModelField
     value: Union[LazyModelField, Any]  # pylint: disable=unsubscriptable-object
 
-    def check(self, event):
+    def check(self, event: Dict) -> bool:
         """Check if event matches the rule.
 
         Args:
@@ -46,7 +46,7 @@ class Rule:
         return event_value == expected_value
 
 
-def selector(**filters):
+def selector(**filters: Any) -> List[Rule]:
     """Return a list of rules that should match in order to select an event.
 
     Args:
@@ -66,13 +66,13 @@ class ModelSelector:
         decision_tree (dict): Stores the rule checking order for model selection.
     """
 
-    def __init__(self, module="ralph.models.edx"):
+    def __init__(self, module: str = "ralph.models.edx") -> None:
         """Instantiates ModelSelector."""
         self.model_rules = ModelSelector.build_model_rules(import_module(module))
         self.decision_tree = self.get_decision_tree(self.model_rules)
 
     @staticmethod
-    def build_model_rules(module: ModuleType):
+    def build_model_rules(module: ModuleType) -> Dict:
         """Build the model_rules dictionary.
 
         Using BaseModel classes defined in the module.
@@ -83,7 +83,7 @@ class ModelSelector:
                 model_rules[class_] = class_.__selector__
         return model_rules
 
-    def get_first_model(self, event: dict):
+    def get_first_model(self, event: Dict) -> Any:
         """Return the first matching model for the event. See `self.get_models`."""
         return self.get_models(event)[0]
 

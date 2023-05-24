@@ -7,7 +7,7 @@ import sys
 from inspect import isasyncgen, isclass, iscoroutinefunction
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import List
+from typing import Any, Optional, Sequence
 
 import bcrypt
 
@@ -115,7 +115,7 @@ class CommaSeparatedKeyValueParamType(click.ParamType):
 class ClientOptionsParamType(CommaSeparatedKeyValueParamType):
     """Comma separated key=value parameter type for client options."""
 
-    def __init__(self, client_options_type):
+    def __init__(self, client_options_type: Any) -> None:
         """Instantiates ClientOptionsParamType for a client_options_type.
 
         Args:
@@ -137,7 +137,7 @@ class ClientOptionsParamType(CommaSeparatedKeyValueParamType):
 class HeadersParametersParamType(CommaSeparatedKeyValueParamType):
     """Comma separated key=value parameter type for headers parameters."""
 
-    def __init__(self, headers_parameters_type):
+    def __init__(self, headers_parameters_type: Any) -> None:
         """Instantiates HeadersParametersParamType for a headers_parameters_type.
 
         Args:
@@ -200,7 +200,7 @@ def cli(verbosity=None):
             handler.setLevel(level)
 
 
-def backends_options(name=None, backend_types: List[BaseModel] = None):
+def backends_options(name=None, backend_types: Optional[Sequence[BaseModel]] = None):
     """Backend-related options decorator for Ralph commands."""
 
     def wrapper(command):

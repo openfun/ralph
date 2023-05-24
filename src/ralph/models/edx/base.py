@@ -1,16 +1,17 @@
 """Base event model definitions."""
 
+import sys
 from datetime import datetime
 from ipaddress import IPv4Address
 from pathlib import Path
 from typing import Dict, Optional, Union
 
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
-
 from pydantic import AnyHttpUrl, BaseModel, constr
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 
 class BaseModelWithConfig(BaseModel):

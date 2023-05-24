@@ -1,14 +1,18 @@
 """`Scorm Profile` activity types definitions."""
 
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
+import sys
 
 from ...base.unnested_objects import BaseXapiActivity, BaseXapiActivityDefinition
 
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
+
 
 # CMI Interaction
+
+
 class CMIInteractionActivityDefinition(BaseXapiActivityDefinition):
     """Pydantic model for CMI Interaction `Activity` type `definition` property.
 
@@ -33,6 +37,8 @@ class CMIInteractionActivity(BaseXapiActivity):
 
 
 # Profile
+
+
 class ProfileActivityDefinition(BaseXapiActivityDefinition):
     """Pydantic model for profile `Activity` type `definition` property.
 
@@ -57,6 +63,8 @@ class ProfileActivity(BaseXapiActivity):
 
 
 # Course
+
+
 class CourseActivityDefinition(BaseXapiActivityDefinition):
     """Pydantic model for course `Activity` type `definition` property.
 
@@ -81,6 +89,8 @@ class CourseActivity(BaseXapiActivity):
 
 
 # Module
+
+
 class ModuleActivityDefinition(BaseXapiActivityDefinition):
     """Pydantic model for module `Activity` type `definition` property.
 

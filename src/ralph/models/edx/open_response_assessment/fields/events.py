@@ -1,18 +1,18 @@
 """Open Response Assessment events model event fields definitions."""
 
+import sys
 from datetime import datetime
 from typing import Dict, List, Optional, Union
-
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
-
 from uuid import UUID
 
 from pydantic import constr
 
 from ralph.models.edx.base import AbstractBaseEventField, BaseModelWithConfig
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 
 class ORAGetPeerSubmissionEventField(AbstractBaseEventField):

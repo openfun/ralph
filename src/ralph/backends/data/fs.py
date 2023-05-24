@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from io import IOBase
 from itertools import chain
 from pathlib import Path
-from typing import IO, Iterable, Iterator, Union
+from typing import IO, Iterable, Iterator, Optional, Union
 from uuid import uuid4
 
 from ralph.backends.data.base import (
@@ -56,7 +56,7 @@ class FSDataBackend(HistoryMixin, BaseDataBackend):
     default_operation_type = BaseOperationType.CREATE
     settings_class = FSDataBackendSettings
 
-    def __init__(self, settings: Union[settings_class, None] = None):
+    def __init__(self, settings: Optional[FSDataBackendSettings] = None):
         """Create the default target directory if it does not exist.
 
         Args:
@@ -90,7 +90,7 @@ class FSDataBackend(HistoryMixin, BaseDataBackend):
         return DataBackendStatus.OK
 
     def list(
-        self, target: Union[str, None] = None, details: bool = False, new: bool = False
+        self, target: Optional[str] = None, details: bool = False, new: bool = False
     ) -> Iterator[Union[str, dict]]:
         """List files and directories in the target directory.
 
@@ -110,7 +110,7 @@ class FSDataBackend(HistoryMixin, BaseDataBackend):
         Raises:
             BackendParameterException: If the `target` argument is not a directory path.
         """
-        target = Path(target) if target else self.default_directory
+        target: Path = Path(target) if target else self.default_directory
         if not target.is_absolute() and target != self.default_directory:
             target = self.default_directory / target
         try:
@@ -145,9 +145,9 @@ class FSDataBackend(HistoryMixin, BaseDataBackend):
     def read(
         self,
         *,
-        query: Union[str, BaseQuery] = None,
-        target: Union[str, None] = None,
-        chunk_size: Union[int, None] = None,
+        query: Optional[Union[str, BaseQuery]] = None,
+        target: Optional[str] = None,
+        chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
@@ -218,10 +218,10 @@ class FSDataBackend(HistoryMixin, BaseDataBackend):
     def write(  # pylint: disable=too-many-arguments
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
-        target: Union[str, None] = None,
-        chunk_size: Union[int, None] = None,
+        target: Optional[str] = None,
+        chunk_size: Optional[int] = None,
         ignore_errors: bool = False,
-        operation_type: Union[BaseOperationType, None] = None,
+        operation_type: Optional[BaseOperationType] = None,
     ) -> int:
         """Write data records to the target file and return their count.
 

@@ -1,18 +1,18 @@
 """Base xAPI `Object` definitions (1)."""
 
-from typing import Dict, List, Optional, Union
-
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
-
+import sys
+from typing import Any, Dict, List, Optional, Union
 from uuid import UUID
 
 from pydantic import AnyUrl, StrictStr, constr, validator
 
 from ..config import BaseModelWithConfig
 from .common import IRI, LanguageMap
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 
 class BaseXapiActivityDefinition(BaseModelWithConfig):
@@ -81,7 +81,7 @@ class BaseXapiActivityInteractionDefinition(BaseXapiActivityDefinition):
 
     @validator("choices", "scale", "source", "target", "steps")
     @classmethod
-    def check_unique_ids(cls, value):
+    def check_unique_ids(cls, value: Any) -> None:
         """Check the uniqueness of interaction components IDs."""
         if len(value) != len({x.id for x in value}):
             raise ValueError("Duplicate InteractionComponents are not valid")

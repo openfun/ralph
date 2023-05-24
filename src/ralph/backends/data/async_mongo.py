@@ -4,7 +4,7 @@ import json
 import logging
 from io import IOBase
 from itertools import chain
-from typing import Any, Dict, Iterable, Iterator, Union
+from typing import Any, Dict, Iterable, Iterator, Optional, Union
 
 from bson.errors import BSONError
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -36,7 +36,7 @@ class AsyncMongoDataBackend(BaseAsyncDataBackend):
     query_model = MongoQuery
     settings_class = MongoDataBackendSettings
 
-    def __init__(self, settings: Union[settings_class, None] = None):
+    def __init__(self, settings: Optional[MongoDataBackendSettings] = None):
         """Instantiate the asynchronous MongoDB client.
 
         Args:
@@ -74,7 +74,7 @@ class AsyncMongoDataBackend(BaseAsyncDataBackend):
         return DataBackendStatus.OK
 
     async def list(
-        self, target: Union[str, None] = None, details: bool = False, new: bool = False
+        self, target: Optional[str] = None, details: bool = False, new: bool = False
     ) -> Iterator[Union[str, dict]]:
         """List collections in the target database.
 
@@ -118,9 +118,9 @@ class AsyncMongoDataBackend(BaseAsyncDataBackend):
     async def read(
         self,
         *,
-        query: Union[str, MongoQuery] = None,
-        target: Union[str, None] = None,
-        chunk_size: Union[int, None] = None,
+        query: Optional[Union[str, MongoQuery]] = None,
+        target: Optional[str] = None,
+        chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
@@ -179,10 +179,10 @@ class AsyncMongoDataBackend(BaseAsyncDataBackend):
     async def write(  # pylint: disable=too-many-arguments
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
-        target: Union[str, None] = None,
-        chunk_size: Union[int, None] = None,
+        target: Optional[str] = None,
+        chunk_size: Optional[int] = None,
         ignore_errors: bool = False,
-        operation_type: Union[BaseOperationType, None] = None,
+        operation_type: Optional[BaseOperationType] = None,
     ) -> int:
         """Write data documents to the target collection and return their count.
 

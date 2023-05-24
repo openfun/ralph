@@ -85,7 +85,9 @@ class BaseHTTPBackend(ABC):
     name = "base"
     query = BaseQuery
 
-    def validate_query(self, query: Union[str, dict, BaseQuery] = None) -> BaseQuery:
+    def validate_query(
+        self, query: Optional[Union[str, dict, BaseQuery]] = None
+    ) -> BaseQuery:
         """Validate and transforms the query."""
         if query is None:
             query = self.query()
@@ -114,7 +116,7 @@ class BaseHTTPBackend(ABC):
 
     @abstractmethod
     async def list(
-        self, target: str = None, details: bool = False, new: bool = False
+        self, target: Optional[str] = None, details: bool = False, new: bool = False
     ) -> Iterator[Union[str, dict]]:
         """List containers in the data backend. E.g., collections, files, indexes."""
 
@@ -126,8 +128,8 @@ class BaseHTTPBackend(ABC):
     @enforce_query_checks
     async def read(  # pylint: disable=too-many-arguments
         self,
-        query: Union[str, BaseQuery] = None,
-        target: str = None,
+        query: Optional[Union[str, BaseQuery]] = None,
+        target: Optional[str] = None,
         chunk_size: Optional[PositiveInt] = 500,
         raw_output: bool = False,
         ignore_errors: bool = False,

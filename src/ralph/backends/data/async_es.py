@@ -3,7 +3,7 @@
 import logging
 from io import IOBase
 from itertools import chain
-from typing import Iterable, Iterator, Union
+from typing import Iterable, Iterator, Optional, Union
 
 from elasticsearch import ApiError, AsyncElasticsearch, TransportError
 from elasticsearch.helpers import BulkIndexError, async_streaming_bulk
@@ -30,7 +30,7 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
     query_model = ESQuery
     settings_class = ESDataBackendSettings
 
-    def __init__(self, settings: Union[settings_class, None] = None):
+    def __init__(self, settings: Optional[ESDataBackendSettings] = None):
         """Instantiate the asynchronous Elasticsearch client.
 
         Args:
@@ -70,7 +70,7 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
         return DataBackendStatus.ERROR
 
     async def list(
-        self, target: str = None, details: bool = False, new: bool = False
+        self, target: Optional[str] = None, details: bool = False, new: bool = False
     ) -> Iterator[Union[str, dict]]:
         """List available Elasticsearch indices, data streams and aliases.
 
@@ -113,8 +113,8 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
     async def read(
         self,
         *,
-        query: Union[str, ESQuery] = None,
-        target: str = None,
+        query: Optional[Union[str, ESQuery]] = None,
+        target: Optional[str] = None,
         chunk_size: Union[None, int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,

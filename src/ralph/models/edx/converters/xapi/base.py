@@ -1,5 +1,6 @@
 """Base xAPI Converter."""
 
+from typing import Set
 from uuid import UUID, uuid5
 
 from ralph.exceptions import ConfigurationException
@@ -27,7 +28,7 @@ class BaseXapiConverter(BaseConversionSet):
             raise ConfigurationException("Invalid UUID namespace") from err
         super().__init__()
 
-    def _get_conversion_items(self):
+    def _get_conversion_items(self) -> Set[ConversionItem]:
         """Return a set of ConversionItems used for conversion."""
         return {
             ConversionItem(

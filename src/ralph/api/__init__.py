@@ -1,5 +1,6 @@
 """Main module for Ralph's LRS API."""
 from functools import lru_cache
+from typing import Any, Dict, List, Union
 from urllib.parse import urlparse
 
 import sentry_sdk
@@ -14,12 +15,14 @@ from .routers import health, statements
 
 
 @lru_cache(maxsize=None)
-def get_health_check_routes():
+def get_health_check_routes() -> List:
     """Return the health check routes."""
     return [route.path for route in health.router.routes]
 
 
-def filter_transactions(event, hint):  # pylint: disable=unused-argument
+def filter_transactions(
+    event: Dict, hint  # pylint: disable=unused-argument
+) -> Union[Dict, None]:
     """Filter transactions for Sentry."""
     url = urlparse(event["request"]["url"])
 
@@ -47,6 +50,6 @@ app.include_router(health.router)
 @app.get("/whoami")
 async def whoami(
     user: AuthenticatedUser = Depends(get_authenticated_user),
-):
+) -> Dict[str, Any]:
     """Return the current user's username along with their scopes."""
     return {"agent": user.agent, "scopes": user.scopes}

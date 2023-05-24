@@ -1,11 +1,13 @@
 """Video event fields definitions."""
 
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
+import sys
 
 from ...base import AbstractBaseEventField
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 
 class VideoBaseEventField(AbstractBaseEventField):

@@ -3,7 +3,7 @@
 import logging
 from datetime import datetime
 from io import IOBase
-from typing import Iterable, List, Literal, Union
+from typing import Iterable, List, Literal, Optional, Union
 from uuid import UUID
 
 from ralph.backends.data.base import BaseOperationType
@@ -99,7 +99,7 @@ class FSLRSBackend(BaseLRSBackend, FSDataBackend):
 
     @staticmethod
     def _add_filter_by_agent(
-        filters: list, agent: Union[AgentParameters, None], related: Union[bool, None]
+        filters: list, agent: Optional[AgentParameters], related: Optional[bool]
     ) -> None:
         """Add agent filters to `filters` if `agent` is set."""
         if not agent:
@@ -122,7 +122,7 @@ class FSLRSBackend(BaseLRSBackend, FSDataBackend):
     @staticmethod
     def _add_filter_by_authority(
         filters: list,
-        authority: Union[AgentParameters, None],
+        authority: Optional[AgentParameters],
     ) -> None:
         """Add authority filters to `filters` if `authority` is set."""
         if not authority:
@@ -147,7 +147,7 @@ class FSLRSBackend(BaseLRSBackend, FSDataBackend):
         )
 
     @staticmethod
-    def _add_filter_by_id(filters: list, statement_id: Union[str, None]) -> None:
+    def _add_filter_by_id(filters: list, statement_id: Optional[str]) -> None:
         """Add the `match_statement_id` filter if `statement_id` is set."""
 
         def match_statement_id(statement: dict) -> bool:
@@ -169,8 +169,8 @@ class FSLRSBackend(BaseLRSBackend, FSDataBackend):
     @staticmethod
     def _add_filter_by_mbox(
         filters: list,
-        mbox: Union[str, None],
-        related: Union[bool, None] = False,
+        mbox: Optional[str],
+        related: Optional[bool] = False,
         field: Literal["actor", "authority"] = "actor",
     ) -> None:
         """Add the `match_mbox` filter if `mbox` is set."""
@@ -196,8 +196,8 @@ class FSLRSBackend(BaseLRSBackend, FSDataBackend):
     @staticmethod
     def _add_filter_by_sha1sum(
         filters: list,
-        sha1sum: Union[str, None],
-        related: Union[bool, None] = False,
+        sha1sum: Optional[str],
+        related: Optional[bool] = False,
         field: Literal["actor", "authority"] = "actor",
     ) -> None:
         """Add the `match_sha1sum` filter if `sha1sum` is set."""
@@ -223,8 +223,8 @@ class FSLRSBackend(BaseLRSBackend, FSDataBackend):
     @staticmethod
     def _add_filter_by_openid(
         filters: list,
-        openid: Union[str, None],
-        related: Union[bool, None] = False,
+        openid: Optional[str],
+        related: Optional[bool] = False,
         field: Literal["actor", "authority"] = "actor",
     ) -> None:
         """Add the `match_openid` filter if `openid` is set."""
@@ -250,9 +250,9 @@ class FSLRSBackend(BaseLRSBackend, FSDataBackend):
     @staticmethod
     def _add_filter_by_account(
         filters: list,
-        name: Union[str, None],
-        home_page: Union[str, None],
-        related: Union[bool, None] = False,
+        name: Optional[str],
+        home_page: Optional[str],
+        related: Optional[bool] = False,
         field: Literal["actor", "authority"] = "actor",
     ) -> None:
         """Add the `match_account` filter if `name` or `home_page` is set."""
@@ -278,7 +278,7 @@ class FSLRSBackend(BaseLRSBackend, FSDataBackend):
             filters.append(match_related_account if related else match_account)
 
     @staticmethod
-    def _add_filter_by_verb(filters: list, verb_id: Union[str, None]) -> None:
+    def _add_filter_by_verb(filters: list, verb_id: Optional[str]) -> None:
         """Add the `match_verb_id` filter if `verb_id` is set."""
 
         def match_verb_id(statement: dict) -> bool:
@@ -290,7 +290,7 @@ class FSLRSBackend(BaseLRSBackend, FSDataBackend):
 
     @staticmethod
     def _add_filter_by_activity(
-        filters: list, object_id: Union[str, None], related: Union[bool, None]
+        filters: list, object_id: Optional[str], related: Optional[bool]
     ) -> None:
         """Add the `match_object_id` filter if `object_id` is set."""
 
@@ -322,7 +322,7 @@ class FSLRSBackend(BaseLRSBackend, FSDataBackend):
 
     @staticmethod
     def _add_filter_by_timestamp_since(
-        filters: list, timestamp: Union[datetime, None]
+        filters: list, timestamp: Optional[datetime]
     ) -> None:
         """Add the `match_since` filter if `timestamp` is set."""
         if isinstance(timestamp, str):
@@ -343,7 +343,7 @@ class FSLRSBackend(BaseLRSBackend, FSDataBackend):
 
     @staticmethod
     def _add_filter_by_timestamp_until(
-        filters: list, timestamp: Union[datetime, None]
+        filters: list, timestamp: Optional[datetime]
     ) -> None:
         """Add the `match_until` function if `timestamp` is set."""
         if isinstance(timestamp, str):
@@ -363,9 +363,7 @@ class FSLRSBackend(BaseLRSBackend, FSDataBackend):
             filters.append(match_until)
 
     @staticmethod
-    def _add_filter_by_search_after(
-        filters: list, search_after: Union[str, None]
-    ) -> None:
+    def _add_filter_by_search_after(filters: list, search_after: Optional[str]) -> None:
         """Add the `match_search_after` filter if `search_after` is set."""
         search_after_state = {"state": False}
 
@@ -382,7 +380,7 @@ class FSLRSBackend(BaseLRSBackend, FSDataBackend):
 
     @staticmethod
     def _add_filter_by_registration(
-        filters: list, registration: Union[UUID, None]
+        filters: list, registration: Optional[UUID]
     ) -> None:
         """Add the `match_registration` filter if `registration` is set."""
         registration_str = str(registration)

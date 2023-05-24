@@ -5,7 +5,17 @@ import logging
 from datetime import datetime
 from io import IOBase
 from itertools import chain
-from typing import Any, Dict, Generator, Iterable, Iterator, List, NamedTuple, Union
+from typing import (
+    Any,
+    Dict,
+    Generator,
+    Iterable,
+    Iterator,
+    List,
+    NamedTuple,
+    Optional,
+    Union,
+)
 from uuid import UUID, uuid4
 
 import clickhouse_connect
@@ -107,7 +117,7 @@ class ClickHouseDataBackend(BaseDataBackend):
     default_operation_type = BaseOperationType.CREATE
     settings_class = ClickHouseDataBackendSettings
 
-    def __init__(self, settings: Union[settings_class, None] = None):
+    def __init__(self, settings: Optional[ClickHouseDataBackendSettings] = None):
         """Instantiate the ClickHouse configuration.
 
         Args:
@@ -156,7 +166,7 @@ class ClickHouseDataBackend(BaseDataBackend):
         return DataBackendStatus.OK
 
     def list(
-        self, target: Union[str, None] = None, details: bool = False, new: bool = False
+        self, target: Optional[str] = None, details: bool = False, new: bool = False
     ) -> Iterator[Union[str, dict]]:
         """List tables for a given database.
 
@@ -191,9 +201,9 @@ class ClickHouseDataBackend(BaseDataBackend):
     def read(
         self,
         *,
-        query: Union[str, ClickHouseQuery] = None,
-        target: Union[str, None] = None,
-        chunk_size: Union[int, None] = None,
+        query: Optional[Union[str, ClickHouseQuery]] = None,
+        target: Optional[str] = None,
+        chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
@@ -285,10 +295,10 @@ class ClickHouseDataBackend(BaseDataBackend):
     def write(  # pylint: disable=too-many-arguments
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
-        target: Union[str, None] = None,
-        chunk_size: Union[int, None] = None,
+        target: Optional[str] = None,
+        chunk_size: Optional[int] = None,
         ignore_errors: bool = False,
-        operation_type: Union[BaseOperationType, None] = None,
+        operation_type: Optional[BaseOperationType] = None,
     ) -> int:
         """Write `data` documents to the `target` table and return their count.
 
@@ -420,7 +430,10 @@ class ClickHouseDataBackend(BaseDataBackend):
             yield insert_tuple
 
     def _bulk_import(
-        self, batch: list, ignore_errors: bool = False, event_table_name: str = None
+        self,
+        batch: list,
+        ignore_errors: bool = False,
+        event_table_name: Optional[str] = None,
     ):
         """Insert a batch of documents into the selected database table."""
         try:

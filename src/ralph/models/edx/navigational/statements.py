@@ -1,11 +1,7 @@
 """Navigational event model definitions."""
 
+import sys
 from typing import Union
-
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
 
 from pydantic import Json, validator
 
@@ -13,6 +9,11 @@ from ralph.models.selector import selector
 
 from ..browser import BaseBrowserModel
 from .fields.events import NavigationalEventField
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 
 class UIPageClose(BaseBrowserModel):
@@ -76,7 +77,9 @@ class UISeqNext(BaseBrowserModel):
 
     @validator("event")
     @classmethod
-    def validate_next_jump_event_field(cls, value):
+    def validate_next_jump_event_field(
+        cls, value: Union[Json[NavigationalEventField], NavigationalEventField]
+    ) -> Union[Json[NavigationalEventField], NavigationalEventField]:
         """Check that event.new is equal to event.old + 1."""
         if value.new != value.old + 1:
             raise ValueError("event.new - event.old should be equal to 1")
@@ -106,7 +109,9 @@ class UISeqPrev(BaseBrowserModel):
 
     @validator("event")
     @classmethod
-    def validate_prev_jump_event_field(cls, value):
+    def validate_prev_jump_event_field(
+        cls, value: Union[Json[NavigationalEventField], NavigationalEventField]
+    ) -> Union[Json[NavigationalEventField], NavigationalEventField]:
         """Check that event.new is equal to event.old - 1."""
         if value.new != value.old - 1:
             raise ValueError("event.old - event.new should be equal to 1")

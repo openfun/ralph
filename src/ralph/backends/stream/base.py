@@ -27,5 +27,5 @@ class BaseStreamBackend(ABC):
     settings_class = BaseStreamBackendSettings
 
     @abstractmethod
-    def stream(self, target: BinaryIO):
+    def stream(self, target: BinaryIO) -> None:
         """Read records and stream them to target."""

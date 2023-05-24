@@ -1,12 +1,7 @@
 """Video xAPI events context fields definitions."""
 
+import sys
 from typing import List, Optional, Union
-
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
-
 from uuid import UUID
 
 from pydantic import Field, NonNegativeFloat, validator
@@ -28,6 +23,11 @@ from ..concepts.constants.video import (
     CONTEXT_EXTENSION_VOLUME,
 )
 from ..config import BaseExtensionModelWithConfig
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 
 class VideoProfileActivity(ProfileActivity):
@@ -58,7 +58,9 @@ class VideoContextContextActivities(BaseXapiContextContextActivities):
         value: Union[
             VideoProfileActivity, List[Union[VideoProfileActivity, BaseXapiActivity]]
         ],
-    ):
+    ) -> Union[
+        VideoProfileActivity, List[Union[VideoProfileActivity, BaseXapiActivity]]
+    ]:
         """Check that the category list contains a `VideoProfileActivity`."""
         if isinstance(value, VideoProfileActivity):
             return value

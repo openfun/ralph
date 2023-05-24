@@ -1,15 +1,16 @@
 """Textbook interaction event fields definitions."""
 
+import sys
 from typing import Optional, Union
-
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
 
 from pydantic import Field, constr
 
 from ...base import AbstractBaseEventField
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 
 # pylint: disable=line-too-long

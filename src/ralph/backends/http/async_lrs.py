@@ -106,7 +106,7 @@ class AsyncLRSHTTPBackend(BaseHTTPBackend):
     settings_class = LRSHTTPBackendSettings
 
     def __init__(  # pylint: disable=too-many-arguments
-        self, settings: settings_class = None
+        self, settings: Optional[LRSHTTPBackendSettings] = None
     ):
         """Instantiate the LRS HTTP (basic auth) backend client.
 
@@ -119,7 +119,7 @@ class AsyncLRSHTTPBackend(BaseHTTPBackend):
         self.base_url = parse_obj_as(AnyHttpUrl, self.settings.BASE_URL)
         self.auth = (self.settings.USERNAME, self.settings.PASSWORD)
 
-    async def status(self):
+    async def status(self) -> HTTPBackendStatus:
         """HTTP backend check for server status."""
         status_url = urljoin(self.base_url, self.settings.STATUS_ENDPOINT)
 
@@ -139,7 +139,7 @@ class AsyncLRSHTTPBackend(BaseHTTPBackend):
         return HTTPBackendStatus.OK
 
     async def list(
-        self, target: str = None, details: bool = False, new: bool = False
+        self, target: Optional[str] = None, details: bool = False, new: bool = False
     ) -> Iterator[Union[str, dict]]:
         """Raise error for unsupported `list` method."""
         msg = "LRS HTTP backend does not support `list` method, cannot list from %s"
@@ -150,8 +150,8 @@ class AsyncLRSHTTPBackend(BaseHTTPBackend):
     @enforce_query_checks
     async def read(  # pylint: disable=too-many-arguments
         self,
-        query: Union[str, LRSStatementsQuery] = None,
-        target: str = None,
+        query: Optional[Union[str, LRSStatementsQuery]] = None,
+        target: Optional[str] = None,
         chunk_size: Optional[PositiveInt] = 500,
         raw_output: bool = False,
         ignore_errors: bool = False,

@@ -1,11 +1,7 @@
 """LMS xAPI events object fields definitions."""
 
+import sys
 from typing import Optional
-
-try:
-    from typing import Literal  # pylint: disable = ungrouped-imports
-except ImportError:
-    from typing_extensions import Literal
 
 from pydantic import Field
 
@@ -20,8 +16,15 @@ from ..concepts.activity_types.activity_streams_vocabulary import (
 from ..concepts.constants.acrossx_profile import ACTIVITY_EXTENSIONS_TYPE
 from ..config import BaseExtensionModelWithConfig
 
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
+
 
 # Page
+
+
 class LMSPageObjectDefinitionExtensions(BaseExtensionModelWithConfig):
     """Pydantic model for LMS page `object`.`definition`.`extensions` property.
 
@@ -56,6 +59,8 @@ class LMSPageObject(WebpageActivity):
 
 
 # File
+
+
 class LMSFileObjectDefinitionExtensions(BaseExtensionModelWithConfig):
     """Pydantic model for LMS file `object`.`definition`.`extensions` property.
 

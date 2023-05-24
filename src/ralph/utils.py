@@ -8,14 +8,15 @@ import operator
 from functools import reduce
 from importlib import import_module
 from inspect import getmembers, isclass, iscoroutine
-from typing import Any, Dict, Iterable, Iterator, List, Union
+from logging import Logger, getLogger
+from typing import Any, Dict, Iterable, Iterator, List, Optional, Sequence, Union
 
 from pydantic import BaseModel
 
 from ralph.exceptions import BackendException
 
 
-def import_subclass(dotted_path, parent_class):
+def import_subclass(dotted_path: str, parent_class: Any) -> Any:
     """Import a dotted module path.
 
     Return the class that is a subclass of `parent_class` inside this module.
@@ -34,7 +35,7 @@ def import_subclass(dotted_path, parent_class):
 
 # Taken from Django utilities
 # https://docs.djangoproject.com/en/3.1/_modules/django/utils/module_loading/#import_string
-def import_string(dotted_path):
+def import_string(dotted_path: str) -> Any:
     """Import a dotted module path.
 
     Return the attribute/class designated by the last name in the path.
@@ -55,7 +56,9 @@ def import_string(dotted_path):
         ) from err
 
 
-def get_backend_type(backend_types: List[BaseModel], backend_name: str):
+def get_backend_type(
+    backend_types: List[BaseModel], backend_name: str
+) -> Union[BaseModel, None]:
     """Return the backend type from a backend name."""
     backend_name = backend_name.upper()
     for backend_type in backend_types:
@@ -64,7 +67,7 @@ def get_backend_type(backend_types: List[BaseModel], backend_name: str):
     return None
 
 
-def get_backend_class(backend_type: BaseModel, backend_name: str):
+def get_backend_class(backend_type: BaseModel, backend_name: str) -> Any:
     """Return the backend class given the backend type and backend name."""
     # Get type name from backend_type class name
     backend_type_name = backend_type.__class__.__name__[
@@ -93,8 +96,8 @@ def get_backend_class(backend_type: BaseModel, backend_name: str):
 def get_backend_instance(
     backend_type: BaseModel,
     backend_name: str,
-    options: Union[dict, None] = None,
-):
+    options: Optional[Dict] = None,
+) -> Any:
     """Return the instantiated backend given the backend type, name and options."""
     backend_class = get_backend_class(backend_type, backend_name)
     backend_settings = getattr(backend_type, backend_name.upper())
@@ -111,20 +114,20 @@ def get_backend_instance(
     return backend_class(backend_settings.__class__(**options))
 
 
-def get_root_logger():
+def get_root_logger() -> Logger:
     """Get main Ralph logger."""
-    ralph_logger = logging.getLogger("ralph")
+    ralph_logger = getLogger("ralph")
     ralph_logger.propagate = True
 
     return ralph_logger
 
 
-def now():
+def now() -> str:
     """Return the current UTC time in ISO format."""
     return datetime.datetime.now(tz=datetime.timezone.utc).isoformat()
 
 
-def get_dict_value_from_path(dict_: dict, path: List[str]):
+def get_dict_value_from_path(dict_: Dict, path: Sequence[str]) -> Union[Dict, None]:
     """Get a nested dictionary value.
 
     Args:
@@ -140,7 +143,7 @@ def get_dict_value_from_path(dict_: dict, path: List[str]):
         return None
 
 
-def set_dict_value_from_path(dict_: dict, path: List[str], value: any):
+def set_dict_value_from_path(dict_: Dict, path: List[str], value: Any) -> None:
     """Set a nested dictionary value.
 
     Args:
@@ -153,7 +156,7 @@ def set_dict_value_from_path(dict_: dict, path: List[str], value: any):
     dict_[path[-1]] = value
 
 
-async def gather_with_limited_concurrency(num_tasks: Union[None, int], *tasks):
+async def gather_with_limited_concurrency(num_tasks: Optional[int], *tasks: Any) -> Any:
     """Gather no more than `num_tasks` tasks at time.
 
     Args:
@@ -164,7 +167,7 @@ async def gather_with_limited_concurrency(num_tasks: Union[None, int], *tasks):
     if num_tasks is not None:
         semaphore = asyncio.Semaphore(num_tasks)
 
-        async def sem_task(task):
+        async def sem_task(task: Any) -> Any:
             async with semaphore:
                 return await task
 
@@ -180,7 +183,7 @@ async def gather_with_limited_concurrency(num_tasks: Union[None, int], *tasks):
         raise exception
 
 
-def statements_are_equivalent(statement_1: dict, statement_2: dict):
+def statements_are_equivalent(statement_1: dict, statement_2: dict) -> bool:
     """Check if statements are equivalent.
 
     To be equivalent, they must be identical on all fields not modified on input by the

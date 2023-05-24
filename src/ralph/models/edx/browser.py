@@ -1,15 +1,16 @@
 """Browser event model definitions."""
 
+import sys
 from typing import Union
-
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
 
 from pydantic import AnyUrl, constr
 
 from .base import BaseEdxModel
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 
 class BaseBrowserModel(BaseEdxModel):

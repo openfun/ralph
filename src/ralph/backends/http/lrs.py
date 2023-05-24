@@ -1,7 +1,9 @@
 """LRS HTTP backend for Ralph."""
 import asyncio
+from typing import Iterator, Union
 
 from ralph.backends.http.async_lrs import AsyncLRSHTTPBackend
+from ralph.backends.http.base import HTTPBackendStatus
 
 
 def _ensure_running_loop_uniqueness(func):
@@ -33,21 +35,21 @@ class LRSHTTPBackend(AsyncLRSHTTPBackend):
     name = "lrs"
 
     @_ensure_running_loop_uniqueness
-    def status(self, *args, **kwargs):
+    def status(self, *args, **kwargs) -> HTTPBackendStatus:
         """HTTP backend check for server status."""
         return asyncio.get_event_loop().run_until_complete(
             super().status(*args, **kwargs)
         )
 
     @_ensure_running_loop_uniqueness
-    def list(self, *args, **kwargs):
+    def list(self, *args, **kwargs) -> Iterator[Union[str, dict]]:
         """Raise error for unsupported `list` method."""
         return asyncio.get_event_loop().run_until_complete(
             super().list(*args, **kwargs)
         )
 
     @_ensure_running_loop_uniqueness
-    def read(self, *args, **kwargs):
+    def read(self, *args, **kwargs) -> Iterator[Union[bytes, dict]]:
         """Get statements from LRS `target` endpoint.
 
         See AsyncLRSHTTP.read for more information.
@@ -61,7 +63,7 @@ class LRSHTTPBackend(AsyncLRSHTTPBackend):
             pass
 
     @_ensure_running_loop_uniqueness
-    def write(self, *args, **kwargs):
+    def write(self, *args, **kwargs) -> int:
         """Write `data` records to the `target` endpoint and return their count.
 
         See AsyncLRSHTTP.write for more information.

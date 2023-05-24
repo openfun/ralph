@@ -3,7 +3,7 @@
 import json
 import logging
 from datetime import datetime
-from typing import List, Literal, Optional, Union
+from typing import Dict, List, Literal, Optional, Union
 from urllib.parse import ParseResult, urlencode
 from uuid import UUID, uuid4
 
@@ -75,31 +75,33 @@ POST_PUT_RESPONSES = {
 }
 
 
-def _enrich_statement_with_id(statement: dict):
+def _enrich_statement_with_id(statement: dict) -> None:
     # id: Statement UUID identifier.
     # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#24-statement-properties
     statement["id"] = str(statement.get("id", uuid4()))
 
 
-def _enrich_statement_with_stored(statement: dict):
+def _enrich_statement_with_stored(statement: dict) -> None:
     # stored: The time at which a Statement is stored by the LRS.
     # https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Data.md#248-stored
     statement["stored"] = now()
 
 
-def _enrich_statement_with_timestamp(statement: dict):
+def _enrich_statement_with_timestamp(statement: dict) -> None:
     # timestamp: Time of the action. If not provided, it takes the same value as stored.
     # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#247-timestamp
     statement["timestamp"] = statement.get("timestamp", statement["stored"])
 
 
-def _enrich_statement_with_authority(statement: dict, current_user: AuthenticatedUser):
+def _enrich_statement_with_authority(
+    statement: dict, current_user: AuthenticatedUser
+) -> None:
     # authority: Information about whom or what has asserted the statement is true.
     # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#249-authority
     statement["authority"] = current_user.agent
 
 
-def _parse_agent_parameters(agent_obj: dict):
+def _parse_agent_parameters(agent_obj: dict) -> AgentParameters:
     """Parse a dict and return an AgentParameters object to use in queries."""
     # Transform agent to `dict` as FastAPI cannot parse JSON (seen as string)
 
@@ -120,7 +122,7 @@ def _parse_agent_parameters(agent_obj: dict):
     return AgentParameters.construct(**agent_query_params)
 
 
-def strict_query_params(request: Request):
+def strict_query_params(request: Request) -> None:
     """Raise a 400 error when using extra query parameters."""
     dependant: Dependant = request.scope["route"].dependant
     allowed_params = [
@@ -279,7 +281,7 @@ async def get(
         ),
     ),
     _=Depends(strict_query_params),
-):
+) -> Dict:
     """Read a single xAPI Statement or multiple xAPI Statements.
 
     LRS Specification:
@@ -410,7 +412,7 @@ async def put(
     background_tasks: BackgroundTasks,
     statement_id: UUID = Query(alias="statementId"),
     _=Depends(strict_query_params),
-):
+) -> None:
     """Store a single statement as a single member of a set.
 
     LRS Specification:
@@ -492,7 +494,7 @@ async def post(
     background_tasks: BackgroundTasks,
     response: Response,
     _=Depends(strict_query_params),
-):
+) -> Union[List, None]:
     """Store a set of statements (or a single statement as a single member of a set).
 
     NB: at this time, using POST to make a GET request, is not supported.
