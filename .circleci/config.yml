@@ -237,7 +237,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install development dependencies
+          name: Install dependencies
           command: pip install --user .
 
       - run:
@@ -252,6 +252,8 @@ jobs:
             ); do
               python -c "from ${module} import *"
             done
+            # One last test
+            python -c "from ralph.models.selector import ModelSelector"
 
   # ---- Tray jobs (k8s) ----
   tray:
