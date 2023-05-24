@@ -196,6 +196,7 @@ class S3StorageBackendSettings(InstantiableSettingsItem):
     SESSION_TOKEN: str = None
     DEFAULT_REGION: str = None
     BUCKET_NAME: str = None
+    ENDPOINT_URL: str = None
 
 
 class StorageBackendSettings(BaseModel):

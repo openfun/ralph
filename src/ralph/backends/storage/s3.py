@@ -32,6 +32,7 @@ class S3Storage(
         session_token: str = s3_settings.SESSION_TOKEN,
         default_region: str = s3_settings.DEFAULT_REGION,
         bucket_name: str = s3_settings.BUCKET_NAME,
+        endpoint_ulr: str = s3_settings.ENDPOINT_URL
     ):
         """Instantiates the AWS S3 client."""
         self.access_key_id = access_key_id
@@ -39,6 +40,7 @@ class S3Storage(
         self.session_token = session_token
         self.default_region = default_region
         self.bucket_name = bucket_name
+        self.endpoint_url = endpoint_ulr
 
         self.client = boto3.client(
             "s3",
@@ -46,6 +48,7 @@ class S3Storage(
             aws_secret_access_key=self.secret_access_key,
             aws_session_token=self.session_token,
             region_name=self.default_region,
+            endpoint_ulr=self.endpoint_url
         )
 
         # Check whether bucket exists and is accessible
