@@ -22,7 +22,7 @@ BACKEND_CLIENT: Union[BaseLRSBackend, BaseAsyncLRSBackend] = get_backend_instanc
 
 
 @router.get("/__lbheartbeat__")
-async def lbheartbeat():
+async def lbheartbeat() -> None:
     """Load balancer heartbeat.
 
     Returns a 200 when the server is running.
@@ -31,7 +31,7 @@ async def lbheartbeat():
 
 
 @router.get("/__heartbeat__")
-async def heartbeat():
+async def heartbeat() -> JSONResponse:
     """Application heartbeat.
 
     Returns a 200 if all checks are successful.

@@ -1,7 +1,7 @@
 """ClickHouse LRS backend for Ralph."""
 
 import logging
-from typing import Iterator, List
+from typing import Generator, Iterator, List
 
 from ralph.backends.data.clickhouse import (
     ClickHouseDataBackend,
@@ -118,7 +118,7 @@ class ClickHouseLRSBackend(BaseLRSBackend, ClickHouseDataBackend):
     def query_statements_by_ids(self, ids: List[str]) -> Iterator[dict]:
         """Yield statements with matching ids from the backend."""
 
-        def chunk_id_list(chunk_size=self.settings.IDS_CHUNK_SIZE):
+        def chunk_id_list(chunk_size: int = self.settings.IDS_CHUNK_SIZE) -> Generator:
             for i in range(0, len(ids), chunk_size):
                 yield ids[i : i + chunk_size]
 
@@ -148,7 +148,7 @@ class ClickHouseLRSBackend(BaseLRSBackend, ClickHouseDataBackend):
         where: list,
         agent_params: AgentParameters,
         target_field: str,
-    ):
+    ) -> None:
         """Add filters relative to agents to `where`."""
         if not agent_params:
             return

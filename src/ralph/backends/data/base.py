@@ -5,7 +5,7 @@ import logging
 from abc import ABC, abstractmethod
 from enum import Enum, unique
 from io import IOBase
-from typing import Iterable, Iterator, Union
+from typing import Iterable, Iterator, Optional, Union
 
 from pydantic import BaseModel, BaseSettings, ValidationError
 
@@ -89,7 +89,7 @@ class BaseDataBackend(ABC):
     settings_class = BaseDataBackendSettings
 
     @abstractmethod
-    def __init__(self, settings: Union[settings_class, None] = None):
+    def __init__(self, settings: Optional[BaseDataBackendSettings] = None):
         """Instantiate the data backend.
 
         Args:
@@ -137,7 +137,7 @@ class BaseDataBackend(ABC):
 
     @abstractmethod
     def list(
-        self, target: Union[str, None] = None, details: bool = False, new: bool = False
+        self, target: Optional[str] = None, details: bool = False, new: bool = False
     ) -> Iterator[Union[str, dict]]:
         """List containers in the data backend. E.g., collections, files, indexes.
 
@@ -161,9 +161,9 @@ class BaseDataBackend(ABC):
     def read(
         self,
         *,
-        query: Union[str, BaseQuery] = None,
-        target: Union[str, None] = None,
-        chunk_size: Union[int, None] = None,
+        query: Optional[Union[str, BaseQuery]] = None,
+        target: Optional[str] = None,
+        chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
@@ -199,10 +199,10 @@ class BaseDataBackend(ABC):
     def write(  # pylint: disable=too-many-arguments
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
-        target: Union[str, None] = None,
-        chunk_size: Union[int, None] = None,
+        target: Optional[str] = None,
+        chunk_size: Optional[int] = None,
         ignore_errors: bool = False,
-        operation_type: Union[BaseOperationType, None] = None,
+        operation_type: Optional[BaseOperationType] = None,
     ) -> int:
         """Write `data` records to the `target` container and return their count.
 
@@ -262,7 +262,7 @@ class BaseAsyncDataBackend(ABC):
     settings_class = BaseDataBackendSettings
 
     @abstractmethod
-    def __init__(self, settings: Union[settings_class, None] = None):
+    def __init__(self, settings: Optional[BaseDataBackendSettings] = None):
         """Instantiate the data backend.
 
         Args:
@@ -310,7 +310,7 @@ class BaseAsyncDataBackend(ABC):
 
     @abstractmethod
     async def list(
-        self, target: Union[str, None] = None, details: bool = False, new: bool = False
+        self, target: Optional[str] = None, details: bool = False, new: bool = False
     ) -> Iterator[Union[str, dict]]:
         """List containers in the data backend. E.g., collections, files, indexes.
 
@@ -334,9 +334,9 @@ class BaseAsyncDataBackend(ABC):
     async def read(
         self,
         *,
-        query: Union[str, BaseQuery] = None,
-        target: Union[str, None] = None,
-        chunk_size: Union[int, None] = None,
+        query: Optional[Union[str, BaseQuery]] = None,
+        target: Optional[str] = None,
+        chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
@@ -372,10 +372,10 @@ class BaseAsyncDataBackend(ABC):
     async def write(  # pylint: disable=too-many-arguments
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
-        target: Union[str, None] = None,
-        chunk_size: Union[int, None] = None,
+        target: Optional[str] = None,
+        chunk_size: Optional[int] = None,
         ignore_errors: bool = False,
-        operation_type: Union[BaseOperationType, None] = None,
+        operation_type: Optional[BaseOperationType] = None,
     ) -> int:
         """Write `data` records to the `target` container and return their count.
 

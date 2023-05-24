@@ -1,7 +1,7 @@
 """OVH's LDP data backend for Ralph."""
 
 import logging
-from typing import Iterable, Iterator, Literal, Union
+from typing import Iterable, Iterator, Literal, Optional, Union
 
 import ovh
 import requests
@@ -40,10 +40,10 @@ class LDPDataBackendSettings(BaseDataBackendSettings):
 
         env_prefix = "RALPH_BACKENDS__DATA__LDP__"
 
-    APPLICATION_KEY: str = None
-    APPLICATION_SECRET: str = None
-    CONSUMER_KEY: str = None
-    DEFAULT_STREAM_ID: str = None
+    APPLICATION_KEY: Optional[str] = None
+    APPLICATION_SECRET: Optional[str] = None
+    CONSUMER_KEY: Optional[str] = None
+    DEFAULT_STREAM_ID: Optional[str] = None
     ENDPOINT: Literal[
         "ovh-eu",
         "ovh-us",
@@ -53,8 +53,8 @@ class LDPDataBackendSettings(BaseDataBackendSettings):
         "soyoustart-eu",
         "soyoustart-ca",
     ] = "ovh-eu"
-    REQUEST_TIMEOUT: int = None
-    SERVICE_NAME: str = None
+    REQUEST_TIMEOUT: Optional[int] = None
+    SERVICE_NAME: Optional[str] = None
 
 
 class LDPDataBackend(HistoryMixin, BaseDataBackend):
@@ -63,7 +63,7 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend):
     name = "ldp"
     settings_class = LDPDataBackendSettings
 
-    def __init__(self, settings: Union[settings_class, None] = None):
+    def __init__(self, settings: Optional[LDPDataBackendSettings] = None):
         """Instantiate the OVH LDP client.
 
         Args:
@@ -101,7 +101,7 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend):
         return DataBackendStatus.OK
 
     def list(
-        self, target: Union[str, None] = None, details: bool = False, new: bool = False
+        self, target: Optional[str] = None, details: bool = False, new: bool = False
     ) -> Iterator[Union[str, dict]]:
         """List archives for a given target stream_id.
 
@@ -150,9 +150,9 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend):
     def read(
         self,
         *,
-        query: Union[str, BaseQuery] = None,
-        target: Union[str, None] = None,
-        chunk_size: Union[int, None] = 4096,
+        query: Optional[Union[str, BaseQuery]] = None,
+        target: Optional[str] = None,
+        chunk_size: Optional[int] = 4096,
         raw_output: bool = True,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
@@ -217,10 +217,10 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend):
     def write(  # pylint: disable=too-many-arguments
         self,
         data: Iterable[Union[bytes, dict]],
-        target: Union[str, None] = None,
-        chunk_size: Union[int, None] = None,
+        target: Optional[str] = None,
+        chunk_size: Optional[int] = None,
         ignore_errors: bool = False,
-        operation_type: Union[BaseOperationType, None] = None,
+        operation_type: Optional[BaseOperationType] = None,
     ) -> int:
         """LDP data backend is read-only, calling this method will raise an error."""
         msg = "LDP data backend is read-only, cannot write to %s"

@@ -91,7 +91,7 @@ class ESLRSBackend(BaseLRSBackend, ESDataBackend):
     @staticmethod
     def _add_agent_filters(
         es_query_filters: list, agent_params: AgentParameters, target_field: str
-    ):
+    ) -> None:
         """Add filters relative to agents to `es_query_filters`."""
         if not agent_params:
             return

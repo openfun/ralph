@@ -1,12 +1,8 @@
 """Video xAPI events result fields definitions."""
 
+import sys
 from datetime import timedelta
 from typing import Optional
-
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
 
 from pydantic import Field, NonNegativeFloat
 
@@ -20,6 +16,11 @@ from ..concepts.constants.video import (
     RESULT_EXTENSION_TIME_TO,
 )
 from ..config import BaseExtensionModelWithConfig
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 
 class VideoResultExtensions(BaseExtensionModelWithConfig):

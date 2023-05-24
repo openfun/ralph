@@ -103,7 +103,7 @@ class MongoLRSBackend(BaseLRSBackend, MongoDataBackend):
     @staticmethod
     def _add_agent_filters(
         mongo_query_filters: dict, agent_params: AgentParameters, target_field: str
-    ):
+    ) -> None:
         """Add filters relative to agents to mongo_query_filters.
 
         Args:

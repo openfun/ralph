@@ -1,9 +1,11 @@
 """Ralph tracking logs filters."""
 
+from typing import Any, Union
+
 from .exceptions import EventKeyError
 
 
-def anonymous(event):
+def anonymous(event: dict) -> Union[dict, Any]:
     """Remove anonymous events.
 
     Args:

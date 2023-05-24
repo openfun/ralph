@@ -1,12 +1,8 @@
 """Base xAPI `Agent` definitions."""
 
+import sys
 from abc import ABC
 from typing import Optional, Union
-
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
 
 from pydantic import StrictStr
 
@@ -18,6 +14,11 @@ from .ifi import (
     BaseXapiMboxSha1SumIFI,
     BaseXapiOpenIdIFI,
 )
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 
 class BaseXapiAgentAccount(BaseModelWithConfig):

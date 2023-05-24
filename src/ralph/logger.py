@@ -6,7 +6,7 @@ from ralph.conf import settings
 from ralph.exceptions import ConfigurationException
 
 
-def configure_logging():
+def configure_logging() -> None:
     """Set up Ralph logging configuration."""
     try:
         dictConfig(settings.LOGGING)

@@ -1,7 +1,7 @@
 """Base xAPI `Statement` definitions."""
 
 from datetime import datetime
-from typing import List, Optional, Union
+from typing import Any, List, Optional, Union
 from uuid import UUID
 
 from pydantic import constr, root_validator
@@ -47,7 +47,7 @@ class BaseXapiStatement(BaseModelWithConfig):
 
     @root_validator(pre=True)
     @classmethod
-    def check_abscence_of_empty_and_invalid_values(cls, values):
+    def check_absence_of_empty_and_invalid_values(cls, values: Any) -> Any:
         """Check the model for empty and invalid values.
 
         Check that the `context` field contains `platform` and `revision` fields
@@ -57,7 +57,7 @@ class BaseXapiStatement(BaseModelWithConfig):
             if value in [None, "", {}]:
                 raise ValueError(f"{field}: invalid empty value")
             if isinstance(value, dict) and field != "extensions":
-                cls.check_abscence_of_empty_and_invalid_values(value)
+                cls.check_absence_of_empty_and_invalid_values(value)
 
         context = dict(values.get("context", {}))
         if context:

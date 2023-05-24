@@ -2,7 +2,7 @@
 
 import logging
 from functools import lru_cache
-from typing import Optional
+from typing import Dict, Optional
 
 import requests
 from fastapi import Depends, HTTPException, status
@@ -54,7 +54,7 @@ class IDToken(BaseModel):
 
 
 @lru_cache()
-def discover_provider(base_url: AnyUrl) -> dict:
+def discover_provider(base_url: AnyUrl) -> Dict:
     """Discover the authentication server (or OpenId Provider) configuration."""
     try:
         response = requests.get(f"{base_url}{OPENID_CONFIGURATION_PATH}", timeout=5)
@@ -72,7 +72,7 @@ def discover_provider(base_url: AnyUrl) -> dict:
 
 
 @lru_cache()
-def get_public_keys(jwks_uri: AnyUrl) -> dict:
+def get_public_keys(jwks_uri: AnyUrl) -> Dict:
     """Retrieve the public keys used by the provider server for signing."""
     try:
         response = requests.get(jwks_uri, timeout=5)

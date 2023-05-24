@@ -1,15 +1,15 @@
 """`Virtual classroom` verbs definitions."""
 
+import sys
 from typing import Dict, Optional
-
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
-
 
 from ...base.verbs import BaseXapiVerb
 from ...constants import LANG_EN_US_DISPLAY
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 
 class MutedVerb(BaseXapiVerb):

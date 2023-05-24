@@ -4,7 +4,7 @@ import json
 import logging
 from io import IOBase
 from itertools import chain
-from typing import Iterable, Iterator, Union
+from typing import Iterable, Iterator, Optional, Union
 from uuid import uuid4
 
 import boto3
@@ -72,7 +72,7 @@ class S3DataBackend(HistoryMixin, BaseDataBackend):
     default_operation_type = BaseOperationType.CREATE
     settings_class = S3DataBackendSettings
 
-    def __init__(self, settings: Union[settings_class, None] = None):
+    def __init__(self, settings: Optional[S3DataBackendSettings] = None):
         """Instantiate the AWS S3 client."""
         self.settings = settings if settings else self.settings_class()
 
@@ -109,7 +109,7 @@ class S3DataBackend(HistoryMixin, BaseDataBackend):
         return DataBackendStatus.OK
 
     def list(
-        self, target: Union[str, None] = None, details: bool = False, new: bool = False
+        self, target: Optional[str] = None, details: bool = False, new: bool = False
     ) -> Iterator[Union[str, dict]]:
         """List objects for the target bucket.
 
@@ -157,9 +157,9 @@ class S3DataBackend(HistoryMixin, BaseDataBackend):
     def read(
         self,
         *,
-        query: Union[str, BaseQuery] = None,
-        target: Union[str, None] = None,
-        chunk_size: Union[int, None] = None,
+        query: Optional[Union[str, BaseQuery]] = None,
+        target: Optional[str] = None,
+        chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
@@ -230,10 +230,10 @@ class S3DataBackend(HistoryMixin, BaseDataBackend):
     def write(  # pylint: disable=too-many-arguments
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
-        target: Union[str, None] = None,
-        chunk_size: Union[int, None] = None,
+        target: Optional[str] = None,
+        chunk_size: Optional[int] = None,
         ignore_errors: bool = False,
-        operation_type: Union[BaseOperationType, None] = None,
+        operation_type: Optional[BaseOperationType] = None,
     ) -> int:
         """Write `data` records to the `target` bucket and return their count.
 

@@ -4,7 +4,7 @@ import logging
 from io import IOBase
 from itertools import chain
 from pathlib import Path
-from typing import Iterable, Iterator, List, Literal, Union
+from typing import Iterable, Iterator, List, Literal, Optional, Union
 
 from elasticsearch import ApiError, Elasticsearch, TransportError
 from elasticsearch.helpers import BulkIndexError, streaming_bulk
@@ -28,8 +28,8 @@ logger = logging.getLogger(__name__)
 class ESClientOptions(ClientOptions):
     """Elasticsearch additional client options."""
 
-    ca_certs: Path = None
-    verify_certs: bool = None
+    ca_certs: Optional[Path] = None
+    verify_certs: Optional[bool] = None
 
 
 class ESDataBackendSettings(BaseDataBackendSettings):
@@ -116,7 +116,7 @@ class ESDataBackend(BaseDataBackend):
     query_model = ESQuery
     settings_class = ESDataBackendSettings
 
-    def __init__(self, settings: Union[settings_class, None] = None):
+    def __init__(self, settings: Optional[ESDataBackendSettings] = None):
         """Instantiate the Elasticsearch data backend.
 
         Args:
@@ -156,7 +156,7 @@ class ESDataBackend(BaseDataBackend):
         return DataBackendStatus.ERROR
 
     def list(
-        self, target: Union[str, None] = None, details: bool = False, new: bool = False
+        self, target: Optional[str] = None, details: bool = False, new: bool = False
     ) -> Iterator[Union[str, dict]]:
         """List available Elasticsearch indices, data streams and aliases.
 
@@ -199,9 +199,9 @@ class ESDataBackend(BaseDataBackend):
     def read(
         self,
         *,
-        query: Union[str, ESQuery] = None,
-        target: Union[str, None] = None,
-        chunk_size: Union[int, None] = None,
+        query: Optional[Union[str, ESQuery]] = None,
+        target: Optional[str] = None,
+        chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
@@ -277,10 +277,10 @@ class ESDataBackend(BaseDataBackend):
     def write(  # pylint: disable=too-many-arguments
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
-        target: Union[str, None] = None,
-        chunk_size: Union[int, None] = None,
+        target: Optional[str] = None,
+        chunk_size: Optional[int] = None,
         ignore_errors: bool = False,
-        operation_type: Union[BaseOperationType, None] = None,
+        operation_type: Optional[BaseOperationType] = None,
     ) -> int:
         """Write data documents to the target index and return their count.
 

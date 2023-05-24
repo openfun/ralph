@@ -1,11 +1,7 @@
 """Problem interaction events model definitions."""
 
+import sys
 from typing import List, Union
-
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
 
 from pydantic import Json
 
@@ -28,6 +24,11 @@ from .fields.events import (
     UIProblemResetEventField,
     UIProblemShowEventField,
 )
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 
 class EdxProblemHintDemandhintDisplayed(BaseServerModel):

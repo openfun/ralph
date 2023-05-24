@@ -1,13 +1,20 @@
 """Configurations for Ralph."""
 
 import io
+import sys
 from enum import Enum
 from pathlib import Path
-from typing import List, Tuple, Union
+from typing import List, Sequence, Union
 
-try:
+from pydantic import AnyHttpUrl, AnyUrl, BaseModel, BaseSettings, Extra, root_validator
+
+from ralph.exceptions import ConfigurationException
+
+from .utils import import_string
+
+if sys.version_info >= (3, 8):
     from typing import Literal
-except ImportError:
+else:
     from typing_extensions import Literal
 
 try:
@@ -19,12 +26,6 @@ except ImportError:
     from unittest.mock import Mock
 
     get_app_dir = Mock(return_value=".")
-
-from pydantic import AnyHttpUrl, AnyUrl, BaseModel, BaseSettings, Extra, root_validator
-
-from ralph.exceptions import ConfigurationException
-
-from .utils import import_string
 
 MODEL_PATH_SEPARATOR = "__"
 
@@ -56,7 +57,7 @@ class CommaSeparatedTuple(str):
 
     @classmethod
     def __get_validators__(cls):  # noqa: D105
-        def validate(value: Union[str, Tuple[str], List[str]]) -> Tuple[str]:
+        def validate(value: Union[str, Sequence[str]]) -> Sequence[str]:
             """Check whether the value is a comma separated string or a list/tuple."""
             if isinstance(value, (tuple, list)):
                 return tuple(value)

@@ -4,7 +4,7 @@ import json
 import logging
 from functools import cached_property
 from io import IOBase
-from typing import Iterable, Iterator, Union
+from typing import Iterable, Iterator, Optional, Union
 from uuid import uuid4
 
 from swiftclient.service import ClientException, Connection
@@ -71,7 +71,7 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend):
     default_operation_type = BaseOperationType.CREATE
     settings_class = SwiftDataBackendSettings
 
-    def __init__(self, settings: Union[settings_class, None] = None):
+    def __init__(self, settings: Optional[SwiftDataBackendSettings] = None):
         """Prepares the options for the SwiftService."""
         self.settings = settings if settings else self.settings_class()
 
@@ -120,7 +120,7 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend):
         return DataBackendStatus.OK
 
     def list(
-        self, target: Union[str, None] = None, details: bool = False, new: bool = False
+        self, target: Optional[str] = None, details: bool = False, new: bool = False
     ) -> Iterator[Union[str, dict]]:
         """List files for the target container.
 
@@ -162,9 +162,9 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend):
     def read(
         self,
         *,
-        query: Union[str, BaseQuery] = None,
-        target: Union[str, None] = None,
-        chunk_size: Union[int, None] = 500,
+        query: Optional[Union[str, BaseQuery]] = None,
+        target: Optional[str] = None,
+        chunk_size: Optional[int] = 500,
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
@@ -241,10 +241,10 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend):
     def write(  # pylint: disable=too-many-arguments, disable=too-many-branches
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
-        target: Union[str, None] = None,
-        chunk_size: Union[int, None] = None,
+        target: Optional[str] = None,
+        chunk_size: Optional[int] = None,
         ignore_errors: bool = False,
-        operation_type: Union[BaseOperationType, None] = None,
+        operation_type: Optional[BaseOperationType] = None,
     ) -> int:
         """Write `data` records to the `target` container and returns their count.
 

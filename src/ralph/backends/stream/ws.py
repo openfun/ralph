@@ -2,7 +2,7 @@
 
 import asyncio
 import logging
-from typing import BinaryIO
+from typing import BinaryIO, Optional
 
 import websockets
 
@@ -25,7 +25,7 @@ class WSStreamBackendSettings(BaseStreamBackendSettings):
 
         env_prefix = "RALPH_BACKENDS__STREAM__WS__"
 
-    URI: str = None
+    URI: Optional[str] = None
 
 
 class WSStreamBackend(BaseStreamBackend):
@@ -34,7 +34,7 @@ class WSStreamBackend(BaseStreamBackend):
     name = "ws"
     settings_class = WSStreamBackendSettings
 
-    def __init__(self, settings: settings_class = None):
+    def __init__(self, settings: Optional[WSStreamBackendSettings] = None):
         """Instantiate the websocket client.
 
         Args:
@@ -43,13 +43,13 @@ class WSStreamBackend(BaseStreamBackend):
         """
         self.settings = settings if settings else self.settings_class()
 
-    def stream(self, target: BinaryIO):
+    def stream(self, target: BinaryIO) -> None:
         """Stream websocket content to target."""
         # pylint: disable=no-member
 
         logger.debug("Streaming from websocket uri: %s", self.settings.URI)
 
-        async def _stream():
+        async def _stream() -> None:
             async with websockets.connect(self.settings.URI) as websocket:
                 while event := await websocket.recv():
                     target.write(bytes(f"{event}" + "\n", encoding="utf-8"))

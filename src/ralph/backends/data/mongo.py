@@ -7,7 +7,7 @@ import logging
 import struct
 from io import IOBase
 from itertools import chain
-from typing import Generator, Iterable, Iterator, List, Tuple, Union
+from typing import Generator, Iterable, Iterator, List, Optional, Tuple, Union
 from uuid import uuid4
 
 from bson.errors import BSONError
@@ -42,8 +42,8 @@ logger = logging.getLogger(__name__)
 class MongoClientOptions(ClientOptions):
     """MongoDB additional client options."""
 
-    document_class: str = None
-    tz_aware: bool = None
+    document_class: Optional[str] = None
+    tz_aware: Optional[bool] = None
 
 
 class MongoDataBackendSettings(BaseDataBackendSettings):
@@ -96,7 +96,7 @@ class MongoDataBackend(BaseDataBackend):
     query_model = MongoQuery
     settings_class = MongoDataBackendSettings
 
-    def __init__(self, settings: Union[settings_class, None] = None):
+    def __init__(self, settings: Optional[MongoDataBackendSettings] = None):
         """Instantiate the MongoDB client.
 
         Args:
@@ -135,7 +135,7 @@ class MongoDataBackend(BaseDataBackend):
         return DataBackendStatus.OK
 
     def list(
-        self, target: Union[str, None] = None, details: bool = False, new: bool = False
+        self, target: Optional[str] = None, details: bool = False, new: bool = False
     ) -> Iterator[Union[str, dict]]:
         """List collections in the `target` database.
 
@@ -174,9 +174,9 @@ class MongoDataBackend(BaseDataBackend):
     def read(
         self,
         *,
-        query: Union[str, MongoQuery] = None,
-        target: Union[str, None] = None,
-        chunk_size: Union[int, None] = None,
+        query: Optional[Union[str, MongoQuery]] = None,
+        target: Optional[str] = None,
+        chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
@@ -231,10 +231,10 @@ class MongoDataBackend(BaseDataBackend):
     def write(  # pylint: disable=too-many-arguments
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
-        target: Union[str, None] = None,
-        chunk_size: Union[int, None] = None,
+        target: Optional[str] = None,
+        chunk_size: Optional[int] = None,
         ignore_errors: bool = False,
-        operation_type: Union[BaseOperationType, None] = None,
+        operation_type: Optional[BaseOperationType] = None,
     ) -> int:
         """Write `data` documents to the `target` collection and return their count.
 
@@ -397,7 +397,7 @@ class MongoDataBackend(BaseDataBackend):
             yield document
 
     @staticmethod
-    def _bulk_import(batch: list, ignore_errors: bool, collection: Collection):
+    def _bulk_import(batch: List, ignore_errors: bool, collection: Collection) -> int:
         """Insert a `batch` of documents into the MongoDB `collection`."""
         try:
             new_documents = collection.insert_many(batch)
@@ -414,7 +414,7 @@ class MongoDataBackend(BaseDataBackend):
         return inserted_count
 
     @staticmethod
-    def _bulk_delete(batch: list, ignore_errors: bool, collection: Collection):
+    def _bulk_delete(batch: List, ignore_errors: bool, collection: Collection) -> int:
         """Delete a `batch` of documents from the MongoDB `collection`."""
         try:
             deleted_documents = collection.delete_many({"_source.id": {"$in": batch}})
@@ -431,7 +431,7 @@ class MongoDataBackend(BaseDataBackend):
         return deleted_count
 
     @staticmethod
-    def _bulk_update(batch: list, ignore_errors: bool, collection: Collection):
+    def _bulk_update(batch: List, ignore_errors: bool, collection: Collection) -> int:
         """Update a `batch` of documents into the MongoDB `collection`."""
         try:
             updated_documents = collection.bulk_write(batch)

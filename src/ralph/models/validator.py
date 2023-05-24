@@ -3,7 +3,7 @@
 
 import json
 import logging
-from typing import TextIO
+from typing import Any, Generator, Optional, TextIO
 
 from pydantic import ValidationError
 
@@ -20,7 +20,9 @@ class Validator:
         """Initializes Validator."""
         self.model_selector = model_selector
 
-    def validate(self, input_file: TextIO, ignore_errors: bool, fail_on_unknown: bool):
+    def validate(
+        self, input_file: TextIO, ignore_errors: bool, fail_on_unknown: bool
+    ) -> Generator:
         """Validates JSON event strings line by line."""
         total = 0
         success = 0
@@ -45,14 +47,14 @@ class Validator:
                     raise BadFormatException(message) from err
         logger.info("Total events: %d, Invalid events: %d", total, total - success)
 
-    def get_first_valid_model(self, event: dict):
+    def get_first_valid_model(self, event: dict) -> Any:
         """Returns the first successfully instantiated model for the event.
 
         Raises:
             UnknownEventException: When the event does not match any model.
             ValidationError: When the last validated event is invalid.
         """
-        error = None
+        error: Optional[BaseException] = None
         for model in self.model_selector.get_models(event):
             try:
                 return model(**event)
@@ -61,7 +63,7 @@ class Validator:
 
         raise error
 
-    def _validate_event(self, event_str: str):
+    def _validate_event(self, event_str: str) -> Any:
         """Validate a single JSON string event.
 
         Raises:
@@ -77,6 +79,8 @@ class Validator:
         return self.get_first_valid_model(event).json()
 
     @staticmethod
-    def _log_error(message, event_str, error=None):
+    def _log_error(
+        message: object, event_str: str, error: Optional[BaseException] = None
+    ) -> None:
         logger.error(message)
         logger.debug("Raised error: %s, for event : %s", error, event_str)

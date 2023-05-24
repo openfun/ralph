@@ -1,16 +1,17 @@
 """Problem interaction events model event fields definitions."""
 
+import sys
 from datetime import datetime
 from typing import Dict, List, Optional, Union
-
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
 
 from pydantic import constr
 
 from ...base import AbstractBaseEventField, BaseModelWithConfig
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 
 class QueueState(BaseModelWithConfig):

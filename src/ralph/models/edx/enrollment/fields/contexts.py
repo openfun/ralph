@@ -1,13 +1,14 @@
 """Enrollment event models context fields definitions."""
 
+import sys
 from typing import Union
 
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
-
 from ...base import BaseContextField
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 
 class EdxCourseEnrollmentUpgradeClickedContextField(BaseContextField):
