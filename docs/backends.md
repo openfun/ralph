@@ -118,6 +118,7 @@ Secondary parameters are required to work with the target bucket:
 
 - `default_region`: the region where your bucket is
 - `bucket_name`: the name of your S3 bucket
+- `endpoint_url`: the endpoint of your S3 server
 
 ### File system
 
