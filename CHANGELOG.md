@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+## Added
+
+- Allow to insert custom endpoint url for S3 service
+
 ### Changed
 
 - Upgrade `fastapi` to `0.95.2`

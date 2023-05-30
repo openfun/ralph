@@ -356,6 +356,7 @@ def s3():
             session_token="session_token",
             default_region="default-region",
             bucket_name="bucket_name",
+            endpoint_url=None,
         )
 
     return get_s3_storage
