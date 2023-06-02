@@ -540,19 +540,26 @@
     Unreleased
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="Unreleased">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#added" class="md-nav__link">
     Added
   </a>
   
-    <nav class="md-nav" aria-label="Added">
-      <ul class="md-nav__list">
+</li>
         
           <li class="md-nav__item">
   <a href="#changed" class="md-nav__link">
     Changed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed" class="md-nav__link">
+    Removed
   </a>
   
 </li>
@@ -781,7 +788,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#removed" class="md-nav__link">
+  <a href="#removed_1" class="md-nav__link">
     Removed
   </a>
   
@@ -815,7 +822,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#removed_1" class="md-nav__link">
+  <a href="#removed_2" class="md-nav__link">
     Removed
   </a>
   
@@ -944,7 +951,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#removed_2" class="md-nav__link">
+  <a href="#removed_3" class="md-nav__link">
     Removed
   </a>
   
@@ -978,7 +985,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#removed_3" class="md-nav__link">
+  <a href="#removed_4" class="md-nav__link">
     Removed
   </a>
   
@@ -1069,19 +1076,26 @@
     Unreleased
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="Unreleased">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#added" class="md-nav__link">
     Added
   </a>
   
-    <nav class="md-nav" aria-label="Added">
-      <ul class="md-nav__list">
+</li>
         
           <li class="md-nav__item">
   <a href="#changed" class="md-nav__link">
     Changed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed" class="md-nav__link">
+    Removed
   </a>
   
 </li>
@@ -1310,7 +1324,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#removed" class="md-nav__link">
+  <a href="#removed_1" class="md-nav__link">
     Removed
   </a>
   
@@ -1344,7 +1358,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#removed_1" class="md-nav__link">
+  <a href="#removed_2" class="md-nav__link">
     Removed
   </a>
   
@@ -1473,7 +1487,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#removed_2" class="md-nav__link">
+  <a href="#removed_3" class="md-nav__link">
     Removed
   </a>
   
@@ -1507,7 +1521,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#removed_3" class="md-nav__link">
+  <a href="#removed_4" class="md-nav__link">
     Removed
   </a>
   
@@ -1562,17 +1576,23 @@
 and this project adheres to
 <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
 <h2 id="unreleased"><a href="https://github.com/openfun/ralph/compare/v3.6.0...master">Unreleased</a><a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
-<h2 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h2>
+<h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
 <ul>
+<li>Implement xAPI virtual classroom pydantic models</li>
 <li>Allow to insert custom endpoint url for S3 service</li>
 </ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <ul>
+<li>Clean xAPI pydantic models naming convention</li>
 <li>Upgrade <code>fastapi</code> to <code>0.95.2</code></li>
 <li>Upgrade <code>sentry_sdk</code> to <code>1.24.0</code></li>
 <li>Upgrade <code>httpx</code> to <code>0.24.1</code></li>
 <li>Force a valid (JSON-formatted) IFI to be passed for the <code>/statements</code> 
 GET query <code>agent</code> filtering</li>
+</ul>
+<h3 id="removed">Removed<a class="headerlink" href="#removed" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>verb</code>.<code>display</code> field no longer mandatory in xAPI models and for converter</li>
 </ul>
 <h2 id="360_-_2023-05-17"><a href="https://github.com/openfun/ralph/compare/v3.5.1...v3.6.0">3.6.0</a> - 2023-05-17<a class="headerlink" href="#360_-_2023-05-17" title="Permanent link">&para;</a></h2>
 <h3 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">&para;</a></h3>
@@ -1676,7 +1696,7 @@ as per the xAPI specification</li>
   ranges)</li>
 <li>Upgrade <code>fastapi</code> to <code>0.87.0</code></li>
 </ul>
-<h3 id="removed">Removed<a class="headerlink" href="#removed" title="Permanent link">&para;</a></h3>
+<h3 id="removed_1">Removed<a class="headerlink" href="#removed_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li>ModelRules constraint</li>
 </ul>
@@ -1716,7 +1736,7 @@ as per the xAPI specification</li>
 <li>Rename backend and parser parameter environment variables (BC)</li>
 <li>Make project dependencies management more modular for library usage</li>
 </ul>
-<h3 id="removed_1">Removed<a class="headerlink" href="#removed_1" title="Permanent link">&para;</a></h3>
+<h3 id="removed_2">Removed<a class="headerlink" href="#removed_2" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Remove YAML configuration file support and <code>pyyaml</code> dependency (BC)</li>
 </ul>
@@ -1811,7 +1831,7 @@ as per the xAPI specification</li>
 <li>Tray: add missing Swift variables in the secret</li>
 <li>Tray: fix pods anti-affinity selector</li>
 </ul>
-<h3 id="removed_2">Removed<a class="headerlink" href="#removed_2" title="Permanent link">&para;</a></h3>
+<h3 id="removed_3">Removed<a class="headerlink" href="#removed_3" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>pandas</code> is no longer required</li>
 </ul>
@@ -1828,7 +1848,7 @@ as per the xAPI specification</li>
 <li>Upgrade <code>pyyaml</code> to <code>5.4.1</code></li>
 <li>Upgrade <code>pandas</code> to <code>1.2.1</code></li>
 </ul>
-<h3 id="removed_3">Removed<a class="headerlink" href="#removed_3" title="Permanent link">&para;</a></h3>
+<h3 id="removed_4">Removed<a class="headerlink" href="#removed_4" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>click_log</code> is no longer required as we are able to configure logging</li>
 </ul>

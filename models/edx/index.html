@@ -4259,16 +4259,16 @@ contain sensitive data: <code>username</code>, <code>referer</code>, <code>event
                 <span class="k">lambda</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span> <span class="k">if</span> <span class="n">user_id</span> <span class="k">else</span> <span class="s2">&quot;anonymous&quot;</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="n">ConversionItem</span><span class="p">(</span>
-                <span class="s2">&quot;object__definition__extensions__&quot;</span> <span class="o">+</span> <span class="n">EXTENSION_SCHOOL_ID</span><span class="p">,</span>
+                <span class="s2">&quot;object__definition__extensions__&quot;</span> <span class="o">+</span> <span class="n">CONTEXT_EXTENSION_SCHOOL_ID</span><span class="p">,</span>
                 <span class="s2">&quot;context__org_id&quot;</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="n">ConversionItem</span><span class="p">(</span>
-                <span class="s2">&quot;object__definition__extensions__&quot;</span> <span class="o">+</span> <span class="n">EXTENSION_COURSE_ID</span><span class="p">,</span>
+                <span class="s2">&quot;object__definition__extensions__&quot;</span> <span class="o">+</span> <span class="n">CONTEXT_EXTENSION_COURSE_ID</span><span class="p">,</span>
                 <span class="s2">&quot;context__course_id&quot;</span><span class="p">,</span>
                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parse_course_id</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;course&quot;</span><span class="p">]),</span>
             <span class="p">),</span>
             <span class="n">ConversionItem</span><span class="p">(</span>
-                <span class="s2">&quot;object__definition__extensions__&quot;</span> <span class="o">+</span> <span class="n">EXTENSION_MODULE_ID</span><span class="p">,</span>
+                <span class="s2">&quot;object__definition__extensions__&quot;</span> <span class="o">+</span> <span class="n">CONTEXT_EXTENSION_MODULE_ID</span><span class="p">,</span>
                 <span class="s2">&quot;context__course_id&quot;</span><span class="p">,</span>
                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parse_course_id</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;module&quot;</span><span class="p">]),</span>
             <span class="p">),</span>
@@ -4477,7 +4477,7 @@ because the <code>platform_url</code> is present in the edX&rsquo;s event <code>
 
 <h6 id="ralph.models.edx.converters.xapi.navigational.UIPageCloseToPageTerminated.__dest__" class="doc doc-heading">
         <code>
-__dest__            (<a class="autorefs autorefs-internal" title="ralph.models.xapi.base.BaseXapiModel" href="../xapi/#ralph.models.xapi.base.BaseXapiModel">BaseXapiModel</a>)
+__dest__            (<a class="autorefs autorefs-internal" title="ralph.models.xapi.base.statements.BaseXapiStatement" href="../xapi/#ralph.models.xapi.base.statements.BaseXapiStatement">BaseXapiStatement</a>)
         </code>
 
 
@@ -4504,26 +4504,26 @@ __dest__            (<a class="autorefs autorefs-internal" title="ralph.models.x
   <tbody>
       <tr>
         <td><code>object</code></td>
-        <td><code>PageObjectField</code></td>
-        <td><p>See PageObjectField.</p></td>
+        <td><code>dict</code></td>
+        <td><p>See PageActivity.</p></td>
       </tr>
       <tr>
         <td><code>verb</code></td>
-        <td><code>PageTerminatedVerbField</code></td>
-        <td><p>See PageTerminatedVerbField.</p></td>
+        <td><code>dict</code></td>
+        <td><p>See TerminatedVerb.</p></td>
       </tr>
   </tbody>
 </table>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/navigational.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">PageTerminated</span><span class="p">(</span><span class="n">BaseXapiModel</span><span class="p">):</span>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">PageTerminated</span><span class="p">(</span><span class="n">BaseXapiStatement</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for page terminated statement.</span>
 
 <span class="sd">    Example: John terminated the https://www.fun-mooc.fr/ page.</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">       object (PageObjectField): See PageObjectField.</span>
-<span class="sd">       verb (PageTerminatedVerbField): See PageTerminatedVerbField.</span>
+<span class="sd">       object (dict): See PageActivity.</span>
+<span class="sd">       verb (dict): See TerminatedVerb.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span>
@@ -4531,8 +4531,8 @@ __dest__            (<a class="autorefs autorefs-internal" title="ralph.models.x
         <span class="n">verb__id</span><span class="o">=</span><span class="s2">&quot;http://adlnet.gov/expapi/verbs/terminated&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="nb">object</span><span class="p">:</span> <span class="n">PageObjectField</span>
-    <span class="n">verb</span><span class="p">:</span> <span class="n">TerminatedVerbField</span> <span class="o">=</span> <span class="n">TerminatedVerbField</span><span class="p">()</span>
+    <span class="nb">object</span><span class="p">:</span> <span class="n">PageActivity</span>
+    <span class="n">verb</span><span class="p">:</span> <span class="n">TerminatedVerb</span> <span class="o">=</span> <span class="n">TerminatedVerb</span><span class="p">()</span>
 </code></pre></div>
         </details>
 
@@ -4772,7 +4772,7 @@ ServerEventToPageViewed            (<a class="autorefs autorefs-internal" title=
 
 <h6 id="ralph.models.edx.converters.xapi.server.ServerEventToPageViewed.__dest__" class="doc doc-heading">
         <code>
-__dest__            (<a class="autorefs autorefs-internal" title="ralph.models.xapi.base.BaseXapiModel" href="../xapi/#ralph.models.xapi.base.BaseXapiModel">BaseXapiModel</a>)
+__dest__            (<a class="autorefs autorefs-internal" title="ralph.models.xapi.base.statements.BaseXapiStatement" href="../xapi/#ralph.models.xapi.base.statements.BaseXapiStatement">BaseXapiStatement</a>)
         </code>
 
 
@@ -4799,26 +4799,26 @@ __dest__            (<a class="autorefs autorefs-internal" title="ralph.models.x
   <tbody>
       <tr>
         <td><code>object</code></td>
-        <td><code>PageObjectField</code></td>
-        <td><p>See PageObjectField.</p></td>
+        <td><code>dict</code></td>
+        <td><p>See PageActivity.</p></td>
       </tr>
       <tr>
         <td><code>verb</code></td>
-        <td><code>PageViewedVerbField</code></td>
-        <td><p>See PageViewedVerbField.</p></td>
+        <td><code>dict</code></td>
+        <td><p>See ViewedVerb.</p></td>
       </tr>
   </tbody>
 </table>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/server.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">PageViewed</span><span class="p">(</span><span class="n">BaseXapiModel</span><span class="p">):</span>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">PageViewed</span><span class="p">(</span><span class="n">BaseXapiStatement</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for page viewed statement.</span>
 
 <span class="sd">    Example: John viewed the https://www.fun-mooc.fr/ page.</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">       object (PageObjectField): See PageObjectField.</span>
-<span class="sd">       verb (PageViewedVerbField): See PageViewedVerbField.</span>
+<span class="sd">       object (dict): See PageActivity.</span>
+<span class="sd">       verb (dict): See ViewedVerb.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span>
@@ -4826,8 +4826,8 @@ __dest__            (<a class="autorefs autorefs-internal" title="ralph.models.x
         <span class="n">verb__id</span><span class="o">=</span><span class="s2">&quot;http://id.tincanapi.com/verb/viewed&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="nb">object</span><span class="p">:</span> <span class="n">PageObjectField</span>
-    <span class="n">verb</span><span class="p">:</span> <span class="n">ViewedVerbField</span> <span class="o">=</span> <span class="n">ViewedVerbField</span><span class="p">()</span>
+    <span class="nb">object</span><span class="p">:</span> <span class="n">PageActivity</span>
+    <span class="n">verb</span><span class="p">:</span> <span class="n">ViewedVerb</span> <span class="o">=</span> <span class="n">ViewedVerb</span><span class="p">()</span>
 </code></pre></div>
         </details>
 
@@ -5064,7 +5064,7 @@ UILoadVideoToVideoInitialized            (<a class="autorefs autorefs-internal" 
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
             <span class="p">{</span>
                 <span class="n">ConversionItem</span><span class="p">(</span>
-                    <span class="s2">&quot;context__extensions__&quot;</span> <span class="o">+</span> <span class="n">VIDEO_EXTENSION_LENGTH</span><span class="p">,</span>
+                    <span class="s2">&quot;context__extensions__&quot;</span> <span class="o">+</span> <span class="n">CONTEXT_EXTENSION_LENGTH</span><span class="p">,</span>
                     <span class="kc">None</span><span class="p">,</span>
                     <span class="c1"># Set the video length to null by default.</span>
                     <span class="c1"># This information is mandatory in the xAPI template</span>
@@ -5072,11 +5072,11 @@ UILoadVideoToVideoInitialized            (<a class="autorefs autorefs-internal" 
                     <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">ConversionItem</span><span class="p">(</span>
-                    <span class="s2">&quot;context__extensions__&quot;</span> <span class="o">+</span> <span class="n">VIDEO_EXTENSION_SESSION_ID</span><span class="p">,</span>
+                    <span class="s2">&quot;context__extensions__&quot;</span> <span class="o">+</span> <span class="n">CONTEXT_EXTENSION_SESSION_ID</span><span class="p">,</span>
                     <span class="s2">&quot;session&quot;</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">ConversionItem</span><span class="p">(</span>
-                    <span class="s2">&quot;context__extensions__&quot;</span> <span class="o">+</span> <span class="n">VIDEO_EXTENSION_USER_AGENT</span><span class="p">,</span> <span class="s2">&quot;agent&quot;</span>
+                    <span class="s2">&quot;context__extensions__&quot;</span> <span class="o">+</span> <span class="n">CONTEXT_EXTENSION_USER_AGENT</span><span class="p">,</span> <span class="s2">&quot;agent&quot;</span>
                 <span class="p">),</span>
             <span class="p">},</span>
         <span class="p">)</span>
@@ -5127,12 +5127,12 @@ __dest__            (<a class="autorefs autorefs-internal" title="ralph.models.x
       <tr>
         <td><code>verb</code></td>
         <td><code>dict</code></td>
-        <td><p>See VideoInitializedVerbField.</p></td>
+        <td><p>See InitializedVerb.</p></td>
       </tr>
       <tr>
         <td><code>context</code></td>
         <td><code>dict</code></td>
-        <td><p>See VideoInitializedContextField.</p></td>
+        <td><p>See VideoInitializedContext.</p></td>
       </tr>
   </tbody>
 </table>
@@ -5144,8 +5144,8 @@ __dest__            (<a class="autorefs autorefs-internal" title="ralph.models.x
 <span class="sd">    Example: A video has been fully initialized.</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        verb (dict): See VideoInitializedVerbField.</span>
-<span class="sd">        context (dict): See VideoInitializedContextField.</span>
+<span class="sd">        verb (dict): See InitializedVerb.</span>
+<span class="sd">        context (dict): See VideoInitializedContext.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span>
@@ -5153,8 +5153,8 @@ __dest__            (<a class="autorefs autorefs-internal" title="ralph.models.x
         <span class="n">verb__id</span><span class="o">=</span><span class="s2">&quot;http://adlnet.gov/expapi/verbs/initialized&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="n">verb</span><span class="p">:</span> <span class="n">VideoInitializedVerbField</span> <span class="o">=</span> <span class="n">VideoInitializedVerbField</span><span class="p">()</span>
-    <span class="n">context</span><span class="p">:</span> <span class="n">VideoInitializedContextField</span>
+    <span class="n">verb</span><span class="p">:</span> <span class="n">InitializedVerb</span> <span class="o">=</span> <span class="n">InitializedVerb</span><span class="p">()</span>
+    <span class="n">context</span><span class="p">:</span> <span class="n">VideoInitializedContext</span>
 </code></pre></div>
         </details>
 
@@ -5328,11 +5328,11 @@ UIPauseVideoToVideoPaused            (<a class="autorefs autorefs-internal" titl
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
             <span class="p">{</span>
                 <span class="n">ConversionItem</span><span class="p">(</span>
-                    <span class="s2">&quot;result__extensions__&quot;</span> <span class="o">+</span> <span class="n">VIDEO_EXTENSION_TIME</span><span class="p">,</span>
+                    <span class="s2">&quot;result__extensions__&quot;</span> <span class="o">+</span> <span class="n">RESULT_EXTENSION_TIME</span><span class="p">,</span>
                     <span class="s2">&quot;event__currentTime&quot;</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">ConversionItem</span><span class="p">(</span>
-                    <span class="s2">&quot;context__extensions__&quot;</span> <span class="o">+</span> <span class="n">VIDEO_EXTENSION_LENGTH</span><span class="p">,</span>
+                    <span class="s2">&quot;context__extensions__&quot;</span> <span class="o">+</span> <span class="n">CONTEXT_EXTENSION_LENGTH</span><span class="p">,</span>
                     <span class="kc">None</span><span class="p">,</span>
                     <span class="c1"># Set the video length to null by default.</span>
                     <span class="c1"># This information is mandatory in the xAPI template</span>
@@ -5340,7 +5340,7 @@ UIPauseVideoToVideoPaused            (<a class="autorefs autorefs-internal" titl
                     <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">ConversionItem</span><span class="p">(</span>
-                    <span class="s2">&quot;context__extensions__&quot;</span> <span class="o">+</span> <span class="n">VIDEO_EXTENSION_SESSION_ID</span><span class="p">,</span>
+                    <span class="s2">&quot;context__extensions__&quot;</span> <span class="o">+</span> <span class="n">CONTEXT_EXTENSION_SESSION_ID</span><span class="p">,</span>
                     <span class="s2">&quot;session&quot;</span><span class="p">,</span>
                 <span class="p">),</span>
             <span class="p">},</span>
@@ -5392,17 +5392,17 @@ __dest__            (<a class="autorefs autorefs-internal" title="ralph.models.x
       <tr>
         <td><code>verb</code></td>
         <td><code>dict</code></td>
-        <td><p>See VideoPausedVerbField.</p></td>
+        <td><p>See PausedVerb.</p></td>
       </tr>
       <tr>
         <td><code>result</code></td>
         <td><code>dict</code></td>
-        <td><p>See VideoPausedResultField.</p></td>
+        <td><p>See VideoPausedResult.</p></td>
       </tr>
       <tr>
         <td><code>context</code></td>
         <td><code>dict</code></td>
-        <td><p>See VideoPausedContextField.</p></td>
+        <td><p>See VideoPausedContext.</p></td>
       </tr>
   </tbody>
 </table>
@@ -5414,9 +5414,9 @@ __dest__            (<a class="autorefs autorefs-internal" title="ralph.models.x
 <span class="sd">    Example: John paused the video or clicked the pause button.</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        verb (dict): See VideoPausedVerbField.</span>
-<span class="sd">        result (dict): See VideoPausedResultField.</span>
-<span class="sd">        context (dict): See VideoPausedContextField.</span>
+<span class="sd">        verb (dict): See PausedVerb.</span>
+<span class="sd">        result (dict): See VideoPausedResult.</span>
+<span class="sd">        context (dict): See VideoPausedContext.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span>
@@ -5424,9 +5424,9 @@ __dest__            (<a class="autorefs autorefs-internal" title="ralph.models.x
         <span class="n">verb__id</span><span class="o">=</span><span class="s2">&quot;https://w3id.org/xapi/video/verbs/paused&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="n">verb</span><span class="p">:</span> <span class="n">VideoPausedVerbField</span> <span class="o">=</span> <span class="n">VideoPausedVerbField</span><span class="p">()</span>
-    <span class="n">result</span><span class="p">:</span> <span class="n">VideoPausedResultField</span>
-    <span class="n">context</span><span class="p">:</span> <span class="n">VideoPausedContextField</span>
+    <span class="n">verb</span><span class="p">:</span> <span class="n">PausedVerb</span> <span class="o">=</span> <span class="n">PausedVerb</span><span class="p">()</span>
+    <span class="n">result</span><span class="p">:</span> <span class="n">VideoPausedResult</span>
+    <span class="n">context</span><span class="p">:</span> <span class="n">VideoPausedContext</span>
 </code></pre></div>
         </details>
 
@@ -5600,11 +5600,11 @@ UIPlayVideoToVideoPlayed            (<a class="autorefs autorefs-internal" title
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
             <span class="p">{</span>
                 <span class="n">ConversionItem</span><span class="p">(</span>
-                    <span class="s2">&quot;result__extensions__&quot;</span> <span class="o">+</span> <span class="n">VIDEO_EXTENSION_TIME</span><span class="p">,</span>
+                    <span class="s2">&quot;result__extensions__&quot;</span> <span class="o">+</span> <span class="n">RESULT_EXTENSION_TIME</span><span class="p">,</span>
                     <span class="s2">&quot;event__currentTime&quot;</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">ConversionItem</span><span class="p">(</span>
-                    <span class="s2">&quot;context__extensions__&quot;</span> <span class="o">+</span> <span class="n">VIDEO_EXTENSION_SESSION_ID</span><span class="p">,</span>
+                    <span class="s2">&quot;context__extensions__&quot;</span> <span class="o">+</span> <span class="n">CONTEXT_EXTENSION_SESSION_ID</span><span class="p">,</span>
                     <span class="s2">&quot;session&quot;</span><span class="p">,</span>
                 <span class="p">),</span>
             <span class="p">},</span>
@@ -5656,17 +5656,17 @@ __dest__            (<a class="autorefs autorefs-internal" title="ralph.models.x
       <tr>
         <td><code>verb</code></td>
         <td><code>dict</code></td>
-        <td><p>See VideoPlayedVerbField.</p></td>
+        <td><p>See PlayedVerb.</p></td>
       </tr>
       <tr>
         <td><code>result</code></td>
         <td><code>dict</code></td>
-        <td><p>See VideoPlayedResultField.</p></td>
+        <td><p>See VideoPlayedResult.</p></td>
       </tr>
       <tr>
         <td><code>context</code></td>
         <td><code>dict</code></td>
-        <td><p>See VideoPlayedContextField.</p></td>
+        <td><p>See VideoPlayedContext.</p></td>
       </tr>
   </tbody>
 </table>
@@ -5678,9 +5678,9 @@ __dest__            (<a class="autorefs autorefs-internal" title="ralph.models.x
 <span class="sd">    Example: John played the video or clicked the play button.</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        verb (dict): See VideoPlayedVerbField.</span>
-<span class="sd">        result (dict): See VideoPlayedResultField.</span>
-<span class="sd">        context (dict): See VideoPlayedContextField.</span>
+<span class="sd">        verb (dict): See PlayedVerb.</span>
+<span class="sd">        result (dict): See VideoPlayedResult.</span>
+<span class="sd">        context (dict): See VideoPlayedContext.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span>
@@ -5688,9 +5688,9 @@ __dest__            (<a class="autorefs autorefs-internal" title="ralph.models.x
         <span class="n">verb__id</span><span class="o">=</span><span class="s2">&quot;https://w3id.org/xapi/video/verbs/played&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="n">verb</span><span class="p">:</span> <span class="n">VideoPlayedVerbField</span> <span class="o">=</span> <span class="n">VideoPlayedVerbField</span><span class="p">()</span>
-    <span class="n">result</span><span class="p">:</span> <span class="n">VideoPlayedResultField</span>
-    <span class="n">context</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VideoPlayedContextField</span><span class="p">]</span>
+    <span class="n">verb</span><span class="p">:</span> <span class="n">PlayedVerb</span> <span class="o">=</span> <span class="n">PlayedVerb</span><span class="p">()</span>
+    <span class="n">result</span><span class="p">:</span> <span class="n">VideoPlayedResult</span>
+    <span class="n">context</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VideoPlayedContext</span><span class="p">]</span>
 </code></pre></div>
         </details>
 
@@ -5864,15 +5864,15 @@ UISeekVideoToVideoSeeked            (<a class="autorefs autorefs-internal" title
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
             <span class="p">{</span>
                 <span class="n">ConversionItem</span><span class="p">(</span>
-                    <span class="s2">&quot;result__extensions__&quot;</span> <span class="o">+</span> <span class="n">VIDEO_EXTENSION_TIME_FROM</span><span class="p">,</span>
+                    <span class="s2">&quot;result__extensions__&quot;</span> <span class="o">+</span> <span class="n">RESULT_EXTENSION_TIME_FROM</span><span class="p">,</span>
                     <span class="s2">&quot;event__old_time&quot;</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">ConversionItem</span><span class="p">(</span>
-                    <span class="s2">&quot;result__extensions__&quot;</span> <span class="o">+</span> <span class="n">VIDEO_EXTENSION_TIME_TO</span><span class="p">,</span>
+                    <span class="s2">&quot;result__extensions__&quot;</span> <span class="o">+</span> <span class="n">RESULT_EXTENSION_TIME_TO</span><span class="p">,</span>
                     <span class="s2">&quot;event__new_time&quot;</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">ConversionItem</span><span class="p">(</span>
-                    <span class="s2">&quot;context__extensions__&quot;</span> <span class="o">+</span> <span class="n">VIDEO_EXTENSION_SESSION_ID</span><span class="p">,</span>
+                    <span class="s2">&quot;context__extensions__&quot;</span> <span class="o">+</span> <span class="n">CONTEXT_EXTENSION_SESSION_ID</span><span class="p">,</span>
                     <span class="s2">&quot;session&quot;</span><span class="p">,</span>
                 <span class="p">),</span>
             <span class="p">},</span>
@@ -5925,17 +5925,17 @@ __dest__            (<a class="autorefs autorefs-internal" title="ralph.models.x
       <tr>
         <td><code>verb</code></td>
         <td><code>dict</code></td>
-        <td><p>See VideoSeekedVerbField.</p></td>
+        <td><p>See SeekedVerb.</p></td>
       </tr>
       <tr>
         <td><code>result</code></td>
         <td><code>dict</code></td>
-        <td><p>See VideoSeekedResultField.</p></td>
+        <td><p>See VideoSeekedResult.</p></td>
       </tr>
       <tr>
         <td><code>context</code></td>
         <td><code>dict</code></td>
-        <td><p>See VideoSeekedContextField.</p></td>
+        <td><p>See VideoSeekedContext.</p></td>
       </tr>
   </tbody>
 </table>
@@ -5948,9 +5948,9 @@ __dest__            (<a class="autorefs autorefs-internal" title="ralph.models.x
 <span class="sd">        video.</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        verb (dict): See VideoSeekedVerbField.</span>
-<span class="sd">        result (dict): See VideoSeekedResultField.</span>
-<span class="sd">        context (dict): See VideoSeekedContextField.</span>
+<span class="sd">        verb (dict): See SeekedVerb.</span>
+<span class="sd">        result (dict): See VideoSeekedResult.</span>
+<span class="sd">        context (dict): See VideoSeekedContext.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span>
@@ -5958,9 +5958,9 @@ __dest__            (<a class="autorefs autorefs-internal" title="ralph.models.x
         <span class="n">verb__id</span><span class="o">=</span><span class="s2">&quot;https://w3id.org/xapi/video/verbs/seeked&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="n">verb</span><span class="p">:</span> <span class="n">VideoSeekedVerbField</span> <span class="o">=</span> <span class="n">VideoSeekedVerbField</span><span class="p">()</span>
-    <span class="n">result</span><span class="p">:</span> <span class="n">VideoSeekedResultField</span>
-    <span class="n">context</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VideoSeekedContextField</span><span class="p">]</span>
+    <span class="n">verb</span><span class="p">:</span> <span class="n">SeekedVerb</span> <span class="o">=</span> <span class="n">SeekedVerb</span><span class="p">()</span>
+    <span class="n">result</span><span class="p">:</span> <span class="n">VideoSeekedResult</span>
+    <span class="n">context</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VideoSeekedContext</span><span class="p">]</span>
 </code></pre></div>
         </details>
 
@@ -6136,11 +6136,11 @@ UIStopVideoToVideoTerminated            (<a class="autorefs autorefs-internal" t
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
             <span class="p">{</span>
                 <span class="n">ConversionItem</span><span class="p">(</span>
-                    <span class="s2">&quot;result__extensions__&quot;</span> <span class="o">+</span> <span class="n">VIDEO_EXTENSION_TIME</span><span class="p">,</span>
+                    <span class="s2">&quot;result__extensions__&quot;</span> <span class="o">+</span> <span class="n">RESULT_EXTENSION_TIME</span><span class="p">,</span>
                     <span class="s2">&quot;event__currentTime&quot;</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">ConversionItem</span><span class="p">(</span>
-                    <span class="s2">&quot;result__extensions__&quot;</span> <span class="o">+</span> <span class="n">VIDEO_EXTENSION_PROGRESS</span><span class="p">,</span>
+                    <span class="s2">&quot;result__extensions__&quot;</span> <span class="o">+</span> <span class="n">RESULT_EXTENSION_PROGRESS</span><span class="p">,</span>
                     <span class="kc">None</span><span class="p">,</span>
                     <span class="c1"># Set the video progress to null by default.</span>
                     <span class="c1"># This information is mandatory in the xAPI template</span>
@@ -6148,7 +6148,7 @@ UIStopVideoToVideoTerminated            (<a class="autorefs autorefs-internal" t
                     <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">ConversionItem</span><span class="p">(</span>
-                    <span class="s2">&quot;context__extensions__&quot;</span> <span class="o">+</span> <span class="n">VIDEO_EXTENSION_LENGTH</span><span class="p">,</span>
+                    <span class="s2">&quot;context__extensions__&quot;</span> <span class="o">+</span> <span class="n">CONTEXT_EXTENSION_LENGTH</span><span class="p">,</span>
                     <span class="kc">None</span><span class="p">,</span>
                     <span class="c1"># Set the video length to null by default.</span>
                     <span class="c1"># This information is mandatory in the xAPI template</span>
@@ -6156,7 +6156,7 @@ UIStopVideoToVideoTerminated            (<a class="autorefs autorefs-internal" t
                     <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">ConversionItem</span><span class="p">(</span>
-                    <span class="s2">&quot;context__extensions__&quot;</span> <span class="o">+</span> <span class="n">VIDEO_EXTENSION_SESSION_ID</span><span class="p">,</span>
+                    <span class="s2">&quot;context__extensions__&quot;</span> <span class="o">+</span> <span class="n">CONTEXT_EXTENSION_SESSION_ID</span><span class="p">,</span>
                     <span class="s2">&quot;session&quot;</span><span class="p">,</span>
                 <span class="p">),</span>
             <span class="p">},</span>
@@ -6208,17 +6208,17 @@ __dest__            (<a class="autorefs autorefs-internal" title="ralph.models.x
       <tr>
         <td><code>verb</code></td>
         <td><code>dict</code></td>
-        <td><p>See VideoTerminatedVerbField.</p></td>
+        <td><p>See TerminatedVerb.</p></td>
       </tr>
       <tr>
         <td><code>result</code></td>
         <td><code>dict</code></td>
-        <td><p>See VideoTerminatedResultField.</p></td>
+        <td><p>See VideoTerminatedResult.</p></td>
       </tr>
       <tr>
         <td><code>context</code></td>
         <td><code>dict</code></td>
-        <td><p>See VideoTerminatedContextField.</p></td>
+        <td><p>See VideoTerminatedContext.</p></td>
       </tr>
   </tbody>
 </table>
@@ -6230,9 +6230,9 @@ __dest__            (<a class="autorefs autorefs-internal" title="ralph.models.x
 <span class="sd">    Example: John ended a video (quit the player).</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        verb (dict): See VideoTerminatedVerbField.</span>
-<span class="sd">        result (dict): See VideoTerminatedResultField.</span>
-<span class="sd">        context (dict): See VideoTerminatedContextField.</span>
+<span class="sd">        verb (dict): See TerminatedVerb.</span>
+<span class="sd">        result (dict): See VideoTerminatedResult.</span>
+<span class="sd">        context (dict): See VideoTerminatedContext.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span>
@@ -6240,9 +6240,9 @@ __dest__            (<a class="autorefs autorefs-internal" title="ralph.models.x
         <span class="n">verb__id</span><span class="o">=</span><span class="s2">&quot;http://adlnet.gov/expapi/verbs/terminated&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="n">verb</span><span class="p">:</span> <span class="n">VideoTerminatedVerbField</span> <span class="o">=</span> <span class="n">VideoTerminatedVerbField</span><span class="p">()</span>
-    <span class="n">result</span><span class="p">:</span> <span class="n">VideoTerminatedResultField</span>
-    <span class="n">context</span><span class="p">:</span> <span class="n">VideoTerminatedContextField</span>
+    <span class="n">verb</span><span class="p">:</span> <span class="n">TerminatedVerb</span> <span class="o">=</span> <span class="n">TerminatedVerb</span><span class="p">()</span>
+    <span class="n">result</span><span class="p">:</span> <span class="n">VideoTerminatedResult</span>
+    <span class="n">context</span><span class="p">:</span> <span class="n">VideoTerminatedContext</span>
 </code></pre></div>
         </details>
 
@@ -6415,7 +6415,7 @@ VideoBaseXapiConverter            (<a class="autorefs autorefs-internal" title="
                 <span class="n">ConversionItem</span><span class="p">(</span>
                     <span class="s2">&quot;object__definition__name&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;event__id&quot;</span><span class="p">,</span>
-                    <span class="k">lambda</span> <span class="nb">id</span><span class="p">:</span> <span class="p">{</span><span class="n">LANG_EN_US_DISPLAY</span><span class="o">.</span><span class="n">__args__</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="nb">id</span><span class="p">},</span>
+                    <span class="k">lambda</span> <span class="nb">id</span><span class="p">:</span> <span class="p">{</span><span class="n">LANG_EN_US_DISPLAY</span><span class="p">:</span> <span class="nb">id</span><span class="p">},</span>
                 <span class="p">),</span>
                 <span class="n">ConversionItem</span><span class="p">(</span>
                     <span class="s2">&quot;object__id&quot;</span><span class="p">,</span>
@@ -6427,7 +6427,7 @@ VideoBaseXapiConverter            (<a class="autorefs autorefs-internal" title="
                     <span class="o">+</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;event&quot;</span><span class="p">][</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
                 <span class="p">),</span>
                 <span class="n">ConversionItem</span><span class="p">(</span>
-                    <span class="s2">&quot;context__extensions__&quot;</span> <span class="o">+</span> <span class="n">VIDEO_EXTENSION_SESSION_ID</span><span class="p">,</span>
+                    <span class="s2">&quot;context__extensions__&quot;</span> <span class="o">+</span> <span class="n">CONTEXT_EXTENSION_SESSION_ID</span><span class="p">,</span>
                     <span class="s2">&quot;session&quot;</span><span class="p">,</span>
                 <span class="p">),</span>
             <span class="p">},</span>
