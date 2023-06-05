@@ -16,8 +16,8 @@ and this project adheres to
 ### Changed
 
 - Clean xAPI pydantic models naming convention
-- Upgrade `fastapi` to `0.95.2`
-- Upgrade `sentry_sdk` to `1.24.0`
+- Upgrade `fastapi` to `0.96.0`
+- Upgrade `sentry_sdk` to `1.25.0`
 - Upgrade `httpx` to `0.24.1`
 - Force a valid (JSON-formatted) IFI to be passed for the `/statements` 
 GET query `agent` filtering
