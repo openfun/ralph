@@ -22,6 +22,10 @@
 # See http://jorisroovers.github.io/gitlint/user_defined_rules for details
 extra-path=gitlint/
 
+# Enforce use of Python re.search() instead of re.match() semantics in all built-in 
+# rules that use regular expressions.
+regex-style-search=true
+
 # [title-max-length]
 # line-length=80
 
