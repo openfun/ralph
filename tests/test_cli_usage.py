@@ -105,7 +105,7 @@ def test_cli_fetch_command_usage():
     assert result.exit_code == 0
     assert (
         "Options:\n"
-        "  -b, --backend [es|mongo|clickhouse|ldp|fs|swift|s3|ws]\n"
+        "  -b, --backend [es|mongo|clickhouse|lrs|ldp|fs|swift|s3|ws]\n"
         "                                  Backend  [required]\n"
         "  ws backend: \n"
         "    --ws-uri TEXT\n"
@@ -136,6 +136,13 @@ def test_cli_fetch_command_usage():
         "    --ldp-application-secret TEXT\n"
         "    --ldp-application-key TEXT\n"
         "    --ldp-endpoint TEXT\n"
+        "  lrs backend: \n"
+        "    --lrs-statements-endpoint TEXT\n"
+        "    --lrs-status-endpoint TEXT\n"
+        "    --lrs-headers KEY=VALUE,KEY=VALUE\n"
+        "    --lrs-password TEXT\n"
+        "    --lrs-username TEXT\n"
+        "    --lrs-base-url TEXT\n"
         "  clickhouse backend: \n"
         "    --clickhouse-client-options KEY=VALUE,KEY=VALUE\n"
         "    --clickhouse-password TEXT\n"
@@ -155,6 +162,8 @@ def test_cli_fetch_command_usage():
         "    --es-index TEXT\n"
         "    --es-hosts VALUE1,VALUE2,VALUE3\n"
         "  -c, --chunk-size INTEGER        Get events by chunks of size #\n"
+        "  -t, --target TEXT               Endpoint from which to fetch events (e.g.\n"
+        "                                  `/statements`)\n"
         '  -q, --query \'{"KEY": "VALUE", "KEY": "VALUE"}\'\n'
         "                                  Query object as a JSON string (database\n"
         "                                  backends ONLY)\n"
@@ -164,8 +173,8 @@ def test_cli_fetch_command_usage():
     assert result.exit_code > 0
     assert (
         "Error: Missing option '-b' / '--backend'. "
-        "Choose from:\n\tes,\n\tmongo,\n\tclickhouse,\n\tldp,\n\tfs,\n\tswift,\n\ts3,"
-        "\n\tws\n"
+        "Choose from:\n\tes,\n\tmongo,\n\tclickhouse,\n\tlrs,\n\tldp,\n\tfs,\n\tswift,"
+        "\n\ts3,\n\tws\n"
     ) in result.output
 
 
