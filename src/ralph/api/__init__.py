@@ -49,4 +49,4 @@ async def whoami(
     user: AuthenticatedUser = Depends(get_authenticated_user),
 ):
     """Return the current user's username along with their scopes."""
-    return {"username": user.username, "scopes": user.scopes}
+    return {"agent": user.agent, "scopes": user.scopes}

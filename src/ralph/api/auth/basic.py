@@ -32,12 +32,12 @@ class UserCredentials(AuthenticatedUser):
     """Pydantic model for user credentials as stored in the credentials file.
 
     Attributes:
-        username (str): Consists of the username for a declared user.
         hash (str): Consists of the hashed password for a declared user.
-        scopes (List): Consists of the scopes a declared has access to.
+        username (str): Consists of the username for a declared user.
     """
 
     hash: str
+    username: str
 
 
 class ServerUsersCredentials(BaseModel):
@@ -182,4 +182,4 @@ def get_authenticated_user(
             headers={"WWW-Authenticate": "Basic"},
         )
 
-    return AuthenticatedUser(username=credentials.username, scopes=user.scopes)
+    return AuthenticatedUser(scopes=user.scopes, agent=user.agent)

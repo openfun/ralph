@@ -15,6 +15,7 @@ from ralph.conf import ESClientOptions, settings
 from ralph.exceptions import BackendException, BackendParameterException
 
 from .base import (
+    AgentParameters,
     BaseDatabase,
     BaseQuery,
     DatabaseStatus,
@@ -146,37 +147,65 @@ class ESDatabase(BaseDatabase):
             ) from error
         return documents
 
+    @staticmethod
+    def _add_agent_filters(
+        es_query_filters: list, agent_params: AgentParameters, target_field: str
+    ):
+        """Add filters relative to agents to es_query_filters.
+
+        Args:
+            es_query_filters: list of filters to be passed to elasticsearch
+            agent_params: query parameters that represent the agent to search for
+            target_field: the field in the database in which to perform the search
+        """
+        if agent_params.mbox:
+            es_query_filters += [
+                {"term": {f"{target_field}.mbox.keyword": agent_params.mbox}}
+            ]
+
+        if agent_params.mbox_sha1sum:
+            es_query_filters += [
+                {
+                    "term": {
+                        f"{target_field}.mbox_sha1sum.keyword": agent_params.mbox_sha1sum  # noqa: E501 # pylint: disable=line-too-long
+                    }
+                }
+            ]
+
+        if agent_params.openid:
+            es_query_filters += [
+                {"term": {f"{target_field}.openid.keyword": agent_params.openid}}
+            ]
+
+        if agent_params.account__name:
+            es_query_filters += [
+                {
+                    "term": {
+                        f"{target_field}.account.name.keyword": agent_params.account__name  # noqa: E501 # pylint: disable=line-too-long
+                    }
+                }
+            ]
+            es_query_filters += [
+                {
+                    "term": {
+                        f"{target_field}.account.homePage.keyword": agent_params.account__home_page  # noqa: E501 # pylint: disable=line-too-long
+                    }
+                }
+            ]
+
     def query_statements(self, params: StatementParameters) -> StatementQueryResult:
         """Returns the results of a statements query using xAPI parameters."""
-        # pylint: disable=too-many-branches
-
         es_query_filters = []
 
         if params.statementId:
             es_query_filters += [{"term": {"_id": params.statementId}}]
 
-        if params.agent__mbox:
-            es_query_filters += [{"term": {"actor.mbox.keyword": params.agent__mbox}}]
-
-        if params.agent__mbox_sha1sum:
-            es_query_filters += [
-                {"term": {"actor.mbox_sha1sum.keyword": params.agent__mbox_sha1sum}}
-            ]
-
-        if params.agent__openid:
-            es_query_filters += [
-                {"term": {"actor.openid.keyword": params.agent__openid}}
-            ]
-
-        if params.agent__account__name:
-            es_query_filters += [
-                {"term": {"actor.account.name.keyword": params.agent__account__name}},
-                {
-                    "term": {
-                        "actor.account.homePage.keyword": params.agent__account__home_page  # pylint: disable=line-too-long # noqa: E501
-                    }
-                },
-            ]
+        self._add_agent_filters(
+            es_query_filters, params.__dict__["agent"], target_field="actor"
+        )
+        self._add_agent_filters(
+            es_query_filters, params.__dict__["authority"], target_field="authority"
+        )
 
         if params.verb:
             es_query_filters += [{"term": {"verb.id.keyword": params.verb}}]

@@ -36,20 +36,31 @@ documentation for
 details](https://click.palletsprojects.com/en/8.1.x/api/#click.get_app_dir)).
 
 The expected format is a list of entries (JSON objects) each containing the
-username, the user's `bcrypt` hashed+salted password and scopes they can
-access:
+username, the user's `bcrypt` hashed+salted password, scopes they can
+access, and an `agent` object used to represent the user in the LRS. The 
+`agent` is constrained by [LRS specifications](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#description-2), and must use one of four valid 
+[Inverse Functional Identifiers](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#inversefunctional).
 
 ```json
 [
   {
     "username": "john.doe@example.com",
     "hash": "$2b$12$yBXrzIuRIk6yaft5KUgVFOIPv0PskCCh9PXmF2t7pno.qUZ5LK0D2",
-    "scopes": ["example_scope"]
+    "scopes": ["example_scope"],
+    "agent": {
+      "mbox": "mailto:john.doe@example.com"
+    }
   },
   {
     "username": "simon.says@example.com",
     "hash": "$2b$12$yBXrzIuRIk6yaft5KUgVFOIPv0PskCCh9PXmF2t7pno.qUZ5LK0D2",
-    "scopes": ["second_scope", "third_scope"]
+    "scopes": ["second_scope", "third_scope"],
+    "agent": {
+      "account": {
+        "name": "simonsAccountName",
+        "homePage": "http://www.exampleHomePage.com"
+      }
+    }
   }
 ]
 ```
@@ -61,6 +72,11 @@ $ ralph auth \
     --username janedoe \
     --password supersecret \
     --scope janedoe_scope \
+    --agent-mbox mailto:janedoe@example.com \
+    # or --agent-mbox-sha1sum ebd31e95054c018b10727ccffd2ef2ec3a016ee9\
+    # or --agent-openid "http://jane.openid.example.org/" \
+    # or --agent-account-name exampleAccountname \
+    #    --agent-account-homePage http://www.exampleHomePage.com \
     -w
 ```
 
@@ -91,7 +107,7 @@ Send your username and password to the API server through HTTP Basic Auth:
 ```bash
 $ curl --user john.doe@example.com:PASSWORD http://localhost:8100/whoami
 < HTTP/1.1 200 OK
-< {"username":"john.doe@example.com","scopes":["authenticated","example_scope"]}
+< {"scopes":["example_scope"], "agent": {"mbox": "mailto:john.doe@example.com"}}
 ```
 
 ### OpenID Connect authentication

@@ -23,6 +23,7 @@ STORED_CREDENTIALS = json.dumps(
             "username": "ralph",
             "hash": bcrypt.hashpw(b"admin", bcrypt.gensalt()).decode("UTF-8"),
             "scopes": ["ralph_test_scope"],
+            "agent": {"mbox": "mailto:ralph@example.com"},
         }
     ]
 )
@@ -34,15 +35,26 @@ def test_api_auth_basic_model_serveruserscredentials():
     users = ServerUsersCredentials(
         __root__=[
             UserCredentials(
-                username="johndoe", hash="notrealhash", scopes=["johndoe_scope"]
+                username="johndoe",
+                hash="notrealhash",
+                scopes=["johndoe_scope"],
+                agent={"mbox": "mailto:johndoe@example.com"},
             ),
-            UserCredentials(username="foo", hash="notsorealhash", scopes=["foo_scope"]),
+            UserCredentials(
+                username="foo",
+                hash="notsorealhash",
+                scopes=["foo_scope"],
+                agent={"mbox": "mailto:foo@example.com"},
+            ),
         ]
     )
     other_users = ServerUsersCredentials.parse_obj(
         [
             UserCredentials(
-                username="janedoe", hash="notreallyrealhash", scopes=["janedoe_scope"]
+                username="janedoe",
+                hash="notreallyrealhash",
+                scopes=["janedoe_scope"],
+                agent={"mbox": "mailto:janedoe@example.com"},
             ),
         ]
     )
@@ -71,7 +83,10 @@ def test_api_auth_basic_model_serveruserscredentials():
         users += ServerUsersCredentials.parse_obj(
             [
                 UserCredentials(
-                    username="foo", hash="notsorealhash", scopes=["foo_scope"]
+                    username="foo",
+                    hash="notsorealhash",
+                    scopes=["foo_scope"],
+                    agent={"mbox": "mailto:foo2@example.com"},
                 ),
             ]
         )
@@ -90,7 +105,10 @@ def test_api_auth_basic_caching_credentials(fs):
 
     assert get_authenticated_user.cache.popitem() == (
         ("ralph", "admin"),
-        AuthenticatedUser(username="ralph", scopes=["ralph_test_scope"]),
+        AuthenticatedUser(
+            agent={"mbox": "mailto:ralph@example.com"},
+            scopes=["ralph_test_scope"],
+        ),
     )
 
 
@@ -202,6 +220,6 @@ def test_get_whoami_correct_credentials(basic_auth_test_client, fs):
 
     assert response.status_code == 200
     assert response.json() == {
-        "username": "ralph",
+        "agent": {"mbox": "mailto:ralph@example.com"},
         "scopes": ["ralph_test_scope"],
     }
