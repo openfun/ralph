@@ -21,6 +21,8 @@ and this project adheres to
 - Upgrade `httpx` to `0.24.1`
 - Force a valid (JSON-formatted) IFI to be passed for the `/statements` 
 GET query `agent` filtering
+- User credentials must now include an "agent" field which can be created 
+using the cli
 
 ### Removed
 

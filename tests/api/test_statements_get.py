@@ -253,11 +253,13 @@ def test_api_statements_get_statements_by_agent(
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
             "timestamp": datetime.now().isoformat(),
             "actor": agent_1,
+            "authority": agent_1,
         },
         {
             "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
             "timestamp": datetime.now().isoformat(),
             "actor": agent_2,
+            "authority": agent_1,
         },
     ]
     insert_statements_and_monkeypatch_backend(statements)

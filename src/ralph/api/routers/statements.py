@@ -19,7 +19,11 @@ from pydantic import parse_raw_as
 from pydantic.types import Json
 
 from ralph.api.forwarding import forward_xapi_statements, get_active_xapi_forwardings
-from ralph.backends.database.base import BaseDatabase, StatementParameters
+from ralph.backends.database.base import (
+    AgentParameters,
+    BaseDatabase,
+    StatementParameters,
+)
 from ralph.conf import settings
 from ralph.exceptions import BackendException, BadFormatException
 from ralph.models.xapi.base.agents import (
@@ -238,21 +242,24 @@ async def get(
 
     # Parse the agent parameter (JSON) into multiple string parameters
     query_params = dict(request.query_params)
+
     if query_params.get("agent") is not None:
         # Transform agent to `dict` as FastAPI cannot parse JSON (seen as string)
+
         agent = parse_raw_as(BaseXapiAgent, query_params["agent"])
 
-        query_params.pop("agent")
-
+        agent_query_params = {}
         if isinstance(agent, BaseXapiAgentWithMbox):
-            query_params["agent__mbox"] = agent.mbox
+            agent_query_params["mbox"] = agent.mbox
         elif isinstance(agent, BaseXapiAgentWithMboxSha1Sum):
-            query_params["agent__mbox_sha1sum"] = agent.mbox_sha1sum
+            agent_query_params["mbox_sha1sum"] = agent.mbox_sha1sum
         elif isinstance(agent, BaseXapiAgentWithOpenId):
-            query_params["agent__openid"] = agent.openid
+            agent_query_params["openid"] = agent.openid
         elif isinstance(agent, BaseXapiAgentWithAccount):
-            query_params["agent__account__name"] = agent.account.name
-            query_params["agent__account__home_page"] = agent.account.homePage
+            agent_query_params["account__name"] = agent.account.name
+            agent_query_params["account__home_page"] = agent.account.homePage
+
+        query_params["agent"] = AgentParameters(**agent_query_params)
 
     # Query Database
     try:

@@ -18,6 +18,7 @@ STORED_CREDENTIALS = json.dumps(
             "username": "ralph",
             "hash": bcrypt.hashpw(b"admin", bcrypt.gensalt()).decode("UTF-8"),
             "scopes": ["ralph_test_scope"],
+            "agent": {"mbox": "mailto:ralph@example.com"},
         }
     ]
 )
@@ -95,6 +96,6 @@ def test_get_whoami_correct_credentials(fs):
 
     assert response.status_code == 200
     assert response.json() == {
-        "username": "ralph",
+        "agent": {"mbox": "mailto:ralph@example.com"},
         "scopes": ["ralph_test_scope"],
     }

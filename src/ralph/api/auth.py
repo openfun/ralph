@@ -3,7 +3,7 @@
 import logging
 from functools import lru_cache
 from pathlib import Path
-from typing import List
+from typing import Dict, List
 
 import bcrypt
 from fastapi import Depends, HTTPException, status
@@ -29,11 +29,11 @@ class AuthenticatedUser(BaseModel):
     """Pydantic model for user authentication.
 
     Attributes:
-        username (str): Consists of the username of the current user.
+        agent (dict): The agent representing the current user.
         scopes (List): Consists of the scopes the user has access to.
     """
 
-    username: str
+    agent: Dict
     scopes: List[str]
 
 
@@ -41,12 +41,12 @@ class UserCredentials(AuthenticatedUser):
     """Pydantic model for user credentials as stored in the credentials file.
 
     Attributes:
-        username (str): Consists of the username for a declared user.
         hash (str): Consists of the hashed password for a declared user.
-        scopes (List): Consists of the scopes a declared has access to.
+        username (str): Consists of the username for a declared user.
     """
 
     hash: str
+    username: str
 
 
 class ServerUsersCredentials(BaseModel):
@@ -165,4 +165,4 @@ def authenticated_user(credentials: HTTPBasicCredentials = Depends(security)):
             headers={"WWW-Authenticate": "Basic"},
         )
 
-    return AuthenticatedUser(username=credentials.username, scopes=user.scopes)
+    return AuthenticatedUser(scopes=user.scopes, agent=user.agent)

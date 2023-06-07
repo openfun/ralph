@@ -15,6 +15,7 @@ from ralph.conf import MongoClientOptions, settings
 from ralph.exceptions import BackendException, BadFormatException
 
 from .base import (
+    AgentParameters,
     BaseDatabase,
     BaseQuery,
     DatabaseStatus,
@@ -185,31 +186,56 @@ class MongoDatabase(BaseDatabase):
 
         return success
 
+    @staticmethod
+    def _add_agent_filters(
+        mongo_query_filters: dict, agent_params: AgentParameters, target_field: str
+    ):
+        """Add filters relative to agents to mongo_query_filters.
+
+        Args:
+            mongo_query_filters: filters to be passed to mongo
+            agent_params: query parameters that represent the agent to search for
+            target_field: the field in the database in which to perform the search
+        """
+        if agent_params.mbox:
+            mongo_query_filters.update(
+                {f"_source.{target_field}.mbox": agent_params.mbox}
+            )
+
+        if agent_params.mbox_sha1sum:
+            mongo_query_filters.update(
+                {f"_source.{target_field}.mbox_sha1sum": agent_params.mbox_sha1sum}
+            )
+
+        if agent_params.openid:
+            mongo_query_filters.update(
+                {f"_source.{target_field}.openid": agent_params.openid}
+            )
+
+        if agent_params.account__name:
+            mongo_query_filters.update(
+                {f"_source.{target_field}.account.name": agent_params.account__name}
+            )
+            mongo_query_filters.update(
+                {
+                    f"_source.{target_field}.account.homePage": agent_params.account__home_page  # noqa: E501 # pylint: disable=line-too-long
+                }
+            )
+
     def query_statements(self, params: StatementParameters) -> StatementQueryResult:
-        """Returns the results of a statements query using xAPI parameters."""
+        """Returns the results of a statements query using xAPI parameter s."""
+        # pylint: disable=too-many-branches
         mongo_query_filters = {}
 
         if params.statementId:
             mongo_query_filters.update({"_source.id": params.statementId})
 
-        if params.agent__mbox:
-            mongo_query_filters.update({"_source.actor.mbox": params.agent__mbox})
-
-        if params.agent__mbox_sha1sum:
-            mongo_query_filters.update(
-                {"_source.actor.mbox_sha1sum": params.agent__mbox_sha1sum}
-            )
-
-        if params.agent__openid:
-            mongo_query_filters.update({"_source.actor.openid": params.agent__openid})
-
-        if params.agent__account__name:
-            mongo_query_filters.update(
-                {"_source.actor.account.name": params.agent__account__name}
-            )
-            mongo_query_filters.update(
-                {"_source.actor.account.homePage": params.agent__account__home_page}
-            )
+        self._add_agent_filters(
+            mongo_query_filters, params.__dict__["agent"], target_field="actor"
+        )
+        self._add_agent_filters(
+            mongo_query_filters, params.__dict__["authority"], target_field="authority"
+        )
 
         if params.verb:
             mongo_query_filters.update({"_source.verb.id": params.verb})
