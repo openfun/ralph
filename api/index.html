@@ -473,6 +473,26 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#additional_configuration" class="md-nav__link">
+    Additional configuration
+  </a>
+  
+    <nav class="md-nav" aria-label="Additional configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#http_basic_auth_caching" class="md-nav__link">
+    HTTP Basic auth caching
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -667,6 +687,26 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#additional_configuration" class="md-nav__link">
+    Additional configuration
+  </a>
+  
+    <nav class="md-nav" aria-label="Additional configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#http_basic_auth_caching" class="md-nav__link">
+    HTTP Basic auth caching
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -841,6 +881,18 @@ To activate Sentry integration, one should define the following environment vari
 </blockquote>
 <p>If you want to lower noisy transactions (<em>e.g.</em> in a Kubernetes cluster), you can disable health checks related ones:
 <div class="highlight"><pre><span></span><code><span class="nv">RALPH_SENTRY_IGNORE_HEALTH_CHECKS</span><span class="o">=</span>True
+</code></pre></div></p>
+<h3 id="additional_configuration">Additional configuration<a class="headerlink" href="#additional_configuration" title="Permanent link">&para;</a></h3>
+<h4 id="http_basic_auth_caching">HTTP Basic auth caching<a class="headerlink" href="#http_basic_auth_caching" title="Permanent link">&para;</a></h4>
+<p>HTTP basic auth implementation uses the secure and standard bcrypt algorithm to hash/salt passwords before storing them.
+This implementation comes with a performance cost.
+To speed up requests, credentials are stored in a LRU cache with a Time To Live.
+To configure this cache, you can define the following environment variables:
+- the maximum number of entries in the cache. Select a value greater than the maximum number of individual user credentials, for better performance. Defaults to 100. 
+<div class="highlight"><pre><span></span><code>RALPH_AUTH_CACHE_MAX_SIZE=100
+</code></pre></div>
+- the Time To Live of the cache entries in seconds. Defaults to 3600s.
+<div class="highlight"><pre><span></span><code>RALPH_AUTH_CACHE_TTL=3600
 </code></pre></div></p>
 
 
