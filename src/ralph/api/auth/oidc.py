@@ -13,6 +13,7 @@ from pydantic import AnyUrl, BaseModel, Extra
 
 from ralph.api.auth.user import AuthenticatedUser
 from ralph.conf import settings
+from ralph.models.xapi.base.ifi import BaseXapiAccount
 
 OPENID_CONFIGURATION_PATH = "/.well-known/openid-configuration"
 oauth2_scheme = OpenIdConnect(
@@ -29,7 +30,7 @@ class IDToken(BaseModel):
     """Pydantic model representing the core of an OpenID Connect ID Token.
 
     ID Tokens are polymorphic and may have many attributes not defined in the
-    spec thus this model accepts all addition fields.
+    specification. This model ignores all additional fields.
 
     Attributes:
         iss (str): Issuer Identifier for the Issuer of the response.
@@ -38,6 +39,7 @@ class IDToken(BaseModel):
         exp (int): Expiration time on or after which the ID Token MUST NOT be
                    accepted for processing.
         iat (int): Time at which the JWT was issued.
+        scope (str): Scope(s) for resource authorization.
     """
 
     iss: str
@@ -45,9 +47,10 @@ class IDToken(BaseModel):
     aud: Optional[str]
     exp: int
     iat: int
+    scope: Optional[str]
 
     class Config:  # pylint: disable=missing-class-docstring # noqa: D106
-        extra = Extra.allow
+        extra = Extra.ignore
 
 
 @lru_cache()
@@ -141,7 +144,20 @@ def get_authenticated_user(
 
     id_token = IDToken.parse_obj(decoded_token)
 
+    try:
+        agent = BaseXapiAccount(
+            homePage=id_token.iss,
+            name=id_token.sub,
+        )
+    except (ValueError, TypeError) as exc:
+        logger.error("Claims cannot be mapped to an agent: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        ) from exc
+
     return AuthenticatedUser(
-        username=f"{id_token.iss}/{id_token.sub}",
-        scopes=id_token.roles if hasattr(id_token, "roles") else None,
+        agent=agent,
+        scopes=id_token.scope.split(" ") if id_token.scope else [],
     )

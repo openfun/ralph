@@ -264,15 +264,86 @@ def backends_options(name=None, backend_types: List[BaseModel] = None):
     help="The user scope(s). This option can be provided multiple times.",
 )
 @click.option(
+    "-M",
+    "--agent-ifi-mbox",
+    type=str,
+    required=False,
+    help="The mbox Inverse Functional Identifier of the associated agent.",
+)
+@click.option(
+    "-S",
+    "--agent-ifi-mbox-sha1sum",
+    type=str,
+    required=False,
+    help="The mbox-sha1sum Inverse Functional Identifier of the associated agent.",
+)
+@click.option(
+    "-O",
+    "--agent-ifi-openid",
+    type=str,
+    required=False,
+    help="The openid Inverse Functional Identifier of the associated agent.",
+)
+@click.option(
+    "-A",
+    "--agent-ifi-account",
+    type=str,
+    nargs=2,
+    required=False,
+    help=(
+        'Input "{name} {homePage}". The account Inverse Functional Identifier of the '
+        "associated agent."
+    ),
+)
+@click.option(
+    "-N",
+    "--agent-name",
+    type=str,
+    required=False,
+    help="The name of the associated agent.",
+)
+@click.option(
     "-w",
     "--write",
     is_flag=True,
     default=False,
     help="Write new credentials to the LRS authentication file.",
 )
-def auth(username, password, scope, write):
+# pylint: disable=too-many-arguments, too-many-locals
+def auth(
+    username,
+    password,
+    scope,
+    write,
+    agent_ifi_mbox,
+    agent_ifi_mbox_sha1sum,
+    agent_ifi_openid,
+    agent_ifi_account,
+    agent_name,
+):
     """Generate credentials for LRS HTTP basic authentification."""
     logger.info("Will generate credentials for user: %s", username)
+
+    # Verify that exactly one agent representation has been provided
+    if (
+        sum(
+            opt is not None
+            for opt in [
+                agent_ifi_mbox,
+                agent_ifi_mbox_sha1sum,
+                agent_ifi_openid,
+                agent_ifi_account,
+            ]
+        )
+        != 1
+    ):
+        raise click.UsageError(
+            "Exactly one (1) of the ifi options is required. These options are:\n"
+            "-M --agent-ifi-mbox : mbox Agent IFI\n"
+            "-S --agent-ifi-mboxsha1sum : mbox-sha1sum Agent IFIr\n"
+            "-O --agent-ifi-openid : openid Agent IFI\n"
+            "-A --agent-ifi-account : account Agent IFI"
+        )
 
     # Import required Pydantic models dynamically so that we don't create a
     # direct dependency between the CLI and the LRS
@@ -280,14 +351,45 @@ def auth(username, password, scope, write):
     ServerUsersCredentials = import_string(
         "ralph.api.auth.basic.ServerUsersCredentials"
     )
-    UserCredentials = import_string("ralph.api.auth.basic.UserCredentials")
+    UserCredentialsBasicAuth = import_string("ralph.api.auth.basic.UserCredentials")
 
-    credentials = UserCredentials(
+    # NB: renaming classes below for clarity
+    Account = import_string("ralph.models.xapi.base.ifi.BaseXapiAccount")
+    AgentMbox = import_string("ralph.models.xapi.base.agents.BaseXapiAgentWithMbox")
+    AgentMboxSha1sum = import_string(
+        "ralph.models.xapi.base.agents.BaseXapiAgentWithMboxSha1Sum"
+    )
+    AgentOpenid = import_string("ralph.models.xapi.base.agents.BaseXapiAgentWithOpenId")
+    AgentAccount = import_string(
+        "ralph.models.xapi.base.agents.BaseXapiAgentWithAccount"
+    )
+
+    if agent_ifi_mbox:
+        if agent_ifi_mbox[:7] != "mailto:":
+            raise click.UsageError(
+                'Mbox field must start with "mailto:" (e.g.: "mailto:foo@bar.com")'
+            )
+        agent = AgentMbox(mbox=agent_ifi_mbox, name=agent_name, objectType="Agent")
+    if agent_ifi_mbox_sha1sum:
+        agent = AgentMboxSha1sum(
+            mbox_sha1sum=agent_ifi_mbox_sha1sum, name=agent_name, objectType="Agent"
+        )
+    if agent_ifi_openid:
+        agent = AgentOpenid(
+            openid=agent_ifi_openid, name=agent_name, objectType="Agent"
+        )
+    if agent_ifi_account:
+        # Parse account details
+        account = Account(homePage=agent_ifi_account[1], name=agent_ifi_account[0])
+        agent = AgentAccount(account=account, name=agent_name, objectType="Agent")
+
+    credentials = UserCredentialsBasicAuth(
         username=username,
         hash=bcrypt.hashpw(
             bytes(password, encoding=settings.LOCALE_ENCODING), bcrypt.gensalt()
         ).decode("ascii"),
         scopes=scope,
+        agent=agent,
     )
 
     if write:
