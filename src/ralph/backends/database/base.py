@@ -44,6 +44,20 @@ class DatabaseStatus(Enum):
 
 
 @dataclass
+class AgentParameters:
+    """Dictionary of possible LRS query parameters for query on type Agent.
+
+    NB: Agent refers to the data structure, NOT to the LRS query parameter.
+    """
+
+    mbox: Optional[str] = None
+    mbox_sha1sum: Optional[str] = None
+    openid: Optional[str] = None
+    account__name: Optional[str] = None
+    account__home_page: Optional[str] = None
+
+
+@dataclass
 class StatementParameters:
     """Represents a dictionary of possible LRS query parameters."""
 
@@ -51,11 +65,7 @@ class StatementParameters:
 
     statementId: Optional[str] = None  # pylint: disable=invalid-name
     voidedStatementId: Optional[str] = None  # pylint: disable=invalid-name
-    agent__mbox: Optional[str] = None
-    agent__mbox_sha1sum: Optional[str] = None
-    agent__openid: Optional[str] = None
-    agent__account__name: Optional[str] = None
-    agent__account__home_page: Optional[str] = None
+    agent: Optional[AgentParameters] = None
     verb: Optional[str] = None
     activity: Optional[str] = None
     registration: Optional[UUID] = None
@@ -69,33 +79,41 @@ class StatementParameters:
     ascending: Optional[bool] = False
     search_after: Optional[str] = None
     pit_id: Optional[str] = None
+    authority: Optional[AgentParameters] = None
 
     def __post_init__(self):
         """Perform additional conformity verifications on parameters."""
-        # Check that both `homePage` and `name` are provided if `account` is being used
-        if (self.agent__account__name is not None) != (
-            self.agent__account__home_page is not None
-        ):
-            raise BackendParameterException(
-                "Invalid agent parameters: home_page and name are both required"
-            )
+        # Initiate agent parameters for queries "agent" and "authority"
+        for query_param in ["agent", "authority"]:
+            # Transform to object if None (cannot be done with defaults)
+            if self.__dict__[query_param] is None:
+                self.__dict__[query_param] = AgentParameters()
 
-        # Check that no more than one Inverse Functional Identifier is provided
-        if (
-            sum(
-                x is not None
-                for x in [
-                    self.agent__mbox,
-                    self.agent__mbox_sha1sum,
-                    self.agent__openid,
-                    self.agent__account__name,
-                ]
-            )
-            > 1
-        ):
-            raise BackendParameterException(
-                "Invalid agent parameters: Only one identifier can be used"
-            )
+            # Check that both `homePage` and `name` are provided if any are
+            if (self.__dict__[query_param].account__name is not None) != (
+                self.__dict__[query_param].account__home_page is not None
+            ):
+                raise BackendParameterException(
+                    f"Invalid {query_param} parameters: homePage and name are "
+                    "both required"
+                )
+
+            # Check that one or less Inverse Functional Identifier is provided
+            if (
+                sum(
+                    x is not None
+                    for x in [
+                        self.__dict__[query_param].mbox,
+                        self.__dict__[query_param].mbox_sha1sum,
+                        self.__dict__[query_param].openid,
+                        self.__dict__[query_param].account__name,
+                    ]
+                )
+                > 1
+            ):
+                raise BackendParameterException(
+                    f"Invalid {query_param} parameters: Only one identifier can be used"
+                )
 
 
 def enforce_query_checks(method):

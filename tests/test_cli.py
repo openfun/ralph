@@ -2,6 +2,7 @@
 import json
 import logging
 from pathlib import Path
+from typing import Union
 
 import pytest
 from click.exceptions import BadParameter
@@ -161,88 +162,250 @@ def test_cli_help_option():
     ) in result.output
 
 
-def test_cli_auth_command_without_writing_auth_file():
-    """Test ralph auth command when credentials are displayed in the tty."""
-    runner = CliRunner()
-    result = runner.invoke(cli, ["auth", "-u", "foo", "-p", "bar", "-s", "foo_scope"])
+# pylint: disable=too-many-arguments
+def _gen_cli_auth_args(
+    username: str,
+    password: str,
+    scopes: list,
+    ifi_command: str,
+    ifi_value: Union[str, dict],
+    agent_name: str = None,
+    write: bool = False,
+):
+    """Generate arguments for cli to create user."""
+    cli_args = ["auth", "-u", username, "-p", password]
+    for scope in scopes:
+        cli_args.extend(["-s", scope])
+    cli_args.append(ifi_command)
+    cli_args.extend(ifi_value.split())
+    if agent_name:
+        cli_args.extend(["-N", agent_name])
+    if write:
+        cli_args.append("-w")
+    return cli_args
 
-    assert result.exit_code == 0
 
-    credentials = json.loads("".join(result.output.split("\n")[-8:-1]))
-    assert credentials["username"] == "foo"
+# pylint: disable=too-many-arguments
+def _assert_matching_basic_auth_credentials(
+    credentials: dict,
+    username: str,
+    scopes: list,
+    ifi_type: str,
+    ifi_value: Union[str, dict],
+    agent_name: str = None,
+    hash_: str = None,
+):
+    """Assert that credentials match other arguments.
+
+    args:
+        credentials: credentials to match against
+        username: username that should match credentials
+        scopes: scopes that should match credentials
+        ifi_type: type of ifi used in credentials. One of "mbox",
+            "mbox_sha1sum", "openid", or "account"
+        ifi_value: value of ifi
+        agent_name: name to assign to agent. If None, no matching is performed
+        hash: hash value of the password. If None, no matching is performed
+    """
+    assert credentials["username"] == username
     assert "hash" in credentials
-    assert len(credentials["scopes"]) == 1
-    assert credentials["scopes"][0] == "foo_scope"
+    if hash_:
+        assert credentials["hash"] == hash_
+    assert credentials["scopes"] == scopes
+    assert "agent" in credentials
 
-    # Test multiple scopes
-    result = runner.invoke(
-        cli, ["auth", "-u", "foo", "-p", "bar", "-s", "foo_scope", "-s", "admin_scope"]
+    if agent_name is not None:
+        assert credentials["agent"]["name"] == agent_name
+
+    if "objectType" in credentials["agent"]:
+        assert credentials["agent"]["objectType"] == "Agent"
+
+    if ifi_type in ["mbox", "mbox_sha1sum", "openid"]:
+        assert ifi_type in credentials["agent"]
+        assert credentials["agent"][ifi_type] == ifi_value
+    elif ifi_type == "account":
+        assert "account" in credentials["agent"]
+        assert "name" in credentials["agent"]["account"]
+        assert "homePage" in credentials["agent"]["account"]
+        assert credentials["agent"]["account"] == ifi_value
+    else:
+        raise ValueError(
+            'ifi_type should be one of: "mbox", "mbox_sha1sum", "openid", "account"'
+        )
+
+
+def _ifi_type_from_command(ifi_command):
+    """Return the ifi_type associated to the command being passed to cli"""
+    if ifi_command not in ["-M", "-S", "-O", "-A"]:
+        raise ValueError('The ifi_command must be one of: "-M", "-S", "-O", "-A"')
+
+    return {"-M": "mbox", "-S": "mbox_sha1sum", "-O": "openid", "-A": "account"}[
+        ifi_command
+    ]
+
+
+def _ifi_value_from_command(ifi_value, ifi_type):
+    """Parse ifi_value returned by cli to generate dict when `ifi_type` is `account`"""
+    if ifi_type == "account":
+        # Parse arguments from cli
+        return {"name": ifi_value.split()[0], "homePage": ifi_value.split()[1]}
+    return ifi_value
+
+
+@pytest.mark.parametrize(
+    "scopes,ifi_command,ifi_value",
+    [
+        (["foo_scope"], "-M", "mailto:foo@bar.com"),  # mbox ifi
+        (["foo_scope", "admin_scope"], "-M", "mailto:foo@bar.com"),
+        (
+            ["foo_scope"],
+            "-S",
+            "ebd31e95054c018b10727ccffd2ef2ec3a016ee9",
+        ),  # mbox_sha1sum ifi
+        (["foo_scope"], "-O", "http://foo.openid.example.org/"),  # mbox_openid ifi
+        (["foo_scope"], "-A", "foo_name http://www.bar.xyz"),  # account ifi
+    ],
+)
+def test_cli_auth_command_without_writing_auth_file(scopes, ifi_command, ifi_value):
+    """Test ralph auth command when credentials are displayed in the tty."""
+
+    username = "foo"
+    password = "bar"
+    agent_name = "foobarname"  # optional name
+
+    cli_args = _gen_cli_auth_args(
+        username,
+        password,
+        scopes,
+        ifi_command,
+        ifi_value,
+        agent_name=agent_name,
+        write=False,
     )
 
+    runner = CliRunner()
+    result = runner.invoke(cli, cli_args)
+
     assert result.exit_code == 0
 
-    credentials = json.loads("".join(result.output.split("\n")[-9:-1]))
-    assert credentials["username"] == "foo"
-    assert "hash" in credentials
-    assert len(credentials["scopes"]) == 2
-    assert credentials["scopes"][0] == "foo_scope"
-    assert credentials["scopes"][1] == "admin_scope"
+    credentials = json.loads(result.output.split(".json", 1)[1].strip())
+
+    ifi_type = _ifi_type_from_command(ifi_command=ifi_command)
+    ifi_value = _ifi_value_from_command(ifi_value, ifi_type)
+
+    _assert_matching_basic_auth_credentials(
+        credentials=credentials,
+        username=username,
+        scopes=scopes,
+        ifi_type=ifi_type,
+        ifi_value=ifi_value,
+        agent_name=agent_name,
+    )
 
 
 # pylint: disable=invalid-name,unused-argument
-def test_cli_auth_command_when_writing_auth_file(fs):
+@pytest.mark.parametrize(
+    "ifi_command_1, ifi_value_1, ifi_command_2, ifi_value_2",
+    [
+        (
+            "-M",
+            "mailto:foo@bar.com",
+            "-S",
+            "ebd31e95054c018b10727ccffd2ef2ec3a016ee9",
+        ),  # mbox ifi
+        (
+            "-S",
+            "ebd31e95054c018b10727ccffd2ef2ec3a016ee9",
+            "-O",
+            "http://foo.openid.example.org/",
+        ),  # mbox_sha1sum ifi
+        (
+            "-O",
+            "http://foo.openid.example.org/",
+            "-A",
+            "foo_name http://www.bar.xyz",
+        ),  # mbox_openid ifi
+        (
+            "-A",
+            "foo_name http://www.bar.xyz",
+            "-M",
+            "mailto:foo@bar.com",
+        ),  # account ifi
+    ],
+)
+# pylint: disable=too-many-locals
+def test_cli_auth_command_when_writing_auth_file(
+    fs, ifi_command_1, ifi_value_1, ifi_command_2, ifi_value_2
+):
     """Test ralph auth command when credentials are written in the authentication
     file.
     """
     runner = CliRunner()
 
+    username_1 = "foo"
+    password_1 = "bar"
+    scopes_1 = ["tele_scope"]
+
     # The authentication file does not exist
-    assert Path(settings.AUTH_FILE).exists() is False
-    result = runner.invoke(
-        cli, ["auth", "-u", "foo", "-p", "bar", "-s", "foo_scope", "-w"]
+
+    # Add a first user
+    cli_args = _gen_cli_auth_args(
+        username_1, password_1, scopes_1, ifi_command_1, ifi_value_1, write=True
     )
+
+    assert Path(settings.AUTH_FILE).exists() is False
+    result = runner.invoke(cli, cli_args)
     assert result.exit_code == 0
     assert Path(settings.AUTH_FILE).exists() is True
     with Path(settings.AUTH_FILE).open(encoding="utf-8") as auth_file:
         all_credentials = json.loads("\n".join(auth_file.readlines()))
     assert len(all_credentials) == 1
-    credentials = all_credentials[0]
-    assert credentials["username"] == "foo"
-    assert "hash" in credentials
-    assert len(credentials["scopes"]) == 1
-    assert credentials["scopes"][0] == "foo_scope"
 
-    # Add a new user
-    result = runner.invoke(
-        cli,
-        [
-            "auth",
-            "-u",
-            "lol",
-            "-p",
-            "baz",
-            "-s",
-            "lol_scope",
-            "-s",
-            "admin_scope",
-            "-w",
-        ],
+    # Check that the first user matches
+    ifi_type_1 = _ifi_type_from_command(ifi_command=ifi_command_1)
+    ifi_value_1 = _ifi_value_from_command(ifi_value_1, ifi_type_1)
+    _assert_matching_basic_auth_credentials(
+        credentials=all_credentials[0],
+        username=username_1,
+        scopes=scopes_1,
+        ifi_type=ifi_type_1,
+        ifi_value=ifi_value_1,
     )
+
+    # Add a second user
+    username_2 = "lol"
+    password_2 = "baz"
+    scopes_2 = ["steto_scope", "peri_scope"]
+
+    cli_args = _gen_cli_auth_args(
+        username_2, password_2, scopes_2, ifi_command_2, ifi_value_2, write=True
+    )
+    result = runner.invoke(cli, cli_args)
+
     assert result.exit_code == 0
     with Path(settings.AUTH_FILE).open(encoding="utf-8") as auth_file:
         all_credentials = json.loads("\n".join(auth_file.readlines()))
     assert len(all_credentials) == 2
-    credentials = all_credentials[0]
-    assert credentials["username"] == "foo"
-    assert "hash" in credentials
-    assert len(credentials["scopes"]) == 1
-    assert credentials["scopes"][0] == "foo_scope"
-    credentials = all_credentials[1]
-    assert credentials["username"] == "lol"
-    assert "hash" in credentials
-    assert len(credentials["scopes"]) == 2
-    assert credentials["scopes"][0] == "lol_scope"
-    assert credentials["scopes"][1] == "admin_scope"
+
+    # Check that the first user still matches
+    _assert_matching_basic_auth_credentials(
+        credentials=all_credentials[0],
+        username=username_1,
+        scopes=scopes_1,
+        ifi_type=ifi_type_1,
+        ifi_value=ifi_value_1,
+    )
+
+    # Check that the second user matches
+    ifi_type_2 = _ifi_type_from_command(ifi_command=ifi_command_2)
+    ifi_value_2 = _ifi_value_from_command(ifi_value_2, ifi_type_2)
+    _assert_matching_basic_auth_credentials(
+        credentials=all_credentials[1],
+        username=username_2,
+        scopes=scopes_2,
+        ifi_type=ifi_type_2,
+        ifi_value=ifi_value_2,
+    )
 
 
 # pylint: disable=invalid-name

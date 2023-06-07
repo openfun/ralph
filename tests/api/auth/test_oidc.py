@@ -38,7 +38,10 @@ def test_api_auth_oidc_valid(
         headers={"Authorization": f"Bearer {encoded_token}"},
     )
     assert response.status_code == 200
-    assert response.json() == {"scopes": None, "username": "some-issuer/123|oidc"}
+    assert response.json() == {
+        "scopes": ["all", "statements/read"],
+        "agent": {"homePage": "https://iss.example.com", "name": "123|oidc"},
+    }
 
 
 @responses.activate

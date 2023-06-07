@@ -11,6 +11,8 @@ and this project adheres to
 ### Changed
 
 - Helm chart: improve chart modularity
+- User credentials must now include an "agent" field which can be created 
+using the cli
 
 ## [3.9.0] - 2023-07-21
 
