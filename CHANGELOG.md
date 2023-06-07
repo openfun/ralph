@@ -17,6 +17,9 @@ and this project adheres to
 - Upgrade `uvicorn` to `0.23.0`
 - Enforce valid IRI for `activity` parameter in `GET /statements`
 - Change how duplicate xAPI statements are handled for `clickhouse` backend
+- User credentials must now include an "agent" field which can be created 
+using the cli
+
 General improvement for the Helm Chart:
 - add dependencies for MongoDB and Clickhouse
 - make persistence optional

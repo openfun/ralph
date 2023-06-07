@@ -11,6 +11,7 @@ from jose import jwt
 from jose.utils import long_to_base64
 
 from ralph import api, conf
+from ralph.api.auth.basic import get_stored_credentials
 from ralph.conf import settings
 
 from . import private_key, public_key
@@ -21,31 +22,65 @@ ISSUER_URI = "http://providerHost:8080/auth/realms/real_name"
 PUBLIC_KEY_ID = "example-key-id"
 
 
-# pylint: disable=invalid-name
-@pytest.fixture
-def auth_credentials(fs):
-    """Sets up the credentials file for request authentication.
+def create_user(fs_, user: str, pwd: str, scopes: list, agent: dict):
+    """Create a user using Basic Auth in the (fake) file system.
 
-    Returns:
-        credentials (str): auth parameters that need to be passed
-            through headers to authenticate the request.
+    Args:
+        fs_: fixture provided by pyfakefs
+        user: username used for auth
+        pwd: password used for auth
+        scopes (List[str]): list of scopes available to the user
+        agent (dict): an agent that represents the user and may be used as authority
     """
-    credential_bytes = base64.b64encode("ralph:admin".encode("utf-8"))
+    credential_bytes = base64.b64encode(f"{user}:{pwd}".encode("utf-8"))
     credentials = str(credential_bytes, "utf-8")
+    auth_file_path = settings.AUTH_FILE  # settings.APP_DIR / "auth.json"
 
-    auth_file_path = settings.APP_DIR / "auth.json"
-    fs.create_file(
+    # Clear lru_cache to allow for auth testing within same function
+    get_stored_credentials.cache_clear()
+
+    fs_.create_file(
         auth_file_path,
         contents=json.dumps(
             [
                 {
-                    "username": "ralph",
-                    "hash": bcrypt.hashpw(b"admin", bcrypt.gensalt()).decode("UTF-8"),
-                    "scopes": ["ralph_test_scope"],
+                    "username": user,
+                    "hash": bcrypt.hashpw(
+                        bytes(pwd.encode("utf-8")), bcrypt.gensalt()
+                    ).decode("UTF-8"),
+                    "scopes": scopes,
+                    "agent": agent,
                 }
             ]
         ),
     )
+    return credentials
+
+
+# pylint: disable=invalid-name
+@pytest.fixture
+def auth_credentials(fs, user_scopes=None, agent=None):
+    """Sets up the credentials file for request authentication.
+
+    Args:
+        fs: fixture provided by pyfakefs (not called in the code)
+        user_scopes (List[str]): list of scopes to associate to the user
+
+    Returns:
+        credentials (str): auth parameters that need to be passed
+            through headers to authenticate the request.
+        user_scopes (List[str]): list of scopes for the created user
+        agent (dict): valid Agent (per xAPI specification) representing the user
+    """
+
+    user = "ralph"
+    pwd = "admin"
+    if user_scopes is None:
+        user_scopes = ["all"]
+    if agent is None:
+        agent = {"mbox": "mailto:test_ralph@example.com"}
+
+    credentials = create_user(fs, user, pwd, user_scopes, agent)
 
     return credentials
 
@@ -191,10 +226,11 @@ def encoded_token():
     return jwt.encode(
         claims={
             "sub": "123|oidc",
-            "iss": "some-issuer",
+            "iss": "https://iss.example.com",
             "aud": AUDIENCE,
             "iat": 0,  # Issued the 1/1/1970
             "exp": 9999999999,  # Expiring in 11/20/2286
+            "scope": "all statements/read",
         },
         key=private_key.private_bytes(
             serialization.Encoding.PEM,
