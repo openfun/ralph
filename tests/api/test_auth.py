@@ -11,15 +11,26 @@ def test_api_auth_model_serveruserscredentials():
     users = ServerUsersCredentials(
         __root__=[
             UserCredentials(
-                username="johndoe", hash="notrealhash", scopes=["johndoe_scope"]
+                username="johndoe",
+                hash="notrealhash",
+                scopes=["johndoe_scope"],
+                agent={"mbox": "mailto:johndoe@example.com"},
             ),
-            UserCredentials(username="foo", hash="notsorealhash", scopes=["foo_scope"]),
+            UserCredentials(
+                username="foo",
+                hash="notsorealhash",
+                scopes=["foo_scope"],
+                agent={"mbox": "mailto:foo@example.com"},
+            ),
         ]
     )
     other_users = ServerUsersCredentials.parse_obj(
         [
             UserCredentials(
-                username="janedoe", hash="notreallyrealhash", scopes=["janedoe_scope"]
+                username="janedoe",
+                hash="notreallyrealhash",
+                scopes=["janedoe_scope"],
+                agent={"mbox": "mailto:janedoe@example.com"},
             ),
         ]
     )
@@ -48,7 +59,10 @@ def test_api_auth_model_serveruserscredentials():
         users += ServerUsersCredentials.parse_obj(
             [
                 UserCredentials(
-                    username="foo", hash="notsorealhash", scopes=["foo_scope"]
+                    username="foo",
+                    hash="notsorealhash",
+                    scopes=["foo_scope"],
+                    agent={"mbox": "mailto:foo2@example.com"},
                 ),
             ]
         )

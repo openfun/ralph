@@ -14,18 +14,21 @@ def test_cli_auth_command_usage():
     result = runner.invoke(cli, ["auth", "--help"])
 
     assert result.exit_code == 0
-    assert (
-        "Options:\n"
-        "  -u, --username TEXT  The user for which we generate credentials.  "
-        "[required]\n"
-        "  -p, --password TEXT  The password to encrypt for this user. Will be "
-        "prompted\n"
-        "                       if missing.  [required]\n"
-        "  -s, --scope TEXT     The user scope(s). This option can be provided "
-        "multiple\n"
-        "                       times.  [required]\n"
-        "  -w, --write          Write new credentials to the LRS authentication file.\n"
-    ) in result.output
+    assert all(
+        text in result.output
+        for text in [
+            "Options:",
+            "-u, --username TEXT",
+            "-p, --password TEXT",
+            "-s, --scope TEXT",
+            "-M, --agent-ifi-mbox TEXT",
+            "-S, --agent-ifi-mbox-sha1sum TEXT",
+            "-O, --agent-ifi-openid TEXT",
+            "-A, --agent-ifi-account TEXT",
+            "-N, --agent-name TEXT",
+            "-w, --write",
+        ]
+    )
 
     result = runner.invoke(cli, ["auth"])
     assert result.exit_code > 0
