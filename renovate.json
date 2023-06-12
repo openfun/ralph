@@ -4,5 +4,6 @@
     ],
     "commitMessagePrefix": "⬆️(project)",
     "commitMessageAction": "upgrade",
-    "commitBodyTable": true
+    "commitBodyTable": true,
+    "ignoreDeps": ["clickhouse-connect"]
 }
