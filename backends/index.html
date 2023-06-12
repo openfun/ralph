@@ -553,6 +553,39 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#http_backends" class="md-nav__link">
+    HTTP backends
+  </a>
+  
+    <nav class="md-nav" aria-label="HTTP backends">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lrs" class="md-nav__link">
+    LRS
+  </a>
+  
+    <nav class="md-nav" aria-label="LRS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend_parameters_8" class="md-nav__link">
+    Backend parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1002,6 +1035,39 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#http_backends" class="md-nav__link">
+    HTTP backends
+  </a>
+  
+    <nav class="md-nav" aria-label="HTTP backends">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lrs" class="md-nav__link">
+    LRS
+  </a>
+  
+    <nav class="md-nav" aria-label="LRS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend_parameters_8" class="md-nav__link">
+    Backend parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1173,22 +1239,42 @@ it can also be used to fetch collections of documents from it.</p>
 <p>The ClickHouse backend can be used as a data lake and to fetch collections of
 documents from it.</p>
 <h4 id="backend_parameters_7">Backend parameters<a class="headerlink" href="#backend_parameters_7" title="Permanent link">&para;</a></h4>
-<p>ClickHouse parameters required to connect are:
-- <code>host</code>: the connection hostname to connect to (<em>e.g.</em> <code>"clickhouse.yourhost.com"</code>)
-- <code>port</code>: the port to the ClickHouse HTTPS interface (<em>e.g.</em> <code>8123</code>)
-- <code>database</code>: the name of the database to connect to
-- <code>event_table_name</code>: the name of the table to write statements to
-- <code>client_options</code>: a comma separated key=value list of ClickHouse client options</p>
-<p>Secondary parameters are needed if not using the default ClickHouse user:
-- <code>username</code>: the username to connect as
-- <code>password</code>: the password for the given ClickHouse username</p>
+<p>ClickHouse parameters required to connect are:</p>
+<ul>
+<li><code>host</code>: the connection hostname to connect to (<em>e.g.</em> <code>"clickhouse.yourhost.com"</code>)</li>
+<li><code>port</code>: the port to the ClickHouse HTTPS interface (<em>e.g.</em> <code>8123</code>)</li>
+<li><code>database</code>: the name of the database to connect to</li>
+<li><code>event_table_name</code>: the name of the table to write statements to</li>
+<li><code>client_options</code>: a comma separated key=value list of ClickHouse client options</li>
+</ul>
+<p>Secondary parameters are needed if not using the default ClickHouse user:</p>
+<ul>
+<li><code>username</code>: the username to connect as</li>
+<li><code>password</code>: the password for the given ClickHouse username</li>
+</ul>
 <p>By default, the following client options are set, if you override the default 
-client options you must also set these:
-- <code>"date_time_input_format": "best_effort"</code> allows RFC date parsing
-- <code>"allow_experimental_object_type": 1</code> allows the JSON data type we use to store statements</p>
+client options you must also set these:</p>
+<ul>
+<li><code>"date_time_input_format": "best_effort"</code> allows RFC date parsing</li>
+<li><code>"allow_experimental_object_type": 1</code> allows the JSON data type we use to store statements</li>
+</ul>
 <p>The ClickHouse client options supported in Ralph can be found in these locations:
 - <a href="https://clickhouse.com/docs/en/integrations/language-clients/python/driver-api#settings-argument">Python driver specific</a>
 - <a href="https://clickhouse.com/docs/en/operations/settings/settings/">General ClickHouse client settings</a></p>
+<h2 id="http_backends">HTTP backends<a class="headerlink" href="#http_backends" title="Permanent link">&para;</a></h2>
+<h3 id="lrs">LRS<a class="headerlink" href="#lrs" title="Permanent link">&para;</a></h3>
+<p>The LRS backend is used to store and retrieve xAPI statements from various systems mostly used in e-learning infrastructures.</p>
+<h4 id="backend_parameters_8">Backend parameters<a class="headerlink" href="#backend_parameters_8" title="Permanent link">&para;</a></h4>
+<p>LRS parameters required to connect are: </p>
+<ul>
+<li><code>url</code>: the URL to connect to the server (<em>e.g.</em> [<code>http://ralph:secret@lrs:8100</code>])</li>
+<li><code>username</code>: the username to connect as</li>
+<li><code>password</code>: the password for the given LRS username</li>
+</ul>
+<p>Optional parameters can be configured if necessary: </p>
+<ul>
+<li><code>headers</code>: a comma-separated key=value list of LRS server headers</li>
+</ul>
 
 
 

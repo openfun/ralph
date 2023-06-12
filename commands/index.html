@@ -805,7 +805,7 @@
 <div class="highlight"><pre><span></span><code>ralph fetch [OPTIONS] [ARCHIVE]
 </code></pre></div>
 <p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  -b, --backend [es|mongo|clickhouse|ldp|fs|swift|s3|ws]
+<div class="highlight"><pre><span></span><code>  -b, --backend [es|mongo|clickhouse|lrs|ldp|fs|swift|s3|ws]
                                   Backend  [required]
   ws backend: 
     --ws-uri TEXT
@@ -836,6 +836,13 @@
     --ldp-application-secret TEXT
     --ldp-application-key TEXT
     --ldp-endpoint TEXT
+  lrs backend: 
+    --lrs-statements-endpoint TEXT
+    --lrs-status-endpoint TEXT
+    --lrs-headers KEY=VALUE,KEY=VALUE
+    --lrs-password TEXT
+    --lrs-username TEXT
+    --lrs-base-url TEXT
   clickhouse backend: 
     --clickhouse-client-options KEY=VALUE,KEY=VALUE
     --clickhouse-password TEXT
@@ -855,6 +862,8 @@
     --es-index TEXT
     --es-hosts VALUE1,VALUE2,VALUE3
   -c, --chunk-size INTEGER        Get events by chunks of size #
+  -t, --target TEXT               Endpoint from which to fetch events (e.g.
+                                  `/statements`)
   -q, --query &#39;{&quot;KEY&quot;: &quot;VALUE&quot;, &quot;KEY&quot;: &quot;VALUE&quot;}&#39;
                                   Query object as a JSON string (database
                                   backends ONLY)
@@ -905,8 +914,15 @@
 <div class="highlight"><pre><span></span><code>ralph push [OPTIONS] [ARCHIVE]
 </code></pre></div>
 <p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  -b, --backend [es|mongo|clickhouse|ldp|fs|swift|s3]
+<div class="highlight"><pre><span></span><code>  -b, --backend [es|mongo|clickhouse|ldp|fs|swift|s3|lrs]
                                   Backend  [required]
+  lrs backend: 
+    --lrs-statements-endpoint TEXT
+    --lrs-status-endpoint TEXT
+    --lrs-headers KEY=VALUE,KEY=VALUE
+    --lrs-password TEXT
+    --lrs-username TEXT
+    --lrs-base-url TEXT
   s3 backend: 
     --s3-endpoint-url TEXT
     --s3-bucket-name TEXT
@@ -955,6 +971,8 @@
   -c, --chunk-size INTEGER        Get events by chunks of size #
   -f, --force                     Overwrite existing archives or records
   -I, --ignore-errors             Continue writing regardless of raised errors
+  -t, --target TEXT               Endpoint in which to push events (e.g.
+                                  `statements`)
   --help                          Show this message and exit.
 </code></pre></div>
 <h3 id="ralph-runserver">ralph runserver<a class="headerlink" href="#ralph-runserver" title="Permanent link">&para;</a></h3>
