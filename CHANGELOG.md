@@ -13,6 +13,8 @@ and this project adheres to
 - Helm chart: improve chart modularity
 - User credentials must now include an "agent" field which can be created 
 using the cli
+- `GET /statements` now has "mine" option which matches statements that
+have an authority field matching that of the user
 
 ## [3.9.0] - 2023-07-21
 
