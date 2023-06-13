@@ -483,6 +483,45 @@ jobs:
             git config --global user.name "FUN MOOC Bot"
             ~/.local/bin/mkdocs gh-deploy
 
+  # Make a new github release
+  release:
+    docker:
+      - image: cimg/base:current
+        auth:
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
+    working_directory: ~/fun
+    steps:
+      - checkout
+      - *docker-login
+      - attach_workspace:
+          at: ~/fun
+      - run:
+          name: Install gh CLI
+          command: |
+            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | \
+              sudo gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | \
+              sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt update
+            sudo apt install gh
+      - run:
+          name: Define release reference
+          command: |
+            echo 'RELEASE=$(echo "${CIRCLE_TAG}")' >> $BASH_ENV
+            source $BASH_ENV
+      - run:
+          name: Get release changes
+          command: |
+            tag="${RELEASE/v/}" ;
+            sed -E -n "/^## \[${tag}\]/,/^##\ /{/^## \[${tag}\]/d ;/^##\ /d; p}" CHANGELOG.md > release.md
+      - run:
+          name: Create release on GitHub
+          command: |
+            gh config set prompt disabled
+            if ! gh release list | grep "${RELEASE}"; then
+              gh release create -F release.md -t "${RELEASE/v/}" "${RELEASE}";
+            fi
 workflows:
   version: 2
 
@@ -623,3 +662,14 @@ workflows:
               only: master
             tags:
               only: /.*/
+
+      # Release
+      - release:
+          requires:
+            - tray
+            - package
+          filters:
+            branches:
+              only: master
+            tags:
+              only: /^v.*/
