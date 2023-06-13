@@ -446,8 +446,23 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#http_basic_authentication" class="md-nav__link">
+    HTTP Basic Authentication
+  </a>
+  
+    <nav class="md-nav" aria-label="HTTP Basic Authentication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#creating_a_credentials_file" class="md-nav__link">
     Creating a credentials file
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scopes" class="md-nav__link">
+    Scopes
   </a>
   
 </li>
@@ -459,12 +474,57 @@
   
 </li>
         
+      </ul>
+    </nav>
+  
+</li>
+        
           <li class="md-nav__item">
+  <a href="#openid_connect_authentication" class="md-nav__link">
+    OpenID Connect authentication
+  </a>
+  
+    <nav class="md-nav" aria-label="OpenID Connect authentication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#identity_providers" class="md-nav__link">
+    Identity Providers
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scopes_1" class="md-nav__link">
+    Scopes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#making_a_get_request_1" class="md-nav__link">
+    Making a GET request
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#forwarding_statements" class="md-nav__link">
     Forwarding statements
   </a>
   
-</li>
+    <nav class="md-nav" aria-label="Forwarding statements">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#sentry_configuration" class="md-nav__link">
@@ -660,8 +720,23 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#http_basic_authentication" class="md-nav__link">
+    HTTP Basic Authentication
+  </a>
+  
+    <nav class="md-nav" aria-label="HTTP Basic Authentication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#creating_a_credentials_file" class="md-nav__link">
     Creating a credentials file
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scopes" class="md-nav__link">
+    Scopes
   </a>
   
 </li>
@@ -673,12 +748,57 @@
   
 </li>
         
+      </ul>
+    </nav>
+  
+</li>
+        
           <li class="md-nav__item">
+  <a href="#openid_connect_authentication" class="md-nav__link">
+    OpenID Connect authentication
+  </a>
+  
+    <nav class="md-nav" aria-label="OpenID Connect authentication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#identity_providers" class="md-nav__link">
+    Identity Providers
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scopes_1" class="md-nav__link">
+    Scopes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#making_a_get_request_1" class="md-nav__link">
+    Making a GET request
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#forwarding_statements" class="md-nav__link">
     Forwarding statements
   </a>
   
-</li>
+    <nav class="md-nav" aria-label="Forwarding statements">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#sentry_configuration" class="md-nav__link">
@@ -734,6 +854,13 @@
 <p>Ralph comes with an API server that aims to implement the Learning Record Store
 (LRS) specification (still a work in progress).</p>
 <h2 id="getting_started">Getting started<a class="headerlink" href="#getting_started" title="Permanent link">&para;</a></h2>
+<p>The API server supports the following authentication methods:</p>
+<ul>
+<li>Http Basic Authentication (default method)</li>
+<li>OpenID Connect authentication on top of OAuth2.0</li>
+</ul>
+<h3 id="http_basic_authentication">HTTP Basic Authentication<a class="headerlink" href="#http_basic_authentication" title="Permanent link">&para;</a></h3>
+<p>The default method for securing Ralph API server is with HTTP basic authentication.</p>
 <p>The API server can be started up with the following command:</p>
 <div class="highlight"><pre><span></span><code>$<span class="w"> </span>ralph<span class="w"> </span>runserver<span class="w"> </span>--backend<span class="w"> </span>es
 </code></pre></div>
@@ -742,7 +869,7 @@ LRS data storage and retrieval. See Ralph&rsquo;s <a href="../backends/">backend
 documentation</a> for more details.</p>
 <p>However, before you can start your API server and make requests against it, you
 need to set up your credentials.</p>
-<h3 id="creating_a_credentials_file">Creating a credentials file<a class="headerlink" href="#creating_a_credentials_file" title="Permanent link">&para;</a></h3>
+<h4 id="creating_a_credentials_file">Creating a credentials file<a class="headerlink" href="#creating_a_credentials_file" title="Permanent link">&para;</a></h4>
 <p>The credentials file is expected to be a valid JSON file. Its location is
 specified by the <code>RALPH_AUTH_FILE</code> configuration value. By default, <code>ralph</code>
 will look for the <code>auth.json</code> file in the application directory (see <a href="https://click.palletsprojects.com/en/8.1.x/api/#click.get_app_dir">click
@@ -777,7 +904,9 @@ access:</p>
 optional dependencies, <em>e.g.</em> <code>pip install ralph-malph[cli]</code> (which we highly
 recommend).</p>
 </blockquote>
-<h3 id="making_a_get_request">Making a GET request<a class="headerlink" href="#making_a_get_request" title="Permanent link">&para;</a></h3>
+<h4 id="scopes">Scopes<a class="headerlink" href="#scopes" title="Permanent link">&para;</a></h4>
+<p>(Work In Progress)</p>
+<h4 id="making_a_get_request">Making a GET request<a class="headerlink" href="#making_a_get_request" title="Permanent link">&para;</a></h4>
 <p>The first request that can be answered by the ralph API server is a <code>whoami</code> request, which checks if the user is authenticated and returns their username and permission scopes.</p>
 <p>Use curl to get <code>http://localhost:8100/whoami</code>:</p>
 <div class="highlight"><pre><span></span><code>$<span class="w"> </span>curl<span class="w"> </span>http://localhost:8100/whoami
@@ -789,7 +918,55 @@ recommend).</p>
 &lt;<span class="w"> </span>HTTP/1.1<span class="w"> </span><span class="m">200</span><span class="w"> </span>OK
 &lt;<span class="w"> </span><span class="o">{</span><span class="s2">&quot;username&quot;</span>:<span class="s2">&quot;john.doe@example.com&quot;</span>,<span class="s2">&quot;scopes&quot;</span>:<span class="o">[</span><span class="s2">&quot;authenticated&quot;</span>,<span class="s2">&quot;example_scope&quot;</span><span class="o">]}</span>
 </code></pre></div>
-<h3 id="forwarding_statements">Forwarding statements<a class="headerlink" href="#forwarding_statements" title="Permanent link">&para;</a></h3>
+<h3 id="openid_connect_authentication">OpenID Connect authentication<a class="headerlink" href="#openid_connect_authentication" title="Permanent link">&para;</a></h3>
+<p>Ralph LRS API server supports OpenID Connect (OIDC) on top of OAuth 2.0 for authentication and authorization.</p>
+<p>To enable OIDC auth, you should set the <code>RALPH_RUNSERVER_AUTH_BACKEND</code> environment variable as follows:
+<div class="highlight"><pre><span></span><code><span class="nv">RALPH_RUNSERVER_AUTH_BACKEND</span><span class="o">=</span>oidc
+</code></pre></div>
+and you should define the <code>RALPH_RUNSERVER_AUTH_OIDC_ISSUER_URI</code> environment variable with your identity provider&rsquo;s Issuer Identifier URI as follows:
+<div class="highlight"><pre><span></span><code><span class="nv">RALPH_RUNSERVER_AUTH_OIDC_ISSUER_URI</span><span class="o">=</span>http://<span class="o">{</span>provider_host<span class="o">}</span>:<span class="o">{</span>provider_port<span class="o">}</span>/auth/realms/<span class="o">{</span>realm_name<span class="o">}</span>
+</code></pre></div></p>
+<p>This address must be accessible to the LRS on startup as it will perform OIDC Discovery to retrieve public keys and other information about the OIDC environment.</p>
+<p>It is also strongly recommended that you set the optional <code>RALPH_RUNSERVER_AUTH_OIDC_AUDIENCE</code> environment variable to the origin address of the LRS itself (ex. &ldquo;http://localhost:8100&rdquo;) to enable verification that a given token was issued specifically for the LRS.</p>
+<h4 id="identity_providers">Identity Providers<a class="headerlink" href="#identity_providers" title="Permanent link">&para;</a></h4>
+<p>OIDC support is currently developed and tested against <a href="https://www.keycloak.org/">Keycloak</a> but may work with other identity providers that implement the specification.</p>
+<p>The <a href="https://github.com/openfun/learning-analytics-playground/">Learning analytics playground</a> repository contains a Docker Compose file and configuration for a demo instance of Keycloak with a <code>ralph</code> client.</p>
+<h4 id="scopes_1">Scopes<a class="headerlink" href="#scopes_1" title="Permanent link">&para;</a></h4>
+<p>(Work In Progress)</p>
+<h4 id="making_a_get_request_1">Making a GET request<a class="headerlink" href="#making_a_get_request_1" title="Permanent link">&para;</a></h4>
+<p>The first request that can be answered by the ralph API server is a <code>whoami</code> request, which checks if the user is authenticated and returns their username and permission scopes.</p>
+<p>Use curl to get <code>http://localhost:8100/whoami</code>:</p>
+<p><div class="highlight"><pre><span></span><code>$<span class="w"> </span>curl<span class="w"> </span>http://localhost:8100/whoami
+&lt;<span class="w"> </span>HTTP/1.1<span class="s2">&quot; 401 Unauthorized</span>
+<span class="s2">&lt; {&quot;</span>detail<span class="s2">&quot;:&quot;</span>Could<span class="w"> </span>not<span class="w"> </span>validate<span class="w"> </span>credentials<span class="s2">&quot;}</span>
+</code></pre></div>
+With the Keycloak instance running, use curl to get access token from Keycloak:
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>--request<span class="w"> </span>POST<span class="w"> </span><span class="s1">&#39;http://localhost:8080/auth/realms/fun-mooc/protocol/openid-connect/token&#39;</span><span class="w"> </span><span class="se">\</span>
+--header<span class="w"> </span><span class="s1">&#39;Content-Type: application/x-www-form-urlencoded&#39;</span><span class="w"> </span><span class="se">\</span>
+--data-urlencode<span class="w"> </span><span class="s1">&#39;client_id=ralph&#39;</span><span class="w"> </span><span class="se">\</span>
+--data-urlencode<span class="w"> </span><span class="s1">&#39;client_secret=super-secret&#39;</span><span class="w"> </span><span class="se">\</span>
+--data-urlencode<span class="w"> </span><span class="s1">&#39;username=ralph_admin&#39;</span><span class="w"> </span><span class="se">\</span>
+--data-urlencode<span class="w"> </span><span class="s1">&#39;password=funfunfun&#39;</span><span class="w"> </span><span class="se">\</span>
+--data-urlencode<span class="w"> </span><span class="s1">&#39;grant_type=password&#39;</span>
+</code></pre></div></p>
+<p>which outputs (tokens truncated for example purpose):</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"> </span>
+<span class="w">  </span><span class="nt">&quot;access_token&quot;</span><span class="p">:</span><span class="s2">&quot;eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJSTWlLM&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;expires_in&quot;</span><span class="p">:</span><span class="mi">300</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;refresh_expires_in&quot;</span><span class="p">:</span><span class="mi">1800</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;refresh_token&quot;</span><span class="p">:</span><span class="s2">&quot;eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI4MDc5NjExM&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;token_type&quot;</span><span class="p">:</span><span class="s2">&quot;Bearer&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;not-before-policy&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;session_state&quot;</span><span class="p">:</span><span class="s2">&quot;22a36735-e35f-496b-a243-152d32ebff45&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;scope&quot;</span><span class="p">:</span><span class="s2">&quot;profile email&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Send the access token to the API server as a Bearer header:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>curl<span class="w"> </span>http://localhost:8100/whoami<span class="w"> </span>--header<span class="w"> </span><span class="s2">&quot;Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJSTWlLM&quot;</span>
+&lt;<span class="w"> </span>HTTP/1.1<span class="w"> </span><span class="m">200</span><span class="w"> </span>OK
+&lt;<span class="w"> </span><span class="o">{</span><span class="s2">&quot;username&quot;</span>:<span class="s2">&quot;ralph_admin&quot;</span>,<span class="s2">&quot;scopes&quot;</span>:<span class="o">[</span><span class="s2">&quot;all&quot;</span><span class="o">]}</span>
+</code></pre></div>
+<h2 id="forwarding_statements">Forwarding statements<a class="headerlink" href="#forwarding_statements" title="Permanent link">&para;</a></h2>
 <p>Ralph&rsquo;s API server can be configured to forward xAPI statements it receives to other
 LRSes.</p>
 <p>To configure statement forwarding, you need to create a <code>.env</code> file in the current
