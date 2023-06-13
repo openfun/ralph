@@ -19,7 +19,8 @@ and this project adheres to
 - Change how duplicate xAPI statements are handled for `clickhouse` backend
 - User credentials must now include an "agent" field which can be created 
 using the cli
-
+- `GET /statements` now has "mine" option which matches statements that
+have an authority field matching that of the user
 General improvement for the Helm Chart:
 - add dependencies for MongoDB and Clickhouse
 - make persistence optional

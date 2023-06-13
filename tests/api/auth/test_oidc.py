@@ -40,7 +40,7 @@ def test_api_auth_oidc_valid(
     assert response.status_code == 200
     assert response.json() == {
         "scopes": ["all", "statements/read"],
-        "agent": {"homePage": "https://iss.example.com", "name": "123|oidc"},
+        "agent": {"openid": "123|oidc"},
     }
 
 
