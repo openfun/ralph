@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [3.7.0] - 2023-06-13
+
 ### Added
 
 - Implement synchronous `lrs` backend
@@ -30,6 +32,7 @@ GET query `agent` filtering
 ### Removed
 
 - `verb`.`display` field no longer mandatory in xAPI models and for converter
+
 ## [3.6.0] - 2023-05-17
 
 ### Added
@@ -316,7 +319,8 @@ as per the xAPI specification
 - Add optional sentry integration
 - Distribute Arnold's tray to deploy Ralph in a k8s cluster as cronjobs
 
-[unreleased]: https://github.com/openfun/ralph/compare/v3.6.0...master
+[unreleased]: https://github.com/openfun/ralph/compare/v3.7.0...master
+[3.7.0]: https://github.com/openfun/ralph/compare/v3.6.0...v3.7.0
 [3.6.0]: https://github.com/openfun/ralph/compare/v3.5.1...v3.6.0
 [3.5.1]: https://github.com/openfun/ralph/compare/v3.5.0...v3.5.1
 [3.5.0]: https://github.com/openfun/ralph/compare/v3.4.0...v3.5.0
