@@ -11,6 +11,7 @@ from elasticsearch.helpers import bulk
 from fastapi.testclient import TestClient
 
 from ralph.api import app
+from ralph.api.auth.basic import get_authenticated_user
 from ralph.backends.database.clickhouse import ClickHouseDatabase
 from ralph.backends.database.mongo import MongoDatabase
 from ralph.exceptions import BackendException
@@ -27,6 +28,8 @@ from tests.fixtures.backends import (
     get_es_test_backend,
     get_mongo_test_backend,
 )
+
+from ..fixtures.auth import create_user
 
 client = TestClient(app)
 
@@ -80,7 +83,13 @@ def create_mock_activity(id_: int = 0):
     }
 
 
-def create_mock_agent(ifi: str, id_: int, home_page_id=None):
+def create_mock_agent(
+    ifi: str,
+    id_: int,
+    home_page_id=None,
+    name: str = None,
+    use_object_type: bool = True,
+):
     """Create distinct mock agents with a given Inverse Functional Identifier.
 
     args:
@@ -89,18 +98,31 @@ def create_mock_agent(ifi: str, id_: int, home_page_id=None):
         id_: An integer used to uniquely identify the created agent.
             If ifi=="account", agent equality requires same (id_, home_page_id)
         home_page (optional): The value of homePage, if ifi=="account"
+        name (optional): name of the agent (NB: do not confuse with account.name
+            with ifi=="account", or "username", as used in credentials)
     """
+    agent = {}
 
+    if use_object_type:
+        agent["objectType"] = "Agent"
+
+    if name is not None:
+        agent["name"] = name
+
+    # Add IFI fields
     if ifi == "mbox":
-        return {"objectType": "Agent", "mbox": f"mailto:user_{id_}@testmail.com"}
+        agent["mbox"] = f"mailto:user_{id_}@testmail.com"
+        return agent
 
     if ifi == "mbox_sha1sum":
         hash_object = hashlib.sha1(f"mailto:user_{id_}@testmail.com".encode("utf-8"))
         mail_hash = hash_object.hexdigest()
-        return {"objectType": "Agent", "mbox_sha1sum": mail_hash}
+        agent["mbox_sha1sum"] = mail_hash
+        return agent
 
     if ifi == "openid":
-        return {"objectType": "Agent", "openid": f"http://user_{id_}.openid.exmpl.org"}
+        agent["openid"] = f"http://user_{id_}.openid.exmpl.org"
+        return agent
 
     if ifi == "account":
         if home_page_id is None:
@@ -108,13 +130,11 @@ def create_mock_agent(ifi: str, id_: int, home_page_id=None):
                 "home_page_id must be defined if using create_mock_agent if "
                 "using ifi=='account'"
             )
-        return {
-            "objectType": "Agent",
-            "account": {
-                "homePage": f"http://example_{home_page_id}.com",
-                "name": f"username_{id_}",
-            },
+        agent["account"] = {
+            "homePage": f"http://example_{home_page_id}.com",
+            "name": f"username_{id_}",
         }
+        return agent
 
     raise ValueError("No valid ifi was provided to create_mock_agent")
 
@@ -144,6 +164,100 @@ def insert_statements_and_monkeypatch_backend(
         monkeypatch.setattr(database_client_class_path, get_es_test_backend())
 
     return _insert_statements_and_monkeypatch_backend
+
+
+@pytest.mark.parametrize(
+    "ifi",
+    [
+        "mbox",
+        "mbox_sha1sum",
+        "openid",
+        "account_same_home_page",
+        "account_different_home_page",
+    ],
+)
+def test_api_statements_get_statements_mine(
+    fs, insert_statements_and_monkeypatch_backend, ifi
+):
+    """Tests the get statements API route, given a "mine=True" query parameter, should
+    return a list of statements filtered by authority.
+    """
+    # pylint: disable=redefined-outer-name
+    # pylint: disable=invalid-name
+
+    # Create two distinct agents
+    if ifi == "account_same_home_page":
+        agent_1 = create_mock_agent("account", 1, home_page_id=1)
+        agent_1_bis = create_mock_agent(
+            "account", 1, home_page_id=1, name="name", use_object_type=False
+        )
+        agent_2 = create_mock_agent("account", 2, home_page_id=1)
+    elif ifi == "account_different_home_page":
+        agent_1 = create_mock_agent("account", 1, home_page_id=1)
+        agent_1_bis = create_mock_agent(
+            "account", 1, home_page_id=1, name="name", use_object_type=False
+        )
+        agent_2 = create_mock_agent("account", 1, home_page_id=2)
+    else:
+        agent_1 = create_mock_agent(ifi, 1)
+        agent_1_bis = create_mock_agent(ifi, 1, name="name", use_object_type=False)
+        agent_2 = create_mock_agent(ifi, 2)
+
+    username_1 = "jane"
+    password_1 = "janepwd"
+    scopes = ["all"]
+
+    credentials_1_bis = create_user(fs, username_1, password_1, scopes, agent_1_bis)
+
+    # Clear cache before each test iteration
+    get_authenticated_user.cache_clear()
+
+    statements = [
+        {
+            "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
+            "timestamp": (datetime.now() - timedelta(hours=1)).isoformat(),
+            "actor": agent_1,
+            "authority": agent_1,
+        },
+        {
+            "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
+            "timestamp": datetime.now().isoformat(),
+            "actor": agent_1,
+            "authority": agent_2,
+        },
+    ]
+    insert_statements_and_monkeypatch_backend(statements)
+
+    # No restriction on "mine" (implicit)
+    response = client.get(
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {credentials_1_bis}"},
+    )
+    assert response.status_code == 200
+    assert response.json() == {"statements": [statements[1], statements[0]]}
+
+    # No restriction on "mine" (explicit)
+    response = client.get(
+        "/xAPI/statements/?mine=False",
+        headers={"Authorization": f"Basic {credentials_1_bis}"},
+    )
+    assert response.status_code == 200
+    assert response.json() == {"statements": [statements[1], statements[0]]}
+
+    # Only fetch mine (mandatory explicit)
+    response = client.get(
+        "/xAPI/statements/?mine=True",
+        headers={"Authorization": f"Basic {credentials_1_bis}"},
+    )
+    assert response.status_code == 200
+    assert response.json() == {"statements": [statements[0]]}
+
+    # Check that invalid parameters returns an error
+    response = client.get(
+        "/xAPI/statements/?mine=BigBoat",
+        headers={"Authorization": f"Basic {credentials_1_bis}"},
+    )
+    assert response.status_code == 422
 
 
 def test_api_statements_get_statements(
