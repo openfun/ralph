@@ -1,7 +1,7 @@
 """Test fixtures related to authentication on the API."""
 import base64
 import json
-from importlib import reload
+import os
 
 import bcrypt
 import pytest
@@ -10,7 +10,7 @@ from fastapi.testclient import TestClient
 from jose import jwt
 from jose.utils import long_to_base64
 
-from ralph import api, conf
+from ralph.api import app, get_authenticated_user
 from ralph.api.auth.basic import get_stored_credentials
 from ralph.conf import settings
 
@@ -22,38 +22,50 @@ ISSUER_URI = "http://providerHost:8080/auth/realms/real_name"
 PUBLIC_KEY_ID = "example-key-id"
 
 
-def create_user(fs_, user: str, pwd: str, scopes: list, agent: dict):
+def create_user(
+    fs_,
+    username: str,
+    password: str,
+    scopes: list,
+    agent: dict,
+):
     """Create a user using Basic Auth in the (fake) file system.
 
     Args:
         fs_: fixture provided by pyfakefs
-        user: username used for auth
-        pwd: password used for auth
+        username (str): username used for auth
+        password (str): password used for auth
         scopes (List[str]): list of scopes available to the user
         agent (dict): an agent that represents the user and may be used as authority
     """
-    credential_bytes = base64.b64encode(f"{user}:{pwd}".encode("utf-8"))
+
+    # Basic HTTP auth
+    credential_bytes = base64.b64encode(f"{username}:{password}".encode("utf-8"))
     credentials = str(credential_bytes, "utf-8")
+
     auth_file_path = settings.AUTH_FILE  # settings.APP_DIR / "auth.json"
 
-    # Clear lru_cache to allow for auth testing within same function
+    # Clear lru_cache to allow for basic auth testing within same function
     get_stored_credentials.cache_clear()
 
-    fs_.create_file(
-        auth_file_path,
-        contents=json.dumps(
-            [
-                {
-                    "username": user,
-                    "hash": bcrypt.hashpw(
-                        bytes(pwd.encode("utf-8")), bcrypt.gensalt()
-                    ).decode("UTF-8"),
-                    "scopes": scopes,
-                    "agent": agent,
-                }
-            ]
+    all_users = []
+    if os.path.exists(auth_file_path):
+        with open(auth_file_path, encoding="utf-8") as file:
+            all_users = json.loads(file.read())
+        os.remove(auth_file_path)
+
+    user = {
+        "username": username,
+        "hash": bcrypt.hashpw(bytes(password.encode("utf-8")), bcrypt.gensalt()).decode(
+            "UTF-8"
         ),
-    )
+        "scopes": scopes,
+        "agent": agent,
+    }
+    all_users.append(user)
+
+    fs_.create_file(auth_file_path, contents=json.dumps(all_users))
+
     return credentials
 
 
@@ -73,41 +85,49 @@ def auth_credentials(fs, user_scopes=None, agent=None):
         agent (dict): valid Agent (per xAPI specification) representing the user
     """
 
-    user = "ralph"
-    pwd = "admin"
+    username = "ralph"
+    password = "admin"
     if user_scopes is None:
         user_scopes = ["all"]
     if agent is None:
         agent = {"mbox": "mailto:test_ralph@example.com"}
 
-    credentials = create_user(fs, user, pwd, user_scopes, agent)
+    credentials = create_user(fs, username, password, user_scopes, agent)
 
     return credentials
 
 
 @pytest.fixture
-def basic_auth_test_client(monkeypatch):
+def basic_auth_test_client():
     """Return a TestClient with HTTP basic authentication mode."""
-    monkeypatch.setenv("RALPH_RUNSERVER_AUTH_BACKEND", "basic")
-    monkeypatch.setenv("RALPH_RUNSERVER_AUTH_OIDC_ISSUER_URI", ISSUER_URI)
-    monkeypatch.setenv("RALPH_RUNSERVER_AUTH_OIDC_AUDIENCE", AUDIENCE)
-    reload(conf)
-    reload(api.auth)
-    app = reload(api).app
-    yield TestClient(app)
+    # pylint:disable=import-outside-toplevel
+    from ralph.api.auth.basic import (
+        get_authenticated_user as get_basic,  # pylint:disable=import-outside-toplevel
+    )
+
+    app.dependency_overrides[get_authenticated_user] = get_basic
+
+    with TestClient(app) as test_client:
+        yield test_client
 
 
 @pytest.fixture
 def oidc_auth_test_client(monkeypatch):
     """Return a TestClient with OpenId Connect authentication mode."""
-    monkeypatch.setenv("RALPH_RUNSERVER_AUTH_BACKEND", "oidc")
-    monkeypatch.setenv("RALPH_RUNSERVER_AUTH_OIDC_ISSUER_URI", ISSUER_URI)
-    monkeypatch.setenv("RALPH_RUNSERVER_AUTH_OIDC_AUDIENCE", AUDIENCE)
-    reload(conf)
-    reload(api.auth.oidc)
-    reload(api.auth)
-    app = reload(api).app
-    yield TestClient(app)
+    # pylint:disable=import-outside-toplevel
+    monkeypatch.setattr(
+        "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_ISSUER_URI",
+        ISSUER_URI,
+    )
+    monkeypatch.setattr(
+        "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_AUDIENCE",
+        AUDIENCE,
+    )
+    from ralph.api.auth.oidc import get_authenticated_user as get_oidc
+
+    app.dependency_overrides[get_authenticated_user] = get_oidc
+    with TestClient(app) as test_client:
+        yield test_client
 
 
 @pytest.fixture

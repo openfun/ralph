@@ -13,7 +13,6 @@ from pydantic import AnyUrl, BaseModel, Extra
 
 from ralph.api.auth.user import AuthenticatedUser
 from ralph.conf import settings
-from ralph.models.xapi.base.ifi import BaseXapiAccount
 
 OPENID_CONFIGURATION_PATH = "/.well-known/openid-configuration"
 oauth2_scheme = OpenIdConnect(
@@ -144,20 +143,7 @@ def get_authenticated_user(
 
     id_token = IDToken.parse_obj(decoded_token)
 
-    try:
-        agent = BaseXapiAccount(
-            homePage=id_token.iss,
-            name=id_token.sub,
-        )
-    except (ValueError, TypeError) as exc:
-        logger.error("Claims cannot be mapped to an agent: %s", exc)
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        ) from exc
-
     return AuthenticatedUser(
-        agent=agent,
+        agent={"openid": id_token.sub},
         scopes=id_token.scope.split(" ") if id_token.scope else [],
     )

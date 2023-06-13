@@ -97,6 +97,7 @@ def test_api_auth_basic_caching_credentials(fs):
 
     auth_file_path = settings.APP_DIR / "auth.json"
     fs.create_file(auth_file_path, contents=STORED_CREDENTIALS)
+    get_authenticated_user.cache_clear()
 
     credentials = HTTPBasicCredentials(username="ralph", password="admin")
 
@@ -117,6 +118,7 @@ def test_api_auth_basic_with_wrong_password(fs):
 
     auth_file_path = settings.APP_DIR / "auth.json"
     fs.create_file(auth_file_path, contents=STORED_CREDENTIALS)
+    get_authenticated_user.cache_clear()
 
     credentials = HTTPBasicCredentials(username="ralph", password="wrong_password")
 
@@ -171,6 +173,7 @@ def test_get_whoami_username_not_found(basic_auth_test_client, fs):
     """Whoami route returns a 401 error when the username cannot be found."""
     credential_bytes = base64.b64encode("john:admin".encode("utf-8"))
     credentials = str(credential_bytes, "utf-8")
+    get_authenticated_user.cache_clear()
 
     auth_file_path = settings.APP_DIR / "auth.json"
     fs.create_file(auth_file_path, contents=STORED_CREDENTIALS)
@@ -192,6 +195,7 @@ def test_get_whoami_wrong_password(basic_auth_test_client, fs):
 
     auth_file_path = settings.APP_DIR / "auth.json"
     fs.create_file(auth_file_path, contents=STORED_CREDENTIALS)
+    get_authenticated_user.cache_clear()
 
     response = basic_auth_test_client.get(
         "/whoami", headers={"Authorization": f"Basic {credentials}"}
@@ -213,6 +217,7 @@ def test_get_whoami_correct_credentials(basic_auth_test_client, fs):
 
     auth_file_path = settings.APP_DIR / "auth.json"
     fs.create_file(auth_file_path, contents=STORED_CREDENTIALS)
+    get_authenticated_user.cache_clear()
 
     response = basic_auth_test_client.get(
         "/whoami", headers={"Authorization": f"Basic {credentials}"}
