@@ -30,7 +30,7 @@ class AuthenticatedUser(BaseModel):
 
     Attributes:
         agent (dict): The agent representing the current user.
-        scopes (List): Consists of the scopes the user has access to.
+        scopes (list): Consists of the scopes the user has access to.
     """
 
     agent: Dict

@@ -12,6 +12,8 @@ and this project adheres to
 
 - Implement xAPI virtual classroom pydantic models
 - Allow to insert custom endpoint url for S3 service
+- `GET /statements` now has "mine" option which matches statements that
+have an authority field matching that of the user 
 
 ### Changed
 
