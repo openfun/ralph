@@ -1,5 +1,6 @@
 """API routes related to statements."""
 
+import json
 import logging
 from datetime import datetime
 from typing import List, Literal, Optional, Union
@@ -15,8 +16,9 @@ from fastapi import (
     Request,
     status,
 )
-from pydantic import parse_raw_as
+from pydantic import parse_obj_as
 from pydantic.types import Json
+from typing_extensions import Annotated
 
 from ralph.api.forwarding import forward_xapi_statements, get_active_xapi_forwardings
 from ralph.backends.database.base import (
@@ -34,7 +36,7 @@ from ralph.models.xapi.base.agents import (
     BaseXapiAgentWithOpenId,
 )
 
-from ..auth import authenticated_user
+from ..auth import AuthenticatedUser, authenticated_user
 from ..models import ErrorDetail, LaxStatement
 
 logger = logging.getLogger(__name__)
@@ -61,11 +63,32 @@ POST_PUT_RESPONSES = {
 }
 
 
+def _parse_agent_parameters(agent_obj: dict):
+    """Parse a dict and return an AgentParameters object to use in queries."""
+    # Transform agent to `dict` as FastAPI cannot parse JSON (seen as string)
+    agent = parse_obj_as(BaseXapiAgent, agent_obj)
+
+    agent_query_params = {}
+    if isinstance(agent, BaseXapiAgentWithMbox):
+        agent_query_params["mbox"] = agent.mbox
+    elif isinstance(agent, BaseXapiAgentWithMboxSha1Sum):
+        agent_query_params["mbox_sha1sum"] = agent.mbox_sha1sum
+    elif isinstance(agent, BaseXapiAgentWithOpenId):
+        agent_query_params["openid"] = agent.openid
+    elif isinstance(agent, BaseXapiAgentWithAccount):
+        agent_query_params["account__name"] = agent.account.name
+        agent_query_params["account__home_page"] = agent.account.homePage
+
+    # Overwrite `agent` field
+    return AgentParameters(**agent_query_params)
+
+
 @router.get("")
 @router.get("/")
 # pylint: disable=too-many-arguments, too-many-locals
 async def get(
     request: Request,
+    current_user: Annotated[AuthenticatedUser, Depends(authenticated_user)],
     ###
     # Query string parameters defined by the LRS specification
     ###
@@ -177,6 +200,13 @@ async def get(
     ascending: Optional[bool] = Query(
         False, description='If "true", return results in ascending order of stored time'
     ),
+    mine: Optional[bool] = Query(
+        False,
+        description=(
+            'If "true", return only the results for which the authority matches the '
+            '"agent" associated to the user that is making the query.'
+        ),
+    ),
     ###
     # Private use query string parameters
     ###
@@ -240,26 +270,20 @@ async def get(
             ),
         )
 
-    # Parse the agent parameter (JSON) into multiple string parameters
     query_params = dict(request.query_params)
 
+    # Parse the "agent" parameter (JSON) into multiple string parameters
     if query_params.get("agent") is not None:
-        # Transform agent to `dict` as FastAPI cannot parse JSON (seen as string)
+        # Overwrite `agent` field
+        query_params["agent"] = _parse_agent_parameters(
+            json.loads(query_params["agent"])
+        )
 
-        agent = parse_raw_as(BaseXapiAgent, query_params["agent"])
+    if mine:
+        query_params["authority"] = _parse_agent_parameters(current_user.agent)
 
-        agent_query_params = {}
-        if isinstance(agent, BaseXapiAgentWithMbox):
-            agent_query_params["mbox"] = agent.mbox
-        elif isinstance(agent, BaseXapiAgentWithMboxSha1Sum):
-            agent_query_params["mbox_sha1sum"] = agent.mbox_sha1sum
-        elif isinstance(agent, BaseXapiAgentWithOpenId):
-            agent_query_params["openid"] = agent.openid
-        elif isinstance(agent, BaseXapiAgentWithAccount):
-            agent_query_params["account__name"] = agent.account.name
-            agent_query_params["account__home_page"] = agent.account.homePage
-
-        query_params["agent"] = AgentParameters(**agent_query_params)
+    if "mine" in query_params:
+        query_params.pop("mine")
 
     # Query Database
     try:
