@@ -466,7 +466,7 @@ def convert(from_, to_, ignore_errors, fail_on_unknown, **conversion_set_kwargs)
     "--query",
     type=JSONStringParamType(),
     default=None,
-    help="Query object as a JSON string (database backends ONLY)",
+    help="Query object as a JSON string (database and HTTP backends ONLY)",
 )
 def fetch(backend, archive, chunk_size, target, query, **options):
     """Fetch an archive or records from a configured backend."""
@@ -502,7 +502,11 @@ def fetch(backend, archive, chunk_size, target, query, **options):
     elif backend_type == settings.BACKENDS.STREAM:
         backend.stream(sys.stdout.buffer)
     elif backend_type == settings.BACKENDS.HTTP:
-        for statement in backend.read(target=target, chunk_size=chunk_size):
+        if query is not None:
+            query = backend.query(query=query)
+        for statement in backend.read(
+            target=target, query=query, chunk_size=chunk_size
+        ):
             click.echo(
                 bytes(
                     json.dumps(statement) if isinstance(statement, dict) else statement,
