@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Allow to use a query for HTTP backends in the CLI
+
 ## [3.7.0] - 2023-06-13
 
 ### Added
@@ -15,7 +19,7 @@ and this project adheres to
 - Implement synchronous `lrs` backend
 - Implement xAPI virtual classroom pydantic models
 - Allow to insert custom endpoint url for S3 service
-- Cache the HTTP Basic auth credentials to improve API response time   
+- Cache the HTTP Basic auth credentials to improve API response time
 - Support OpenID Connect authentication method
 
 ### Changed
@@ -25,7 +29,7 @@ and this project adheres to
 - Upgrade `sentry_sdk` to `1.25.1`
 - Set Clickhouse `client_options` to a dedicated Pydantic model
 - Upgrade `httpx` to `0.24.1`
-- Force a valid (JSON-formatted) IFI to be passed for the `/statements` 
+- Force a valid (JSON-formatted) IFI to be passed for the `/statements`
 GET query `agent` filtering
 - Upgrade `cachetools` to `5.3.1`
 

@@ -165,8 +165,9 @@ def test_cli_fetch_command_usage():
         "  -t, --target TEXT               Endpoint from which to fetch events (e.g.\n"
         "                                  `/statements`)\n"
         '  -q, --query \'{"KEY": "VALUE", "KEY": "VALUE"}\'\n'
-        "                                  Query object as a JSON string (database\n"
-        "                                  backends ONLY)\n"
+        "                                  Query object as a JSON string (database "
+        "and\n"
+        "                                  HTTP backends ONLY)\n"
     ) in result.output
     logging.warning(result.output)
     result = runner.invoke(cli, ["fetch"])
