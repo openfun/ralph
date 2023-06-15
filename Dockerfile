@@ -22,8 +22,7 @@ RUN apt-get update && \
         build-essential \
         gcc \
         libc6-dev \
-        libffi-dev \
-        python-dev && \
+        libffi-dev && \
     rm -rf /var/lib/apt/lists/*
 
 RUN pip install .[backend-clickhouse,backend-es,backend-ldp,backend-lrs,backend-mongo,backend-swift,backend-ws,cli,lrs]
@@ -56,8 +55,7 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ]; \
     then apt-get update && \
         apt-get install -y \
             build-essential \
-            gcc \
-            python-dev && \
+            gcc && \
         rm -rf /var/lib/apt/lists/*; \
     fi;
 
