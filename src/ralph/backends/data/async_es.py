@@ -1,123 +1,37 @@
-"""Elasticsearch data backend for Ralph."""
+"""Asynchronous Elasticsearch data backend for Ralph."""
 
 import logging
 from io import IOBase
 from itertools import chain
-from pathlib import Path
-from typing import Iterable, Iterator, List, Literal, Optional, Union
+from typing import Iterable, Iterator, Union
 
-from elasticsearch import ApiError, Elasticsearch, TransportError
-from elasticsearch.helpers import BulkIndexError, streaming_bulk
-from pydantic import BaseModel
+from elasticsearch import ApiError, AsyncElasticsearch, TransportError
+from elasticsearch.helpers import BulkIndexError, async_streaming_bulk
 
 from ralph.backends.data.base import (
-    BaseDataBackend,
-    BaseDataBackendSettings,
+    BaseAsyncDataBackend,
     BaseOperationType,
-    BaseQuery,
     DataBackendStatus,
     enforce_query_checks,
 )
-from ralph.conf import BaseSettingsConfig, CommaSeparatedTuple
+from ralph.backends.data.es import ESDataBackend, ESDataBackendSettings, ESQuery
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import parse_bytes_to_dict, read_raw
+
+# pylint: disable=duplicate-code
 
 logger = logging.getLogger(__name__)
 
 
-class ESClientOptions(BaseModel):
-    """Elasticsearch additional client options."""
+class AsyncESDataBackend(BaseAsyncDataBackend):
+    """Asynchronous Elasticsearch data backend."""
 
-    ca_certs: Path = None
-    verify_certs: bool = None
-
-
-class ESDataBackendSettings(BaseDataBackendSettings):
-    """Elasticsearch data backend default configuration.
-
-    Attributes:
-        ALLOW_YELLOW_STATUS (bool): Whether to consider Elasticsearch yellow health
-            status to be ok.
-        CLIENT_OPTIONS (dict): A dictionary of valid options for the Elasticsearch class
-            initialization.
-        DEFAULT_CHUNK_SIZE (int): The default chunk size for reading batches of
-            documents.
-        DEFAULT_INDEX (str): The default index to use for querying Elasticsearch.
-        HOSTS (str or tuple): The comma separated list of Elasticsearch nodes to
-            connect to.
-        LOCALE_ENCODING (str): The encoding used for reading/writing documents.
-        POINT_IN_TIME_KEEP_ALIVE (str): The duration for which Elasticsearch should
-            keep a point in time alive.
-        REFRESH_AFTER_WRITE (str or bool): Whether the Elasticsearch index should be
-            refreshed after the write operation.
-    """
-
-    class Config(BaseSettingsConfig):
-        """Pydantic Configuration."""
-
-        env_prefix = "RALPH_BACKENDS__DATA__ES__"
-
-    ALLOW_YELLOW_STATUS: bool = False
-    CLIENT_OPTIONS: ESClientOptions = ESClientOptions()
-    DEFAULT_CHUNK_SIZE: int = 500
-    DEFAULT_INDEX: str = "statements"
-    HOSTS: CommaSeparatedTuple = ("http://localhost:9200",)
-    LOCALE_ENCODING: str = "utf8"
-    POINT_IN_TIME_KEEP_ALIVE: str = "1m"
-    REFRESH_AFTER_WRITE: Union[Literal["false", "true", "wait_for"], bool, str, None]
-
-
-class ESQueryPit(BaseModel):
-    """Elasticsearch point in time (pit) query configuration.
-
-    Attributes:
-        id (str): Context identifier of the Elasticsearch point in time.
-        keep_alive (str): The duration for which Elasticsearch should keep the point in
-            time alive.
-    """
-
-    id: Optional[str]
-    keep_alive: Optional[str]
-
-
-class ESQuery(BaseQuery):
-    """Elasticsearch query model.
-
-    Attributes:
-        query (dict): A search query definition using the Elasticsearch Query DSL.
-            See Elasticsearch search reference for query DSL syntax:
-            https://www.elastic.co/guide/en/elasticsearch/reference/8.9/search-search.html#request-body-search-query
-        query_string (str): The Elastisearch query in the Lucene query string syntax.
-            See Elasticsearch search reference for Lucene query syntax:
-            https://www.elastic.co/guide/en/elasticsearch/reference/8.9/search-search.html#search-api-query-params-q
-        pit (dict): Limit the search to a point in time (PIT). See ESQueryPit.
-        size (int): The maximum number of documents to yield.
-        sort (str or list): Specify how to sort search results. Set to `_doc` or
-            `_shard_doc` if order doesn't matter.
-            See https://www.elastic.co/guide/en/elasticsearch/reference/8.9/sort-search-results.html
-        search_after (list): Limit search query results to values after a document
-            matching the set of sort values in `search_after`. Used for pagination.
-        track_total_hits (bool): Number of hits matching the query to count accurately.
-            Not used. Always set to `False`.
-    """  # pylint: disable=line-too-long # noqa: E501
-
-    query: dict = {"match_all": {}}
-    pit: ESQueryPit = ESQueryPit()
-    size: Optional[int]
-    sort: Union[str, List[dict]] = "_shard_doc"
-    search_after: Optional[list]
-    track_total_hits: Literal[False] = False
-
-
-class ESDataBackend(BaseDataBackend):
-    """Elasticsearch data backend."""
-
-    name = "es"
+    name = "async_es"
     query_model = ESQuery
     settings_class = ESDataBackendSettings
 
     def __init__(self, settings: settings_class = None):
-        """Instantiate the Elasticsearch data backend.
+        """Instantiate the asynchronous Elasticsearch client.
 
         Args:
             settings (ESDataBackendSettings or None): The data backend settings.
@@ -128,18 +42,18 @@ class ESDataBackend(BaseDataBackend):
 
     @property
     def client(self):
-        """Create an Elasticsearch client if it doesn't exist."""
+        """Create an AsyncElasticsearch client if it doesn't exist."""
         if not self._client:
-            self._client = Elasticsearch(
+            self._client = AsyncElasticsearch(
                 self.settings.HOSTS, **self.settings.CLIENT_OPTIONS.dict()
             )
         return self._client
 
-    def status(self) -> DataBackendStatus:
+    async def status(self) -> DataBackendStatus:
         """Check Elasticsearch cluster connection and status."""
         try:
-            self.client.info()
-            cluster_status = self.client.cat.health()
+            await self.client.info()
+            cluster_status = await self.client.cat.health()
         except TransportError as error:
             logger.error("Failed to connect to Elasticsearch: %s", error)
             return DataBackendStatus.AWAY
@@ -155,7 +69,7 @@ class ESDataBackend(BaseDataBackend):
 
         return DataBackendStatus.ERROR
 
-    def list(
+    async def list(
         self, target: str = None, details: bool = False, new: bool = False
     ) -> Iterator[Union[str, dict]]:
         """List available Elasticsearch indices, data streams and aliases.
@@ -177,7 +91,7 @@ class ESDataBackend(BaseDataBackend):
         """
         target = target if target else "*"
         try:
-            indices = self.client.indices.get(index=target)
+            indices = await self.client.indices.get(index=target)
         except (ApiError, TransportError) as error:
             msg = "Failed to read indices: %s"
             logger.error(msg, error)
@@ -196,7 +110,7 @@ class ESDataBackend(BaseDataBackend):
             yield index
 
     @enforce_query_checks
-    def read(
+    async def read(
         self,
         *,
         query: Union[str, ESQuery] = None,
@@ -234,8 +148,10 @@ class ESDataBackend(BaseDataBackend):
             query.pit.keep_alive = self.settings.POINT_IN_TIME_KEEP_ALIVE
         if not query.pit.id:
             try:
-                query.pit.id = self.client.open_point_in_time(
-                    index=target, keep_alive=query.pit.keep_alive
+                query.pit.id = (
+                    await self.client.open_point_in_time(
+                        index=target, keep_alive=query.pit.keep_alive
+                    )
                 )["id"]
             except (ApiError, TransportError, ValueError) as error:
                 msg = "Failed to open Elasticsearch point in time: %s"
@@ -251,7 +167,7 @@ class ESDataBackend(BaseDataBackend):
         while limit or chunk_size == count:
             kwargs["size"] = limit if limit and limit < chunk_size else chunk_size
             try:
-                documents = self.client.search(**kwargs)["hits"]["hits"]
+                documents = (await self.client.search(**kwargs))["hits"]["hits"]
             except (ApiError, TransportError, TypeError) as error:
                 msg = "Failed to execute Elasticsearch query: %s"
                 logger.error(msg, error)
@@ -268,7 +184,7 @@ class ESDataBackend(BaseDataBackend):
             for document in documents:
                 yield document
 
-    def write(  # pylint: disable=too-many-arguments
+    async def write(  # pylint: disable=too-many-arguments
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Union[None, str] = None,
@@ -324,7 +240,7 @@ class ESDataBackend(BaseDataBackend):
             "Start writing to the %s index (chunk size: %d)", target, chunk_size
         )
         try:
-            for success, action in streaming_bulk(
+            async for success, action in async_streaming_bulk(
                 client=self.client,
                 actions=ESDataBackend.to_documents(data, target, operation_type),
                 chunk_size=chunk_size,
@@ -342,34 +258,18 @@ class ESDataBackend(BaseDataBackend):
             raise BackendException(msg % (error, details, count)) from error
         return count
 
-    @staticmethod
-    def to_documents(
-        data: Iterable[dict],
-        target: str,
-        operation_type: BaseOperationType,
-    ) -> Iterator[dict]:
-        """Convert dictionaries from `data` to ES documents and yield them."""
-        if operation_type == BaseOperationType.UPDATE:
-            for item in data:
-                yield {
-                    "_index": target,
-                    "_id": item.get("id", None),
-                    "_op_type": operation_type.value,
-                    "doc": item,
-                }
-        elif operation_type in (BaseOperationType.CREATE, BaseOperationType.INDEX):
-            for item in data:
-                yield {
-                    "_index": target,
-                    "_id": item.get("id", None),
-                    "_op_type": operation_type.value,
-                    "_source": item,
-                }
-        else:
-            # operation_type == BaseOperationType.DELETE (by exclusion)
-            for item in data:
-                yield {
-                    "_index": target,
-                    "_id": item.get("id", None),
-                    "_op_type": operation_type.value,
-                }
+    async def close(self) -> None:
+        """Close the AsyncElasticsearch client.
+
+        Raise:
+            BackendException: If a failure during the close operation occurs.
+        """
+        if not self._client:
+            return
+
+        try:
+            await self.client.close()
+        except TransportError as error:
+            msg = "Failed to close Elasticsearch client: %s"
+            logger.error(msg, error)
+            raise BackendException(msg % error) from error

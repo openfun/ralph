@@ -21,6 +21,7 @@ from httpx import AsyncClient, ConnectError
 from pymongo import MongoClient
 from pymongo.errors import CollectionInvalid
 
+from ralph.backends.data.async_es import AsyncESDataBackend
 from ralph.backends.data.clickhouse import ClickHouseDataBackend
 from ralph.backends.data.es import ESDataBackend
 from ralph.backends.data.fs import FSDataBackend, FSDataBackendSettings
@@ -30,6 +31,7 @@ from ralph.backends.data.swift import SwiftDataBackend, SwiftDataBackendSettings
 from ralph.backends.database.clickhouse import ClickHouseDatabase
 from ralph.backends.database.es import ESDatabase
 from ralph.backends.database.mongo import MongoDatabase
+from ralph.backends.lrs.async_es import AsyncESLRSBackend
 from ralph.backends.lrs.clickhouse import ClickHouseLRSBackend
 from ralph.backends.lrs.es import ESLRSBackend
 from ralph.backends.lrs.fs import FSLRSBackend
@@ -281,7 +283,6 @@ def es_data_stream():
     client.
     """
     client = Elasticsearch(ES_TEST_HOSTS)
-
     # Create statements index template with enabled data stream
     index_patterns = [ES_TEST_INDEX_PATTERN]
     data_stream = {}
@@ -295,9 +296,9 @@ def es_data_stream():
             "dynamic_templates": [],
             "date_detection": True,
             "numeric_detection": True,
-            # Note: We define an explicit mapping of the `timestamp` field to allow the
-            # Elasticsearch database to be queried even if no document has been inserted
-            # before.
+            # Note: We define an explicit mapping of the `timestamp` field to allow
+            # the Elasticsearch database to be queried even if no document has
+            # been inserted before.
             "properties": {
                 "timestamp": {
                     "type": "date",
@@ -358,6 +359,49 @@ def ldp_backend(settings_fs):
         return LDPDataBackend(settings)
 
     return get_ldp_data_backend
+
+
+@pytest.fixture
+def async_es_backend():
+    """Return the `get_async_es_data_backend` function."""
+    # pylint: disable=invalid-name,redefined-outer-name,unused-argument
+
+    def get_async_es_data_backend():
+        """Return an instance of AsyncESDataBackend."""
+        settings = AsyncESDataBackend.settings_class(
+            ALLOW_YELLOW_STATUS=False,
+            CLIENT_OPTIONS={"ca_certs": None, "verify_certs": None},
+            DEFAULT_CHUNK_SIZE=500,
+            DEFAULT_INDEX=ES_TEST_INDEX,
+            HOSTS=ES_TEST_HOSTS,
+            LOCALE_ENCODING="utf8",
+            REFRESH_AFTER_WRITE=True,
+        )
+        return AsyncESDataBackend(settings)
+
+    return get_async_es_data_backend
+
+
+@pytest.fixture
+def async_es_lrs_backend():
+    """Return the `get_async_es_lrs_backend` function."""
+    # pylint: disable=invalid-name,redefined-outer-name,unused-argument
+
+    def get_async_es_lrs_backend(index: str = ES_TEST_INDEX):
+        """Return an instance of AsyncESLRSBackend."""
+        settings = AsyncESLRSBackend.settings_class(
+            ALLOW_YELLOW_STATUS=False,
+            CLIENT_OPTIONS={"ca_certs": None, "verify_certs": None},
+            DEFAULT_CHUNK_SIZE=500,
+            DEFAULT_INDEX=index,
+            HOSTS=ES_TEST_HOSTS,
+            LOCALE_ENCODING="utf8",
+            POINT_IN_TIME_KEEP_ALIVE="1m",
+            REFRESH_AFTER_WRITE=True,
+        )
+        return AsyncESLRSBackend(settings)
+
+    return get_async_es_lrs_backend
 
 
 @pytest.fixture
