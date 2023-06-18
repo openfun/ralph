@@ -258,78 +258,91 @@ from tests.fixtures.backends import ES_TEST_FORWARDING_INDEX, ES_TEST_INDEX
         ),
     ],
 )
-def test_backends_lrs_es_lrs_backend_query_statements_query(
-    params, expected_query, es_lrs_backend, monkeypatch
+@pytest.mark.anyio
+async def test_backends_lrs_async_es_lrs_backend_query_statements_query(
+    params, expected_query, async_es_lrs_backend, monkeypatch
 ):
-    """Test the `ESLRSBackend.query_statements` method, given valid statement
+    """Test the `AsyncESLRSBackend.query_statements` method, given valid statement
     parameters, should produce the expected Elasticsearch query.
     """
 
-    def mock_read(query, chunk_size):
-        """Mock the `ESLRSBackend.read` method."""
+    async def mock_read(query, chunk_size):
+        """Mock the `AsyncESLRSBackend.read` method."""
         assert query.dict() == expected_query
         assert chunk_size == expected_query.get("size")
         query.pit.id = "foo_pit_id"
         query.search_after = ["bar_search_after", "baz_search_after"]
-        return []
+        yield {"_source": {}}
 
-    backend = es_lrs_backend()
+    backend = async_es_lrs_backend()
     monkeypatch.setattr(backend, "read", mock_read)
-    result = backend.query_statements(StatementParameters(**params))
-    assert not result.statements
+    result = await backend.query_statements(StatementParameters(**params))
+    assert result.statements == [{}]
     assert result.pit_id == "foo_pit_id"
     assert result.search_after == "bar_search_after|baz_search_after"
 
+    await backend.close()
 
-def test_backends_lrs_es_lrs_backend_query_statements(es, es_lrs_backend):
-    """Test the `ESLRSBackend.query_statements` method, given a query,
+
+@pytest.mark.anyio
+async def test_backends_lrs_async_es_lrs_backend_query_statements(
+    es, async_es_lrs_backend
+):
+    """Test the `AsyncESLRSBackend.query_statements` method, given a query,
     should return matching statements.
     """
-    # pylint: disable=invalid-name,unused-argument
-    # Instantiate ESLRSBackend.
-    backend = es_lrs_backend()
+    # pylint: disable=invalid-name, unused-argument
+    # Instantiate AsyncESLRSBackend.
+    backend = async_es_lrs_backend()
     # Insert documents.
     documents = [{"id": "2", "timestamp": "2023-06-24T00:00:20.194929+00:00"}]
-    assert backend.write(documents) == 1
+    assert await backend.write(documents) == 1
 
     # Check the expected search query results.
-    result = backend.query_statements(StatementParameters(limit=10))
+    result = await backend.query_statements(StatementParameters(limit=10))
     assert result.statements == documents
     assert re.match(r"[0-9]+\|0", result.search_after)
 
+    await backend.close()
 
-def test_backends_lrs_es_lrs_backend_query_statements_with_search_query_failure(
-    es, es_lrs_backend, monkeypatch, caplog
+
+@pytest.mark.anyio
+async def test_backends_lrs_async_es_lrs_backend_query_statements_pit_query_failure(
+    es, async_es_lrs_backend, monkeypatch, caplog
 ):
-    """Test the `ESLRSBackend.query_statements`, given a search query failure, should
-    raise a `BackendException` and log the error.
+    """Test the `AsyncESLRSBackend.query_statements` method, given a point in time
+    query failure, should raise a `BackendException` and log the error.
     """
     # pylint: disable=invalid-name,unused-argument
 
-    def mock_read(**_):
+    async def mock_read(**_):
         """Mock the Elasticsearch.read method."""
+        yield {"_source": {}}
         raise BackendException("Query error")
 
-    backend = es_lrs_backend()
+    backend = async_es_lrs_backend()
     monkeypatch.setattr(backend, "read", mock_read)
 
     msg = "Query error"
     with pytest.raises(BackendException, match=msg):
         with caplog.at_level(logging.ERROR):
-            backend.query_statements(StatementParameters())
+            await backend.query_statements(StatementParameters())
+
+    await backend.close()
 
     assert (
-        "ralph.backends.lrs.es",
+        "ralph.backends.lrs.async_es",
         logging.ERROR,
         "Failed to read from Elasticsearch",
     ) in caplog.record_tuples
 
 
-def test_backends_lrs_es_lrs_backend_query_statements_by_ids_with_search_query_failure(
-    es, es_lrs_backend, monkeypatch, caplog
+@pytest.mark.anyio
+async def test_backends_lrs_es_lrs_backend_query_statements_by_ids_search_query_failure(
+    es, async_es_lrs_backend, monkeypatch, caplog
 ):
-    """Test the `ESLRSBackend.query_statements_by_ids` method, given a search query
-    failure, should raise a `BackendException` and log the error.
+    """Test the `AsyncESLRSBackend.query_statements_by_ids` method, given a search
+    query failure, should raise a `BackendException` and log the error.
     """
     # pylint: disable=invalid-name,unused-argument
 
@@ -337,27 +350,35 @@ def test_backends_lrs_es_lrs_backend_query_statements_by_ids_with_search_query_f
         """Mock the Elasticsearch.search method."""
         raise ApiError("Query error", ApiResponseMeta(*([None] * 5)), None)
 
-    backend = es_lrs_backend()
+    backend = async_es_lrs_backend()
     monkeypatch.setattr(backend.client, "search", mock_search)
 
     msg = r"Failed to execute Elasticsearch query: ApiError\(None, 'Query error'\)"
     with pytest.raises(BackendException, match=msg):
         with caplog.at_level(logging.ERROR):
-            list(backend.query_statements_by_ids(StatementParameters()))
+            _ = [
+                statement
+                async for statement in backend.query_statements_by_ids(
+                    StatementParameters()
+                )
+            ]
+
+    await backend.close()
 
     assert (
-        "ralph.backends.lrs.es",
+        "ralph.backends.lrs.async_es",
         logging.ERROR,
         "Failed to read from Elasticsearch",
     ) in caplog.record_tuples
 
 
-def test_backends_lrs_es_lrs_backend_query_statements_by_ids_with_multiple_indexes(
-    es, es_forwarding, es_lrs_backend
+@pytest.mark.anyio
+async def test_backends_lrs_async_es_lrs_backend_query_statements_by_ids_many_indexes(
+    es, es_forwarding, async_es_lrs_backend
 ):
-    """Test the `ESLRSBackend.query_statements_by_ids` method, given a valid search
-    query, should execute the query only on the specified index and return the
-    expected results.
+    """Test the `AsyncESLRSBackend.query_statements_by_ids` method, given a valid
+    search query, should execute the query uniquely on the specified index and return
+    the expected results.
     """
     # pylint: disable=invalid-name
 
@@ -376,14 +397,25 @@ def test_backends_lrs_es_lrs_backend_query_statements_by_ids_with_multiple_index
     es.indices.refresh(index=ES_TEST_INDEX)
     es_forwarding.indices.refresh(index=ES_TEST_FORWARDING_INDEX)
 
-    # Instantiate ESLRSBackends.
-    backend_1 = es_lrs_backend(index=ES_TEST_INDEX)
-    backend_2 = es_lrs_backend(index=ES_TEST_FORWARDING_INDEX)
+    # Instantiate AsyncESLRSBackends.
+    backend_1 = async_es_lrs_backend(index=ES_TEST_INDEX)
+    backend_2 = async_es_lrs_backend(index=ES_TEST_FORWARDING_INDEX)
 
     # Check the expected search query results.
     index_1_document = {"id": "1"}
     index_2_document = {"id": "2"}
-    assert list(backend_1.query_statements_by_ids(["1"])) == [index_1_document]
-    assert not list(backend_1.query_statements_by_ids(["2"]))
-    assert not list(backend_2.query_statements_by_ids(["1"]))
-    assert list(backend_2.query_statements_by_ids(["2"])) == [index_2_document]
+    assert [
+        statement async for statement in backend_1.query_statements_by_ids(["1"])
+    ] == [index_1_document]
+    assert not [
+        statement async for statement in backend_1.query_statements_by_ids(["2"])
+    ]
+    assert not [
+        statement async for statement in backend_2.query_statements_by_ids(["1"])
+    ]
+    assert [
+        statement async for statement in backend_2.query_statements_by_ids(["2"])
+    ] == [index_2_document]
+
+    await backend_1.close()
+    await backend_2.close()
