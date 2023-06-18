@@ -8,7 +8,11 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from ralph.backends.data.base import BaseDataBackend, BaseDataBackendSettings
+from ralph.backends.data.base import (
+    BaseAsyncDataBackend,
+    BaseDataBackend,
+    BaseDataBackendSettings,
+)
 
 
 class BaseLRSBackendSettings(BaseDataBackendSettings):
@@ -74,3 +78,19 @@ class BaseLRSBackend(BaseDataBackend):
     @abstractmethod
     def query_statements_by_ids(self, ids: List[str]) -> Iterator[dict]:
         """Yield statements with matching ids from the backend."""
+
+
+class BaseAsyncLRSBackend(BaseAsyncDataBackend):
+    """Base async LRS backend interface."""
+
+    settings_class = BaseLRSBackendSettings
+
+    @abstractmethod
+    async def query_statements(
+        self, params: StatementParameters
+    ) -> StatementQueryResult:
+        """Return the statements query payload using xAPI parameters."""
+
+    @abstractmethod
+    async def query_statements_by_ids(self, ids: List[str]) -> Iterator[dict]:
+        """Return the list of matching statement IDs from the database."""

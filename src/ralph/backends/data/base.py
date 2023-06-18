@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 class BaseDataBackendSettings(BaseSettings):
-    """Represents the data backend default configuration."""
+    """Data backend default configuration."""
 
     class Config(BaseSettingsConfig):
         """Pydantic Configuration."""
@@ -66,7 +66,7 @@ class DataBackendStatus(Enum):
 
 
 def enforce_query_checks(method):
-    """Enforces query argument type checking for methods using it."""
+    """Enforce query argument type checking for methods using it."""
 
     @functools.wraps(method)
     def wrapper(*args, **kwargs):
@@ -89,15 +89,15 @@ class BaseDataBackend(ABC):
 
     @abstractmethod
     def __init__(self, settings: settings_class = None):
-        """Instantiates the data backend.
+        """Instantiate the data backend.
 
         Args:
-            settings (BaseDataBackendSettings or None): The backend settings.
+            settings (BaseDataBackendSettings or None): The data backend settings.
                 If `settings` is `None`, a default settings instance is used instead.
         """
 
     def validate_query(self, query: Union[str, dict, BaseQuery] = None) -> BaseQuery:
-        """Validates and transforms the query."""
+        """Validate and transform the query."""
         if query is None:
             query = self.query_model()
 
@@ -126,7 +126,7 @@ class BaseDataBackend(ABC):
 
     @abstractmethod
     def status(self) -> DataBackendStatus:
-        """Implements data backend checks (e.g. connection, cluster status).
+        """Implement data backend checks (e.g. connection, cluster status).
 
         Return:
             DataBackendStatus: The status of the data backend.
@@ -136,7 +136,7 @@ class BaseDataBackend(ABC):
     def list(
         self, target: str = None, details: bool = False, new: bool = False
     ) -> Iterator[Union[str, dict]]:
-        """Lists containers in the data backend. E.g., collections, files, indexes.
+        """List containers in the data backend. E.g., collections, files, indexes.
 
         Args:
             target (str or None): The target container name.
@@ -164,7 +164,7 @@ class BaseDataBackend(ABC):
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
-        """Reads records matching the `query` in the `target` container and yields them.
+        """Read records matching the `query` in the `target` container and yield them.
 
         Args:
             query: (str or BaseQuery): The query to select records to read.
@@ -200,7 +200,7 @@ class BaseDataBackend(ABC):
         ignore_errors: bool = False,
         operation_type: Union[None, BaseOperationType] = None,
     ) -> int:
-        """Writes `data` records to the `target` container and returns their count.
+        """Write `data` records to the `target` container and return their count.
 
         Args:
             data: (Iterable or IOBase): The data to write.
@@ -226,22 +226,8 @@ class BaseDataBackend(ABC):
         """
 
 
-def async_enforce_query_checks(method):
-    """Enforces query argument type checking for methods using it."""
-
-    @functools.wraps(method)
-    async def wrapper(*args, **kwargs):
-        """Wrap method execution."""
-        query = kwargs.pop("query", None)
-        self_ = args[0]
-
-        return method(*args, query=self_.validate_query(query), **kwargs)
-
-    return wrapper
-
-
 class BaseAsyncDataBackend(ABC):
-    """Base data backend interface."""
+    """Base async data backend interface."""
 
     name = "base"
     query_model = BaseQuery
@@ -250,7 +236,7 @@ class BaseAsyncDataBackend(ABC):
 
     @abstractmethod
     def __init__(self, settings: settings_class = None):
-        """Instantiates the data backend.
+        """Instantiate the data backend.
 
         Args:
             settings (BaseDataBackendSettings or None): The backend settings.
@@ -258,7 +244,7 @@ class BaseAsyncDataBackend(ABC):
         """
 
     def validate_query(self, query: Union[str, dict, BaseQuery] = None) -> BaseQuery:
-        """Validates and transforms the query."""
+        """Validate and transform the query."""
         if query is None:
             query = self.query_model()
 
@@ -268,17 +254,18 @@ class BaseAsyncDataBackend(ABC):
         if isinstance(query, dict):
             try:
                 query = self.query_model(**query)
-            except ValidationError as err:
+            except ValidationError as error:
+                msg = "The 'query' argument is expected to be a %s instance. %s"
+                errors = error.errors()
+                logger.error(msg, self.query_model.__name__, errors)
                 raise BackendParameterException(
-                    "The 'query' argument is expected to be a "
-                    f"{self.query_model.__name__} instance. {err.errors()}"
-                ) from err
+                    msg % (self.query_model.__name__, errors)
+                ) from error
 
         if not isinstance(query, self.query_model):
-            raise BackendParameterException(
-                "The 'query' argument is expected to be a "
-                f"{self.query_model.__name__} instance."
-            )
+            msg = "The 'query' argument is expected to be a %s instance."
+            logger.error(msg, self.query_model.__name__)
+            raise BackendParameterException(msg % (self.query_model.__name__,))
 
         logger.debug("Query: %s", str(query))
 
@@ -286,7 +273,7 @@ class BaseAsyncDataBackend(ABC):
 
     @abstractmethod
     async def status(self) -> DataBackendStatus:
-        """Implements data backend checks (e.g. connection, cluster status).
+        """Implement data backend checks (e.g. connection, cluster status).
 
         Return:
             DataBackendStatus: The status of the data backend.
@@ -296,7 +283,7 @@ class BaseAsyncDataBackend(ABC):
     async def list(
         self, target: str = None, details: bool = False, new: bool = False
     ) -> Iterator[Union[str, dict]]:
-        """Lists containers in the data backend. E.g., collections, files, indexes.
+        """List containers in the data backend. E.g., collections, files, indexes.
 
         Args:
             target (str or None): The target container name.
@@ -314,7 +301,7 @@ class BaseAsyncDataBackend(ABC):
         """
 
     @abstractmethod
-    @async_enforce_query_checks
+    @enforce_query_checks
     async def read(
         self,
         *,
@@ -324,7 +311,7 @@ class BaseAsyncDataBackend(ABC):
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
-        """Reads records matching the `query` in the `target` container and yields them.
+        """Read records matching the `query` in the `target` container and yield them.
 
         Args:
             query: (str or BaseQuery): The query to select records to read.
@@ -360,7 +347,7 @@ class BaseAsyncDataBackend(ABC):
         ignore_errors: bool = False,
         operation_type: Union[None, BaseOperationType] = None,
     ) -> int:
-        """Writes `data` records to the `target` container and returns their count.
+        """Write `data` records to the `target` container and return their count.
 
         Args:
             data: (Iterable or IOBase): The data to write.
