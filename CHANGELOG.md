@@ -11,6 +11,7 @@ and this project adheres to
 ### Added
 
 - Implement edX open response assessment events pydantic models
+- Implement edx peer instruction events pydantic models
 
 ### Changed
 

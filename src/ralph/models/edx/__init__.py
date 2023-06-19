@@ -24,6 +24,11 @@ from .open_response_assessment.statements import (
     ORASubmitFeedbackOnAssessments,
     ORAUploadFile,
 )
+from .peer_instruction.statements import (
+    PeerInstructionAccessed,
+    PeerInstructionOriginalSubmitted,
+    PeerInstructionRevisedSubmitted,
+)
 from .problem_interaction.statements import (
     EdxProblemHintDemandhintDisplayed,
     EdxProblemHintFeedbackDisplayed,
