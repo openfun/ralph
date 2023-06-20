@@ -24,6 +24,7 @@ from .fixtures.backends import (  # noqa: F401
     es_lrs_backend,
     events,
     fs_backend,
+    fs_lrs_backend,
     ldp_backend,
     lrs,
     mongo,
