@@ -32,6 +32,7 @@ from ralph.backends.database.es import ESDatabase
 from ralph.backends.database.mongo import MongoDatabase
 from ralph.backends.lrs.clickhouse import ClickHouseLRSBackend
 from ralph.backends.lrs.es import ESLRSBackend
+from ralph.backends.lrs.fs import FSLRSBackend
 from ralph.backends.storage.s3 import S3Storage
 from ralph.backends.storage.swift import SwiftStorage
 from ralph.conf import ClickhouseClientOptions, Settings, core_settings
@@ -161,6 +162,25 @@ def fs_backend(fs, settings_fs):
         return FSDataBackend(settings)
 
     return get_fs_data_backend
+
+
+@pytest.fixture
+def fs_lrs_backend(fs, settings_fs):
+    """Return the `get_fs_data_backend` function."""
+    # pylint: disable=invalid-name,redefined-outer-name,unused-argument
+    fs.create_dir("foo")
+
+    def get_fs_lrs_backend(path: str = "foo"):
+        """Return an instance of FSLRSBackend."""
+        settings = FSLRSBackend.settings_class(
+            DEFAULT_CHUNK_SIZE=1024,
+            DEFAULT_DIRECTORY_PATH=path,
+            DEFAULT_QUERY_STRING="*",
+            LOCALE_ENCODING="utf8",
+        )
+        return FSLRSBackend(settings)
+
+    return get_fs_lrs_backend
 
 
 def get_mongo_fixture(
