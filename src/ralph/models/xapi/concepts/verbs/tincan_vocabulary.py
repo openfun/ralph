@@ -24,3 +24,17 @@ class ViewedVerb(BaseXapiVerb):
         "http://id.tincanapi.com/verb/viewed"
     ] = "http://id.tincanapi.com/verb/viewed"
     display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["viewed"]]]
+
+
+class DownloadedVerb(BaseXapiVerb):
+    """Pydantic model for downloaded `verb`.
+
+    Attributes:
+        id (str): Consists of the value `http://id.tincanapi.com/verb/downloaded`.
+        display (dict): Consists of the dictionary `{"en-US": "downloaded"}`.
+    """
+
+    id: Literal[
+        "http://id.tincanapi.com/verb/downloaded"
+    ] = "http://id.tincanapi.com/verb/downloaded"
+    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["downloaded"]]]

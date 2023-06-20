@@ -5,6 +5,7 @@
 from .navigation.statements import PageTerminated, PageViewed
 from .video.statements import (
     VideoCompleted,
+    VideoDownloaded,
     VideoEnableClosedCaptioning,
     VideoInitialized,
     VideoPaused,
