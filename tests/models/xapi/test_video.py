@@ -10,6 +10,7 @@ from ralph.models.selector import ModelSelector
 from ralph.models.validator import Validator
 from ralph.models.xapi.video.statements import (
     VideoCompleted,
+    VideoDownloaded,
     VideoEnableClosedCaptioning,
     VideoInitialized,
     VideoPaused,
@@ -33,6 +34,7 @@ from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
         VideoPlayed,
         VideoSeeked,
         VideoTerminated,
+        VideoDownloaded,
     ],
 )
 @custom_given(st.data())
@@ -142,6 +144,19 @@ def test_models_xapi_video_terminated_with_valid_statement(statement):
     """
 
     assert statement.verb.id == "http://adlnet.gov/expapi/verbs/terminated"
+    assert (
+        statement.object.definition.type
+        == "https://w3id.org/xapi/video/activity-type/video"
+    )
+
+
+@custom_given(VideoDownloaded)
+def test_models_xapi_video_downloaded_with_valid_statement(statement):
+    """Tests that a video terminated statement has the expected `verb`.`id` and
+    `object`.`definition`.`type` property values.
+    """
+
+    assert statement.verb.id == "http://id.tincanapi.com/verb/downloaded"
     assert (
         statement.object.definition.type
         == "https://w3id.org/xapi/video/activity-type/video"

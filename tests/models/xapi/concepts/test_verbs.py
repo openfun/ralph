@@ -17,7 +17,10 @@ from ralph.models.xapi.concepts.verbs.scorm_profile import (
     InteractedVerb,
     TerminatedVerb,
 )
-from ralph.models.xapi.concepts.verbs.tincan_vocabulary import ViewedVerb
+from ralph.models.xapi.concepts.verbs.tincan_vocabulary import (
+    DownloadedVerb,
+    ViewedVerb,
+)
 from ralph.models.xapi.concepts.verbs.video import PausedVerb, PlayedVerb, SeekedVerb
 from ralph.models.xapi.concepts.verbs.virtual_classroom import (
     LoweredHandVerb,
@@ -47,6 +50,7 @@ from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
         (InteractedVerb, "http://adlnet.gov/expapi/verbs/interacted"),
         (TerminatedVerb, "http://adlnet.gov/expapi/verbs/terminated"),
         (ViewedVerb, "http://id.tincanapi.com/verb/viewed"),
+        (DownloadedVerb, "http://id.tincanapi.com/verb/downloaded"),
         (PausedVerb, "https://w3id.org/xapi/video/verbs/paused"),
         (PlayedVerb, "https://w3id.org/xapi/video/verbs/played"),
         (SeekedVerb, "https://w3id.org/xapi/video/verbs/seeked"),
