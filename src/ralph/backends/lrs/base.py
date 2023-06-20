@@ -20,8 +20,8 @@ class StatementQueryResult:
     """Result of an LRS statements query."""
 
     statements: List[dict]
-    pit_id: str
-    search_after: str
+    pit_id: Optional[str]
+    search_after: Optional[str]
 
 
 class AgentParameters(BaseModel):

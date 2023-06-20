@@ -16,13 +16,13 @@ from ralph.exceptions import BackendParameterException
     ],
 )
 def test_backends_data_base_enforce_query_checks_with_valid_input(value, expected):
-    """Tests the enforce_query_checks function given valid input."""
+    """Test the enforce_query_checks function given valid input."""
 
     class MockBaseDataBackend(BaseDataBackend):
         """A class mocking the base database class."""
 
         def __init__(self, settings=None):
-            """Instantiates the Mock data backend."""
+            """Instantiate the Mock data backend."""
 
         @enforce_query_checks
         def read(self, query=None):  # pylint: disable=no-self-use,arguments-differ
@@ -57,13 +57,13 @@ def test_backends_data_base_enforce_query_checks_with_valid_input(value, expecte
 def test_backends_data_base_enforce_query_checks_with_invalid_input(
     value, error, caplog
 ):
-    """Tests the enforce_query_checks function given invalid input."""
+    """Test the enforce_query_checks function given invalid input."""
 
     class MockBaseDataBackend(BaseDataBackend):
         """A class mocking the base database class."""
 
         def __init__(self, settings=None):
-            """Instantiates the Mock data backend."""
+            """Instantiate the Mock data backend."""
 
         @enforce_query_checks
         def read(self, query=None):  # pylint: disable=no-self-use,arguments-differ
