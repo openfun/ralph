@@ -58,11 +58,11 @@ class FSDataBackend(HistoryMixin, BaseDataBackend):
 
     def __init__(self, settings: settings_class = None):
         """Creates the default target directory if it does not exist."""
-        settings = settings if settings else self.settings_class()
-        self.default_chunk_size = settings.DEFAULT_CHUNK_SIZE
-        self.default_directory = settings.DEFAULT_DIRECTORY_PATH
-        self.default_query_string = settings.DEFAULT_QUERY_STRING
-        self.locale_encoding = settings.LOCALE_ENCODING
+        self.settings = settings if settings else self.settings_class()
+        self.default_chunk_size = self.settings.DEFAULT_CHUNK_SIZE
+        self.default_directory = self.settings.DEFAULT_DIRECTORY_PATH
+        self.default_query_string = self.settings.DEFAULT_QUERY_STRING
+        self.locale_encoding = self.settings.LOCALE_ENCODING
 
         if not self.default_directory.is_dir():
             msg = "Default directory doesn't exist, creating: %s"
