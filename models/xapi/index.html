@@ -1232,6 +1232,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ralph.models.xapi.concepts.verbs.tincan_vocabulary.DownloadedVerb" class="md-nav__link">
+    DownloadedVerb
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ralph.models.xapi.concepts.verbs.tincan_vocabulary.ViewedVerb" class="md-nav__link">
     ViewedVerb
   </a>
@@ -1489,6 +1496,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ralph.models.xapi.video.contexts.VideoDownloadedContext" class="md-nav__link">
+    VideoDownloadedContext
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ralph.models.xapi.video.contexts.VideoDownloadedContextExtensions" class="md-nav__link">
+    VideoDownloadedContextExtensions
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ralph.models.xapi.video.contexts.VideoEnableClosedCaptioningContext" class="md-nav__link">
     VideoEnableClosedCaptioningContext
   </a>
@@ -1706,6 +1727,13 @@
           <li class="md-nav__item">
   <a href="#ralph.models.xapi.video.statements.VideoCompleted" class="md-nav__link">
     VideoCompleted
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ralph.models.xapi.video.statements.VideoDownloaded" class="md-nav__link">
+    VideoDownloaded
   </a>
   
 </li>
@@ -3049,6 +3077,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ralph.models.xapi.concepts.verbs.tincan_vocabulary.DownloadedVerb" class="md-nav__link">
+    DownloadedVerb
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ralph.models.xapi.concepts.verbs.tincan_vocabulary.ViewedVerb" class="md-nav__link">
     ViewedVerb
   </a>
@@ -3306,6 +3341,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ralph.models.xapi.video.contexts.VideoDownloadedContext" class="md-nav__link">
+    VideoDownloadedContext
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ralph.models.xapi.video.contexts.VideoDownloadedContextExtensions" class="md-nav__link">
+    VideoDownloadedContextExtensions
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ralph.models.xapi.video.contexts.VideoEnableClosedCaptioningContext" class="md-nav__link">
     VideoEnableClosedCaptioningContext
   </a>
@@ -3523,6 +3572,13 @@
           <li class="md-nav__item">
   <a href="#ralph.models.xapi.video.statements.VideoCompleted" class="md-nav__link">
     VideoCompleted
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ralph.models.xapi.video.statements.VideoDownloaded" class="md-nav__link">
+    VideoDownloaded
   </a>
   
 </li>
@@ -10089,6 +10145,89 @@ TerminatedVerb            (<a class="autorefs autorefs-internal" title="ralph.mo
 
 
 
+<h5 id="ralph.models.xapi.concepts.verbs.tincan_vocabulary.DownloadedVerb" class="doc doc-heading">
+        <code>
+DownloadedVerb            (<a class="autorefs autorefs-internal" title="ralph.models.xapi.base.verbs.BaseXapiVerb" href="#ralph.models.xapi.base.verbs.BaseXapiVerb">BaseXapiVerb</a>)
+        </code>
+
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-model"><code>pydantic-model</code></small>
+  </span>
+
+<a href="#ralph.models.xapi.concepts.verbs.tincan_vocabulary.DownloadedVerb" class="headerlink" title="Permanent link">&para;</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Pydantic model for downloaded <code>verb</code>.</p>
+
+<p><strong>Attributes:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>id</code></td>
+        <td><code>str</code></td>
+        <td><p>Consists of the value <code>http://id.tincanapi.com/verb/downloaded</code>.</p></td>
+      </tr>
+      <tr>
+        <td><code>display</code></td>
+        <td><code>dict</code></td>
+        <td><p>Consists of the dictionary <code>{"en-US": "downloaded"}</code>.</p></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>ralph/models/xapi/concepts/verbs/tincan_vocabulary.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">DownloadedVerb</span><span class="p">(</span><span class="n">BaseXapiVerb</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for downloaded `verb`.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        id (str): Consists of the value `http://id.tincanapi.com/verb/downloaded`.</span>
+<span class="sd">        display (dict): Consists of the dictionary `{&quot;en-US&quot;: &quot;downloaded&quot;}`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">id</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">&quot;http://id.tincanapi.com/verb/downloaded&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;http://id.tincanapi.com/verb/downloaded&quot;</span>
+    <span class="n">display</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="n">LANG_EN_US_DISPLAY</span><span class="p">],</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;downloaded&quot;</span><span class="p">]]]</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
 <h5 id="ralph.models.xapi.concepts.verbs.tincan_vocabulary.ViewedVerb" class="doc doc-heading">
         <code>
 ViewedVerb            (<a class="autorefs autorefs-internal" title="ralph.models.xapi.base.verbs.BaseXapiVerb" href="#ralph.models.xapi.base.verbs.BaseXapiVerb">BaseXapiVerb</a>)
@@ -12151,6 +12290,170 @@ VideoContextExtensions            (<a class="autorefs autorefs-internal" title="
 
 
   <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h4 id="ralph.models.xapi.video.contexts.VideoDownloadedContext" class="doc doc-heading">
+        <code>
+VideoDownloadedContext            (<a class="autorefs autorefs-internal" title="ralph.models.xapi.video.contexts.BaseVideoContext" href="#ralph.models.xapi.video.contexts.BaseVideoContext">BaseVideoContext</a>)
+        </code>
+
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-model"><code>pydantic-model</code></small>
+  </span>
+
+<a href="#ralph.models.xapi.video.contexts.VideoDownloadedContext" class="headerlink" title="Permanent link">&para;</a></h4>
+
+    <div class="doc doc-contents ">
+
+      <p>Pydantic model for video downloaded <code>context</code> property.</p>
+
+<p><strong>Attributes:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>extensions</code></td>
+        <td><code>dict</code></td>
+        <td><p>See VideoDownloadedContextExtensions.</p></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>ralph/models/xapi/video/contexts.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VideoDownloadedContext</span><span class="p">(</span><span class="n">BaseVideoContext</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for video downloaded `context` property.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        extensions (dict): See VideoDownloadedContextExtensions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">extensions</span><span class="p">:</span> <span class="n">VideoDownloadedContextExtensions</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h4 id="ralph.models.xapi.video.contexts.VideoDownloadedContextExtensions" class="doc doc-heading">
+        <code>
+VideoDownloadedContextExtensions            (<a class="autorefs autorefs-internal" title="ralph.models.xapi.video.contexts.VideoContextExtensions" href="#ralph.models.xapi.video.contexts.VideoContextExtensions">VideoContextExtensions</a>)
+        </code>
+
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-model"><code>pydantic-model</code></small>
+  </span>
+
+<a href="#ralph.models.xapi.video.contexts.VideoDownloadedContextExtensions" class="headerlink" title="Permanent link">&para;</a></h4>
+
+    <div class="doc doc-contents ">
+
+      <p>Represents the context.extensions field for video <code>downloaded</code> xAPI statement.</p>
+
+<p><strong>Attributes:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>length</code></td>
+        <td><code>float</code></td>
+        <td><p>Consists of the length of the video.</p></td>
+      </tr>
+      <tr>
+        <td><code>quality</code></td>
+        <td><code>int</code></td>
+        <td><p>Consists of the video resolution or quality of the video.</p></td>
+      </tr>
+      <tr>
+        <td><code>session</code></td>
+        <td><code>uuid</code></td>
+        <td><p>Consists of the ID of the active session.</p></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>ralph/models/xapi/video/contexts.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VideoDownloadedContextExtensions</span><span class="p">(</span><span class="n">VideoContextExtensions</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents the context.extensions field for video `downloaded` xAPI statement.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        length (float): Consists of the length of the video.</span>
+<span class="sd">        quality (int): Consists of the video resolution or quality of the video.</span>
+<span class="sd">        session (uuid): Consists of the ID of the active session.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">length</span><span class="p">:</span> <span class="n">NonNegativeFloat</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">alias</span><span class="o">=</span><span class="n">CONTEXT_EXTENSION_LENGTH</span><span class="p">)</span>
+    <span class="n">quality</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">alias</span><span class="o">=</span><span class="n">CONTEXT_EXTENSION_QUALITY</span><span class="p">)</span>
+    <span class="n">session_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">UUID</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">alias</span><span class="o">=</span><span class="n">CONTEXT_EXTENSION_SESSION_ID</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
 
 
 
@@ -14478,6 +14781,96 @@ VideoCompleted            (<a class="autorefs autorefs-internal" title="ralph.mo
     <span class="n">verb</span><span class="p">:</span> <span class="n">CompletedVerb</span> <span class="o">=</span> <span class="n">CompletedVerb</span><span class="p">()</span>
     <span class="n">result</span><span class="p">:</span> <span class="n">VideoCompletedResult</span>
     <span class="n">context</span><span class="p">:</span> <span class="n">VideoCompletedContext</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h4 id="ralph.models.xapi.video.statements.VideoDownloaded" class="doc doc-heading">
+        <code>
+VideoDownloaded            (<a class="autorefs autorefs-internal" title="ralph.models.xapi.video.statements.BaseVideoStatement" href="#ralph.models.xapi.video.statements.BaseVideoStatement">BaseVideoStatement</a>)
+        </code>
+
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-model"><code>pydantic-model</code></small>
+  </span>
+
+<a href="#ralph.models.xapi.video.statements.VideoDownloaded" class="headerlink" title="Permanent link">&para;</a></h4>
+
+    <div class="doc doc-contents ">
+
+      <p>Pydantic model for video downloaded statement.</p>
+<p>Example: John downloaded (rather than accessed or opened) a video.</p>
+
+<p><strong>Attributes:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>verb</code></td>
+        <td><code>dict</code></td>
+        <td><p>See DownloadedVerb.</p></td>
+      </tr>
+      <tr>
+        <td><code>context</code></td>
+        <td><code>dict</code></td>
+        <td><p>See VideoDownloadedContext.</p></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>ralph/models/xapi/video/statements.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VideoDownloaded</span><span class="p">(</span><span class="n">BaseVideoStatement</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for video downloaded statement.</span>
+
+<span class="sd">    Example: John downloaded (rather than accessed or opened) a video.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        verb (dict): See DownloadedVerb.</span>
+<span class="sd">        context (dict): See VideoDownloadedContext.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span>
+        <span class="n">object__definition__type</span><span class="o">=</span><span class="s2">&quot;https://w3id.org/xapi/video/activity-type/video&quot;</span><span class="p">,</span>
+        <span class="n">verb__id</span><span class="o">=</span><span class="s2">&quot;http://id.tincanapi.com/verb/downloaded&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">verb</span><span class="p">:</span> <span class="n">DownloadedVerb</span> <span class="o">=</span> <span class="n">DownloadedVerb</span><span class="p">()</span>
+    <span class="n">context</span><span class="p">:</span> <span class="n">VideoDownloadedContext</span>
 </code></pre></div>
         </details>
 

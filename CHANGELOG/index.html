@@ -1634,6 +1634,8 @@ and this project adheres to
 <ul>
 <li>Implement edX open response assessment events pydantic models</li>
 <li>Implement edx peer instruction events pydantic models</li>
+<li>Implement xAPI VideoDownloaded pydantic model
+(using xAPI TinCan <code>downloaded</code> verb)</li>
 </ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1653,7 +1655,7 @@ and this project adheres to
 <li>Clean xAPI pydantic models naming convention</li>
 <li>Upgrade <code>fastapi</code> to <code>0.97.0</code></li>
 <li>Upgrade <code>sentry_sdk</code> to <code>1.25.1</code></li>
-<li>Set Clickhouse <code>client_options</code> to a dedicated Pydantic model</li>
+<li>Set Clickhouse <code>client_options</code> to a dedicated pydantic model</li>
 <li>Upgrade <code>httpx</code> to <code>0.24.1</code></li>
 <li>Force a valid (JSON-formatted) IFI to be passed for the <code>/statements</code>
 GET query <code>agent</code> filtering</li>
