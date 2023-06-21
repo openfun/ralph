@@ -8,12 +8,14 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [3.8.0] - 2023-06-21
+
 ### Added
 
 - Implement edX open response assessment events pydantic models
 - Implement edx peer instruction events pydantic models
 - Implement xAPI VideoDownloaded pydantic model
-(using xAPI TinCan `downloaded` verb)
+  (using xAPI TinCan `downloaded` verb)
 
 ### Changed
 
@@ -331,7 +333,8 @@ as per the xAPI specification
 - Add optional sentry integration
 - Distribute Arnold's tray to deploy Ralph in a k8s cluster as cronjobs
 
-[unreleased]: https://github.com/openfun/ralph/compare/v3.7.0...master
+[unreleased]: https://github.com/openfun/ralph/compare/v3.8.0...master
+[3.8.0]: https://github.com/openfun/ralph/compare/v3.7.0...v3.8.0
 [3.7.0]: https://github.com/openfun/ralph/compare/v3.6.0...v3.7.0
 [3.6.0]: https://github.com/openfun/ralph/compare/v3.5.1...v3.6.0
 [3.5.1]: https://github.com/openfun/ralph/compare/v3.5.0...v3.5.1
