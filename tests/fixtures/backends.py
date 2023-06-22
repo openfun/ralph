@@ -26,6 +26,7 @@ from ralph.backends.data.clickhouse import ClickHouseDataBackend
 from ralph.backends.data.es import ESDataBackend
 from ralph.backends.data.fs import FSDataBackend, FSDataBackendSettings
 from ralph.backends.data.ldp import LDPDataBackend
+from ralph.backends.data.mongo import MongoDataBackend
 from ralph.backends.data.s3 import S3DataBackend, S3DataBackendSettings
 from ralph.backends.data.swift import SwiftDataBackend, SwiftDataBackendSettings
 from ralph.backends.database.clickhouse import ClickHouseDatabase
@@ -35,6 +36,7 @@ from ralph.backends.lrs.async_es import AsyncESLRSBackend
 from ralph.backends.lrs.clickhouse import ClickHouseLRSBackend
 from ralph.backends.lrs.es import ESLRSBackend
 from ralph.backends.lrs.fs import FSLRSBackend
+from ralph.backends.lrs.mongo import MongoLRSBackend
 from ralph.backends.storage.s3 import S3Storage
 from ralph.backends.storage.swift import SwiftStorage
 from ralph.conf import ClickhouseClientOptions, Settings, core_settings
@@ -149,12 +151,12 @@ def es_forwarding():
 
 @pytest.fixture
 def fs_backend(fs, settings_fs):
-    """Returns the `get_fs_data_backend` function."""
+    """Return the `get_fs_data_backend` function."""
     # pylint: disable=invalid-name,redefined-outer-name,unused-argument
     fs.create_dir("foo")
 
     def get_fs_data_backend(path: str = "foo"):
-        """Returns an instance of FSDataBackend."""
+        """Return an instance of `FSDataBackend`."""
         settings = FSDataBackendSettings(
             DEFAULT_CHUNK_SIZE=1024,
             DEFAULT_DIRECTORY_PATH=path,
@@ -211,6 +213,52 @@ def mongo():
     """Yields a Mongo test client. See get_mongo_fixture above."""
     for mongo_client in get_mongo_fixture():
         yield mongo_client
+
+
+@pytest.fixture
+def mongo_backend():
+    """Return the `get_mongo_data_backend` function."""
+
+    def get_mongo_data_backend(
+        connection_uri: str = MONGO_TEST_CONNECTION_URI,
+        default_collection: str = MONGO_TEST_COLLECTION,
+        client_options: dict = None,
+    ):
+        """Return an instance of `MongoDataBackend`."""
+        settings = MongoDataBackend.settings_class(
+            CONNECTION_URI=connection_uri,
+            DEFAULT_DATABASE=MONGO_TEST_DATABASE,
+            DEFAULT_COLLECTION=default_collection,
+            CLIENT_OPTIONS=client_options if client_options else {},
+            DEFAULT_CHUNK_SIZE=500,
+            LOCALE_ENCODING="utf8",
+        )
+        return MongoDataBackend(settings)
+
+    return get_mongo_data_backend
+
+
+@pytest.fixture
+def mongo_lrs_backend():
+    """Return the `get_mongo_lrs_backend` function."""
+
+    def get_mongo_lrs_backend(
+        connection_uri: str = MONGO_TEST_CONNECTION_URI,
+        default_collection: str = MONGO_TEST_COLLECTION,
+        client_options: dict = None,
+    ):
+        """Return an instance of MongoLRSBackend."""
+        settings = MongoLRSBackend.settings_class(
+            CONNECTION_URI=connection_uri,
+            DEFAULT_DATABASE=MONGO_TEST_DATABASE,
+            DEFAULT_COLLECTION=default_collection,
+            CLIENT_OPTIONS=client_options if client_options else {},
+            DEFAULT_CHUNK_SIZE=500,
+            LOCALE_ENCODING="utf8",
+        )
+        return MongoLRSBackend(settings)
+
+    return get_mongo_lrs_backend
 
 
 @pytest.fixture
@@ -342,11 +390,11 @@ def settings_fs(fs, monkeypatch):
 
 @pytest.fixture
 def ldp_backend(settings_fs):
-    """Returns the `get_ldp_data_backend` function."""
+    """Return the `get_ldp_data_backend` function."""
     # pylint: disable=invalid-name,redefined-outer-name,unused-argument
 
     def get_ldp_data_backend(service_name: str = "foo", stream_id: str = "bar"):
-        """Returns an instance of LDPDataBackend."""
+        """Return an instance of LDPDataBackend."""
         settings = LDPDataBackend.settings_class(
             APPLICATION_KEY="fake_key",
             APPLICATION_SECRET="fake_secret",
@@ -518,10 +566,10 @@ def swift():
 
 @pytest.fixture
 def swift_backend():
-    """Returns get_swift_data_backend function."""
+    """Return get_swift_data_backend function."""
 
     def get_swift_data_backend():
-        """Returns an instance of SwiftDataBackend."""
+        """Return an instance of SwiftDataBackend."""
         settings = SwiftDataBackendSettings(
             AUTH_URL="https://auth.cloud.ovh.net/",
             USERNAME="os_username",

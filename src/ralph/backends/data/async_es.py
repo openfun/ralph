@@ -180,7 +180,9 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
                 query.search_after = [str(part) for part in documents[-1]["sort"]]
             kwargs["search_after"] = query.search_after
             if raw_output:
-                documents = read_raw(documents, self.settings.LOCALE_ENCODING)
+                documents = read_raw(
+                    documents, self.settings.LOCALE_ENCODING, ignore_errors, logger
+                )
             for document in documents:
                 yield document
 

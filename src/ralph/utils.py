@@ -156,13 +156,27 @@ def parse_bytes_to_dict(
             yield json.loads(raw_document)
         except (TypeError, json.JSONDecodeError) as error:
             msg = "Failed to decode JSON: %s, for document: %s"
-            logger_class.error(msg, error, raw_document)
             if ignore_errors:
+                logger_class.warning(msg, error, raw_document)
                 continue
+            logger_class.error(msg, error, raw_document)
             raise BackendException(msg % (error, raw_document)) from error
 
 
-def read_raw(documents: Iterable[Dict[str, Any]], encoding: str) -> Iterator[bytes]:
+def read_raw(
+    documents: Iterable[Dict[str, Any]],
+    encoding: str,
+    ignore_errors: bool,
+    logger_class: logging.Logger,
+) -> Iterator[bytes]:
     """Read the `documents` Iterable with the `encoding` and yield bytes."""
     for document in documents:
-        yield json.dumps(document).encode(encoding)
+        try:
+            yield json.dumps(document).encode(encoding)
+        except (TypeError, ValueError) as error:
+            msg = "Failed to convert document to bytes: %s"
+            if ignore_errors:
+                logger_class.warning(msg, error)
+                continue
+            logger_class.error(msg, error)
+            raise BackendException(msg % error) from error
