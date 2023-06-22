@@ -84,7 +84,7 @@ def test_backends_data_swift_data_backend_instantiation_with_settings(fs):
     try:
         SwiftDataBackend(settings_)
     except Exception as err:  # pylint:disable=broad-except
-        pytest.fail(f"SwiftDataBackend should not raise exceptions: {err}")
+        pytest.fail(f"Two SwiftDataBackends should not raise exceptions: {err}")
 
 
 def test_backends_data_swift_data_backend_status_method_with_error_status(
