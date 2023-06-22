@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 class FSDataBackendSettings(BaseDataBackendSettings):
-    """Represents the FileSystem data backend default configuration.
+    """FileSystem data backend default configuration.
 
     Attributes:
         DEFAULT_CHUNK_SIZE (int): The default chunk size for reading files.
@@ -57,7 +57,12 @@ class FSDataBackend(HistoryMixin, BaseDataBackend):
     settings_class = FSDataBackendSettings
 
     def __init__(self, settings: settings_class = None):
-        """Creates the default target directory if it does not exist."""
+        """Create the default target directory if it does not exist.
+
+        Args:
+            settings (FSDataBackendSettings or None): The data backend settings.
+                If `settings` is `None`, a default settings instance is used instead.
+        """
         self.settings = settings if settings else self.settings_class()
         self.default_chunk_size = self.settings.DEFAULT_CHUNK_SIZE
         self.default_directory = self.settings.DEFAULT_DIRECTORY_PATH
@@ -72,7 +77,7 @@ class FSDataBackend(HistoryMixin, BaseDataBackend):
         logger.debug("Default directory: %s", self.default_directory)
 
     def status(self) -> DataBackendStatus:
-        """Checks whether the default directory has appropriate permissions."""
+        """Check whether the default directory has appropriate permissions."""
         for mode in [os.R_OK, os.W_OK, os.X_OK]:
             if not os.access(self.default_directory, mode):
                 logger.error(
@@ -87,7 +92,7 @@ class FSDataBackend(HistoryMixin, BaseDataBackend):
     def list(
         self, target: str = None, details: bool = False, new: bool = False
     ) -> Iterator[Union[str, dict]]:
-        """Lists files and directories in the target directory.
+        """List files and directories in the target directory.
 
         Args:
             target (str or None): The directory path where to list the files and
@@ -146,7 +151,7 @@ class FSDataBackend(HistoryMixin, BaseDataBackend):
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
-        """Reads files matching the query in the target folder and yields them.
+        """Read files matching the query in the target folder and yield them.
 
         Args:
             query: (str or BaseQuery): The relative pattern for the files to read.
@@ -217,7 +222,7 @@ class FSDataBackend(HistoryMixin, BaseDataBackend):
         ignore_errors: bool = False,
         operation_type: Union[None, BaseOperationType] = None,
     ) -> int:
-        """Writes data records to the target file and return their count.
+        """Write data records to the target file and return their count.
 
         Args:
             data: (Iterable or IOBase): The data to write.
@@ -241,7 +246,7 @@ class FSDataBackend(HistoryMixin, BaseDataBackend):
         Raises:
             BackendException: If the `operation_type` is `CREATE` or `INDEX` and the
                 target file already exists.
-            BackendParameterException: If the `operation_type` is `DELETED` as it is not
+            BackendParameterException: If the `operation_type` is `DELETE` as it is not
                 supported.
         """
         data = iter(data)
@@ -305,13 +310,13 @@ class FSDataBackend(HistoryMixin, BaseDataBackend):
 
     @staticmethod
     def _read_raw(file: IO, chunk_size: int, _ignore_errors: bool) -> Iterator[bytes]:
-        """Reads the `file` in chunks of size `chunk_size` and yields them."""
+        """Read the `file` in chunks of size `chunk_size` and yield them."""
         while chunk := file.read(chunk_size):
             yield chunk
 
     @staticmethod
     def _read_dict(file: IO, _chunk_size: int, ignore_errors: bool) -> Iterator[dict]:
-        """Reads the `file` by line and yields JSON parsed dictionaries."""
+        """Read the `file` by line and yield JSON parsed dictionaries."""
         for i, line in enumerate(file):
             try:
                 yield json.loads(line)
@@ -323,9 +328,9 @@ class FSDataBackend(HistoryMixin, BaseDataBackend):
 
     @staticmethod
     def _write_raw(file: IO, chunk: bytes) -> None:
-        """Writes the `chunk` bytes to the file."""
+        """Write the `chunk` bytes to the file."""
         file.write(chunk)
 
     def _write_dict(self, file: IO, chunk: dict) -> None:
-        """Writes the `chunk` dictionary to the file."""
+        """Write the `chunk` dictionary to the file."""
         file.write(bytes(f"{json.dumps(chunk)}\n", encoding=self.locale_encoding))
