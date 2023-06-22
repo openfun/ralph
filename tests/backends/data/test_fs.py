@@ -15,7 +15,7 @@ from ralph.utils import now
 
 
 def test_backends_data_fs_data_backend_default_instantiation(monkeypatch, fs):
-    """Tests the `FSDataBackend` default instantiation."""
+    """Test the `FSDataBackend` default instantiation."""
     # pylint: disable=invalid-name
     fs.create_file(".env")
     backend_settings_names = [
@@ -39,7 +39,7 @@ def test_backends_data_fs_data_backend_default_instantiation(monkeypatch, fs):
 
 
 def test_backends_data_fs_data_backend_instantiation_with_settings(fs):
-    """Tests the `FSDataBackend` instantiation with settings."""
+    """Test the `FSDataBackend` instantiation with settings."""
     # pylint: disable=invalid-name,unused-argument
     deep_path = "deep/directories/path"
     assert not os.path.exists(deep_path)
@@ -60,7 +60,7 @@ def test_backends_data_fs_data_backend_instantiation_with_settings(fs):
     try:
         FSDataBackend(settings)
     except Exception as err:  # pylint:disable=broad-except
-        pytest.fail(f"FSDataBackend should not raise exceptions: {err}")
+        pytest.fail(f"Two FSDataBackends should not raise exceptions: {err}")
 
 
 @pytest.mark.parametrize(
@@ -70,7 +70,7 @@ def test_backends_data_fs_data_backend_instantiation_with_settings(fs):
 def test_backends_data_fs_data_backend_status_method_with_error_status(
     mode, fs_backend, caplog
 ):
-    """Tests the `FSDataBackend.status` method, given a directory with wrong
+    """Test the `FSDataBackend.status` method, given a directory with wrong
     permissions, should return `DataBackendStatus.ERROR`.
     """
     os.mkdir("directory", mode)
@@ -87,7 +87,7 @@ def test_backends_data_fs_data_backend_status_method_with_error_status(
 
 @pytest.mark.parametrize("mode", [0o700])
 def test_backends_data_fs_data_backend_status_method_with_ok_status(mode, fs_backend):
-    """Tests the `FSDataBackend.status` method, given a directory with right
+    """Test the `FSDataBackend.status` method, given a directory with right
     permissions, should return `DataBackendStatus.OK`.
     """
     os.mkdir("directory", mode)
@@ -108,7 +108,7 @@ def test_backends_data_fs_data_backend_status_method_with_ok_status(mode, fs_bac
 def test_backends_data_fs_data_backend_list_method_with_invalid_target(
     files, target, error, fs_backend, fs
 ):
-    """Tests the `FSDataBackend.list` method given an invalid `target` argument should
+    """Test the `FSDataBackend.list` method given an invalid `target` argument should
     raise a `BackendParameterException`.
     """
     # pylint: disable=invalid-name
@@ -142,7 +142,7 @@ def test_backends_data_fs_data_backend_list_method_with_invalid_target(
 def test_backends_data_fs_data_backend_list_method_without_history(
     files, target, expected, fs_backend, fs
 ):
-    """Tests the `FSDataBackend.list` method without history."""
+    """Test the `FSDataBackend.list` method without history."""
     # pylint: disable=invalid-name
     for file in files:
         fs.create_file(file)
@@ -175,7 +175,7 @@ def test_backends_data_fs_data_backend_list_method_without_history(
 def test_backends_data_fs_data_backend_list_method_with_details(
     files, target, expected, fs_backend, fs
 ):
-    """Tests the `FSDataBackend.list` method with `details` set to `True`."""
+    """Test the `FSDataBackend.list` method with `details` set to `True`."""
     # pylint: disable=invalid-name,too-many-arguments
     for file in files:
         fs.create_file(file)
@@ -191,7 +191,7 @@ def test_backends_data_fs_data_backend_list_method_with_details(
 
 
 def test_backends_data_fs_data_backend_list_method_with_history(fs_backend, fs):
-    """Tests the `FSDataBackend.list` method with history."""
+    """Test the `FSDataBackend.list` method with history."""
     # pylint: disable=invalid-name
 
     # Create 3 files in the default directory.
@@ -269,7 +269,7 @@ def test_backends_data_fs_data_backend_list_method_with_history(fs_backend, fs):
 def test_backends_data_fs_data_backend_list_method_with_history_and_details(
     fs_backend, fs
 ):
-    """Tests the `FSDataBackend.list` method with an history and detailed output."""
+    """Test the `FSDataBackend.list` method with an history and detailed output."""
     # pylint: disable=invalid-name
 
     # Create 3 files in the default directory.
@@ -361,7 +361,7 @@ def test_backends_data_fs_data_backend_list_method_with_history_and_details(
 def test_backends_data_fs_data_backend_read_method_with_raw_ouput(
     fs_backend, fs, monkeypatch
 ):
-    """Tests the `FSDataBackend.read` method with `raw_output` set to `True`."""
+    """Test the `FSDataBackend.read` method with `raw_output` set to `True`."""
     # pylint: disable=invalid-name
 
     # Create files in absolute path directory.
@@ -476,7 +476,7 @@ def test_backends_data_fs_data_backend_read_method_with_raw_ouput(
 def test_backends_data_fs_data_backend_read_method_without_raw_output(
     fs_backend, fs, monkeypatch
 ):
-    """Tests the `FSDataBackend.read` method with `raw_output` set to `False`."""
+    """Test the `FSDataBackend.read` method with `raw_output` set to `False`."""
     # pylint: disable=invalid-name
 
     # File contents.
@@ -558,7 +558,7 @@ def test_backends_data_fs_data_backend_read_method_without_raw_output(
 
 
 def test_backends_data_fs_data_backend_read_method_with_ignore_errors(fs_backend, fs):
-    """Tests the `FSDataBackend.read` method with `ignore_errors` set to `True`, given
+    """Test the `FSDataBackend.read` method with `ignore_errors` set to `True`, given
     a file containing invalid JSON lines, should skip the invalid lines.
     """
     # pylint: disable=invalid-name
@@ -603,7 +603,7 @@ def test_backends_data_fs_data_backend_read_method_with_ignore_errors(fs_backend
 def test_backends_data_fs_data_backend_read_method_without_ignore_errors(
     fs_backend, fs, monkeypatch
 ):
-    """Tests the `FSDataBackend.read` method with `ignore_errors` set to `False`, given
+    """Test the `FSDataBackend.read` method with `ignore_errors` set to `False`, given
     a file containing invalid JSON lines, should raise a `BackendException`.
     """
     # pylint: disable=invalid-name
@@ -685,7 +685,7 @@ def test_backends_data_fs_data_backend_read_method_without_ignore_errors(
 
 
 def test_backends_data_fs_data_backend_read_method_with_query(fs_backend, fs):
-    """Tests the `FSDataBackend.read` method, given a query argument."""
+    """Test the `FSDataBackend.read` method, given a query argument."""
     # pylint: disable=invalid-name
 
     # File contents.
@@ -742,7 +742,7 @@ def test_backends_data_fs_data_backend_read_method_with_query(fs_backend, fs):
 def test_backends_data_fs_data_backend_write_method_with_file_exists_error(
     operation_type, fs_backend, fs
 ):
-    """Tests the `FSDataBackend.write` method, given a target matching an
+    """Test the `FSDataBackend.write` method, given a target matching an
     existing file and a `CREATE` or `INDEX` `operation_type`, should raise a
     `BackendException`.
     """
@@ -767,7 +767,7 @@ def test_backends_data_fs_data_backend_write_method_with_file_exists_error(
 def test_backends_data_fs_data_backend_write_method_with_delete_operation(
     fs_backend,
 ):
-    """Tests the `FSDataBackend.write` method, given a `DELETE` `operation_type`, should
+    """Test the `FSDataBackend.write` method, given a `DELETE` `operation_type`, should
     raise a `BackendParameterException`.
     """
     # pylint: disable=invalid-name
@@ -784,7 +784,7 @@ def test_backends_data_fs_data_backend_write_method_with_delete_operation(
 def test_backends_data_fs_data_backend_write_method_with_update_operation(
     fs_backend, fs, monkeypatch
 ):
-    """Tests the `FSDataBackend.write` method, given an `UPDATE` `operation_type`,
+    """Test the `FSDataBackend.write` method, given an `UPDATE` `operation_type`,
     should overwrite the target file content with the provided data.
     """
     # pylint: disable=invalid-name
@@ -892,7 +892,7 @@ def test_backends_data_fs_data_backend_write_method_with_update_operation(
 def test_backends_data_fs_data_backend_write_method_with_append_operation(
     data, expected, fs_backend, fs, monkeypatch
 ):
-    """Tests the `FSDataBackend.write` method, given an `APPEND` `operation_type`,
+    """Test the `FSDataBackend.write` method, given an `APPEND` `operation_type`,
     should append the provided data to the end of the target file.
     """
     # pylint: disable=invalid-name
@@ -942,10 +942,20 @@ def test_backends_data_fs_data_backend_write_method_with_append_operation(
     ]
 
 
+def test_backends_data_fs_data_backend_write_method_with_no_data(fs_backend, caplog):
+    """Test the `FSDataBackend.write` method, given no data, should return 0."""
+    backend = fs_backend()
+    with caplog.at_level(logging.INFO):
+        assert backend.write(data=[]) == 0
+
+    msg = "Data Iterator is empty; skipping write to target."
+    assert ("ralph.backends.data.fs", logging.INFO, msg) in caplog.record_tuples
+
+
 def test_backends_data_fs_data_backend_write_method_without_target(
     fs_backend, monkeypatch
 ):
-    """Tests the `FSDataBackend.write` method, given no `target` argument,
+    """Test the `FSDataBackend.write` method, given no `target` argument,
     should create a new random file and write the provided data into it.
     """
     # pylint: disable=invalid-name
