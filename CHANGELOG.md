@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade `fastapi` to `0.98.0`
+- Upgrade `sentry_sdk` to `1.26.0`
+
 ## [3.8.0] - 2023-06-21
 
 ### Added
