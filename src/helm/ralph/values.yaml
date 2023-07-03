@@ -1,49 +1,34 @@
-# Default values for ralph.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
+# Ralph Chart default values
 
-###########################
-### CHART CONFIGURATION ###
-###########################
-
-namespace: default
-
-replicaCount: 1
+nameOverride: ""
+fullnameOverride: ""
 
 image:
   repository: fundocker/ralph
   pullPolicy: Always
-  # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
+replicaCount: 1
+
 imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
-
-dependencies:
-  mongodb:
-    enabled: false
-  clickhouse:
-    enabled: false
-  elasticsearch:
-    enabled: false
-
-podAnnotations: {}
 
 securityContext:
   runAsUser: 1000
   runAsGroup: 1000
 
+podAnnotations: {}
+
 service:
   type: ClusterIP
   port: 8080
+  nodePort:
+    http: nil
 
 ingress:
   enabled: false
-  className: "traefik"
-  annotations:
-    # kubernetes.io/ingress.class: traefik
-    cert-manager.io/issuer: letsencrypt
+  ingressClassName: ""
+  hostname: ""
+  annotations: {}
 
 persistence:
   enabled: true
@@ -71,48 +56,52 @@ autoscaling:
   minReplicas: 1
   maxReplicas: 10
   targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
 
 nodeSelector: {}
 
 tolerations: []
 
-resources:
-  {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+resources: {}
 
-###########################
-### RALPH CONFIGURATION ###
-###########################
+envFromSecret: 'ralph-env'
+envSecrets: {}
+existingSecret: false
 
-ralph:
-  customer: ""
-  env_type: ""
-  prefix: "traefik"
-  acme_enabled_route_prefix: "traefik.acme"
-  secret_name: "secret-ralph"
-  sentry_ignore_health_checks: false
-  volume_history:
+executionEnvironment: "production"
+sentryIgnoreHealthChecks: true
+
+volumes:
+  history:
+    enabled: false
+    name: "ralph-history"
+    claimName: "ralph-pvc-history"
     size: 2Gi
-    access_modes: ReadWriteMany
-    storage_class: "local-storage"
-  elastic:
-    mount_ca_secret: true
-    ca_secret_name: "ralph-es-ca"
+    accessModes: ReadWriteMany
+    storageClass: ""
 
-ralph_lrs:
-  host: ralph.example.com
+lrs:
   port: 8080
-  auth_secret_name: "ralph-lrs-auth"
+  authSecretName: 'ralph-lrs-auth'
+  # Authentication
+  #
+  # For each entry, we expect the following keys:
+  #   - username (str)
+  #   - hash (str)
+  #   - scopes (list)
+  #
+  # Example:
+  #
+  # auth:
+  #   - username: "foo"
+  #     hash: "thehash"
+  #     scopes:
+  #       - "foo_scope"
+  #
+  # For more information about hash generation, see Ralph's documentation:
+  # https://openfun.github.io/ralph/api/#creating_a_credentials_file
+  auth: []
+  authExistingSecret: false
   command:
     - uvicorn
     - "ralph.api:app"
@@ -122,16 +111,29 @@ ralph_lrs:
     - "--port"
     - "8080"
 
-# ralph_cronjobs: []
-ralph_cronjobs:
-  - name: daily-ldp-to-es
-    schedule: "30 2 * * *"
-    command:
-      - ralph list --backend ldp --new |
-        xargs -I {} -n 1 bash -c "
-        ralph fetch --backend ldp {} |
-        gunzip |
-        ralph extract -p gelf |
-        ralph push \
-        --backend es \
-        --es-client-options ca_certs=/usr/local/share/ca-certificates/es-cluster.pem"
+# Ralph cronjob should define a name, a cronjob schedule and a command to execute, e.g.:
+#
+# ralph_cronjobs:
+#   - name: daily-ldp-to-es
+#     schedule: "30 2 * * *"
+#     command:
+#       - ralph list --backend ldp --new |
+#         xargs -I {} -n 1 bash -c "
+#         ralph fetch --backend ldp {} |
+#         gunzip |
+#         ralph extract -p gelf |
+#         ralph push \
+#         --backend es \
+#         --es-client-options ca_certs=/usr/local/share/ca-certificates/es-cluster.pem"
+cronjobs: []
+
+mongodb:
+  enabled: false
+
+clickhouse:
+  enabled: false
+
+elastic:
+  enabled: false
+  mountCACert: false
+  caSecretName: ""

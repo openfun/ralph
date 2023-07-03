@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "ralph.fullname" . }}
-  namespace: {{ .Values.namespace }}
+  name: {{ template "ralph.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "ralph.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
       {{- include "ralph.selectorLabels" . | nindent 6 }}
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -32,25 +32,19 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
-            {{- toYaml .Values.ralph_lrs.command | nindent 12 }}
+            {{- toYaml .Values.lrs.command | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           livenessProbe:
             httpGet:
               path: /__heartbeat__
-              port: {{ .Values.ralph_lrs.port }}
-              httpHeaders:
-                - name: Host
-                  value: "lrs.{{ .Values.namespace }}.{{ .Values.ralph_lrs.domain_name }}"
+              port: {{ .Values.lrs.port }}
             initialDelaySeconds: 15
             periodSeconds: 30
           readinessProbe:
             httpGet:
               path: /__lbheartbeat__
-              port: {{ .Values.ralph_lrs.port }}
-              httpHeaders:
-                - name: Host
-                  value: "lrs.{{ .Values.namespace }}.{{ .Values.ralph_lrs.domain_name }}"
+              port: {{ .Values.lrs.port }}
             initialDelaySeconds: 5
             periodSeconds: 5
           env:
@@ -58,38 +52,38 @@ spec:
               value: "/app/.ralph"
             - name: RALPH_AUTH_FILE
               value: "/var/run/ralph/auth.json"
+            - name: RALPH_EXECUTION_ENVIRONMENT
+              value: "{{ .Values.executionEnvironment }}"
             - name: RALPH_SENTRY_IGNORE_HEALTH_CHECKS
-              value: "{{ .Values.ralph.sentry_ignore_health_checks }}"
-            - name: RALPH_BACKENDS__DATABASE__ES__CLIENT_OPTIONS__ca_certs
-              value: "/usr/local/share/ca-certificates/es-cluster.pem"
+              value: "{{ .Values.sentryIgnoreHealthChecks }}"
           envFrom:
             - secretRef:
-                name: {{ .Values.ralph.secret_name }}
+                name: {{ tpl .Values.envFromSecret . | quote }}
           volumeMounts:
-            - name: ralph-v-history
+            - name: {{ .Values.volumes.history.name }}
               mountPath: /app/.ralph
-            {{- if .Values.ralph.elastic.mount_ca_secret }}
+            {{- if .Values.elastic.mountCACert }}
             - name: es-ca-certificate
               mountPath: /usr/local/share/ca-certificates/
             {{- end }}
             - name: lrs-auth
               mountPath: /var/run/ralph/
       volumes:
-        - name: ralph-v-history
-        {{- if .Values.persistence.enabled }}
+        - name: {{ .Values.volumes.history.name }}
+        {{- if .Values.volumes.history.enabled }}
           persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim | default (printf "%s-pvc" (include "ralph.fullname" .)) }}
+            claimName: {{ .Values.volumes.history.claimName }}
         {{- else }}
           emptyDir: {}
         {{- end }}
-        {{- if .Values.ralph.elastic.mount_ca_secret }}
+        {{- if .Values.elastic.mountCACert }}
         - name: es-ca-certificate
           secret:
-            secretName: {{ .Values.ralph.elastic.ca_secret_name }}
+            secretName: {{ .Values.elastic.caSecretName }}
         {{- end }}
         - name: lrs-auth
           secret:
-            secretName: {{ .Values.ralph_lrs.auth_secret_name }}
+            secretName: {{ .Values.lrs.authSecretName }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
