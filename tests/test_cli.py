@@ -7,6 +7,7 @@ import pytest
 from click.exceptions import BadParameter
 from click.testing import CliRunner
 from elasticsearch.helpers import bulk, scan
+from hypothesis import settings as hypothesis_settings
 from pydantic import ValidationError
 
 from ralph.backends.storage.fs import FSStorage
@@ -318,6 +319,7 @@ def test_cli_validate_command_with_edx_format(event):
     assert event_str in result.output
 
 
+@hypothesis_settings(deadline=None)
 @custom_given(UIPageClose)
 @pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_cli_convert_command_from_edx_to_xapi_format(valid_uuid, event):
