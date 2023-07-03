@@ -2,8 +2,8 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "ralph.fullname" . }}
-  namespace: {{ .Values.namespace }}
+  name: {{ template "ralph.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "ralph.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
@@ -11,20 +11,20 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  ingressClassName: {{ .Values.ingress.className }}
+  ingressClassName: {{ .Values.ingress.className | quote }}
   tls:
     - hosts:
-        - {{ .Values.ralph_lrs.host | quote }}
-      secretName: "ralph-app-tls"
+        - {{ .Values.ingress.hostname | quote }}
+      secretName: {{ printf "%s-tls" .Values.ingress.hostname }}
   rules:
-    - host: {{ .Values.ralph_lrs.host | quote }}
+    - host: {{ .Values.ingress.hostname | quote }}
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: "ralph-app"
+                name: {{ include "ralph.fullname" . }}
                 port:
-                  number: {{ .Values.ralph_lrs.port }}
+                  number: {{ .Values.service.port }}
 {{- end }}

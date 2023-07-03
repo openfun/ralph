@@ -5,8 +5,8 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: "ralph-job-{{ $job.name }}"
-  namespace: {{ .Values.namespace }}
+  name: "{{ template "ralph.fullname" . }}-{{ $job.name }}"
+  namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "ralph.labels" . | nindent 4 }}
     type: job
@@ -20,7 +20,7 @@ spec:
     spec:
       template:
         metadata:
-          name: "ralph-job-{{ $job.name }}"
+          name: "{{ template "ralph.fullname" . }}-{{ $job.name }}"
           labels:
             {{- include "ralph.labels" . | nindent 12 }}
             type: job
@@ -33,7 +33,7 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           containers:
-            - name: "ralph-job-{{ $job.name }}"
+            - name: "{{ template "ralph.fullname" . }}-{{ $job.name }}"
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
               imagePullPolicy: {{ .Values.image.pullPolicy }}
               command:
@@ -45,30 +45,39 @@ spec:
               env:
                 - name: RALPH_APP_DIR
                   value: "/app/.ralph"
+                - name: RALPH_AUTH_FILE
+                  value: "/var/run/ralph/auth.json"
+                - name: RALPH_EXECUTION_ENVIRONMENT
+                  value: "{{ .Values.executionEnvironment }}"
+                - name: RALPH_SENTRY_IGNORE_HEALTH_CHECKS
+                  value: "{{ .Values.sentryIgnoreHealthChecks }}"
+                {{- if and .Values.elastic.enabled .Values.elastic.mountCACert }}
+                - name: RALPH_BACKENDS__DATABASE__ES__CLIENT_OPTIONS__ca_certs
+                  value: "/usr/local/share/ca-certificates/ca.crt"
+                {{- end }}
               envFrom:
                 - secretRef:
-                    name: {{ .Values.ralph.secret_name }}
+                    name: {{ tpl .Values.envFromSecret . | quote }}
               volumeMounts:
-                - name: ralph-v-history
+                - name: {{ .Values.volumes.history.name }}
                   mountPath: /app/.ralph
-                {{- if .Values.ralph.elastic.mount_ca_secret }}
+                {{- if .Values.elastic.mountCASecret }}
                 - name: es-ca-certificate
                   mountPath: /usr/local/share/ca-certificates/
                 {{- end }}
-                - name: lrs-auth
-                  mountPath: /var/run/ralph/
           volumes:
-            - name: ralph-v-history
+            - name: {{ .Values.volumes.history.name }}
+            {{- if .Values.volumes.history.enabled }}
               persistentVolumeClaim:
-                claimName: ralph-pvc-history
-            {{- if .Values.ralph.elastic.mount_ca_secret }}
+                claimName: {{ .Values.volumes.history.claimName }}
+            {{- else }}
+              emptyDir: {}
+            {{- end }}
+            {{- if .Values.elastic.mountCACert }}
             - name: es-ca-certificate
               secret:
-                secretName: {{ .Values.ralph.elastic.ca_secret_name }}
+                secretName: {{ .Values.elastic.caSecretName }}
             {{- end }}
-            - name: lrs-auth
-              secret:
-                secretName: {{ .Values.ralph_lrs.auth_secret_name }}
 {{- end }}
 {{- end }}
 {{- end }}
