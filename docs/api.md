@@ -3,7 +3,7 @@
 Ralph comes with an API server that aims to implement the Learning Record Store
 (LRS) specification (still a work in progress).
 
-## Getting started
+## Authenticating via API
 
 The API server supports the following authentication methods:
 
