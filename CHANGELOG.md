@@ -39,6 +39,7 @@ General improvement for the Helm Chart:
 - remove prefix label from ingress object name
 - add missing namespace label
 - make object name consistent
+- add statement API documentation
 
 ## [3.8.0] - 2023-06-21
 

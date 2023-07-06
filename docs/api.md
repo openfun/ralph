@@ -90,7 +90,7 @@ This command updates your credentials file with the new `janedoe` user.
 
 (Work In Progress)
 
-#### Making a GET request
+#### Validating Authentication
 
 The first request that can be answered by the ralph API server is a `whoami` request, which checks if the user is authenticated and returns their username and permission scopes.
 
@@ -137,7 +137,7 @@ The [Learning analytics playground](https://github.com/openfun/learning-analytic
 
 (Work In Progress)
 
-#### Making a GET request
+#### Validating Authentication
 
 The first request that can be answered by the ralph API server is a `whoami` request, which checks if the user is authenticated and returns their username and permission scopes.
 
@@ -181,6 +181,14 @@ $ curl http://localhost:8100/whoami --header "Authorization: Bearer eyJhbGciOiJS
 < HTTP/1.1 200 OK
 < {"username":"ralph_admin","scopes":["all"]}
 ```
+
+## The statement API
+
+Ralph's statements API can be used to POST, PUT, GET and DELETE xApi statements.
+
+To use the statements API on a running server, connect to `http://localhost:8100/xAPI/statements`. You will have to be authenticated to make a call.
+
+
 
 ## Forwarding statements
 
