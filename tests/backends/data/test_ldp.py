@@ -6,12 +6,12 @@ import logging
 import os.path
 from collections.abc import Iterable
 from operator import itemgetter
-from pathlib import Path
 from xmlrpc.client import gzip_decode
 
 import ovh
 import pytest
 import requests
+import requests_mock
 
 from ralph.backends.data.base import BaseOperationType, BaseQuery, DataBackendStatus
 from ralph.backends.data.ldp import LDPDataBackend
@@ -435,41 +435,19 @@ def test_backends_data_ldp_data_backend_read_method_without_raw_ouput(
     log a warning message.
     """
 
-    class MockResponse:
-        """Mock the requests response."""
-
-        def __enter__(self):
-            return self
-
-        def __exit__(self, *args):
-            pass
-
-        def raise_for_status(self):
-            """Ignored."""
-
-        def iter_content(self, chunk_size):
-            """Fake content file iteration."""
-            # pylint: disable=no-self-use,unused-argument
-            yield
-
-    def mock_requests_get(url, stream=True, timeout=None):
-        """Mock the request get method."""
-        # pylint: disable=unused-argument
-        return MockResponse()
-
     def mock_get(url):
         """Mock the OVH client get request."""
         # pylint: disable=unused-argument
         return {"filename": "archive_name", "size": 10}
 
     backend = ldp_backend()
-
-    monkeypatch.setattr(requests, "get", mock_requests_get)
-    monkeypatch.setattr(backend, "_url", lambda *_: "/")
+    monkeypatch.setattr(backend, "_url", lambda *_: "http://example.com")
     monkeypatch.setattr(backend.client, "get", mock_get)
 
     with caplog.at_level(logging.WARNING):
-        list(backend.read(query="archiveID", raw_output=False))
+        with requests_mock.Mocker() as request_mocker:
+            request_mocker.get("http://example.com")
+            assert not list(backend.read(query="archiveID", raw_output=False))
 
     assert (
         "ralph.backends.data.ldp",
@@ -481,31 +459,9 @@ def test_backends_data_ldp_data_backend_read_method_without_raw_ouput(
 def test_backends_data_ldp_data_backend_read_method_without_ignore_errors(
     ldp_backend, caplog, monkeypatch
 ):
-    """Test the `LDPDataBackend.read method, given `ignore_errors` set to `False`,
+    """Test the `LDPDataBackend.read` method, given `ignore_errors` set to `False`,
     should log a warning message.
     """
-
-    class MockResponse:
-        """Mock the requests response."""
-
-        def __enter__(self):
-            return self
-
-        def __exit__(self, *args):
-            pass
-
-        def raise_for_status(self):
-            """Ignored."""
-
-        def iter_content(self, chunk_size):
-            """Fake content file iteration."""
-            # pylint: disable=no-self-use,unused-argument
-            yield
-
-    def mock_requests_get(url, stream=True, timeout=None):
-        """Mock the request get method."""
-        # pylint: disable=unused-argument
-        return MockResponse()
 
     def mock_get(url):
         """Mock the OVH client get request."""
@@ -514,13 +470,14 @@ def test_backends_data_ldp_data_backend_read_method_without_ignore_errors(
 
     backend = ldp_backend()
 
-    monkeypatch.setattr(requests, "get", mock_requests_get)
     backend = ldp_backend()
-    monkeypatch.setattr(backend, "_url", lambda *_: "/")
+    monkeypatch.setattr(backend, "_url", lambda *_: "http://example.com")
     monkeypatch.setattr(backend.client, "get", mock_get)
 
     with caplog.at_level(logging.WARNING):
-        list(backend.read(query="archiveID", ignore_errors=False))
+        with requests_mock.Mocker() as request_mocker:
+            request_mocker.get("http://example.com")
+            assert not list(backend.read(query="archiveID", ignore_errors=False))
 
     assert (
         "ralph.backends.data.ldp",
@@ -603,10 +560,8 @@ def test_backends_data_ldp_data_backend_read_method_with_query(
     # pylint: disable=invalid-name
 
     # Create fake archive to stream.
-    archive_path = Path("/tmp/2020-06-16.gz")
     archive_content = {"foo": "bar"}
-    with gzip.open(archive_path, "wb") as archive_file:
-        archive_file.write(bytes(json.dumps(archive_content), encoding="utf-8"))
+    archive = gzip.compress(bytes(json.dumps(archive_content), encoding="utf-8"))
 
     def mock_ovh_post(url):
         """Mock the OVH Client post request."""
@@ -639,32 +594,6 @@ def test_backends_data_ldp_data_backend_read_method_with_query(
             "size": 67906662,
         }
 
-    class MockRequestsResponse:
-        """Mock the requests response."""
-
-        def __enter__(self):
-            return self
-
-        def __exit__(self, *args):
-            pass
-
-        def iter_content(self, chunk_size):
-            """Fake content file iteration."""
-            # pylint: disable=no-self-use
-
-            with archive_path.open("rb") as archive:
-                while chunk := archive.read(chunk_size):
-                    yield chunk
-
-        def raise_for_status(self):
-            """Ignored."""
-
-    def mock_requests_get(url, stream=True, timeout=None):
-        """Mock the request get method."""
-        # pylint: disable=unused-argument
-
-        return MockRequestsResponse()
-
     # Freeze the ralph.utils.now() value.
     frozen_now = now()
     monkeypatch.setattr("ralph.backends.data.ldp.now", lambda: frozen_now)
@@ -672,12 +601,14 @@ def test_backends_data_ldp_data_backend_read_method_with_query(
     backend = ldp_backend()
     monkeypatch.setattr(backend.client, "post", mock_ovh_post)
     monkeypatch.setattr(backend.client, "get", mock_ovh_get)
-    monkeypatch.setattr(requests, "get", mock_requests_get)
+    monkeypatch.setattr(backend, "_url", lambda *_: "http://example.com")
 
     fs.create_dir(settings.APP_DIR)
     assert not os.path.exists(settings.HISTORY_FILE)
 
-    result = b"".join(backend.read(query="5d5c4c93-04a4-42c5-9860-f51fa4044aa1"))
+    with requests_mock.Mocker() as request_mocker:
+        request_mocker.get("http://example.com", content=archive)
+        result = b"".join(backend.read(query="5d5c4c93-04a4-42c5-9860-f51fa4044aa1"))
 
     assert os.path.exists(settings.HISTORY_FILE)
     assert backend.history == [
