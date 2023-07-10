@@ -470,16 +470,20 @@ def test_backends_database_mongo_query_statements_by_ids_with_multiple_collectio
 
     # Insert documents
     timestamp = {"timestamp": "2022-06-27T15:36:50"}
-    collection_1_document = list(MongoDatabase.to_documents([{"id": "1", **timestamp}]))
-    collection_2_document = list(MongoDatabase.to_documents([{"id": "2", **timestamp}]))
+    statement_1 = {"id": "1", **timestamp}
+    statement_1_expected = [{"_id": "1", "_source": statement_1}]
+    statement_2 = {"id": "2", **timestamp}
+    statement_2_expected = [{"_id": "2", "_source": statement_2}]
+    collection_1_document = list(MongoDatabase.to_documents([statement_1]))
+    collection_2_document = list(MongoDatabase.to_documents([statement_2]))
     backend_1.bulk_import(collection_1_document)
     backend_2.bulk_import(collection_2_document)
 
     # Check the expected search query results
-    assert backend_1.query_statements_by_ids(["1"]) == collection_1_document
-    assert backend_1.query_statements_by_ids(["2"]) == []
+    assert backend_1.query_statements_by_ids(["1"]) == statement_1_expected
     assert backend_2.query_statements_by_ids(["1"]) == []
-    assert backend_2.query_statements_by_ids(["2"]) == collection_2_document
+    assert backend_2.query_statements_by_ids(["2"]) == statement_2_expected
+    assert backend_1.query_statements_by_ids(["2"]) == []
 
 
 def test_backends_database_mongo_status(mongo):

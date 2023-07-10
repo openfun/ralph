@@ -254,8 +254,11 @@ class MongoDatabase(BaseDatabase):
         )
 
     def query_statements_by_ids(self, ids: List[str]) -> List:
-        """Returns the list of matching statement IDs from the database."""
-        return self._find(filter={"_source.id": {"$in": ids}})
+        """Returns the list of matching statements from the database."""
+        return [
+            {"_id": statement["_source"]["id"], "_source": statement["_source"]}
+            for statement in self._find(filter={"_source.id": {"$in": ids}})
+        ]
 
     def _find(self, **kwargs):
         """Wraps the MongoClient.collection.find method.

@@ -224,7 +224,9 @@ def test_api_statements_put_statement_duplicate_of_existing_statement(
     )
 
     assert response.status_code == 409
-    assert response.json() == {"detail": "Statement already exists with the same ID"}
+    assert response.json() == {
+        "detail": "A different statement already exists with the same ID"
+    }
 
     response = client.get(
         f"/xAPI/statements/?statementId={statement['id']}",

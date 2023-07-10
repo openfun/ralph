@@ -238,15 +238,15 @@ class ClickHouseDatabase(BaseDatabase):  # pylint: disable=too-many-instance-att
 
         return rows_inserted
 
-    def query_statements_by_ids(self, ids: List[str]) -> List:
-        """Returns the list of matching statement IDs from the database."""
+    def query_statements_by_ids(self, ids: List[str]) -> List[dict]:
+        """Returns the list of matching statements from the database."""
 
         def chunk_id_list(chunk_size=10000):
             for i in range(0, len(ids), chunk_size):
                 yield ids[i : i + chunk_size]
 
         sql = """
-                SELECT event_id
+                SELECT event_id, event_str
                 FROM {table_name:Identifier}
                 WHERE event_id IN ({ids:Array(String)})
         """
@@ -257,15 +257,22 @@ class ClickHouseDatabase(BaseDatabase):  # pylint: disable=too-many-instance-att
             column_oriented=True,
         )
 
-        found_ids = []
+        found_statements = []
 
         try:
             for chunk_ids in chunk_id_list():
                 query_context.set_parameter("ids", chunk_ids)
                 result = self.client.query(context=query_context).named_results()
-                found_ids.extend(result)
+                for row in result:
+                    # This is the format to match the other backends
+                    found_statements.append(
+                        {
+                            "_id": str(row["event_id"]),
+                            "_source": json.loads(row["event_str"]),
+                        }
+                    )
 
-            return found_ids
+            return found_statements
         except (ClickHouseError, IndexError, TypeError, ValueError) as error:
             msg = "Failed to execute ClickHouse query"
             logger.error("%s. %s", msg, error)

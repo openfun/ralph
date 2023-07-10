@@ -13,6 +13,7 @@ from fastapi import (
     HTTPException,
     Query,
     Request,
+    Response,
     status,
 )
 from pydantic import parse_raw_as
@@ -332,21 +333,24 @@ async def put(
         )
 
     try:
-        statements_ids_result = DATABASE_CLIENT.query_statements_by_ids([statementId])
+        existing_statement = DATABASE_CLIENT.query_statements_by_ids([statementId])
     except BackendException as error:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="xAPI statements query failed",
         ) from error
 
-    if len(statements_ids_result) > 0:
-        # NB: LRS specification calls for performing a deep comparison of incoming
-        # statements and existing statements with the same ID.
-        # This seems too costly for performance and was not implemented for this POC.
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Statement already exists with the same ID",
-        )
+    if existing_statement:
+        # The LRS specification calls for deep comparison of duplicate statement ids.
+        # In the case that the current statement is not an exact duplicate of the one
+        # found in the database we return a 409, otherwise the usual 204.
+        for existing in existing_statement:
+            if statement_dict != existing["_source"]:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="A different statement already exists with the same ID",
+                )
+        return
 
     # For valid requests, perform the bulk indexing of all incoming statements
     try:
@@ -368,6 +372,7 @@ async def put(
 async def post(
     statements: Union[LaxStatement, List[LaxStatement]],
     background_tasks: BackgroundTasks,
+    response: Response,
 ):
     """Stores a set of statements (or a single statement as a single member of a set).
 
@@ -405,21 +410,44 @@ async def post(
         )
 
     try:
-        statements_ids_result = DATABASE_CLIENT.query_statements_by_ids(statements_ids)
+        existing_statements = DATABASE_CLIENT.query_statements_by_ids(statements_ids)
     except BackendException as error:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="xAPI statements query failed",
         ) from error
 
-    if len(statements_ids_result) > 0:
-        # NB: LRS specification calls for performing a deep comparison of incoming
-        # statements and existing statements with the same ID.
-        # This seems too costly for performance and was not implemented for this POC.
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Statements already exist with the same ID",
-        )
+    # If there are duplicate statements, remove them from our id list and
+    # dictionary for insertion. We will return the shortened list of ids below
+    # so that consumers can derive which statements were inserted and which
+    # were skipped for being duplicates.
+    # See: https://github.com/openfun/ralph/issues/345
+    if existing_statements:
+        existing_ids = []
+        for existing in existing_statements:
+            existing_ids.append(existing["_id"])
+
+            # The LRS specification calls for deep comparison of duplicates. This
+            # is done here. If they are not exactly the same, we raise an error.
+            if statements_dict[existing["_id"]] != existing["_source"]:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="Differing statements already exist with the same ID: "
+                    f"{existing['_id']}",
+                )
+
+        # Overwrite our statements and ids with the deduplicated ones.
+        statements_ids = [id for id in statements_ids if id not in existing_ids]
+
+        statements_dict = {
+            key: value
+            for key, value in statements_dict.items()
+            if key in statements_ids
+        }
+
+        if not statements_ids:
+            response.status_code = status.HTTP_204_NO_CONTENT
+            return
 
     # For valid requests, perform the bulk indexing of all incoming statements
     try:

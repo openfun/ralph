@@ -278,6 +278,8 @@ def test_api_statements_post_statements_list_with_duplicate_of_existing_statemen
     # pylint: disable=invalid-name,unused-argument
 
     monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
+
+    statement_uuid = str(uuid4())
     statement = {
         "actor": {
             "account": {
@@ -286,7 +288,7 @@ def test_api_statements_post_statements_list_with_duplicate_of_existing_statemen
             },
             "objectType": "Agent",
         },
-        "id": str(uuid4()),
+        "id": statement_uuid,
         "object": {"id": "https://example.com/object-id/1/"},
         "timestamp": "2022-03-15T14:07:51Z",
         "verb": {"id": "https://example.com/verb-id/1/"},
@@ -299,10 +301,22 @@ def test_api_statements_post_statements_list_with_duplicate_of_existing_statemen
         json=statement,
     )
     assert response.status_code == 200
+    assert response.json() == [statement_uuid]
 
     es.indices.refresh()
 
-    # Post the statement twice, trying to change the version field which is not allowed.
+    # Post the statement twice, the data is identical so it should succeed but not
+    # include the ID in the response as it wasn't inserted.
+    response = client.post(
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {auth_credentials}"},
+        json=statement,
+    )
+    assert response.status_code == 204
+
+    es.indices.refresh()
+
+    # Post the statement again, trying to change the version field which is not allowed.
     response = client.post(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {auth_credentials}"},
@@ -310,7 +324,10 @@ def test_api_statements_post_statements_list_with_duplicate_of_existing_statemen
     )
 
     assert response.status_code == 409
-    assert response.json() == {"detail": "Statements already exist with the same ID"}
+    assert response.json() == {
+        "detail": f"Differing statements already exist with the same ID: "
+        f"{statement_uuid}"
+    }
 
     response = client.get(
         "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
