@@ -19,8 +19,8 @@ General improvement for the Helm Chart:
 
 ### Changed
 
-- Upgrade `fastapi` to `0.99.1`
-- Upgrade `sentry_sdk` to `1.26.0`
+- Upgrade `fastapi` to `0.100.0`
+- Upgrade `sentry_sdk` to `1.27.1`
 
 ## [3.8.0] - 2023-06-21
 
