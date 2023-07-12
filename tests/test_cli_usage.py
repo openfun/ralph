@@ -83,7 +83,8 @@ def test_cli_convert_command_usage():
         "    -u, --uuid-namespace TEXT     The UUID namespace to use for the `ID` "
         "field\n"
         "                                  generation\n"
-        "    -p, --platform-url TEXT       The `actor.account.homePage` to use in the\n"
+        "    -p, --platform-url TEXT       The `actor.account.homePage` to use in"
+        " the\n"
         "                                  xAPI statements  [required]\n"
         "  -f, --from [edx]                Input events format to convert  [required]\n"
         "  -t, --to [xapi]                 Output events format  [required]\n"
@@ -98,7 +99,7 @@ def test_cli_convert_command_usage():
 
 
 def test_cli_fetch_command_usage():
-    """Tests ralph fetch command usage."""
+    """Test ralph fetch command usage."""
     runner = CliRunner()
     result = runner.invoke(cli, ["fetch", "--help"])
 
@@ -180,7 +181,7 @@ def test_cli_fetch_command_usage():
 
 
 def test_cli_list_command_usage():
-    """Tests ralph list command usage."""
+    """Test ralph list command usage."""
     runner = CliRunner()
     result = runner.invoke(cli, ["list", "--help"])
 
@@ -228,8 +229,101 @@ def test_cli_list_command_usage():
     ) in result.output
 
 
+def test_cli_push_command_usage():
+    """Test ralph push command usage."""
+    runner = CliRunner()
+    result = runner.invoke(cli, ["push", "--help"])
+
+    assert result.exit_code == 0
+
+    expected_output = (
+        "Usage: ralph push [OPTIONS] [ARCHIVE]\n"
+        "\n"
+        "  Push an archive to a configured backend.\n"
+        "\n"
+        "Options:\n"
+        "  -b, --backend [es|mongo|clickhouse|ldp|fs|swift|s3|lrs]\n"
+        "                                  Backend  [required]\n"
+        "  lrs backend: \n"
+        "    --lrs-statements-endpoint TEXT\n"
+        "    --lrs-status-endpoint TEXT\n"
+        "    --lrs-headers KEY=VALUE,KEY=VALUE\n"
+        "    --lrs-password TEXT\n"
+        "    --lrs-username TEXT\n"
+        "    --lrs-base-url TEXT\n"
+        "  s3 backend: \n"
+        "    --s3-endpoint-url TEXT\n"
+        "    --s3-bucket-name TEXT\n"
+        "    --s3-default-region TEXT\n"
+        "    --s3-session-token TEXT\n"
+        "    --s3-secret-access-key TEXT\n"
+        "    --s3-access-key-id TEXT\n"
+        "  swift backend: \n"
+        "    --swift-os-identity-api-version TEXT\n"
+        "    --swift-os-auth-url TEXT\n"
+        "    --swift-os-project-domain-name TEXT\n"
+        "    --swift-os-user-domain-name TEXT\n"
+        "    --swift-os-storage-url TEXT\n"
+        "    --swift-os-region-name TEXT\n"
+        "    --swift-os-password TEXT\n"
+        "    --swift-os-username TEXT\n"
+        "    --swift-os-tenant-name TEXT\n"
+        "    --swift-os-tenant-id TEXT\n"
+        "  fs backend: \n"
+        "    --fs-path TEXT\n"
+        "  ldp backend: \n"
+        "    --ldp-stream-id TEXT\n"
+        "    --ldp-service-name TEXT\n"
+        "    --ldp-consumer-key TEXT\n"
+        "    --ldp-application-secret TEXT\n"
+        "    --ldp-application-key TEXT\n"
+        "    --ldp-endpoint TEXT\n"
+        "  clickhouse backend: \n"
+        "    --clickhouse-client-options KEY=VALUE,KEY=VALUE\n"
+        "    --clickhouse-password TEXT\n"
+        "    --clickhouse-username TEXT\n"
+        "    --clickhouse-event-table-name TEXT\n"
+        "    --clickhouse-database TEXT\n"
+        "    --clickhouse-port INTEGER\n"
+        "    --clickhouse-host TEXT\n"
+        "  mongo backend: \n"
+        "    --mongo-client-options KEY=VALUE,KEY=VALUE\n"
+        "    --mongo-collection TEXT\n"
+        "    --mongo-database TEXT\n"
+        "    --mongo-connection-uri TEXT\n"
+        "  es backend: \n"
+        "    --es-op-type TEXT\n"
+        "    --es-client-options KEY=VALUE,KEY=VALUE\n"
+        "    --es-index TEXT\n"
+        "    --es-hosts VALUE1,VALUE2,VALUE3\n"
+        "  -c, --chunk-size INTEGER        Get events by chunks of size #\n"
+        "  -f, --force                     Overwrite existing archives or records\n"
+        "  -I, --ignore-errors             Continue writing regardless of raised "
+        "errors\n"
+        "  -s, --simultaneous              With HTTP backend, POST all chunks\n"
+        "                                  simultaneously (instead of sequentially)\n"
+        "  -m, --max-num-simultaneous INTEGER\n"
+        "                                  The maximum number of chunks to send at "
+        "once,\n"
+        "                                  when using `--simultaneous`. Use `-1` to "
+        "not\n"
+        "                                  set a limit.\n"
+        "  -t, --target TEXT               Endpoint in which to push events (e.g.\n"
+        "                                  `statements`)\n"
+        "  --help                          Show this message and exit.\n"
+    )
+    assert expected_output in result.output
+
+    result = runner.invoke(cli, ["push"])
+    assert result.exit_code > 0
+    assert (
+        "Missing option '-b' / '--backend'. Choose from:\n\tes,\n\tmongo,"
+        "\n\tclickhouse,\n\tldp,\n\tfs,\n\tswift,\n\ts3,\n\tlrs\n"
+    ) in result.output
+
+
 def test_cli_runserver_command_usage():
-    """Tests ralph runserver command usage."""
+    """Test ralph runserver command usage."""
     runner = CliRunner()
     result = runner.invoke(cli, ["runserver", "--help"])
 

@@ -1,11 +1,12 @@
 """Utilities for Ralph."""
 
+import asyncio
 import datetime
 import logging
 import operator
 from functools import reduce
 from importlib import import_module
-from typing import List
+from typing import List, Union
 
 from pydantic import BaseModel
 
@@ -92,3 +93,30 @@ def set_dict_value_from_path(dict_: dict, path: List[str], value: any):
     for key in path[:-1]:
         dict_ = dict_.setdefault(key, {})
     dict_[path[-1]] = value
+
+
+async def gather_with_limited_concurrency(num_tasks: Union[None, int], *tasks):
+    """Gather no more than `num_tasks` tasks at time.
+
+    Args:
+        num_tasks: the maximum number of tasks to run concurrently, if None,
+            no maximum value is set
+        tasks: tasks to run concurrently
+    """
+    if num_tasks is not None:
+        semaphore = asyncio.Semaphore(num_tasks)
+
+        async def sem_task(task):
+            async with semaphore:
+                return await task
+
+        group = asyncio.gather(*(sem_task(task) for task in tasks))
+    else:
+        group = asyncio.gather(*tasks)
+
+    # Cancel background tasks on first error
+    try:
+        return await group
+    except Exception as exception:
+        group.cancel()
+        raise exception

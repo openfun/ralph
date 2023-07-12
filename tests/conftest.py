@@ -13,6 +13,7 @@ from .fixtures.auth import (  # noqa: F401
     oidc_auth_test_client,
 )
 from .fixtures.backends import (  # noqa: F401
+    anyio_backend,
     clickhouse,
     es,
     es_data_stream,

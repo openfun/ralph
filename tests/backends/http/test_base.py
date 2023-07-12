@@ -13,15 +13,15 @@ def test_backends_http_base_abstract_interface_with_implemented_abstract_method(
 
         name = "good"
 
-        def status(self):
+        async def status(self):
             """Fakes the status method."""
 
-        def list(
+        async def list(
             self, target: str = None, details: bool = False, new: bool = False
         ) -> Iterator[Union[str, dict]]:
             """Fakes the list method."""
 
-        def read(  # pylint: disable=too-many-arguments
+        async def read(  # pylint: disable=too-many-arguments
             self,
             query: Union[str, BaseQuery] = None,
             target: str = None,
@@ -31,7 +31,7 @@ def test_backends_http_base_abstract_interface_with_implemented_abstract_method(
         ):
             """Fakes the read method."""
 
-        def write(  # pylint: disable=too-many-arguments
+        async def write(  # pylint: disable=too-many-arguments
             self,
             data: Union[List[bytes], List[dict]],
             target: Union[None, str] = None,

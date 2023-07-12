@@ -373,6 +373,8 @@ def events():
 def ws(events):
     """Returns a websocket server instance."""
     # pylint: disable=invalid-name,redefined-outer-name
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
 
     async def forward(websocket, path):
         """Stupid test server that sends events."""
@@ -388,6 +390,9 @@ def ws(events):
     yield server
 
     server.ws_server.close()
+
+    asyncio.get_event_loop().run_until_complete(server.ws_server.wait_closed())
+    loop.close()
 
 
 @pytest.fixture
@@ -419,3 +424,9 @@ def lrs():
             process.terminate()
 
     return runserver
+
+
+@pytest.fixture
+def anyio_backend():
+    """Select asyncio backend for pytest anyio."""
+    return "asyncio"

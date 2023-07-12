@@ -215,7 +215,7 @@ The ClickHouse client options supported in Ralph can be found in these locations
 
 ## HTTP backends
 
-### LRS
+### LRS and Asynchronous LRS
 
 The LRS backend is used to store and retrieve xAPI statements from various systems mostly used in e-learning infrastructures.
 

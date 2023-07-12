@@ -39,6 +39,7 @@ General improvement for the Helm Chart:
 
 ### Added
 
+- Implement asynchronous `async_lrs` backend
 - Implement synchronous `lrs` backend
 - Implement xAPI virtual classroom pydantic models
 - Allow to insert custom endpoint url for S3 service
