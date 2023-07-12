@@ -550,16 +550,46 @@ def fetch(backend, archive, chunk_size, target, query, **options):
     help="Continue writing regardless of raised errors",
 )
 @click.option(
+    "-s",
+    "--simultaneous",
+    default=False,
+    is_flag=True,
+    help="With HTTP backend, POST all chunks simultaneously (instead of sequentially)",
+)
+@click.option(
+    "-m",
+    "--max-num-simultaneous",
+    type=int,
+    default=-1,
+    help=(
+        "The maximum number of chunks to send at once, when using `--simultaneous`. "
+        "Use `-1` to not set a limit."
+    ),
+)
+@click.option(
     "-t",
     "--target",
     type=str,
     default=None,
     help="Endpoint in which to push events (e.g. `statements`)",
 )
-def push(backend, archive, chunk_size, force, ignore_errors, target, **options):
+def push(
+    backend,
+    archive,
+    chunk_size,
+    force,
+    ignore_errors,
+    simultaneous,
+    max_num_simultaneous,
+    target,
+    **options,
+):
     """Push an archive to a configured backend."""
     logger.info("Pushing archive %s to the configured %s backend", archive, backend)
     logger.debug("Backend parameters: %s", options)
+
+    if max_num_simultaneous == 1:
+        max_num_simultaneous = None
 
     backend_type = get_backend_type(settings.BACKENDS, backend)
     backend = get_backend_instance(backend_type, backend, options)
@@ -574,6 +604,8 @@ def push(backend, archive, chunk_size, force, ignore_errors, target, **options):
             data=sys.stdin.buffer,
             chunk_size=chunk_size,
             ignore_errors=ignore_errors,
+            simultaneous=simultaneous,
+            max_num_simultaneous=max_num_simultaneous,
         )
     elif backend_type is None:
         msg = "Cannot find an implemented backend type for backend %s"

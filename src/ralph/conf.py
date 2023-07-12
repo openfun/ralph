@@ -166,8 +166,8 @@ class HeadersParameters(BaseModel):
 class LRSHeaders(HeadersParameters):
     """Pydantic model for LRS headers."""
 
-    X_EXPERIENCE_API_VERSION: str = "1.0.3"
-    CONTENT_TYPE: str = "application/json"
+    X_EXPERIENCE_API_VERSION: str = Field("1.0.3", alias="X-Experience-API-Version")
+    CONTENT_TYPE: str = Field("application/json", alias="content-type")
 
 
 class LRSHTTPBackendSettings(InstantiableSettingsItem):

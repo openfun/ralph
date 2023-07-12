@@ -99,18 +99,18 @@ class BaseHTTP(ABC):
         return query
 
     @abstractmethod
-    def list(
+    async def list(
         self, target: str = None, details: bool = False, new: bool = False
     ) -> Iterator[Union[str, dict]]:
-        """Lists containers in the data backend. E.g., collections, files, indexes."""
+        """List containers in the data backend. E.g., collections, files, indexes."""
 
     @abstractmethod
-    def status(self) -> HTTPBackendStatus:
-        """Implements HTTP backend check for server status."""
+    async def status(self) -> HTTPBackendStatus:
+        """Implement HTTP backend check for server status."""
 
     @abstractmethod
     @enforce_query_checks
-    def read(  # pylint: disable=too-many-arguments
+    async def read(  # pylint: disable=too-many-arguments
         self,
         query: Union[str, BaseQuery] = None,
         target: str = None,
@@ -118,10 +118,10 @@ class BaseHTTP(ABC):
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
-        """Yields records read from the HTTP response results."""
+        """Yield records read from the HTTP response results."""
 
     @abstractmethod
-    def write(  # pylint: disable=too-many-arguments
+    async def write(  # pylint: disable=too-many-arguments
         self,
         data: Union[List[bytes], List[dict]],
         target: Union[None, str] = None,
