@@ -971,6 +971,12 @@
   -c, --chunk-size INTEGER        Get events by chunks of size #
   -f, --force                     Overwrite existing archives or records
   -I, --ignore-errors             Continue writing regardless of raised errors
+  -s, --simultaneous              With HTTP backend, POST all chunks
+                                  simultaneously (instead of sequentially)
+  -m, --max-num-simultaneous INTEGER
+                                  The maximum number of chunks to send at
+                                  once, when using `--simultaneous`. Use `-1`
+                                  to not set a limit.
   -t, --target TEXT               Endpoint in which to push events (e.g.
                                   `statements`)
   --help                          Show this message and exit.
