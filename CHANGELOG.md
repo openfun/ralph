@@ -17,11 +17,10 @@ General improvement for the Helm Chart:
 - add missing namespace label
 - make object name consistent
 
-### Changed
-
 - Upgrade `fastapi` to `0.100.0`
 - Upgrade `sentry_sdk` to `1.28.1`
 - Upgrade `uvicorn` to `0.23.0`
+- Enforce valid IRI for `activity` parameter in `GET /statements`
 
 ## [3.8.0] - 2023-06-21
 
