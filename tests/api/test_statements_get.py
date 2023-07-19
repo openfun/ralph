@@ -67,6 +67,19 @@ def insert_clickhouse_statements(statements):
     assert success == len(statements)
 
 
+def create_mock_activity(id_: int = 0):
+    """Create distinct activites with valid IRIs.
+
+    args:
+        id_: An integer used to uniquely identify the created agent.
+
+    """
+    return {
+        "objectType": "Activity",
+        "id": f"http://example.com/activity_{id_}",
+    }
+
+
 def create_mock_agent(ifi: str, id_: int, home_page_id=None):
     """Create distinct mock agents with a given Inverse Functional Identifier.
 
@@ -310,33 +323,39 @@ def test_api_statements_get_statements_by_activity(
     """
     # pylint: disable=redefined-outer-name
 
+    activity_0 = create_mock_activity(0)
+    activity_1 = create_mock_activity(1)
+
     statements = [
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
             "timestamp": datetime.now().isoformat(),
-            "object": {
-                "id": "58d8bede-155f-48b1-b1ff-a41eb28c2f0b",
-                "objectType": "Activity",
-            },
+            "object": activity_0,
         },
         {
             "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
             "timestamp": datetime.now().isoformat(),
-            "object": {
-                "id": "a2956991-200b-40a7-9548-293cdcc06c4b",
-                "objectType": "Activity",
-            },
+            "object": activity_1,
         },
     ]
     insert_statements_and_monkeypatch_backend(statements)
 
     response = client.get(
-        "/xAPI/statements/?activity=a2956991-200b-40a7-9548-293cdcc06c4b",
+        f"/xAPI/statements/?activity={activity_1['id']}",
         headers={"Authorization": f"Basic {auth_credentials}"},
     )
 
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[1]]}
+
+    # Check that badly formated activity returns an error
+    response = client.get(
+        "/xAPI/statements/?activity=INVALID_IRI",
+        headers={"Authorization": f"Basic {auth_credentials}"},
+    )
+
+    assert response.status_code == 422
+    assert response.json()["detail"][0]["msg"] == "'INVALID_IRI' is not a valid 'IRI'."
 
 
 def test_api_statements_get_statements_since_timestamp(
@@ -606,7 +625,7 @@ def test_api_statements_get_statements_invalid_query_parameters(
 
     # Check for error when invalid parameters are provided with a statementId
     for invalid_param, value in [
-        ("activity", "activity_1"),
+        ("activity", create_mock_activity()["id"]),
         ("agent", json.dumps(create_mock_agent("mbox", 1))),
         ("verb", "verb_1"),
     ]:
@@ -615,6 +634,12 @@ def test_api_statements_get_statements_invalid_query_parameters(
             headers={"Authorization": f"Basic {auth_credentials}"},
         )
         assert response.status_code == 400
+        assert response.json() == {
+            "detail": (
+                "Querying by id only accepts `attachments` and `format` as "
+                "extra parameters"
+            )
+        }
 
     # Check for NO 400 when statementId is passed with authorized parameters
     for valid_param, value in [("format", "ids"), ("attachments", "true")]:

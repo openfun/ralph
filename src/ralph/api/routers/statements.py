@@ -30,6 +30,7 @@ from ralph.models.xapi.base.agents import (
     BaseXapiAgentWithMboxSha1Sum,
     BaseXapiAgentWithOpenId,
 )
+from ralph.models.xapi.base.common import IRI
 
 from ..models import ErrorDetail, LaxStatement
 
@@ -82,7 +83,7 @@ async def get(
         None,
         description="Filter, only return Statements matching the specified Verb id",
     ),
-    activity: Optional[str] = Query(
+    activity: Optional[IRI] = Query(
         None,
         description=(
             "Filter, only return Statements for which the Object "
@@ -231,7 +232,7 @@ async def get(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=(
-                "Querying by id only accepts `attachments` and `format` as extra"
+                "Querying by id only accepts `attachments` and `format` as extra "
                 "parameters"
             ),
         )
