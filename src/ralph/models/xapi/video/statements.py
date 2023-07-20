@@ -9,11 +9,9 @@ from ..concepts.verbs.scorm_profile import (
     InteractedVerb,
     TerminatedVerb,
 )
-from ..concepts.verbs.tincan_vocabulary import DownloadedVerb
 from ..concepts.verbs.video import PausedVerb, PlayedVerb, SeekedVerb
 from .contexts import (
     VideoCompletedContext,
-    VideoDownloadedContext,
     VideoEnableClosedCaptioningContext,
     VideoInitializedContext,
     VideoPausedContext,
@@ -168,25 +166,6 @@ class VideoTerminated(BaseVideoStatement):
     verb: TerminatedVerb = TerminatedVerb()
     result: VideoTerminatedResult
     context: VideoTerminatedContext
-
-
-class VideoDownloaded(BaseVideoStatement):
-    """Pydantic model for video downloaded statement.
-
-    Example: John downloaded (rather than accessed or opened) a video.
-
-    Attributes:
-        verb (dict): See DownloadedVerb.
-        context (dict): See VideoDownloadedContext.
-    """
-
-    __selector__ = selector(
-        object__definition__type="https://w3id.org/xapi/video/activity-type/video",
-        verb__id="http://id.tincanapi.com/verb/downloaded",
-    )
-
-    verb: DownloadedVerb = DownloadedVerb()
-    context: VideoDownloadedContext
 
 
 class VideoEnableClosedCaptioning(BaseVideoStatement):

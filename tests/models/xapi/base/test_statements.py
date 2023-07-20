@@ -1,5 +1,7 @@
 """Tests for the BaseXapiStatement."""
 
+import json
+
 import pytest
 from hypothesis import settings
 from hypothesis import strategies as st
@@ -21,8 +23,6 @@ from ralph.models.xapi.base.unnested_objects import (
     BaseXapiActivityInteractionDefinition,
     BaseXapiStatementRef,
 )
-from ralph.models.xapi.video.statements import BaseVideoStatement
-from ralph.models.xapi.virtual_classroom.statements import BaseVirtualClassroomStatement
 from ralph.utils import set_dict_value_from_path
 
 from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
@@ -494,14 +494,7 @@ def test_models_xapi_base_statement_with_valid_version(statement):
 @settings(deadline=None)
 @pytest.mark.parametrize(
     "model",
-    [
-        model
-        for model in ModelSelector("ralph.models.xapi").model_rules
-        # We have to bypass Video and Virtual Classroom Statements in
-        # this test because we want to support
-        # invalid values (non IRI keys) in their extension fields.
-        if not issubclass(model, (BaseVideoStatement, BaseVirtualClassroomStatement))
-    ],
+    list(ModelSelector("ralph.models.xapi").model_rules),
 )
 @custom_given(st.data())
 def test_models_xapi_base_statement_should_consider_valid_all_defined_xapi_models(
@@ -510,8 +503,8 @@ def test_models_xapi_base_statement_should_consider_valid_all_defined_xapi_model
     """Tests that all defined xAPI models in the ModelSelector make valid statements."""
     # All specific xAPI models should inherit BaseXapiStatement
     assert issubclass(model, BaseXapiStatement)
-    statement = data.draw(custom_builds(model)).dict(exclude_none=True)
+    statement = data.draw(custom_builds(model)).json(exclude_none=True, by_alias=True)
     try:
-        BaseXapiStatement(**statement)
+        BaseXapiStatement(**json.loads(statement))
     except ValidationError as err:
         pytest.fail(f"Specific xAPI models should be valid BaseXapiStatements: {err}")

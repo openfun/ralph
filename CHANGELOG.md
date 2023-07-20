@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Implement xAPI LMS Profile statements validation
+
 ### Changed
 
 - Helm chart: improve chart modularity
@@ -29,6 +33,10 @@ have an authority field matching that of the user
 - Backends: add `max_statements` option to `AsyncLRSHTTP`
 - API: Incoming statements are enriched with `id`, `timestamp`, `stored`
   and `authority`
+
+### Removed
+
+- `name` field in `VideoActivity` xAPI model mistakenly used in `video` profile
 
 ## [3.9.0] - 2023-07-21
 

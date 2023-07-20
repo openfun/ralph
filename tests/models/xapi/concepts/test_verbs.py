@@ -10,7 +10,15 @@ from ralph.models.xapi.concepts.verbs.activity_streams_vocabulary import (
     JoinVerb,
     LeaveVerb,
 )
-from ralph.models.xapi.concepts.verbs.adl_vocabulary import AnsweredVerb, AskedVerb
+from ralph.models.xapi.concepts.verbs.adl_vocabulary import (
+    AnsweredVerb,
+    AskedVerb,
+    RegisteredVerb,
+)
+from ralph.models.xapi.concepts.verbs.navy_common_reference_profile import (
+    AccessedVerb,
+    UploadedVerb,
+)
 from ralph.models.xapi.concepts.verbs.scorm_profile import (
     CompletedVerb,
     InitializedVerb,
@@ -19,6 +27,7 @@ from ralph.models.xapi.concepts.verbs.scorm_profile import (
 )
 from ralph.models.xapi.concepts.verbs.tincan_vocabulary import (
     DownloadedVerb,
+    UnregisteredVerb,
     ViewedVerb,
 )
 from ralph.models.xapi.concepts.verbs.video import PausedVerb, PlayedVerb, SeekedVerb
@@ -45,18 +54,22 @@ from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
         (LeaveVerb, "http://activitystrea.ms/leave"),
         (AnsweredVerb, "http://adlnet.gov/expapi/verbs/answered"),
         (AskedVerb, "http://adlnet.gov/expapi/verbs/asked"),
+        (RegisteredVerb, "http://adlnet.gov/expapi/verbs/registered"),
         (CompletedVerb, "http://adlnet.gov/expapi/verbs/completed"),
         (InitializedVerb, "http://adlnet.gov/expapi/verbs/initialized"),
         (InteractedVerb, "http://adlnet.gov/expapi/verbs/interacted"),
         (TerminatedVerb, "http://adlnet.gov/expapi/verbs/terminated"),
         (ViewedVerb, "http://id.tincanapi.com/verb/viewed"),
         (DownloadedVerb, "http://id.tincanapi.com/verb/downloaded"),
+        (UnregisteredVerb, "http://id.tincanapi.com/verb/unregistered"),
         (PausedVerb, "https://w3id.org/xapi/video/verbs/paused"),
         (PlayedVerb, "https://w3id.org/xapi/video/verbs/played"),
         (SeekedVerb, "https://w3id.org/xapi/video/verbs/seeked"),
         (LoweredHandVerb, "https://w3id.org/xapi/virtual-classroom/verbs/lowered-hand"),
         (MutedVerb, "https://w3id.org/xapi/virtual-classroom/verbs/muted"),
         (RaisedHandVerb, "https://w3id.org/xapi/virtual-classroom/verbs/raised-hand"),
+        (AccessedVerb, "https://w3id.org/xapi/netc/verbs/accessed"),
+        (UploadedVerb, "https://w3id.org/xapi/netc/verbs/uploaded"),
         (
             SharedScreenVerb,
             "https://w3id.org/xapi/virtual-classroom/verbs/shared-screen",
