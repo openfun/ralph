@@ -31,3 +31,27 @@ class MessageActivity(BaseXapiActivity):
     """
 
     definition: MessageActivityDefinition = MessageActivityDefinition()
+
+
+# Webpage
+
+
+class WebpageActivityDefinition(BaseXapiActivityDefinition):
+    """Pydantic model for webpage `Activity` type `definition` property.
+
+    Attributes:
+        type (str): Consists of the value
+            `https://w3id.org/xapi/acrossx/activities/webpage`.
+    """
+
+    type: Literal["https://w3id.org/xapi/acrossx/activities/webpage"]
+
+
+class WebpageActivity(BaseXapiActivity):
+    """Pydantic model for webpage `Activity` type.
+
+    Attributes:
+        definition (dict): see WebpageActivityDefinition.
+    """
+
+    definition: WebpageActivityDefinition

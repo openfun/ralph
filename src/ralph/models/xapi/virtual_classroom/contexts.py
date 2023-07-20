@@ -81,7 +81,7 @@ class VirtualClassroomContext(BaseXapiContext):
 
     Attributes:
         registration (uuid): the registration that the Statement is associated with.
-        extensions (dict): see VirtualClassroomExtensions.
+        extensions (dict): see VirtualClassroomContextExtensions.
     """
 
     contextActivities: VirtualClassroomContextContextActivities

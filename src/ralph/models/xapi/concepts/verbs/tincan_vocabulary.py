@@ -38,3 +38,17 @@ class DownloadedVerb(BaseXapiVerb):
         "http://id.tincanapi.com/verb/downloaded"
     ] = "http://id.tincanapi.com/verb/downloaded"
     display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["downloaded"]]]
+
+
+class UnregisteredVerb(BaseXapiVerb):
+    """Pydantic model for unregistered `verb`.
+
+    Attributes:
+        id (str): Consists of the value `http://id.tincanapi.com/verb/unregistered`.
+        display (dict): Consists of the dictionary `{"en-US": "unregistered"}`.
+    """
+
+    id: Literal[
+        "http://id.tincanapi.com/verb/unregistered"
+    ] = "http://id.tincanapi.com/verb/unregistered"
+    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["unregistered"]]]

@@ -9,7 +9,7 @@ except ImportError:
 
 from uuid import UUID
 
-from pydantic import Field, NonNegativeFloat, PositiveInt, validator
+from pydantic import Field, NonNegativeFloat, validator
 
 from ..base.contexts import BaseXapiContext, BaseXapiContextContextActivities
 from ..base.unnested_objects import BaseXapiActivity
@@ -20,7 +20,6 @@ from ..concepts.constants.video import (
     CONTEXT_EXTENSION_COMPLETION_THRESHOLD,
     CONTEXT_EXTENSION_FULL_SCREEN,
     CONTEXT_EXTENSION_LENGTH,
-    CONTEXT_EXTENSION_QUALITY,
     CONTEXT_EXTENSION_SCREEN_SIZE,
     CONTEXT_EXTENSION_SESSION_ID,
     CONTEXT_EXTENSION_SPEED,
@@ -147,20 +146,6 @@ class VideoBrowsingContextExtensions(VideoContextExtensions):
     )
 
 
-class VideoDownloadedContextExtensions(VideoContextExtensions):
-    """Represents the context.extensions field for video `downloaded` xAPI statement.
-
-    Attributes:
-        length (float): Consists of the length of the video.
-        quality (int): Consists of the video resolution or quality of the video.
-        session (uuid): Consists of the ID of the active session.
-    """
-
-    length: NonNegativeFloat = Field(alias=CONTEXT_EXTENSION_LENGTH)
-    quality: PositiveInt = Field(alias=CONTEXT_EXTENSION_QUALITY)
-    session_id: Optional[UUID] = Field(alias=CONTEXT_EXTENSION_SESSION_ID)
-
-
 class VideoEnableClosedCaptioningContextExtensions(VideoContextExtensions):
     """Represents the context.extensions field for video `interacted` xAPI statement.
 
@@ -259,16 +244,6 @@ class VideoTerminatedContext(BaseVideoContext):
     """
 
     extensions: VideoBrowsingContextExtensions
-
-
-class VideoDownloadedContext(BaseVideoContext):
-    """Pydantic model for video downloaded `context` property.
-
-    Attributes:
-        extensions (dict): See VideoDownloadedContextExtensions.
-    """
-
-    extensions: VideoDownloadedContextExtensions
 
 
 class VideoEnableClosedCaptioningContext(BaseVideoContext):

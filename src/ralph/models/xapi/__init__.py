@@ -2,10 +2,23 @@
 
 # flake8: noqa
 
+from .lms.statements import (
+    LMSAccessedFile,
+    LMSAccessedPage,
+    LMSDownloadedAudio,
+    LMSDownloadedDocument,
+    LMSDownloadedFile,
+    LMSDownloadedVideo,
+    LMSRegisteredCourse,
+    LMSUnregisteredCourse,
+    LMSUploadedAudio,
+    LMSUploadedDocument,
+    LMSUploadedFile,
+    LMSUploadedVideo,
+)
 from .navigation.statements import PageTerminated, PageViewed
 from .video.statements import (
     VideoCompleted,
-    VideoDownloaded,
     VideoEnableClosedCaptioning,
     VideoInitialized,
     VideoPaused,

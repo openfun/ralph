@@ -11,6 +11,18 @@ from ralph.models.edx.navigational.fields.events import NavigationalEventField
 from ralph.models.edx.navigational.statements import UISeqNext, UISeqPrev
 from ralph.models.xapi.base.contexts import BaseXapiContext
 from ralph.models.xapi.base.results import BaseXapiResultScore
+from ralph.models.xapi.lms.contexts import (
+    LMSContextContextActivities,
+    LMSProfileActivity,
+)
+from ralph.models.xapi.video.contexts import (
+    VideoContextContextActivities,
+    VideoProfileActivity,
+)
+from ralph.models.xapi.virtual_classroom.contexts import (
+    VirtualClassroomContextContextActivities,
+    VirtualClassroomProfileActivity,
+)
 
 OVERWRITTEN_STRATEGIES = {}
 
@@ -106,5 +118,10 @@ OVERWRITTEN_STRATEGIES = {
         "raw": False,
         "min": False,
         "max": False,
+    },
+    LMSContextContextActivities: {"category": custom_builds(LMSProfileActivity)},
+    VideoContextContextActivities: {"category": custom_builds(VideoProfileActivity)},
+    VirtualClassroomContextContextActivities: {
+        "category": custom_builds(VirtualClassroomProfileActivity)
     },
 }

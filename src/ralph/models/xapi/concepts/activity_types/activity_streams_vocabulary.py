@@ -5,10 +5,10 @@ try:
 except ImportError:
     from typing_extensions import Literal
 
-
 from ...base.unnested_objects import BaseXapiActivity, BaseXapiActivityDefinition
 
 
+# Page
 class PageActivityDefinition(BaseXapiActivityDefinition):
     """Pydantic model for page `Activity` type `definition` property.
 
@@ -29,3 +29,24 @@ class PageActivity(BaseXapiActivity):
     """
 
     definition: PageActivityDefinition = PageActivityDefinition()
+
+
+# File
+class FileActivityDefinition(BaseXapiActivityDefinition):
+    """Pydantic model for file `Activity` type `definition` property.
+
+    Attributes:
+       type (str): Consists of the value `http://activitystrea.ms/file`.
+    """
+
+    type: Literal["http://activitystrea.ms/file"]
+
+
+class FileActivity(BaseXapiActivity):
+    """Pydantic model for file `Activity` type.
+
+    Attributes:
+        definition (dict): See FileActivityDefinition.
+    """
+
+    definition: FileActivityDefinition
