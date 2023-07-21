@@ -9,6 +9,8 @@ and this project adheres to
 ## [Unreleased]
 
 ### Changed
+
+- Change how duplicate xAPI statements are handled by backends
 General improvement for the Helm Chart:
 - add dependencies for MongoDB and Clickhouse
 - make persistence optional
