@@ -8,9 +8,15 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [3.9.0] - 2023-07-21
+
 ### Changed
 
-- Change how duplicate xAPI statements are handled by backends
+- Upgrade `fastapi` to `0.100.0`
+- Upgrade `sentry_sdk` to `1.28.1`
+- Upgrade `uvicorn` to `0.23.0`
+- Enforce valid IRI for `activity` parameter in `GET /statements`
+- Change how duplicate xAPI statements are handled for `clickhouse` backend
 General improvement for the Helm Chart:
 - add dependencies for MongoDB and Clickhouse
 - make persistence optional
@@ -18,11 +24,6 @@ General improvement for the Helm Chart:
 - remove prefix label from ingress object name
 - add missing namespace label
 - make object name consistent
-
-- Upgrade `fastapi` to `0.100.0`
-- Upgrade `sentry_sdk` to `1.28.1`
-- Upgrade `uvicorn` to `0.23.0`
-- Enforce valid IRI for `activity` parameter in `GET /statements`
 
 ## [3.8.0] - 2023-06-21
 
@@ -350,7 +351,8 @@ as per the xAPI specification
 - Add optional sentry integration
 - Distribute Arnold's tray to deploy Ralph in a k8s cluster as cronjobs
 
-[unreleased]: https://github.com/openfun/ralph/compare/v3.8.0...master
+[unreleased]: https://github.com/openfun/ralph/compare/v3.9.0...master
+[3.9.0]: https://github.com/openfun/ralph/compare/v3.8.0...v3.9.0
 [3.8.0]: https://github.com/openfun/ralph/compare/v3.7.0...v3.8.0
 [3.7.0]: https://github.com/openfun/ralph/compare/v3.6.0...v3.7.0
 [3.6.0]: https://github.com/openfun/ralph/compare/v3.5.1...v3.6.0
