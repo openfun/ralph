@@ -229,14 +229,14 @@ def test_backends_storage_ldp_list_method_history_management(
     # Apply the monkeypatch for requests.post to mock_get
     monkeypatch.setattr(storage.client, "get", mock_list)
 
-    # Create a fetch history
+    # Create a read history
     fs.create_file(
         settings.HISTORY_FILE,
         contents=json.dumps(
             [
                 {
                     "backend": "ldp",
-                    "command": "fetch",
+                    "command": "read",
                     "id": "5d5c4c93-04a4-42c5-9860-f51fa4044aa1",
                     "filename": "20201002.tgz",
                     "size": 23424233,
@@ -244,7 +244,7 @@ def test_backends_storage_ldp_list_method_history_management(
                 },
                 {
                     "backend": "ldp",
-                    "command": "fetch",
+                    "command": "read",
                     "id": "997db3eb-b9ca-485d-810f-b530a6cef7c6",
                     "filename": "20201002.tgz",
                     "size": 23424233,
@@ -252,7 +252,7 @@ def test_backends_storage_ldp_list_method_history_management(
                 },
                 {
                     "backend": "ldp",
-                    "command": "fetch",
+                    "command": "read",
                     "id": "08075b54-8d24-42ea-a509-9f10b0e3b416",
                     "filename": "20201002.tgz",
                     "size": 23424233,
@@ -430,7 +430,7 @@ def test_backends_storage_ldp_read_method(monkeypatch, fs, settings_fs):
     assert storage.history == [
         {
             "backend": "ldp",
-            "command": "fetch",
+            "command": "read",
             "id": "5d5c4c93-04a4-42c5-9860-f51fa4044aa1",
             "filename": "2020-06-16.gz",
             "size": 67906662,

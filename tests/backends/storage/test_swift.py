@@ -61,8 +61,8 @@ def test_backends_storage_swift_list_should_yield_archive_names(
         {"name": "2020-05-01.gz"},
     ]
     history = [
-        {"id": "2020-04-29.gz", "backend": "swift", "command": "fetch"},
-        {"id": "2020-04-30.gz", "backend": "swift", "command": "fetch"},
+        {"id": "2020-04-29.gz", "backend": "swift", "command": "read"},
+        {"id": "2020-04-30.gz", "backend": "swift", "command": "read"},
     ]
 
     def mock_list_with_pages(*args, **kwargs):  # pylint:disable=unused-argument
@@ -141,7 +141,7 @@ def test_backends_storage_swift_read_with_valid_name_should_write_to_history(
     assert swift.history == [
         {
             "backend": "swift",
-            "command": "fetch",
+            "command": "read",
             "id": "2020-04-29.gz",
             "size": 12,
             "fetched_at": freezed_now,
@@ -192,8 +192,8 @@ def test_backends_storage_swift_write_should_write_to_history_new_or_overwriten_
     should raise a FileExistsError.
     """
     history = [
-        {"id": "2020-04-29.gz", "backend": "swift", "command": "fetch"},
-        {"id": "2020-04-30.gz", "backend": "swift", "command": "fetch"},
+        {"id": "2020-04-29.gz", "backend": "swift", "command": "read"},
+        {"id": "2020-04-30.gz", "backend": "swift", "command": "read"},
     ]
     listing = [
         {"name": "2020-04-29.gz"},
@@ -205,7 +205,7 @@ def test_backends_storage_swift_write_should_write_to_history_new_or_overwriten_
     new_history_entry = [
         {
             "backend": "swift",
-            "command": "push",
+            "command": "write",
             "id": archive_name,
             "pushed_at": freezed_now,
         }
@@ -249,8 +249,8 @@ def test_backends_storage_swift_write_should_log_the_error(
     """
     error = "Unauthorized. Check username/id, password"
     history = [
-        {"id": "2020-04-29.gz", "backend": "swift", "command": "fetch"},
-        {"id": "2020-04-30.gz", "backend": "swift", "command": "fetch"},
+        {"id": "2020-04-29.gz", "backend": "swift", "command": "read"},
+        {"id": "2020-04-30.gz", "backend": "swift", "command": "read"},
     ]
     listing = [
         {"name": "2020-04-29.gz"},

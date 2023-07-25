@@ -12,6 +12,7 @@ and this project adheres to
 
 ### Changed
 
+- In cli, change `push` to `write` and `fetch` to `read`
 - Upgrade `fastapi` to `0.100.0`
 - Upgrade `sentry_sdk` to `1.28.1`
 - Upgrade `uvicorn` to `0.23.0`

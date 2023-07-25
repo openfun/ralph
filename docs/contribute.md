@@ -103,18 +103,18 @@ it's time to play with them:
 ```bash
 # Store a JSON file in the Swift backend
 $ echo '{"id": 1, "foo": "bar"}' | \
-    ./bin/ralph push -b swift -f foo.json
+    ./bin/ralph write -b swift -f foo.json
 
 # Check that we have created a new JSON file in the Swift backend
 $ bin/ralph list -b swift
 foo.json
 
-# Fetch the content of the JSON file and index it in Elasticsearch
-$ bin/ralph fetch -b swift foo.json | \
-    bin/ralph push -b es
+# Read the content of the JSON file and index it in Elasticsearch
+$ bin/ralph read -b swift foo.json | \
+    bin/ralph write -b es
 
 # Check that we have properly indexed the JSON file in Elasticsearch
-$ bin/ralph fetch -b es
+$ bin/ralph read -b es
 {"id": 1, "foo": "bar"}
 ```
 

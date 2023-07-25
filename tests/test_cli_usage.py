@@ -26,7 +26,7 @@ def test_cli_auth_command_usage():
             "-O, --agent-ifi-openid TEXT",
             "-A, --agent-ifi-account TEXT",
             "-N, --agent-name TEXT",
-            "-w, --write",
+            "-w, --write-credentials",
         ]
     )
 
@@ -36,7 +36,7 @@ def test_cli_auth_command_usage():
 
 
 def test_cli_extract_command_usage():
-    """Tests ralph extract command usage."""
+    """Test ralph extract command usage."""
     runner = CliRunner()
     result = runner.invoke(cli, ["extract", "--help"])
 
@@ -55,7 +55,7 @@ def test_cli_extract_command_usage():
 
 
 def test_cli_validate_command_usage():
-    """Tests ralph validate command usage."""
+    """Test ralph validate command usage."""
     runner = CliRunner()
     result = runner.invoke(cli, ["validate", "--help"])
 
@@ -75,7 +75,7 @@ def test_cli_validate_command_usage():
 
 
 def test_cli_convert_command_usage():
-    """Tests ralph convert command usage."""
+    """Test ralph convert command usage."""
     runner = CliRunner()
     result = runner.invoke(cli, ["convert", "--help"])
 
@@ -101,10 +101,10 @@ def test_cli_convert_command_usage():
     assert "Error: Missing option '-p' / '--platform-url'" in result.output
 
 
-def test_cli_fetch_command_usage():
-    """Test ralph fetch command usage."""
+def test_cli_read_command_usage():
+    """Test ralph read command usage."""
     runner = CliRunner()
-    result = runner.invoke(cli, ["fetch", "--help"])
+    result = runner.invoke(cli, ["read", "--help"])
 
     assert result.exit_code == 0
     assert (
@@ -166,7 +166,7 @@ def test_cli_fetch_command_usage():
         "    --es-index TEXT\n"
         "    --es-hosts VALUE1,VALUE2,VALUE3\n"
         "  -c, --chunk-size INTEGER        Get events by chunks of size #\n"
-        "  -t, --target TEXT               Endpoint from which to fetch events (e.g.\n"
+        "  -t, --target TEXT               Endpoint from which to read events (e.g.\n"
         "                                  `/statements`)\n"
         '  -q, --query \'{"KEY": "VALUE", "KEY": "VALUE"}\'\n'
         "                                  Query object as a JSON string (database "
@@ -174,7 +174,7 @@ def test_cli_fetch_command_usage():
         "                                  HTTP backends ONLY)\n"
     ) in result.output
     logging.warning(result.output)
-    result = runner.invoke(cli, ["fetch"])
+    result = runner.invoke(cli, ["read"])
     assert result.exit_code > 0
     assert (
         "Error: Missing option '-b' / '--backend'. "
@@ -232,17 +232,17 @@ def test_cli_list_command_usage():
     ) in result.output
 
 
-def test_cli_push_command_usage():
-    """Test ralph push command usage."""
+def test_cli_write_command_usage():
+    """Test ralph write command usage."""
     runner = CliRunner()
-    result = runner.invoke(cli, ["push", "--help"])
+    result = runner.invoke(cli, ["write", "--help"])
 
     assert result.exit_code == 0
 
     expected_output = (
-        "Usage: ralph push [OPTIONS] [ARCHIVE]\n"
+        "Usage: ralph write [OPTIONS] [ARCHIVE]\n"
         "\n"
-        "  Push an archive to a configured backend.\n"
+        "  Write an archive to a configured backend.\n"
         "\n"
         "Options:\n"
         "  -b, --backend [es|mongo|clickhouse|ldp|fs|swift|s3|lrs]\n"
@@ -311,13 +311,13 @@ def test_cli_push_command_usage():
         "                                  when using `--simultaneous`. Use `-1` to "
         "not\n"
         "                                  set a limit.\n"
-        "  -t, --target TEXT               Endpoint in which to push events (e.g.\n"
+        "  -t, --target TEXT               Endpoint in which to write events (e.g.\n"
         "                                  `statements`)\n"
         "  --help                          Show this message and exit.\n"
     )
     assert expected_output in result.output
 
-    result = runner.invoke(cli, ["push"])
+    result = runner.invoke(cli, ["write"])
     assert result.exit_code > 0
     assert (
         "Missing option '-b' / '--backend'. Choose from:\n\tes,\n\tmongo,"
