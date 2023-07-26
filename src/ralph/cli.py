@@ -314,7 +314,7 @@ def auth(
     username,
     password,
     scope,
-    write_credentials,
+    write_to_disk,
     agent_ifi_mbox,
     agent_ifi_mbox_sha1sum,
     agent_ifi_openid,
@@ -392,7 +392,7 @@ def auth(
         agent=agent,
     )
 
-    if write_credentials:
+    if write_to_disk:
         logger.info("Will append new credentials to: %s", settings.AUTH_FILE)
 
         # Force Path object instantiation so that the file creation can be
