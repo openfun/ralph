@@ -2,6 +2,7 @@
 
 import asyncio
 import datetime
+from dateutil.parser import parse
 import logging
 import operator
 from functools import reduce
@@ -120,3 +121,47 @@ async def gather_with_limited_concurrency(num_tasks: Union[None, int], *tasks):
     except Exception as exception:
         group.cancel()
         raise exception
+
+def statements_are_equivalent(statement_1: dict, statement_2: dict):
+    """Check if statements are identical on fields not modified on input by the LRS.
+    
+    Fields not being compared are: "timestamp", "stored", "authority".
+    """
+    fields = ["actor", "verb", "object", "id", "result", "context", "attachements"]
+    print('jokeyr\n')
+    import pprint
+    pprint.pprint(statement_1)
+    print('\n')
+    pprint.pprint(statement_2)
+    return all(statement_1.get(field) == statement_2.get(field) for field in fields)
+
+def _assert_statements_are_equivalent(statement_1: dict, statement_2: dict):  
+    """Assert that statements are identical on fields not modified by the LRS."""
+    assert statements_are_equivalent(statement_1, statement_2)
+
+def assert_statement_get_responses_are_equivalent(response_1: dict, response_2: dict):
+    """Check that responses to GET /statements are equivalent.
+    
+    Check that all statements in response are equivalent, meaning that all
+    fields not modified by the LRS are equal.
+    """
+
+    assert response_1.keys() == response_2.keys()
+
+    def _all_but_statements(response):
+        return {key: val for key, val in response.items() if key != "statements"}
+
+    assert _all_but_statements(response_1) == _all_but_statements(response_2)
+
+    # Assert the statements part of the response is equivalent
+    assert "statements" in response_1.keys()
+    assert len(response_1["statements"]) == len(response_2["statements"])
+    for statement_1, statement_2 in zip(response_1["statements"], response_2["statements"]):
+        _assert_statements_are_equivalent(statement_1, statement_2)
+
+def string_is_date(string):
+    try: 
+        parse(string)
+        return True
+    except:
+        return False

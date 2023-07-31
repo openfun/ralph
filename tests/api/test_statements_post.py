@@ -12,6 +12,7 @@ from ralph.backends.database.es import ESDatabase
 from ralph.backends.database.mongo import MongoDatabase
 from ralph.conf import XapiForwardingConfigurationSettings
 from ralph.exceptions import BackendException
+from ralph.utils import assert_statement_get_responses_are_equivalent, string_is_date
 
 from tests.fixtures.backends import (
     ES_TEST_FORWARDING_INDEX,
@@ -70,7 +71,63 @@ def test_api_statements_post_single_statement_directly(
         "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
     )
     assert response.status_code == 200
-    assert response.json() == {"statements": [statement]}
+    assert_statement_get_responses_are_equivalent(response.json(), {"statements": [statement]})
+
+
+@pytest.mark.parametrize(
+    "backend",
+    [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
+)
+# pylint: disable=too-many-arguments
+def test_api_statements_post_pre_processing(
+    backend, monkeypatch, auth_credentials, es, mongo, clickhouse
+):
+    """Tests the post statements pre-processing."""
+    # pylint: disable=invalid-name,unused-argument
+
+    monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
+    statement = {
+        "actor": {
+            "account": {
+                "homePage": "https://example.com/homepage/",
+                "name": str(uuid4()),
+            },
+            "objectType": "Agent",
+        },
+        "id": str(uuid4()),
+        "object": {"id": "https://example.com/object-id/1/"},
+        "timestamp": "2022-06-22T08:31:38Z",
+        "verb": {"id": "https://example.com/verb-id/1/"},
+    }
+
+    response = client.post(
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {auth_credentials}"},
+        json=statement,
+    )
+
+    assert response.status_code == 200
+    assert response.json() == [statement["id"]]
+
+    es.indices.refresh()
+
+    response = client.get(
+        "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
+    )
+
+    # Test pre-processing: id
+    assert "id" in response.json()['statements'][0]
+
+    # Test pre-processing: timestamp
+    assert "timestamp" in response.json()["statements"][0]
+    assert string_is_date(response.json()["statements"][0]["timestamp"])
+
+    # Test pre-processing: stored
+    assert "stored" in response.json()["statements"][0]
+    assert string_is_date(response.json()["statements"][0]["stored"])
+
+    # Test pre-processing: authority
+    # TODO
 
 
 @pytest.mark.parametrize(
@@ -149,7 +206,7 @@ def test_api_statements_post_statements_list_of_one(
         "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
     )
     assert response.status_code == 200
-    assert response.json() == {"statements": [statement]}
+    assert_statement_get_responses_are_equivalent(response.json(), {"statements": [statement]})
 
 
 @pytest.mark.parametrize(
@@ -210,9 +267,14 @@ def test_api_statements_post_statements_list(
         "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
     )
     assert get_response.status_code == 200
+
     # Update statements with the generated id.
     statements[1] = dict(statements[1], **{"id": generated_id})
-    assert get_response.json() == {"statements": statements}
+
+    # assert get_response.json() == {"statements": statements}
+    assert_statement_get_responses_are_equivalent(get_response.json(), {"statements": statements})
+
+
 
 
 @pytest.mark.parametrize(
@@ -333,7 +395,8 @@ def test_api_statements_post_statements_list_with_duplicate_of_existing_statemen
         "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
     )
     assert response.status_code == 200
-    assert response.json() == {"statements": [statement]}
+    assert_statement_get_responses_are_equivalent(response.json(), {"statements": [statement]})
+    
 
 
 @pytest.mark.parametrize(

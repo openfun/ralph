@@ -117,3 +117,74 @@ def test_utils_set_dict_value_from_path_updating_fields():
     dictionary = {"foo": {"bar": "bar_value"}}
     ralph_utils.set_dict_value_from_path(dictionary, ["foo", "bar"], "baz")
     assert dictionary == {"foo": {"bar": "baz"}}
+
+def test_utils_assert_statement_get_responses_are_equivalent():
+    """Test the equivalency assertion for get responses.
+    
+    Equivalency (term NOT in specifaction) means that two statements have 
+    identical values on all fields except `authority`, `stored` and `timestamp`
+    (where the value may or may not be identical).
+    """
+    statement_1 = {
+        "actor": {"actor_field": "actor_1"},
+        "verb": "verb_1",
+        "object": "object_1",
+        "id": "id_1",
+        "result": "result_1",
+        "context": "context_1",
+        "attachements": "attachements_1",
+
+        "timestamp": "timestamp_1",
+        "stored": "stored_1",
+        "authority": "authority_1"
+    }
+
+    statement_2 = {
+        "actor": {"actor_field": "actor_1"},
+        "verb": "verb_1",
+        "object": "object_1",
+        "id": "id_1",
+        "result": "result_1",
+        "context": "context_1",
+        "attachements": "attachements_1",
+
+        "timestamp": "timestamp_2",
+        "stored": "stored_2",
+        "authority": "authority_2",
+    }
+
+    statement_3 = {
+        "actor": {"actor_field": "actor_3"},
+        "verb": "verb_1",
+        "object": "object_1",
+        "id": "id_1",
+        "result": "result_1",
+        "context": "context_1",
+        "attachements": "attachements_1",
+
+        "timestamp": "timestamp_1",
+        "stored": "stored_1",
+        "authority": "authority_1",
+    }
+
+    get_response_1 = {"statements": [statement_1]}
+    get_response_2 = {"statements": [statement_2]}
+    get_response_3 = {"statements": [statement_3]}
+
+    # Test that statements 1 and 2 are equivalent
+    ralph_utils.assert_statement_get_responses_are_equivalent(get_response_1, get_response_2)
+
+    # Test that statements 1 and 3 are NOT equivalent
+    with pytest.raises(AssertionError):
+        ralph_utils.assert_statement_get_responses_are_equivalent(get_response_1, get_response_3)
+
+
+def test_utils_string_is_date():
+    """Test that strings representing dates are properly identified."""
+    string = '2022-06-22T08:31:38Z'
+    assert ralph_utils.string_is_date(string)
+
+    string = '40223-06-22T08:31:38Z'
+    assert not ralph_utils.string_is_date(string)
+
+

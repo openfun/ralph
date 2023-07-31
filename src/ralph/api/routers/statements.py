@@ -3,7 +3,6 @@
 import json
 import logging
 from datetime import datetime
-from time import now
 from typing import List, Literal, Optional, Union
 from urllib.parse import ParseResult, urlencode
 from uuid import UUID, uuid4
@@ -17,6 +16,7 @@ from fastapi import (
     Request,
     Response,
     status,
+    Security
 )
 from pydantic import parse_obj_as
 from pydantic.types import Json
@@ -40,7 +40,9 @@ from ralph.models.xapi.base.agents import (
     BaseXapiAgentWithOpenId,
 )
 from ralph.models.xapi.base.common import IRI
+from ralph.utils import now, statements_are_equivalent
 
+from ..auth import get_authenticated_user
 from ..models import ErrorDetail, LaxStatement
 
 logger = logging.getLogger(__name__)
@@ -379,6 +381,7 @@ async def get(
 @router.put("", responses=POST_PUT_RESPONSES, status_code=status.HTTP_204_NO_CONTENT)
 # pylint: disable=unused-argument
 async def put(
+    current_user: Annotated[AuthenticatedUser, Depends(get_authenticated_user)],
     # pylint: disable=invalid-name
     statementId: str,
     statement: LaxStatement,
@@ -389,13 +392,10 @@ async def put(
     LRS Specification:
     https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#211-put-statements
     """
-    statement_dict = {statementId: statement.dict(exclude_unset=True)}
+    statement_as_dict = statement.dict(exclude_unset=True)
+    _pre_process_statement(current_user, statement_as_dict)
 
-    # Force the UUID id in the statement to string, make sure it matches the
-    # statementId given in the URL.
-    statement_dict[statementId]["id"] = str(statement_dict[statementId]["id"])
-
-    if not statementId == statement_dict[statementId]["id"]:
+    if not statementId == statement_as_dict["id"]:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="xAPI statement id does not match given statementId",
@@ -403,7 +403,7 @@ async def put(
 
     if get_active_xapi_forwardings():
         background_tasks.add_task(
-            forward_xapi_statements, list(statement_dict.values())
+            forward_xapi_statements, [statement_as_dict]
         )
 
     try:
@@ -419,17 +419,20 @@ async def put(
         # In the case that the current statement is not an exact duplicate of the one
         # found in the database we return a 409, otherwise the usual 204.
         for existing in existing_statement:
-            if statement_dict != existing["_source"]:
+            if not statements_are_equivalent(statement_as_dict, existing["_source"]):
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
                     detail="A different statement already exists with the same ID",
                 )
         return
 
+    # Enrich statements before insertion
+    _pre_process_statement(current_user, statement)
+
     # For valid requests, perform the bulk indexing of all incoming statements
     try:
         success_count = DATABASE_CLIENT.put(
-            statement_dict.values(), ignore_errors=False
+            [statement_as_dict], ignore_errors=False
         )
     except (BackendException, BadFormatException) as exc:
         logger.error("Failed to index submitted statement")
@@ -444,6 +447,7 @@ async def put(
 @router.post("/", responses=POST_PUT_RESPONSES)
 @router.post("", responses=POST_PUT_RESPONSES)
 async def post(
+    current_user: Annotated[AuthenticatedUser, Depends(get_authenticated_user)],
     statements: Union[LaxStatement, List[LaxStatement]],
     background_tasks: BackgroundTasks,
     response: Response,
@@ -465,8 +469,7 @@ async def post(
     # - provide an iterable containing both the statements and generated IDs for bulk.
     statements_dict = {}
     for statement in map(lambda x: x.dict(exclude_unset=True), statements):
-        statement_id = str(statement.get("id", uuid4()))
-        statement["id"] = statement_id
+        statement_id = _pre_process_statement(current_user, statement)
         statements_dict[statement_id] = statement
 
     # Requests with duplicate statement IDs are considered invalid
@@ -503,7 +506,8 @@ async def post(
 
             # The LRS specification calls for deep comparison of duplicates. This
             # is done here. If they are not exactly the same, we raise an error.
-            if statements_dict[existing["_id"]] != existing["_source"]:
+            if not statements_are_equivalent(statements_dict[existing["_id"]], existing["_source"]):
+                print('jiglyjigy')
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
                     detail="Differing statements already exist with the same ID: "
@@ -522,9 +526,6 @@ async def post(
         if not statements_ids:
             response.status_code = status.HTTP_204_NO_CONTENT
             return
-        
-    # Enrich statements before insertion
-    [_pre_process_statement(current_user, statement) for statement in statements_dict()]
 
     # For valid requests, perform the bulk indexing of all incoming statements
     try:
