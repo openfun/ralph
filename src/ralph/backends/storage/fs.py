@@ -62,7 +62,7 @@ class FSStorage(HistoryMixin, BaseStorage):
         logger.debug("Found %d archives", len(archives))
 
         if new:
-            archives = set(archives) - set(self.get_command_history(self.name, "fetch"))
+            archives = set(archives) - set(self.get_command_history(self.name, "read"))
             logger.debug("New archives: %d", len(archives))
 
         for archive in archives:
@@ -86,7 +86,7 @@ class FSStorage(HistoryMixin, BaseStorage):
         self.append_to_history(
             {
                 "backend": self.name,
-                "command": "fetch",
+                "command": "read",
                 "id": name,
                 "filename": details.get("filename"),
                 "size": details.get("size"),
@@ -114,7 +114,7 @@ class FSStorage(HistoryMixin, BaseStorage):
         self.append_to_history(
             {
                 "backend": self.name,
-                "command": "push",
+                "command": "write",
                 "id": name,
                 "filename": details.get("filename"),
                 "size": details.get("size"),

@@ -64,7 +64,7 @@ class S3Storage(
         """Lists archives in the storage backend."""
         archives_to_skip = set()
         if new:
-            archives_to_skip = set(self.get_command_history(self.name, "fetch"))
+            archives_to_skip = set(self.get_command_history(self.name, "read"))
 
         try:
             paginator = self.client.get_paginator("list_objects_v2")
@@ -114,7 +114,7 @@ class S3Storage(
         self.append_to_history(
             {
                 "backend": self.name,
-                "command": "fetch",
+                "command": "read",
                 "id": name,
                 "size": size,
                 "fetched_at": now(),
@@ -141,7 +141,7 @@ class S3Storage(
         self.append_to_history(
             {
                 "backend": self.name,
-                "command": "push",
+                "command": "write",
                 "id": name,
                 "pushed_at": now(),
             }

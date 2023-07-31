@@ -15,6 +15,7 @@ and this project adheres to
 using the cli
 - `GET /statements` now has "mine" option which matches statements that
 have an authority field matching that of the user
+- CLI: change `push` to `write` and `fetch` to `read` [BC]
 
 ## [3.9.0] - 2023-07-21
 

@@ -2,7 +2,7 @@
 
 Ralph is a toolbox for your learning analytics, it can be used as a:
 
-- **library**, to fetch learning events from various backends, (de)serialize or
+- **library**, to read learning events from various backends, (de)serialize or
   convert them from various standard formats such as
   [xAPI](https://adlnet.gov/projects/xapi/),
 - **command-line interface** (CLI), to build data pipelines the UNIX-way™️,
@@ -38,15 +38,15 @@ base commands and UNIX standard streams (`stdin`, `stdout`) to connect them in
 a pipeline. A base example pipeline may be:
 
 ```sh
-$ ralph fetch --backend swift my_archive.gzip | \
+$ ralph read --backend swift my_archive.gzip | \
     gunzip | \
-    ralph push --backend es
+    ralph write --backend es
 ```
 
 In this small pipeline, we stream `my_archive.gzip` content from a Swift
-container to the standard output (using the `fetch` command), uncompress the
+container to the standard output (using the `read` command), uncompress the
 content (using the `gunzip` command), and bulk insert logs in an ElasticSearch
-index (using the `push` command).
+index (using the `write` command).
 
 As UNIX is beautiful, Ralph offers many powerful possibilities by combining its
 commands with other standard commands or command line tools.
