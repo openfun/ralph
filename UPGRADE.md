@@ -8,8 +8,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 #### Upgrade history syntax
 
-CLI syntax has been changed from `fetch` & `push` to `read` & `write` affecting the command history. You must replace the command 
-history after updating:sed -i 's/"fetch"/"read"/g'
+CLI syntax has been changed from `fetch` & `push` to `read` & `write` affecting the command history. You must replace the command history after updating:
 - locate your history file path, which is in `{ RALPH_APP_DIR }/history.json` (defaults to `.ralph/history.json`)
 - run the commands below to update history
 ```
