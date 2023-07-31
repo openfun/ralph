@@ -21,10 +21,10 @@ ralph_mount_es_ca_secret: false
 #       - "-c"
 #       - ralph list --backend ldp --new |
 #           xargs -I {} -n 1 bash -c "
-#             ralph fetch --backend ldp {} |
+#             ralph read --backend ldp {} |
 #             gunzip |
 #             ralph extract -p gelf |
-#             ralph push \
+#             ralph write \
 #               --backend es \
 #               --es-client-options ca_certs=/usr/local/share/ca-certificates/es-cluster.pem"
 ralph_cronjobs: []

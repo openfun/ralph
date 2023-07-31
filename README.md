@@ -150,6 +150,10 @@ $ ralph COMMAND --help
 > You should substitute `COMMAND` by the target command, _e.g._ `list`, to see
 > its usage.
 
+## Migrating
+
+Some major version changes require updating persistence layers. Check out the [migration guide](https://github.com/openfun/ralph/blob/master/UPGRADE.md) for more information.
+
 ## Documentation
 
 We try our best to maintain an up-to-date reference documentation for this

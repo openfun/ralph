@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- CLI: change `push` to `write` and `fetch` to `read` [BC]
+
 ## [3.9.0] - 2023-07-21
 
 ### Changed

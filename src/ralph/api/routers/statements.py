@@ -229,7 +229,7 @@ async def get(
         ),
     ),
 ):
-    """Fetches a single xAPI Statement or multiple xAPI Statements.
+    """Read a single xAPI Statement or multiple xAPI Statements.
 
     LRS Specification:
     https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#213-get-statements

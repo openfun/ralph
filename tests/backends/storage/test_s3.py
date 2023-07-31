@@ -99,8 +99,8 @@ def test_backends_storage_s3_list_should_yield_archive_names(
     ]
 
     history = [
-        {"id": "2022-04-29.gz", "backend": "s3", "command": "fetch"},
-        {"id": "2022-04-30.gz", "backend": "s3", "command": "fetch"},
+        {"id": "2022-04-29.gz", "backend": "s3", "command": "read"},
+        {"id": "2022-04-30.gz", "backend": "s3", "command": "read"},
     ]
 
     s3 = s3()
@@ -224,7 +224,7 @@ def test_backends_storage_s3_read_with_valid_name_should_write_to_history(
     assert s3.history == [
         {
             "backend": "s3",
-            "command": "fetch",
+            "command": "read",
             "id": "2022-09-29.gz",
             "size": len(body),
             "fetched_at": freezed_now,
@@ -300,8 +300,8 @@ def test_backends_storage_s3_write_should_write_to_history_new_or_overwritten_ar
     )
 
     history = [
-        {"id": "2022-09-29.gz", "backend": "s3", "command": "fetch"},
-        {"id": "2022-09-30.gz", "backend": "s3", "command": "fetch"},
+        {"id": "2022-09-29.gz", "backend": "s3", "command": "read"},
+        {"id": "2022-09-30.gz", "backend": "s3", "command": "read"},
     ]
 
     freezed_now = datetime.datetime.now(tz=datetime.timezone.utc).isoformat()
@@ -309,7 +309,7 @@ def test_backends_storage_s3_write_should_write_to_history_new_or_overwritten_ar
     new_history_entry = [
         {
             "backend": "s3",
-            "command": "push",
+            "command": "write",
             "id": archive_name,
             "pushed_at": freezed_now,
         }
@@ -359,8 +359,8 @@ def test_backends_storage_s3_write_should_log_the_error(
     )
 
     history = [
-        {"id": "2022-09-29.gz", "backend": "s3", "command": "fetch"},
-        {"id": "2022-09-30.gz", "backend": "s3", "command": "fetch"},
+        {"id": "2022-09-29.gz", "backend": "s3", "command": "read"},
+        {"id": "2022-09-30.gz", "backend": "s3", "command": "read"},
     ]
 
     fs.create_file(settings.HISTORY_FILE, contents=json.dumps(history))
