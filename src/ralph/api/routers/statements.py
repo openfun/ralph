@@ -3,6 +3,7 @@
 import json
 import logging
 from datetime import datetime
+from time import now
 from typing import List, Literal, Optional, Union
 from urllib.parse import ParseResult, urlencode
 from uuid import UUID, uuid4
@@ -65,6 +66,47 @@ POST_PUT_RESPONSES = {
     },
 }
 
+def _pre_process_statement(current_user: AuthenticatedUser, statement: dict):#, authority: Authority):
+    """Enrich LRS statement according to specifications.
+
+    args:
+        statement: statement being passed on to the LRS. Modified by this function.
+    """
+
+    # id: UUID
+    # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#24-statement-properties
+    statement_id = str(statement.get("id", uuid4()))
+    statement["id"] = statement_id
+
+    # authority: Information about whom or what has asserted that this statement is true
+    # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#249-authority
+    # authority = current_user.infer_authority()
+    # if "authority" in statement and statement["authority"] != authority:
+    #     logger.error(
+    #         "Failed to index submitted statements. Submitted authority does not match."
+    #     )
+    #     raise HTTPException(
+    #         status_code=status.HTTP_403_FORBIDDEN,
+    #         detail=(
+    #             "Stated authority does not match credentials. Change or remove"
+    #              "`authority`.",
+    #         )
+    #     )
+    # else:
+    #     statement["authority"] = authority
+
+    # stored: The time at which a Statement is stored by the LRS
+    # https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Data.md#248-stored
+    statement["stored"] = now()
+
+    # timestamp: If not provided, same value as stored
+    # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#247-timestamp
+    statement["timestamp"] = statement.get("timestamp", statement["stored"])
+
+    # Setting "version" property is not recommended
+    # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#24-statement-properties
+
+    return statement_id
 
 def _parse_agent_parameters(agent_obj: dict):
     """Parse a dict and return an AgentParameters object to use in queries."""
@@ -480,6 +522,9 @@ async def post(
         if not statements_ids:
             response.status_code = status.HTTP_204_NO_CONTENT
             return
+        
+    # Enrich statements before insertion
+    [_pre_process_statement(current_user, statement) for statement in statements_dict()]
 
     # For valid requests, perform the bulk indexing of all incoming statements
     try:
