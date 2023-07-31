@@ -304,7 +304,7 @@ def backends_options(name=None, backend_types: List[BaseModel] = None):
 )
 @click.option(
     "-w",
-    "--write",
+    "--write-to-disk",
     is_flag=True,
     default=False,
     help="Write new credentials to the LRS authentication file.",
@@ -314,7 +314,7 @@ def auth(
     username,
     password,
     scope,
-    write,
+    write_to_disk,
     agent_ifi_mbox,
     agent_ifi_mbox_sha1sum,
     agent_ifi_openid,
@@ -392,7 +392,7 @@ def auth(
         agent=agent,
     )
 
-    if write:
+    if write_to_disk:
         logger.info("Will append new credentials to: %s", settings.AUTH_FILE)
 
         # Force Path object instantiation so that the file creation can be
@@ -561,7 +561,7 @@ def convert(from_, to_, ignore_errors, fail_on_unknown, **conversion_set_kwargs)
     "--target",
     type=str,
     default=None,
-    help="Endpoint from which to fetch events (e.g. `/statements`)",
+    help="Endpoint from which to read events (e.g. `/statements`)",
 )
 @click.option(
     "-q",
@@ -570,8 +570,8 @@ def convert(from_, to_, ignore_errors, fail_on_unknown, **conversion_set_kwargs)
     default=None,
     help="Query object as a JSON string (database and HTTP backends ONLY)",
 )
-def fetch(backend, archive, chunk_size, target, query, **options):
-    """Fetch an archive or records from a configured backend."""
+def read(backend, archive, chunk_size, target, query, **options):
+    """Read an archive or records from a configured backend."""
     logger.info(
         (
             "Fetching data from the configured %s backend "
@@ -673,9 +673,9 @@ def fetch(backend, archive, chunk_size, target, query, **options):
     "--target",
     type=str,
     default=None,
-    help="Endpoint in which to push events (e.g. `statements`)",
+    help="Endpoint in which to write events (e.g. `statements`)",
 )
-def push(
+def write(
     backend,
     archive,
     chunk_size,
@@ -686,8 +686,9 @@ def push(
     target,
     **options,
 ):
-    """Push an archive to a configured backend."""
-    logger.info("Pushing archive %s to the configured %s backend", archive, backend)
+    """Write an archive to a configured backend."""
+    logger.info("Writing archive %s to the configured %s backend", archive, backend)
+
     logger.debug("Backend parameters: %s", options)
 
     if max_num_simultaneous == 1:

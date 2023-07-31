@@ -10,7 +10,7 @@ from ralph.exceptions import ConfigurationException
 
 # pylint: disable=invalid-name, unused-argument
 def test_logger_exists(fs, monkeypatch):
-    """Tests the logging system when a correct configuration is provided."""
+    """Test the logging system when a correct configuration is provided."""
     mock_default_config = {
         "version": 1,
         "propagate": True,
@@ -42,18 +42,18 @@ def test_logger_exists(fs, monkeypatch):
     runner = CliRunner()
     result = runner.invoke(
         cli,
-        ["push", "-b", "fs", "test_file"],
+        ["write", "-b", "fs", "test_file"],
         input="test input",
     )
 
     assert result.exit_code == 0
-    assert "Pushing archive test_file to the configured fs backend" in result.output
+    assert "Writing archive test_file to the configured fs backend" in result.output
     assert "Backend parameters:" in result.output
 
 
 # pylint: disable=invalid-name, unused-argument
 def test_logger_no_config(fs, monkeypatch):
-    """Tests that an error occurs when no logging configuration exists."""
+    """Test that an error occurs when no logging configuration exists."""
     mock_default_config = None
 
     monkeypatch.setattr(ralph.logger.settings, "LOGGING", mock_default_config)
@@ -67,7 +67,7 @@ def test_logger_no_config(fs, monkeypatch):
 
 # pylint: disable=invalid-name, unused-argument
 def test_logger_bad_config(fs, monkeypatch):
-    """Tests that an error occurs when a logging is improperly configured."""
+    """Test that an error occurs when a logging is improperly configured."""
     mock_default_config = "this is not a valid json"
 
     monkeypatch.setattr(ralph.logger.settings, "LOGGING", mock_default_config)
