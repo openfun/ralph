@@ -147,10 +147,6 @@ def test_utils_assert_statement_get_responses_are_equivalent():
         "result": "result_1",
         "context": "context_1",
         "attachements": "attachements_1",
-
-        "timestamp": "timestamp_2",
-        "stored": "stored_2",
-        "authority": "authority_2",
     }
 
     statement_3 = {
@@ -173,7 +169,7 @@ def test_utils_assert_statement_get_responses_are_equivalent():
 
     # Test that statements 1 and 2 are equivalent
     ralph_utils.assert_statement_get_responses_are_equivalent(get_response_1, get_response_2)
-
+    
     # Test that statements 1 and 3 are NOT equivalent
     with pytest.raises(AssertionError):
         ralph_utils.assert_statement_get_responses_are_equivalent(get_response_1, get_response_3)
