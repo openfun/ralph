@@ -68,18 +68,28 @@ POST_PUT_RESPONSES = {
     },
 }
 
-def _pre_process_statement(current_user: AuthenticatedUser, statement: dict):#, authority: Authority):
-    """Enrich LRS statement according to specifications.
-
-    args:
-        statement: statement being passed on to the LRS. Modified by this function.
-    """
-
+def _enrich_statement_with_id(statement):
     # id: UUID
     # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#24-statement-properties
-    statement_id = str(statement.get("id", uuid4()))
-    statement["id"] = statement_id
+    statement["id"] = str(statement.get("id", uuid4()))
+    return statement["id"]
 
+def _enrich_statement_with_stored(statement, value=None):
+    # stored: The time at which a Statement is stored by the LRS
+    # https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Data.md#248-stored
+    if value is None:
+        statement["stored"] = now()
+    else:
+        statement["stored"] = value
+    return statement["stored"]
+
+def _enrich_statement_with_timestamp(statement):
+    # timestamp: If not provided, same value as stored
+    # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#247-timestamp
+    statement["timestamp"] = statement.get("timestamp", statement.get("stored", now()))
+    return statement["timestamp"]
+
+def _enrich_statement_with_authority(statement, current_user):
     # authority: Information about whom or what has asserted that this statement is true
     # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#249-authority
     # authority = current_user.infer_authority()
@@ -96,19 +106,7 @@ def _pre_process_statement(current_user: AuthenticatedUser, statement: dict):#, 
     #     )
     # else:
     #     statement["authority"] = authority
-
-    # stored: The time at which a Statement is stored by the LRS
-    # https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Data.md#248-stored
-    statement["stored"] = now()
-
-    # timestamp: If not provided, same value as stored
-    # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#247-timestamp
-    statement["timestamp"] = statement.get("timestamp", statement["stored"])
-
-    # Setting "version" property is not recommended
-    # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#24-statement-properties
-
-    return statement_id
+    pass
 
 def _parse_agent_parameters(agent_obj: dict):
     """Parse a dict and return an AgentParameters object to use in queries."""
@@ -393,18 +391,31 @@ async def put(
     https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#211-put-statements
     """
     statement_as_dict = statement.dict(exclude_unset=True)
-    _pre_process_statement(current_user, statement_as_dict)
 
-    if not statementId == statement_as_dict["id"]:
+    statement_as_dict["id"] = str(statement_as_dict["id"])
+    if statementId != statement_as_dict["id"]:
+        print('gloubi\n')
+        print(statementId)
+        print('\n')
+        print(statement_as_dict["id"])
+        print(type(statementId))
+        print(type(statement_as_dict["id"]))
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="xAPI statement id does not match given statementId",
         )
+    
+    # Enrich statement before forwarding (NB: id is already set)
+    timestamp = _enrich_statement_with_timestamp(statement_as_dict)
 
     if get_active_xapi_forwardings():
         background_tasks.add_task(
-            forward_xapi_statements, [statement_as_dict]
+            forward_xapi_statements, statement_as_dict
         )
+
+    # Finish enriching statements after forwarding
+    _enrich_statement_with_stored(statement_as_dict, timestamp)
+    _enrich_statement_with_authority(statement_as_dict, current_user)
 
     try:
         existing_statement = DATABASE_CLIENT.query_statements_by_ids([statementId])
@@ -425,9 +436,6 @@ async def put(
                     detail="A different statement already exists with the same ID",
                 )
         return
-
-    # Enrich statements before insertion
-    _pre_process_statement(current_user, statement)
 
     # For valid requests, perform the bulk indexing of all incoming statements
     try:
@@ -463,13 +471,11 @@ async def post(
     if not isinstance(statements, list):
         statements = [statements]
 
-    # The statements dict has multiple functions:
-    # - generate IDs for statements that are missing them;
-    # - use the list of keys to perform validations and as a final return value;
-    # - provide an iterable containing both the statements and generated IDs for bulk.
+    # Enrich statements before forwarding
     statements_dict = {}
     for statement in map(lambda x: x.dict(exclude_unset=True), statements):
-        statement_id = _pre_process_statement(current_user, statement)
+        statement_id = _enrich_statement_with_id(statement)
+        timestamp = _enrich_statement_with_timestamp(statement)
         statements_dict[statement_id] = statement
 
     # Requests with duplicate statement IDs are considered invalid
@@ -485,6 +491,11 @@ async def post(
         background_tasks.add_task(
             forward_xapi_statements, list(statements_dict.values())
         )
+
+    # Finish enriching statements after forwarding
+    for statement in statements_dict.values():
+        _enrich_statement_with_stored(statement, value=timestamp)
+        _enrich_statement_with_authority(statement, current_user)
 
     try:
         existing_statements = DATABASE_CLIENT.query_statements_by_ids(statements_ids)

@@ -271,7 +271,6 @@ def test_api_statements_post_statements_list(
     # Update statements with the generated id.
     statements[1] = dict(statements[1], **{"id": generated_id})
 
-    # assert get_response.json() == {"statements": statements}
     assert_statement_get_responses_are_equivalent(get_response.json(), {"statements": statements})
 
 
@@ -378,11 +377,11 @@ def test_api_statements_post_statements_list_with_duplicate_of_existing_statemen
 
     es.indices.refresh()
 
-    # Post the statement again, trying to change the version field which is not allowed.
+    # Post the statement again, trying to change the timestamp field which is not allowed.
     response = client.post(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {auth_credentials}"},
-        json=[dict(statement, **{"version": "1.0.0"})],
+        json=[dict(statement, **{"timestamp": "2023-03-15T14:07:51Z"})],
     )
 
     assert response.status_code == 409
@@ -647,7 +646,8 @@ async def test_post_statements_list_with_statement_forwarding(
                 headers={"Authorization": f"Basic {auth_credentials}"},
             )
             assert response.status_code == 200
-            assert response.json() == {"statements": [statement]}
+            assert_statement_get_responses_are_equivalent(response.json(), {"statements": [statement]})
+
 
     # The statement should also be stored on the receiving client
     async with AsyncClient() as receiving_client:
@@ -656,7 +656,8 @@ async def test_post_statements_list_with_statement_forwarding(
             headers={"Authorization": f"Basic {auth_credentials}"},
         )
         assert response.status_code == 200
-        assert response.json() == {"statements": [statement]}
+        assert_statement_get_responses_are_equivalent(response.json(), {"statements": [statement]})
+
 
     # Stop receiving LRS client
     await lrs_context.__aexit__(None, None, None)

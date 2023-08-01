@@ -61,7 +61,8 @@ def test_api_statements_put_single_statement_directly(
         headers={"Authorization": f"Basic {auth_credentials}"},
         json=statement,
     )
-
+    print('yologr')
+    print(response.content)
     assert response.status_code == 204
 
     es.indices.refresh()
@@ -274,11 +275,11 @@ def test_api_statements_put_statement_duplicate_of_existing_statement(
 
     es.indices.refresh()
 
-    # Put the statement twice, trying to change the version field which is not allowed.
+    # Put the statement twice, trying to change the timestamp field which is not allowed.
     response = client.put(
         f"/xAPI/statements/?statementId={statement['id']}",
         headers={"Authorization": f"Basic {auth_credentials}"},
-        json=dict(statement, **{"version": "1.0.0"}),
+        json=dict(statement, **{"timestamp": "2023-03-15T14:07:51Z"}),
     )
 
     assert response.status_code == 409
@@ -291,7 +292,7 @@ def test_api_statements_put_statement_duplicate_of_existing_statement(
         headers={"Authorization": f"Basic {auth_credentials}"},
     )
     assert response.status_code == 200
-    assert response.json() == {"statements": [statement]}
+    assert_statement_get_responses_are_equivalent(response.json(), {"statements": [statement]})
 
 
 @pytest.mark.parametrize(
@@ -544,7 +545,7 @@ async def test_put_statement_with_statement_forwarding(
                 headers={"Authorization": f"Basic {auth_credentials}"},
             )
             assert response.status_code == 200
-            assert response.json() == {"statements": [statement]}
+            assert_statement_get_responses_are_equivalent(response.json(), {"statements": [statement]})
 
     # The statement should also be stored on the receiving client
     async with AsyncClient() as receiving_client:
@@ -553,7 +554,7 @@ async def test_put_statement_with_statement_forwarding(
             headers={"Authorization": f"Basic {auth_credentials}"},
         )
         assert response.status_code == 200
-        assert response.json() == {"statements": [statement]}
+        assert_statement_get_responses_are_equivalent(response.json(), {"statements": [statement]})
 
     # Stop receiving LRS client
     await lrs_context.__aexit__(None, None, None)

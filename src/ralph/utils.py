@@ -133,23 +133,12 @@ def statements_are_equivalent(statement_1: dict, statement_2: dict):
     # Check that unmutable fields have the same values
     fields = ["actor", "verb", "object", "id", "result", "context", "attachements"]
     if any(statement_1.get(field) != statement_2.get(field) for field in fields):
-        print('yoga fire')
         return False
 
-    print('nice judo')
     # Check that fields enriched by the LRS are equal when present in both statements
     other_fields = {"authority", "stored", "timestamp", "version"}
     other_fields = other_fields & statement_1.keys() & statement_2.keys()
     if any(statement_1.get(field) != statement_2.get(field) for field in other_fields):
-        print('free drink')
-        print(other_fields)
-        print('\n')
-        for field in other_fields:
-            print(field)
-            print(statement_1.get(field))
-            print(statement_2.get(field))
-            print("\n")
-
         return False
     
     return True
