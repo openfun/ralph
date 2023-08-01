@@ -394,12 +394,6 @@ async def put(
 
     statement_as_dict["id"] = str(statement_as_dict["id"])
     if statementId != statement_as_dict["id"]:
-        print('gloubi\n')
-        print(statementId)
-        print('\n')
-        print(statement_as_dict["id"])
-        print(type(statementId))
-        print(type(statement_as_dict["id"]))
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="xAPI statement id does not match given statementId",
@@ -518,7 +512,6 @@ async def post(
             # The LRS specification calls for deep comparison of duplicates. This
             # is done here. If they are not exactly the same, we raise an error.
             if not statements_are_equivalent(statements_dict[existing["_id"]], existing["_source"]):
-                print('jiglyjigy')
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
                     detail="Differing statements already exist with the same ID: "

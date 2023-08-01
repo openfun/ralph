@@ -61,8 +61,7 @@ def test_api_statements_put_single_statement_directly(
         headers={"Authorization": f"Basic {auth_credentials}"},
         json=statement,
     )
-    print('yologr')
-    print(response.content)
+    
     assert response.status_code == 204
 
     es.indices.refresh()

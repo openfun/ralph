@@ -304,7 +304,7 @@ def backends_options(name=None, backend_types: List[BaseModel] = None):
 )
 @click.option(
     "-w",
-    "--write-credentials",
+    "--write-to-disk",
     is_flag=True,
     default=False,
     help="Write new credentials to the LRS authentication file.",

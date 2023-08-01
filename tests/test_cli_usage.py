@@ -26,7 +26,7 @@ def test_cli_auth_command_usage():
             "-O, --agent-ifi-openid TEXT",
             "-A, --agent-ifi-account TEXT",
             "-N, --agent-name TEXT",
-            "-w, --write-credentials",
+            "-w, --write-to-disk",
         ]
     )
 
