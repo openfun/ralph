@@ -19,7 +19,7 @@
         <link rel="next" href="commands/">
       
       <link rel="icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.18">
+      <meta name="generator" content="mkdocs-1.5.1, mkdocs-material-9.1.21">
     
     
       
@@ -27,7 +27,7 @@
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.26e3688c.min.css">
+      <link rel="stylesheet" href="assets/stylesheets/main.eebd395e.min.css">
       
         
         <link rel="stylesheet" href="assets/stylesheets/palette.ecc896b0.min.css">
@@ -679,7 +679,7 @@
 <h1 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h1>
 <p>Ralph is a toolbox for your learning analytics, it can be used as a:</p>
 <ul>
-<li><strong>library</strong>, to fetch learning events from various backends, (de)serialize or
+<li><strong>library</strong>, to read learning events from various backends, (de)serialize or
   convert them from various standard formats such as
   <a href="https://adlnet.gov/projects/xapi/">xAPI</a>,</li>
 <li><strong>command-line interface</strong> (CLI), to build data pipelines the UNIX-way™️,</li>
@@ -710,14 +710,14 @@ traces in xAPI format:</p>
 <p>At first, Ralph has been designed as a CLI to batch process your logs using
 base commands and UNIX standard streams (<code>stdin</code>, <code>stdout</code>) to connect them in
 a pipeline. A base example pipeline may be:</p>
-<div class="highlight"><pre><span></span><code>$<span class="w"> </span>ralph<span class="w"> </span>fetch<span class="w"> </span>--backend<span class="w"> </span>swift<span class="w"> </span>my_archive.gzip<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>ralph<span class="w"> </span><span class="nb">read</span><span class="w"> </span>--backend<span class="w"> </span>swift<span class="w"> </span>my_archive.gzip<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>gunzip<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>ralph<span class="w"> </span>push<span class="w"> </span>--backend<span class="w"> </span>es
+<span class="w">    </span>ralph<span class="w"> </span>write<span class="w"> </span>--backend<span class="w"> </span>es
 </code></pre></div>
 <p>In this small pipeline, we stream <code>my_archive.gzip</code> content from a Swift
-container to the standard output (using the <code>fetch</code> command), uncompress the
+container to the standard output (using the <code>read</code> command), uncompress the
 content (using the <code>gunzip</code> command), and bulk insert logs in an ElasticSearch
-index (using the <code>push</code> command).</p>
+index (using the <code>write</code> command).</p>
 <p>As UNIX is beautiful, Ralph offers many powerful possibilities by combining its
 commands with other standard commands or command line tools.</p>
 <h2 id="quick_start_guide">Quick start guide<a class="headerlink" href="#quick_start_guide" title="Permanent link">&para;</a></h2>

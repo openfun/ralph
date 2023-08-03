@@ -21,7 +21,7 @@
         <link rel="next" href="../LICENSE/">
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.18">
+      <meta name="generator" content="mkdocs-1.5.1, mkdocs-material-9.1.21">
     
     
       
@@ -29,7 +29,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.26e3688c.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.eebd395e.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ecc896b0.min.css">
@@ -1713,6 +1713,15 @@ and this project adheres to
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Helm chart: improve chart modularity</li>
+<li>User credentials must now include an &ldquo;agent&rdquo; field which can be created 
+using the cli</li>
+<li><code>GET /statements</code> now has &ldquo;mine&rdquo; option which matches statements that
+have an authority field matching that of the user</li>
+<li>CLI: change <code>push</code> to <code>write</code> and <code>fetch</code> to <code>read</code> [BC]</li>
+<li>Upgrade <code>fastapi</code> to <code>0.100.1</code></li>
+<li>Upgrade <code>more-itertools</code> to <code>10.0.0</code></li>
+<li>Upgrade <code>sentry_sdk</code> to <code>1.29.0</code></li>
+<li>Upgrade <code>uvicorn</code> to <code>0.23.2</code></li>
 </ul>
 <h2 id="390_-_2023-07-21"><a href="https://github.com/openfun/ralph/compare/v3.8.0...v3.9.0">3.9.0</a> - 2023-07-21<a class="headerlink" href="#390_-_2023-07-21" title="Permanent link">&para;</a></h2>
 <h3 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">&para;</a></h3>

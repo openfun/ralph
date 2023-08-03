@@ -21,7 +21,7 @@
         <link rel="next" href="../contribute/">
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.18">
+      <meta name="generator" content="mkdocs-1.5.1, mkdocs-material-9.1.21">
     
     
       
@@ -29,7 +29,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.26e3688c.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.eebd395e.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ecc896b0.min.css">
@@ -876,18 +876,29 @@ will look for the <code>auth.json</code> file in the application directory (see 
 documentation for
 details</a>).</p>
 <p>The expected format is a list of entries (JSON objects) each containing the
-username, the user&rsquo;s <code>bcrypt</code> hashed+salted password and scopes they can
-access:</p>
+username, the user&rsquo;s <code>bcrypt</code> hashed+salted password, scopes they can
+access, and an <code>agent</code> object used to represent the user in the LRS. The 
+<code>agent</code> is constrained by <a href="https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#description-2">LRS specifications</a>, and must use one of four valid 
+<a href="https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#inversefunctional">Inverse Functional Identifiers</a>.</p>
 <div class="highlight"><pre><span></span><code><span class="p">[</span>
 <span class="w">  </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;john.doe@example.com&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;hash&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;$2b$12$yBXrzIuRIk6yaft5KUgVFOIPv0PskCCh9PXmF2t7pno.qUZ5LK0D2&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;scopes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;example_scope&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="nt">&quot;scopes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;example_scope&quot;</span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;agent&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;mbox&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;mailto:john.doe@example.com&quot;</span>
+<span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">},</span>
 <span class="w">  </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;simon.says@example.com&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">&quot;hash&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;$2b$12$yBXrzIuRIk6yaft5KUgVFOIPv0PskCCh9PXmF2t7pno.qUZ5LK0D2&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;scopes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;second_scope&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;third_scope&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="nt">&quot;scopes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;second_scope&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;third_scope&quot;</span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;agent&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;account&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;simonsAccountName&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;homePage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://www.exampleHomePage.com&quot;</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">]</span>
 </code></pre></div>
@@ -896,6 +907,11 @@ access:</p>
 <span class="w">    </span>--username<span class="w"> </span>janedoe<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--password<span class="w"> </span>supersecret<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--scope<span class="w"> </span>janedoe_scope<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--agent-mbox<span class="w"> </span>mailto:janedoe@example.com<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="c1"># or --agent-mbox-sha1sum ebd31e95054c018b10727ccffd2ef2ec3a016ee9\</span>
+<span class="w">    </span><span class="c1"># or --agent-openid &quot;http://jane.openid.example.org/&quot; \</span>
+<span class="w">    </span><span class="c1"># or --agent-account-name exampleAccountname \</span>
+<span class="w">    </span><span class="c1">#    --agent-account-homePage http://www.exampleHomePage.com \</span>
 <span class="w">    </span>-w
 </code></pre></div>
 <p>This command updates your credentials file with the new <code>janedoe</code> user.</p>
@@ -916,7 +932,7 @@ recommend).</p>
 <p>Send your username and password to the API server through HTTP Basic Auth:</p>
 <div class="highlight"><pre><span></span><code>$<span class="w"> </span>curl<span class="w"> </span>--user<span class="w"> </span>john.doe@example.com:PASSWORD<span class="w"> </span>http://localhost:8100/whoami
 &lt;<span class="w"> </span>HTTP/1.1<span class="w"> </span><span class="m">200</span><span class="w"> </span>OK
-&lt;<span class="w"> </span><span class="o">{</span><span class="s2">&quot;username&quot;</span>:<span class="s2">&quot;john.doe@example.com&quot;</span>,<span class="s2">&quot;scopes&quot;</span>:<span class="o">[</span><span class="s2">&quot;authenticated&quot;</span>,<span class="s2">&quot;example_scope&quot;</span><span class="o">]}</span>
+&lt;<span class="w"> </span><span class="o">{</span><span class="s2">&quot;scopes&quot;</span>:<span class="o">[</span><span class="s2">&quot;example_scope&quot;</span><span class="o">]</span>,<span class="w"> </span><span class="s2">&quot;agent&quot;</span>:<span class="w"> </span><span class="o">{</span><span class="s2">&quot;mbox&quot;</span>:<span class="w"> </span><span class="s2">&quot;mailto:john.doe@example.com&quot;</span><span class="o">}}</span>
 </code></pre></div>
 <h3 id="openid_connect_authentication">OpenID Connect authentication<a class="headerlink" href="#openid_connect_authentication" title="Permanent link">&para;</a></h3>
 <p>Ralph LRS API server supports OpenID Connect (OIDC) on top of OAuth 2.0 for authentication and authorization.</p>
@@ -978,41 +994,41 @@ the following key/value pairs:</p>
 <table>
 <thead>
 <tr>
-<th align="left">key</th>
-<th align="left">value type</th>
-<th align="left">description</th>
+<th style="text-align: left;">key</th>
+<th style="text-align: left;">value type</th>
+<th style="text-align: left;">description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left"><code>is_active</code></td>
-<td align="left"><code>boolean</code></td>
-<td align="left">Specifies whether or not this forwarding configuration should take effect.</td>
+<td style="text-align: left;"><code>is_active</code></td>
+<td style="text-align: left;"><code>boolean</code></td>
+<td style="text-align: left;">Specifies whether or not this forwarding configuration should take effect.</td>
 </tr>
 <tr>
-<td align="left"><code>url</code></td>
-<td align="left"><code>URL</code></td>
-<td align="left">Specifies the endpoint URL where forwarded statements should be send.</td>
+<td style="text-align: left;"><code>url</code></td>
+<td style="text-align: left;"><code>URL</code></td>
+<td style="text-align: left;">Specifies the endpoint URL where forwarded statements should be send.</td>
 </tr>
 <tr>
-<td align="left"><code>basic_username</code></td>
-<td align="left"><code>string</code></td>
-<td align="left">Specifies the basic auth username.</td>
+<td style="text-align: left;"><code>basic_username</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Specifies the basic auth username.</td>
 </tr>
 <tr>
-<td align="left"><code>basic_password</code></td>
-<td align="left"><code>string</code></td>
-<td align="left">Specifies the basic auth password.</td>
+<td style="text-align: left;"><code>basic_password</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Specifies the basic auth password.</td>
 </tr>
 <tr>
-<td align="left"><code>max_retries</code></td>
-<td align="left"><code>number</code></td>
-<td align="left">Specifies the number of times a failed forwarding request should be retried.</td>
+<td style="text-align: left;"><code>max_retries</code></td>
+<td style="text-align: left;"><code>number</code></td>
+<td style="text-align: left;">Specifies the number of times a failed forwarding request should be retried.</td>
 </tr>
 <tr>
-<td align="left"><code>timeout</code></td>
-<td align="left"><code>number</code></td>
-<td align="left">Specifies the duration in seconds of network inactivity leading to a timeout.</td>
+<td style="text-align: left;"><code>timeout</code></td>
+<td style="text-align: left;"><code>number</code></td>
+<td style="text-align: left;">Specifies the duration in seconds of network inactivity leading to a timeout.</td>
 </tr>
 </tbody>
 </table>

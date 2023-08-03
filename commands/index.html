@@ -21,7 +21,7 @@
         <link rel="next" href="../backends/">
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.18">
+      <meta name="generator" content="mkdocs-1.5.1, mkdocs-material-9.1.21">
     
     
       
@@ -29,7 +29,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.26e3688c.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.eebd395e.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ecc896b0.min.css">
@@ -363,13 +363,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ralph-fetch" class="md-nav__link">
-    fetch
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ralph-list" class="md-nav__link">
     list
   </a>
@@ -377,8 +370,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ralph-push" class="md-nav__link">
-    push
+  <a href="#ralph-read" class="md-nav__link">
+    read
   </a>
   
 </li>
@@ -393,6 +386,13 @@
           <li class="md-nav__item">
   <a href="#ralph-validate" class="md-nav__link">
     validate
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ralph-write" class="md-nav__link">
+    write
   </a>
   
 </li>
@@ -689,13 +689,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ralph-fetch" class="md-nav__link">
-    fetch
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ralph-list" class="md-nav__link">
     list
   </a>
@@ -703,8 +696,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ralph-push" class="md-nav__link">
-    push
+  <a href="#ralph-read" class="md-nav__link">
+    read
   </a>
   
 </li>
@@ -719,6 +712,13 @@
           <li class="md-nav__item">
   <a href="#ralph-validate" class="md-nav__link">
     validate
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ralph-write" class="md-nav__link">
+    write
   </a>
   
 </li>
@@ -764,13 +764,27 @@
 <div class="highlight"><pre><span></span><code>ralph auth [OPTIONS]
 </code></pre></div>
 <p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  -u, --username TEXT  The user for which we generate credentials.  [required]
-  -p, --password TEXT  The password to encrypt for this user. Will be prompted
-                       if missing.  [required]
-  -s, --scope TEXT     The user scope(s). This option can be provided multiple
-                       times.  [required]
-  -w, --write          Write new credentials to the LRS authentication file.
-  --help               Show this message and exit.
+<div class="highlight"><pre><span></span><code>  -u, --username TEXT             The user for which we generate credentials.
+                                  [required]
+  -p, --password TEXT             The password to encrypt for this user. Will
+                                  be prompted if missing.  [required]
+  -s, --scope TEXT                The user scope(s). This option can be
+                                  provided multiple times.  [required]
+  -M, --agent-ifi-mbox TEXT       The mbox Inverse Functional Identifier of
+                                  the associated agent.
+  -S, --agent-ifi-mbox-sha1sum TEXT
+                                  The mbox-sha1sum Inverse Functional
+                                  Identifier of the associated agent.
+  -O, --agent-ifi-openid TEXT     The openid Inverse Functional Identifier of
+                                  the associated agent.
+  -A, --agent-ifi-account TEXT...
+                                  Input &quot;{name} {homePage}&quot;. The account
+                                  Inverse Functional Identifier of the
+                                  associated agent.
+  -N, --agent-name TEXT           The name of the associated agent.
+  -w, --write-to-disk             Write new credentials to the LRS
+                                  authentication file.
+  --help                          Show this message and exit.
 </code></pre></div>
 <h3 id="ralph-convert">ralph convert<a class="headerlink" href="#ralph-convert" title="Permanent link">&para;</a></h3>
 <p>Convert input events to a given format.</p>
@@ -799,10 +813,49 @@
                           [required]
   --help                  Show this message and exit.
 </code></pre></div>
-<h3 id="ralph-fetch">ralph fetch<a class="headerlink" href="#ralph-fetch" title="Permanent link">&para;</a></h3>
-<p>Fetch an archive or records from a configured backend.</p>
+<h3 id="ralph-list">ralph list<a class="headerlink" href="#ralph-list" title="Permanent link">&para;</a></h3>
+<p>List available archives from a configured storage backend.</p>
 <p><strong>Usage:</strong></p>
-<div class="highlight"><pre><span></span><code>ralph fetch [OPTIONS] [ARCHIVE]
+<div class="highlight"><pre><span></span><code>ralph list [OPTIONS]
+</code></pre></div>
+<p><strong>Options:</strong></p>
+<div class="highlight"><pre><span></span><code>  -b, --backend [ldp|fs|swift|s3]
+                                  Backend  [required]
+  s3 backend: 
+    --s3-endpoint-url TEXT
+    --s3-bucket-name TEXT
+    --s3-default-region TEXT
+    --s3-session-token TEXT
+    --s3-secret-access-key TEXT
+    --s3-access-key-id TEXT
+  swift backend: 
+    --swift-os-identity-api-version TEXT
+    --swift-os-auth-url TEXT
+    --swift-os-project-domain-name TEXT
+    --swift-os-user-domain-name TEXT
+    --swift-os-storage-url TEXT
+    --swift-os-region-name TEXT
+    --swift-os-password TEXT
+    --swift-os-username TEXT
+    --swift-os-tenant-name TEXT
+    --swift-os-tenant-id TEXT
+  fs backend: 
+    --fs-path TEXT
+  ldp backend: 
+    --ldp-stream-id TEXT
+    --ldp-service-name TEXT
+    --ldp-consumer-key TEXT
+    --ldp-application-secret TEXT
+    --ldp-application-key TEXT
+    --ldp-endpoint TEXT
+  -n, --new / -a, --all           List not fetched (or all) archives
+  -D, --details / -I, --ids       Get archives detailed output (JSON)
+  --help                          Show this message and exit.
+</code></pre></div>
+<h3 id="ralph-read">ralph read<a class="headerlink" href="#ralph-read" title="Permanent link">&para;</a></h3>
+<p>Read an archive or records from a configured backend.</p>
+<p><strong>Usage:</strong></p>
+<div class="highlight"><pre><span></span><code>ralph read [OPTIONS] [ARCHIVE]
 </code></pre></div>
 <p><strong>Options:</strong></p>
 <div class="highlight"><pre><span></span><code>  -b, --backend [es|mongo|clickhouse|lrs|ldp|fs|swift|s3|ws]
@@ -862,56 +915,59 @@
     --es-index TEXT
     --es-hosts VALUE1,VALUE2,VALUE3
   -c, --chunk-size INTEGER        Get events by chunks of size #
-  -t, --target TEXT               Endpoint from which to fetch events (e.g.
+  -t, --target TEXT               Endpoint from which to read events (e.g.
                                   `/statements`)
   -q, --query &#39;{&quot;KEY&quot;: &quot;VALUE&quot;, &quot;KEY&quot;: &quot;VALUE&quot;}&#39;
                                   Query object as a JSON string (database and
                                   HTTP backends ONLY)
   --help                          Show this message and exit.
 </code></pre></div>
-<h3 id="ralph-list">ralph list<a class="headerlink" href="#ralph-list" title="Permanent link">&para;</a></h3>
-<p>List available archives from a configured storage backend.</p>
+<h3 id="ralph-runserver">ralph runserver<a class="headerlink" href="#ralph-runserver" title="Permanent link">&para;</a></h3>
+<p>Run the API server for the development environment.</p>
+<p>Starts uvicorn programmatically for convenience and documentation.</p>
 <p><strong>Usage:</strong></p>
-<div class="highlight"><pre><span></span><code>ralph list [OPTIONS]
+<div class="highlight"><pre><span></span><code>ralph runserver [OPTIONS]
 </code></pre></div>
 <p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  -b, --backend [ldp|fs|swift|s3]
+<div class="highlight"><pre><span></span><code>  -b, --backend [es|mongo|clickhouse]
                                   Backend  [required]
-  s3 backend: 
-    --s3-endpoint-url TEXT
-    --s3-bucket-name TEXT
-    --s3-default-region TEXT
-    --s3-session-token TEXT
-    --s3-secret-access-key TEXT
-    --s3-access-key-id TEXT
-  swift backend: 
-    --swift-os-identity-api-version TEXT
-    --swift-os-auth-url TEXT
-    --swift-os-project-domain-name TEXT
-    --swift-os-user-domain-name TEXT
-    --swift-os-storage-url TEXT
-    --swift-os-region-name TEXT
-    --swift-os-password TEXT
-    --swift-os-username TEXT
-    --swift-os-tenant-name TEXT
-    --swift-os-tenant-id TEXT
-  fs backend: 
-    --fs-path TEXT
-  ldp backend: 
-    --ldp-stream-id TEXT
-    --ldp-service-name TEXT
-    --ldp-consumer-key TEXT
-    --ldp-application-secret TEXT
-    --ldp-application-key TEXT
-    --ldp-endpoint TEXT
-  -n, --new / -a, --all           List not fetched (or all) archives
-  -D, --details / -I, --ids       Get archives detailed output (JSON)
+  clickhouse backend: 
+    --clickhouse-client-options KEY=VALUE,KEY=VALUE
+    --clickhouse-password TEXT
+    --clickhouse-username TEXT
+    --clickhouse-event-table-name TEXT
+    --clickhouse-database TEXT
+    --clickhouse-port INTEGER
+    --clickhouse-host TEXT
+  mongo backend: 
+    --mongo-client-options KEY=VALUE,KEY=VALUE
+    --mongo-collection TEXT
+    --mongo-database TEXT
+    --mongo-connection-uri TEXT
+  es backend: 
+    --es-op-type TEXT
+    --es-client-options KEY=VALUE,KEY=VALUE
+    --es-index TEXT
+    --es-hosts VALUE1,VALUE2,VALUE3
+  -h, --host TEXT                 LRS server host name
+  -p, --port INTEGER              LRS server port
   --help                          Show this message and exit.
 </code></pre></div>
-<h3 id="ralph-push">ralph push<a class="headerlink" href="#ralph-push" title="Permanent link">&para;</a></h3>
-<p>Push an archive to a configured backend.</p>
+<h3 id="ralph-validate">ralph validate<a class="headerlink" href="#ralph-validate" title="Permanent link">&para;</a></h3>
+<p>Validate input events of given format.</p>
 <p><strong>Usage:</strong></p>
-<div class="highlight"><pre><span></span><code>ralph push [OPTIONS] [ARCHIVE]
+<div class="highlight"><pre><span></span><code>ralph validate [OPTIONS]
+</code></pre></div>
+<p><strong>Options:</strong></p>
+<div class="highlight"><pre><span></span><code>  -f, --format [edx|xapi]  Input events format to validate  [required]
+  -I, --ignore-errors      Continue validating regardless of raised errors
+  -F, --fail-on-unknown    Stop validating at first unknown event
+  --help                   Show this message and exit.
+</code></pre></div>
+<h3 id="ralph-write">ralph write<a class="headerlink" href="#ralph-write" title="Permanent link">&para;</a></h3>
+<p>Write an archive to a configured backend.</p>
+<p><strong>Usage:</strong></p>
+<div class="highlight"><pre><span></span><code>ralph write [OPTIONS] [ARCHIVE]
 </code></pre></div>
 <p><strong>Options:</strong></p>
 <div class="highlight"><pre><span></span><code>  -b, --backend [es|mongo|clickhouse|ldp|fs|swift|s3|lrs]
@@ -977,51 +1033,9 @@
                                   The maximum number of chunks to send at
                                   once, when using `--simultaneous`. Use `-1`
                                   to not set a limit.
-  -t, --target TEXT               Endpoint in which to push events (e.g.
+  -t, --target TEXT               Endpoint in which to write events (e.g.
                                   `statements`)
   --help                          Show this message and exit.
-</code></pre></div>
-<h3 id="ralph-runserver">ralph runserver<a class="headerlink" href="#ralph-runserver" title="Permanent link">&para;</a></h3>
-<p>Run the API server for the development environment.</p>
-<p>Starts uvicorn programmatically for convenience and documentation.</p>
-<p><strong>Usage:</strong></p>
-<div class="highlight"><pre><span></span><code>ralph runserver [OPTIONS]
-</code></pre></div>
-<p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  -b, --backend [es|mongo|clickhouse]
-                                  Backend  [required]
-  clickhouse backend: 
-    --clickhouse-client-options KEY=VALUE,KEY=VALUE
-    --clickhouse-password TEXT
-    --clickhouse-username TEXT
-    --clickhouse-event-table-name TEXT
-    --clickhouse-database TEXT
-    --clickhouse-port INTEGER
-    --clickhouse-host TEXT
-  mongo backend: 
-    --mongo-client-options KEY=VALUE,KEY=VALUE
-    --mongo-collection TEXT
-    --mongo-database TEXT
-    --mongo-connection-uri TEXT
-  es backend: 
-    --es-op-type TEXT
-    --es-client-options KEY=VALUE,KEY=VALUE
-    --es-index TEXT
-    --es-hosts VALUE1,VALUE2,VALUE3
-  -h, --host TEXT                 LRS server host name
-  -p, --port INTEGER              LRS server port
-  --help                          Show this message and exit.
-</code></pre></div>
-<h3 id="ralph-validate">ralph validate<a class="headerlink" href="#ralph-validate" title="Permanent link">&para;</a></h3>
-<p>Validate input events of given format.</p>
-<p><strong>Usage:</strong></p>
-<div class="highlight"><pre><span></span><code>ralph validate [OPTIONS]
-</code></pre></div>
-<p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  -f, --format [edx|xapi]  Input events format to validate  [required]
-  -I, --ignore-errors      Continue validating regardless of raised errors
-  -F, --fail-on-unknown    Stop validating at first unknown event
-  --help                   Show this message and exit.
 </code></pre></div>
 
 
