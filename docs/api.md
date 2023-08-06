@@ -182,9 +182,9 @@ $ curl http://localhost:8100/whoami --header "Authorization: Bearer eyJhbGciOiJS
 < {"username":"ralph_admin","scopes":["all"]}
 ```
 
-## The statement API
+## The Statement Resource API
 
-Ralph's statements API can be used to POST, PUT, GET and DELETE xApi statements.
+Ralph's statements API can be used to POST, PUT, GET and DELETE xAPI statements.
 
 To use the statements API on a running server, connect to `http://localhost:8100/xAPI/statements`. You will have to be authenticated to make a call.
 
