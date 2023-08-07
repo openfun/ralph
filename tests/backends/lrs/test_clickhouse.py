@@ -218,6 +218,7 @@ def test_backends_database_clickhouse_query_statements(
     monkeypatch.setattr(backend, "read", mock_read)
 
     backend.query_statements(StatementParameters(**params))
+    backend.close()
 
 
 def test_backends_lrs_clickhouse_lrs_backend_query_statements(
@@ -251,6 +252,7 @@ def test_backends_lrs_clickhouse_lrs_backend_query_statements(
         StatementParameters(statementId=test_id, limit=10)
     )
     assert result.statements == statements
+    backend.close()
 
 
 def test_backends_lrs_clickhouse_lrs_backend__find(clickhouse, clickhouse_lrs_backend):
@@ -279,6 +281,7 @@ def test_backends_lrs_clickhouse_lrs_backend__find(clickhouse, clickhouse_lrs_ba
     # Check the expected search query results.
     result = backend.query_statements(StatementParameters())
     assert result.statements == statements
+    backend.close()
 
 
 def test_backends_lrs_clickhouse_lrs_backend_query_statements_by_ids(
@@ -310,6 +313,7 @@ def test_backends_lrs_clickhouse_lrs_backend_query_statements_by_ids(
     # Check the expected search query results.
     result = list(backend.query_statements_by_ids([test_id]))
     assert result[0]["event"] == statements[0]
+    backend.close()
 
 
 def test_backends_lrs_clickhouse_lrs_backend_query_statements_client_failure(
@@ -338,6 +342,7 @@ def test_backends_lrs_clickhouse_lrs_backend_query_statements_client_failure(
         logging.ERROR,
         "Failed to read from ClickHouse",
     ) in caplog.record_tuples
+    backend.close()
 
 
 def test_backends_lrs_clickhouse_lrs_backend_query_statements_by_ids_client_failure(
@@ -366,3 +371,4 @@ def test_backends_lrs_clickhouse_lrs_backend_query_statements_by_ids_client_fail
         logging.ERROR,
         "Failed to read from ClickHouse",
     ) in caplog.record_tuples
+    backend.close()

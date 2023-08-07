@@ -264,9 +264,10 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
         """Close the AsyncElasticsearch client.
 
         Raise:
-            BackendException: If a failure during the close operation occurs.
+            BackendException: If a failure occurs during the close operation.
         """
         if not self._client:
+            logger.warning("No backend client to close.")
             return
 
         try:

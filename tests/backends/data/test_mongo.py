@@ -51,6 +51,7 @@ def test_backends_data_mongo_data_backend_default_instantiation(monkeypatch, fs)
     assert backend.settings.CLIENT_OPTIONS == MongoClientOptions()
     assert backend.settings.DEFAULT_CHUNK_SIZE == 500
     assert backend.settings.LOCALE_ENCODING == "utf8"
+    backend.close()
 
 
 def test_backends_data_mongo_data_backend_instantiation_with_settings():
@@ -75,6 +76,7 @@ def test_backends_data_mongo_data_backend_instantiation_with_settings():
         MongoDataBackend(settings)
     except Exception as err:  # pylint:disable=broad-except
         pytest.fail(f"Two MongoDataBackends should not raise exceptions: {err}")
+    backend.close()
 
 
 def test_backends_data_mongo_data_backend_status_with_connection_failure(
@@ -163,6 +165,7 @@ def test_backends_data_mongo_data_backend_status_with_ok_status(mongo_backend):
     """
     backend = mongo_backend()
     assert backend.status() == DataBackendStatus.OK
+    backend.close()
 
 
 @pytest.mark.parametrize("invalid_character", [" ", ".", "/", '"'])
@@ -182,6 +185,7 @@ def test_backends_data_mongo_data_backend_list_method_with_invalid_target(
             list(backend.list(f"foo{invalid_character}bar"))
 
     assert ("ralph.backends.data.mongo", logging.ERROR, msg) in caplog.record_tuples
+    backend.close()
 
 
 def test_backends_data_mongo_data_backend_list_method_with_failure(
@@ -203,6 +207,7 @@ def test_backends_data_mongo_data_backend_list_method_with_failure(
             list(backend.list())
 
     assert ("ralph.backends.data.mongo", logging.ERROR, msg) in caplog.record_tuples
+    backend.close()
 
 
 def test_backends_data_mongo_data_backend_list_method_without_history(
@@ -221,6 +226,7 @@ def test_backends_data_mongo_data_backend_list_method_without_history(
         sorted([MONGO_TEST_COLLECTION, "bar", "baz"])
     )
     assert not list(backend.list("non_existent_database"))
+    backend.close()
 
 
 def test_backends_data_mongo_data_backend_list_method_with_history(
@@ -238,6 +244,7 @@ def test_backends_data_mongo_data_backend_list_method_with_history(
         logging.WARNING,
         "The `new` argument is ignored",
     ) in caplog.record_tuples
+    backend.close()
 
 
 def test_backends_data_mongo_data_backend_read_method_with_raw_output(
@@ -262,6 +269,7 @@ def test_backends_data_mongo_data_backend_read_method_with_raw_output(
     assert list(backend.read(raw_output=True, target="foobar")) == expected[:2]
     assert list(backend.read(raw_output=True, chunk_size=2)) == expected
     assert list(backend.read(raw_output=True, chunk_size=1000)) == expected
+    backend.close()
 
 
 def test_backends_data_mongo_data_backend_read_method_without_raw_output(
@@ -286,6 +294,7 @@ def test_backends_data_mongo_data_backend_read_method_without_raw_output(
     assert list(backend.read(target="foobar")) == expected[:2]
     assert list(backend.read(chunk_size=2)) == expected
     assert list(backend.read(chunk_size=1000)) == expected
+    backend.close()
 
 
 @pytest.mark.parametrize(
@@ -313,6 +322,7 @@ def test_backends_data_mongo_data_backend_read_method_with_invalid_target(
             list(backend.read(target=invalid_target))
 
     assert ("ralph.backends.data.mongo", logging.ERROR, msg) in caplog.record_tuples
+    backend.close()
 
 
 def test_backends_data_mongo_data_backend_read_method_with_failure(
@@ -336,6 +346,7 @@ def test_backends_data_mongo_data_backend_read_method_with_failure(
             list(backend.read())
 
     assert ("ralph.backends.data.mongo", logging.ERROR, msg) in caplog.record_tuples
+    backend.close()
 
 
 def test_backends_data_mongo_data_backend_read_method_with_ignore_errors(
@@ -370,6 +381,7 @@ def test_backends_data_mongo_data_backend_read_method_with_ignore_errors(
         "Failed to convert document to bytes: "
         "Object of type ObjectId is not JSON serializable",
     ) in caplog.record_tuples
+    backend.close()
 
 
 def test_backends_data_mongo_data_backend_read_method_without_ignore_errors(
@@ -414,6 +426,7 @@ def test_backends_data_mongo_data_backend_read_method_without_ignore_errors(
 
     error_log = ("ralph.backends.data.mongo", logging.ERROR, msg)
     assert len(list(filter(lambda x: x == error_log, caplog.record_tuples))) == 4
+    backend.close()
 
 
 @pytest.mark.parametrize(
@@ -454,6 +467,7 @@ def test_backends_data_mongo_data_backend_read_method_with_query(
     assert list(backend.read(query=query)) == expected
     assert list(backend.read(query=query, chunk_size=1)) == expected
     assert list(backend.read(query=query, chunk_size=1000)) == expected
+    backend.close()
 
 
 def test_backends_data_mongo_data_backend_write_method_with_target(
@@ -480,6 +494,7 @@ def test_backends_data_mongo_data_backend_write_method_with_target(
         "_id": "62b9ce92fcde2b2edba56bf4",
         "_source": {"id": "bar", **timestamp},
     }
+    backend.close()
 
 
 def test_backends_data_mongo_data_backend_write_method_without_target(
@@ -502,6 +517,7 @@ def test_backends_data_mongo_data_backend_write_method_without_target(
         "_id": "62b9ce92fcde2b2edba56bf4",
         "_source": {"id": "bar", **timestamp},
     }
+    backend.close()
 
 
 def test_backends_data_mongo_data_backend_write_method_with_duplicated_key_error(
@@ -555,6 +571,7 @@ def test_backends_data_mongo_data_backend_write_method_with_duplicated_key_error
         logging.ERROR,
         exception_info.value.args[0],
     ) in caplog.record_tuples
+    backend.close()
 
 
 def test_backends_data_mongo_data_backend_write_method_with_delete_operation(
@@ -582,6 +599,7 @@ def test_backends_data_mongo_data_backend_write_method_with_delete_operation(
     binary_documents = [json.dumps(documents[2]).encode("utf8")]
     assert backend.write(binary_documents, operation_type=BaseOperationType.DELETE) == 1
     assert not list(backend.read())
+    backend.close()
 
 
 def test_backends_data_mongo_data_backend_write_method_with_delete_operation_failure(
@@ -615,6 +633,7 @@ def test_backends_data_mongo_data_backend_write_method_with_delete_operation_fai
         )
 
     assert ("ralph.backends.data.mongo", logging.WARNING, msg) in caplog.record_tuples
+    backend.close()
 
 
 def test_backends_data_mongo_data_backend_write_method_with_update_operation(
@@ -651,6 +670,7 @@ def test_backends_data_mongo_data_backend_write_method_with_update_operation(
         "_id": "62b9ce922c26b46b68ffc68f",
         "_source": {"id": "foo", "new_field": "bar"},
     }
+    backend.close()
 
 
 def test_backends_data_mongo_data_backend_write_method_with_update_operation_failure(
@@ -708,6 +728,7 @@ def test_backends_data_mongo_data_backend_write_method_with_update_operation_fai
         logging.ERROR,
         exception_info.value.args[0],
     ) in caplog.record_tuples
+    backend.close()
 
 
 def test_backends_data_mongo_data_backend_write_method_with_append_operation(
@@ -723,6 +744,7 @@ def test_backends_data_mongo_data_backend_write_method_with_append_operation(
             backend.write(data=[], operation_type=BaseOperationType.APPEND)
 
     assert ("ralph.backends.data.mongo", logging.ERROR, msg) in caplog.record_tuples
+    backend.close()
 
 
 def test_backends_data_mongo_data_backend_write_method_with_create_operation(
@@ -741,6 +763,7 @@ def test_backends_data_mongo_data_backend_write_method_with_create_operation(
     results = backend.read()
     assert next(results)["_source"]["timestamp"] == documents[0]["timestamp"]
     assert next(results)["_source"]["timestamp"] == documents[1]["timestamp"]
+    backend.close()
 
 
 @pytest.mark.parametrize(
@@ -777,6 +800,7 @@ def test_backends_data_mongo_data_backend_write_method_with_invalid_documents(
         assert backend.write([document], ignore_errors=True) == 0
 
     assert ("ralph.backends.data.mongo", logging.WARNING, error) in caplog.record_tuples
+    backend.close()
 
 
 def test_backends_data_mongo_data_backend_write_method_with_unparsable_documents(
@@ -801,6 +825,7 @@ def test_backends_data_mongo_data_backend_write_method_with_unparsable_documents
         assert backend.write([b"not valid JSON!"], ignore_errors=True) == 0
 
     assert ("ralph.backends.data.mongo", logging.WARNING, msg) in caplog.record_tuples
+    backend.close()
 
 
 def test_backends_data_mongo_data_backend_write_method_with_no_data(
@@ -813,6 +838,7 @@ def test_backends_data_mongo_data_backend_write_method_with_no_data(
 
     msg = "Data Iterator is empty; skipping write to target."
     assert ("ralph.backends.data.mongo", logging.INFO, msg) in caplog.record_tuples
+    backend.close()
 
 
 def test_backends_data_mongo_data_backend_write_method_with_custom_chunk_size(
@@ -870,3 +896,32 @@ def test_backends_data_mongo_data_backend_write_method_with_custom_chunk_size(
         {"_id": "62b9ce92fcde2b2edba56bf4", "_source": {"id": "bar", **new_timestamp}},
         {"_id": "62b9ce92baa5a0964d3320fb", "_source": {"id": "baz", **new_timestamp}},
     ]
+    backend.close()
+
+
+def test_backends_data_mongo_data_backend_close_method_with_failure(
+    mongo_backend, monkeypatch
+):
+    """Test the `MongoDataBackend.close` method."""
+
+    backend = mongo_backend()
+
+    def mock_connection_error():
+        """Mongo client close mock that raises a connection error."""
+        raise PyMongoError("", (Exception("Mocked connection error"),))
+
+    monkeypatch.setattr(backend.client, "close", mock_connection_error)
+
+    with pytest.raises(BackendException, match="Failed to close MongoDB client"):
+        backend.close()
+
+
+def test_backends_data_mongo_data_backend_close_method(mongo_backend):
+    """Test the `MongoDataBackend.close` method."""
+
+    backend = mongo_backend()
+
+    # Still possible to connect to client after closing it, as it creates
+    # a new connection
+    backend.close()
+    assert backend.status() == DataBackendStatus.AWAY

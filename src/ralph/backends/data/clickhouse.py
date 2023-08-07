@@ -382,6 +382,23 @@ class ClickHouseDataBackend(BaseDataBackend):
 
         return count
 
+    def close(self) -> None:
+        """Close the ClickHouse backend client.
+
+        Raise:
+            BackendException: If a failure occurs during the close operation.
+        """
+        if not self._client:
+            logger.warning("No backend client to close.")
+            return
+
+        try:
+            self.client.close()
+        except ClickHouseError as error:
+            msg = "Failed to close ClickHouse client: %s"
+            logger.error(msg, error)
+            raise BackendException(msg % error) from error
+
     @staticmethod
     def _to_insert_tuples(
         data: Iterable[dict],

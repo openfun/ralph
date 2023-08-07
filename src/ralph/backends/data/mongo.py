@@ -16,7 +16,13 @@ from dateutil.parser import isoparse
 from pydantic import Json, MongoDsn, constr
 from pymongo import MongoClient, ReplaceOne
 from pymongo.collection import Collection
-from pymongo.errors import BulkWriteError, ConnectionFailure, InvalidName, PyMongoError
+from pymongo.errors import (
+    BulkWriteError,
+    ConnectionFailure,
+    InvalidName,
+    InvalidOperation,
+    PyMongoError,
+)
 
 from ralph.backends.data.base import (
     BaseDataBackend,
@@ -113,7 +119,7 @@ class MongoDataBackend(BaseDataBackend):
         # Check MongoDB connection.
         try:
             self.client.admin.command("ping")
-        except ConnectionFailure as error:
+        except (ConnectionFailure, InvalidOperation) as error:
             logger.error("Failed to connect to MongoDB: %s", error)
             return DataBackendStatus.AWAY
 
@@ -295,6 +301,19 @@ class MongoDataBackend(BaseDataBackend):
             logger.info("Inserted %d documents with success", count)
 
         return count
+
+    def close(self) -> None:
+        """Close the MongoDB backend client.
+
+        Raise:
+            BackendException: If a failure occurs during the close operation.
+        """
+        try:
+            self.client.close()
+        except PyMongoError as error:
+            msg = "Failed to close MongoDB client: %s"
+            logger.error(msg, error)
+            raise BackendException(msg % error) from error
 
     @staticmethod
     def iter_by_batch(data: Iterable[dict], chunk_size: int):

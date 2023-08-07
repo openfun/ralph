@@ -51,6 +51,7 @@ def test_backends_data_swift_data_backend_default_instantiation(monkeypatch, fs)
     assert backend.options["user_domain_name"] == "Default"
     assert backend.default_container is None
     assert backend.locale_encoding == "utf8"
+    backend.close()
 
 
 def test_backends_data_swift_data_backend_instantiation_with_settings(fs):
@@ -85,6 +86,7 @@ def test_backends_data_swift_data_backend_instantiation_with_settings(fs):
         SwiftDataBackend(settings_)
     except Exception as err:  # pylint:disable=broad-except
         pytest.fail(f"Two SwiftDataBackends should not raise exceptions: {err}")
+    backend.close()
 
 
 def test_backends_data_swift_data_backend_status_method_with_error_status(
@@ -101,17 +103,18 @@ def test_backends_data_swift_data_backend_status_method_with_error_status(
         # pylint:disable=unused-argument
         raise ClientException(error)
 
-    swift = swift_backend()
-    monkeypatch.setattr(swift.connection, "head_account", mock_failed_head_account)
+    backend = swift_backend()
+    monkeypatch.setattr(backend.connection, "head_account", mock_failed_head_account)
 
     with caplog.at_level(logging.ERROR):
-        assert swift.status() == DataBackendStatus.ERROR
+        assert backend.status() == DataBackendStatus.ERROR
 
     assert (
         "ralph.backends.data.swift",
         logging.ERROR,
         f"Unable to connect to the Swift account: {error}",
     ) in caplog.record_tuples
+    backend.close()
 
 
 def test_backends_data_swift_data_backend_status_method_with_ok_status(
@@ -124,13 +127,16 @@ def test_backends_data_swift_data_backend_status_method_with_ok_status(
     def mock_successful_head_account(*args, **kwargs):  # pylint:disable=unused-argument
         return 1
 
-    swift = swift_backend()
-    monkeypatch.setattr(swift.connection, "head_account", mock_successful_head_account)
+    backend = swift_backend()
+    monkeypatch.setattr(
+        backend.connection, "head_account", mock_successful_head_account
+    )
 
     with caplog.at_level(logging.ERROR):
-        assert swift.status() == DataBackendStatus.OK
+        assert backend.status() == DataBackendStatus.OK
 
     assert caplog.record_tuples == []
+    backend.close()
 
 
 def test_backends_data_swift_data_backend_list_method(
@@ -188,6 +194,7 @@ def test_backends_data_swift_data_backend_list_method(
     assert list(backend.list()) == [x["name"] for x in listing]
     assert list(backend.list(new=True)) == ["2020-05-01.gz"]
     assert list(backend.list(details=True)) == listing
+    backend.close()
 
 
 def test_backends_data_swift_data_backend_list_with_failed_details(
@@ -226,6 +233,7 @@ def test_backends_data_swift_data_backend_list_with_failed_details(
             next(backend.list(details=True))
 
     assert ("ralph.backends.data.swift", logging.ERROR, msg) in caplog.record_tuples
+    backend.close()
 
 
 def test_backends_data_swift_data_backend_list_with_failed_connection(
@@ -254,6 +262,7 @@ def test_backends_data_swift_data_backend_list_with_failed_connection(
             next(backend.list(details=True))
 
     assert ("ralph.backends.data.swift", logging.ERROR, msg) in caplog.record_tuples
+    backend.close()
 
 
 def test_backends_data_swift_data_backend_read_method_with_raw_output(
@@ -314,6 +323,7 @@ def test_backends_data_swift_data_backend_read_method_with_raw_output(
             "timestamp": frozen_now,
         },
     ]
+    backend.close()
 
 
 def test_backends_data_swift_data_backend_read_method_without_raw_output(
@@ -352,6 +362,7 @@ def test_backends_data_swift_data_backend_read_method_without_raw_output(
             "timestamp": frozen_now,
         }
     ]
+    backend.close()
 
 
 def test_backends_data_swift_data_backend_read_method_with_invalid_query(swift_backend):
@@ -363,6 +374,7 @@ def test_backends_data_swift_data_backend_read_method_with_invalid_query(swift_b
     error = "Invalid query. The query should be a valid archive name"
     with pytest.raises(BackendParameterException, match=error):
         list(backend.read())
+    backend.close()
 
 
 def test_backends_data_swift_data_backend_read_method_with_ignore_errors(
@@ -409,6 +421,7 @@ def test_backends_data_swift_data_backend_read_method_with_ignore_errors(
     result = backend.read(ignore_errors=True, query="2020-06-02.gz")
     assert isinstance(result, Iterable)
     assert list(result) == [valid_dictionary]
+    backend.close()
 
 
 def test_backends_data_swift_data_backend_read_method_without_ignore_errors(
@@ -465,6 +478,7 @@ def test_backends_data_swift_data_backend_read_method_without_ignore_errors(
     assert isinstance(result, Iterable)
     with pytest.raises(BackendException, match="Raised error:"):
         next(result)
+    backend.close()
 
 
 def test_backends_data_swift_data_backend_read_method_with_failed_connection(
@@ -488,6 +502,7 @@ def test_backends_data_swift_data_backend_read_method_with_failed_connection(
             next(result)
 
     assert ("ralph.backends.data.swift", logging.ERROR, msg) in caplog.record_tuples
+    backend.close()
 
 
 @pytest.mark.parametrize(
@@ -521,6 +536,7 @@ def test_backends_data_swift_data_backend_write_method_with_file_exists_error(
 
     # When the `write` method fails, then no entry should be added to the history.
     assert not sorted(backend.history, key=itemgetter("id"))
+    backend.close()
 
 
 def test_backends_data_swift_data_backend_write_method_with_failed_connection(
@@ -553,6 +569,7 @@ def test_backends_data_swift_data_backend_write_method_with_failed_connection(
 
     # When the `write` method fails, then no entry should be added to the history.
     assert not sorted(backend.history, key=itemgetter("id"))
+    backend.close()
 
 
 @pytest.mark.parametrize(
@@ -582,6 +599,7 @@ def test_backends_data_swift_data_backend_write_method_with_invalid_operation(
 
     # When the `write` method fails, then no entry should be added to the history.
     assert not sorted(backend.history, key=itemgetter("id"))
+    backend.close()
 
 
 def test_backends_data_swift_data_backend_write_method_without_target(
@@ -638,3 +656,43 @@ def test_backends_data_swift_data_backend_write_method_without_target(
             "timestamp": frozen_now,
         }
     ]
+    backend.close()
+
+
+def test_backends_data_swift_data_backend_close_method_with_failure(
+    swift_backend, monkeypatch
+):
+    """Test the `SwiftDataBackend.close` method."""
+
+    backend = swift_backend()
+
+    def mock_connection_error():
+        """Swift backend connection close mock that raises a connection error."""
+        raise ClientException({"Error": {}}, "error")
+
+    monkeypatch.setattr(backend.connection, "close", mock_connection_error)
+
+    with pytest.raises(BackendException, match="Failed to close Swift backend client"):
+        backend.close()
+
+
+def test_backends_data_swift_data_backend_close_method(swift_backend, caplog):
+    """Test the `SwiftDataBackend.close` method."""
+
+    backend = swift_backend()
+
+    # Not possible to connect to client after closing it
+    backend.close()
+    assert backend.status() == DataBackendStatus.ERROR
+
+    # No client instantiated
+    backend = swift_backend()
+    backend._connection = None  # pylint: disable=protected-access
+    with caplog.at_level(logging.WARNING):
+        backend.close()
+
+    assert (
+        "ralph.backends.data.swift",
+        logging.WARNING,
+        "No backend client to close.",
+    ) in caplog.record_tuples

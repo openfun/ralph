@@ -39,6 +39,9 @@ def test_backends_data_base_enforce_query_checks_with_valid_input(value, expecte
         def write(self):  # pylint: disable=arguments-differ,missing-function-docstring
             pass
 
+        def close(self):  # pylint: disable=arguments-differ,missing-function-docstring
+            pass
+
     MockBaseDataBackend().read(query=value)
 
 
@@ -78,6 +81,9 @@ def test_backends_data_base_enforce_query_checks_with_invalid_input(
             pass
 
         def write(self):  # pylint: disable=arguments-differ,missing-function-docstring
+            pass
+
+        def close(self):  # pylint: disable=arguments-differ,missing-function-docstring
             pass
 
     with pytest.raises(BackendParameterException, match=error):
