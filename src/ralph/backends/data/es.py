@@ -344,6 +344,23 @@ class ESDataBackend(BaseDataBackend):
             raise BackendException(msg % (error, details, count)) from error
         return count
 
+    def close(self) -> None:
+        """Close the Elasticsearch backend client.
+
+        Raise:
+            BackendException: If a failure occurs during the close operation.
+        """
+        if not self._client:
+            logger.warning("No backend client to close.")
+            return
+
+        try:
+            self.client.close()
+        except TransportError as error:
+            msg = "Failed to close Elasticsearch client: %s"
+            logger.error(msg, error)
+            raise BackendException(msg % error) from error
+
     @staticmethod
     def to_documents(
         data: Iterable[dict],

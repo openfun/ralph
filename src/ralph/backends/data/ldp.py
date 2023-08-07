@@ -226,6 +226,12 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend):
         logger.error(msg, target)
         raise NotImplementedError(msg % target)
 
+    def close(self) -> None:
+        """LDP client does not support close, this method is not implemented."""
+        msg = "LDP data backend does not support `close` method"
+        logger.error(msg)
+        raise NotImplementedError(msg)
+
     def _get_archive_endpoint(self, stream_id: Union[None, str] = None) -> str:
         """Return OVH's archive endpoint."""
         stream_id = stream_id if stream_id else self.stream_id

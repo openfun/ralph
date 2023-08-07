@@ -825,7 +825,7 @@ async def test_backends_data_async_es_data_backend_write_method_with_datastream(
 
 
 @pytest.mark.anyio
-async def test_backends_data_es_data_backend_close_method(
+async def test_backends_data_es_data_backend_close_method_with_failure(
     async_es_backend, monkeypatch
 ):
     """Test the `AsyncESDataBackend.close` method."""
@@ -840,3 +840,21 @@ async def test_backends_data_es_data_backend_close_method(
 
     with pytest.raises(BackendException, match="Failed to close Elasticsearch client"):
         await backend.close()
+
+
+@pytest.mark.anyio
+async def test_backends_data_es_data_backend_close_method(async_es_backend, caplog):
+    """Test the `AsyncESDataBackend.close` method."""
+
+    # No client instantiated
+    backend = async_es_backend()
+    await backend.close()
+    backend._client = None  # pylint: disable=protected-access
+    with caplog.at_level(logging.WARNING):
+        await backend.close()
+
+    assert (
+        "ralph.backends.data.async_es",
+        logging.WARNING,
+        "No backend client to close.",
+    ) in caplog.record_tuples

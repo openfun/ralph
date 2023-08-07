@@ -1056,7 +1056,7 @@ async def test_backends_data_async_mongo_data_backend_write_method_with_custom_c
 
 
 @pytest.mark.anyio
-async def test_backends_data_async_mongo_data_backend_close(
+async def test_backends_data_async_mongo_data_backend_close_method_with_failure(
     async_mongo_backend, monkeypatch, caplog
 ):
     """Test the `AsyncMongoDataBackend.close` method, given a failed close,
@@ -1084,3 +1084,14 @@ async def test_backends_data_async_mongo_data_backend_close(
         logging.ERROR,
         "Failed to close AsyncIOMotorClient: Close failure",
     ) in caplog.record_tuples
+
+
+@pytest.mark.anyio
+async def test_backends_data_async_mongo_data_backend_close_method(async_mongo_backend):
+    """Test the `AsyncMongoDataBackend.close` method."""
+
+    backend = async_mongo_backend()
+
+    # Not possible to connect to client after closing it
+    await backend.close()
+    assert await backend.status() == DataBackendStatus.AWAY
