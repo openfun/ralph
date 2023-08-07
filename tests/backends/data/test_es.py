@@ -108,6 +108,8 @@ def test_backends_data_es_data_backend_instantiation_with_settings():
     except Exception as err:  # pylint:disable=broad-except
         pytest.fail(f"Two ESDataBackends should not raise exceptions: {err}")
 
+    backend.close()
+
 
 def test_backends_data_es_data_backend_status_method(monkeypatch, es_backend, caplog):
     """Test the `ESDataBackend.status` method."""
@@ -157,6 +159,8 @@ def test_backends_data_es_data_backend_status_method(monkeypatch, es_backend, ca
         "Exception(Mocked connection error)",
     ) in caplog.record_tuples
 
+    backend.close()
+
 
 @pytest.mark.parametrize(
     "exception, error",
@@ -189,6 +193,8 @@ def test_backends_data_es_data_backend_list_method_with_failure(
         f"Failed to read indices: {error}",
     ) in caplog.record_tuples
 
+    backend.close()
+
 
 def test_backends_data_es_data_backend_list_method_without_history(
     es_backend, monkeypatch
@@ -207,6 +213,8 @@ def test_backends_data_es_data_backend_list_method_without_history(
     result = backend.list("target_index*")
     assert isinstance(result, Iterable)
     assert list(result) == list(indices.keys())
+
+    backend.close()
 
 
 def test_backends_data_es_data_backend_list_method_with_details(
@@ -229,6 +237,8 @@ def test_backends_data_es_data_backend_list_method_with_details(
         {"index_2": {"info_2": "baz"}},
     ]
 
+    backend.close()
+
 
 def test_backends_data_es_data_backend_list_method_with_history(
     es_backend, caplog, monkeypatch
@@ -246,6 +256,8 @@ def test_backends_data_es_data_backend_list_method_with_history(
         logging.WARNING,
         "The `new` argument is ignored",
     ) in caplog.record_tuples
+
+    backend.close()
 
 
 @pytest.mark.parametrize(
@@ -300,6 +312,8 @@ def test_backends_data_es_data_backend_read_method_with_failure(
         "Failed to open Elasticsearch point in time: %s" % error.replace("\\", ""),
     ) in caplog.record_tuples
 
+    backend.close()
+
 
 def test_backends_data_es_data_backend_read_method_with_ignore_errors(
     es, es_backend, monkeypatch, caplog
@@ -319,6 +333,8 @@ def test_backends_data_es_data_backend_read_method_with_ignore_errors(
         "The `ignore_errors` argument is ignored",
     ) in caplog.record_tuples
 
+    backend.close()
+
 
 def test_backends_data_es_data_backend_read_method_with_raw_ouput(es, es_backend):
     """Test the `ESDataBackend.read` method with `raw_output` set to `True`."""
@@ -331,6 +347,8 @@ def test_backends_data_es_data_backend_read_method_with_raw_ouput(es, es_backend
         assert isinstance(hit, bytes)
         assert json.loads(hit).get("_source") == documents[i]
 
+    backend.close()
+
 
 def test_backends_data_es_data_backend_read_method_without_raw_ouput(es, es_backend):
     """Test the `ESDataBackend.read` method with `raw_output` set to `False`."""
@@ -342,6 +360,8 @@ def test_backends_data_es_data_backend_read_method_without_raw_ouput(es, es_back
     for i, hit in enumerate(hits):
         assert isinstance(hit, dict)
         assert hit.get("_source") == documents[i]
+
+    backend.close()
 
 
 def test_backends_data_es_data_backend_read_method_with_query(es, es_backend, caplog):
@@ -402,6 +422,8 @@ def test_backends_data_es_data_backend_read_method_with_query(es, es_backend, ca
         "'type': 'value_error.extra'}]",
     ) in caplog.record_tuples
 
+    backend.close()
+
 
 def test_backends_data_es_data_backend_write_method_with_create_operation(
     es, es_backend, caplog
@@ -449,6 +471,8 @@ def test_backends_data_es_data_backend_write_method_with_create_operation(
     hits = list(backend.read())
     assert [hit["_source"] for hit in hits] == [{"value": str(idx)} for idx in range(9)]
 
+    backend.close()
+
 
 def test_backends_data_es_data_backend_write_method_with_delete_operation(
     es,
@@ -473,6 +497,8 @@ def test_backends_data_es_data_backend_write_method_with_delete_operation(
     hits = list(backend.read())
     assert len(hits) == 7
     assert sorted([hit["_source"]["id"] for hit in hits]) == list(range(3, 10))
+
+    backend.close()
 
 
 def test_backends_data_es_data_backend_write_method_with_update_operation(
@@ -518,6 +544,8 @@ def test_backends_data_es_data_backend_write_method_with_update_operation(
         map(lambda x: str(x + 10), range(10))
     )
 
+    backend.close()
+
 
 def test_backends_data_es_data_backend_write_method_with_append_operation(
     es_backend, caplog
@@ -536,6 +564,8 @@ def test_backends_data_es_data_backend_write_method_with_append_operation(
         logging.ERROR,
         "Append operation_type is not supported.",
     ) in caplog.record_tuples
+
+    backend.close()
 
 
 def test_backends_data_es_data_backend_write_method_with_target(es, es_backend):
@@ -569,6 +599,8 @@ def test_backends_data_es_data_backend_write_method_with_target(es, es_backend):
             {"value": "1"},
             {"value": "2"},
         ]
+
+    backend.close()
 
 
 def test_backends_data_es_data_backend_write_method_without_ignore_errors(
@@ -639,6 +671,8 @@ def test_backends_data_es_data_backend_write_method_without_ignore_errors(
     hits = list(backend.read())
     assert len(hits) == 5
 
+    backend.close()
+
 
 def test_backends_data_es_data_backend_write_method_with_ignore_errors(es, es_backend):
     """Test the `ESDataBackend.write` method with `ignore_errors` set to `True`, given
@@ -676,6 +710,8 @@ def test_backends_data_es_data_backend_write_method_with_ignore_errors(es, es_ba
     assert len(hits) == 11
     assert [hit["_source"] for hit in hits[9:]] == [{"foo": "bar"}, {"foo": "baz"}]
 
+    backend.close()
+
 
 def test_backends_data_es_data_backend_write_method_with_datastream(
     es_data_stream, es_backend
@@ -693,3 +729,45 @@ def test_backends_data_es_data_backend_write_method_with_datastream(
     hits = list(backend.read())
     assert len(hits) == 10
     assert sorted([hit["_source"]["id"] for hit in hits]) == list(range(10))
+
+    backend.close()
+
+
+def test_backends_data_es_data_backend_close_method_with_failure(
+    es_backend, monkeypatch
+):
+    """Test the `ESDataBackend.close` method."""
+
+    backend = es_backend()
+
+    def mock_connection_error():
+        """ES client close mock that raises a connection error."""
+        raise ESConnectionError("", (Exception("Mocked connection error"),))
+
+    monkeypatch.setattr(backend.client, "close", mock_connection_error)
+
+    with pytest.raises(BackendException, match="Failed to close Elasticsearch client"):
+        backend.close()
+
+
+def test_backends_data_es_data_backend_close_method(es_backend, caplog):
+    """Test the `ESDataBackend.close` method."""
+
+    backend = es_backend()
+    backend.status()
+
+    # Not possible to connect to client after closing it
+    backend.close()
+    assert backend.status() == DataBackendStatus.AWAY
+
+    # No client instantiated
+    backend = es_backend()
+    backend._client = None  # pylint: disable=protected-access
+    with caplog.at_level(logging.WARNING):
+        backend.close()
+
+    assert (
+        "ralph.backends.data.es",
+        logging.WARNING,
+        "No backend client to close.",
+    ) in caplog.record_tuples

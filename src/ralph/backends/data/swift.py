@@ -346,6 +346,23 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend):
         )
         return count
 
+    def close(self) -> None:
+        """Close the Swift backend client.
+
+        Raise:
+            BackendException: If a failure occurs during the close operation.
+        """
+        if not self._connection:
+            logger.warning("No backend client to close.")
+            return
+
+        try:
+            self.connection.close()
+        except ClientException as error:
+            msg = "Failed to close Swift backend client: %s"
+            logger.error(msg, error)
+            raise BackendException(msg % error) from error
+
     def _details(self, container: str, name: str):
         """Return `name` object details from `container`."""
         try:

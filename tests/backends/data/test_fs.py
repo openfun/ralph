@@ -1,4 +1,4 @@
-"""Tests for Ralph fs data backend"""
+"""Tests for Ralph fs data backend"""  # pylint: disable = too-many-lines
 import json
 import logging
 import os
@@ -996,3 +996,13 @@ def test_backends_data_fs_data_backend_write_method_without_target(
             "timestamp": frozen_now,
         },
     ]
+
+
+def test_backends_data_fs_data_backend_close_method(fs_backend):
+    """Test that the `FSDataBackend.close` method raise an error."""
+
+    backend = fs_backend()
+
+    error = "FS data backend does not support `close` method"
+    with pytest.raises(NotImplementedError, match=error):
+        backend.close()
