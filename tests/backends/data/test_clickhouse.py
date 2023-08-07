@@ -51,6 +51,7 @@ def test_backends_data_clickhouse_data_backend_default_instantiation(monkeypatch
     assert backend.event_table_name == "xapi_events_all"
     assert backend.default_chunk_size == 500
     assert backend.locale_encoding == "utf8"
+    backend.close()
 
 
 def test_backends_data_clickhouse_data_backend_instantiation_with_settings():
@@ -75,6 +76,7 @@ def test_backends_data_clickhouse_data_backend_instantiation_with_settings():
     assert backend.event_table_name == CLICKHOUSE_TEST_TABLE_NAME
     assert backend.default_chunk_size == 1000
     assert backend.locale_encoding == "utf-16"
+    backend.close()
 
 
 def test_backends_data_clickhouse_data_backend_status(
@@ -93,6 +95,7 @@ def test_backends_data_clickhouse_data_backend_status(
 
     monkeypatch.setattr(backend.client, "query", mock_query)
     assert backend.status() == DataBackendStatus.AWAY
+    backend.close()
 
 
 def test_backends_data_clickhouse_data_backend_read_method_with_raw_output(
@@ -130,6 +133,7 @@ def test_backends_data_clickhouse_data_backend_read_method_with_raw_output(
     assert len(results) == 3
     assert isinstance(results[0], bytes)
     assert json.loads(results[0])["event"] == statements[0]
+    backend.close()
 
 
 # pylint: disable=unused-argument
@@ -203,6 +207,7 @@ def test_backends_data_clickhouse_data_backend_read_method_with_a_custom_query(
     results = list(backend.read(query=query))
     assert len(results) == 1
     assert results[0]["event"] == statements[1]
+    backend.close()
 
 
 def test_backends_data_clickhouse_data_backend_read_method_with_failures(
@@ -276,6 +281,7 @@ def test_backends_data_clickhouse_data_backend_read_method_with_failures(
         logging.ERROR,
         msg,
     ) in caplog.record_tuples
+    backend.close()
 
 
 def test_backends_data_clickhouse_data_backend_list_method(
@@ -287,6 +293,7 @@ def test_backends_data_clickhouse_data_backend_list_method(
 
     assert list(backend.list(details=True)) == [{"name": CLICKHOUSE_TEST_TABLE_NAME}]
     assert list(backend.list(details=False)) == [CLICKHOUSE_TEST_TABLE_NAME]
+    backend.close()
 
 
 def test_backends_data_clickhouse_data_backend_list_method_with_failure(
@@ -315,6 +322,7 @@ def test_backends_data_clickhouse_data_backend_list_method_with_failure(
         logging.ERROR,
         msg,
     ) in caplog.record_tuples
+    backend.close()
 
 
 def test_backends_data_clickhouse_data_backend_write_method_with_invalid_timestamp(
@@ -343,6 +351,7 @@ def test_backends_data_clickhouse_data_backend_write_method_with_invalid_timesta
         match=msg,
     ):
         backend.write(statements, ignore_errors=False)
+    backend.close()
 
 
 def test_backends_data_clickhouse_data_backend_write_method_no_timestamp(
@@ -388,6 +397,7 @@ def test_backends_data_clickhouse_data_backend_write_method_no_timestamp(
         logging.ERROR,
         f"Statement {statement} has an invalid 'id' or 'timestamp' field",
     ) not in caplog.record_tuples
+    backend.close()
 
 
 def test_backends_data_clickhouse_data_backend_write_method_with_duplicated_key(
@@ -412,6 +422,7 @@ def test_backends_data_clickhouse_data_backend_write_method_with_duplicated_key(
 
     with pytest.raises(BackendException, match="Duplicate IDs found in batch"):
         backend.write(statements, ignore_errors=False)
+    backend.close()
 
 
 def test_backends_data_clickhouse_data_backend_write_method_chunks_on_error(
@@ -435,6 +446,7 @@ def test_backends_data_clickhouse_data_backend_write_method_chunks_on_error(
         {"id": dupe_id, **timestamp},
     ]
     assert backend.write(statements, ignore_errors=True) == 0
+    backend.close()
 
 
 def test_backends_data_clickhouse_data_backend_write_method(
@@ -472,6 +484,7 @@ def test_backends_data_clickhouse_data_backend_write_method(
     assert result[1]["event_id"] == native_statements[1]["id"]
     assert result[1]["emission_time"] == native_statements[1]["timestamp"]
     assert result[1]["event"] == statements[1]
+    backend.close()
 
 
 def test_backends_data_clickhouse_data_backend_write_method_bytes(
@@ -514,6 +527,7 @@ def test_backends_data_clickhouse_data_backend_write_method_bytes(
     assert result[1]["event_id"] == native_statements[1]["id"]
     assert result[1]["emission_time"] == native_statements[1]["timestamp"]
     assert result[1]["event"] == statements[1]
+    backend.close()
 
 
 def test_backends_data_clickhouse_data_backend_write_method_bytes_failed(
@@ -545,6 +559,7 @@ def test_backends_data_clickhouse_data_backend_write_method_bytes_failed(
 
     result = clickhouse.query(sql).result_set
     assert result[0][0] == 0
+    backend.close()
 
 
 def test_backends_data_clickhouse_data_backend_write_method_empty(
@@ -563,6 +578,7 @@ def test_backends_data_clickhouse_data_backend_write_method_empty(
 
     result = clickhouse.query(sql).result_set
     assert result[0][0] == 0
+    backend.close()
 
 
 def test_backends_data_clickhouse_data_backend_write_method_wrong_operation_type(
@@ -589,6 +605,7 @@ def test_backends_data_clickhouse_data_backend_write_method_wrong_operation_type
         match=f"{BaseOperationType.APPEND.name} operation_type is not allowed.",
     ):
         backend.write(data=statements, operation_type=BaseOperationType.APPEND)
+    backend.close()
 
 
 def test_backends_data_clickhouse_data_backend_write_method_with_custom_chunk_size(
@@ -626,3 +643,43 @@ def test_backends_data_clickhouse_data_backend_write_method_with_custom_chunk_si
     assert result[1]["event_id"] == native_statements[1]["id"]
     assert result[1]["emission_time"] == native_statements[1]["timestamp"]
     assert result[1]["event"] == statements[1]
+    backend.close()
+
+
+def test_backends_data_clickhouse_data_backend_close_method_with_failure(
+    clickhouse_backend, monkeypatch
+):
+    """Test the `ClickHouseDataBackend.close` method with failure."""
+
+    backend = clickhouse_backend()
+
+    def mock_connection_error():
+        """ClickHouse client close mock that raises a connection error."""
+        raise ClickHouseError("", (Exception("Mocked connection error"),))
+
+    monkeypatch.setattr(backend.client, "close", mock_connection_error)
+
+    with pytest.raises(BackendException, match="Failed to close ClickHouse client"):
+        backend.close()
+
+
+def test_backends_data_clickhouse_data_backend_close_method(clickhouse_backend, caplog):
+    """Test the `ClickHouseDataBackend.close` method."""
+
+    backend = clickhouse_backend()
+
+    # Not possible to connect to client after closing it
+    backend.close()
+    assert backend.status() == DataBackendStatus.AWAY
+
+    # No client instantiated
+    backend = clickhouse_backend()
+    backend._client = None  # pylint: disable=protected-access
+    with caplog.at_level(logging.WARNING):
+        backend.close()
+
+    assert (
+        "ralph.backends.data.clickhouse",
+        logging.WARNING,
+        "No backend client to close.",
+    ) in caplog.record_tuples

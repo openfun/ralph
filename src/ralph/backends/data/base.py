@@ -227,6 +227,14 @@ class BaseDataBackend(ABC):
             BackendParameterException: If a backend argument value is not valid.
         """
 
+    @abstractmethod
+    def close(self) -> None:
+        """Close the data backend client.
+
+        Raise:
+            BackendException: If a failure occurs during the close operation.
+        """
+
 
 class BaseAsyncDataBackend(ABC):
     """Base async data backend interface."""
@@ -381,5 +389,5 @@ class BaseAsyncDataBackend(ABC):
         """Close the data backend client.
 
         Raise:
-            BackendException: If a failure during the close operation occurs.
+            BackendException: If a failure occurs during the close operation.
         """

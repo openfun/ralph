@@ -698,3 +698,13 @@ def test_backends_data_ldp_data_backend_url_method(monkeypatch, ldp_backend):
     backend = ldp_backend()
     monkeypatch.setattr(backend.client, "post", mock_post)
     assert backend._url(archive_name) == archive_url
+
+
+def test_backends_data_ldp_data_backend_close_method(ldp_backend):
+    """Test that the `LDPDataBackend.close` method raise an error."""
+
+    backend = ldp_backend()
+
+    error = "LDP data backend does not support `close` method"
+    with pytest.raises(NotImplementedError, match=error):
+        backend.close()

@@ -242,6 +242,7 @@ def test_backends_lrs_mongo_lrs_backend_query_statements_query(
     assert result.statements == [{}]
     assert not result.pit_id
     assert result.search_after == "search_after_id"
+    backend.close()
 
 
 def test_backends_lrs_mongo_lrs_backend_query_statements_with_success(
@@ -285,6 +286,7 @@ def test_backends_lrs_mongo_lrs_backend_query_statements_with_success(
     assert statement_query_result.statements == [
         {"id": "62b9ce922c26b46b68ffc68f", **timestamp, **meta}
     ]
+    backend.close()
 
 
 def test_backends_lrs_mongo_lrs_backend_query_statements_with_query_failure(
@@ -314,6 +316,7 @@ def test_backends_lrs_mongo_lrs_backend_query_statements_with_query_failure(
         logging.ERROR,
         "Failed to read from MongoDB",
     ) in caplog.record_tuples
+    backend.close()
 
 
 def test_backends_lrs_mongo_lrs_backend_query_statements_by_ids_with_query_failure(
@@ -343,6 +346,7 @@ def test_backends_lrs_mongo_lrs_backend_query_statements_by_ids_with_query_failu
         logging.ERROR,
         "Failed to read from MongoDB",
     ) in caplog.record_tuples
+    backend.close()
 
 
 def test_backends_lrs_mongo_lrs_backend_query_statements_by_ids_with_two_collections(
@@ -368,3 +372,5 @@ def test_backends_lrs_mongo_lrs_backend_query_statements_by_ids_with_two_collect
     assert not list(backend_1.query_statements_by_ids(["2"]))
     assert not list(backend_2.query_statements_by_ids(["1"]))
     assert list(backend_2.query_statements_by_ids(["2"])) == [{"id": "2", **timestamp}]
+    backend_1.close()
+    backend_2.close()

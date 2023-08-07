@@ -280,6 +280,8 @@ def test_backends_lrs_es_lrs_backend_query_statements_query(
     assert result.pit_id == "foo_pit_id"
     assert result.search_after == "bar_search_after|baz_search_after"
 
+    backend.close()
+
 
 def test_backends_lrs_es_lrs_backend_query_statements(es, es_lrs_backend):
     """Test the `ESLRSBackend.query_statements` method, given a query,
@@ -296,6 +298,8 @@ def test_backends_lrs_es_lrs_backend_query_statements(es, es_lrs_backend):
     result = backend.query_statements(StatementParameters(limit=10))
     assert result.statements == documents
     assert re.match(r"[0-9]+\|0", result.search_after)
+
+    backend.close()
 
 
 def test_backends_lrs_es_lrs_backend_query_statements_with_search_query_failure(
@@ -324,6 +328,8 @@ def test_backends_lrs_es_lrs_backend_query_statements_with_search_query_failure(
         "Failed to read from Elasticsearch",
     ) in caplog.record_tuples
 
+    backend.close()
+
 
 def test_backends_lrs_es_lrs_backend_query_statements_by_ids_with_search_query_failure(
     es, es_lrs_backend, monkeypatch, caplog
@@ -350,6 +356,8 @@ def test_backends_lrs_es_lrs_backend_query_statements_by_ids_with_search_query_f
         logging.ERROR,
         "Failed to read from Elasticsearch",
     ) in caplog.record_tuples
+
+    backend.close()
 
 
 def test_backends_lrs_es_lrs_backend_query_statements_by_ids_with_multiple_indexes(
@@ -387,3 +395,6 @@ def test_backends_lrs_es_lrs_backend_query_statements_by_ids_with_multiple_index
     assert not list(backend_1.query_statements_by_ids(["2"]))
     assert not list(backend_2.query_statements_by_ids(["1"]))
     assert list(backend_2.query_statements_by_ids(["2"])) == [index_2_document]
+
+    backend_1.close()
+    backend_2.close()
