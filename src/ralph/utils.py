@@ -2,13 +2,16 @@
 
 import asyncio
 import datetime
+import json
 import logging
 import operator
 from functools import reduce
 from importlib import import_module
-from typing import List, Union
+from typing import Any, Dict, Iterable, Iterator, List, Union
 
 from pydantic import BaseModel
+
+from ralph.exceptions import BackendException
 
 
 # Taken from Django utilities
@@ -120,3 +123,24 @@ async def gather_with_limited_concurrency(num_tasks: Union[None, int], *tasks):
     except Exception as exception:
         group.cancel()
         raise exception
+
+
+def parse_bytes_to_dict(
+    raw_documents: Iterable[bytes], ignore_errors: bool, logger_class: logging.Logger
+) -> Iterator[dict]:
+    """Read the `raw_documents` Iterable and yield dictionaries."""
+    for raw_document in raw_documents:
+        try:
+            yield json.loads(raw_document)
+        except (TypeError, json.JSONDecodeError) as error:
+            msg = "Failed to decode JSON: %s, for document: %s"
+            logger_class.error(msg, error, raw_document)
+            if ignore_errors:
+                continue
+            raise BackendException(msg % (error, raw_document)) from error
+
+
+def read_raw(documents: Iterable[Dict[str, Any]], encoding: str) -> Iterator[bytes]:
+    """Read the `documents` Iterable with the `encoding` and yield bytes."""
+    for document in documents:
+        yield json.dumps(document).encode(encoding)
