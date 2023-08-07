@@ -256,7 +256,7 @@ class AsyncMongoDataBackend(BaseAsyncDataBackend):
         """Close the AsyncIOMotorClient client.
 
         Raise:
-            BackendException: If a failure during the close operation occurs.
+            BackendException: If a failure occurs during the close operation.
         """
         try:
             self.client.close()

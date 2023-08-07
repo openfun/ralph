@@ -72,12 +72,16 @@ def test_backends_data_s3_data_backend_status_method(s3_backend):
     # Regions outside of us-east-1 require the appropriate LocationConstraint
     s3_client = boto3.client("s3", region_name="us-east-1")
 
-    assert s3_backend().status() == DataBackendStatus.ERROR
+    backend = s3_backend()
+    assert backend.status() == DataBackendStatus.ERROR
+    backend.close()
 
     bucket_name = "bucket_name"
     s3_client.create_bucket(Bucket=bucket_name)
 
-    assert s3_backend().status() == DataBackendStatus.OK
+    backend = s3_backend()
+    assert backend.status() == DataBackendStatus.OK
+    backend.close()
 
 
 @mock_s3
@@ -117,9 +121,9 @@ def test_backends_data_s3_data_backend_list_should_yield_archive_names(
         {"name": "2022-10-01.gz"},
     ]
 
-    s3 = s3_backend()
+    backend = s3_backend()
 
-    s3.history.extend(
+    backend.history.extend(
         [
             {"id": "bucket_name/2022-04-29.gz", "backend": "s3", "command": "read"},
             {"id": "bucket_name/2022-04-30.gz", "backend": "s3", "command": "read"},
@@ -127,15 +131,16 @@ def test_backends_data_s3_data_backend_list_should_yield_archive_names(
     )
 
     try:
-        response_list = s3.list()
-        response_list_new = s3.list(new=True)
-        response_list_details = s3.list(details=True)
+        response_list = backend.list()
+        response_list_new = backend.list(new=True)
+        response_list_details = backend.list(details=True)
     except Exception:  # pylint:disable=broad-except
         pytest.fail("S3 backend should not raise exception on successful list")
 
     assert list(response_list) == [x["name"] for x in listing]
     assert list(response_list_new) == ["2022-10-01.gz"]
     assert [x["Key"] for x in response_list_details] == [x["name"] for x in listing]
+    backend.close()
 
 
 @mock_s3
@@ -153,15 +158,16 @@ def test_backends_data_s3_list_on_empty_bucket_should_do_nothing(
 
     listing = []
 
-    s3 = s3_backend()
+    backend = s3_backend()
 
-    s3.clean_history(lambda *_: True)
+    backend.clean_history(lambda *_: True)
     try:
-        response_list = s3.list()
+        response_list = backend.list()
     except Exception:  # pylint:disable=broad-except
         pytest.fail("S3 backend should not raise exception on successful list")
 
     assert list(response_list) == [x["name"] for x in listing]
+    backend.close()
 
 
 @mock_s3
@@ -184,19 +190,19 @@ def test_backends_data_s3_list_with_failed_connection_should_log_the_error(
         Body=json.dumps({"id": "1", "foo": "bar"}),
     )
 
-    s3 = s3_backend()
+    backend = s3_backend()
 
-    s3.clean_history(lambda *_: True)
+    backend.clean_history(lambda *_: True)
 
     msg = "Failed to list the bucket wrong_name: The specified bucket does not exist"
 
     with caplog.at_level(logging.ERROR):
         with pytest.raises(BackendException, match=msg):
-            next(s3.list(target="wrong_name"))
+            next(backend.list(target="wrong_name"))
         with pytest.raises(BackendException, match=msg):
-            next(s3.list(target="wrong_name", new=True))
+            next(backend.list(target="wrong_name", new=True))
         with pytest.raises(BackendException, match=msg):
-            next(s3.list(target="wrong_name", details=True))
+            next(backend.list(target="wrong_name", details=True))
 
     assert (
         list(
@@ -207,6 +213,7 @@ def test_backends_data_s3_list_with_failed_connection_should_log_the_error(
         )
         == [("ralph.backends.data.s3", logging.ERROR, msg)] * 3
     )
+    backend.close()
 
 
 @mock_s3
@@ -242,11 +249,11 @@ def test_backends_data_s3_read_with_valid_name_should_write_to_history(
     freezed_now = datetime.datetime.now(tz=datetime.timezone.utc).isoformat()
     monkeypatch.setattr("ralph.backends.data.s3.now", lambda: freezed_now)
 
-    s3 = s3_backend()
-    s3.clean_history(lambda *_: True)
+    backend = s3_backend()
+    backend.clean_history(lambda *_: True)
 
     list(
-        s3.read(
+        backend.read(
             query="2022-09-29.gz",
             target=bucket_name,
             chunk_size=1000,
@@ -260,10 +267,10 @@ def test_backends_data_s3_read_with_valid_name_should_write_to_history(
         "id": f"{bucket_name}/2022-09-29.gz",
         "size": len(raw_body),
         "timestamp": freezed_now,
-    } in s3.history
+    } in backend.history
 
     list(
-        s3.read(
+        backend.read(
             query="2022-09-30.gz",
             raw_output=False,
         )
@@ -275,7 +282,8 @@ def test_backends_data_s3_read_with_valid_name_should_write_to_history(
         "id": f"{bucket_name}/2022-09-30.gz",
         "size": len(json_body),
         "timestamp": freezed_now,
-    } in s3.history
+    } in backend.history
+    backend.close()
 
 
 @mock_s3
@@ -302,8 +310,8 @@ def test_backends_data_s3_read_with_invalid_output_should_log_the_error(
 
     with caplog.at_level(logging.ERROR):
         with pytest.raises(BackendException):
-            s3 = s3_backend()
-            list(s3.read(query="2022-09-29.gz", raw_output=False))
+            backend = s3_backend()
+            list(backend.read(query="2022-09-29.gz", raw_output=False))
 
     assert (
         "ralph.backends.data.s3",
@@ -311,7 +319,8 @@ def test_backends_data_s3_read_with_invalid_output_should_log_the_error(
         "Raised error: Expecting value: line 1 column 1 (char 0)",
     ) in caplog.record_tuples
 
-    s3.clean_history(lambda *_: True)
+    backend.clean_history(lambda *_: True)
+    backend.close()
 
 
 @mock_s3
@@ -339,8 +348,8 @@ def test_backends_data_s3_read_with_invalid_name_should_log_the_error(
 
     with caplog.at_level(logging.ERROR):
         with pytest.raises(BackendParameterException):
-            s3 = s3_backend()
-            list(s3.read(query=None, target=bucket_name))
+            backend = s3_backend()
+            list(backend.read(query=None, target=bucket_name))
 
     assert (
         "ralph.backends.data.s3",
@@ -348,7 +357,8 @@ def test_backends_data_s3_read_with_invalid_name_should_log_the_error(
         "Invalid query. The query should be a valid object name.",
     ) in caplog.record_tuples
 
-    s3.clean_history(lambda *_: True)
+    backend.clean_history(lambda *_: True)
+    backend.close()
 
 
 @mock_s3
@@ -376,9 +386,9 @@ def test_backends_data_s3_read_with_wrong_name_should_log_the_error(
 
     with caplog.at_level(logging.ERROR):
         with pytest.raises(BackendException):
-            s3 = s3_backend()
-            s3.clean_history(lambda *_: True)
-            list(s3.read(query="invalid_name.gz", target=bucket_name))
+            backend = s3_backend()
+            backend.clean_history(lambda *_: True)
+            list(backend.read(query="invalid_name.gz", target=bucket_name))
 
     assert (
         "ralph.backends.data.s3",
@@ -386,7 +396,8 @@ def test_backends_data_s3_read_with_wrong_name_should_log_the_error(
         "Failed to download invalid_name.gz: The specified key does not exist.",
     ) in caplog.record_tuples
 
-    assert s3.history == []
+    assert backend.history == []
+    backend.close()
 
 
 @mock_s3
@@ -418,17 +429,18 @@ def test_backends_data_s3_read_with_iter_error_should_log_the_error(
 
     with caplog.at_level(logging.ERROR):
         with pytest.raises(BackendException):
-            s3 = s3_backend()
-            monkeypatch.setattr(s3, "_read_raw", mock_read_raw)
-            s3.clean_history(lambda *_: True)
-            list(s3.read(query=object_name, target=bucket_name, raw_output=True))
+            backend = s3_backend()
+            monkeypatch.setattr(backend, "_read_raw", mock_read_raw)
+            backend.clean_history(lambda *_: True)
+            list(backend.read(query=object_name, target=bucket_name, raw_output=True))
 
     assert (
         "ralph.backends.data.s3",
         logging.ERROR,
         f"Failed to read chunk from object {object_name}",
     ) in caplog.record_tuples
-    assert s3.history == []
+    assert backend.history == []
+    backend.close()
 
 
 @pytest.mark.parametrize(
@@ -462,9 +474,9 @@ def test_backends_data_s3_write_method_with_parameter_error(
 
     with caplog.at_level(logging.ERROR):
         with pytest.raises(BackendException):
-            s3 = s3_backend()
-            s3.clean_history(lambda *_: True)
-            s3.write(
+            backend = s3_backend()
+            backend.clean_history(lambda *_: True)
+            backend.write(
                 data=some_content, target=object_name, operation_type=operation_type
             )
 
@@ -474,7 +486,8 @@ def test_backends_data_s3_write_method_with_parameter_error(
     )
 
     assert ("ralph.backends.data.s3", logging.ERROR, msg) in caplog.record_tuples
-    assert s3.history == []
+    assert backend.history == []
+    backend.close()
 
 
 @pytest.mark.parametrize(
@@ -494,6 +507,7 @@ def test_backends_data_s3_data_backend_write_method_with_append_or_delete_operat
         match=f"{operation_type.name} operation_type is not allowed.",
     ):
         backend.write(data=[b"foo"], operation_type=operation_type)
+    backend.close()
 
 
 @pytest.mark.parametrize(
@@ -520,10 +534,10 @@ def test_backends_data_s3_write_method_with_create_index_operation(
     object_name = "new-archive.gz"
     some_content = b"some contents in the stream file to upload"
     data = [some_content, some_content, some_content]
-    s3 = s3_backend()
-    s3.clean_history(lambda *_: True)
+    backend = s3_backend()
+    backend.clean_history(lambda *_: True)
 
-    response = s3.write(
+    response = backend.write(
         data=data,
         target=object_name,
         operation_type=operation_type,
@@ -537,13 +551,13 @@ def test_backends_data_s3_write_method_with_create_index_operation(
         "id": f"{bucket_name}/{object_name}",
         "size": len(some_content) * 3,
         "timestamp": freezed_now,
-    } in s3.history
+    } in backend.history
 
     object_name = "new-archive2.gz"
     other_content = {"some": "content"}
 
     data = [other_content, other_content]
-    response = s3.write(
+    response = backend.write(
         data=data,
         target=object_name,
         operation_type=operation_type,
@@ -557,9 +571,9 @@ def test_backends_data_s3_write_method_with_create_index_operation(
         "id": f"{bucket_name}/{object_name}",
         "size": len(bytes(f"{json.dumps(other_content)}\n", encoding="utf8")) * 2,
         "timestamp": freezed_now,
-    } in s3.history
+    } in backend.history
 
-    assert list(s3.read(query=object_name, raw_output=False)) == data
+    assert list(backend.read(query=object_name, raw_output=False)) == data
 
     object_name = "new-archive3.gz"
     date = datetime.datetime(2023, 6, 30, 8, 42, 15, 554892)
@@ -571,7 +585,7 @@ def test_backends_data_s3_write_method_with_create_index_operation(
     with caplog.at_level(logging.ERROR):
         # Without ignoring error
         with pytest.raises(BackendException, match=error):
-            response = s3.write(
+            response = backend.write(
                 data=data,
                 target=object_name,
                 operation_type=operation_type,
@@ -579,7 +593,7 @@ def test_backends_data_s3_write_method_with_create_index_operation(
             )
 
         # Ignoring error
-        response = s3.write(
+        response = backend.write(
             data=data,
             target=object_name,
             operation_type=operation_type,
@@ -601,6 +615,7 @@ def test_backends_data_s3_write_method_with_create_index_operation(
         ]
         * 2
     )
+    backend.close()
 
 
 @mock_s3
@@ -618,13 +633,14 @@ def test_backends_data_s3_write_method_with_no_data_should_skip(
 
     object_name = "new-archive.gz"
 
-    s3 = s3_backend()
-    response = s3.write(
+    backend = s3_backend()
+    response = backend.write(
         data=[],
         target=object_name,
         operation_type=BaseOperationType.CREATE,
     )
     assert response == 0
+    backend.close()
 
 
 @mock_s3
@@ -647,12 +663,47 @@ def test_backends_data_s3_write_method_with_failure_should_log_the_error(
     def raise_client_error(*args, **kwargs):
         raise ClientError({"Error": {}}, "error")
 
-    s3 = s3_backend()
-    s3.client.put_object = raise_client_error
+    backend = s3_backend()
+    backend.client.put_object = raise_client_error
 
     with pytest.raises(BackendException, match=error):
-        s3.write(
+        backend.write(
             data=[body],
             target=object_name,
             operation_type=BaseOperationType.CREATE,
         )
+    backend.close()
+
+
+def test_backends_data_s3_data_backend_close_method_with_failure(
+    s3_backend, monkeypatch
+):
+    """Test the `S3DataBackend.close` method."""
+
+    backend = s3_backend()
+
+    def mock_connection_error():
+        """S3 backend client close mock that raises a connection error."""
+        raise ClientError({"Error": {}}, "error")
+
+    monkeypatch.setattr(backend.client, "close", mock_connection_error)
+
+    with pytest.raises(BackendException, match="Failed to close S3 backend client"):
+        backend.close()
+
+
+@mock_s3
+def test_backends_data_s3_data_backend_close_method(s3_backend, caplog):
+    """Test the `S3DataBackend.close` method."""
+
+    # No client instantiated
+    backend = s3_backend()
+    backend._client = None  # pylint: disable=protected-access
+    with caplog.at_level(logging.WARNING):
+        backend.close()
+
+    assert (
+        "ralph.backends.data.s3",
+        logging.WARNING,
+        "No backend client to close.",
+    ) in caplog.record_tuples

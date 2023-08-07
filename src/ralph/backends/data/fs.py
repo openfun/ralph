@@ -308,6 +308,12 @@ class FSDataBackend(HistoryMixin, BaseDataBackend):
         )
         return 1
 
+    def close(self) -> None:
+        """FS backend has nothing to close, this method is not implemented."""
+        msg = "FS data backend does not support `close` method"
+        logger.error(msg)
+        raise NotImplementedError(msg)
+
     @staticmethod
     def _read_raw(file: IO, chunk_size: int, _ignore_errors: bool) -> Iterator[bytes]:
         """Read the `file` in chunks of size `chunk_size` and yield them."""

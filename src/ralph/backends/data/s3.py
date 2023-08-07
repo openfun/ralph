@@ -11,6 +11,7 @@ import boto3
 from boto3.s3.transfer import TransferConfig
 from botocore.exceptions import (
     ClientError,
+    EndpointConnectionError,
     ParamValidationError,
     ReadTimeoutError,
     ResponseStreamingError,
@@ -102,7 +103,7 @@ class S3DataBackend(HistoryMixin, BaseDataBackend):
         """
         try:
             self.client.head_bucket(Bucket=self.default_bucket_name)
-        except ClientError:
+        except (ClientError, EndpointConnectionError):
             return DataBackendStatus.ERROR
 
         return DataBackendStatus.OK
@@ -197,7 +198,7 @@ class S3DataBackend(HistoryMixin, BaseDataBackend):
 
         try:
             response = self.client.get_object(Bucket=target, Key=query.query_string)
-        except ClientError as err:
+        except (ClientError, EndpointConnectionError) as err:
             error_msg = err.response["Error"]["Message"]
             msg = "Failed to download %s: %s"
             logger.error(msg, query.query_string, error_msg)
@@ -321,7 +322,7 @@ class S3DataBackend(HistoryMixin, BaseDataBackend):
                 Config=TransferConfig(multipart_chunksize=chunk_size),
             )
             response = self.client.head_object(Bucket=target_bucket, Key=target_object)
-        except (ClientError, ParamValidationError) as exc:
+        except (ClientError, ParamValidationError, EndpointConnectionError) as exc:
             msg = "Failed to upload %s"
             logger.error(msg, target)
             raise BackendException(msg % target) from exc
@@ -339,6 +340,23 @@ class S3DataBackend(HistoryMixin, BaseDataBackend):
         )
 
         return counter["count"]
+
+    def close(self) -> None:
+        """Close the S3 backend client.
+
+        Raise:
+            BackendException: If a failure occurs during the close operation.
+        """
+        if not self._client:
+            logger.warning("No backend client to close.")
+            return
+
+        try:
+            self.client.close()
+        except ClientError as error:
+            msg = "Failed to close S3 backend client: %s"
+            logger.error(msg, error)
+            raise BackendException(msg % error) from error
 
     @staticmethod
     def _read_raw(
