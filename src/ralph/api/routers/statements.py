@@ -16,7 +16,7 @@ from fastapi import (
     Request,
     Response,
     status,
-    Security
+    Security,
 )
 from pydantic import parse_obj_as
 from pydantic.types import Json
@@ -68,11 +68,13 @@ POST_PUT_RESPONSES = {
     },
 }
 
+
 def _enrich_statement_with_id(statement):
     # id: UUID
     # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#24-statement-properties
     statement["id"] = str(statement.get("id", uuid4()))
     return statement["id"]
+
 
 def _enrich_statement_with_stored(statement, value=None):
     # stored: The time at which a Statement is stored by the LRS
@@ -83,11 +85,13 @@ def _enrich_statement_with_stored(statement, value=None):
         statement["stored"] = value
     return statement["stored"]
 
+
 def _enrich_statement_with_timestamp(statement):
     # timestamp: If not provided, same value as stored
     # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#247-timestamp
     statement["timestamp"] = statement.get("timestamp", statement.get("stored", now()))
     return statement["timestamp"]
+
 
 def _enrich_statement_with_authority(statement, current_user: AuthenticatedUser):
     # authority: Information about whom or what has asserted that this statement is true
@@ -101,12 +105,13 @@ def _enrich_statement_with_authority(statement, current_user: AuthenticatedUser)
             status_code=status.HTTP_403_FORBIDDEN,
             detail=(
                 "Stated `authority` does not match credentials. Change or remove"
-                 "`authority` field from incoming statement.",
-            )
+                "`authority` field from incoming statement.",
+            ),
         )
     else:
         statement["authority"] = authority
     pass
+
 
 def _parse_agent_parameters(agent_obj: dict):
     """Parse a dict and return an AgentParameters object to use in queries."""
@@ -398,14 +403,12 @@ async def put(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="xAPI statement id does not match given statementId",
         )
-    
+
     # Enrich statement before forwarding (NB: id is already set)
     timestamp = _enrich_statement_with_timestamp(statement_as_dict)
 
     if get_active_xapi_forwardings():
-        background_tasks.add_task(
-            forward_xapi_statements, statement_as_dict
-        )
+        background_tasks.add_task(forward_xapi_statements, statement_as_dict)
 
     # Finish enriching statements after forwarding
     _enrich_statement_with_stored(statement_as_dict, timestamp)
@@ -433,9 +436,7 @@ async def put(
 
     # For valid requests, perform the bulk indexing of all incoming statements
     try:
-        success_count = DATABASE_CLIENT.put(
-            [statement_as_dict], ignore_errors=False
-        )
+        success_count = DATABASE_CLIENT.put([statement_as_dict], ignore_errors=False)
     except (BackendException, BadFormatException) as exc:
         logger.error("Failed to index submitted statement")
         raise HTTPException(
@@ -511,7 +512,9 @@ async def post(
 
             # The LRS specification calls for deep comparison of duplicates. This
             # is done here. If they are not exactly the same, we raise an error.
-            if not statements_are_equivalent(statements_dict[existing["_id"]], existing["_source"]):
+            if not statements_are_equivalent(
+                statements_dict[existing["_id"]], existing["_source"]
+            ):
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
                     detail="Differing statements already exist with the same ID: "

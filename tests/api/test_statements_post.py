@@ -71,7 +71,9 @@ def test_api_statements_post_single_statement_directly(
         "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
     )
     assert response.status_code == 200
-    assert_statement_get_responses_are_equivalent(response.json(), {"statements": [statement]})
+    assert_statement_get_responses_are_equivalent(
+        response.json(), {"statements": [statement]}
+    )
 
 
 # pylint: disable=too-many-arguments
@@ -81,7 +83,9 @@ def test_api_statements_post_enriching_without_existing_values(
     """Test that statements are properly enriched when statement provides no values."""
     # pylint: disable=invalid-name,unused-argument
 
-    monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", get_es_test_backend())
+    monkeypatch.setattr(
+        "ralph.api.routers.statements.DATABASE_CLIENT", get_es_test_backend()
+    )
     statement = {
         "actor": {
             "account": {
@@ -108,7 +112,7 @@ def test_api_statements_post_enriching_without_existing_values(
         "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
     )
 
-    statement = response.json()['statements'][0]
+    statement = response.json()["statements"][0]
 
     # Test pre-processing: id
     assert "id" in statement
@@ -130,7 +134,7 @@ def test_api_statements_post_enriching_without_existing_values(
 @pytest.mark.parametrize(
     "field,value,status",
     [
-        ("id", str(uuid4()), 200), 
+        ("id", str(uuid4()), 200),
         ("timestamp", "2022-06-22T08:31:38Z", 200),
         ("stored", "2022-06-22T08:31:38Z", 200),
         ("authority", {"mbox": "mailto:test_ralph@example.com"}, 200),
@@ -144,7 +148,9 @@ def test_api_statements_post_enriching_with_existing_values(
     """Test that statements are properly enriched when values are provided."""
     # pylint: disable=invalid-name,unused-argument
 
-    monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", get_es_test_backend())
+    monkeypatch.setattr(
+        "ralph.api.routers.statements.DATABASE_CLIENT", get_es_test_backend()
+    )
     statement = {
         "actor": {
             "account": {
@@ -173,7 +179,7 @@ def test_api_statements_post_enriching_with_existing_values(
         response = client.get(
             "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
         )
-        statement = response.json()['statements'][0]
+        statement = response.json()["statements"][0]
 
         # Test enriching
 
@@ -261,7 +267,9 @@ def test_api_statements_post_statements_list_of_one(
         "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
     )
     assert response.status_code == 200
-    assert_statement_get_responses_are_equivalent(response.json(), {"statements": [statement]})
+    assert_statement_get_responses_are_equivalent(
+        response.json(), {"statements": [statement]}
+    )
 
 
 @pytest.mark.parametrize(
@@ -326,9 +334,9 @@ def test_api_statements_post_statements_list(
     # Update statements with the generated id.
     statements[1] = dict(statements[1], **{"id": generated_id})
 
-    assert_statement_get_responses_are_equivalent(get_response.json(), {"statements": statements})
-
-
+    assert_statement_get_responses_are_equivalent(
+        get_response.json(), {"statements": statements}
+    )
 
 
 @pytest.mark.parametrize(
@@ -449,8 +457,9 @@ def test_api_statements_post_statements_list_with_duplicate_of_existing_statemen
         "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
     )
     assert response.status_code == 200
-    assert_statement_get_responses_are_equivalent(response.json(), {"statements": [statement]})
-    
+    assert_statement_get_responses_are_equivalent(
+        response.json(), {"statements": [statement]}
+    )
 
 
 @pytest.mark.parametrize(
@@ -701,8 +710,9 @@ async def test_post_statements_list_with_statement_forwarding(
                 headers={"Authorization": f"Basic {auth_credentials}"},
             )
             assert response.status_code == 200
-            assert_statement_get_responses_are_equivalent(response.json(), {"statements": [statement]})
-
+            assert_statement_get_responses_are_equivalent(
+                response.json(), {"statements": [statement]}
+            )
 
     # The statement should also be stored on the receiving client
     async with AsyncClient() as receiving_client:
@@ -711,8 +721,9 @@ async def test_post_statements_list_with_statement_forwarding(
             headers={"Authorization": f"Basic {auth_credentials}"},
         )
         assert response.status_code == 200
-        assert_statement_get_responses_are_equivalent(response.json(), {"statements": [statement]})
-
+        assert_statement_get_responses_are_equivalent(
+            response.json(), {"statements": [statement]}
+        )
 
     # Stop receiving LRS client
     await lrs_context.__aexit__(None, None, None)
