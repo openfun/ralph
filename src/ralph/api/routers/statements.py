@@ -89,23 +89,23 @@ def _enrich_statement_with_timestamp(statement):
     statement["timestamp"] = statement.get("timestamp", statement.get("stored", now()))
     return statement["timestamp"]
 
-def _enrich_statement_with_authority(statement, current_user):
+def _enrich_statement_with_authority(statement, current_user: AuthenticatedUser):
     # authority: Information about whom or what has asserted that this statement is true
     # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#249-authority
-    # authority = current_user.infer_authority()
-    # if "authority" in statement and statement["authority"] != authority:
-    #     logger.error(
-    #         "Failed to index submitted statements. Submitted authority does not match."
-    #     )
-    #     raise HTTPException(
-    #         status_code=status.HTTP_403_FORBIDDEN,
-    #         detail=(
-    #             "Stated authority does not match credentials. Change or remove"
-    #              "`authority`.",
-    #         )
-    #     )
-    # else:
-    #     statement["authority"] = authority
+    authority = current_user.agent
+    if "authority" in statement and statement["authority"] != authority:
+        logger.error(
+            "Failed to index submitted statements. Submitted authority does not match."
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=(
+                "Stated `authority` does not match credentials. Change or remove"
+                 "`authority` field from incoming statement.",
+            )
+        )
+    else:
+        statement["authority"] = authority
     pass
 
 def _parse_agent_parameters(agent_obj: dict):

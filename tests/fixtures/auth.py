@@ -21,7 +21,6 @@ AUDIENCE = "http://clientHost:8100"
 ISSUER_URI = "http://providerHost:8080/auth/realms/real_name"
 PUBLIC_KEY_ID = "example-key-id"
 
-
 def create_user(
     fs_,
     username: str,
