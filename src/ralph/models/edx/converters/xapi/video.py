@@ -52,6 +52,11 @@ class VideoBaseXapiConverter(BaseXapiConverter):
                     + event["event"]["id"],
                 ),
                 ConversionItem(
+                    "context__contextActivities__category",
+                    None,
+                    lambda _: [{"id": "https://w3id.org/xapi/video"}],
+                ),
+                ConversionItem(
                     "context__extensions__" + CONTEXT_EXTENSION_SESSION_ID,
                     "session",
                 ),
