@@ -6290,7 +6290,7 @@ __dest__            (<a class="autorefs autorefs-internal" title="ralph.models.x
 
     <span class="n">verb</span><span class="p">:</span> <span class="n">PlayedVerb</span> <span class="o">=</span> <span class="n">PlayedVerb</span><span class="p">()</span>
     <span class="n">result</span><span class="p">:</span> <span class="n">VideoPlayedResult</span>
-    <span class="n">context</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VideoPlayedContext</span><span class="p">]</span>
+    <span class="n">context</span><span class="p">:</span> <span class="n">VideoPlayedContext</span>
 </code></pre></div>
         </details>
 
@@ -6560,7 +6560,7 @@ __dest__            (<a class="autorefs autorefs-internal" title="ralph.models.x
 
     <span class="n">verb</span><span class="p">:</span> <span class="n">SeekedVerb</span> <span class="o">=</span> <span class="n">SeekedVerb</span><span class="p">()</span>
     <span class="n">result</span><span class="p">:</span> <span class="n">VideoSeekedResult</span>
-    <span class="n">context</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VideoSeekedContext</span><span class="p">]</span>
+    <span class="n">context</span><span class="p">:</span> <span class="n">VideoSeekedContext</span>
 </code></pre></div>
         </details>
 
@@ -7025,6 +7025,11 @@ VideoBaseXapiConverter            (<a class="autorefs autorefs-internal" title="
                     <span class="o">+</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;context&quot;</span><span class="p">][</span><span class="s2">&quot;course_id&quot;</span><span class="p">]</span>
                     <span class="o">+</span> <span class="s2">&quot;-course-v1:+type@video+block@&quot;</span>
                     <span class="o">+</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;event&quot;</span><span class="p">][</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
+                <span class="p">),</span>
+                <span class="n">ConversionItem</span><span class="p">(</span>
+                    <span class="s2">&quot;context__contextActivities__category&quot;</span><span class="p">,</span>
+                    <span class="kc">None</span><span class="p">,</span>
+                    <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;https://w3id.org/xapi/video&quot;</span><span class="p">}],</span>
                 <span class="p">),</span>
                 <span class="n">ConversionItem</span><span class="p">(</span>
                     <span class="s2">&quot;context__extensions__&quot;</span> <span class="o">+</span> <span class="n">CONTEXT_EXTENSION_SESSION_ID</span><span class="p">,</span>
