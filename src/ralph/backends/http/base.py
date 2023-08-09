@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from enum import Enum, unique
 from typing import Iterator, List, Optional, Union
 
-from pydantic import BaseModel, ValidationError
+from pydantic import ConfigDict, BaseModel, ValidationError
 
 from ralph.exceptions import BackendParameterException
 
@@ -56,11 +56,7 @@ def enforce_query_checks(method):
 
 class BaseQuery(BaseModel):
     """Base query model."""
-
-    class Config:
-        """Base query model configuration."""
-
-        extra = "forbid"
+    model_config = ConfigDict(extra="forbid")
 
     query_string: Optional[str]
 

@@ -131,8 +131,8 @@ class VideoCompletedResult(BaseXapiResult):
     """
 
     extensions: VideoCompletedResultExtensions
-    completion: Optional[Literal[True]]
-    duration: Optional[timedelta]
+    completion: Optional[Literal[True]] = None
+    duration: Optional[timedelta] = None
 
 
 class VideoTerminatedResult(BaseXapiResult):

@@ -35,10 +35,10 @@ class BaseXapiSubStatement(BaseModelWithConfig):
     verb: BaseXapiVerb
     object: BaseXapiUnnestedObject
     objectType: Literal["SubStatement"]
-    result: Optional[BaseXapiResult]
-    context: Optional[BaseXapiContext]
-    timestamp: Optional[datetime]
-    attachments: Optional[List[BaseXapiAttachment]]
+    result: Optional[BaseXapiResult] = None
+    context: Optional[BaseXapiContext] = None
+    timestamp: Optional[datetime] = None
+    attachments: Optional[List[BaseXapiAttachment]] = None
 
 
 BaseXapiObject = Union[

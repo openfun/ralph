@@ -84,7 +84,7 @@ class VideoPlayed(BaseVideoStatement):
 
     verb: PlayedVerb = PlayedVerb()
     result: VideoPlayedResult
-    context: Optional[VideoPlayedContext]
+    context: Optional[VideoPlayedContext] = None
 
 
 class VideoPaused(BaseVideoStatement):
@@ -127,7 +127,7 @@ class VideoSeeked(BaseVideoStatement):
 
     verb: SeekedVerb = SeekedVerb()
     result: VideoSeekedResult
-    context: Optional[VideoSeekedContext]
+    context: Optional[VideoSeekedContext] = None
 
 
 class VideoCompleted(BaseVideoStatement):

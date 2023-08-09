@@ -36,8 +36,8 @@ class ClickHouseInsert(BaseModel):
 class ClickHouseQuery(BaseQuery):
     """ClickHouse query model."""
 
-    where_clause: Optional[str]
-    return_fields: Optional[List[str]]
+    where_clause: Optional[str] = None
+    return_fields: Optional[List[str]] = None
 
 
 class ClickHouseDatabase(BaseDatabase):  # pylint: disable=too-many-instance-attributes

@@ -9,7 +9,7 @@ from enum import Enum, unique
 from typing import BinaryIO, List, Literal, Optional, TextIO, Union
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import ConfigDict, BaseModel
 
 from ralph.exceptions import BackendParameterException
 
@@ -18,11 +18,7 @@ logger = logging.getLogger(__name__)
 
 class BaseQuery(BaseModel):
     """Base query model."""
-
-    class Config:
-        """Base query model configuration."""
-
-        extra = "forbid"
+    model_config = ConfigDict(extra="forbid")
 
 
 @dataclass

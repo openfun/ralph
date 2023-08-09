@@ -31,13 +31,13 @@ class StatementResponse(BaseModel):
     """Pydantic model for `get` statements response."""
 
     statements: Union[List[dict], dict]
-    more: Optional[str]
+    more: Optional[str] = None
 
 
 class LRSQuery(BaseQuery):
     """LRS body query model."""
 
-    query: Optional[dict]
+    query: Optional[dict] = None
 
 
 class AsyncLRSHTTP(BaseHTTP):

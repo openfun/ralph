@@ -6,9 +6,9 @@ from typing import Dict, List, Optional, Union
 try:
     from typing import Literal
 except ImportError:
-    from typing_extensions import Literal
+    from typing_extensions import Annotated, Literal
 
-from pydantic import constr
+from pydantic import StringConstraints
 
 from ...base import AbstractBaseEventField, BaseModelWithConfig
 
@@ -40,13 +40,13 @@ class CorrectMap(BaseModelWithConfig):
         queuestate (json): see QueueStateField.
     """
 
-    answervariable: Union[Literal[None], None, str]
+    answervariable: Union[Literal[None], None, str] = None
     correctness: Union[Literal["correct"], Literal["incorrect"]]
-    hint: Optional[str]
-    hintmode: Optional[Union[Literal["on_request"], Literal["always"]]]
+    hint: Optional[str] = None
+    hintmode: Optional[Union[Literal["on_request"], Literal["always"]]] = None
     msg: str
-    npoints: Optional[int]
-    queuestate: Optional[QueueState]
+    npoints: Optional[int] = None
+    queuestate: Optional[QueueState] = None
 
 
 class State(BaseModelWithConfig):
@@ -61,10 +61,10 @@ class State(BaseModelWithConfig):
     """
 
     correct_map: Dict[
-        constr(regex=r"^[a-f0-9]{32}_[0-9]_[0-9]$"),  # noqa : F722
+        Annotated[str, StringConstraints(pattern=r"^[a-f0-9]{32}_[0-9]_[0-9]$")],  # noqa : F722
         CorrectMap,
     ]
-    done: Optional[bool]
+    done: Optional[bool] = None
     input_state: dict
     seed: int
     student_answers: dict
@@ -134,7 +134,7 @@ class EdxProblemHintFeedbackDisplayedEventField(AbstractBaseEventField):
             `student_answer` response. Consists either of `single` or `compound` value.
     """
 
-    choice_all: Optional[List[str]]
+    choice_all: Optional[List[str]] = None
     correctness: bool
     hint_label: str
     hints: List[dict]
@@ -169,23 +169,23 @@ class ProblemCheckEventField(AbstractBaseEventField):
     """
 
     answers: Dict[
-        constr(regex=r"^[a-f0-9]{32}_[0-9]_[0-9]$"),  # noqa : F722
+        Annotated[str, StringConstraints(pattern=r"^[a-f0-9]{32}_[0-9]_[0-9]$")],  # noqa : F722
         Union[List[str], str],
     ]
     attempts: int
     correct_map: Dict[
-        constr(regex=r"^[a-f0-9]{32}_[0-9]_[0-9]$"),  # noqa : F722
+        Annotated[str, StringConstraints(pattern=r"^[a-f0-9]{32}_[0-9]_[0-9]$")],  # noqa : F722
         CorrectMap,
     ]
     grade: int
     max_grade: int
-    problem_id: constr(
-        regex=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"  # noqa : F722
+    problem_id: Annotated[str, StringConstraints(
+        pattern=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"  # noqa : F722
         r"type@problem\+block@[a-f0-9]{32}$"  # noqa : F722
-    )
+    )]
     state: State
     submission: Dict[
-        constr(regex=r"^[a-f0-9]{32}_[0-9]_[0-9]$"),  # noqa : F722
+        Annotated[str, StringConstraints(pattern=r"^[a-f0-9]{32}_[0-9]_[0-9]$")],  # noqa : F722
         SubmissionAnswerField,
     ]
     success: Union[Literal["correct"], Literal["incorrect"]]
@@ -203,14 +203,14 @@ class ProblemCheckFailEventField(AbstractBaseEventField):
     """
 
     answers: Dict[
-        constr(regex=r"^[a-f0-9]{32}_[0-9]_[0-9]$"),  # noqa : F722
+        Annotated[str, StringConstraints(pattern=r"^[a-f0-9]{32}_[0-9]_[0-9]$")],  # noqa : F722
         Union[List[str], str],
     ]
     failure: Union[Literal["closed"], Literal["unreset"]]
-    problem_id: constr(
-        regex=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"  # noqa : F722
+    problem_id: Annotated[str, StringConstraints(
+        pattern=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"  # noqa : F722
         r"type@problem\+block@[a-f0-9]{32}$"  # noqa : F722
-    )
+    )]
     state: State
 
 
@@ -234,10 +234,10 @@ class ProblemRescoreEventField(AbstractBaseEventField):
     new_total: int
     orig_score: int
     orig_total: int
-    problem_id: constr(
-        regex=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"  # noqa : F722
+    problem_id: Annotated[str, StringConstraints(
+        pattern=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"  # noqa : F722
         r"type@problem\+block@[a-f0-9]{32}$"  # noqa : F722
-    )
+    )]
     state: State
     success: Union[Literal["correct"], Literal["incorrect"]]
 
@@ -252,10 +252,10 @@ class ProblemRescoreFailEventField(AbstractBaseEventField):
     """
 
     failure: Union[Literal["closed"], Literal["unreset"]]
-    problem_id: constr(
-        regex=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"  # noqa : F722
+    problem_id: Annotated[str, StringConstraints(
+        pattern=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"  # noqa : F722
         r"type@problem\+block@[a-f0-9]{32}$"  # noqa : F722
-    )
+    )]
     state: State
 
 
@@ -292,10 +292,10 @@ class ResetProblemEventField(AbstractBaseEventField):
 
     new_state: State
     old_state: State
-    problem_id: constr(
-        regex=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"  # noqa : F722
+    problem_id: Annotated[str, StringConstraints(
+        pattern=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"  # noqa : F722
         r"type@problem\+block@[a-f0-9]{32}$"  # noqa : F722
-    )
+    )]
 
 
 class ResetProblemFailEventField(AbstractBaseEventField):
@@ -309,10 +309,10 @@ class ResetProblemFailEventField(AbstractBaseEventField):
 
     failure: Union[Literal["closed"], Literal["not_done"]]
     old_state: State
-    problem_id: constr(
-        regex=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"  # noqa : F722
+    problem_id: Annotated[str, StringConstraints(
+        pattern=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"  # noqa : F722
         r"type@problem\+block@[a-f0-9]{32}$"  # noqa : F722
-    )
+    )]
 
 
 class SaveProblemFailEventField(AbstractBaseEventField):
@@ -328,10 +328,10 @@ class SaveProblemFailEventField(AbstractBaseEventField):
 
     answers: Dict[str, Union[int, str, list, dict]]
     failure: Union[Literal["closed"], Literal["done"]]
-    problem_id: constr(
-        regex=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"  # noqa : F722
+    problem_id: Annotated[str, StringConstraints(
+        pattern=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"  # noqa : F722
         r"type@problem\+block@[a-f0-9]{32}$"  # noqa : F722
-    )
+    )]
     state: State
 
 
@@ -346,10 +346,10 @@ class SaveProblemSuccessEventField(AbstractBaseEventField):
     """
 
     answers: Dict[str, Union[int, str, list, dict]]
-    problem_id: constr(
-        regex=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"  # noqa : F722
+    problem_id: Annotated[str, StringConstraints(
+        pattern=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"  # noqa : F722
         r"type@problem\+block@[a-f0-9]{32}$"  # noqa : F722
-    )
+    )]
     state: State
 
 
@@ -360,7 +360,7 @@ class ShowAnswerEventField(AbstractBaseEventField):
         problem_id (str): Consists of the ID of the problem being shown.
     """
 
-    problem_id: constr(
-        regex=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"  # noqa : F722
+    problem_id: Annotated[str, StringConstraints(
+        pattern=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"  # noqa : F722
         r"type@problem\+block@[a-f0-9]{32}$"  # noqa : F722
-    )
+    )]

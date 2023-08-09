@@ -7,7 +7,7 @@ try:
 except ImportError:
     from typing_extensions import Literal
 
-from pydantic import Json, validator
+from pydantic import field_validator, Json
 
 from ralph.models.selector import selector
 
@@ -74,7 +74,8 @@ class UISeqNext(BaseBrowserModel):
     event_type: Literal["seq_next"]
     name: Literal["seq_next"]
 
-    @validator("event")
+    @field_validator("event")
+    @classmethod
     @classmethod
     def validate_next_jump_event_field(cls, value):
         """Checks that event.new is equal to event.old + 1."""
@@ -104,7 +105,8 @@ class UISeqPrev(BaseBrowserModel):
     event_type: Literal["seq_prev"]
     name: Literal["seq_prev"]
 
-    @validator("event")
+    @field_validator("event")
+    @classmethod
     @classmethod
     def validate_prev_jump_event_field(cls, value):
         """Checks that event.new is equal to event.old - 1."""

@@ -40,7 +40,7 @@ class OpType(Enum):
 class ESQuery(BaseQuery):
     """Elasticsearch body query model."""
 
-    query: Optional[dict]
+    query: Optional[dict] = None
 
 
 class ESDatabase(BaseDatabase):

@@ -27,4 +27,4 @@ class EnrollmentEventField(AbstractBaseEventField):
     mode: Union[
         Literal["audit"], Literal["honor"], Literal["professional"], Literal["verified"]
     ]
-    user_id: Union[int, Literal[""], None]
+    user_id: Union[int, Literal[""], None] = None

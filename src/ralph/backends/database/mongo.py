@@ -31,8 +31,8 @@ logger = logging.getLogger(__name__)
 class MongoQuery(BaseQuery):
     """Mongo query model."""
 
-    filter: Optional[dict]
-    projection: Optional[dict]
+    filter: Optional[dict] = None
+    projection: Optional[dict] = None
 
 
 class MongoDatabase(BaseDatabase):
