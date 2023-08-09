@@ -29,6 +29,35 @@ from tests.fixtures.backends import (
 client = TestClient(app)
 
 
+def test_api_statements_post_invalid_parameters(auth_credentials):
+    """Test that using invalid parameters returns the proper status code."""
+
+    statement = {
+        "actor": {
+            "account": {
+                "homePage": "https://example.com/homepage/",
+                "name": str(uuid4()),
+            },
+            "objectType": "Agent",
+        },
+        "id": str(uuid4()),
+        "object": {"id": "https://example.com/object-id/1/"},
+        "timestamp": "2022-06-22T08:31:38Z",
+        "verb": {"id": "https://example.com/verb-id/1/"},
+    }
+
+    # Check for 400 status code when unknown parameters are provided
+    response = client.post(
+        "/xAPI/statements/?mamamia=herewegoagain",
+        headers={"Authorization": f"Basic {auth_credentials}"},
+        json=statement,
+    )
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "The following parameter is not allowed: `mamamia`"
+    }
+
+
 @pytest.mark.parametrize(
     "backend",
     [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
@@ -37,7 +66,7 @@ client = TestClient(app)
 def test_api_statements_post_single_statement_directly(
     backend, monkeypatch, auth_credentials, es, mongo, clickhouse
 ):
-    """Tests the post statements API route with one statement."""
+    """Test the post statements API route with one statement."""
     # pylint: disable=invalid-name,unused-argument
 
     monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
@@ -81,7 +110,7 @@ def test_api_statements_post_single_statement_directly(
 def test_api_statements_post_single_statement_no_trailing_slash(
     backend, monkeypatch, auth_credentials, es, mongo, clickhouse
 ):
-    """Tests that the statements endpoint also works without the trailing slash."""
+    """Test that the statements endpoint also works without the trailing slash."""
     # pylint: disable=invalid-name,unused-argument
 
     monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
@@ -117,7 +146,7 @@ def test_api_statements_post_single_statement_no_trailing_slash(
 def test_api_statements_post_statements_list_of_one(
     backend, monkeypatch, auth_credentials, es, mongo, clickhouse
 ):
-    """Tests the post statements API route with one statement in a list."""
+    """Test the post statements API route with one statement in a list."""
     # pylint: disable=invalid-name,unused-argument
 
     monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
@@ -160,7 +189,7 @@ def test_api_statements_post_statements_list_of_one(
 def test_api_statements_post_statements_list(
     backend, monkeypatch, auth_credentials, es, mongo, clickhouse
 ):
-    """Tests the post statements API route with two statements in a list."""
+    """Test the post statements API route with two statements in a list."""
     # pylint: disable=invalid-name,unused-argument
 
     monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
@@ -227,7 +256,7 @@ def test_api_statements_post_statements_list(
 def test_api_statements_post_statements_list_with_duplicates(
     backend, monkeypatch, auth_credentials, es_data_stream, mongo, clickhouse
 ):
-    """Tests the post statements API route with duplicate statement IDs should fail."""
+    """Test the post statements API route with duplicate statement IDs should fail."""
     # pylint: disable=invalid-name,unused-argument
 
     monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
@@ -272,7 +301,7 @@ def test_api_statements_post_statements_list_with_duplicates(
 def test_api_statements_post_statements_list_with_duplicate_of_existing_statement(
     backend, monkeypatch, auth_credentials, es, mongo, clickhouse
 ):
-    """Tests the post statements API route, given a statement that already exist in the
+    """Test the post statements API route, given a statement that already exist in the
     database (has the same ID), should fail.
     """
     # pylint: disable=invalid-name,unused-argument
@@ -343,7 +372,7 @@ def test_api_statements_post_statements_list_with_duplicate_of_existing_statemen
 def test_api_statements_post_statements_with_a_failure_during_storage(
     backend, monkeypatch, auth_credentials, es, mongo, clickhouse
 ):
-    """Tests the post statements API route with a failure happening during storage."""
+    """Test the post statements API route with a failure happening during storage."""
     # pylint: disable=invalid-name,unused-argument, too-many-arguments
 
     def put_mock(*args, **kwargs):
@@ -386,7 +415,7 @@ def test_api_statements_post_statements_with_a_failure_during_storage(
 def test_api_statements_post_statements_with_a_failure_during_id_query(
     backend, monkeypatch, auth_credentials, es, mongo, clickhouse
 ):
-    """Tests the post statements API route with a failure during query execution."""
+    """Test the post statements API route with a failure during query execution."""
     # pylint: disable=invalid-name,unused-argument,too-many-arguments
 
     def query_statements_by_ids_mock(*args, **kwargs):
@@ -432,7 +461,7 @@ def test_api_statements_post_statements_with_a_failure_during_id_query(
 def test_post_statements_list_without_statement_forwarding(
     backend, auth_credentials, monkeypatch, es, mongo, clickhouse
 ):
-    """Tests the post statements API route, given an empty forwarding configuration,
+    """Test the post statements API route, given an empty forwarding configuration,
     should not start the forwarding background task.
     """
     # pylint: disable=invalid-name,unused-argument
@@ -502,7 +531,7 @@ async def test_post_statements_list_with_statement_forwarding(
     mongo_forwarding,
     lrs,
 ):
-    """Tests the xAPI forwarding functionality given two ralph instances - a forwarding
+    """Test the xAPI forwarding functionality given two ralph instances - a forwarding
     instance and a receiving instance. When the forwarding instance receives a valid
     xAPI statement it should store and forward it to the receiving instance which in
     turn should store it too.

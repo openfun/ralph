@@ -17,6 +17,7 @@ from fastapi import (
     Response,
     status,
 )
+from fastapi.dependencies.models import Dependant
 from pydantic import parse_obj_as
 from pydantic.types import Json
 from typing_extensions import Annotated
@@ -84,6 +85,23 @@ def _parse_agent_parameters(agent_obj: dict):
 
     # Overwrite `agent` field
     return AgentParameters(**agent_query_params)
+
+
+def strict_query_params(request: Request):
+    """Raise a 400 error when using extra query parameters."""
+    dependant: Dependant = request.scope["route"].dependant
+    allowed_params = [
+        param.alias
+        for dependency in dependant.dependencies
+        for param in dependency.query_params
+    ]
+    allowed_params += [modelfield.alias for modelfield in dependant.query_params]
+    for requested_param in request.query_params.keys():
+        if requested_param not in allowed_params:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"The following parameter is not allowed: `{requested_param}`",
+            )
 
 
 @router.get("")
@@ -228,6 +246,7 @@ async def get(
             "NB: for internal use, not part of the LRS specification."
         ),
     ),
+    _=Depends(strict_query_params),
 ):
     """Read a single xAPI Statement or multiple xAPI Statements.
 
@@ -341,6 +360,7 @@ async def put(
     statementId: str,
     statement: LaxStatement,
     background_tasks: BackgroundTasks,
+    _=Depends(strict_query_params),
 ):
     """Stores a single statement as a single member of a set.
 
@@ -361,7 +381,7 @@ async def put(
 
     if get_active_xapi_forwardings():
         background_tasks.add_task(
-            forward_xapi_statements, list(statement_dict.values())
+            forward_xapi_statements, statement_dict[statementId], method="put"
         )
 
     try:
@@ -405,6 +425,7 @@ async def post(
     statements: Union[LaxStatement, List[LaxStatement]],
     background_tasks: BackgroundTasks,
     response: Response,
+    _=Depends(strict_query_params),
 ):
     """Stores a set of statements (or a single statement as a single member of a set).
 
@@ -438,7 +459,7 @@ async def post(
 
     if get_active_xapi_forwardings():
         background_tasks.add_task(
-            forward_xapi_statements, list(statements_dict.values())
+            forward_xapi_statements, list(statements_dict.values()), method="post"
         )
 
     try:

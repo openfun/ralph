@@ -1,4 +1,4 @@
-"""Tests for the GET statements endpoint of the Ralph API."""
+"""Test for the GET statements endpoint of the Ralph API."""
 
 
 import hashlib
@@ -263,7 +263,7 @@ def test_api_statements_get_statements_mine(
 def test_api_statements_get_statements(
     insert_statements_and_monkeypatch_backend, auth_credentials
 ):
-    """Tests the get statements API route without any filters set up."""
+    """Test the get statements API route without any filters set up."""
     # pylint: disable=redefined-outer-name
 
     statements = [
@@ -291,7 +291,7 @@ def test_api_statements_get_statements(
 def test_api_statements_get_statements_ascending(
     insert_statements_and_monkeypatch_backend, auth_credentials
 ):
-    """Tests the get statements API route, given an "ascending" query parameter, should
+    """Test the get statements API route, given an "ascending" query parameter, should
     return statements in ascending order by their timestamp.
     """
     # pylint: disable=redefined-outer-name
@@ -320,7 +320,7 @@ def test_api_statements_get_statements_ascending(
 def test_api_statements_get_statements_by_statement_id(
     insert_statements_and_monkeypatch_backend, auth_credentials
 ):
-    """Tests the get statements API route, given a "statementId" query parameter, should
+    """Test the get statements API route, given a "statementId" query parameter, should
     return a list of statements matching the given statementId.
     """
     # pylint: disable=redefined-outer-name
@@ -359,7 +359,7 @@ def test_api_statements_get_statements_by_statement_id(
 def test_api_statements_get_statements_by_agent(
     ifi, insert_statements_and_monkeypatch_backend, auth_credentials
 ):
-    """Tests the get statements API route, given an "agent" query parameter, should
+    """Test the get statements API route, given an "agent" query parameter, should
     return a list of statements filtered by the given agent.
     """
     # pylint: disable=redefined-outer-name
@@ -403,7 +403,7 @@ def test_api_statements_get_statements_by_agent(
 def test_api_statements_get_statements_by_verb(
     insert_statements_and_monkeypatch_backend, auth_credentials
 ):
-    """Tests the get statements API route, given a "verb" query parameter, should
+    """Test the get statements API route, given a "verb" query parameter, should
     return a list of statements filtered by the given verb id.
     """
     # pylint: disable=redefined-outer-name
@@ -434,7 +434,7 @@ def test_api_statements_get_statements_by_verb(
 def test_api_statements_get_statements_by_activity(
     insert_statements_and_monkeypatch_backend, auth_credentials
 ):
-    """Tests the get statements API route, given an "activity" query parameter, should
+    """Test the get statements API route, given an "activity" query parameter, should
     return a list of statements filtered by the given activity id.
     """
     # pylint: disable=redefined-outer-name
@@ -477,7 +477,7 @@ def test_api_statements_get_statements_by_activity(
 def test_api_statements_get_statements_since_timestamp(
     insert_statements_and_monkeypatch_backend, auth_credentials
 ):
-    """Tests the get statements API route, given a "since" query parameter, should
+    """Test the get statements API route, given a "since" query parameter, should
     return a list of statements filtered by the given timestamp.
     """
     # pylint: disable=redefined-outer-name
@@ -507,7 +507,7 @@ def test_api_statements_get_statements_since_timestamp(
 def test_api_statements_get_statements_until_timestamp(
     insert_statements_and_monkeypatch_backend, auth_credentials
 ):
-    """Tests the get statements API route, given an "until" query parameter,
+    """Test the get statements API route, given an "until" query parameter,
     should return a list of statements filtered by the given timestamp.
     """
     # pylint: disable=redefined-outer-name
@@ -537,7 +537,7 @@ def test_api_statements_get_statements_until_timestamp(
 def test_api_statements_get_statements_with_pagination(
     monkeypatch, insert_statements_and_monkeypatch_backend, auth_credentials
 ):
-    """Tests the get statements API route, given a request leading to more results than
+    """Test the get statements API route, given a request leading to more results than
     can fit on the first page, should return a list of statements non exceeding the page
     limit and include a "more" property with a link to get the next page of results.
     """
@@ -607,7 +607,7 @@ def test_api_statements_get_statements_with_pagination(
 def test_api_statements_get_statements_with_pagination_and_query(
     monkeypatch, insert_statements_and_monkeypatch_backend, auth_credentials
 ):
-    """Tests the get statements API route, given a request with a query parameter
+    """Test the get statements API route, given a request with a query parameter
     leading to more results than can fit on the first page, should return a list
     of statements non exceeding the page limit and include a "more" property with
     a link to get the next page of results.
@@ -672,7 +672,7 @@ def test_api_statements_get_statements_with_pagination_and_query(
 def test_api_statements_get_statements_with_no_matching_statement(
     insert_statements_and_monkeypatch_backend, auth_credentials
 ):
-    """Tests the get statements API route, given a query yielding no matching statement,
+    """Test the get statements API route, given a query yielding no matching statement,
     should return an empty list.
     """
     # pylint: disable=redefined-outer-name
@@ -701,7 +701,7 @@ def test_api_statements_get_statements_with_no_matching_statement(
 def test_api_statements_get_statements_with_database_query_failure(
     auth_credentials, monkeypatch
 ):
-    """Tests the get statements API route, given a query raising a BackendException,
+    """Test the get statements API route, given a query raising a BackendException,
     should return an error response with HTTP code 500.
     """
     # pylint: disable=redefined-outer-name
@@ -732,14 +732,24 @@ def test_api_statements_get_statements_invalid_query_parameters(
     id_1 = "be67b160-d958-4f51-b8b8-1892002dbac6"
     id_2 = "66c81e98-1763-4730-8cfc-f5ab34f1bad5"
 
-    # Test error when both statementId and voidedStatementId are provided
+    # Check for 400 status code when unknown parameters are provided
+    response = client.get(
+        "/xAPI/statements/?mamamia=herewegoagain",
+        headers={"Authorization": f"Basic {auth_credentials}"},
+    )
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "The following parameter is not allowed: `mamamia`"
+    }
+
+    # Check for 400 status code when both statementId and voidedStatementId are provided
     response = client.get(
         f"/xAPI/statements/?statementId={id_1}&voidedStatementId={id_2}",
         headers={"Authorization": f"Basic {auth_credentials}"},
     )
     assert response.status_code == 400
 
-    # Check for error when invalid parameters are provided with a statementId
+    # Check for 400 status code when invalid parameters are provided with a statementId
     for invalid_param, value in [
         ("activity", create_mock_activity()["id"]),
         ("agent", json.dumps(create_mock_agent("mbox", 1))),
@@ -757,7 +767,7 @@ def test_api_statements_get_statements_invalid_query_parameters(
             )
         }
 
-    # Check for NO 400 when statementId is passed with authorized parameters
+    # Check for NO 400 status code when statementId is passed with authorized parameters
     for valid_param, value in [("format", "ids"), ("attachments", "true")]:
         response = client.get(
             f"/xAPI/statements/?{id_param}={id_1}&{valid_param}={value}",

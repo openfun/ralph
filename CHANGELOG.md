@@ -20,6 +20,8 @@ have an authority field matching that of the user
 - Upgrade `more-itertools` to `10.1.0`
 - Upgrade `sentry_sdk` to `1.29.2`
 - Upgrade `uvicorn` to `0.23.2`
+- API: Invalid parameters now return 400 status code
+- API: Forwarding PUT now uses PUT (instead of POST)
 
 ## [3.9.0] - 2023-07-21
 

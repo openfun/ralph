@@ -164,7 +164,7 @@ def test_api_forwarding_forward_xapi_statements_with_successful_request(
 
     caplog.clear()
     with caplog.at_level(logging.DEBUG):
-        asyncio.run(forward_xapi_statements(statements))
+        asyncio.run(forward_xapi_statements(statements, method="post"))
 
     assert [
         f"Forwarded {len(statements)} statements to {forwarding.url} with success."
@@ -211,7 +211,7 @@ def test_api_forwarding_forward_xapi_statements_with_unsuccessful_request(
 
     caplog.clear()
     with caplog.at_level(logging.ERROR):
-        asyncio.run(forward_xapi_statements(statements))
+        asyncio.run(forward_xapi_statements(statements, method="post"))
 
     assert ["Failed to forward xAPI statements. Failure during request."] == [
         message
