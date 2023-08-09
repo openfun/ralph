@@ -35,6 +35,8 @@ def test_ui_load_video_to_video_initialized(uuid_namespace, event, platform_url)
     event.context.course_id = ""
     event.context.org_id = ""
     event.context.user_id = "1"
+    event.session = "af45a0e650c4a4fdb0bcde75a1e4b694"
+    session_uuid = "af45a0e6-50c4-a4fd-b0bc-de75a1e4b694"
     event_str = event.json()
     event = json.loads(event_str)
     xapi_event = convert_dict_event(
@@ -47,13 +49,21 @@ def test_ui_load_video_to_video_initialized(uuid_namespace, event, platform_url)
         "actor": {"account": {"homePage": platform_url, "name": "1"}},
         "verb": {"id": "http://adlnet.gov/expapi/verbs/initialized"},
         "context": {
+            "contextActivities": {
+                "category": [
+                    {
+                        "id": "https://w3id.org/xapi/video",
+                        "definition": {
+                            "type": "http://adlnet.gov/expapi/activities/profile"
+                        },
+                    }
+                ],
+            },
             "extensions": {
                 "https://w3id.org/xapi/video/extensions/length": 0.0,
-                "https://w3id.org/xapi/video/extensions/session-id": str(
-                    UUID(event["session"])
-                ),
+                "https://w3id.org/xapi/video/extensions/session-id": session_uuid,
                 "https://w3id.org/xapi/video/extensions/user-agent": event["agent"],
-            }
+            },
         },
         "object": {
             "id": platform_url
@@ -81,6 +91,8 @@ def test_ui_play_video_to_video_played(uuid_namespace, event, platform_url):
     event.context.course_id = ""
     event.context.org_id = ""
     event.context.user_id = "1"
+    event.session = "af45a0e650c4a4fdb0bcde75a1e4b694"
+    session_uuid = "af45a0e6-50c4-a4fd-b0bc-de75a1e4b694"
     event_str = event.json()
     event = json.loads(event_str)
     xapi_event = convert_dict_event(
@@ -110,10 +122,18 @@ def test_ui_play_video_to_video_played(uuid_namespace, event, platform_url):
             }
         },
         "context": {
+            "contextActivities": {
+                "category": [
+                    {
+                        "id": "https://w3id.org/xapi/video",
+                        "definition": {
+                            "type": "http://adlnet.gov/expapi/activities/profile"
+                        },
+                    }
+                ],
+            },
             "extensions": {
-                "https://w3id.org/xapi/video/extensions/session-id": str(
-                    UUID(event["session"])
-                ),
+                "https://w3id.org/xapi/video/extensions/session-id": session_uuid,
             },
         },
         "timestamp": event["time"],
@@ -131,6 +151,8 @@ def test_ui_pause_video_to_video_paused(uuid_namespace, event, platform_url):
     event.context.course_id = ""
     event.context.org_id = ""
     event.context.user_id = "1"
+    event.session = "af45a0e650c4a4fdb0bcde75a1e4b694"
+    session_uuid = "af45a0e6-50c4-a4fd-b0bc-de75a1e4b694"
     event_str = event.json()
     event = json.loads(event_str)
     xapi_event = convert_dict_event(
@@ -153,12 +175,20 @@ def test_ui_pause_video_to_video_paused(uuid_namespace, event, platform_url):
             },
         },
         "context": {
+            "contextActivities": {
+                "category": [
+                    {
+                        "id": "https://w3id.org/xapi/video",
+                        "definition": {
+                            "type": "http://adlnet.gov/expapi/activities/profile"
+                        },
+                    }
+                ],
+            },
             "extensions": {
                 "https://w3id.org/xapi/video/extensions/length": 0.0,
-                "https://w3id.org/xapi/video/extensions/session-id": str(
-                    UUID(event["session"])
-                ),
-            }
+                "https://w3id.org/xapi/video/extensions/session-id": session_uuid,
+            },
         },
         "result": {
             "extensions": {
@@ -182,6 +212,8 @@ def test_ui_stop_video_to_video_terminated(uuid_namespace, event, platform_url):
     event.context.course_id = ""
     event.context.org_id = ""
     event.context.user_id = "1"
+    event.session = "af45a0e650c4a4fdb0bcde75a1e4b694"
+    session_uuid = "af45a0e6-50c4-a4fd-b0bc-de75a1e4b694"
     event_str = event.json()
     event = json.loads(event_str)
     xapi_event = convert_dict_event(
@@ -204,12 +236,20 @@ def test_ui_stop_video_to_video_terminated(uuid_namespace, event, platform_url):
             },
         },
         "context": {
+            "contextActivities": {
+                "category": [
+                    {
+                        "id": "https://w3id.org/xapi/video",
+                        "definition": {
+                            "type": "http://adlnet.gov/expapi/activities/profile"
+                        },
+                    }
+                ],
+            },
             "extensions": {
                 "https://w3id.org/xapi/video/extensions/length": 0.0,
-                "https://w3id.org/xapi/video/extensions/session-id": str(
-                    UUID(event["session"])
-                ),
-            }
+                "https://w3id.org/xapi/video/extensions/session-id": session_uuid,
+            },
         },
         "result": {
             "extensions": {
@@ -234,6 +274,8 @@ def test_ui_seek_video_to_video_seeked(uuid_namespace, event, platform_url):
     event.context.course_id = ""
     event.context.org_id = ""
     event.context.user_id = "1"
+    event.session = "af45a0e650c4a4fdb0bcde75a1e4b694"
+    session_uuid = "af45a0e6-50c4-a4fd-b0bc-de75a1e4b694"
     event_str = event.json()
     event = json.loads(event_str)
     xapi_event = convert_dict_event(
@@ -266,10 +308,18 @@ def test_ui_seek_video_to_video_seeked(uuid_namespace, event, platform_url):
             }
         },
         "context": {
+            "contextActivities": {
+                "category": [
+                    {
+                        "id": "https://w3id.org/xapi/video",
+                        "definition": {
+                            "type": "http://adlnet.gov/expapi/activities/profile"
+                        },
+                    }
+                ],
+            },
             "extensions": {
-                "https://w3id.org/xapi/video/extensions/session-id": str(
-                    UUID(event["session"])
-                ),
+                "https://w3id.org/xapi/video/extensions/session-id": session_uuid,
             },
         },
         "timestamp": event["time"],

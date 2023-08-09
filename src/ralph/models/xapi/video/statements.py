@@ -1,7 +1,5 @@
 """Video xAPI event definitions."""
 
-from typing import Optional
-
 from ...selector import selector
 from ..base.statements import BaseXapiStatement
 from ..concepts.activity_types.video import VideoActivity
@@ -84,7 +82,7 @@ class VideoPlayed(BaseVideoStatement):
 
     verb: PlayedVerb = PlayedVerb()
     result: VideoPlayedResult
-    context: Optional[VideoPlayedContext]
+    context: VideoPlayedContext
 
 
 class VideoPaused(BaseVideoStatement):
@@ -127,7 +125,7 @@ class VideoSeeked(BaseVideoStatement):
 
     verb: SeekedVerb = SeekedVerb()
     result: VideoSeekedResult
-    context: Optional[VideoSeekedContext]
+    context: VideoSeekedContext
 
 
 class VideoCompleted(BaseVideoStatement):
