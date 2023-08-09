@@ -11,14 +11,14 @@ and this project adheres to
 ### Changed
 
 - Helm chart: improve chart modularity
-- User credentials must now include an "agent" field which can be created 
+- User credentials must now include an "agent" field which can be created
 using the cli
 - `GET /statements` now has "mine" option which matches statements that
 have an authority field matching that of the user
 - CLI: change `push` to `write` and `fetch` to `read` [BC]
-- Upgrade `fastapi` to `0.100.1`
-- Upgrade `more-itertools` to `10.0.0`
-- Upgrade `sentry_sdk` to `1.29.0`
+- Upgrade `fastapi` to `0.101.0`
+- Upgrade `more-itertools` to `10.1.0`
+- Upgrade `sentry_sdk` to `1.29.2`
 - Upgrade `uvicorn` to `0.23.2`
 
 ## [3.9.0] - 2023-07-21

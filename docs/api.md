@@ -72,11 +72,10 @@ $ ralph auth \
     --username janedoe \
     --password supersecret \
     --scope janedoe_scope \
-    --agent-mbox mailto:janedoe@example.com \
-    # or --agent-mbox-sha1sum ebd31e95054c018b10727ccffd2ef2ec3a016ee9\
-    # or --agent-openid "http://jane.openid.example.org/" \
-    # or --agent-account-name exampleAccountname \
-    #    --agent-account-homePage http://www.exampleHomePage.com \
+    --agent-ifi-mbox mailto:janedoe@example.com \
+    # or --agent-ifi-mbox-sha1sum ebd31e95054c018b10727ccffd2ef2ec3a016ee9 \
+    # or --agent-ifi-openid "http://jane.openid.example.org/" \
+    # or --agent-ifi-account exampleAccountname http://www.exampleHomePage.com \
     -w
 ```
 
