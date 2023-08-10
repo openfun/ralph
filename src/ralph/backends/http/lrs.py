@@ -4,6 +4,27 @@ import asyncio
 from ralph.backends.http.async_lrs import AsyncLRSHTTP
 
 
+def _ensure_running_loop_uniqueness(func):
+    """Raise an error when methods are used in a running asyncio events loop."""
+
+    def wrap(*args, **kwargs):
+        """Wrapper for decorator function."""
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            return func(*args, **kwargs)
+        if loop.is_running():
+            raise RuntimeError(
+                f"This event loop is already running. You must use "
+                f"`AsyncLRSHTTP.{func.__name__}` (instead of `LRSHTTP."
+                f"{func.__name__}`), or run this code outside the current"
+                " event loop."
+            )
+        return func(*args, **kwargs)
+
+    return wrap
+
+
 class LRSHTTP(AsyncLRSHTTP):
     """LRS HTTP backend."""
 
@@ -11,18 +32,21 @@ class LRSHTTP(AsyncLRSHTTP):
 
     name = "lrs"
 
+    @_ensure_running_loop_uniqueness
     def status(self, *args, **kwargs):
         """HTTP backend check for server status."""
         return asyncio.get_event_loop().run_until_complete(
             super().status(*args, **kwargs)
         )
 
+    @_ensure_running_loop_uniqueness
     def list(self, *args, **kwargs):
         """Raise error for unsuported `list` method."""
         return asyncio.get_event_loop().run_until_complete(
             super().list(*args, **kwargs)
         )
 
+    @_ensure_running_loop_uniqueness
     def read(self, *args, **kwargs):
         """Get statements from LRS `target` endpoint.
 
@@ -36,6 +60,7 @@ class LRSHTTP(AsyncLRSHTTP):
         except StopAsyncIteration:
             pass
 
+    @_ensure_running_loop_uniqueness
     def write(self, *args, **kwargs):
         """Write `data` records to the `target` endpoint and return their count.
 

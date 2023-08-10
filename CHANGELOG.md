@@ -24,6 +24,7 @@ have an authority field matching that of the user
 - API: Forwarding PUT now uses PUT (instead of POST)
 - Models: The xAPI `context.contextActivities.category` field is now mandatory
   in the video and virtual classroom profiles. [BC]
+- Backends: `LRSHTTP` methods must not be used in `asyncio` events loop (BC) 
 
 ## [3.9.0] - 2023-07-21
 
