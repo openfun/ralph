@@ -1,6 +1,7 @@
 """Tests for Ralph Async LRS HTTP backend."""
 
 import asyncio
+import re
 from unittest.mock import AsyncMock
 
 import pytest
@@ -11,6 +12,48 @@ from ralph.backends.http.lrs import LRSHTTP
 from ralph.conf import settings
 
 lrs_settings = settings.BACKENDS.HTTP.LRS
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("method", ["status", "list", "write", "read"])
+async def test_backend_http_lrs_in_async_setting(monkeypatch, method):
+    """Test that backend returns the proper error when run in async function."""
+
+    # Define mock responses
+    if method == "read":
+        read_mock_response = [{"hello": "world"}, {"save": "pandas"}]
+
+        async def response_mock(*args, **kwargs):
+            """Mock a read function."""
+            # pylint: disable=invalid-name
+            # pylint: disable=unused-argument
+            for statement in read_mock_response:
+                yield statement
+
+    else:
+        response_mock = AsyncMock(return_value=HTTPBackendStatus.OK)
+    monkeypatch.setattr(AsyncLRSHTTP, method, response_mock)
+
+    async def async_function():
+        """Encapsulate the synchronous method in an asynchronous function."""
+        lrs = LRSHTTP()
+        if method == "read":
+            list(getattr(lrs, method)())
+        else:
+            getattr(lrs, method)()
+
+    # Check that the proper error is raised
+    with pytest.raises(
+        RuntimeError,
+        match=re.escape(
+            (
+                f"This event loop is already running. You must use "
+                f"`AsyncLRSHTTP.{method}` (instead of `LRSHTTP.{method}`)"
+                ", or run this code outside the current event loop."
+            )
+        ),
+    ):
+        await async_function()
 
 
 def test_backend_http_lrs_default_properties():
@@ -54,7 +97,7 @@ def test_backends_http_lrs_inheritence(monkeypatch):
     read_chunk_size = 11
 
     async def read_mock(*args, **kwargs):
-        """Mock a read read function."""
+        """Mock a read function."""
         # pylint: disable=invalid-name
         # pylint: disable=unused-argument
 
