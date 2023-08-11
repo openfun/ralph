@@ -1,52 +1,63 @@
 """Common for xAPI base definitions."""
 
-from typing import Dict
+from typing import Annotated, Dict
 
 from langcodes import tag_is_valid
-from pydantic import StrictStr, validate_email
+from pydantic import  StrictStr, validate_email
+from pydantic.functional_validators import AfterValidator, BeforeValidator
 from rfc3987 import parse
 
 
-class IRI(str):
-    """Pydantic custom data type validating RFC 3987 IRIs."""
+# class IRI(str):
+#     """Pydantic custom data type validating RFC 3987 IRIs."""
 
-    @classmethod
-    def __get_validators__(cls):  # noqa: D105
-        def validate(iri: str):
-            """Checks whether the provided IRI is a valid RFC 3987 IRI."""
-            parse(iri, rule="IRI")
-            return cls(iri)
+#     @classmethod
+#     def __get_validators__(cls):  # noqa: D105
+#         def validate(iri: str):
+#             """Checks whether the provided IRI is a valid RFC 3987 IRI."""
+#             parse(iri, rule="IRI")
+#             return cls(iri)
 
-        yield validate
+#         yield validate
+
+def validate_iri(iri):
+    parse(iri, rule="IRI")
+    return iri
+
+IRI = Annotated[str, BeforeValidator(validate_iri)]
 
 
-class LanguageTag(str):
-    """Pydantic custom data type validating RFC 5646 Language tags."""
+def validate_language_tag(tag: str):
+    """Checks whether the provided tag is a valid RFC 5646 Language tag."""
+    if not tag_is_valid(tag):
+        raise TypeError("Invalid RFC 5646 Language tag")
+    return tag
 
-    @classmethod
-    def __get_validators__(cls):  # noqa: D105
-        def validate(tag: str):
-            """Checks whether the provided tag is a valid RFC 5646 Language tag."""
-            if not tag_is_valid(tag):
-                raise TypeError("Invalid RFC 5646 Language tag")
-            return cls(tag)
-
-        yield validate
-
+LanguageTag = Annotated[str, AfterValidator(validate_language_tag)]
 
 LanguageMap = Dict[LanguageTag, StrictStr]
 
 
-class MailtoEmail(str):
-    """Pydantic custom data type validating `mailto:email` format."""
+# class MailtoEmail(str):
+#     """Pydantic custom data type validating `mailto:email` format."""
 
-    @classmethod
-    def __get_validators__(cls):  # noqa: D105
-        def validate(mailto: str):
-            """Checks whether the provided value follows the `mailto:email` format."""
-            if not mailto.startswith("mailto:"):
-                raise TypeError("Invalid `mailto:email` value")
-            valid = validate_email(mailto[7:])
-            return cls(f"mailto:{valid[1]}")
+#     @classmethod
+#     def validate(cls, mailto: str):
+#         """Check whether the provided value follows the `mailto:email` format."""
+#         if not mailto.startswith("mailto:"):
+#             raise TypeError("Invalid `mailto:email` value")
+#         valid = validate_email(mailto[7:])
+#         return cls(f"mailto:{valid[1]}")
 
-        yield validate
+#     @classmethod
+#     def __get_validators__(cls):  # noqa: D105
+#         yield cls.validate
+
+def validate_mailto_email(mailto: str):
+    """Check whether the provided value follows the `mailto:email` format."""
+    if not mailto.startswith("mailto:"):
+        raise TypeError("Invalid `mailto:email` value")
+    valid = validate_email(mailto[7:])
+    return f"mailto:{valid[1]}"
+
+MailtoEmail = Annotated[str, AfterValidator(validate_mailto_email)]

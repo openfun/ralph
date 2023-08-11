@@ -1,6 +1,6 @@
 """Base xAPI `Object` definitions (1)."""
 
-from typing import Dict, List, Optional, Union
+from typing import Annotated, Dict, List, Optional, Union
 
 try:
     from typing import Literal
@@ -9,7 +9,7 @@ except ImportError:
 
 from uuid import UUID
 
-from pydantic import AnyUrl, StrictStr, constr, validator
+from pydantic import AnyUrl, StrictStr, Field, validator
 
 from ..config import BaseModelWithConfig
 from .common import IRI, LanguageMap
@@ -41,7 +41,7 @@ class BaseXapiInteractionComponent(BaseModelWithConfig):
         description (LanguageMap): Consists of the description of the interaction.
     """
 
-    id: constr(regex=r"^[^\s]+$")  # noqa:F722
+    id: Annotated[str, Field(pattern=r"^[^\s]+$")]
     description: Optional[LanguageMap]
 
 

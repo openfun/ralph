@@ -4,7 +4,7 @@ from datetime import timedelta
 from decimal import Decimal
 from typing import Dict, Optional, Union
 
-from pydantic import Field, StrictBool, StrictStr, root_validator
+from pydantic import Field, StrictBool, StrictStr, model_validator
 
 from ..config import BaseModelWithConfig
 from .common import IRI
@@ -26,7 +26,7 @@ class BaseXapiResultScore(BaseModelWithConfig):
     min: Optional[Decimal] = None
     max: Optional[Decimal] = None
 
-    @root_validator
+    @model_validator(mode='after') # TODO: needs review
     @classmethod
     def check_raw_min_max_relation(cls, values):
         """Checks the relationship `min < raw < max`."""

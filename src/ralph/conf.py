@@ -3,7 +3,9 @@
 import io
 from enum import Enum
 from pathlib import Path
-from typing import List, Tuple, Union
+from typing import Any, List, Tuple, Union
+
+
 
 try:
     from typing import Literal, Optional
@@ -19,7 +21,8 @@ except ImportError:
     from unittest.mock import Mock
 
     get_app_dir = Mock(return_value=".")
-from pydantic import ConfigDict, AnyHttpUrl, AnyUrl, BaseModel, Field
+from pydantic import BaseModel, ConfigDict, AnyHttpUrl, AnyUrl, BaseModel, Field, GetCoreSchemaHandler
+from pydantic_core import CoreSchema, core_schema
 
 from .utils import import_string
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -57,23 +60,81 @@ class CoreSettings(BaseSettings):
 core_settings = CoreSettings()
 
 
-class CommaSeparatedTuple():
-    """Pydantic field type validating comma separated strings or tuples."""
+# class CommaSeparatedTuple(str):
+#     """Pydantic field type validating comma separated strings or tuples."""
+
+#     @classmethod
+#     def validate(cls, value: Union[str, Tuple[str]]) -> Tuple[str]:
+#         """Checks whether the value is a comma separated string or a tuple."""
+#         if isinstance(value, tuple):
+#             return value
+
+#         if isinstance(value, str):
+#             return tuple(value.split(","))
+
+#         raise TypeError("Invalid comma separated list")
+
+#     @classmethod
+#     def __get_pydantic_core_schema__(
+#         cls, source_type: Any, handler: GetCoreSchemaHandler
+#     ) -> CoreSchema:
+#         return core_schema.no_info_after_validator_function(
+#             cls.validate, handler(tuple)
+#         )
     
-    @classmethod
-    def __get_validators__(cls):  # noqa: D105
-        def validate(value: Union[str, Tuple[str]]) -> Tuple[str]:
-            """Checks whether the value is a comma separated string or a tuple."""
-            if isinstance(value, tuple):
-                return value
 
-            if isinstance(value, str):
-                return tuple(value.split(","))
+from typing_extensions import Annotated
 
-            raise TypeError("Invalid comma separated list")
+from pydantic import BaseModel, ValidationError, model_validator
+from pydantic.functional_validators import AfterValidator
 
-        yield validate
 
+# def validate(value: Union[str, Tuple[str]]) -> Tuple[str]:
+#     """Checks whether the value is a comma separated string or a tuple."""
+
+#     if isinstance(value, tuple):
+#         return value
+
+#     if isinstance(value, str):
+#         return tuple(value.split(","))
+
+#     raise TypeError("Invalid comma separated list")
+
+# class CommaSeparatedTuple(BaseModel):
+
+#     @model_validator(mode='before')
+#     @classmethod
+#     def validate(cls, value: Union[str, Tuple[str]]) -> Tuple[str]:
+#         """Checks whether the value is a comma separated string or a tuple."""
+
+#         if isinstance(value, tuple):
+#             return value
+
+#         if isinstance(value, str):
+#             return tuple(value.split(","))
+
+#         raise TypeError("Invalid comma separated list")
+
+
+def validate_comma_separated_tuple(value: Union[str, Tuple[str]]) -> Tuple[str]:
+    """Checks whether the value is a comma separated string or a tuple."""
+
+    if isinstance(value, tuple):
+        return value
+
+    if isinstance(value, str):
+        return tuple(value.split(","))
+
+    raise TypeError("Invalid comma separated list")
+
+from pydantic import parse_obj_as
+CommaSeparatedTuple = Annotated[Union[str, Tuple[str, ...]], AfterValidator(validate_comma_separated_tuple)]
+print('gyolo')
+aze = parse_obj_as(CommaSeparatedTuple, ("test", "toast"))
+print(type(aze))
+
+
+       
 
 class InstantiableSettingsItem(BaseModel):
     """Pydantic model for a settings configuration item that can be instantiated."""
@@ -133,11 +194,10 @@ class MongoClientOptions(ClientOptions):
 
 class ESDatabaseBackendSettings(InstantiableSettingsItem):
     """Pydantic modelf for Elasticsearch database backend configuration settings."""    
-    model_config = SettingsConfigDict(arbitrary_types_allowed=True) # TODO: fix this
 
     _class_path: str = "ralph.backends.database.es.ESDatabase"
 
-    HOSTS: CommaSeparatedTuple = ("http://localhost:9200",)
+    HOSTS: CommaSeparatedTuple = "http://localhost:9200"
     INDEX: str = "statements"
     CLIENT_OPTIONS: ESClientOptions = ESClientOptions()
     OP_TYPE: Literal["index", "create", "delete", "update"] = "index"
@@ -334,7 +394,7 @@ class Settings(BaseSettings):
     #     env_file_encoding = core_settings.LOCALE_ENCODING
 
     #model_config = SettingsConfigDict(env_file = ".env", env_file_encoding = core_settings.LOCALE_ENCODING) | BaseSettingsConfig()
-    model_config = BASE_SETTINGS_CONFIG | SettingsConfigDict(env_file = ".env", env_file_encoding = core_settings.LOCALE_ENCODING)
+    model_config = BASE_SETTINGS_CONFIG | SettingsConfigDict(env_file = ".env", env_file_encoding = core_settings.LOCALE_ENCODING, extra="ignore")
 
     class AuthBackends(Enum):
         """Enum of the authentication backends."""
@@ -343,6 +403,10 @@ class Settings(BaseSettings):
         OIDC = "oidc"
 
     _CORE: CoreSettings = core_settings
+    
+    # APP_DIR: Path = core_settings.APP_DIR
+    # LOCALE_ENCODING: str = core_settings.LOCALE_ENCODING
+
     AUTH_FILE: Path = _CORE.APP_DIR / "auth.json"
     AUTH_CACHE_MAX_SIZE : int = 100
     AUTH_CACHE_TTL : int = 3600
