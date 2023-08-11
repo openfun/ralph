@@ -5,12 +5,10 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, List, Tuple, Union
 
-
-
 try:
-    from typing import Literal, Optional
+    from typing import Annotated, Literal, Optional
 except ImportError:
-    from typing_extensions import Literal, Optional
+    from typing_extensions import Annotated, Literal, Optional
 
 try:
     from click import get_app_dir
@@ -21,10 +19,12 @@ except ImportError:
     from unittest.mock import Mock
 
     get_app_dir = Mock(return_value=".")
-from pydantic import BaseModel, ConfigDict, AnyHttpUrl, AnyUrl, BaseModel, Field, GetCoreSchemaHandler, parse_obj_as
+from pydantic import BaseModel, ConfigDict, AnyHttpUrl, AnyUrl, BaseModel, Field, GetCoreSchemaHandler, model_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic.functional_validators import AfterValidator
 
 from .utils import import_string
-from pydantic_settings import BaseSettings, SettingsConfigDict
+
 
 MODEL_PATH_SEPARATOR = "__"
 
@@ -57,61 +57,6 @@ class CoreSettings(BaseSettings):
 
 
 core_settings = CoreSettings()
-
-
-# class CommaSeparatedTuple(str):
-#     """Pydantic field type validating comma separated strings or tuples."""
-
-#     @classmethod
-#     def validate(cls, value: Union[str, Tuple[str]]) -> Tuple[str]:
-#         """Checks whether the value is a comma separated string or a tuple."""
-#         if isinstance(value, tuple):
-#             return value
-
-#         if isinstance(value, str):
-#             return tuple(value.split(","))
-
-#         raise TypeError("Invalid comma separated list")
-
-#     @classmethod
-#     def __get_pydantic_core_schema__(
-#         cls, source_type: Any, handler: GetCoreSchemaHandler
-#     ) -> CoreSchema:
-#         return core_schema.no_info_after_validator_function(
-#             cls.validate, handler(tuple)
-#         )
-    
-
-from typing_extensions import Annotated
-
-from pydantic import BaseModel, ValidationError, model_validator
-from pydantic.functional_validators import AfterValidator
-
-
-# def validate(value: Union[str, Tuple[str]]) -> Tuple[str]:
-#     """Checks whether the value is a comma separated string or a tuple."""
-
-#     if isinstance(value, tuple):
-#         return value
-
-#     if isinstance(value, str):
-#         return tuple(value.split(","))
-
-#     raise TypeError("Invalid comma separated list")
-
-class CommaSeparatedTuple(BaseModel):
-    @model_validator(mode='before')
-    @classmethod
-    def validate(cls, value: Union[str, Tuple[str]]) -> Tuple[str]:
-        """Checks whether the value is a comma separated string or a tuple."""
-
-        if isinstance(value, tuple):
-            return value
-
-        if isinstance(value, str):
-            return tuple(value.split(","))
-
-        raise TypeError("Invalid comma separated list")
 
 
 def validate_comma_separated_tuple(value: Union[str, Tuple[str, ...]]) -> Tuple[str]:
