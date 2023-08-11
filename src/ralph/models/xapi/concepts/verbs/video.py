@@ -22,7 +22,7 @@ class PlayedVerb(BaseXapiVerb):
     id: Literal[
         "https://w3id.org/xapi/video/verbs/played"
     ] = "https://w3id.org/xapi/video/verbs/played"
-    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["played"]]]
+    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["played"]]] = None # TODO: validate that this is the behavior we want
 
 
 class PausedVerb(BaseXapiVerb):
@@ -36,7 +36,7 @@ class PausedVerb(BaseXapiVerb):
     id: Literal[
         "https://w3id.org/xapi/video/verbs/paused"
     ] = "https://w3id.org/xapi/video/verbs/paused"
-    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["paused"]]]
+    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["paused"]]] = None # TODO: validate that this is the behavior we want
 
 
 class SeekedVerb(BaseXapiVerb):
@@ -50,4 +50,4 @@ class SeekedVerb(BaseXapiVerb):
     id: Literal[
         "https://w3id.org/xapi/video/verbs/seeked"
     ] = "https://w3id.org/xapi/video/verbs/seeked"
-    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["seeked"]]]
+    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["seeked"]]] = None # TODO: validate that this is the behavior we want

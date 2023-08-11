@@ -23,7 +23,7 @@ class ViewedVerb(BaseXapiVerb):
     id: Literal[
         "http://id.tincanapi.com/verb/viewed"
     ] = "http://id.tincanapi.com/verb/viewed"
-    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["viewed"]]]
+    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["viewed"]]] = None # TODO: validate that this is the behavior we want
 
 
 class DownloadedVerb(BaseXapiVerb):
@@ -37,4 +37,4 @@ class DownloadedVerb(BaseXapiVerb):
     id: Literal[
         "http://id.tincanapi.com/verb/downloaded"
     ] = "http://id.tincanapi.com/verb/downloaded"
-    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["downloaded"]]]
+    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["downloaded"]]] = None # TODO: validate that this is the behavior we want

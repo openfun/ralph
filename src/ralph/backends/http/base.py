@@ -58,7 +58,7 @@ class BaseQuery(BaseModel):
     """Base query model."""
     model_config = ConfigDict(extra="forbid")
 
-    query_string: Optional[str]
+    query_string: Optional[str] = None # TODO: validate that this is the behavior we want
 
 
 class BaseHTTP(ABC):

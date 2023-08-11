@@ -271,7 +271,7 @@ class BookEventField(AbstractBaseEventField):
         Literal["textbook.pdf.page.loaded"], Literal["textbook.pdf.page.navigatednext"]
     ]
     new: int
-    old: Optional[int]
+    old: Optional[int] = None # TODO: validate that this is the behavior we want
     type: Union[Literal["gotopage"], Literal["prevpage"], Literal["nextpage"]] = Field(
         alias="type"
     )

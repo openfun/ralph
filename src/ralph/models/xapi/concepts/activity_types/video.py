@@ -37,5 +37,5 @@ class VideoActivity(BaseXapiActivity):
         definition (dict): See VideoActivityDefinition.
     """
 
-    name: Optional[Dict[Literal[LANG_EN_US_DISPLAY], str]]
+    name: Optional[Dict[Literal[LANG_EN_US_DISPLAY], str]] = None # TODO: validate that this is the behavior we want
     definition: VideoActivityDefinition = VideoActivityDefinition()

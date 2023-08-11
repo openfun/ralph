@@ -22,7 +22,7 @@ class CompletedVerb(BaseXapiVerb):
     id: Literal[
         "http://adlnet.gov/expapi/verbs/completed"
     ] = "http://adlnet.gov/expapi/verbs/completed"
-    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["completed"]]]
+    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["completed"]]] = None # TODO: validate that this is the behavior we want
 
 
 class InitializedVerb(BaseXapiVerb):
@@ -36,7 +36,7 @@ class InitializedVerb(BaseXapiVerb):
     id: Literal[
         "http://adlnet.gov/expapi/verbs/initialized"
     ] = "http://adlnet.gov/expapi/verbs/initialized"
-    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["initialized"]]]
+    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["initialized"]]] = None # TODO: validate that this is the behavior we want
 
 
 class InteractedVerb(BaseXapiVerb):
@@ -50,7 +50,7 @@ class InteractedVerb(BaseXapiVerb):
     id: Literal[
         "http://adlnet.gov/expapi/verbs/interacted"
     ] = "http://adlnet.gov/expapi/verbs/interacted"
-    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["interacted"]]]
+    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["interacted"]]] = None # TODO: validate that this is the behavior we want
 
 
 class TerminatedVerb(BaseXapiVerb):
@@ -64,4 +64,4 @@ class TerminatedVerb(BaseXapiVerb):
     id: Literal[
         "http://adlnet.gov/expapi/verbs/terminated"
     ] = "http://adlnet.gov/expapi/verbs/terminated"
-    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["terminated"]]]
+    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["terminated"]]] = None # TODO: validate that this is the behavior we want

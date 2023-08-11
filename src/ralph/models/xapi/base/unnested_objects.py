@@ -26,11 +26,11 @@ class BaseXapiActivityDefinition(BaseModelWithConfig):
         extensions (dict): Consists of a dictionary of other properties as needed.
     """
 
-    name: Optional[LanguageMap]
-    description: Optional[LanguageMap]
-    type: Optional[IRI]
-    moreInfo: Optional[AnyUrl]
-    extensions: Optional[Dict[IRI, Union[str, int, bool, list, dict, None]]]
+    name: Optional[LanguageMap] = None # TODO: needs validation that this is the behavior we want
+    description: Optional[LanguageMap] = None
+    type: Optional[IRI] = None
+    moreInfo: Optional[AnyUrl] = None
+    extensions: Optional[Dict[IRI, Union[str, int, bool, list, dict, None]]] = None
 
 
 class BaseXapiInteractionComponent(BaseModelWithConfig):

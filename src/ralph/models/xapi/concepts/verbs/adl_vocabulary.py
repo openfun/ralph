@@ -22,7 +22,7 @@ class AskedVerb(BaseXapiVerb):
     id: Literal[
         "http://adlnet.gov/expapi/verbs/asked"
     ] = "http://adlnet.gov/expapi/verbs/asked"
-    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["asked"]]]
+    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["asked"]]] = None # TODO: validate that this is the behavior we want
 
 
 class AnsweredVerb(BaseXapiVerb):
@@ -36,4 +36,4 @@ class AnsweredVerb(BaseXapiVerb):
     id: Literal[
         "http://adlnet.gov/expapi/verbs/answered"
     ] = "http://adlnet.gov/expapi/verbs/answered"
-    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["answered"]]]
+    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["answered"]]] = None # TODO: validate that this is the behavior we want
