@@ -21,8 +21,7 @@ except ImportError:
     from unittest.mock import Mock
 
     get_app_dir = Mock(return_value=".")
-from pydantic import BaseModel, ConfigDict, AnyHttpUrl, AnyUrl, BaseModel, Field, GetCoreSchemaHandler
-from pydantic_core import CoreSchema, core_schema
+from pydantic import BaseModel, ConfigDict, AnyHttpUrl, AnyUrl, BaseModel, Field, GetCoreSchemaHandler, parse_obj_as
 
 from .utils import import_string
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -100,23 +99,22 @@ from pydantic.functional_validators import AfterValidator
 
 #     raise TypeError("Invalid comma separated list")
 
-# class CommaSeparatedTuple(BaseModel):
+class CommaSeparatedTuple(BaseModel):
+    @model_validator(mode='before')
+    @classmethod
+    def validate(cls, value: Union[str, Tuple[str]]) -> Tuple[str]:
+        """Checks whether the value is a comma separated string or a tuple."""
 
-#     @model_validator(mode='before')
-#     @classmethod
-#     def validate(cls, value: Union[str, Tuple[str]]) -> Tuple[str]:
-#         """Checks whether the value is a comma separated string or a tuple."""
+        if isinstance(value, tuple):
+            return value
 
-#         if isinstance(value, tuple):
-#             return value
+        if isinstance(value, str):
+            return tuple(value.split(","))
 
-#         if isinstance(value, str):
-#             return tuple(value.split(","))
-
-#         raise TypeError("Invalid comma separated list")
+        raise TypeError("Invalid comma separated list")
 
 
-def validate_comma_separated_tuple(value: Union[str, Tuple[str]]) -> Tuple[str]:
+def validate_comma_separated_tuple(value: Union[str, Tuple[str, ...]]) -> Tuple[str]:
     """Checks whether the value is a comma separated string or a tuple."""
 
     if isinstance(value, tuple):
@@ -127,12 +125,7 @@ def validate_comma_separated_tuple(value: Union[str, Tuple[str]]) -> Tuple[str]:
 
     raise TypeError("Invalid comma separated list")
 
-from pydantic import parse_obj_as
 CommaSeparatedTuple = Annotated[Union[str, Tuple[str, ...]], AfterValidator(validate_comma_separated_tuple)]
-print('gyolo')
-aze = parse_obj_as(CommaSeparatedTuple, ("test", "toast"))
-print(type(aze))
-
 
        
 
