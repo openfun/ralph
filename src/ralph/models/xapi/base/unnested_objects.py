@@ -9,7 +9,7 @@ except ImportError:
 
 from uuid import UUID
 
-from pydantic import AnyUrl, StrictStr, Field, validator
+from pydantic import AnyUrl, StrictStr, validator, StringConstraints
 
 from ..config import BaseModelWithConfig
 from .common import IRI, LanguageMap
@@ -41,7 +41,7 @@ class BaseXapiInteractionComponent(BaseModelWithConfig):
         description (LanguageMap): Consists of the description of the interaction.
     """
 
-    id: Annotated[str, Field(pattern=r"^[^\s]+$")]
+    id: Annotated[str, StringConstraints(pattern=r"^[^\s]+$")]
     description: Optional[LanguageMap]
 
 

@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Dict, Optional, Union
 
 try:
-    from typing import Literal
+    from typing import Annotated, Literal
 except ImportError:
     from typing_extensions import Annotated, Literal
 

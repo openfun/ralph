@@ -3,7 +3,7 @@
 from typing import Union
 
 try:
-    from typing import Literal
+    from typing import Annotated, Literal
 except ImportError:
     from typing_extensions import Annotated, Literal
 

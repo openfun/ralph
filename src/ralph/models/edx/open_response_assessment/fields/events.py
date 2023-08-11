@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Dict, List, Optional, Union
 
 try:
-    from typing import Literal
+    from typing import Annotated, iteral
 except ImportError:
     from typing_extensions import Annotated, Literal
 

@@ -3,11 +3,11 @@
 from typing import Optional, Union
 
 try:
-    from typing import Literal
+    from typing import Annotated, Literal
 except ImportError:
-    from typing_extensions import Literal
+    from typing_extensions import Annotated, Literal
 
-from pydantic import Field, constr
+from pydantic import Field, StringConstraints
 
 from ...base import AbstractBaseEventField
 
@@ -23,11 +23,11 @@ class TextbookInteractionBaseEventField(AbstractBaseEventField):
     """
 
     page: int
-    chapter: constr(
-        regex=(
+    chapter: Annotated[str, StringConstraints(
+        pattern=(
             r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"  # noqa
         )
-    )
+    )]
 
 
 class TextbookPdfThumbnailsToggledEventField(TextbookInteractionBaseEventField):
@@ -73,11 +73,11 @@ class TextbookPdfChapterNavigatedEventField(AbstractBaseEventField):
     """
 
     name: Literal["textbook.pdf.chapter.navigated"]
-    chapter: constr(
-        regex=(
+    chapter: Annotated[str, StringConstraints(
+        pattern=(
             r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"  # noqa
         )
-    )
+    )]
     chapter_title: str
 
 
@@ -262,11 +262,11 @@ class BookEventField(AbstractBaseEventField):
             clicked or `nextpage` value when the previous page button is clicked.
     """
 
-    chapter: constr(
-        regex=(
+    chapter: Annotated[str, StringConstraints(
+        pattern=(
             r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"  # noqa
         )
-    )
+    )]
     name: Union[
         Literal["textbook.pdf.page.loaded"], Literal["textbook.pdf.page.navigatednext"]
     ]
