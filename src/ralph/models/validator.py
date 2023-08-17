@@ -74,7 +74,7 @@ class Validator:
             event_str (str): The cleaned JSON-formatted input event_str.
         """
         event = json.loads(event_str)
-        return self.get_first_valid_model(event).json()
+        return self.get_first_valid_model(event).json(by_alias=True)
 
     @staticmethod
     def _log_error(message, event_str, error=None):

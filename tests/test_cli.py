@@ -23,6 +23,7 @@ from ralph.conf import settings
 from ralph.exceptions import ConfigurationException
 from ralph.models.edx.navigational.statements import UIPageClose
 from ralph.models.xapi.navigation.statements import PageTerminated
+from ralph.models.xapi.profile import Profile
 
 from tests.fixtures.backends import (
     ES_TEST_HOSTS,
@@ -479,6 +480,16 @@ def test_cli_validate_command_with_edx_format(event):
     event_str = event.json()
     runner = CliRunner()
     result = runner.invoke(cli, ["validate", "-f", "edx"], input=event_str)
+    assert event_str in result.output
+
+
+@custom_given(Profile)
+def test_cli_validate_command_with_xapi_profile_format(event):
+    """Test the validate command using the xAPI profile format."""
+
+    event_str = event.json(by_alias=True)
+    runner = CliRunner()
+    result = runner.invoke(cli, "validate -f xapi.profile".split(), input=event_str)
     assert event_str in result.output
 
 

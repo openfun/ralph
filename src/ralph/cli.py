@@ -446,9 +446,9 @@ def extract(parser):
     "-f",
     "--format",
     "format_",
-    type=click.Choice(["edx", "xapi"]),
+    type=click.Choice(["edx", "xapi", "xapi.profile"]),
     required=True,
-    help="Input events format to validate",
+    help="Input data format to validate",
 )
 @click.option(
     "-I",
@@ -462,7 +462,7 @@ def extract(parser):
     "--fail-on-unknown",
     default=False,
     is_flag=True,
-    help="Stop validating at first unknown event",
+    help="Stop validating at first unknown record",
 )
 def validate(format_, ignore_errors, fail_on_unknown):
     """Validate input events of given format."""
