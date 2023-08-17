@@ -5,30 +5,35 @@ from io import BytesIO
 
 import websockets
 
-from ralph.backends.stream.ws import WSStream
-from ralph.conf import settings
+from ralph.backends.stream.ws import WSStreamBackend, WSStreamBackendSettings
 
 from tests.fixtures.backends import WS_TEST_HOST, WS_TEST_PORT
 
 
-def test_backends_stream_ws_stream_instantiation(ws):
-    """Tests the WSStream backend instantiation."""
+def test_backends_stream_ws_stream_default_instantiation(monkeypatch, fs):
+    """Test the `WSStreamBackend` instantiation."""
     # pylint: disable=invalid-name,unused-argument
+    fs.create_file(".env")
+    backend_settings_names = ["URI"]
+    for name in backend_settings_names:
+        monkeypatch.delenv(f"RALPH_BACKENDS__STREAM__WS__{name}", raising=False)
 
-    assert WSStream.name == "ws"
-
-    assert WSStream().uri == settings.BACKENDS.STREAM.WS.URI
+    assert WSStreamBackend.name == "ws"
+    assert WSStreamBackend.settings_class == WSStreamBackendSettings
+    backend = WSStreamBackend()
+    assert not backend.settings.URI
 
     uri = f"ws://{WS_TEST_HOST}:{WS_TEST_PORT}"
-    client = WSStream(uri)
-    assert client.uri == uri
+    backend = WSStreamBackend(WSStreamBackendSettings(URI=uri))
+    assert backend.settings.URI == uri
 
 
 def test_backends_stream_ws_stream_stream(ws, monkeypatch, events):
-    """Tests the WSStream backend stream method."""
+    """Test the `WSStreamBackend` stream method."""
     # pylint: disable=invalid-name,unused-argument
+    settings = WSStreamBackendSettings(URI=f"ws://{WS_TEST_HOST}:{WS_TEST_PORT}")
 
-    client = WSStream(f"ws://{WS_TEST_HOST}:{WS_TEST_PORT}")
+    backend = WSStreamBackend(settings)
 
     # Mock stdout stream
     class MockStdout:
@@ -39,7 +44,7 @@ def test_backends_stream_ws_stream_stream(ws, monkeypatch, events):
     mock_stdout = MockStdout()
 
     try:
-        client.stream(mock_stdout.buffer)
+        backend.stream(mock_stdout.buffer)
     except websockets.exceptions.ConnectionClosedOK:
         pass
 
@@ -49,10 +54,10 @@ def test_backends_stream_ws_stream_stream(ws, monkeypatch, events):
 
 
 def test_backends_stream_ws_stream_stream_when_server_stops(ws, monkeypatch, events):
-    """Tests the WSStream backend stream method when the websocket server stops."""
+    """Test the WSStreamBackend stream method when the websocket server stops."""
     # pylint: disable=invalid-name,unused-argument
-
-    client = WSStream(f"ws://{WS_TEST_HOST}:{WS_TEST_PORT}")
+    settings = WSStreamBackendSettings(URI=f"ws://{WS_TEST_HOST}:{WS_TEST_PORT}")
+    backend = WSStreamBackend(settings)
 
     # Mock stdout stream
     class MockStdout:
@@ -63,7 +68,7 @@ def test_backends_stream_ws_stream_stream_when_server_stops(ws, monkeypatch, eve
     mock_stdout = MockStdout()
 
     try:
-        client.stream(mock_stdout.buffer)
+        backend.stream(mock_stdout.buffer)
     except websockets.exceptions.ConnectionClosedOK:
         pass
 
