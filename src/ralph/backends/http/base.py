@@ -6,12 +6,24 @@ from abc import ABC, abstractmethod
 from enum import Enum, unique
 from typing import Iterator, List, Optional, Union
 
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, BaseSettings, ValidationError
 from pydantic.types import PositiveInt
 
+from ralph.conf import BaseSettingsConfig, core_settings
 from ralph.exceptions import BackendParameterException
 
 logger = logging.getLogger(__name__)
+
+
+class BaseHTTPBackendSettings(BaseSettings):
+    """Data backend default configuration."""
+
+    class Config(BaseSettingsConfig):
+        """Pydantic Configuration."""
+
+        env_prefix = "RALPH_BACKENDS__HTTP__"
+        env_file = ".env"
+        env_file_encoding = core_settings.LOCALE_ENCODING
 
 
 @unique
@@ -66,7 +78,7 @@ class BaseQuery(BaseModel):
     query_string: Optional[str]
 
 
-class BaseHTTP(ABC):
+class BaseHTTPBackend(ABC):
     """Base HTTP backend interface."""
 
     name = "base"
