@@ -9,23 +9,55 @@ from urllib.parse import ParseResult, parse_qs, urljoin, urlparse
 
 from httpx import AsyncClient, HTTPError, HTTPStatusError, RequestError
 from more_itertools import chunked
-from pydantic import AnyHttpUrl, BaseModel, parse_obj_as
+from pydantic import AnyHttpUrl, BaseModel, Field, parse_obj_as
 from pydantic.types import PositiveInt
 
-from ralph.conf import LRSHeaders, settings
+from ralph.conf import BaseSettingsConfig, HeadersParameters
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import gather_with_limited_concurrency
 
 from .base import (
-    BaseHTTP,
+    BaseHTTPBackend,
+    BaseHTTPBackendSettings,
     BaseQuery,
     HTTPBackendStatus,
     OperationType,
     enforce_query_checks,
 )
 
-lrs_settings = settings.BACKENDS.HTTP.LRS
 logger = logging.getLogger(__name__)
+
+
+class LRSHeaders(HeadersParameters):
+    """Pydantic model for LRS headers."""
+
+    X_EXPERIENCE_API_VERSION: str = Field("1.0.3", alias="X-Experience-API-Version")
+    CONTENT_TYPE: str = Field("application/json", alias="content-type")
+
+
+class LRSHTTPBackendSettings(BaseHTTPBackendSettings):
+    """LRS HTTP backend default configuration.
+
+    Attributes:
+        BASE_URL (AnyHttpUrl): LRS server URL.
+        USERNAME (str): Basic auth username for LRS authentication.
+        PASSWORD (str): Basic auth password for LRS authentication.
+        HEADERS (dict): Headers defined for the LRS server connection.
+        STATUS_ENDPOINT (str): Endpoint used to check server status.
+        STATEMENTS_ENDPOINT (str): Default endpoint for LRS statements resource.
+    """
+
+    class Config(BaseSettingsConfig):
+        """Pydantic Configuration."""
+
+        env_prefix = "RALPH_BACKENDS__HTTP__LRS__"
+
+    BASE_URL: AnyHttpUrl = Field("http://0.0.0.0:8100")
+    USERNAME: str = "ralph"
+    PASSWORD: str = "secret"
+    HEADERS: LRSHeaders = LRSHeaders()
+    STATUS_ENDPOINT: str = "/__heartbeat__"
+    STATEMENTS_ENDPOINT: str = "/xAPI/statements"
 
 
 class StatementResponse(BaseModel):
@@ -41,41 +73,31 @@ class LRSQuery(BaseQuery):
     query: Optional[dict]
 
 
-class AsyncLRSHTTP(BaseHTTP):
-    """Asynchroneous LRS HTTP backend."""
+class AsyncLRSHTTPBackend(BaseHTTPBackend):
+    """Asynchronous LRS HTTP backend."""
 
     name = "async_lrs"
     query = LRSQuery
     default_operation_type = OperationType.CREATE
+    settings_class = LRSHTTPBackendSettings
 
     def __init__(  # pylint: disable=too-many-arguments
-        self,
-        base_url: str = lrs_settings.BASE_URL,
-        username: str = lrs_settings.USERNAME,
-        password: str = lrs_settings.PASSWORD,
-        headers: LRSHeaders = lrs_settings.HEADERS,
-        status_endpoint: str = lrs_settings.STATUS_ENDPOINT,
-        statements_endpoint: str = lrs_settings.STATEMENTS_ENDPOINT,
+        self, settings: settings_class = None
     ):
-        """Instantiate the LRS client.
+        """Instantiate the LRS HTTP backend.
 
         Args:
-            base_url (AnyHttpUrl): LRS server URL.
-            username (str): Basic auth username for LRS authentication.
-            password (str): Basic auth password for LRS authentication.
-            headers (dict): Headers defined for the LRS server connection.
-            status_endpoint (str): Endpoint used to check server status.
-            statements_endpoint (str): Default endpoint for LRS statements resource.
+            settings (LRSHTTPBackendSettings or None): The LRS HTTP backend settings.
+                If `settings` is `None`, a default settings instance is used instead.
         """
-        self.base_url = parse_obj_as(AnyHttpUrl, base_url)
-        self.auth = (username, password)
-        self.headers = headers
-        self.status_endpoint = status_endpoint
-        self.statements_endpoint = statements_endpoint
+        self.settings = settings if settings else self.settings_class()
+
+        self.base_url = parse_obj_as(AnyHttpUrl, self.settings.BASE_URL)
+        self.auth = (self.settings.USERNAME, self.settings.PASSWORD)
 
     async def status(self):
         """HTTP backend check for server status."""
-        status_url = urljoin(self.base_url, self.status_endpoint)
+        status_url = urljoin(self.base_url, self.settings.STATUS_ENDPOINT)
 
         try:
             async with AsyncClient() as client:
@@ -139,7 +161,7 @@ class AsyncLRSHTTP(BaseHTTP):
             max_statements: The maximum number of statements to yield.
         """
         if not target:
-            target = self.statements_endpoint
+            target = self.settings.STATEMENTS_ENDPOINT
 
         query_params = {}
         if query.query:
@@ -232,7 +254,7 @@ class AsyncLRSHTTP(BaseHTTP):
             raise BackendParameterException(msg)
 
         if not target:
-            target = self.statements_endpoint
+            target = self.settings.STATEMENTS_ENDPOINT
 
         target = ParseResult(
             scheme=urlparse(self.base_url).scheme,
@@ -278,7 +300,7 @@ class AsyncLRSHTTP(BaseHTTP):
     async def _fetch_statements(self, target, raw_output, query_params: dict):
         """Fetch statements from a LRS. Used in `read`."""
         async with AsyncClient(
-            auth=self.auth, headers=self.headers.dict(by_alias=True)
+            auth=self.auth, headers=self.settings.HEADERS.dict(by_alias=True)
         ) as client:
             while True:
                 response = await client.get(target, params=query_params)
@@ -344,7 +366,7 @@ class AsyncLRSHTTP(BaseHTTP):
 
         For use in `write`.
         """
-        async with AsyncClient(auth=self.auth, headers=self.headers) as client:
+        async with AsyncClient(auth=self.auth, headers=self.settings.HEADERS) as client:
             try:
                 request = await client.post(
                     # Encode data to allow async post
