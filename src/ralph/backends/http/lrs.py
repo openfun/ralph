@@ -1,7 +1,7 @@
 """LRS HTTP backend for Ralph."""
 import asyncio
 
-from ralph.backends.http.async_lrs import AsyncLRSHTTP
+from ralph.backends.http.async_lrs import AsyncLRSHTTPBackend
 
 
 def _ensure_running_loop_uniqueness(func):
@@ -16,7 +16,7 @@ def _ensure_running_loop_uniqueness(func):
         if loop.is_running():
             raise RuntimeError(
                 f"This event loop is already running. You must use "
-                f"`AsyncLRSHTTP.{func.__name__}` (instead of `LRSHTTP."
+                f"`AsyncLRSHTTPBackend.{func.__name__}` (instead of `LRSHTTPBackend."
                 f"{func.__name__}`), or run this code outside the current"
                 " event loop."
             )
@@ -25,7 +25,7 @@ def _ensure_running_loop_uniqueness(func):
     return wrap
 
 
-class LRSHTTP(AsyncLRSHTTP):
+class LRSHTTPBackend(AsyncLRSHTTPBackend):
     """LRS HTTP backend."""
 
     # pylint: disable=invalid-overridden-method
