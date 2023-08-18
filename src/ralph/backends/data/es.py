@@ -4,7 +4,7 @@ import logging
 from io import IOBase
 from itertools import chain
 from pathlib import Path
-from typing import Iterable, Iterator, List, Literal, Optional, Union
+from typing import Iterable, Iterator, List, Literal, Union
 
 from elasticsearch import ApiError, Elasticsearch, TransportError
 from elasticsearch.helpers import BulkIndexError, streaming_bulk
@@ -76,8 +76,8 @@ class ESQueryPit(BaseModel):
             time alive.
     """
 
-    id: Optional[str]
-    keep_alive: Optional[str]
+    id: Union[str, None]
+    keep_alive: Union[str, None]
 
 
 class ESQuery(BaseQuery):
@@ -103,9 +103,9 @@ class ESQuery(BaseQuery):
 
     query: dict = {"match_all": {}}
     pit: ESQueryPit = ESQueryPit()
-    size: Optional[int]
+    size: Union[int, None]
     sort: Union[str, List[dict]] = "_shard_doc"
-    search_after: Optional[list]
+    search_after: Union[list, None]
     track_total_hits: Literal[False] = False
 
 
@@ -116,7 +116,7 @@ class ESDataBackend(BaseDataBackend):
     query_model = ESQuery
     settings_class = ESDataBackendSettings
 
-    def __init__(self, settings: settings_class = None):
+    def __init__(self, settings: Union[settings_class, None] = None):
         """Instantiate the Elasticsearch data backend.
 
         Args:
@@ -156,7 +156,7 @@ class ESDataBackend(BaseDataBackend):
         return DataBackendStatus.ERROR
 
     def list(
-        self, target: str = None, details: bool = False, new: bool = False
+        self, target: Union[str, None] = None, details: bool = False, new: bool = False
     ) -> Iterator[Union[str, dict]]:
         """List available Elasticsearch indices, data streams and aliases.
 
@@ -200,8 +200,8 @@ class ESDataBackend(BaseDataBackend):
         self,
         *,
         query: Union[str, ESQuery] = None,
-        target: str = None,
-        chunk_size: Union[None, int] = None,
+        target: Union[str, None] = None,
+        chunk_size: Union[int, None] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
@@ -213,7 +213,7 @@ class ESDataBackend(BaseDataBackend):
                 DSL. The Lucene query overrides the query DSL if present. See ESQuery.
             target (str or None): The target Elasticsearch index name to query.
                 If target is `None`, the `DEFAULT_INDEX` is used instead.
-            chunk_size (int or None): The chunk size for reading batches of documents.
+            chunk_size (int or None): The chunk size when reading documents by batches.
                 If chunk_size is `None` it defaults to `DEFAULT_CHUNK_SIZE`.
             raw_output (bool): Controls whether to yield dictionaries or bytes.
             ignore_errors (bool): Ignored.
@@ -273,10 +273,10 @@ class ESDataBackend(BaseDataBackend):
     def write(  # pylint: disable=too-many-arguments
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
-        target: Union[None, str] = None,
-        chunk_size: Union[None, int] = None,
+        target: Union[str, None] = None,
+        chunk_size: Union[int, None] = None,
         ignore_errors: bool = False,
-        operation_type: Union[None, BaseOperationType] = None,
+        operation_type: Union[BaseOperationType, None] = None,
     ) -> int:
         """Write data documents to the target index and return their count.
 
@@ -294,7 +294,7 @@ class ESDataBackend(BaseDataBackend):
                 instead. See `BaseOperationType`.
 
         Return:
-            int: The number of written documents.
+            int: The number of documents written.
 
         Raise:
             BackendException: If a failure occurs while writing to Elasticsearch or

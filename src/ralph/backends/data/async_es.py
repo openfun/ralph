@@ -30,7 +30,7 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
     query_model = ESQuery
     settings_class = ESDataBackendSettings
 
-    def __init__(self, settings: settings_class = None):
+    def __init__(self, settings: Union[settings_class, None] = None):
         """Instantiate the asynchronous Elasticsearch client.
 
         Args:
@@ -127,7 +127,7 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
                 DSL. The Lucene query overrides the query DSL if present. See ESQuery.
             target (str or None): The target Elasticsearch index name to query.
                 If target is `None`, the `DEFAULT_INDEX` is used instead.
-            chunk_size (int or None): The chunk size for reading batches of documents.
+            chunk_size (int or None): The chunk size when reading documents by batches.
                 If chunk_size is `None` it defaults to `DEFAULT_CHUNK_SIZE`.
             raw_output (bool): Controls whether to yield dictionaries or bytes.
             ignore_errors (bool): Ignored.
@@ -210,7 +210,7 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
                 instead. See `BaseOperationType`.
 
         Return:
-            int: The number of written documents.
+            int: The number of documents written.
 
         Raise:
             BackendException: If a failure occurs while writing to Elasticsearch or

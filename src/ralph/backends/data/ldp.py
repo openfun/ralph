@@ -63,7 +63,7 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend):
     name = "ldp"
     settings_class = LDPDataBackendSettings
 
-    def __init__(self, settings: settings_class = None):
+    def __init__(self, settings: Union[settings_class, None] = None):
         """Instantiate the OVH LDP client.
 
         Args:
@@ -101,7 +101,7 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend):
         return DataBackendStatus.OK
 
     def list(
-        self, target: str = None, details: bool = False, new: bool = False
+        self, target: Union[str, None] = None, details: bool = False, new: bool = False
     ) -> Iterator[Union[str, dict]]:
         """List archives for a given target stream_id.
 
@@ -151,8 +151,8 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend):
         self,
         *,
         query: Union[str, BaseQuery] = None,
-        target: str = None,
-        chunk_size: Union[None, int] = 4096,
+        target: Union[str, None] = None,
+        chunk_size: Union[int, None] = 4096,
         raw_output: bool = True,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
@@ -162,7 +162,7 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend):
             query (str or BaseQuery): The ID of the archive to read.
             target (str or None): The target stream_id containing the archives.
                 If target is `None`, the `DEFAULT_STREAM_ID` is used instead.
-            chunk_size (int or None): The chunk size for reading archives.
+            chunk_size (int or None): The chunk size when reading archives by batch.
             raw_output (bool): Ignored. Always set to `True`.
             ignore_errors (bool): Ignored.
 
@@ -216,10 +216,10 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend):
     def write(  # pylint: disable=too-many-arguments
         self,
         data: Iterable[Union[bytes, dict]],
-        target: Union[None, str] = None,
-        chunk_size: Union[None, int] = None,
+        target: Union[str, None] = None,
+        chunk_size: Union[int, None] = None,
         ignore_errors: bool = False,
-        operation_type: Union[None, BaseOperationType] = None,
+        operation_type: Union[BaseOperationType, None] = None,
     ) -> int:
         """LDP data backend is read-only, calling this method will raise an error."""
         msg = "LDP data backend is read-only, cannot write to %s"

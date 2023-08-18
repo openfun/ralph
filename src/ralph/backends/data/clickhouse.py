@@ -14,7 +14,6 @@ from typing import (
     List,
     Literal,
     NamedTuple,
-    Optional,
     Union,
 )
 from uuid import UUID, uuid4
@@ -96,18 +95,18 @@ class BaseClickHouseQuery(BaseQuery):
     """Base ClickHouse query model."""
 
     select: Union[str, List[str]] = "event"
-    where: Optional[Union[str, List[str]]]
-    parameters: Optional[Dict]
-    limit: Optional[int]
-    sort: Optional[str]
-    column_oriented: Optional[bool] = False
+    where: Union[str, List[str], None]
+    parameters: Union[Dict, None]
+    limit: Union[int, None]
+    sort: Union[str, None]
+    column_oriented: Union[bool, None] = False
 
 
 class ClickHouseQuery(BaseClickHouseQuery):
     """ClickHouse query model."""
 
     # pylint: disable=unsubscriptable-object
-    query_string: Optional[Json[BaseClickHouseQuery]]
+    query_string: Union[Json[BaseClickHouseQuery], None]
 
 
 class ClickHouseDataBackend(BaseDataBackend):
@@ -118,7 +117,7 @@ class ClickHouseDataBackend(BaseDataBackend):
     default_operation_type = BaseOperationType.CREATE
     settings_class = ClickHouseDataBackendSettings
 
-    def __init__(self, settings: settings_class = None):
+    def __init__(self, settings: Union[settings_class, None] = None):
         """Instantiate the ClickHouse configuration.
 
         Args:
@@ -167,7 +166,7 @@ class ClickHouseDataBackend(BaseDataBackend):
         return DataBackendStatus.OK
 
     def list(
-        self, target: str = None, details: bool = False, new: bool = False
+        self, target: Union[str, None] = None, details: bool = False, new: bool = False
     ) -> Iterator[Union[str, dict]]:
         """List tables for a given database.
 
@@ -203,8 +202,8 @@ class ClickHouseDataBackend(BaseDataBackend):
         self,
         *,
         query: Union[str, ClickHouseQuery] = None,
-        target: str = None,
-        chunk_size: Union[None, int] = None,
+        target: Union[str, None] = None,
+        chunk_size: Union[int, None] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
@@ -214,7 +213,7 @@ class ClickHouseDataBackend(BaseDataBackend):
             query (str or ClickHouseQuery): The query to use when fetching documents.
             target (str or None): The target table name to query.
                 If target is `None`, the `event_table_name` is used instead.
-            chunk_size (int or None): The chunk size for reading batches of documents.
+            chunk_size (int or None): The chunk size when reading documents by batches.
                 If chunk_size is `None` it defaults to `default_chunk_size`.
             raw_output (bool): Controls whether to yield dictionaries or bytes.
             ignore_errors (bool): If `True`, errors during the encoding operation
@@ -295,10 +294,10 @@ class ClickHouseDataBackend(BaseDataBackend):
     def write(  # pylint: disable=too-many-arguments
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
-        target: Union[None, str] = None,
-        chunk_size: Union[None, int] = None,
+        target: Union[str, None] = None,
+        chunk_size: Union[int, None] = None,
         ignore_errors: bool = False,
-        operation_type: Union[None, BaseOperationType] = None,
+        operation_type: Union[BaseOperationType, None] = None,
     ) -> int:
         """Write `data` documents to the `target` table and return their count.
 
@@ -316,7 +315,7 @@ class ClickHouseDataBackend(BaseDataBackend):
                 instead. See `BaseOperationType`.
 
         Return:
-            int: The number of written documents.
+            int: The number of documents written.
 
         Raise:
             BackendException: If a failure occurs while writing to ClickHouse or
