@@ -18,14 +18,14 @@ from ralph.backends.data.base import (
     DataBackendStatus,
     enforce_query_checks,
 )
-from ralph.conf import BaseSettingsConfig, CommaSeparatedTuple
+from ralph.conf import BaseSettingsConfig, ClientOptions, CommaSeparatedTuple
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import parse_bytes_to_dict, read_raw
 
 logger = logging.getLogger(__name__)
 
 
-class ESClientOptions(BaseModel):
+class ESClientOptions(ClientOptions):
     """Elasticsearch additional client options."""
 
     ca_certs: Path = None

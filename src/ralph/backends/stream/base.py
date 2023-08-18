@@ -19,7 +19,7 @@ class BaseStreamBackendSettings(BaseSettings):
         env_file_encoding = core_settings.LOCALE_ENCODING
 
 
-class BaseStream(ABC):
+class BaseStreamBackend(ABC):
     """Base stream backend interface."""
 
     name = "base"
