@@ -9,7 +9,7 @@ from ralph.backends.lrs.base import (
     StatementParameters,
     StatementQueryResult,
 )
-from ralph.backends.lrs.es import get_query
+from ralph.backends.lrs.es import ESLRSBackend
 from ralph.exceptions import BackendException, BackendParameterException
 
 logger = logging.getLogger(__name__)
@@ -24,7 +24,7 @@ class AsyncESLRSBackend(BaseAsyncLRSBackend, AsyncESDataBackend):
         self, params: StatementParameters
     ) -> StatementQueryResult:
         """Return the statements query payload using xAPI parameters."""
-        query = get_query(params=params)
+        query = ESLRSBackend.get_query(params=params)
         try:
             statements = [
                 document["_source"]
