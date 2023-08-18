@@ -104,13 +104,13 @@ from ralph.exceptions import BackendException
             {
                 "where": [
                     "event_id = {statementId:UUID}",
-                    "event.actor.account_name = {actor__account_name:String}",
-                    "event.actor.account_homepage = {actor__account_homepage:String}",
+                    "event.actor.account.name = {actor__account__name:String}",
+                    "event.actor.account.homePage = {actor__account_home_page:String}",
                 ],
                 "params": {
                     "statementId": "test_id",
-                    "actor__account_name": "13936749",
-                    "actor__account_homepage": "http://www.example.com",
+                    "actor__account__name": "13936749",
+                    "actor__account_home_page": "http://www.example.com",
                     "ascending": True,
                     "format": "exact",
                 },
