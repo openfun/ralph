@@ -5,7 +5,7 @@ import logging
 from abc import ABC, abstractmethod
 from enum import Enum, unique
 from io import IOBase
-from typing import Iterable, Iterator, Optional, Union
+from typing import Iterable, Iterator, Union
 
 from pydantic import BaseModel, BaseSettings, ValidationError
 
@@ -34,7 +34,7 @@ class BaseQuery(BaseModel):
 
         extra = "forbid"
 
-    query_string: Optional[str]
+    query_string: Union[str, None]
 
 
 @unique
@@ -88,7 +88,7 @@ class BaseDataBackend(ABC):
     settings_class = BaseDataBackendSettings
 
     @abstractmethod
-    def __init__(self, settings: settings_class = None):
+    def __init__(self, settings: Union[settings_class, None] = None):
         """Instantiate the data backend.
 
         Args:
@@ -96,7 +96,9 @@ class BaseDataBackend(ABC):
                 If `settings` is `None`, a default settings instance is used instead.
         """
 
-    def validate_query(self, query: Union[str, dict, BaseQuery] = None) -> BaseQuery:
+    def validate_query(
+        self, query: Union[str, dict, BaseQuery, None] = None
+    ) -> BaseQuery:
         """Validate and transform the query."""
         if query is None:
             query = self.query_model()
@@ -134,7 +136,7 @@ class BaseDataBackend(ABC):
 
     @abstractmethod
     def list(
-        self, target: str = None, details: bool = False, new: bool = False
+        self, target: Union[str, None] = None, details: bool = False, new: bool = False
     ) -> Iterator[Union[str, dict]]:
         """List containers in the data backend. E.g., collections, files, indexes.
 
@@ -159,8 +161,8 @@ class BaseDataBackend(ABC):
         self,
         *,
         query: Union[str, BaseQuery] = None,
-        target: str = None,
-        chunk_size: Union[None, int] = None,
+        target: Union[str, None] = None,
+        chunk_size: Union[int, None] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
@@ -195,10 +197,10 @@ class BaseDataBackend(ABC):
     def write(  # pylint: disable=too-many-arguments
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
-        target: Union[None, str] = None,
-        chunk_size: Union[None, int] = None,
+        target: Union[str, None] = None,
+        chunk_size: Union[int, None] = None,
         ignore_errors: bool = False,
-        operation_type: Union[None, BaseOperationType] = None,
+        operation_type: Union[BaseOperationType, None] = None,
     ) -> int:
         """Write `data` records to the `target` container and return their count.
 
@@ -235,7 +237,7 @@ class BaseAsyncDataBackend(ABC):
     settings_class = BaseDataBackendSettings
 
     @abstractmethod
-    def __init__(self, settings: settings_class = None):
+    def __init__(self, settings: Union[settings_class, None] = None):
         """Instantiate the data backend.
 
         Args:
@@ -243,7 +245,9 @@ class BaseAsyncDataBackend(ABC):
                 If `settings` is `None`, a default settings instance is used instead.
         """
 
-    def validate_query(self, query: Union[str, dict, BaseQuery] = None) -> BaseQuery:
+    def validate_query(
+        self, query: Union[str, dict, BaseQuery, None] = None
+    ) -> BaseQuery:
         """Validate and transform the query."""
         if query is None:
             query = self.query_model()
@@ -281,7 +285,7 @@ class BaseAsyncDataBackend(ABC):
 
     @abstractmethod
     async def list(
-        self, target: str = None, details: bool = False, new: bool = False
+        self, target: Union[str, None] = None, details: bool = False, new: bool = False
     ) -> Iterator[Union[str, dict]]:
         """List containers in the data backend. E.g., collections, files, indexes.
 
@@ -306,8 +310,8 @@ class BaseAsyncDataBackend(ABC):
         self,
         *,
         query: Union[str, BaseQuery] = None,
-        target: str = None,
-        chunk_size: Union[None, int] = None,
+        target: Union[str, None] = None,
+        chunk_size: Union[int, None] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
@@ -342,10 +346,10 @@ class BaseAsyncDataBackend(ABC):
     async def write(  # pylint: disable=too-many-arguments
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
-        target: Union[None, str] = None,
-        chunk_size: Union[None, int] = None,
+        target: Union[str, None] = None,
+        chunk_size: Union[int, None] = None,
         ignore_errors: bool = False,
-        operation_type: Union[None, BaseOperationType] = None,
+        operation_type: Union[BaseOperationType, None] = None,
     ) -> int:
         """Write `data` records to the `target` container and return their count.
 

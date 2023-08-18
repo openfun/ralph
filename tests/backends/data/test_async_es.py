@@ -751,13 +751,17 @@ async def test_backends_data_async_es_data_backend_write_method_without_ignore_e
 
 @pytest.mark.anyio
 async def test_backends_data_async_es_data_backend_write_method_with_ignore_errors(
-    es, async_es_backend
+    es, async_es_backend, caplog
 ):
     """Test the `AsyncESDataBackend.write` method with `ignore_errors` set to `True`,
     given badly formatted data, should should skip the invalid data.
     """
     # pylint: disable=invalid-name,unused-argument
 
+    msg = (
+        "Failed to decode JSON: Expecting value: line 1 column 1 (char 0), "
+        "for document: b'This is invalid JSON'"
+    )
     records = [{"id": idx, "count": random.randint(0, 100)} for idx in range(10)]
     # Patch a record with a non-expected type for the count field (should be
     # assigned as long)
@@ -781,12 +785,19 @@ async def test_backends_data_async_es_data_backend_write_method_with_ignore_erro
         "This is invalid JSON".encode("utf-8"),
         json.dumps({"foo": "baz"}).encode("utf-8"),
     ]
-    assert await backend.write(data, chunk_size=2, ignore_errors=True) == 2
+    with caplog.at_level(logging.WARNING):
+        assert await backend.write(data, chunk_size=2, ignore_errors=True) == 2
 
     es.indices.refresh(index=ES_TEST_INDEX)
     hits = [statement async for statement in backend.read()]
     assert len(hits) == 11
     assert [hit["_source"] for hit in hits[9:]] == [{"foo": "bar"}, {"foo": "baz"}]
+
+    assert (
+        "ralph.backends.data.async_es",
+        logging.WARNING,
+        msg,
+    ) in caplog.record_tuples
 
     await backend.close()
 

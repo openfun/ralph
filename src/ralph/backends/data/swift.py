@@ -71,7 +71,7 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend):
     default_operation_type = BaseOperationType.CREATE
     settings_class = SwiftDataBackendSettings
 
-    def __init__(self, settings: settings_class = None):
+    def __init__(self, settings: Union[settings_class, None] = None):
         """Prepares the options for the SwiftService."""
         self.settings = settings if settings else self.settings_class()
 
@@ -120,7 +120,7 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend):
         return DataBackendStatus.OK
 
     def list(
-        self, target: str = None, details: bool = False, new: bool = False
+        self, target: Union[str, None] = None, details: bool = False, new: bool = False
     ) -> Iterator[Union[str, dict]]:
         """List files for the target container.
 
@@ -163,8 +163,8 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend):
         self,
         *,
         query: Union[str, BaseQuery] = None,
-        target: str = None,
-        chunk_size: Union[None, int] = 500,
+        target: Union[str, None] = None,
+        chunk_size: Union[int, None] = 500,
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
@@ -240,10 +240,10 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend):
     def write(  # pylint: disable=too-many-arguments, disable=too-many-branches
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
-        target: Union[None, str] = None,
-        chunk_size: Union[None, int] = None,
+        target: Union[str, None] = None,
+        chunk_size: Union[int, None] = None,
         ignore_errors: bool = False,
-        operation_type: Union[None, BaseOperationType] = None,
+        operation_type: Union[BaseOperationType, None] = None,
     ) -> int:
         """Write `data` records to the `target` container and returns their count.
 
