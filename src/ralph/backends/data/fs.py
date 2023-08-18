@@ -56,7 +56,7 @@ class FSDataBackend(HistoryMixin, BaseDataBackend):
     default_operation_type = BaseOperationType.CREATE
     settings_class = FSDataBackendSettings
 
-    def __init__(self, settings: settings_class = None):
+    def __init__(self, settings: Union[settings_class, None] = None):
         """Create the default target directory if it does not exist.
 
         Args:
@@ -90,7 +90,7 @@ class FSDataBackend(HistoryMixin, BaseDataBackend):
         return DataBackendStatus.OK
 
     def list(
-        self, target: str = None, details: bool = False, new: bool = False
+        self, target: Union[str, None] = None, details: bool = False, new: bool = False
     ) -> Iterator[Union[str, dict]]:
         """List files and directories in the target directory.
 
@@ -146,8 +146,8 @@ class FSDataBackend(HistoryMixin, BaseDataBackend):
         self,
         *,
         query: Union[str, BaseQuery] = None,
-        target: str = None,
-        chunk_size: Union[None, int] = None,
+        target: Union[str, None] = None,
+        chunk_size: Union[int, None] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
@@ -159,8 +159,8 @@ class FSDataBackend(HistoryMixin, BaseDataBackend):
                 If target is `None`, the `default_directory_path` is used instead.
                 If target is a relative path, it is considered to be relative to the
                     `default_directory_path`.
-            chunk_size (int or None): The chunk size for reading files. Ignored if
-                `raw_output` is set to False.
+            chunk_size (int or None): The chunk size when reading documents by batches.
+                Ignored if `raw_output` is set to False.
             raw_output (bool): Controls whether to yield bytes or dictionaries.
             ignore_errors (bool): If `True`, errors during the read operation
                 will be ignored and logged. If `False` (default), a `BackendException`
@@ -217,10 +217,10 @@ class FSDataBackend(HistoryMixin, BaseDataBackend):
     def write(  # pylint: disable=too-many-arguments
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
-        target: Union[None, str] = None,
-        chunk_size: Union[None, int] = None,
+        target: Union[str, None] = None,
+        chunk_size: Union[int, None] = None,
         ignore_errors: bool = False,
-        operation_type: Union[None, BaseOperationType] = None,
+        operation_type: Union[BaseOperationType, None] = None,
     ) -> int:
         """Write data records to the target file and return their count.
 
