@@ -29,6 +29,8 @@ from click_option_group import optgroup
 from pydantic import BaseModel
 
 from ralph import __version__ as ralph_version
+from ralph.backends.conf import backends_settings
+from ralph.backends.data.base import BaseOperationType
 from ralph.conf import ClientOptions, CommaSeparatedTuple, HeadersParameters, settings
 from ralph.exceptions import UnsupportedBackendException
 from ralph.logger import configure_logging
@@ -207,7 +209,9 @@ def backends_options(name=None, backend_types: List[BaseModel] = None):
                 backend_names.append(backend_name)
                 for field_name, field in backend:
                     field_type = backend.__fields__[field_name].type_
-                    field_name = f"{backend_name}-{field_name}".replace("_", "-")
+                    field_name = f"{backend_name}-{field_name.lower()}".replace(
+                        "_", "-"
+                    )
                     option = f"--{field_name}"
                     option_kwargs = {}
                     # If the field is a boolean, convert it to a flag option
@@ -224,6 +228,8 @@ def backends_options(name=None, backend_types: List[BaseModel] = None):
                         field_type, HeadersParameters
                     ):
                         option_kwargs["type"] = HeadersParametersParamType(field_type)
+                    elif field_type is Path:
+                        option_kwargs["type"] = click.Path()
 
                     command = optgroup.option(
                         option.lower(), default=field, **option_kwargs
@@ -553,8 +559,15 @@ def convert(from_, to_, ignore_errors, fail_on_unknown, **conversion_set_kwargs)
         click.echo(event)
 
 
+read_backend_types = [
+    backends_settings.BACKENDS.DATA,
+    backends_settings.BACKENDS.HTTP,
+    backends_settings.BACKENDS.STREAM,
+]
+
+
 @click.argument("archive", required=False)
-@backends_options(backend_types=[backend for _, backend in settings.BACKENDS])
+@backends_options(backend_types=read_backend_types)
 @click.option(
     "-c",
     "--chunk-size",
@@ -576,7 +589,32 @@ def convert(from_, to_, ignore_errors, fail_on_unknown, **conversion_set_kwargs)
     default=None,
     help="Query object as a JSON string (database and HTTP backends ONLY)",
 )
-def read(backend, archive, chunk_size, target, query, **options):
+@click.option(
+    "-r",
+    "--raw-output",
+    is_flag=True,
+    show_default=True,
+    default=True,
+    help="Yield bytes instead of dictionaries.",
+)
+@click.option(
+    "-i",
+    "--ignore_errors",
+    is_flag=False,
+    show_default=True,
+    default=False,
+    help="Ignore errors during the encoding operation.",
+)
+def read(
+    backend,
+    archive,
+    chunk_size,
+    target,
+    query,
+    raw_output,
+    ignore_errors,
+    **options,
+):  # pylint: disable=too-many-arguments
     """Read an archive or records from a configured backend."""
     logger.info(
         (
@@ -591,25 +629,22 @@ def read(backend, archive, chunk_size, target, query, **options):
     )
     logger.debug("Backend parameters: %s", options)
 
-    backend_type = get_backend_type(settings.BACKENDS, backend)
+    backend_type = get_backend_type(read_backend_types, backend)
     backend = get_backend_instance(backend_type, backend, options)
 
-    if backend_type == settings.BACKENDS.STORAGE:
-        for data in backend.read(archive, chunk_size=chunk_size):
-            click.echo(data, nl=False)
-    elif backend_type == settings.BACKENDS.DATABASE:
-        if query is not None:
-            query = backend.query_model.parse_obj(query)
-        for document in backend.get(query=query, chunk_size=chunk_size):
-            click.echo(
-                bytes(
-                    json.dumps(document) if isinstance(document, dict) else document,
-                    encoding="utf-8",
-                )
-            )
-    elif backend_type == settings.BACKENDS.STREAM:
+    if backend_type == backends_settings.BACKENDS.DATA:
+        for statement in backend.read(
+            query=query,
+            target=target,
+            chunk_size=chunk_size,
+            raw_output=raw_output,
+            ignore_errors=ignore_errors,
+        ):
+            click.echo(statement)
+
+    elif backend_type == backends_settings.BACKENDS.STREAM:
         backend.stream(sys.stdout.buffer)
-    elif backend_type == settings.BACKENDS.HTTP:
+    elif backend_type == backends_settings.BACKENDS.HTTP:
         if query is not None:
             query = backend.query(query=query)
         for statement in backend.read(
@@ -627,15 +662,14 @@ def read(backend, archive, chunk_size, target, query, **options):
         raise UnsupportedBackendException(msg, backend)
 
 
+write_backend_types = [
+    backends_settings.BACKENDS.DATA,
+    backends_settings.BACKENDS.HTTP,
+]
+
+
 # pylint: disable=unnecessary-direct-lambda-call, too-many-arguments
-@click.argument("archive", required=False)
-@backends_options(
-    backend_types=[
-        settings.BACKENDS.DATABASE,
-        settings.BACKENDS.STORAGE,
-        settings.BACKENDS.HTTP,
-    ]
-)
+@backends_options(backend_types=write_backend_types)
 @click.option(
     "-c",
     "--chunk-size",
@@ -679,11 +713,10 @@ def read(backend, archive, chunk_size, target, query, **options):
     "--target",
     type=str,
     default=None,
-    help="Endpoint in which to write events (e.g. `statements`)",
+    help="The target container to write into",
 )
 def write(
     backend,
-    archive,
     chunk_size,
     force,
     ignore_errors,
@@ -693,21 +726,27 @@ def write(
     **options,
 ):
     """Write an archive to a configured backend."""
-    logger.info("Writing archive %s to the configured %s backend", archive, backend)
+    logger.info("Writing to target %s for the configured %s backend", target, backend)
 
     logger.debug("Backend parameters: %s", options)
 
     if max_num_simultaneous == 1:
         max_num_simultaneous = None
 
-    backend_type = get_backend_type(settings.BACKENDS, backend)
+    backend_type = get_backend_type(write_backend_types, backend)
     backend = get_backend_instance(backend_type, backend, options)
 
-    if backend_type == settings.BACKENDS.STORAGE:
-        backend.write(sys.stdin.buffer, archive, overwrite=force)
-    elif backend_type == settings.BACKENDS.DATABASE:
-        backend.put(sys.stdin, chunk_size=chunk_size, ignore_errors=ignore_errors)
-    elif backend_type == settings.BACKENDS.HTTP:
+    if backend_type == backends_settings.BACKENDS.DATA:
+        backend.write(
+            data=sys.stdin.buffer,
+            target=target,
+            chunk_size=chunk_size,
+            ignore_errors=ignore_errors,
+            operation_type=BaseOperationType.UPDATE
+            if force
+            else BaseOperationType.INDEX,
+        )
+    elif backend_type == backends_settings.BACKENDS.HTTP:
         backend.write(
             target=target,
             data=sys.stdin.buffer,
@@ -722,7 +761,17 @@ def write(
         raise UnsupportedBackendException(msg, backend)
 
 
-@backends_options(name="list", backend_types=[settings.BACKENDS.STORAGE])
+list_backend_types = [backends_settings.BACKENDS.DATA]
+
+
+@backends_options(name="list", backend_types=list_backend_types)
+@click.option(
+    "-t",
+    "--target",
+    type=str,
+    default=None,
+    help="Container to list events from",
+)
 @click.option(
     "-n/-a",
     "--new/--all",
@@ -735,15 +784,17 @@ def write(
     default=False,
     help="Get archives detailed output (JSON)",
 )
-def list_(details, new, backend, **options):
+def list_(target, details, new, backend, **options):
     """List available archives from a configured storage backend."""
     logger.info("Listing archives for the configured %s backend", backend)
+    logger.debug("Target container: %s", target)
     logger.debug("Fetch details: %s", str(details))
     logger.debug("Backend parameters: %s", options)
 
-    storage = get_backend_instance(settings.BACKENDS.STORAGE, backend, options)
+    backend_type = get_backend_type(list_backend_types, backend)
+    backend = get_backend_instance(backend_type, backend, options)
 
-    archives = storage.list(details=details, new=new)
+    archives = backend.list(target=target, details=details, new=new)
 
     counter = 0
     for archive in archives:
@@ -751,10 +802,13 @@ def list_(details, new, backend, **options):
         counter += 1
 
     if counter == 0:
-        logger.warning("Configured %s backend contains no archive", backend)
+        logger.warning("Configured %s backend contains no archive", backend.name)
 
 
-@backends_options(name="runserver", backend_types=[settings.BACKENDS.DATABASE])
+runserver_backend_types = [backends_settings.BACKENDS.LRS]
+
+
+@backends_options(name="runserver", backend_types=runserver_backend_types)
 @click.option(
     "-h",
     "--host",
@@ -794,7 +848,7 @@ def runserver(backend: str, host: str, port: int, **options):
             if value is None:
                 continue
             backend_name, field_name = key.split(sep="_", maxsplit=1)
-            key = f"RALPH_BACKENDS__DATABASE__{backend_name}__{field_name}".upper()
+            key = f"RALPH_BACKENDS__LRS__{backend_name}__{field_name}".upper()
             if isinstance(value, tuple):
                 value = ",".join(value)
             if issubclass(type(value), ClientOptions):

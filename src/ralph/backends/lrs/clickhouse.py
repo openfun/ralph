@@ -165,13 +165,13 @@ class ClickHouseLRSBackend(BaseLRSBackend, ClickHouseDataBackend):
                 f"event.{target_field}.openid = {{{target_field}__openid:String}}"
             )
         elif agent_params.account__name:
-            ch_params[f"{target_field}__account_name"] = agent_params.account__name
+            ch_params[f"{target_field}__account__name"] = agent_params.account__name
             where.append(
-                f"event.{target_field}.account_name = {{{target_field}__account_name:String}}"  # noqa: E501 # pylint: disable=line-too-long
+                f"event.{target_field}.account.name = {{{target_field}__account__name:String}}"  # noqa: E501 # pylint: disable=line-too-long
             )
             ch_params[
-                f"{target_field}__account_homepage"
+                f"{target_field}__account_home_page"
             ] = agent_params.account__home_page
             where.append(
-                f"event.{target_field}.account_homepage = {{{target_field}__account_homepage:String}}"  # noqa: E501 # pylint: disable=line-too-long
+                f"event.{target_field}.account.homePage = {{{target_field}__account_home_page:String}}"  # noqa: E501 # pylint: disable=line-too-long
             )

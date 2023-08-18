@@ -42,12 +42,12 @@ def test_logger_exists(fs, monkeypatch):
     runner = CliRunner()
     result = runner.invoke(
         cli,
-        ["write", "-b", "fs", "test_file"],
+        ["write", "-b", "fs", "-t", "test_file"],
         input="test input",
     )
 
     assert result.exit_code == 0
-    assert "Writing archive test_file to the configured fs backend" in result.output
+    assert "Writing to target test_file for the configured fs backend" in result.output
     assert "Backend parameters:" in result.output
 
 

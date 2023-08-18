@@ -5,8 +5,10 @@ import datetime
 import json
 import logging
 import operator
+import re
 from functools import reduce
 from importlib import import_module
+from inspect import getmembers, isclass
 from typing import Any, Dict, Iterable, Iterator, List, Union
 
 from pydantic import BaseModel
@@ -14,12 +16,30 @@ from pydantic import BaseModel
 from ralph.exceptions import BackendException
 
 
+def import_subclass(dotted_path, parent_class):
+    """Import a dotted module path.
+
+    Return the class that is a subclass of `parent_class` inside this module.
+    Raise ImportError if the import failed.
+    """
+
+    module = import_module(dotted_path)
+
+    for _, class_ in getmembers(module, isclass):
+        if issubclass(class_, parent_class):
+            return class_
+
+    raise ImportError(
+        f'Module "{dotted_path}" does not define a subclass of "{parent_class}" class'
+    )
+
+
 # Taken from Django utilities
 # https://docs.djangoproject.com/en/3.1/_modules/django/utils/module_loading/#import_string
 def import_string(dotted_path):
     """Import a dotted module path.
 
-    Returns the attribute/class designated by the last name in the path.
+    Return the attribute/class designated by the last name in the path.
     Raise ImportError if the import failed.
     """
     try:
@@ -37,23 +57,50 @@ def import_string(dotted_path):
         ) from err
 
 
-def get_backend_type(backends: BaseModel, backend_name: str):
+def get_backend_type(backend_types: List[BaseModel], backend_name: str):
     """Return the backend type from a backend name."""
     backend_name = backend_name.upper()
-    for _, backend_type in backends:
+    for backend_type in backend_types:
         if hasattr(backend_type, backend_name):
             return backend_type
     return None
 
 
-def get_backend_instance(backend_type: BaseModel, backend_name: str, options: dict):
+def get_backend_instance(
+    backend_type: BaseModel,
+    backend_name: str,
+    options: dict,
+):
     """Return the instantiated backend instance given backend-name-prefixed options."""
+    # Get type name from backend_type class name
+    backend_type_name = backend_type.__class__.__name__[
+        : -len("BackendSettings")
+    ].lower()
+
+    backend_settings = getattr(backend_type, backend_name.upper())
     prefix = f"{backend_name}_"
     # Filter backend-related parameters. Parameter name is supposed to start
     # with the backend name
     names = filter(lambda key: key.startswith(prefix), options.keys())
-    options = {name.replace(prefix, ""): options[name] for name in names}
-    return getattr(backend_type, backend_name.upper()).get_instance(**options)
+    options = {name.replace(prefix, "").upper(): options[name] for name in names}
+    module = import_module(f"ralph.backends.{backend_type_name}.{backend_name}")
+    for _, class_ in getmembers(module, isclass):
+        if getattr(class_, "name", None) == backend_name:
+            backend_class = class_
+            break
+
+    if not backend_class:
+        raise BackendException(
+            f'No backend named "{backend_name}" '
+            f'under the backend type "{backend_type_name}"'
+        )
+
+    # Override settings with CLI options
+    settings_instance = backend_settings.copy()
+    for option, value in options.items():
+        setattr(settings_instance, option, value)
+
+    return backend_class(settings_instance)
 
 
 def get_root_logger():

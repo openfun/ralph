@@ -23,69 +23,65 @@ from pymongo.errors import CollectionInvalid
 
 from ralph.backends.data.async_es import AsyncESDataBackend
 from ralph.backends.data.async_mongo import AsyncMongoDataBackend
-from ralph.backends.data.clickhouse import ClickHouseDataBackend
+from ralph.backends.data.clickhouse import (
+    ClickHouseClientOptions,
+    ClickHouseDataBackend,
+)
 from ralph.backends.data.es import ESDataBackend
 from ralph.backends.data.fs import FSDataBackend, FSDataBackendSettings
 from ralph.backends.data.ldp import LDPDataBackend
 from ralph.backends.data.mongo import MongoDataBackend
 from ralph.backends.data.s3 import S3DataBackend, S3DataBackendSettings
 from ralph.backends.data.swift import SwiftDataBackend, SwiftDataBackendSettings
-from ralph.backends.database.clickhouse import ClickHouseDatabase
-from ralph.backends.database.es import ESDatabase
-from ralph.backends.database.mongo import MongoDatabase
 from ralph.backends.lrs.async_es import AsyncESLRSBackend
 from ralph.backends.lrs.async_mongo import AsyncMongoLRSBackend
 from ralph.backends.lrs.clickhouse import ClickHouseLRSBackend
 from ralph.backends.lrs.es import ESLRSBackend
 from ralph.backends.lrs.fs import FSLRSBackend
 from ralph.backends.lrs.mongo import MongoLRSBackend
-from ralph.backends.storage.s3 import S3Storage
-from ralph.backends.storage.swift import SwiftStorage
-from ralph.conf import ClickhouseClientOptions, Settings, core_settings
+from ralph.conf import Settings, core_settings
 
 # ClickHouse backend defaults
 CLICKHOUSE_TEST_DATABASE = os.environ.get(
-    "RALPH_BACKENDS__DATABASE__CLICKHOUSE__TEST_DATABASE", "test_statements"
+    "RALPH_BACKENDS__DATA__CLICKHOUSE__TEST_DATABASE", "test_statements"
 )
 CLICKHOUSE_TEST_HOST = os.environ.get(
-    "RALPH_BACKENDS__DATABASE__CLICKHOUSE__TEST_HOST", "localhost"
+    "RALPH_BACKENDS__DATA__CLICKHOUSE__TEST_HOST", "localhost"
 )
 CLICKHOUSE_TEST_PORT = os.environ.get(
-    "RALPH_BACKENDS__DATABASE__CLICKHOUSE__TEST_PORT", 8123
+    "RALPH_BACKENDS__DATA__CLICKHOUSE__TEST_PORT", 8123
 )
 CLICKHOUSE_TEST_TABLE_NAME = os.environ.get(
-    "RALPH_BACKENDS__DATABASE__CLICKHOUSE__TEST_TABLE_NAME", "test_xapi_events_all"
+    "RALPH_BACKENDS__DATA__CLICKHOUSE__TEST_TABLE_NAME", "test_xapi_events_all"
 )
 
 # Elasticsearch backend defaults
-ES_TEST_INDEX = os.environ.get(
-    "RALPH_BACKENDS__DATABASE__ES__TEST_INDEX", "test-index-foo"
-)
+ES_TEST_INDEX = os.environ.get("RALPH_BACKENDS__DATA__ES__TEST_INDEX", "test-index-foo")
 ES_TEST_FORWARDING_INDEX = os.environ.get(
-    "RALPH_BACKENDS__DATABASE__ES__TEST_FORWARDING_INDEX", "test-index-foo-2"
+    "RALPH_BACKENDS__DATA__ES__TEST_FORWARDING_INDEX", "test-index-foo-2"
 )
 ES_TEST_INDEX_TEMPLATE = os.environ.get(
-    "RALPH_BACKENDS__DATABASE__ES__INDEX_TEMPLATE", "test-index"
+    "RALPH_BACKENDS__DATA__ES__INDEX_TEMPLATE", "test-index"
 )
 ES_TEST_INDEX_PATTERN = os.environ.get(
-    "RALPH_BACKENDS__DATABASE__ES__TEST_INDEX_PATTERN", "test-index-*"
+    "RALPH_BACKENDS__DATA__ES__TEST_INDEX_PATTERN", "test-index-*"
 )
 ES_TEST_HOSTS = os.environ.get(
-    "RALPH_BACKENDS__DATABASE__ES__TEST_HOSTS", "http://localhost:9200"
+    "RALPH_BACKENDS__DATA__ES__TEST_HOSTS", "http://localhost:9200"
 ).split(",")
 
 # Mongo backend defaults
 MONGO_TEST_COLLECTION = os.environ.get(
-    "RALPH_BACKENDS__DATABASE__MONGO__TEST_COLLECTION", "marsha"
+    "RALPH_BACKENDS__DATA__MONGO__TEST_COLLECTION", "marsha"
 )
 MONGO_TEST_FORWARDING_COLLECTION = os.environ.get(
-    "RALPH_BACKENDS__DATABASE__MONGO__TEST_FORWARDING_COLLECTION", "marsha-2"
+    "RALPH_BACKENDS__DATA__MONGO__TEST_FORWARDING_COLLECTION", "marsha-2"
 )
 MONGO_TEST_DATABASE = os.environ.get(
-    "RALPH_BACKENDS__DATABASE__MONGO__TEST_DATABASE", "statements"
+    "RALPH_BACKENDS__DATA__MONGO__TEST_DATABASE", "statements"
 )
 MONGO_TEST_CONNECTION_URI = os.environ.get(
-    "RALPH_BACKENDS__DATABASE__MONGO__TEST_CONNECTION_URI", "mongodb://localhost:27017/"
+    "RALPH_BACKENDS__DATA__MONGO__TEST_CONNECTION_URI", "mongodb://localhost:27017/"
 )
 
 RUNSERVER_TEST_HOST = os.environ.get("RALPH_RUNSERVER_TEST_HOST", "0.0.0.0")
@@ -98,8 +94,9 @@ WS_TEST_PORT = 8765
 
 @lru_cache()
 def get_clickhouse_test_backend():
-    """Return a ClickHouseDatabase backend instance using test defaults."""
-    return ClickHouseDatabase(
+    """Return a ClickHouseLRSBackend backend instance using test defaults."""
+
+    return ClickHouseLRSBackend(
         host=CLICKHOUSE_TEST_HOST,
         port=CLICKHOUSE_TEST_PORT,
         database=CLICKHOUSE_TEST_DATABASE,
@@ -109,18 +106,19 @@ def get_clickhouse_test_backend():
 
 @lru_cache
 def get_es_test_backend():
-    """Return a ESDatabase backend instance using test defaults."""
-    return ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX)
+    """Return a ESLRSBackend backend instance using test defaults."""
+    return ESLRSBackend(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX)
 
 
 @lru_cache
 def get_mongo_test_backend():
     """Returns a MongoDatabase backend instance using test defaults."""
-    return MongoDatabase(
+    settings = MongoLRSBackend.settings_class(
         connection_uri=MONGO_TEST_CONNECTION_URI,
         database=MONGO_TEST_DATABASE,
         collection=MONGO_TEST_COLLECTION,
     )
+    return MongoLRSBackend(settings)
 
 
 def get_es_fixture(host=ES_TEST_HOSTS, index=ES_TEST_INDEX):
@@ -331,7 +329,7 @@ def get_clickhouse_fixture(
     """Create / delete a ClickHouse test database + table and yields an
     instantiated client.
     """
-    client_options = ClickhouseClientOptions(
+    client_options = ClickHouseClientOptions(
         date_time_input_format="best_effort",  # Allows RFC dates
         allow_experimental_object_type=1,  # Allows JSON data type
     ).dict()
@@ -601,24 +599,6 @@ def es_lrs_backend():
 
 
 @pytest.fixture
-def swift():
-    """Return get_swift_storage function."""
-
-    def get_swift_storage():
-        """Returns an instance of SwiftStorage."""
-        return SwiftStorage(
-            os_tenant_id="os_tenant_id",
-            os_tenant_name="os_tenant_name",
-            os_username="os_username",
-            os_password="os_password",
-            os_region_name="os_region_name",
-            os_storage_url="os_storage_url/ralph_logs_container",
-        )
-
-    return get_swift_storage
-
-
-@pytest.fixture
 def swift_backend():
     """Return get_swift_data_backend function."""
 
@@ -651,26 +631,6 @@ def moto_fs(fs):
     for module in [boto3, botocore]:
         module_dir = Path(module.__file__).parent
         fs.add_real_directory(module_dir, lazy_read=False)
-
-
-@pytest.fixture
-def s3():
-    """Return get_s3_storage function."""
-    # pylint:disable=invalid-name
-
-    def get_s3_storage():
-        """Returns an instance of S3Storage."""
-
-        return S3Storage(
-            access_key_id="access_key_id",
-            secret_access_key="secret_access_key",
-            session_token="session_token",
-            default_region="default-region",
-            bucket_name="bucket_name",
-            endpoint_url=None,
-        )
-
-    return get_s3_storage
 
 
 @pytest.fixture
