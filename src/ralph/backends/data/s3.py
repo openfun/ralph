@@ -71,7 +71,7 @@ class S3DataBackend(HistoryMixin, BaseDataBackend):
     default_operation_type = BaseOperationType.CREATE
     settings_class = S3DataBackendSettings
 
-    def __init__(self, settings: settings_class = None):
+    def __init__(self, settings: Union[settings_class, None] = None):
         """Instantiate the AWS S3 client."""
         self.settings = settings if settings else self.settings_class()
 
@@ -108,7 +108,7 @@ class S3DataBackend(HistoryMixin, BaseDataBackend):
         return DataBackendStatus.OK
 
     def list(
-        self, target: str = None, details: bool = False, new: bool = False
+        self, target: Union[str, None] = None, details: bool = False, new: bool = False
     ) -> Iterator[Union[str, dict]]:
         """List objects for the target bucket.
 
@@ -157,8 +157,8 @@ class S3DataBackend(HistoryMixin, BaseDataBackend):
         self,
         *,
         query: Union[str, BaseQuery] = None,
-        target: str = None,
-        chunk_size: Union[None, int] = None,
+        target: Union[str, None] = None,
+        chunk_size: Union[int, None] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
@@ -168,7 +168,7 @@ class S3DataBackend(HistoryMixin, BaseDataBackend):
             query: (str or BaseQuery): The ID of the object to read.
             target (str or None): The target bucket containing the objects.
                 If target is `None`, the `default_bucket` is used instead.
-            chunk_size (int or None): The chunk size for reading objects.
+            chunk_size (int or None): The chunk size when reading objects by batch.
             raw_output (bool): Controls whether to yield bytes or dictionaries.
             ignore_errors (bool): If `True`, errors during the read operation
                 will be ignored and logged. If `False` (default), a `BackendException`
@@ -228,10 +228,10 @@ class S3DataBackend(HistoryMixin, BaseDataBackend):
     def write(  # pylint: disable=too-many-arguments
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
-        target: Union[None, str] = None,
-        chunk_size: Union[None, int] = None,
+        target: Union[str, None] = None,
+        chunk_size: Union[int, None] = None,
         ignore_errors: bool = False,
-        operation_type: Union[None, BaseOperationType] = None,
+        operation_type: Union[BaseOperationType, None] = None,
     ) -> int:
         """Write `data` records to the `target` bucket and return their count.
 
