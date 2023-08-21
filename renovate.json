@@ -5,5 +5,5 @@
     "commitMessagePrefix": "⬆️(project)",
     "commitMessageAction": "upgrade",
     "commitBodyTable": true,
-    "ignoreDeps": ["clickhouse-connect","pydantic","responses"]
+    "ignoreDeps": ["clickhouse-connect","pydantic","pytest-httpx","responses"]
 }
