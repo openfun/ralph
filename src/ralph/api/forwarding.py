@@ -2,7 +2,7 @@
 
 import logging
 from functools import lru_cache
-from typing import List
+from typing import List, Literal, Union
 
 from httpx import AsyncClient, AsyncHTTPTransport, HTTPStatusError, RequestError
 
@@ -32,13 +32,16 @@ def get_active_xapi_forwardings() -> List[XapiForwardingConfigurationSettings]:
     return active_forwardings
 
 
-async def forward_xapi_statements(statements: List[dict]):
+async def forward_xapi_statements(
+    statements: Union[dict, List[dict]], method: Literal["post", "put"]
+):
     """Forwards xAPI statements."""
     for forwarding in get_active_xapi_forwardings():
         transport = AsyncHTTPTransport(retries=forwarding.max_retries)
         async with AsyncClient(transport=transport) as client:
             try:
-                req = await client.post(
+                # NB: post or put
+                req = await getattr(client, method)(
                     forwarding.url,
                     json=statements,
                     auth=(forwarding.basic_username, forwarding.basic_password),
@@ -46,6 +49,9 @@ async def forward_xapi_statements(statements: List[dict]):
                 )
                 req.raise_for_status()
                 msg = "Forwarded %s statements to %s with success."
-                logger.debug(msg, len(statements), forwarding.url)
+                if isinstance(statements, list):
+                    logger.debug(msg, len(statements), forwarding.url)
+                else:
+                    logger.debug(msg, 1, forwarding.url)
             except (RequestError, HTTPStatusError) as error:
                 logger.error("Failed to forward xAPI statements. %s", error)

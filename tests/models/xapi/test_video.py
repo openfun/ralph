@@ -5,9 +5,11 @@ import json
 import pytest
 from hypothesis import settings
 from hypothesis import strategies as st
+from pydantic import ValidationError
 
 from ralph.models.selector import ModelSelector
 from ralph.models.validator import Validator
+from ralph.models.xapi.video.contexts import VideoContextContextActivities
 from ralph.models.xapi.video.statements import (
     VideoCompleted,
     VideoDownloaded,
@@ -200,3 +202,63 @@ def test_models_xapi_video_screen_change_interaction_with_valid_statement(statem
         statement.object.definition.type
         == "https://w3id.org/xapi/video/activity-type/video"
     )
+
+
+@settings(deadline=None)
+@pytest.mark.parametrize(
+    "category",
+    [
+        {"id": "https://w3id.org/xapi/video"},
+        {
+            "id": "https://w3id.org/xapi/video",
+            "definition": {"type": "http://adlnet.gov/expapi/activities/profile"},
+        },
+        [{"id": "https://w3id.org/xapi/video"}],
+        [{"id": "https://foo.bar"}, {"id": "https://w3id.org/xapi/video"}],
+    ],
+)
+@custom_given(VideoContextContextActivities)
+def test_models_xapi_video_context_activities_with_valid_category(
+    category, context_activities
+):
+    """Test that a valid `VideoContextContextActivities` should not raise a
+    `ValidationError`.
+    """
+    activities = json.loads(context_activities.json(exclude_none=True, by_alias=True))
+    activities["category"] = category
+    try:
+        VideoContextContextActivities(**activities)
+    except ValidationError as err:
+        pytest.fail(
+            f"Valid VideoContextContextActivities should not raise exceptions: {err}"
+        )
+
+
+@settings(deadline=None)
+@pytest.mark.parametrize(
+    "category",
+    [
+        {"id": "https://w3id.org/xapi/not-video"},
+        {
+            "id": "https://w3id.org/xapi/video",
+            "definition": {"type": "http://adlnet.gov/expapi/activities/not-profile"},
+        },
+        [{"id": "https://w3id.org/xapi/not-video"}],
+        [{"id": "https://foo.bar"}, {"id": "https://w3id.org/xapi/not-video"}],
+    ],
+)
+@custom_given(VideoContextContextActivities)
+def test_models_xapi_video_context_activities_with_invalid_category(
+    category, context_activities
+):
+    """Test that an invalid `VideoContextContextActivities` should raise a
+    `ValidationError`.
+    """
+    activities = json.loads(context_activities.json(exclude_none=True, by_alias=True))
+    activities["category"] = category
+    msg = (
+        r"(The `context.contextActivities.category` field should contain at least one "
+        r"valid `VideoProfileActivity`) | (unexpected value)"
+    )
+    with pytest.raises(ValidationError, match=msg):
+        VideoContextContextActivities(**activities)

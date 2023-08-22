@@ -5,8 +5,12 @@ import json
 import pytest
 from hypothesis import settings
 from hypothesis import strategies as st
+from pydantic import ValidationError
 
 from ralph.models.selector import ModelSelector
+from ralph.models.xapi.virtual_classroom.contexts import (
+    VirtualClassroomContextContextActivities,
+)
 from ralph.models.xapi.virtual_classroom.statements import (
     VirtualClassroomAnsweredPoll,
     VirtualClassroomInitialized,
@@ -254,3 +258,67 @@ def test_models_xapi_virtual_classroom_posted_public_message_with_valid_statemen
         statement.object.definition.type
         == "https://w3id.org/xapi/acrossx/activities/message"
     )
+
+
+@settings(deadline=None)
+@pytest.mark.parametrize(
+    "category",
+    [
+        {"id": "https://w3id.org/xapi/virtual-classroom"},
+        {
+            "id": "https://w3id.org/xapi/virtual-classroom",
+            "definition": {"type": "http://adlnet.gov/expapi/activities/profile"},
+        },
+        [{"id": "https://w3id.org/xapi/virtual-classroom"}],
+        [{"id": "https://foo.bar"}, {"id": "https://w3id.org/xapi/virtual-classroom"}],
+    ],
+)
+@custom_given(VirtualClassroomContextContextActivities)
+def test_models_xapi_virtual_classroom_context_activities_with_valid_category(
+    category, context_activities
+):
+    """Test that a valid `VirtualClassroomContextContextActivities` should not raise a
+    `ValidationError`.
+    """
+    activities = json.loads(context_activities.json(exclude_none=True, by_alias=True))
+    activities["category"] = category
+    try:
+        VirtualClassroomContextContextActivities(**activities)
+    except ValidationError as err:
+        pytest.fail(
+            "Valid VirtualClassroomContextContextActivities should not raise "
+            f"exceptions: {err}"
+        )
+
+
+@settings(deadline=None)
+@pytest.mark.parametrize(
+    "category",
+    [
+        {"id": "https://w3id.org/xapi/not-virtual-classroom"},
+        {
+            "id": "https://w3id.org/xapi/virtual-classroom",
+            "definition": {"type": "http://adlnet.gov/expapi/activities/not-profile"},
+        },
+        [{"id": "https://w3id.org/xapi/not-virtual-classroom"}],
+        [
+            {"id": "https://foo.bar"},
+            {"id": "https://w3id.org/xapi/not-virtual-classroom"},
+        ],
+    ],
+)
+@custom_given(VirtualClassroomContextContextActivities)
+def test_models_xapi_virtual_classroom_context_activities_with_invalid_category(
+    category, context_activities
+):
+    """Test that an invalid `VirtualClassroomContextContextActivities` should raise a
+    `ValidationError`.
+    """
+    activities = json.loads(context_activities.json(exclude_none=True, by_alias=True))
+    activities["category"] = category
+    msg = (
+        r"(The `context.contextActivities.category` field should contain at least one "
+        r"valid `VirtualClassroomProfileActivity`) | (unexpected value)"
+    )
+    with pytest.raises(ValidationError, match=msg):
+        VirtualClassroomContextContextActivities(**activities)

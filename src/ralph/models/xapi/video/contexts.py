@@ -9,7 +9,7 @@ except ImportError:
 
 from uuid import UUID
 
-from pydantic import Field, NonNegativeFloat, PositiveInt
+from pydantic import Field, NonNegativeFloat, PositiveInt, validator
 
 from ..base.contexts import BaseXapiContext, BaseXapiContextContextActivities
 from ..base.unnested_objects import BaseXapiActivity
@@ -31,31 +31,45 @@ from ..concepts.constants.video import (
 from ..config import BaseExtensionModelWithConfig
 
 
-class VideoContextContextActivitiesCategory(BaseXapiActivity):
-    # noqa: D205, D415
-    """Pydantic model for video `context`.`contextActivities`.`category`
-    property.
+class VideoProfileActivity(ProfileActivity):
+    """Pydantic model for video profile `Activity` type.
 
     Attributes:
         id (str): Consists of the value `https://w3id.org/xapi/video`.
-        definition (dict): see ProfileActivity.
     """
 
     id: Literal["https://w3id.org/xapi/video"] = "https://w3id.org/xapi/video"
-    definition: ProfileActivity
 
 
 class VideoContextContextActivities(BaseXapiContextContextActivities):
     """Pydantic model for video `context`.`contextActivities` property.
 
     Attributes:
-        category (list): see VideoContextContextActivitiesCategory.
+        category (dict or list): see VideoProfileActivity.
     """
 
     category: Union[
-        VideoContextContextActivitiesCategory,
-        List[VideoContextContextActivitiesCategory],
+        VideoProfileActivity, List[Union[VideoProfileActivity, BaseXapiActivity]]
     ]
+
+    @validator("category")
+    @classmethod
+    def check_presence_of_profile_activity_category(
+        cls,
+        value: Union[
+            VideoProfileActivity, List[Union[VideoProfileActivity, BaseXapiActivity]]
+        ],
+    ):
+        """Check that the category list contains a `VideoProfileActivity`."""
+        if isinstance(value, VideoProfileActivity):
+            return value
+        for activity in value:
+            if isinstance(activity, VideoProfileActivity):
+                return value
+        raise ValueError(
+            "The `context.contextActivities.category` field should contain at least "
+            "one valid `VideoProfileActivity`"
+        )
 
 
 class BaseVideoContext(BaseXapiContext):
@@ -65,7 +79,7 @@ class BaseVideoContext(BaseXapiContext):
         contextActivities (dict): see VideoContextContextActivities.
     """
 
-    contextActivities: Optional[VideoContextContextActivities]
+    contextActivities: VideoContextContextActivities
 
 
 class VideoContextExtensions(BaseExtensionModelWithConfig):

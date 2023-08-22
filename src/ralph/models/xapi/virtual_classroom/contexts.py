@@ -2,14 +2,15 @@
 
 from datetime import datetime
 from typing import List, Optional, Union
-from uuid import UUID
 
 try:
-    from typing import Literal  # pylint: disable = ungrouped-imports
+    from typing import Literal
 except ImportError:
     from typing_extensions import Literal
 
-from pydantic import Field
+from uuid import UUID
+
+from pydantic import Field, validator
 
 from ..base.contexts import BaseXapiContext, BaseXapiContextContextActivities
 from ..base.unnested_objects import BaseXapiActivity
@@ -20,33 +21,49 @@ from ..concepts.constants.tincan_vocabulary import CONTEXT_EXTENSION_PLANNED_DUR
 from ..config import BaseExtensionModelWithConfig
 
 
-class VirtualClassroomContextActivitiesCategory(BaseXapiActivity):
-    # noqa: D205, D415
-    """Pydantic model for virtual classroom `context`.`contextActivities`.`category`
-    property.
+class VirtualClassroomProfileActivity(ProfileActivity):
+    """Pydantic model for virtual classroom profile `Activity` type.
 
     Attributes:
         id (str): Consists of the value `https://w3id.org/xapi/virtual-classroom`.
-        definition (dict): see ProfileActivity.
     """
 
     id: Literal[
         "https://w3id.org/xapi/virtual-classroom"
     ] = "https://w3id.org/xapi/virtual-classroom"
-    definition: ProfileActivity
 
 
 class VirtualClassroomContextContextActivities(BaseXapiContextContextActivities):
     """Pydantic model for virtual classroom `context`.`contextActivities` property.
 
     Attributes:
-        category (list): see VirtualClassroomContextActivitiesCategory.
+        category (dict or list): see VirtualClassroomProfileActivity.
     """
 
     category: Union[
-        VirtualClassroomContextActivitiesCategory,
-        List[VirtualClassroomContextActivitiesCategory],
+        VirtualClassroomProfileActivity,
+        List[Union[VirtualClassroomProfileActivity, BaseXapiActivity]],
     ]
+
+    @validator("category")
+    @classmethod
+    def check_presence_of_profile_activity_category(
+        cls,
+        value: Union[
+            VirtualClassroomProfileActivity,
+            List[Union[VirtualClassroomProfileActivity, BaseXapiActivity]],
+        ],
+    ):
+        """Check that the category list contains a `VirtualClassroomProfileActivity`."""
+        if isinstance(value, VirtualClassroomProfileActivity):
+            return value
+        for activity in value:
+            if isinstance(activity, VirtualClassroomProfileActivity):
+                return value
+        raise ValueError(
+            "The `context.contextActivities.category` field should contain at least "
+            "one valid `VirtualClassroomProfileActivity`"
+        )
 
 
 class VirtualClassroomContextExtensions(BaseExtensionModelWithConfig):
