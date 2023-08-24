@@ -43,3 +43,6 @@ ralph_lrs_command:
 ralph_lrs_auth_secret_name: "ralph-lrs-auth-{{ ralph_vault_checksum | default('undefined_ralph_vault_checksum') }}"
 ralph_ingress_class_name: "{{ default_ingress_class_name }}"
 ralph_sentry_ignore_health_checks: false
+
+# -- pvc
+ralph_pvc_history_name: "ralph-pvc-history"
