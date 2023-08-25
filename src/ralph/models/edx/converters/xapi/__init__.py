@@ -2,6 +2,10 @@
 
 # flake8: noqa
 
+from .enrollment import (
+    EdxCourseEnrollmentActivatedToLMSRegisteredCourse,
+    EdxCourseEnrollmentDeactivatedToLMSUnregisteredCourse,
+)
 from .navigational import UIPageCloseToPageTerminated
 from .server import ServerEventToPageViewed
 from .video import (
