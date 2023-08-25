@@ -11,6 +11,7 @@ and this project adheres to
 ### Added
 
 - Implement xAPI LMS Profile statements validation
+- `EdX` to `xAPI` converters for enrollment events
 
 ### Changed
 
