@@ -195,12 +195,79 @@ async def test_backends_http_lrs_list(caplog):
             ) in caplog.record_tuples
 
 
+@pytest.mark.parametrize("max_statements", [None, 2, 4, 8])
+@pytest.mark.anyio
+async def test_backends_http_lrs_read_max_statements(
+    httpx_mock: HTTPXMock, max_statements: int
+):
+    """Test the LRS backend `read` method `max_statements` property."""
+
+    base_url = "http://fake-lrs.com"
+    target = "/xAPI/statements/"
+    more_target = "/xAPI/statements/?pit_id=fake-pit-id"
+
+    chunk_size = 3
+
+    statements = {
+        "statements": [_gen_statement() for _ in range(chunk_size)],
+        "more": more_target,
+    }
+    more_statements = {
+        "statements": [_gen_statement() for _ in range(chunk_size)],
+    }
+
+    # Mock GET response of HTTPX for target and "more" target without query parameter
+    params = {"limit": 500}
+    httpx_mock.add_response(
+        url=ParseResult(
+            scheme=urlparse(base_url).scheme,
+            netloc=urlparse(base_url).netloc,
+            path=target,
+            query=urlencode(params),
+            params="",
+            fragment="",
+        ).geturl(),
+        method="GET",
+        json=statements,
+    )
+
+    if (max_statements is None) or (max_statements > chunk_size):
+        params.update(dict(parse_qsl(urlparse(more_target).query)))
+        httpx_mock.add_response(
+            url=ParseResult(
+                scheme=urlparse(base_url).scheme,
+                netloc=urlparse(base_url).netloc,
+                path=urlparse(more_target).path,
+                query=urlencode(params),
+                params="",
+                fragment="",
+            ).geturl(),
+            method="GET",
+            json=more_statements,
+        )
+
+    backend = AsyncLRSHTTP(base_url=base_url, username="user", password="pass")
+
+    # Return an iterable of dict
+    result = await _unpack_async_generator(
+        backend.read(target=target, max_statements=max_statements)
+    )
+    all_statements = statements["statements"] + more_statements["statements"]
+    assert len(all_statements) == 6
+
+    # Assert that result is of the proper length
+    if max_statements is None:
+        assert result == all_statements
+    else:
+        assert result == all_statements[:max_statements]
+
+
 @pytest.mark.parametrize("greedy", [False, True])
 @pytest.mark.anyio
 async def test_backends_http_lrs_read_without_target(
     httpx_mock: HTTPXMock, greedy: bool
 ):
-    """Tests the LRS backend `read` method without target parameter value fetches
+    """Test that the LRS backend `read` method without target parameter value fetches
     statements from '/xAPI/statements' default endpoint.
     """
 
@@ -743,7 +810,7 @@ async def test_backends_http_lrs_write_backend_exception(
 # Asynchronicity tests for dev purposes (skip in CI)
 
 
-@pytest.mark.skip(reason="Timing based tests are too unstable to run in CI")
+@pytest.mark.skip(reason="Timing based tests are too unstable to run in CI.")
 @pytest.mark.anyio
 @pytest.mark.parametrize(
     "num_pages,chunk_size,network_latency_time", [(3, 3, 0.2), (10, 3, 0.2)]
@@ -829,7 +896,7 @@ async def test_backends_http_lrs_read_concurrency(
         await _simulate_slow_processing()
     duration_greedy = time.time() - time_2
 
-    # Assert gains are close enough to theoritical gains
+    # Assert gains are close enough to theoretical gains
     proximity_ratio = 0.9
     assert (
         duration_non_greedy

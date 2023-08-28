@@ -10,6 +10,7 @@ from urllib.parse import ParseResult, parse_qs, urljoin, urlparse
 from httpx import AsyncClient, HTTPError, HTTPStatusError, RequestError
 from more_itertools import chunked
 from pydantic import AnyHttpUrl, BaseModel, parse_obj_as
+from pydantic.types import PositiveInt
 
 from ralph.conf import LRSHeaders, settings
 from ralph.exceptions import BackendException, BackendParameterException
@@ -105,10 +106,11 @@ class AsyncLRSHTTP(BaseHTTP):
         self,
         query: Union[str, LRSQuery] = None,
         target: str = None,
-        chunk_size: Union[None, int] = 500,
+        chunk_size: Optional[PositiveInt] = 500,
         raw_output: bool = False,
         ignore_errors: bool = False,
         greedy: bool = True,
+        max_statements: Optional[PositiveInt] = None,
     ) -> Iterator[Union[bytes, dict]]:
         """Get statements from LRS `target` endpoint.
 
@@ -134,6 +136,7 @@ class AsyncLRSHTTP(BaseHTTP):
                 before the statements yielded by the generator are consumed. Caution:
                 this might potentially lead to large amounts of API calls and to the
                 memory filling up.
+            max_statements: The maximum number of statements to yield.
         """
         if not target:
             target = self.statements_endpoint
@@ -155,18 +158,24 @@ class AsyncLRSHTTP(BaseHTTP):
             fragment="",
         ).geturl()
 
-        try:
-            if greedy:
-                async for statement in self._greedy_fetch_statements(
-                    target, raw_output, query_params
-                ):
-                    yield statement
-            else:
-                async for statement in self._fetch_statements(
-                    target=target, raw_output=raw_output, query_params=query_params
-                ):
-                    yield statement
+        # Select the appropriate fetch function
+        if greedy:
+            statements_async_generator = self._greedy_fetch_statements(
+                target, raw_output, query_params
+            )
+        else:
+            statements_async_generator = self._fetch_statements(
+                target=target, raw_output=raw_output, query_params=query_params
+            )
 
+        # Iterate through results
+        counter = 0
+        try:
+            async for statement in statements_async_generator:
+                if max_statements and (counter >= max_statements):
+                    break
+                yield statement
+                counter += 1
         except HTTPError as error:
             msg = "Failed to fetch statements."
             logger.error("%s. %s", msg, error)
@@ -175,12 +184,12 @@ class AsyncLRSHTTP(BaseHTTP):
     async def write(  # pylint: disable=too-many-arguments
         self,
         data: Union[Iterable[bytes], Iterable[dict]],
-        target: Union[None, str] = None,
-        chunk_size: Union[None, int] = 500,
+        target: Optional[str] = None,
+        chunk_size: Optional[PositiveInt] = 500,
         ignore_errors: bool = False,
-        operation_type: Union[None, OperationType] = None,
+        operation_type: Optional[OperationType] = None,
         simultaneous: bool = False,
-        max_num_simultaneous: Union[None, int] = None,
+        max_num_simultaneous: Optional[PositiveInt] = None,
     ) -> int:
         """Write `data` records to the `target` endpoint and return their count.
 

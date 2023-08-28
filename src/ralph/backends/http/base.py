@@ -7,6 +7,7 @@ from enum import Enum, unique
 from typing import Iterator, List, Optional, Union
 
 from pydantic import BaseModel, ValidationError
+from pydantic.types import PositiveInt
 
 from ralph.exceptions import BackendParameterException
 
@@ -114,9 +115,11 @@ class BaseHTTP(ABC):
         self,
         query: Union[str, BaseQuery] = None,
         target: str = None,
-        chunk_size: Union[None, int] = 500,
+        chunk_size: Optional[PositiveInt] = 500,
         raw_output: bool = False,
         ignore_errors: bool = False,
+        greedy: bool = False,
+        max_statements: Optional[PositiveInt] = None,
     ) -> Iterator[Union[bytes, dict]]:
         """Yield records read from the HTTP response results."""
 
@@ -124,9 +127,11 @@ class BaseHTTP(ABC):
     async def write(  # pylint: disable=too-many-arguments
         self,
         data: Union[List[bytes], List[dict]],
-        target: Union[None, str] = None,
-        chunk_size: Union[None, int] = 500,
+        target: Optional[str] = None,
+        chunk_size: Optional[PositiveInt] = 500,
         ignore_errors: bool = False,
-        operation_type: Union[None, OperationType] = None,
+        operation_type: Optional[OperationType] = None,
+        simultaneous: bool = False,
+        max_num_simultaneous: Optional[int] = None,
     ) -> int:
         """Writes statements into the HTTP server given an input endpoint."""
