@@ -100,7 +100,7 @@ class AsyncMongoDataBackend(BaseAsyncDataBackend):
 
         try:
             collections = await database.list_collections()
-            for collection_info in collections:
+            async for collection_info in collections:
                 if details:
                     yield collection_info
                 else:
