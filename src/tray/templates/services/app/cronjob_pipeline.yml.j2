@@ -49,7 +49,7 @@ items:
               volumes:
                 - name: ralph-v-history
                   persistentVolumeClaim:
-                    claimName: ralph-pvc-history
+                    claimName: "{{ ralph_pvc_history_name }}"
 {% if ralph_mount_es_ca_secret %}
                 - name: es-ca-certificate
                   secret:

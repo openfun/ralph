@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+- Add variable to override PVC name in arnold deployment
+
 ## [2.0.1] - 2021-07-15
 
 ### Changed

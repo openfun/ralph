@@ -24,3 +24,6 @@ ralph_mount_es_ca_secret: false
 #               --backend es \
 #               --es-client-options ca_certs=/usr/local/share/ca-certificates/es-cluster.pem"
 ralph_cronjobs: []
+# -- pvc
+
+ralph_pvc_history_name: "ralph-pvc-history"
