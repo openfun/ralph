@@ -120,3 +120,25 @@ async def gather_with_limited_concurrency(num_tasks: Union[None, int], *tasks):
     except Exception as exception:
         group.cancel()
         raise exception
+
+
+def statements_are_equivalent(statement_1: dict, statement_2: dict):
+    """Check if statements are equivalent.
+
+    To be equivalent, they must be identical on all fields not modified on input by the
+    LRS and identical on other fields, if these fields are present in both
+    statements. For example, if an "authority" field is present in only one statement,
+    they may still be equivalent.
+    """
+    # Check that unmutable fields have the same values
+    fields = ["actor", "verb", "object", "id", "result", "context", "attachements"]
+
+    # Check that some fields enriched by the LRS are equal when in both statements
+    # The LRS specification excludes the fields below from equivalency. It was
+    # decided to include them anyway as their value is inherent to the statements.
+    other_fields = {"timestamp", "version"}  # "authority" and "stored" remain ignored.
+    fields.extend(other_fields & statement_1.keys() & statement_2.keys())
+
+    if any(statement_1.get(field) != statement_2.get(field) for field in fields):
+        return False
+    return True

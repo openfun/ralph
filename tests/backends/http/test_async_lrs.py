@@ -44,11 +44,11 @@ def _gen_statement(id_=None, verb=None, timestamp=None):
     if timestamp is None:
         timestamp = datetime.strftime(
             datetime.fromtimestamp(time.time() - random.random()),
-            "%y-%m-%dT%H:%M:%S",
+            "%Y-%m-%dT%H:%M:%S",
         )
     elif isinstance(timestamp, int):
         timestamp = datetime.strftime(
-            datetime.fromtimestamp((time.time() - timestamp), "%y-%m-%dT%H:%M:%S")
+            datetime.fromtimestamp((time.time() - timestamp), "%Y-%m-%dT%H:%M:%S")
         )
     return {"id": id_, "verb": verb, "timestamp": timestamp}
 
