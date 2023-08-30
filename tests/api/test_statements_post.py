@@ -26,6 +26,12 @@ from tests.fixtures.backends import (
     get_mongo_test_backend,
 )
 
+from ..helpers import (
+    assert_statement_get_responses_are_equivalent,
+    string_is_date,
+    string_is_uuid,
+)
+
 client = TestClient(app)
 
 
@@ -99,7 +105,123 @@ def test_api_statements_post_single_statement_directly(
         "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
     )
     assert response.status_code == 200
-    assert response.json() == {"statements": [statement]}
+    assert_statement_get_responses_are_equivalent(
+        response.json(), {"statements": [statement]}
+    )
+
+
+# pylint: disable=too-many-arguments
+def test_api_statements_post_enriching_without_existing_values(
+    monkeypatch, auth_credentials, es
+):
+    """Test that statements are properly enriched when statement provides no values."""
+    # pylint: disable=invalid-name,unused-argument
+
+    monkeypatch.setattr(
+        "ralph.api.routers.statements.DATABASE_CLIENT", get_es_test_backend()
+    )
+    statement = {
+        "actor": {
+            "account": {
+                "homePage": "https://example.com/homepage/",
+                "name": str(uuid4()),
+            },
+            "objectType": "Agent",
+        },
+        "object": {"id": "https://example.com/object-id/1/"},
+        "verb": {"id": "https://example.com/verb-id/1/"},
+    }
+
+    response = client.post(
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {auth_credentials}"},
+        json=statement,
+    )
+
+    assert response.status_code == 200
+
+    es.indices.refresh()
+
+    response = client.get(
+        "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
+    )
+
+    statement = response.json()["statements"][0]
+
+    # Test pre-processing: id
+    assert "id" in statement
+    assert string_is_uuid(statement["id"])
+
+    # Test pre-processing: timestamp
+    assert "timestamp" in statement
+    assert string_is_date(statement["timestamp"])
+
+    # Test pre-processing: stored
+    assert "stored" in statement
+    assert string_is_date(statement["stored"])
+
+    # Test pre-processing: authority
+    assert "authority" in statement
+    assert statement["authority"] == {"mbox": "mailto:test_ralph@example.com"}
+
+
+@pytest.mark.parametrize(
+    "field,value,status",
+    [
+        ("id", str(uuid4()), 200),
+        ("timestamp", "2022-06-22T08:31:38Z", 200),
+        ("stored", "2022-06-22T08:31:38Z", 200),
+        ("authority", {"mbox": "mailto:test_ralph@example.com"}, 200),
+    ],
+)
+# pylint: disable=too-many-arguments
+def test_api_statements_post_enriching_with_existing_values(
+    field, value, status, monkeypatch, auth_credentials, es
+):
+    """Test that statements are properly enriched when values are provided."""
+    # pylint: disable=invalid-name,unused-argument
+
+    monkeypatch.setattr(
+        "ralph.api.routers.statements.DATABASE_CLIENT", get_es_test_backend()
+    )
+    statement = {
+        "actor": {
+            "account": {
+                "homePage": "https://example.com/homepage/",
+                "name": str(uuid4()),
+            },
+            "objectType": "Agent",
+        },
+        "object": {"id": "https://example.com/object-id/1/"},
+        "verb": {"id": "https://example.com/verb-id/1/"},
+    }
+    # Add the field to be tested
+    statement[field] = value
+
+    response = client.post(
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {auth_credentials}"},
+        json=statement,
+    )
+
+    assert response.status_code == status
+
+    # Check that values match when they should
+    if status == 200:
+        es.indices.refresh()
+        response = client.get(
+            "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
+        )
+        statement = response.json()["statements"][0]
+
+        # Test enriching
+
+        assert field in statement
+        if field == "stored":
+            # Check that stored value was overwritten
+            assert statement[field] != value
+        else:
+            assert statement[field] == value
 
 
 @pytest.mark.parametrize(
@@ -178,7 +300,9 @@ def test_api_statements_post_statements_list_of_one(
         "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
     )
     assert response.status_code == 200
-    assert response.json() == {"statements": [statement]}
+    assert_statement_get_responses_are_equivalent(
+        response.json(), {"statements": [statement]}
+    )
 
 
 @pytest.mark.parametrize(
@@ -239,9 +363,13 @@ def test_api_statements_post_statements_list(
         "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
     )
     assert get_response.status_code == 200
+
     # Update statements with the generated id.
     statements[1] = dict(statements[1], **{"id": generated_id})
-    assert get_response.json() == {"statements": statements}
+
+    assert_statement_get_responses_are_equivalent(
+        get_response.json(), {"statements": statements}
+    )
 
 
 @pytest.mark.parametrize(
@@ -345,11 +473,11 @@ def test_api_statements_post_statements_list_with_duplicate_of_existing_statemen
 
     es.indices.refresh()
 
-    # Post the statement again, trying to change the version field which is not allowed.
+    # Post the statement again, trying to change the timestamp which is not allowed.
     response = client.post(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {auth_credentials}"},
-        json=[dict(statement, **{"version": "1.0.0"})],
+        json=[dict(statement, **{"timestamp": "2023-03-15T14:07:51Z"})],
     )
 
     assert response.status_code == 409
@@ -362,7 +490,9 @@ def test_api_statements_post_statements_list_with_duplicate_of_existing_statemen
         "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
     )
     assert response.status_code == 200
-    assert response.json() == {"statements": [statement]}
+    assert_statement_get_responses_are_equivalent(
+        response.json(), {"statements": [statement]}
+    )
 
 
 @pytest.mark.parametrize(
@@ -613,7 +743,9 @@ async def test_post_statements_list_with_statement_forwarding(
                 headers={"Authorization": f"Basic {auth_credentials}"},
             )
             assert response.status_code == 200
-            assert response.json() == {"statements": [statement]}
+            assert_statement_get_responses_are_equivalent(
+                response.json(), {"statements": [statement]}
+            )
 
     # The statement should also be stored on the receiving client
     async with AsyncClient() as receiving_client:
@@ -622,7 +754,9 @@ async def test_post_statements_list_with_statement_forwarding(
             headers={"Authorization": f"Basic {auth_credentials}"},
         )
         assert response.status_code == 200
-        assert response.json() == {"statements": [statement]}
+        assert_statement_get_responses_are_equivalent(
+            response.json(), {"statements": [statement]}
+        )
 
     # Stop receiving LRS client
     await lrs_context.__aexit__(None, None, None)

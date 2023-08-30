@@ -27,6 +27,8 @@ have an authority field matching that of the user
 - Backends: `LRSHTTP` methods must not be used in `asyncio` events loop (BC)
 - Add variable to override PVC name in arnold deployment
 - Backends: add `max_statements` option to `AsyncLRSHTTP`
+- API: Incoming statements are enriched with `id`, `timestamp`, `stored`
+  and `authority`
 
 ## [3.9.0] - 2023-07-21
 

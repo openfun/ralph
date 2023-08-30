@@ -25,6 +25,8 @@ from tests.fixtures.backends import (
     get_mongo_test_backend,
 )
 
+from ..helpers import assert_statement_get_responses_are_equivalent, string_is_date
+
 client = TestClient(app)
 
 
@@ -96,7 +98,122 @@ def test_api_statements_put_single_statement_directly(
         "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
     )
     assert response.status_code == 200
-    assert response.json() == {"statements": [statement]}
+    assert_statement_get_responses_are_equivalent(
+        response.json(), {"statements": [statement]}
+    )
+
+
+# pylint: disable=too-many-arguments
+def test_api_statements_put_enriching_without_existing_values(
+    monkeypatch, auth_credentials, es
+):
+    """Test that statements are properly enriched when statement provides no values."""
+    # pylint: disable=invalid-name,unused-argument
+
+    monkeypatch.setattr(
+        "ralph.api.routers.statements.DATABASE_CLIENT", get_es_test_backend()
+    )
+    statement = {
+        "actor": {
+            "account": {
+                "homePage": "https://example.com/homepage/",
+                "name": str(uuid4()),
+            },
+            "objectType": "Agent",
+        },
+        "object": {"id": "https://example.com/object-id/1/"},
+        "verb": {"id": "https://example.com/verb-id/1/"},
+        "id": str(uuid4()),
+    }
+
+    response = client.put(
+        f"/xAPI/statements/?statementId={statement['id']}",
+        headers={"Authorization": f"Basic {auth_credentials}"},
+        json=statement,
+    )
+    assert response.status_code == 204
+
+    es.indices.refresh()
+
+    response = client.get(
+        "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
+    )
+
+    statement = response.json()["statements"][0]
+
+    # Test pre-processing: id
+    assert "id" in statement
+    assert statement
+
+    # Test pre-processing: timestamp
+    assert "timestamp" in statement
+    assert string_is_date(statement["timestamp"])
+
+    # Test pre-processing: stored
+    assert "stored" in statement
+    assert string_is_date(statement["stored"])
+
+    # Test pre-processing: authority
+    assert "authority" in statement
+    assert statement["authority"] == {"mbox": "mailto:test_ralph@example.com"}
+
+
+@pytest.mark.parametrize(
+    "field,value,status",
+    [
+        ("timestamp", "2022-06-22T08:31:38Z", 204),
+        ("stored", "2022-06-22T08:31:38Z", 204),
+        ("authority", {"mbox": "mailto:test_ralph@example.com"}, 204),
+    ],
+)
+# pylint: disable=too-many-arguments
+def test_api_statements_put_enriching_with_existing_values(
+    field, value, status, monkeypatch, auth_credentials, es
+):
+    """Test that statements are properly enriched when values are provided."""
+    # pylint: disable=invalid-name,unused-argument
+
+    monkeypatch.setattr(
+        "ralph.api.routers.statements.DATABASE_CLIENT", get_es_test_backend()
+    )
+    statement = {
+        "actor": {
+            "account": {
+                "homePage": "https://example.com/homepage/",
+                "name": str(uuid4()),
+            },
+            "objectType": "Agent",
+        },
+        "object": {"id": "https://example.com/object-id/1/"},
+        "verb": {"id": "https://example.com/verb-id/1/"},
+        "id": str(uuid4()),
+    }
+    # Add the field to be tested
+    statement[field] = value
+
+    response = client.put(
+        f"/xAPI/statements/?statementId={statement['id']}",
+        headers={"Authorization": f"Basic {auth_credentials}"},
+        json=statement,
+    )
+
+    assert response.status_code == status
+
+    # Check that values match when they should
+    if status == 204:
+        es.indices.refresh()
+        response = client.get(
+            "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
+        )
+        statement = response.json()["statements"][0]
+
+        # Test enriching
+        assert field in statement
+        if field == "stored":
+            # Check that stored value was overwritten
+            assert statement[field] != value
+        else:
+            assert statement[field] == value
 
 
 @pytest.mark.parametrize(
@@ -244,11 +361,11 @@ def test_api_statements_put_statement_duplicate_of_existing_statement(
 
     es.indices.refresh()
 
-    # Put the statement twice, trying to change the version field which is not allowed.
+    # Put the statement twice, trying to change the timestamp, which is not allowed
     response = client.put(
         f"/xAPI/statements/?statementId={statement['id']}",
         headers={"Authorization": f"Basic {auth_credentials}"},
-        json=dict(statement, **{"version": "1.0.0"}),
+        json=dict(statement, **{"timestamp": "2023-03-15T14:07:51Z"}),
     )
 
     assert response.status_code == 409
@@ -261,7 +378,9 @@ def test_api_statements_put_statement_duplicate_of_existing_statement(
         headers={"Authorization": f"Basic {auth_credentials}"},
     )
     assert response.status_code == 200
-    assert response.json() == {"statements": [statement]}
+    assert_statement_get_responses_are_equivalent(
+        response.json(), {"statements": [statement]}
+    )
 
 
 @pytest.mark.parametrize(
@@ -514,7 +633,9 @@ async def test_put_statement_with_statement_forwarding(
                 headers={"Authorization": f"Basic {auth_credentials}"},
             )
             assert response.status_code == 200
-            assert response.json() == {"statements": [statement]}
+            assert_statement_get_responses_are_equivalent(
+                response.json(), {"statements": [statement]}
+            )
 
     # The statement should also be stored on the receiving client
     async with AsyncClient() as receiving_client:
@@ -523,7 +644,9 @@ async def test_put_statement_with_statement_forwarding(
             headers={"Authorization": f"Basic {auth_credentials}"},
         )
         assert response.status_code == 200
-        assert response.json() == {"statements": [statement]}
+        assert_statement_get_responses_are_equivalent(
+            response.json(), {"statements": [statement]}
+        )
 
     # Stop receiving LRS client
     await lrs_context.__aexit__(None, None, None)
