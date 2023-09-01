@@ -4,13 +4,12 @@ import functools
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from datetime import datetime
 from enum import Enum, unique
-from typing import BinaryIO, List, Literal, Optional, TextIO, Union
-from uuid import UUID
+from typing import BinaryIO, List, Optional, TextIO, Union
 
 from pydantic import BaseModel
 
+from ralph.backends.http.async_lrs import LRSStatementsQuery
 from ralph.exceptions import BackendParameterException
 
 logger = logging.getLogger(__name__)
@@ -43,52 +42,33 @@ class DatabaseStatus(Enum):
     ERROR = "error"
 
 
-@dataclass
-class AgentParameters:
+class AgentParameters(BaseModel):
     """Dictionary of possible LRS query parameters for query on type Agent.
 
     NB: Agent refers to the data structure, NOT to the LRS query parameter.
     """
 
-    mbox: Optional[str] = None
-    mbox_sha1sum: Optional[str] = None
-    openid: Optional[str] = None
-    account__name: Optional[str] = None
-    account__home_page: Optional[str] = None
+    mbox: Optional[str]
+    mbox_sha1sum: Optional[str]
+    openid: Optional[str]
+    account__name: Optional[str]
+    account__home_page: Optional[str]
 
 
-@dataclass
-class StatementParameters:
+class RalphStatementsQuery(LRSStatementsQuery):
     """Represents a dictionary of possible LRS query parameters."""
 
     # pylint: disable=too-many-instance-attributes
 
-    statementId: Optional[str] = None  # pylint: disable=invalid-name
-    voidedStatementId: Optional[str] = None  # pylint: disable=invalid-name
-    agent: Optional[AgentParameters] = None
-    verb: Optional[str] = None
-    activity: Optional[str] = None
-    registration: Optional[UUID] = None
-    related_activities: Optional[bool] = False
-    related_agents: Optional[bool] = False
-    since: Optional[datetime] = None
-    until: Optional[datetime] = None
-    limit: Optional[int] = None
-    format: Optional[Literal["ids", "exact", "canonical"]] = "exact"
-    attachments: Optional[bool] = False
-    ascending: Optional[bool] = False
-    search_after: Optional[str] = None
-    pit_id: Optional[str] = None
-    authority: Optional[AgentParameters] = None
+    agent: Optional[AgentParameters] = AgentParameters.construct()
+    search_after: Optional[str]
+    pit_id: Optional[str]
+    authority: Optional[AgentParameters] = AgentParameters.construct()
 
     def __post_init__(self):
         """Perform additional conformity verifications on parameters."""
         # Initiate agent parameters for queries "agent" and "authority"
         for query_param in ["agent", "authority"]:
-            # Transform to object if None (cannot be done with defaults)
-            if self.__dict__[query_param] is None:
-                self.__dict__[query_param] = AgentParameters()
-
             # Check that both `homePage` and `name` are provided if any are
             if (self.__dict__[query_param].account__name is not None) != (
                 self.__dict__[query_param].account__home_page is not None
@@ -174,7 +154,7 @@ class BaseDatabase(ABC):
         """
 
     @abstractmethod
-    def query_statements(self, params: StatementParameters) -> StatementQueryResult:
+    def query_statements(self, params: RalphStatementsQuery) -> StatementQueryResult:
         """Returns the statements query payload using xAPI parameters."""
 
     @abstractmethod

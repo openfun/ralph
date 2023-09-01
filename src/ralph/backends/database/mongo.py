@@ -19,7 +19,7 @@ from .base import (
     BaseDatabase,
     BaseQuery,
     DatabaseStatus,
-    StatementParameters,
+    RalphStatementsQuery,
     StatementQueryResult,
     enforce_query_checks,
 )
@@ -222,7 +222,7 @@ class MongoDatabase(BaseDatabase):
                 }
             )
 
-    def query_statements(self, params: StatementParameters) -> StatementQueryResult:
+    def query_statements(self, params: RalphStatementsQuery) -> StatementQueryResult:
         """Return the results of a statements query using xAPI parameters."""
         # pylint: disable=too-many-branches
         mongo_query_filters = {}
