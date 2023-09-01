@@ -3,17 +3,22 @@
 import asyncio
 import json
 import logging
+from datetime import datetime
 from itertools import chain
-from typing import Iterable, Iterator, List, Optional, Union
+from typing import Iterable, Iterator, List, Literal, Optional, Union
 from urllib.parse import ParseResult, parse_qs, urljoin, urlparse
+from uuid import UUID
 
 from httpx import AsyncClient, HTTPError, HTTPStatusError, RequestError
 from more_itertools import chunked
-from pydantic import AnyHttpUrl, BaseModel, parse_obj_as
+from pydantic import AnyHttpUrl, BaseModel, NonNegativeInt, parse_obj_as
 from pydantic.types import PositiveInt
 
 from ralph.conf import LRSHeaders, settings
 from ralph.exceptions import BackendException, BackendParameterException
+from ralph.models.xapi.base.agents import BaseXapiAgent
+from ralph.models.xapi.base.common import IRI
+from ralph.models.xapi.base.groups import BaseXapiGroup
 from ralph.utils import gather_with_limited_concurrency
 
 from .base import (
@@ -35,17 +40,36 @@ class StatementResponse(BaseModel):
     more: Optional[str]
 
 
-class LRSQuery(BaseQuery):
-    """LRS body query model."""
+class LRSStatementsQuery(BaseQuery):
+    """Pydantic model for LRS query on Statements resource query parameters.
 
-    query: Optional[dict]
+    LRS Specification:
+    https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#213-get-statements
+    """
+
+    # pylint: disable=too-many-instance-attributes
+
+    statementId: Optional[str]  # pylint: disable=invalid-name
+    voidedStatementId: Optional[str]  # pylint: disable=invalid-name
+    agent: Optional[Union[BaseXapiAgent, BaseXapiGroup]]
+    verb: Optional[IRI]
+    activity: Optional[IRI]
+    registration: Optional[UUID]
+    related_activities: Optional[bool] = False
+    related_agents: Optional[bool] = False
+    since: Optional[datetime]
+    until: Optional[datetime]
+    limit: Optional[NonNegativeInt] = 0
+    format: Optional[Literal["ids", "exact", "canonical"]] = "exact"
+    attachments: Optional[bool] = False
+    ascending: Optional[bool] = False
 
 
 class AsyncLRSHTTP(BaseHTTP):
     """Asynchroneous LRS HTTP backend."""
 
     name = "async_lrs"
-    query = LRSQuery
+    query = LRSStatementsQuery
     default_operation_type = OperationType.CREATE
 
     def __init__(  # pylint: disable=too-many-arguments
@@ -104,7 +128,7 @@ class AsyncLRSHTTP(BaseHTTP):
     @enforce_query_checks
     async def read(  # pylint: disable=too-many-arguments
         self,
-        query: Union[str, LRSQuery] = None,
+        query: Union[str, LRSStatementsQuery] = None,
         target: str = None,
         chunk_size: Optional[PositiveInt] = 500,
         raw_output: bool = False,
@@ -119,7 +143,7 @@ class AsyncLRSHTTP(BaseHTTP):
         been limited.
 
         Args:
-            query (str, LRSQuery):  The query to select records to read.
+            query (str, LRSStatementsQuery):  The query to select records to read.
             target (str): Endpoint from which to read data (e.g. `/statements`).
                 If target is `None`, `/xAPI/statements` default endpoint is used.
             chunk_size (int or None): The number of records or bytes to read in one
@@ -141,12 +165,16 @@ class AsyncLRSHTTP(BaseHTTP):
         if not target:
             target = self.statements_endpoint
 
-        query_params = {}
-        if query.query:
-            query_params.update(query.query)
+        if query and query.limit:
+            logger.warning(
+                "The limit query parameter value is overwritten by the chunk_size "
+                "parameter value."
+            )
 
-        # Set chunk_size to limit parameter if not exist in the query
-        query_params.setdefault("limit", chunk_size)
+        if query is None:
+            query = LRSStatementsQuery()
+
+        query.limit = chunk_size
 
         # Create request URL
         target = ParseResult(
@@ -161,11 +189,13 @@ class AsyncLRSHTTP(BaseHTTP):
         # Select the appropriate fetch function
         if greedy:
             statements_async_generator = self._greedy_fetch_statements(
-                target, raw_output, query_params
+                target, raw_output, query.dict(exclude_none=True, exclude_unset=True)
             )
         else:
             statements_async_generator = self._fetch_statements(
-                target=target, raw_output=raw_output, query_params=query_params
+                target=target,
+                raw_output=raw_output,
+                query_params=query.dict(exclude_none=True, exclude_unset=True),
             )
 
         # Iterate through results
@@ -301,7 +331,7 @@ class AsyncLRSHTTP(BaseHTTP):
 
                 query_params.update(parse_qs(urlparse(statements_response.more).query))
 
-    async def _greedy_fetch_statements(self, target, raw_output, query_params):
+    async def _greedy_fetch_statements(self, target, raw_output, query_params: dict):
         """Fetch as many statements as possible and yield when they are available.
 
         This may be used in the context of paginated results, to allow processing

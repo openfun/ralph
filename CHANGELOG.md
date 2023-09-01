@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Added
 
+- Implement Pydantic model for LRS Statements resource query parameters
 - Implement xAPI LMS Profile statements validation
 - `EdX` to `xAPI` converters for enrollment events
 

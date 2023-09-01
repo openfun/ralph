@@ -16,7 +16,7 @@ from httpx import HTTPStatusError, RequestError
 from pydantic import AnyHttpUrl
 from pytest_httpx import HTTPXMock
 
-from ralph.backends.http.async_lrs import LRSQuery, OperationType
+from ralph.backends.http.async_lrs import LRSStatementsQuery, OperationType
 from ralph.backends.http.base import HTTPBackendStatus
 from ralph.backends.http.lrs import AsyncLRSHTTP
 from ralph.conf import LRSHeaders, settings
@@ -56,7 +56,7 @@ def _gen_statement(id_=None, verb=None, timestamp=None):
 def test_backends_http_lrs_http_instantiation():
     """Test the LRS backend instantiation."""
     assert AsyncLRSHTTP.name == "async_lrs"
-    assert AsyncLRSHTTP.query == LRSQuery
+    assert AsyncLRSHTTP.query == LRSStatementsQuery
 
     headers = LRSHeaders(
         X_EXPERIENCE_API_VERSION="1.0.3", CONTENT_TYPE="application/json"
@@ -217,13 +217,15 @@ async def test_backends_http_lrs_read_max_statements(
     }
 
     # Mock GET response of HTTPX for target and "more" target without query parameter
-    params = {"limit": 500}
+    default_params = LRSStatementsQuery(limit=chunk_size).dict(
+        exclude_none=True, exclude_unset=True
+    )
     httpx_mock.add_response(
         url=ParseResult(
             scheme=urlparse(base_url).scheme,
             netloc=urlparse(base_url).netloc,
             path=target,
-            query=urlencode(params),
+            query=urlencode(default_params).lower(),
             params="",
             fragment="",
         ).geturl(),
@@ -232,13 +234,13 @@ async def test_backends_http_lrs_read_max_statements(
     )
 
     if (max_statements is None) or (max_statements > chunk_size):
-        params.update(dict(parse_qsl(urlparse(more_target).query)))
+        default_params.update(dict(parse_qsl(urlparse(more_target).query)))
         httpx_mock.add_response(
             url=ParseResult(
                 scheme=urlparse(base_url).scheme,
                 netloc=urlparse(base_url).netloc,
                 path=urlparse(more_target).path,
-                query=urlencode(params),
+                query=urlencode(default_params).lower(),
                 params="",
                 fragment="",
             ).geturl(),
@@ -250,7 +252,9 @@ async def test_backends_http_lrs_read_max_statements(
 
     # Return an iterable of dict
     result = await _unpack_async_generator(
-        backend.read(target=target, max_statements=max_statements)
+        backend.read(
+            target=target, max_statements=max_statements, chunk_size=chunk_size
+        )
     )
     all_statements = statements["statements"] + more_statements["statements"]
     assert len(all_statements) == 6
@@ -278,12 +282,15 @@ async def test_backends_http_lrs_read_without_target(
     statements = {"statements": [_gen_statement() for _ in range(3)]}
 
     # Mock HTTPX GET
+    default_params = LRSStatementsQuery(limit=500).dict(
+        exclude_none=True, exclude_unset=True
+    )
     httpx_mock.add_response(
         url=ParseResult(
             scheme=urlparse(base_url).scheme,
             netloc=urlparse(base_url).netloc,
             path=backend.statements_endpoint,
-            query=urlencode({"limit": 500}),
+            query=urlencode(default_params).lower(),
             params="",
             fragment="",
         ).geturl(),
@@ -311,12 +318,15 @@ async def test_backends_http_lrs_read_backend_error(
     backend = AsyncLRSHTTP(base_url=base_url, username="user", password="pass")
 
     # Mock GET response of HTTPX
+    default_params = LRSStatementsQuery(limit=500).dict(
+        exclude_none=True, exclude_unset=True
+    )
     httpx_mock.add_response(
         url=ParseResult(
             scheme=urlparse(base_url).scheme,
             netloc=urlparse(base_url).netloc,
             path=target,
-            query=urlencode({"limit": 500}),
+            query=urlencode(default_params).lower(),
             params="",
             fragment="",
         ).geturl(),
@@ -357,13 +367,15 @@ async def test_backends_http_lrs_read_without_pagination(
     }
 
     # Mock GET response of HTTPX without query parameter
-    params = {"limit": 500}
+    default_params = LRSStatementsQuery(limit=500).dict(
+        exclude_none=True, exclude_unset=True
+    )
     httpx_mock.add_response(
         url=ParseResult(
             scheme=urlparse(base_url).scheme,
             netloc=urlparse(base_url).netloc,
             path=target,
-            query=urlencode(params),
+            query=urlencode(default_params).lower(),
             params="",
             fragment="",
         ).geturl(),
@@ -389,21 +401,21 @@ async def test_backends_http_lrs_read_without_pagination(
     assert len(result) == 3
 
     # Mock GET response of HTTPX with query parameter
-    query = LRSQuery(query={"verb": "https://w3id.org/xapi/video/verbs/played"})
+    query = LRSStatementsQuery(verb="https://w3id.org/xapi/video/verbs/played")
 
     statements_with_query_played_verb = {
         "statements": [
             raw for raw in statements["statements"] if "played" in raw["verb"]["id"]
         ]
     }
-
-    params.update(query.query)
+    query_params = query.dict(exclude_none=True, exclude_unset=True)
+    query_params.update({"limit": 500})
     httpx_mock.add_response(
         url=ParseResult(
             scheme=urlparse(base_url).scheme,
             netloc=urlparse(base_url).netloc,
             path=target,
-            query=urlencode(params),
+            query=urlencode(query_params).lower(),
             params="",
             fragment="",
         ).geturl(),
@@ -458,26 +470,28 @@ async def test_backends_http_lrs_read_with_pagination(httpx_mock: HTTPXMock):
     }
 
     # Mock GET response of HTTPX for target and "more" target without query parameter
-    params = {"limit": 500}
+    default_params = LRSStatementsQuery(limit=500).dict(
+        exclude_none=True, exclude_unset=True
+    )
     httpx_mock.add_response(
         url=ParseResult(
             scheme=urlparse(base_url).scheme,
             netloc=urlparse(base_url).netloc,
             path=target,
-            query=urlencode(params),
+            query=urlencode(default_params).lower(),
             params="",
             fragment="",
         ).geturl(),
         method="GET",
         json=statements,
     )
-    params.update(dict(parse_qsl(urlparse(more_target).query)))
+    default_params.update(dict(parse_qsl(urlparse(more_target).query)))
     httpx_mock.add_response(
         url=ParseResult(
             scheme=urlparse(base_url).scheme,
             netloc=urlparse(base_url).netloc,
             path=urlparse(more_target).path,
-            query=urlencode(params),
+            query=urlencode(default_params).lower(),
             params="",
             fragment="",
         ).geturl(),
@@ -501,7 +515,7 @@ async def test_backends_http_lrs_read_with_pagination(httpx_mock: HTTPXMock):
     assert len(result) == 6
 
     # Mock GET response of HTTPX with query parameter
-    query_params = LRSQuery(query={"verb": "https://w3id.org/xapi/video/verbs/played"})
+    query = LRSStatementsQuery(verb="https://w3id.org/xapi/video/verbs/played")
 
     statements_with_query_played_verb = {
         "statements": [
@@ -516,29 +530,27 @@ async def test_backends_http_lrs_read_with_pagination(httpx_mock: HTTPXMock):
             if "played" in raw["verb"]["id"]
         ]
     }
-    params = {"limit": 500}
-    params.update(query_params.query)
-
+    query_params = query.dict(exclude_none=True, exclude_unset=True)
+    query_params.update({"limit": 500})
     httpx_mock.add_response(
         url=ParseResult(
             scheme=urlparse(base_url).scheme,
             netloc=urlparse(base_url).netloc,
             path=target,
-            query=urlencode(params),
+            query=urlencode(query_params).lower(),
             params="",
             fragment="",
         ).geturl(),
         method="GET",
         json=statements_with_query_played_verb,
     )
-    params.update(dict(parse_qsl(urlparse(more_target).query)))
-
+    query_params.update(dict(parse_qsl(urlparse(more_target).query)))
     httpx_mock.add_response(
         url=ParseResult(
             scheme=urlparse(base_url).scheme,
             netloc=urlparse(base_url).netloc,
             path=urlparse(more_target).path,
-            query=urlencode(params),
+            query=urlencode(query_params).lower(),
             params="",
             fragment="",
         ).geturl(),
@@ -549,7 +561,7 @@ async def test_backends_http_lrs_read_with_pagination(httpx_mock: HTTPXMock):
     # Return an iterable of dict
 
     result = await _unpack_async_generator(
-        backend.read(query=query_params, target=target, raw_output=False)
+        backend.read(query=query, target=target, raw_output=False)
     )
     assert (
         result
@@ -560,7 +572,7 @@ async def test_backends_http_lrs_read_with_pagination(httpx_mock: HTTPXMock):
 
     # Return an iterable of bytes
     result = await _unpack_async_generator(
-        backend.read(query=query_params, target=target, raw_output=True)
+        backend.read(query=query, target=target, raw_output=True)
     )
 
     assert result == [
