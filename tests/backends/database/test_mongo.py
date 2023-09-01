@@ -8,7 +8,7 @@ from bson.objectid import ObjectId
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 
-from ralph.backends.database.base import DatabaseStatus, StatementParameters
+from ralph.backends.database.base import DatabaseStatus, RalphStatementsQuery
 from ralph.backends.database.mongo import MongoDatabase, MongoQuery
 from ralph.exceptions import (
     BackendException,
@@ -411,7 +411,7 @@ def test_backends_database_mongo_query_statements_with_search_query_failure(
 
     msg = "'Failed to execute MongoDB query', 'Something is wrong'"
     with pytest.raises(BackendException, match=msg):
-        backend.query_statements(StatementParameters())
+        backend.query_statements(RalphStatementsQuery.construct())
 
     logger_name = "ralph.backends.database.mongo"
     msg = "Failed to execute MongoDB query. Something is wrong"
@@ -440,7 +440,7 @@ def test_backends_database_mongo_query_statements_by_ids_with_search_query_failu
 
     msg = "'Failed to execute MongoDB query', 'Something is wrong'"
     with pytest.raises(BackendException, match=msg):
-        backend.query_statements_by_ids(StatementParameters())
+        backend.query_statements_by_ids(RalphStatementsQuery())
 
     logger_name = "ralph.backends.database.mongo"
     msg = "Failed to execute MongoDB query. Something is wrong"

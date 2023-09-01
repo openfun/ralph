@@ -1,9 +1,9 @@
 """ClickHouse database backend for Ralph."""
+
 import datetime
 import json
 import logging
 import uuid
-from dataclasses import asdict
 from typing import Generator, List, Optional, TextIO, Union
 
 import clickhouse_connect
@@ -17,7 +17,7 @@ from .base import (
     BaseDatabase,
     BaseQuery,
     DatabaseStatus,
-    StatementParameters,
+    RalphStatementsQuery,
     StatementQueryResult,
     enforce_query_checks,
 )
@@ -324,12 +324,12 @@ class ClickHouseDatabase(BaseDatabase):  # pylint: disable=too-many-instance-att
                 f"event.{target_field}.account.homePage = {{{target_field}__account__home_page:String}}"  # noqa: E501 # pylint: disable=line-too-long
             )
 
-    def query_statements(self, params: StatementParameters) -> StatementQueryResult:
+    def query_statements(self, params: RalphStatementsQuery) -> StatementQueryResult:
         """Returns the results of a statements query using xAPI parameters."""
         # pylint: disable=too-many-branches
         # pylint: disable=invalid-name
 
-        clickhouse_params = asdict(params)
+        clickhouse_params = params.dict(exclude_none=True)
         where_clauses = []
 
         if params.statementId:
@@ -338,7 +338,7 @@ class ClickHouseDatabase(BaseDatabase):  # pylint: disable=too-many-instance-att
         self._add_agent_filters(
             clickhouse_params,
             where_clauses,
-            params.__dict__["agent"],
+            params.agent,
             target_field="actor",
         )
         clickhouse_params.pop("agent")
@@ -346,7 +346,7 @@ class ClickHouseDatabase(BaseDatabase):  # pylint: disable=too-many-instance-att
         self._add_agent_filters(
             clickhouse_params,
             where_clauses,
-            params.__dict__["authority"],
+            params.authority,
             target_field="authority",
         )
         clickhouse_params.pop("authority")

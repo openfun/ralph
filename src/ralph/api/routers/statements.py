@@ -29,7 +29,7 @@ from ralph.api.models import ErrorDetail, LaxStatement
 from ralph.backends.database.base import (
     AgentParameters,
     BaseDatabase,
-    StatementParameters,
+    RalphStatementsQuery,
 )
 from ralph.conf import settings
 from ralph.exceptions import BackendException, BadFormatException
@@ -109,7 +109,7 @@ def _parse_agent_parameters(agent_obj: dict):
         agent_query_params["account__home_page"] = agent.account.homePage
 
     # Overwrite `agent` field
-    return AgentParameters(**agent_query_params)
+    return AgentParameters.construct(**agent_query_params)
 
 
 def strict_query_params(request: Request):
@@ -335,7 +335,7 @@ async def get(
     # Query Database
     try:
         query_result = DATABASE_CLIENT.query_statements(
-            StatementParameters(**{**query_params, "limit": limit})
+            RalphStatementsQuery.construct(**{**query_params, "limit": limit})
         )
     except BackendException as error:
         raise HTTPException(

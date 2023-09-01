@@ -9,7 +9,7 @@ import pytz
 from clickhouse_connect.driver.exceptions import ClickHouseError
 from clickhouse_connect.driver.httpclient import HttpClient
 
-from ralph.backends.database.base import DatabaseStatus, StatementParameters
+from ralph.backends.database.base import DatabaseStatus, RalphStatementsQuery
 from ralph.backends.database.clickhouse import ClickHouseDatabase, ClickHouseQuery
 from ralph.exceptions import (
     BackendException,
@@ -92,7 +92,7 @@ def test_backends_db_clickhouse_get_method_on_timestamp_boundary(clickhouse):
     backend.bulk_import(documents)
 
     # First get all 3 rows with default settings
-    results = backend.query_statements(StatementParameters())
+    results = backend.query_statements(RalphStatementsQuery.construct())
     result_statements = results.statements
     assert len(result_statements) == 3
     assert result_statements[0] == statements[0]
@@ -100,15 +100,17 @@ def test_backends_db_clickhouse_get_method_on_timestamp_boundary(clickhouse):
     assert result_statements[2] == statements[2]
 
     # Next get them one at a time, starting with the first
-    params = StatementParameters(limit=1)
+    params = RalphStatementsQuery.construct(limit=1)
     results = backend.query_statements(params)
     result_statements = results.statements
     assert len(result_statements) == 1
     assert result_statements[0] == statements[0]
 
     # Next get the second row with an appropriate search after
-    params = StatementParameters(
-        limit=1, search_after=results.search_after, pit_id=results.pit_id
+    params = RalphStatementsQuery.construct(
+        limit=1,
+        search_after=results.search_after,
+        pit_id=results.pit_id,
     )
     results = backend.query_statements(params)
     result_statements = results.statements
@@ -116,8 +118,10 @@ def test_backends_db_clickhouse_get_method_on_timestamp_boundary(clickhouse):
     assert result_statements[0] == statements[1]
 
     # And finally the third
-    params = StatementParameters(
-        limit=1, search_after=results.search_after, pit_id=results.pit_id
+    params = RalphStatementsQuery.construct(
+        limit=1,
+        search_after=results.search_after,
+        pit_id=results.pit_id,
     )
     results = backend.query_statements(params)
     result_statements = results.statements
@@ -481,7 +485,7 @@ def test_backends_db_clickhouse_query_statements_with_search_query_failure(
 
     msg = "'Failed to execute ClickHouse query', 'Something is wrong'"
     with pytest.raises(BackendException, match=msg):
-        backend.query_statements(StatementParameters())
+        backend.query_statements(RalphStatementsQuery.construct())
 
     logger_name = "ralph.backends.database.clickhouse"
     msg = "Failed to execute ClickHouse query. Something is wrong"

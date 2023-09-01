@@ -17,7 +17,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch.client import CatClient
 from elasticsearch.helpers import bulk
 
-from ralph.backends.database.base import DatabaseStatus, StatementParameters
+from ralph.backends.database.base import DatabaseStatus, RalphStatementsQuery
 from ralph.backends.database.es import ESDatabase, ESQuery
 from ralph.conf import ESClientOptions, settings
 from ralph.exceptions import BackendException, BackendParameterException
@@ -414,7 +414,7 @@ def test_backends_database_es_query_statements_with_pit_query_failure(
 
     msg = "'Failed to open ElasticSearch point in time', 'ES failure'"
     with pytest.raises(BackendException, match=msg):
-        database.query_statements(StatementParameters())
+        database.query_statements(RalphStatementsQuery.construct())
 
     logger_name = "ralph.backends.database.es"
     msg = "Failed to open ElasticSearch point in time. ES failure"
@@ -440,7 +440,7 @@ def test_backends_database_es_query_statements_with_search_query_failure(
 
     msg = "'Failed to execute ElasticSearch query', 'Something is wrong'"
     with pytest.raises(BackendException, match=msg):
-        database.query_statements(StatementParameters())
+        database.query_statements(RalphStatementsQuery.construct())
 
     logger_name = "ralph.backends.database.es"
     msg = "Failed to execute ElasticSearch query. ApiError(None, 'Something is wrong')"
@@ -466,7 +466,7 @@ def test_backends_database_es_query_statements_by_ids_with_search_query_failure(
 
     msg = "'Failed to execute ElasticSearch query', 'Something is wrong'"
     with pytest.raises(BackendException, match=msg):
-        database.query_statements_by_ids(StatementParameters())
+        database.query_statements_by_ids(RalphStatementsQuery())
 
     logger_name = "ralph.backends.database.es"
     msg = "Failed to execute ElasticSearch query. ApiError(None, 'Something is wrong')"

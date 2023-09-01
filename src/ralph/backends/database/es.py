@@ -19,7 +19,7 @@ from .base import (
     BaseDatabase,
     BaseQuery,
     DatabaseStatus,
-    StatementParameters,
+    RalphStatementsQuery,
     StatementQueryResult,
     enforce_query_checks,
 )
@@ -193,7 +193,7 @@ class ESDatabase(BaseDatabase):
                 }
             ]
 
-    def query_statements(self, params: StatementParameters) -> StatementQueryResult:
+    def query_statements(self, params: RalphStatementsQuery) -> StatementQueryResult:
         """Returns the results of a statements query using xAPI parameters."""
         es_query_filters = []
 

@@ -16,6 +16,7 @@ and this project adheres to
 
 ### Changed
 
+- Refactor LRS Statements resource query parameters defined for `ralph` API
 - Helm chart: improve chart modularity
 - User credentials must now include an "agent" field which can be created
 using the cli
