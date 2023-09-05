@@ -15,7 +15,7 @@ from tests.fixtures.hypothesis_strategies import custom_given
 
 @custom_given(UIPageClose, provisional.urls())
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
-def test_navigational_ui_page_close_to_page_terminated(
+def test_models_edx_converters_xapi_navigational_ui_page_close_to_page_terminated(
     uuid_namespace, event, platform_url
 ):
     """Test that converting with UIPageCloseToPageTerminated returns the expected xAPI
