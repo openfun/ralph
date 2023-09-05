@@ -21,8 +21,6 @@ def test_models_edx_converters_xapi_navigational_ui_page_close_to_page_terminate
     """Test that converting with UIPageCloseToPageTerminated returns the expected xAPI
     statement.
     """
-    event.context.course_id = ""
-    event.context.org_id = ""
     event.context.user_id = "1"
     event_str = event.json()
     event = json.loads(event_str)

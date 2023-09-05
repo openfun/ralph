@@ -33,9 +33,6 @@ def test_models_edx_converters_xapi_video_ui_load_video_to_video_initialized(
     """Tests that converting with `UILoadVideoToVideoInitialized` returns the
     expected xAPI statement.
     """
-
-    event.context.course_id = ""
-    event.context.org_id = ""
     event.context.user_id = "1"
     event.session = "af45a0e650c4a4fdb0bcde75a1e4b694"
     session_uuid = "af45a0e6-50c4-a4fd-b0bc-de75a1e4b694"
@@ -91,9 +88,6 @@ def test_models_edx_converters_xapi_video_ui_play_video_to_video_played(
     """Tests that converting with `UIPlayVideoToVideoPlayed` returns the expected
     xAPI statement.
     """
-
-    event.context.course_id = ""
-    event.context.org_id = ""
     event.context.user_id = "1"
     event.session = "af45a0e650c4a4fdb0bcde75a1e4b694"
     session_uuid = "af45a0e6-50c4-a4fd-b0bc-de75a1e4b694"
@@ -153,9 +147,6 @@ def test_models_edx_converters_xapi_video_ui_pause_video_to_video_paused(
     """Tests that converting with `UIPauseVideoToVideoPaused` returns the expected xAPI
     statement.
     """
-
-    event.context.course_id = ""
-    event.context.org_id = ""
     event.context.user_id = "1"
     event.session = "af45a0e650c4a4fdb0bcde75a1e4b694"
     session_uuid = "af45a0e6-50c4-a4fd-b0bc-de75a1e4b694"
@@ -216,9 +207,6 @@ def test_models_edx_converters_xapi_video_ui_stop_video_to_video_terminated(
     """Tests that converting with `UIStopVideoToVideoTerminated` returns the expected
     xAPI statement.
     """
-
-    event.context.course_id = ""
-    event.context.org_id = ""
     event.context.user_id = "1"
     event.session = "af45a0e650c4a4fdb0bcde75a1e4b694"
     session_uuid = "af45a0e6-50c4-a4fd-b0bc-de75a1e4b694"
@@ -280,9 +268,6 @@ def test_models_edx_converters_xapi_video_ui_seek_video_to_video_seeked(
     """Tests that converting with `UISeekVideoToVideoSeeked` returns the expected
     xAPI statement.
     """
-
-    event.context.course_id = ""
-    event.context.org_id = ""
     event.context.user_id = "1"
     event.session = "af45a0e650c4a4fdb0bcde75a1e4b694"
     session_uuid = "af45a0e6-50c4-a4fd-b0bc-de75a1e4b694"

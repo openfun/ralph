@@ -38,19 +38,3 @@ def test_models_edx_converters_xapi_base_xapi_converter_unsuccessful_initializat
 
     with pytest.raises(ConfigurationException, match="Invalid UUID namespace"):
         DummyBaseXapiConverter(None, "https://fun-mooc.fr")
-
-
-@pytest.mark.parametrize(
-    "course_id,expected",
-    [
-        ("", {"course": None, "module": None}),
-        ("course-v1:+course+not_empty", {"course": None, "module": None}),
-        ("course-v1:org", {"course": None, "module": None}),
-        ("course-v1:org+course", {"course": None, "module": None}),
-        ("course-v1:org+course+", {"course": None, "module": None}),
-        ("course-v1:org+course+module", {"course": "course", "module": "module"}),
-    ],
-)
-def test_base_xapi_converter_parse_course_id(course_id, expected):
-    """Test that the parse_course_id method returns the expected value."""
-    assert BaseXapiConverter.parse_course_id(course_id) == expected

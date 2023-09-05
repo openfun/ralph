@@ -1,17 +1,9 @@
 """Base xAPI Converter."""
 
-import re
 from uuid import UUID, uuid5
 
 from ralph.exceptions import ConfigurationException
 from ralph.models.converter import BaseConversionSet, ConversionItem
-from ralph.models.xapi.concepts.constants.acrossx_profile import (
-    CONTEXT_EXTENSION_SCHOOL_ID,
-)
-from ralph.models.xapi.concepts.constants.scorm_profile import (
-    CONTEXT_EXTENSION_COURSE_ID,
-    CONTEXT_EXTENSION_MODULE_ID,
-)
 
 
 class BaseXapiConverter(BaseConversionSet):
@@ -52,30 +44,5 @@ class BaseXapiConverter(BaseConversionSet):
                 "context__user_id",
                 lambda user_id: str(user_id) if user_id else "anonymous",
             ),
-            ConversionItem(
-                "object__definition__extensions__" + CONTEXT_EXTENSION_SCHOOL_ID,
-                "context__org_id",
-            ),
-            ConversionItem(
-                "object__definition__extensions__" + CONTEXT_EXTENSION_COURSE_ID,
-                "context__course_id",
-                (self.parse_course_id, lambda x: x["course"]),
-            ),
-            ConversionItem(
-                "object__definition__extensions__" + CONTEXT_EXTENSION_MODULE_ID,
-                "context__course_id",
-                (self.parse_course_id, lambda x: x["module"]),
-            ),
             ConversionItem("timestamp", "time"),
         }
-
-    @staticmethod
-    def parse_course_id(course_id: str):
-        """Parse edX event's `context`.`course_id`.
-
-        Return a dictionary with `course` and `module`.
-        """
-        match = re.match(r"^course-v1:.+\+(.+)\+(.+)$", course_id)
-        if not match:
-            return {"course": None, "module": None}
-        return {"course": match.group(1), "module": match.group(2)}
