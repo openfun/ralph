@@ -29,7 +29,6 @@ def test_models_edx_converters_xapi_enrollment_edx_course_enrollment_activated_t
     """
 
     event.event.course_id = "edX/DemoX/Demo_Course"
-    event.context.org_id = ""
     event.context.user_id = "1"
     event_str = event.json()
     event = json.loads(event_str)
@@ -78,7 +77,6 @@ def test_models_edx_converters_xapi_enrollment_edx_course_enrollment_deactivated
     """
 
     event.event.course_id = "edX/DemoX/Demo_Course"
-    event.context.org_id = ""
     event.context.user_id = "1"
     event_str = event.json()
     event = json.loads(event_str)

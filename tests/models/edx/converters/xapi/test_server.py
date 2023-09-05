@@ -42,8 +42,6 @@ def test_models_edx_converters_xapi_server_server_event_to_page_viewed(
     statement.
     """
     event.event_type = "/main/blog"
-    event.context.course_id = ""
-    event.context.org_id = ""
     event.context.user_id = "1"
     event_str = event.json()
     event = json.loads(event_str)

@@ -48,6 +48,7 @@ have an authority field matching that of the user
 
 ### Removed
 
+- `school`, `course`, `module` context extensions in Edx to xAPI base converter
 - `name` field in `VideoActivity` xAPI model mistakenly used in `video` profile
 
 ## [3.9.0] - 2023-07-21
