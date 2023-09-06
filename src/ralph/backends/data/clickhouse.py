@@ -5,22 +5,12 @@ import logging
 from datetime import datetime
 from io import IOBase
 from itertools import chain
-from typing import (
-    Any,
-    Dict,
-    Generator,
-    Iterable,
-    Iterator,
-    List,
-    Literal,
-    NamedTuple,
-    Union,
-)
+from typing import Any, Dict, Generator, Iterable, Iterator, List, NamedTuple, Union
 from uuid import UUID, uuid4
 
 import clickhouse_connect
 from clickhouse_connect.driver.exceptions import ClickHouseError
-from pydantic import BaseModel, Json, ValidationError
+from pydantic import BaseModel, Json, ValidationError, conint
 
 from ralph.backends.data.base import (
     BaseDataBackend,
@@ -47,7 +37,7 @@ class ClickHouseClientOptions(ClientOptions):
     """Pydantic model for `clickhouse` client options."""
 
     date_time_input_format: str = "best_effort"
-    allow_experimental_object_type: Literal[0, 1] = 1
+    allow_experimental_object_type: conint(ge=0, le=1) = 1
 
 
 class InsertTuple(NamedTuple):
