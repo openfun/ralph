@@ -20,7 +20,11 @@ from ralph.backends.data.mongo import (
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import parse_bytes_to_dict
 
-from ..data.base import BaseAsyncDataBackend, DataBackendStatus, enforce_query_checks
+from ..data.base import (
+    BaseAsyncDataBackend,
+    DataBackendStatus,
+    async_enforce_query_checks,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -110,7 +114,7 @@ class AsyncMongoDataBackend(BaseAsyncDataBackend):
             logger.error(msg, error)
             raise BackendException(msg % error) from error
 
-    @enforce_query_checks
+    @async_enforce_query_checks
     async def read(
         self,
         *,
