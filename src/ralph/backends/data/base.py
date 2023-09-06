@@ -236,6 +236,20 @@ class BaseDataBackend(ABC):
         """
 
 
+def async_enforce_query_checks(method):
+    """Enforce query argument type checking for methods using it."""
+
+    @functools.wraps(method)
+    async def wrapper(*args, **kwargs):
+        """Wrap method execution."""
+        query = kwargs.pop("query", None)
+        self_ = args[0]
+        async for result in method(*args, query=self_.validate_query(query), **kwargs):
+            yield result
+
+    return wrapper
+
+
 class BaseAsyncDataBackend(ABC):
     """Base async data backend interface."""
 
@@ -313,7 +327,7 @@ class BaseAsyncDataBackend(ABC):
         """
 
     @abstractmethod
-    @enforce_query_checks
+    @async_enforce_query_checks
     async def read(
         self,
         *,
