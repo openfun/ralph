@@ -235,3 +235,34 @@ def read_raw(
                 continue
             logger_class.error(msg, error)
             raise BackendException(msg % error) from error
+
+
+def iter_over_async(agenerator) -> Iterable:
+    """Iterate synchronously over an asynchronous generator."""
+    loop = asyncio.get_event_loop()
+    aiterator = aiter(agenerator)
+
+    async def get_next():
+        """Get the next element from the async iterator."""
+        try:
+            obj = await anext(aiterator)
+            return False, obj
+        except StopAsyncIteration:
+            return True, None
+
+    while True:
+        done, obj = loop.run_until_complete(get_next())
+        if done:
+            break
+        yield obj
+
+
+def execute_async(method):
+    """Run asynchronous method in a synchronous context."""
+
+    def wrapper(*args, **kwargs):
+        """Wrap method execution."""
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(method(*args, **kwargs))
+
+    return wrapper
