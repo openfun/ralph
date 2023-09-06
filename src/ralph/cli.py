@@ -4,7 +4,7 @@ import json
 import logging
 import re
 import sys
-from inspect import isclass, isasyncgen
+from inspect import isasyncgen, isclass, iscoroutinefunction
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import List
@@ -38,11 +38,12 @@ from ralph.models.converter import Converter
 from ralph.models.selector import ModelSelector
 from ralph.models.validator import Validator
 from ralph.utils import (
+    execute_async,
     get_backend_instance,
     get_backend_type,
     get_root_logger,
     import_string,
-    iter_over_async
+    iter_over_async,
 )
 
 # cli module logger
@@ -625,15 +626,18 @@ def read(
     backend = get_backend_instance(backend_type, backend, options)
 
     if backend_type == backends_settings.BACKENDS.DATA:
-        for statement in backend.read(
+        statements = backend.read(
             query=query,
             target=target,
             chunk_size=chunk_size,
             raw_output=True,
             ignore_errors=ignore_errors,
-        ):
+        )
+        statements = (
+            iter_over_async(statements) if isasyncgen(statements) else statements
+        )
+        for statement in statements:
             click.echo(statement)
-
     elif backend_type == backends_settings.BACKENDS.STREAM:
         backend.stream(sys.stdout.buffer)
     elif backend_type == backends_settings.BACKENDS.HTTP:
@@ -729,7 +733,12 @@ def write(
     backend = get_backend_instance(backend_type, backend, options)
 
     if backend_type == backends_settings.BACKENDS.DATA:
-        backend.write(
+        writer = (
+            execute_async(backend.write)
+            if iscoroutinefunction(backend.write)
+            else backend.write
+        )
+        writer(
             data=sys.stdin.buffer,
             target=target,
             chunk_size=chunk_size,

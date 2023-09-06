@@ -12,7 +12,7 @@ from ralph.backends.data.base import (
     BaseAsyncDataBackend,
     BaseOperationType,
     DataBackendStatus,
-    enforce_query_checks,
+    async_enforce_query_checks,
 )
 from ralph.backends.data.es import ESDataBackend, ESDataBackendSettings, ESQuery
 from ralph.exceptions import BackendException, BackendParameterException
@@ -109,7 +109,7 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
         for index in indices:
             yield index
 
-    @enforce_query_checks
+    @async_enforce_query_checks
     async def read(
         self,
         *,
