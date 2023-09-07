@@ -69,6 +69,7 @@ class StatementParameters(BaseModel):
 class BaseLRSBackend(BaseDataBackend):
     """Base LRS backend interface."""
 
+    type = "lrs"
     settings_class = BaseLRSBackendSettings
 
     @abstractmethod
@@ -83,6 +84,7 @@ class BaseLRSBackend(BaseDataBackend):
 class BaseAsyncLRSBackend(BaseAsyncDataBackend):
     """Base async LRS backend interface."""
 
+    type = "lrs"
     settings_class = BaseLRSBackendSettings
 
     @abstractmethod

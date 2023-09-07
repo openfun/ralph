@@ -312,7 +312,7 @@ def test_backends_lrs_clickhouse_lrs_backend_query_statements_by_ids(
 
     # Check the expected search query results.
     result = list(backend.query_statements_by_ids([test_id]))
-    assert result[0]["event"] == statements[0]
+    assert result[0] == statements[0]
     backend.close()
 
 
