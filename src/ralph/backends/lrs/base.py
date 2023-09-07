@@ -2,9 +2,7 @@
 
 from abc import abstractmethod
 from dataclasses import dataclass
-from datetime import datetime
-from typing import Iterator, List, Literal, Optional
-from uuid import UUID
+from typing import Iterator, List, Optional
 
 from pydantic import BaseModel
 
@@ -13,6 +11,7 @@ from ralph.backends.data.base import (
     BaseDataBackend,
     BaseDataBackendSettings,
 )
+from ralph.backends.http.async_lrs import LRSStatementsQuery
 
 
 class BaseLRSBackendSettings(BaseDataBackendSettings):
@@ -41,38 +40,24 @@ class AgentParameters(BaseModel):
     account__home_page: Optional[str]
 
 
-class StatementParameters(BaseModel):
-    """LRS statements query parameters."""
+class RalphStatementsQuery(LRSStatementsQuery):
+    """Represents a dictionary of possible LRS query parameters."""
 
-    # pylint: disable=too-many-instance-attributes
-
-    statementId: Optional[str]  # pylint: disable=invalid-name
-    voidedStatementId: Optional[str]  # pylint: disable=invalid-name
-    agent: Optional[AgentParameters]
-    verb: Optional[str]
-    activity: Optional[str]
-    registration: Optional[UUID]
-    related_activities: Optional[bool]
-    related_agents: Optional[bool]
-    since: Optional[datetime]
-    until: Optional[datetime]
-    limit: Optional[int]
-    format: Optional[Literal["ids", "exact", "canonical"]] = "exact"
-    attachments: Optional[bool]
-    ascending: Optional[bool]
+    agent: Optional[AgentParameters] = AgentParameters.construct()
     search_after: Optional[str]
     pit_id: Optional[str]
-    authority: Optional[AgentParameters]
+    authority: Optional[AgentParameters] = AgentParameters.construct()
     ignore_order: Optional[bool]
 
 
 class BaseLRSBackend(BaseDataBackend):
     """Base LRS backend interface."""
 
+    type = "lrs"
     settings_class = BaseLRSBackendSettings
 
     @abstractmethod
-    def query_statements(self, params: StatementParameters) -> StatementQueryResult:
+    def query_statements(self, params: RalphStatementsQuery) -> StatementQueryResult:
         """Return the statements query payload using xAPI parameters."""
 
     @abstractmethod
@@ -83,11 +68,12 @@ class BaseLRSBackend(BaseDataBackend):
 class BaseAsyncLRSBackend(BaseAsyncDataBackend):
     """Base async LRS backend interface."""
 
+    type = "lrs"
     settings_class = BaseLRSBackendSettings
 
     @abstractmethod
     async def query_statements(
-        self, params: StatementParameters
+        self, params: RalphStatementsQuery
     ) -> StatementQueryResult:
         """Return the statements query payload using xAPI parameters."""
 

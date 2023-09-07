@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 
 from ralph.api import app
 from ralph.api.routers import health
-from ralph.backends.database.base import DatabaseStatus
+from ralph.backends.data.base import DataBackendStatus
 
 from tests.fixtures.backends import (
     get_clickhouse_test_backend,
@@ -23,7 +23,7 @@ client = TestClient(app)
 )
 def test_api_health_lbheartbeat(backend, monkeypatch):
     """Test the load balancer heartbeat healthcheck."""
-    monkeypatch.setattr(health, "DATABASE_CLIENT", backend())
+    monkeypatch.setattr(health, "BACKEND_CLIENT", backend())
 
     response = client.get("/__lbheartbeat__")
     assert response.status_code == 200
@@ -37,19 +37,21 @@ def test_api_health_lbheartbeat(backend, monkeypatch):
 # pylint: disable=unused-argument
 def test_api_health_heartbeat(backend, monkeypatch, clickhouse):
     """Test the heartbeat healthcheck."""
-    monkeypatch.setattr(health, "DATABASE_CLIENT", backend())
+    monkeypatch.setattr(health, "BACKEND_CLIENT", backend())
 
     response = client.get("/__heartbeat__")
     logging.warning(response.read())
     assert response.status_code == 200
     assert response.json() == {"database": "ok"}
 
-    monkeypatch.setattr(health.DATABASE_CLIENT, "status", lambda: DatabaseStatus.AWAY)
+    monkeypatch.setattr(health.BACKEND_CLIENT, "status", lambda: DataBackendStatus.AWAY)
     response = client.get("/__heartbeat__")
     assert response.json() == {"database": "away"}
     assert response.status_code == 500
 
-    monkeypatch.setattr(health.DATABASE_CLIENT, "status", lambda: DatabaseStatus.ERROR)
+    monkeypatch.setattr(
+        health.BACKEND_CLIENT, "status", lambda: DataBackendStatus.ERROR
+    )
     response = client.get("/__heartbeat__")
     assert response.json() == {"database": "error"}
     assert response.status_code == 500

@@ -248,7 +248,10 @@ class ESDataBackend(BaseDataBackend):
             kwargs["q"] = query.query_string
 
         count = chunk_size
-        while limit or chunk_size == count:
+        # The first condition is set to comprise either limit as None
+        # (when the backend query does not have `size` parameter),
+        # or limit with a positive value.
+        while limit != 0 and chunk_size == count:
             kwargs["size"] = limit if limit and limit < chunk_size else chunk_size
             try:
                 documents = self.client.search(**kwargs)["hits"]["hits"]

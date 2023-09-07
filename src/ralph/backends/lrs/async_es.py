@@ -6,7 +6,7 @@ from typing import Iterator, List
 from ralph.backends.data.async_es import AsyncESDataBackend
 from ralph.backends.lrs.base import (
     BaseAsyncLRSBackend,
-    StatementParameters,
+    RalphStatementsQuery,
     StatementQueryResult,
 )
 from ralph.backends.lrs.es import ESLRSBackend
@@ -21,7 +21,7 @@ class AsyncESLRSBackend(BaseAsyncLRSBackend, AsyncESDataBackend):
     settings_class = AsyncESDataBackend.settings_class
 
     async def query_statements(
-        self, params: StatementParameters
+        self, params: RalphStatementsQuery
     ) -> StatementQueryResult:
         """Return the statements query payload using xAPI parameters."""
         query = ESLRSBackend.get_query(params=params)

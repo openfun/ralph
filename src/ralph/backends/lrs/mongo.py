@@ -10,7 +10,7 @@ from ralph.backends.data.mongo import MongoDataBackend, MongoQuery
 from ralph.backends.lrs.base import (
     AgentParameters,
     BaseLRSBackend,
-    StatementParameters,
+    RalphStatementsQuery,
     StatementQueryResult,
 )
 from ralph.exceptions import BackendException, BackendParameterException
@@ -23,7 +23,7 @@ class MongoLRSBackend(BaseLRSBackend, MongoDataBackend):
 
     settings_class = MongoDataBackend.settings_class
 
-    def query_statements(self, params: StatementParameters) -> StatementQueryResult:
+    def query_statements(self, params: RalphStatementsQuery) -> StatementQueryResult:
         """Return the results of a statements query using xAPI parameters."""
         query = self.get_query(params)
         try:
@@ -52,12 +52,12 @@ class MongoLRSBackend(BaseLRSBackend, MongoDataBackend):
             raise error
 
     @staticmethod
-    def get_query(params: StatementParameters) -> MongoQuery:
+    def get_query(params: RalphStatementsQuery) -> MongoQuery:
         """Construct query from statement parameters."""
         mongo_query_filters = {}
 
-        if params.statementId:
-            mongo_query_filters.update({"_source.id": params.statementId})
+        if params.statement_id:
+            mongo_query_filters.update({"_source.id": params.statement_id})
 
         MongoLRSBackend._add_agent_filters(mongo_query_filters, params.agent, "actor")
         MongoLRSBackend._add_agent_filters(
@@ -76,16 +76,12 @@ class MongoLRSBackend(BaseLRSBackend, MongoDataBackend):
             )
 
         if params.since:
-            mongo_query_filters.update(
-                {"_source.timestamp": {"$gt": params.since.isoformat()}}
-            )
+            mongo_query_filters.update({"_source.timestamp": {"$gt": params.since}})
 
         if params.until:
             if not params.since:
                 mongo_query_filters["_source.timestamp"] = {}
-            mongo_query_filters["_source.timestamp"].update(
-                {"$lte": params.until.isoformat()}
-            )
+            mongo_query_filters["_source.timestamp"].update({"$lte": params.until})
 
         if params.search_after:
             search_order = "$gt" if params.ascending else "$lt"
@@ -118,20 +114,23 @@ class MongoLRSBackend(BaseLRSBackend, MongoDataBackend):
         if not agent_params:
             return
 
-        if agent_params.mbox:
+        if not isinstance(agent_params, dict):
+            agent_params = agent_params.dict()
+
+        if agent_params.get("mbox"):
             key = f"_source.{target_field}.mbox"
-            mongo_query_filters.update({key: agent_params.mbox})
+            mongo_query_filters.update({key: agent_params.get("mbox")})
 
-        if agent_params.mbox_sha1sum:
+        if agent_params.get("mbox_sha1sum"):
             key = f"_source.{target_field}.mbox_sha1sum"
-            mongo_query_filters.update({key: agent_params.mbox_sha1sum})
+            mongo_query_filters.update({key: agent_params.get("mbox_sha1sum")})
 
-        if agent_params.openid:
+        if agent_params.get("openid"):
             key = f"_source.{target_field}.openid"
-            mongo_query_filters.update({key: agent_params.openid})
+            mongo_query_filters.update({key: agent_params.get("openid")})
 
-        if agent_params.account__name:
+        if agent_params.get("account__name"):
             key = f"_source.{target_field}.account.name"
-            mongo_query_filters.update({key: agent_params.account__name})
+            mongo_query_filters.update({key: agent_params.get("account__name")})
             key = f"_source.{target_field}.account.homePage"
-            mongo_query_filters.update({key: agent_params.account__home_page})
+            mongo_query_filters.update({key: agent_params.get("account__home_page")})

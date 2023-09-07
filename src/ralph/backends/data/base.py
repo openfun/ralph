@@ -82,6 +82,7 @@ def enforce_query_checks(method):
 class BaseDataBackend(ABC):
     """Base data backend interface."""
 
+    type = "data"
     name = "base"
     query_model = BaseQuery
     default_operation_type = BaseOperationType.INDEX
@@ -253,6 +254,7 @@ def async_enforce_query_checks(method):
 class BaseAsyncDataBackend(ABC):
     """Base async data backend interface."""
 
+    type = "data"
     name = "base"
     query_model = BaseQuery
     default_operation_type = BaseOperationType.INDEX

@@ -96,27 +96,31 @@ WS_TEST_PORT = 8765
 def get_clickhouse_test_backend():
     """Return a ClickHouseLRSBackend backend instance using test defaults."""
 
-    return ClickHouseLRSBackend(
-        host=CLICKHOUSE_TEST_HOST,
-        port=CLICKHOUSE_TEST_PORT,
-        database=CLICKHOUSE_TEST_DATABASE,
-        event_table_name=CLICKHOUSE_TEST_TABLE_NAME,
+    settings = ClickHouseLRSBackend.settings_class(
+        HOST=CLICKHOUSE_TEST_HOST,
+        PORT=CLICKHOUSE_TEST_PORT,
+        DATABASE=CLICKHOUSE_TEST_DATABASE,
+        EVENT_TABLE_NAME=CLICKHOUSE_TEST_TABLE_NAME,
     )
+    return ClickHouseLRSBackend(settings)
 
 
 @lru_cache
 def get_es_test_backend():
-    """Return a ESLRSBackend backend instance using test defaults."""
-    return ESLRSBackend(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX)
+    """Returns a ESLRSBackend backend instance using test defaults."""
+    settings = ESLRSBackend.settings_class(
+        HOSTS=ES_TEST_HOSTS, DEFAULT_INDEX=ES_TEST_INDEX
+    )
+    return ESLRSBackend(settings)
 
 
 @lru_cache
 def get_mongo_test_backend():
     """Returns a MongoDatabase backend instance using test defaults."""
     settings = MongoLRSBackend.settings_class(
-        connection_uri=MONGO_TEST_CONNECTION_URI,
-        database=MONGO_TEST_DATABASE,
-        collection=MONGO_TEST_COLLECTION,
+        CONNECTION_URI=MONGO_TEST_CONNECTION_URI,
+        DEFAULT_DATABASE=MONGO_TEST_DATABASE,
+        DEFAULT_COLLECTION=MONGO_TEST_COLLECTION,
     )
     return MongoLRSBackend(settings)
 
