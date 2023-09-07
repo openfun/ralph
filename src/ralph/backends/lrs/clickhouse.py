@@ -11,7 +11,7 @@ from ralph.backends.lrs.base import (
     AgentParameters,
     BaseLRSBackend,
     BaseLRSBackendSettings,
-    StatementParameters,
+    RalphStatementsQuery,
     StatementQueryResult,
 )
 from ralph.exceptions import BackendException, BackendParameterException
@@ -36,12 +36,12 @@ class ClickHouseLRSBackend(BaseLRSBackend, ClickHouseDataBackend):
 
     settings_class = ClickHouseLRSBackendSettings
 
-    def query_statements(self, params: StatementParameters) -> StatementQueryResult:
+    def query_statements(self, params: RalphStatementsQuery) -> StatementQueryResult:
         """Return the statements query payload using xAPI parameters."""
         ch_params = params.dict(exclude_none=True)
         where = []
 
-        if params.statementId:
+        if params.statement_id:
             where.append("event_id = {statementId:UUID}")
 
         self._add_agent_filters(ch_params, where, params.agent, "actor")
@@ -131,11 +131,12 @@ class ClickHouseLRSBackend(BaseLRSBackend, ClickHouseDataBackend):
         try:
             for chunk_ids in chunk_id_list():
                 query["parameters"]["ids"] = chunk_ids
-                yield from self.read(
+                ch_response = self.read(
                     query=query,
                     target=self.event_table_name,
                     ignore_errors=True,
                 )
+                yield from (document["event"] for document in ch_response)
         except (BackendException, BackendParameterException) as error:
             msg = "Failed to read from ClickHouse"
             logger.error(msg)
@@ -151,27 +152,33 @@ class ClickHouseLRSBackend(BaseLRSBackend, ClickHouseDataBackend):
         """Add filters relative to agents to `where`."""
         if not agent_params:
             return
-        if agent_params.mbox:
-            ch_params[f"{target_field}__mbox"] = agent_params.mbox
+        if not isinstance(agent_params, dict):
+            agent_params = agent_params.dict()
+        if agent_params.get("mbox"):
+            ch_params[f"{target_field}__mbox"] = agent_params.get("mbox")
             where.append(f"event.{target_field}.mbox = {{{target_field}__mbox:String}}")
-        elif agent_params.mbox_sha1sum:
-            ch_params[f"{target_field}__mbox_sha1sum"] = agent_params.mbox_sha1sum
+        elif agent_params.get("mbox_sha1sum"):
+            ch_params[f"{target_field}__mbox_sha1sum"] = agent_params.get(
+                "mbox_sha1sum"
+            )
             where.append(
                 f"event.{target_field}.mbox_sha1sum = {{{target_field}__mbox_sha1sum:String}}"  # noqa: E501 # pylint: disable=line-too-long
             )
-        elif agent_params.openid:
-            ch_params[f"{target_field}__openid"] = agent_params.openid
+        elif agent_params.get("openid"):
+            ch_params[f"{target_field}__openid"] = agent_params.get("openid")
             where.append(
                 f"event.{target_field}.openid = {{{target_field}__openid:String}}"
             )
-        elif agent_params.account__name:
-            ch_params[f"{target_field}__account__name"] = agent_params.account__name
+        elif agent_params.get("account__name"):
+            ch_params[f"{target_field}__account__name"] = agent_params.get(
+                "account__name"
+            )
             where.append(
                 f"event.{target_field}.account.name = {{{target_field}__account__name:String}}"  # noqa: E501 # pylint: disable=line-too-long
             )
-            ch_params[
-                f"{target_field}__account_home_page"
-            ] = agent_params.account__home_page
+            ch_params[f"{target_field}__account__home_page"] = agent_params.get(
+                "account__home_page"
+            )
             where.append(
-                f"event.{target_field}.account.homePage = {{{target_field}__account_home_page:String}}"  # noqa: E501 # pylint: disable=line-too-long
+                f"event.{target_field}.account.homePage = {{{target_field}__account__home_page:String}}"  # noqa: E501 # pylint: disable=line-too-long
             )

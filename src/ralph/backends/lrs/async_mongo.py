@@ -7,7 +7,7 @@ from typing import Iterator, List
 from ralph.backends.data.async_mongo import AsyncMongoDataBackend
 from ralph.backends.lrs.base import (
     BaseAsyncLRSBackend,
-    StatementParameters,
+    RalphStatementsQuery,
     StatementQueryResult,
 )
 from ralph.backends.lrs.mongo import MongoLRSBackend
@@ -22,7 +22,7 @@ class AsyncMongoLRSBackend(BaseAsyncLRSBackend, AsyncMongoDataBackend):
     settings_class = AsyncMongoDataBackend.settings_class
 
     async def query_statements(
-        self, params: StatementParameters
+        self, params: RalphStatementsQuery
     ) -> StatementQueryResult:
         """Return the statements query payload using xAPI parameters."""
         query = MongoLRSBackend.get_query(params)

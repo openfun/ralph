@@ -8,7 +8,7 @@ import operator
 from functools import reduce
 from importlib import import_module
 from inspect import getmembers, isclass
-from typing import Any, Dict, Iterable, Iterator, List, Union
+from typing import Any, Dict, Iterable, Iterator, List, Optional, Union
 
 from pydantic import BaseModel
 

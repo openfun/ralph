@@ -7,8 +7,8 @@ from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
 from ralph.api import app
-from ralph.backends.database.es import ESDatabase
-from ralph.backends.database.mongo import MongoDatabase
+from ralph.backends.lrs.es import ESLRSBackend
+from ralph.backends.lrs.mongo import MongoLRSBackend
 from ralph.conf import XapiForwardingConfigurationSettings
 from ralph.exceptions import BackendException
 
@@ -69,7 +69,7 @@ def test_api_statements_put_single_statement_directly(
     """Test the put statements API route with one statement."""
     # pylint: disable=invalid-name,unused-argument
 
-    monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
+    monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
     statement = {
         "actor": {
             "account": {
@@ -111,7 +111,7 @@ def test_api_statements_put_enriching_without_existing_values(
     # pylint: disable=invalid-name,unused-argument
 
     monkeypatch.setattr(
-        "ralph.api.routers.statements.DATABASE_CLIENT", get_es_test_backend()
+        "ralph.api.routers.statements.BACKEND_CLIENT", get_es_test_backend()
     )
     statement = {
         "actor": {
@@ -174,7 +174,7 @@ def test_api_statements_put_enriching_with_existing_values(
     # pylint: disable=invalid-name,unused-argument
 
     monkeypatch.setattr(
-        "ralph.api.routers.statements.DATABASE_CLIENT", get_es_test_backend()
+        "ralph.api.routers.statements.BACKEND_CLIENT", get_es_test_backend()
     )
     statement = {
         "actor": {
@@ -227,7 +227,7 @@ def test_api_statements_put_single_statement_no_trailing_slash(
     """Test that the statements endpoint also works without the trailing slash."""
     # pylint: disable=invalid-name,unused-argument
 
-    monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
+    monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
     statement = {
         "actor": {
             "account": {
@@ -261,7 +261,7 @@ def test_api_statements_put_statement_id_mismatch(
 ):
     # pylint: disable=invalid-name,unused-argument
     """Test the put statements API route when the statementId doesn't match."""
-    monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
+    monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
     statement = {
         "actor": {
             "account": {
@@ -299,7 +299,7 @@ def test_api_statements_put_statements_list_of_one(
 ):
     # pylint: disable=invalid-name,unused-argument
     """Test that we fail on PUTs with a list, even if it's one statement."""
-    monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
+    monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
     statement = {
         "actor": {
             "account": {
@@ -336,7 +336,7 @@ def test_api_statements_put_statement_duplicate_of_existing_statement(
     """
     # pylint: disable=invalid-name,unused-argument
 
-    monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
+    monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
     statement = {
         "actor": {
             "account": {
@@ -387,21 +387,19 @@ def test_api_statements_put_statement_duplicate_of_existing_statement(
     "backend",
     [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
 )
-def test_api_statement_put_statements_with_a_failure_during_storage(
+def test_api_statements_put_statements_with_a_failure_during_storage(
     backend, monkeypatch, auth_credentials, es, mongo, clickhouse
 ):
     """Test the put statements API route with a failure happening during storage."""
     # pylint: disable=invalid-name,unused-argument, too-many-arguments
 
-    def put_mock(*args, **kwargs):
-        """Raise an exception. Mock the database.put method."""
+    def write_mock(*args, **kwargs):
+        """Raises an exception. Mocks the database.write method."""
         raise BackendException()
 
     backend_instance = backend()
-    monkeypatch.setattr(backend_instance, "put", put_mock)
-    monkeypatch.setattr(
-        "ralph.api.routers.statements.DATABASE_CLIENT", backend_instance
-    )
+    monkeypatch.setattr(backend_instance, "write", write_mock)
+    monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend_instance)
     statement = {
         "actor": {
             "account": {
@@ -444,9 +442,7 @@ def test_api_statements_put_statement_with_a_failure_during_id_query(
     monkeypatch.setattr(
         backend_instance, "query_statements_by_ids", query_statements_by_ids_mock
     )
-    monkeypatch.setattr(
-        "ralph.api.routers.statements.DATABASE_CLIENT", backend_instance
-    )
+    monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend_instance)
     statement = {
         "actor": {
             "account": {
@@ -476,7 +472,7 @@ def test_api_statements_put_statement_with_a_failure_during_id_query(
     [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
 )
 # pylint: disable=too-many-arguments
-def test_put_statement_without_statement_forwarding(
+def test_api_statements_put_statement_without_statement_forwarding(
     backend, auth_credentials, monkeypatch, es, mongo, clickhouse
 ):
     """Test the put statements API route, given an empty forwarding configuration,
@@ -497,7 +493,7 @@ def test_put_statement_without_statement_forwarding(
     monkeypatch.setattr(
         "ralph.api.routers.statements.get_active_xapi_forwardings", lambda: []
     )
-    monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
+    monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
 
     statement = {
         "actor": {
@@ -529,15 +525,21 @@ def test_put_statement_without_statement_forwarding(
 @pytest.mark.parametrize(
     "forwarding_backend",
     [
-        lambda: ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_FORWARDING_INDEX),
-        lambda: MongoDatabase(
-            connection_uri=MONGO_TEST_CONNECTION_URI,
-            database=MONGO_TEST_DATABASE,
-            collection=MONGO_TEST_FORWARDING_COLLECTION,
+        lambda: ESLRSBackend(
+            settings=ESLRSBackend.settings_class(
+                HOSTS=ES_TEST_HOSTS, DEFAULT_INDEX=ES_TEST_FORWARDING_INDEX
+            )
+        ),
+        lambda: MongoLRSBackend(
+            settings=MongoLRSBackend.settings_class(
+                CONNECTION_URI=MONGO_TEST_CONNECTION_URI,
+                DEFAULT_DATABASE=MONGO_TEST_DATABASE,
+                DEFAULT_COLLECTION=MONGO_TEST_FORWARDING_COLLECTION,
+            )
         ),
     ],
 )
-async def test_put_statement_with_statement_forwarding(
+async def test_api_statements_put_statement_with_statement_forwarding(
     receiving_backend,
     forwarding_backend,
     monkeypatch,
@@ -577,7 +579,7 @@ async def test_put_statement_with_statement_forwarding(
         )
         # Receiving client should use the receiving Elasticsearch client for storage
         receiving_patch.setattr(
-            "ralph.api.routers.statements.DATABASE_CLIENT", receiving_backend()
+            "ralph.api.routers.statements.BACKEND_CLIENT", receiving_backend()
         )
         lrs_context = lrs(app)
         # Start receiving LRS client
@@ -610,7 +612,7 @@ async def test_put_statement_with_statement_forwarding(
 
         # Forwarding client should use the forwarding Elasticsearch client for storage
         forwarding_patch.setattr(
-            "ralph.api.routers.statements.DATABASE_CLIENT", forwarding_backend()
+            "ralph.api.routers.statements.BACKEND_CLIENT", forwarding_backend()
         )
         # Start forwarding LRS client
         async with AsyncClient(

@@ -6,7 +6,7 @@ import pytest
 from bson.objectid import ObjectId
 from pymongo import ASCENDING, DESCENDING
 
-from ralph.backends.lrs.base import StatementParameters
+from ralph.backends.lrs.base import RalphStatementsQuery
 from ralph.exceptions import BackendException
 
 from tests.fixtures.backends import MONGO_TEST_FORWARDING_COLLECTION
@@ -20,7 +20,7 @@ from tests.fixtures.backends import MONGO_TEST_FORWARDING_COLLECTION
             {},
             {
                 "filter": {},
-                "limit": None,
+                "limit": 0,
                 "projection": None,
                 "sort": [
                     ("_source.timestamp", DESCENDING),
@@ -34,7 +34,7 @@ from tests.fixtures.backends import MONGO_TEST_FORWARDING_COLLECTION
             {"statementId": "statementId"},
             {
                 "filter": {"_source.id": "statementId"},
-                "limit": None,
+                "limit": 0,
                 "projection": None,
                 "sort": [
                     ("_source.timestamp", DESCENDING),
@@ -51,7 +51,7 @@ from tests.fixtures.backends import MONGO_TEST_FORWARDING_COLLECTION
                     "_source.id": "statementId",
                     "_source.actor.mbox": "mailto:foo@bar.baz",
                 },
-                "limit": None,
+                "limit": 0,
                 "projection": None,
                 "sort": [
                     ("_source.timestamp", DESCENDING),
@@ -73,7 +73,7 @@ from tests.fixtures.backends import MONGO_TEST_FORWARDING_COLLECTION
                         "a7a5b7462b862c8c8767d43d43e865ffff754a64"
                     ),
                 },
-                "limit": None,
+                "limit": 0,
                 "projection": None,
                 "sort": [
                     ("_source.timestamp", DESCENDING),
@@ -93,7 +93,7 @@ from tests.fixtures.backends import MONGO_TEST_FORWARDING_COLLECTION
                     "_source.id": "statementId",
                     "_source.actor.openid": "http://toby.openid.example.org/",
                 },
-                "limit": None,
+                "limit": 0,
                 "projection": None,
                 "sort": [
                     ("_source.timestamp", DESCENDING),
@@ -117,7 +117,7 @@ from tests.fixtures.backends import MONGO_TEST_FORWARDING_COLLECTION
                     "_source.actor.account.name": "13936749",
                     "_source.actor.account.homePage": "http://www.example.com",
                 },
-                "limit": None,
+                "limit": 0,
                 "projection": None,
                 "sort": [
                     ("_source.timestamp", DESCENDING),
@@ -138,7 +138,7 @@ from tests.fixtures.backends import MONGO_TEST_FORWARDING_COLLECTION
                     "_source.object.id": "http://www.example.com/meetings/34534",
                     "_source.object.objectType": "Activity",
                 },
-                "limit": None,
+                "limit": 0,
                 "projection": None,
                 "sort": [
                     ("_source.timestamp", DESCENDING),
@@ -160,7 +160,7 @@ from tests.fixtures.backends import MONGO_TEST_FORWARDING_COLLECTION
                         "$lte": "2023-06-24T00:00:20.194929+00:00",
                     },
                 },
-                "limit": None,
+                "limit": 0,
                 "projection": None,
                 "sort": [
                     ("_source.timestamp", DESCENDING),
@@ -180,7 +180,7 @@ from tests.fixtures.backends import MONGO_TEST_FORWARDING_COLLECTION
                         "$lte": "2023-06-24T00:00:20.194929+00:00",
                     },
                 },
-                "limit": None,
+                "limit": 0,
                 "projection": None,
                 "sort": [
                     ("_source.timestamp", DESCENDING),
@@ -196,7 +196,7 @@ from tests.fixtures.backends import MONGO_TEST_FORWARDING_COLLECTION
                 "filter": {
                     "_id": {"$lt": ObjectId("666f6f2d6261722d71757578")},
                 },
-                "limit": None,
+                "limit": 0,
                 "projection": None,
                 "sort": [
                     ("_source.timestamp", DESCENDING),
@@ -212,7 +212,7 @@ from tests.fixtures.backends import MONGO_TEST_FORWARDING_COLLECTION
                 "filter": {
                     "_id": {"$gt": ObjectId("666f6f2d6261722d71757578")},
                 },
-                "limit": None,
+                "limit": 0,
                 "projection": None,
                 "sort": [
                     ("_source.timestamp", ASCENDING),
@@ -239,7 +239,7 @@ async def test_backends_lrs_async_mongo_lrs_backend_query_statements_query(
 
     backend = async_mongo_lrs_backend()
     monkeypatch.setattr(backend, "read", mock_read)
-    result = await backend.query_statements(StatementParameters(**params))
+    result = await backend.query_statements(RalphStatementsQuery.construct(**params))
     assert result.statements == [{}]
     assert not result.pit_id
     assert result.search_after == "search_after_id"
@@ -270,8 +270,8 @@ async def test_backends_lrs_async_mongo_lrs_backend_query_statements_with_succes
     ]
     assert await backend.write(documents) == 2
 
-    statement_parameters = StatementParameters(
-        statementId="62b9ce922c26b46b68ffc68f",
+    statement_parameters = RalphStatementsQuery.construct(
+        statement_id="62b9ce922c26b46b68ffc68f",
         agent={
             "account__name": "test_name",
             "account__home_page": "http://example.com",
@@ -312,7 +312,7 @@ async def test_backends_lrs_async_mongo_lrs_backend_query_statements_with_query_
 
     with caplog.at_level(logging.ERROR):
         with pytest.raises(BackendException, match=msg):
-            await backend.query_statements(StatementParameters())
+            await backend.query_statements(RalphStatementsQuery.construct())
 
     assert (
         "ralph.backends.lrs.async_mongo",
@@ -345,7 +345,7 @@ async def test_backends_lrs_mongo_lrs_backend_query_statements_by_ids_query_fail
             _ = [
                 statement
                 async for statement in backend.query_statements_by_ids(
-                    StatementParameters()
+                    RalphStatementsQuery.construct()
                 )
             ]
 

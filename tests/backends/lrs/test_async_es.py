@@ -2,14 +2,13 @@
 
 import logging
 import re
-from datetime import datetime
 
 import pytest
 from elastic_transport import ApiResponseMeta
 from elasticsearch import ApiError
 from elasticsearch.helpers import bulk
 
-from ralph.backends.lrs.base import StatementParameters
+from ralph.backends.lrs.base import RalphStatementsQuery
 from ralph.exceptions import BackendException
 
 from tests.fixtures.backends import ES_TEST_FORWARDING_INDEX, ES_TEST_INDEX
@@ -26,7 +25,7 @@ from tests.fixtures.backends import ES_TEST_FORWARDING_INDEX, ES_TEST_INDEX
                 "query": {"match_all": {}},
                 "query_string": None,
                 "search_after": None,
-                "size": None,
+                "size": 0,
                 "sort": [{"timestamp": {"order": "desc"}}],
                 "track_total_hits": False,
             },
@@ -39,7 +38,7 @@ from tests.fixtures.backends import ES_TEST_FORWARDING_INDEX, ES_TEST_INDEX
                 "query": {"bool": {"filter": [{"term": {"_id": "statementId"}}]}},
                 "query_string": None,
                 "search_after": None,
-                "size": None,
+                "size": 0,
                 "sort": [{"timestamp": {"order": "desc"}}],
                 "track_total_hits": False,
             },
@@ -59,7 +58,7 @@ from tests.fixtures.backends import ES_TEST_FORWARDING_INDEX, ES_TEST_INDEX
                 },
                 "query_string": None,
                 "search_after": None,
-                "size": None,
+                "size": 0,
                 "sort": [{"timestamp": {"order": "desc"}}],
                 "track_total_hits": False,
             },
@@ -88,7 +87,7 @@ from tests.fixtures.backends import ES_TEST_FORWARDING_INDEX, ES_TEST_INDEX
                 },
                 "query_string": None,
                 "search_after": None,
-                "size": None,
+                "size": 0,
                 "sort": [{"timestamp": {"order": "desc"}}],
                 "track_total_hits": False,
             },
@@ -117,7 +116,7 @@ from tests.fixtures.backends import ES_TEST_FORWARDING_INDEX, ES_TEST_INDEX
                 },
                 "query_string": None,
                 "search_after": None,
-                "size": None,
+                "size": 0,
                 "sort": [{"timestamp": {"order": "desc"}}],
                 "track_total_hits": False,
             },
@@ -150,7 +149,7 @@ from tests.fixtures.backends import ES_TEST_FORWARDING_INDEX, ES_TEST_INDEX
                 },
                 "query_string": None,
                 "search_after": None,
-                "size": None,
+                "size": 0,
                 "sort": [{"timestamp": {"order": "desc"}}],
                 "track_total_hits": False,
             },
@@ -186,7 +185,7 @@ from tests.fixtures.backends import ES_TEST_FORWARDING_INDEX, ES_TEST_INDEX
                 },
                 "query_string": None,
                 "search_after": None,
-                "size": None,
+                "size": 0,
                 "sort": [{"timestamp": {"order": "desc"}}],
                 "track_total_hits": False,
             },
@@ -205,18 +204,14 @@ from tests.fixtures.backends import ES_TEST_FORWARDING_INDEX, ES_TEST_INDEX
                             {
                                 "range": {
                                     "timestamp": {
-                                        "gt": datetime.fromisoformat(
-                                            "2021-06-24T00:00:20.194929+00:00"
-                                        )
+                                        "gt": "2021-06-24T00:00:20.194929+00:00"
                                     }
                                 }
                             },
                             {
                                 "range": {
                                     "timestamp": {
-                                        "lte": datetime.fromisoformat(
-                                            "2023-06-24T00:00:20.194929+00:00"
-                                        )
+                                        "lte": "2023-06-24T00:00:20.194929+00:00"
                                     }
                                 }
                             },
@@ -225,7 +220,7 @@ from tests.fixtures.backends import ES_TEST_FORWARDING_INDEX, ES_TEST_INDEX
                 },
                 "query_string": None,
                 "search_after": None,
-                "size": None,
+                "size": 0,
                 "sort": [{"timestamp": {"order": "desc"}}],
                 "track_total_hits": False,
             },
@@ -238,7 +233,7 @@ from tests.fixtures.backends import ES_TEST_FORWARDING_INDEX, ES_TEST_INDEX
                 "query": {"match_all": {}},
                 "query_string": None,
                 "search_after": ["1686557542970", "0"],
-                "size": None,
+                "size": 0,
                 "sort": [{"timestamp": {"order": "desc"}}],
                 "track_total_hits": False,
             },
@@ -251,7 +246,7 @@ from tests.fixtures.backends import ES_TEST_FORWARDING_INDEX, ES_TEST_INDEX
                 "query": {"match_all": {}},
                 "query_string": None,
                 "search_after": None,
-                "size": None,
+                "size": 0,
                 "sort": "_shard_doc",
                 "track_total_hits": False,
             },
@@ -276,7 +271,7 @@ async def test_backends_lrs_async_es_lrs_backend_query_statements_query(
 
     backend = async_es_lrs_backend()
     monkeypatch.setattr(backend, "read", mock_read)
-    result = await backend.query_statements(StatementParameters(**params))
+    result = await backend.query_statements(RalphStatementsQuery.construct(**params))
     assert result.statements == [{}]
     assert result.pit_id == "foo_pit_id"
     assert result.search_after == "bar_search_after|baz_search_after"
@@ -299,7 +294,7 @@ async def test_backends_lrs_async_es_lrs_backend_query_statements(
     assert await backend.write(documents) == 1
 
     # Check the expected search query results.
-    result = await backend.query_statements(StatementParameters(limit=10))
+    result = await backend.query_statements(RalphStatementsQuery.construct(limit=10))
     assert result.statements == documents
     assert re.match(r"[0-9]+\|0", result.search_after)
 
@@ -326,7 +321,7 @@ async def test_backends_lrs_async_es_lrs_backend_query_statements_pit_query_fail
     msg = "Query error"
     with pytest.raises(BackendException, match=msg):
         with caplog.at_level(logging.ERROR):
-            await backend.query_statements(StatementParameters())
+            await backend.query_statements(RalphStatementsQuery.construct())
 
     await backend.close()
 
@@ -359,7 +354,7 @@ async def test_backends_lrs_es_lrs_backend_query_statements_by_ids_search_query_
             _ = [
                 statement
                 async for statement in backend.query_statements_by_ids(
-                    StatementParameters()
+                    RalphStatementsQuery.construct()
                 )
             ]
 

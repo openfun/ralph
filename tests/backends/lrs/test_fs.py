@@ -2,7 +2,7 @@
 
 import pytest
 
-from ralph.backends.lrs.base import StatementParameters
+from ralph.backends.lrs.base import RalphStatementsQuery
 
 
 @pytest.mark.parametrize(
@@ -260,7 +260,7 @@ def test_backends_lrs_fs_lrs_backend_query_statements_query(
     ]
     backend = fs_lrs_backend()
     backend.write(statements)
-    result = backend.query_statements(StatementParameters(**params))
+    result = backend.query_statements(RalphStatementsQuery.construct(**params))
     ids = [statement.get("id") for statement in result.statements]
     assert ids == expected_statement_ids
 
