@@ -131,11 +131,12 @@ class ClickHouseLRSBackend(BaseLRSBackend, ClickHouseDataBackend):
         try:
             for chunk_ids in chunk_id_list():
                 query["parameters"]["ids"] = chunk_ids
-                yield from self.read(
+                for raw in self.read(
                     query=query,
                     target=self.event_table_name,
                     ignore_errors=True,
-                )
+                ):
+                    yield raw["event"]
         except (BackendException, BackendParameterException) as error:
             msg = "Failed to read from ClickHouse"
             logger.error(msg)

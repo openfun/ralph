@@ -5,16 +5,19 @@ import logging
 from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse
 
-from ralph.backends.database.base import BaseDatabase
+from ralph.backends.conf import backends_settings
+from ralph.backends.lrs.base import BaseLRSBackend
 from ralph.conf import settings
+from ralph.utils import get_backend_instance
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-DATABASE_CLIENT: BaseDatabase = getattr(
-    settings.BACKENDS.DATABASE, settings.RUNSERVER_BACKEND.upper()
-).get_instance()
+BACKEND_CLIENT: BaseLRSBackend = get_backend_instance(
+    backend_type=backends_settings.BACKENDS.LRS,
+    backend_name=settings.RUNSERVER_BACKEND,
+)
 
 
 @router.get("/__lbheartbeat__")
@@ -32,7 +35,7 @@ async def heartbeat():
 
     Returns a 200 if all checks are successful.
     """
-    content = {"database": DATABASE_CLIENT.status().value}
+    content = {"database": BACKEND_CLIENT.status().value}
     status_code = (
         status.HTTP_200_OK
         if all(v == "ok" for v in content.values())

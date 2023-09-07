@@ -22,6 +22,7 @@ class BaseStreamBackendSettings(BaseSettings):
 class BaseStreamBackend(ABC):
     """Base stream backend interface."""
 
+    type = "stream"
     name = "base"
     settings_class = BaseStreamBackendSettings
 

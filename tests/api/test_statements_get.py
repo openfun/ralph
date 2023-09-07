@@ -12,8 +12,9 @@ from fastapi.testclient import TestClient
 
 from ralph.api import app
 from ralph.api.auth.basic import get_authenticated_user
-from ralph.backends.database.clickhouse import ClickHouseDatabase
-from ralph.backends.database.mongo import MongoDatabase
+from ralph.backends.data.base import BaseOperationType
+from ralph.backends.data.clickhouse import ClickHouseDataBackend
+from ralph.backends.data.mongo import MongoDataBackend
 from ralph.exceptions import BackendException
 
 from tests.fixtures.backends import (
@@ -55,18 +56,28 @@ def insert_mongo_statements(mongo_client, statements):
     """Inserts a bunch of example statements into MongoDB for testing."""
     database = getattr(mongo_client, MONGO_TEST_DATABASE)
     collection = getattr(database, MONGO_TEST_COLLECTION)
-    collection.insert_many(list(MongoDatabase.to_documents(statements)))
+    collection.insert_many(
+        list(
+            MongoDataBackend.to_documents(
+                data=statements,
+                ignore_errors=True,
+                operation_type=BaseOperationType.CREATE,
+                logger_class=None,
+            )
+        )
+    )
 
 
 def insert_clickhouse_statements(statements):
     """Inserts a bunch of example statements into ClickHouse for testing."""
-    backend = ClickHouseDatabase(
-        host=CLICKHOUSE_TEST_HOST,
-        port=CLICKHOUSE_TEST_PORT,
-        database=CLICKHOUSE_TEST_DATABASE,
-        event_table_name=CLICKHOUSE_TEST_TABLE_NAME,
+    settings = ClickHouseDataBackend.settings_class(
+        HOST=CLICKHOUSE_TEST_HOST,
+        PORT=CLICKHOUSE_TEST_PORT,
+        DATABASE=CLICKHOUSE_TEST_DATABASE,
+        EVENT_TABLE_NAME=CLICKHOUSE_TEST_TABLE_NAME,
     )
-    success = backend.put(statements)
+    backend = ClickHouseDataBackend(settings=settings)
+    success = backend.write(statements)
     assert success == len(statements)
 
 
@@ -149,7 +160,7 @@ def insert_statements_and_monkeypatch_backend(
 
     def _insert_statements_and_monkeypatch_backend(statements):
         """Inserts statements once into each backend."""
-        database_client_class_path = "ralph.api.routers.statements.DATABASE_CLIENT"
+        database_client_class_path = "ralph.api.routers.statements.BACKEND_CLIENT"
         if request.param == "mongo":
             insert_mongo_statements(mongo, statements)
             monkeypatch.setattr(database_client_class_path, get_mongo_test_backend())
@@ -707,11 +718,11 @@ def test_api_statements_get_statements_with_database_query_failure(
     # pylint: disable=redefined-outer-name
 
     def mock_query_statements(*_):
-        """Mocks the DATABASE_CLIENT.query_statements method."""
+        """Mocks the BACKEND_CLIENT.query_statements method."""
         raise BackendException()
 
     monkeypatch.setattr(
-        "ralph.api.routers.statements.DATABASE_CLIENT.query_statements",
+        "ralph.api.routers.statements.BACKEND_CLIENT.query_statements",
         mock_query_statements,
     )
 

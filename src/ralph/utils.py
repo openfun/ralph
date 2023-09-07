@@ -8,7 +8,7 @@ import operator
 from functools import reduce
 from importlib import import_module
 from inspect import getmembers, isclass
-from typing import Any, Dict, Iterable, Iterator, List, Union
+from typing import Any, Dict, Iterable, Iterator, List, Optional, Union
 
 from pydantic import BaseModel
 
@@ -65,26 +65,20 @@ def get_backend_type(backend_types: List[BaseModel], backend_name: str):
     return None
 
 
-def get_backend_instance(
-    backend_type: BaseModel,
-    backend_name: str,
-    options: dict,
-):
-    """Return the instantiated backend instance given backend-name-prefixed options."""
+def get_backend_class(backend_type: BaseModel, backend_name: str):
+    """Return the backend class given the backend type and backend name."""
     # Get type name from backend_type class name
     backend_type_name = backend_type.__class__.__name__[
         : -len("BackendSettings")
     ].lower()
+    backend_name = backend_name.lower()
 
-    backend_settings = getattr(backend_type, backend_name.upper())
-    prefix = f"{backend_name}_"
-    # Filter backend-related parameters. Parameter name is supposed to start
-    # with the backend name
-    names = filter(lambda key: key.startswith(prefix), options.keys())
-    options = {name.replace(prefix, "").upper(): options[name] for name in names}
     module = import_module(f"ralph.backends.{backend_type_name}.{backend_name}")
     for _, class_ in getmembers(module, isclass):
-        if getattr(class_, "name", None) == backend_name:
+        if (
+            getattr(class_, "type", None) == backend_type_name
+            and getattr(class_, "name", None) == backend_name
+        ):
             backend_class = class_
             break
 
@@ -94,8 +88,30 @@ def get_backend_instance(
             f'under the backend type "{backend_type_name}"'
         )
 
-    # Override settings with CLI options
+    return backend_class
+
+
+def get_backend_instance(
+    backend_type: BaseModel,
+    backend_name: str,
+    options: Union[dict, None] = None,
+):
+    """Return the instantiated backend given the backend type, name and options."""
+
+    backend_class = get_backend_class(backend_type, backend_name)
+    backend_settings = getattr(backend_type, backend_name.upper())
+
+    if not options:
+        return backend_class(backend_settings)
+
     settings_instance = backend_settings.copy()
+    prefix = f"{backend_name}_"
+    # Filter backend-related parameters. Parameter name is supposed to start
+    # with the backend name
+    names = filter(lambda key: key.startswith(prefix), options.keys())
+    options = {name.replace(prefix, "").upper(): options[name] for name in names}
+
+    # Override settings with CLI options
     for option, value in options.items():
         setattr(settings_instance, option, value)
 
