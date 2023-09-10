@@ -9,7 +9,7 @@ from fastapi.responses import JSONResponse
 from ralph.backends.conf import backends_settings
 from ralph.backends.lrs.base import BaseAsyncLRSBackend, BaseLRSBackend
 from ralph.conf import settings
-from ralph.utils import get_backend_instance
+from ralph.utils import await_if_coroutine, get_backend_instance
 
 logger = logging.getLogger(__name__)
 
