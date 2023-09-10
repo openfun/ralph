@@ -39,7 +39,13 @@ from ralph.models.xapi.base.agents import (
     BaseXapiAgentWithOpenId,
 )
 from ralph.models.xapi.base.common import IRI
-from ralph.utils import get_backend_instance, now, statements_are_equivalent
+from ralph.utils import (
+    await_if_coroutine,
+    desync,
+    get_backend_instance,
+    now,
+    statements_are_equivalent,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -342,8 +348,10 @@ async def get(
 
     # Query Database
     try:
-        query_result = BACKEND_CLIENT.query_statements(
-            StatementParameters(**{**query_params, "limit": limit})
+        query_result = await await_if_coroutine(
+            BACKEND_CLIENT.query_statements(
+                StatementParameters(**{**query_params, "limit": limit})
+            )
         )
     except BackendException as error:
         raise HTTPException(
@@ -423,7 +431,9 @@ async def put(
     _enrich_statement_with_authority(statement_as_dict, current_user)
 
     try:
-        existing_statements = BACKEND_CLIENT.query_statements_by_ids([statementId])
+        existing_statements = desync(
+            BACKEND_CLIENT.query_statements_by_ids([statementId])
+        )
     except BackendException as error:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -484,8 +494,8 @@ async def put(
 
     # For valid requests, perform the bulk indexing of all incoming statements
     try:
-        success_count = BACKEND_CLIENT.write(
-            data=[statement_as_dict], ignore_errors=False
+        success_count = await await_if_coroutine(
+            BACKEND_CLIENT.write(data=[statement_as_dict], ignore_errors=False)
         )
     except (BackendException, BadFormatException) as exc:
         logger.error("Failed to index submitted statement")
@@ -539,7 +549,9 @@ async def post(
         )
 
     try:
-        existing_statements = BACKEND_CLIENT.query_statements_by_ids(statements_ids)
+        existing_statements = desync(
+            BACKEND_CLIENT.query_statements_by_ids(statements_ids)
+        )
     except BackendException as error:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -553,7 +565,7 @@ async def post(
     # See: https://github.com/openfun/ralph/issues/345
     if isasyncgen(existing_statements):
         existing_ids = []
-        for existing in existing_statements:
+        async for existing in existing_statements:
             existing_ids.append(existing["id"])
 
             # The LRS specification calls for deep comparison of duplicates. This
@@ -571,9 +583,7 @@ async def post(
             for key, value in statements_dict.items()
             if key not in existing_ids
         }
-
-        # Return if all incoming statements already exist
-        if not statements_dict:
+        if not statements_ids:
             response.status_code = status.HTTP_204_NO_CONTENT
             return
 
@@ -605,8 +615,8 @@ async def post(
 
     # For valid requests, perform the bulk indexing of all incoming statements
     try:
-        success_count = BACKEND_CLIENT.write(
-            data=statements_dict.values(), ignore_errors=False
+        success_count = await await_if_coroutine(
+            BACKEND_CLIENT.write(data=statements_dict.values(), ignore_errors=False)
         )
     except (BackendException, BadFormatException) as exc:
         logger.error("Failed to index submitted statements")
