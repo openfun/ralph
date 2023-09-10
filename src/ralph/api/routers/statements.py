@@ -42,7 +42,12 @@ from ralph.models.xapi.base.agents import (
     BaseXapiAgentWithOpenId,
 )
 from ralph.models.xapi.base.common import IRI
-from ralph.utils import get_backend_instance, now, statements_are_equivalent
+from ralph.utils import (
+    await_if_coroutine,
+    get_backend_instance,
+    now,
+    statements_are_equivalent,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -456,8 +461,8 @@ async def put(
 
     # For valid requests, perform the bulk indexing of all incoming statements
     try:
-        success_count = BACKEND_CLIENT.write(
-            data=[statement_as_dict], ignore_errors=False
+        success_count = await await_if_coroutine(
+            BACKEND_CLIENT.write(data=[statement_as_dict], ignore_errors=False)
         )
     except (BackendException, BadFormatException) as exc:
         logger.error("Failed to index submitted statement")
@@ -560,8 +565,8 @@ async def post(
 
     # For valid requests, perform the bulk indexing of all incoming statements
     try:
-        success_count = BACKEND_CLIENT.write(
-            data=statements_dict.values(), ignore_errors=False
+        success_count = await await_if_coroutine(
+            BACKEND_CLIENT.write(data=statements_dict.values(), ignore_errors=False)
         )
     except (BackendException, BadFormatException) as exc:
         logger.error("Failed to index submitted statements")
