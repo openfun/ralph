@@ -66,7 +66,7 @@ class LRSStatementsQuery(BaseQuery):
 
 
 class AsyncLRSHTTP(BaseHTTP):
-    """Asynchroneous LRS HTTP backend."""
+    """Asynchronous LRS HTTP backend."""
 
     name = "async_lrs"
     query = LRSStatementsQuery
@@ -154,7 +154,7 @@ class AsyncLRSHTTP(BaseHTTP):
                 If the records are bytes and `raw_output` is set to `False`, they are
                 decoded as JSON by line.
             ignore_errors (bool): If `True`, errors during the read operation
-                are be ignored and logged. If `False` (default), a `BackendException`
+                are ignored and logged. If `False` (default), a `BackendException`
                 is raised if an error occurs.
             greedy: If set to True, the client will fetch all available pages even
                 before the statements yielded by the generator are consumed. Caution:
@@ -274,7 +274,7 @@ class AsyncLRSHTTP(BaseHTTP):
         ).geturl()
 
         if (max_num_simultaneous is not None) and max_num_simultaneous < 1:
-            msg = "max_num_simultaneous must be a stricly positive integer"
+            msg = "max_num_simultaneous must be a strictly positive integer"
             logger.error(msg)
             raise BackendParameterException(msg)
 
@@ -356,7 +356,7 @@ class AsyncLRSHTTP(BaseHTTP):
                 raise exception
             await queue.put(None)
 
-        # Run fetch_all_statements in the backround
+        # Run fetch_all_statements in the background
         task = asyncio.create_task(fetch_all_statements(queue))
 
         # Yield statements as they arrive

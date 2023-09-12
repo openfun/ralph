@@ -54,7 +54,7 @@ class ORAGetSubmissionForStaffGradingEventField(AbstractBaseEventField):
         requesting_staff_id (str): Consists of the course-specific anonymized user ID
             of the course team member who is retrieved the response for grading.
         type (str): Consists of the type of staff grading that is being performed.
-            Currently set to `full-grade`.
+            Currently, set to `full-grade`.
     """
 
     item_id: constr(
@@ -69,7 +69,7 @@ class ORAGetSubmissionForStaffGradingEventField(AbstractBaseEventField):
 
 
 class ORAAssessEventPartsCriterionField(BaseModelWithConfig):
-    """Pydantic model for assessement `event`.`parts`.`criterion` field.
+    """Pydantic model for assessment `event`.`parts`.`criterion` field.
 
     Attributes:
         name (str): Consists of the criterion name.
@@ -148,7 +148,7 @@ class ORAStaffAssessEventField(ORAAssessEventField):
 
     Attributes:
         type (str): Consists of the type of staff grading that is being performed. Can
-            be either equalt to `regrade` in the case of a grade override or
+            be either equal to `regrade` in the case of a grade override or
             `full-grade` in the case of an included staff assessment step.
     """
 
@@ -165,7 +165,7 @@ class ORASubmitFeedbackOnAssessmentsEventField(AbstractBaseEventField):
             process.
         options (list): Consists of the label of each checkbox option that the learner
             selected to evaluate the assessment process.
-        submission_uuid (str): Consists of the unique identifier for for the feedback.
+        submission_uuid (str): Consists of the unique identifier for the feedback.
     """
 
     feedback_text: str
@@ -234,7 +234,7 @@ class ORASaveSubmissionEventField(AbstractBaseEventField):
             Note:
                 Responses have a length limit of 100000 in the front-end but not in the
                 back-end. Events are truncated at `TRACK_MAX_EVENT` which is 50000 by
-                default. Also the `eventtracking.backends.logger.LoggerBackend`
+                default. Also, the `eventtracking.backends.logger.LoggerBackend`
                 silently drops events when they exceed `TRACK_MAX_EVENT`.
     """
 

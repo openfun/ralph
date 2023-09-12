@@ -159,7 +159,7 @@ class TextbookPdfSearchExecutedEventField(TextbookInteractionBaseEventField):
 
     Attributes:
         name (str): Consists of the value `textbook.pdf.search.executed`.
-        caseSensitive (bool): Consists either of the `true` value if the case sensitive
+        caseSensitive (bool): Consists either of the `true` value if the case-sensitive
             option is selected or `false` if this option is not selected.
         highlightAll (bool): Consists either of the `true` value if the option to
             highlight all matches is selected or `false` if this option is not selected.
@@ -180,7 +180,7 @@ class TextbookPdfSearchNavigatedNextEventField(TextbookInteractionBaseEventField
 
     Attributes:
         name (str): Consists of the value `textbook.pdf.search.navigatednext`.
-        caseSensitive (bool): Consists either of the `true` value if the case sensitive
+        caseSensitive (bool): Consists either of the `true` value if the case-sensitive
             option is selected or `false` if this option is not selected.
         findPrevious(bool): Consists either of the ‘true’ value if the user clicks the
             Find Previous icon or ‘false’ if the user clicks the <kbd>Find Next</kbd>

@@ -215,7 +215,7 @@ def test_models_xapi_base_statement_should_not_accept_additional_properties(stat
 
 @pytest.mark.parametrize("path,value", [("object__id", "w3id.org/xapi/video")])
 @custom_given(BaseXapiStatement)
-def test_models_xapi_base_statement_with_iri_wihout_scheme(path, value, statement):
+def test_models_xapi_base_statement_with_iri_without_scheme(path, value, statement):
     """Tests that the statement does not accept IRIs without a scheme.
 
     XAPI-00011
@@ -372,7 +372,7 @@ def test_models_xapi_base_statement_with_sub_statement_ref(path, value, statemen
     [
         [{"id": "invalid whitespace"}],
         [{"id": "valid"}, {"id": "invalid whitespace"}],
-        [{"id": "invalid_dublicate"}, {"id": "invalid_dublicate"}],
+        [{"id": "invalid_duplicate"}, {"id": "invalid_duplicate"}],
     ],
 )
 @custom_given(

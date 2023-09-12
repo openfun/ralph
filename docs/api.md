@@ -261,7 +261,7 @@ RALPH_SENTRY_IGNORE_HEALTH_CHECKS=True
 
 HTTP basic auth implementation uses the secure and standard bcrypt algorithm to hash/salt passwords before storing them.
 This implementation comes with a performance cost.
-To speed up requests, credentials are stored in a LRU cache with a Time To Live.
+To speed up requests, credentials are stored in an LRU cache with a Time To Live.
 To configure this cache, you can define the following environment variables:
 - the maximum number of entries in the cache. Select a value greater than the maximum number of individual user credentials, for better performance. Defaults to 100. 
 ```

@@ -60,7 +60,7 @@ $ make run
 
 The server should be up and running at
 [http://localhost:8100](http://localhost:8100). You can check its status using
-the hearbeat probe:
+the heartbeat probe:
 
 ```
 $ curl http://localhost:8100/__heartbeat__
@@ -121,7 +121,7 @@ $ docker run --pull always --rm fundocker/ralph:latest ralph --help
 ### Testing the CLI (Python)
 
 Ralph is distributed as a standard python package; it can be installed _via_
-`pip` or any other python package manager (_e.g_ Poetry, Pipenv, etc.):
+`pip` or any other python package manager (_e.g._ Poetry, Pipenv, etc.):
 
 ```sh
 # Install the full package
@@ -168,7 +168,7 @@ get in touch if you have any question related to our implementation or design
 decisions.
 
 We try to raise our code quality standards and expect contributors to follow
-the recommandations from our
+the recommendations from our
 [handbook](https://handbook.openfun.fr).
 
 ## License

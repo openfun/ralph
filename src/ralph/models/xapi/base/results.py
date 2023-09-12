@@ -16,8 +16,8 @@ class BaseXapiResultScore(BaseModelWithConfig):
     Attributes:
         scaled (int): Consists of the normalized score related to the experience.
         raw (Decimal): Consists of the non-normalized score achieved by the Actor.
-        min (Decimal): Consists of lowest possible score.
-        max (Decimal): Consists of highest possible score.
+        min (Decimal): Consists of the lowest possible score.
+        max (Decimal): Consists of the highest possible score.
     """
 
     scaled: Optional[conint(ge=-1, le=1)]

@@ -170,7 +170,7 @@ async def test_backends_http_lrs_status_with_http_status_error(
 
 @pytest.mark.anyio
 async def test_backends_http_lrs_list(caplog):
-    "Test the LRS backend `list` method raises a `NotImplementedError`."
+    """Test the LRS backend `list` method raises a `NotImplementedError`."""
 
     base_url = "http://fake-lrs.com"
     target = "/xAPI/statements/"
@@ -700,7 +700,7 @@ async def test_backends_http_lrs_write_with_unsupported_operation(
 @pytest.mark.parametrize(
     "simultaneous,max_num_simultaneous,error_msg",
     [
-        (True, 0, "max_num_simultaneous must be a stricly positive integer"),
+        (True, 0, "max_num_simultaneous must be a strictly positive integer"),
         (False, 2, "max_num_simultaneous can only be used with `simultaneous=True`"),
     ],
 )
@@ -895,7 +895,7 @@ async def test_backends_http_lrs_read_concurrency(
         if index < num_pages - 1:
             params.update(dict(parse_qsl(urlparse(targets[index + 1]).query)))
 
-    # Check that greedy read is faster than non greedy when processing is slow
+    # Check that greedy read is faster than non-greedy when processing is slow
     time_1 = time.time()
     counter = 0
     async for _ in backend.read(target=targets[0], chunk_size=chunk_size, greedy=False):
@@ -942,7 +942,7 @@ async def test_backends_http_lrs_write_concurrency(
 
     httpx_mock.add_callback(simulate_network_latency)
 
-    # Check that simultaneous write is faster than non simultaneous
+    # Check that simultaneous write is faster than non-simultaneous
     time_1 = time.time()
     await backend.write(
         data=data,

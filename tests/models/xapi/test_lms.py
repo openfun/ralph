@@ -176,7 +176,7 @@ def test_models_xapi_lms_uploaded_document_with_valid_statement(statement):
 
 @custom_given(LMSDownloadedAudio)
 def test_models_xapi_lms_downloaded_audio_with_valid_statement(statement):
-    """Test that a valid downloaded a audio statement has the expected `verb`.`id` and
+    """Test that a valid downloaded an audio statement has the expected `verb`.`id` and
     `object`.`definition`.`type` property values.
     """
 
@@ -189,7 +189,7 @@ def test_models_xapi_lms_downloaded_audio_with_valid_statement(statement):
 
 @custom_given(LMSUploadedAudio)
 def test_models_xapi_lms_uploaded_audio_with_valid_statement(statement):
-    """Test that a valid uploaded a audio statement has the expected `verb`.`id` and
+    """Test that a valid uploaded an audio statement has the expected `verb`.`id` and
     `object`.`definition`.`type` property values.
     """
 

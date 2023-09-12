@@ -102,7 +102,7 @@ class BaseEdxModel(BaseModelWithConfig):
     WARNING: it does not define the `event`, `event_type` and `event_source` fields.
 
     Attributes:
-        username (str): Consists of the unique username identifying the logged in user.
+        username (str): Consists of the unique username identifying the logged-in user.
             Retrieved with:
                 `request.user.username` querying the `auth_user` table.
             Note:

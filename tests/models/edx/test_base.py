@@ -44,7 +44,7 @@ def test_models_edx_base_edx_model_with_valid_statement(statement):
 )
 @custom_given(BaseEdxModel)
 def test_models_edx_base_edx_model_with_invalid_statement(course_id, error, statement):
-    """Tests that a invalid base `Edx` statement raises a `ValidationError`."""
+    """Tests that an invalid base `Edx` statement raises a `ValidationError`."""
     invalid_statement = json.loads(statement.json())
     invalid_statement["context"]["course_id"] = course_id
 

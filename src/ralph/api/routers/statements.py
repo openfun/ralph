@@ -81,7 +81,7 @@ def _enrich_statement_with_stored(statement: dict):
 
 
 def _enrich_statement_with_timestamp(statement: dict):
-    # timestamp: Time of the action. If not provided, it take the same value as stored.
+    # timestamp: Time of the action. If not provided, it takes the same value as stored.
     # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#247-timestamp
     statement["timestamp"] = statement.get("timestamp", statement["stored"])
 

@@ -11,7 +11,7 @@ class BaseXapiVerb(BaseModelWithConfig):
 
     Attributes:
         id (IRI): Consists of an identifier for the verb.
-        display (LanguageMap): Consists of a human readable representation of the verb.
+        display (LanguageMap): Consists of a human-readable representation of the verb.
     """
 
     id: IRI

@@ -366,7 +366,7 @@ jobs:
 
   # Publishing to PyPI requires that:
   #   * you already registered to pypi.org
-  #   * you have define both the TWINE_USERNAME & TWINE_PASSWORD secret
+  #   * you have defined both the TWINE_USERNAME & TWINE_PASSWORD secret
   #     environment variables in CircleCI UI (with your PyPI credentials)
   pypi:
     docker:

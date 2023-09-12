@@ -35,7 +35,7 @@ class BaseSettingsConfig:
 
 
 class CoreSettings(BaseSettings):
-    """Pydantice model for Ralph's core settings."""
+    """Pydantic model for Ralph's core settings."""
 
     class Config(BaseSettingsConfig):
         """Pydantic Configuration."""
@@ -74,7 +74,7 @@ class InstantiableSettingsItem(BaseModel):
     _class_path: str = None
 
     def get_instance(self, **init_parameters):
-        """Returns an instance of the settings item class using it's `_class_path`."""
+        """Returns an instance of the settings item class using its `_class_path`."""
         return import_string(self._class_path)(**init_parameters)
 
 
@@ -82,7 +82,7 @@ class InstantiableSettingsItem(BaseModel):
 
 
 class ClientOptions(BaseModel):
-    """Pydantic model for additionnal client options."""
+    """Pydantic model for additional client options."""
 
     class Config:  # pylint: disable=missing-class-docstring # noqa: D106
         extra = Extra.forbid
@@ -96,7 +96,7 @@ class ClickhouseClientOptions(ClientOptions):
 
 
 class ESClientOptions(ClientOptions):
-    """Pydantic model for Elasticsearch additionnal client options."""
+    """Pydantic model for Elasticsearch additional client options."""
 
     ca_certs: Path = None
     verify_certs: bool = None
@@ -117,14 +117,14 @@ class ClickhouseDatabaseBackendSettings(InstantiableSettingsItem):
 
 
 class MongoClientOptions(ClientOptions):
-    """Pydantic model for MongoDB additionnal client options."""
+    """Pydantic model for MongoDB additional client options."""
 
     document_class: str = None
     tz_aware: bool = None
 
 
 class ESDatabaseBackendSettings(InstantiableSettingsItem):
-    """Pydantic modelf for Elasticsearch database backend configuration settings."""
+    """Pydantic model for Elasticsearch database backend configuration settings."""
 
     _class_path: str = "ralph.backends.database.es.ESDatabase"
 
@@ -285,7 +285,7 @@ class BackendSettings(BaseModel):
 
 
 class ESParserSettings(InstantiableSettingsItem):
-    """Pydantic model for Elastisearch parser configuration settings."""
+    """Pydantic model for Elasticsearch parser configuration settings."""
 
     _class_path: str = "ralph.parsers.ElasticSearchParser"
 

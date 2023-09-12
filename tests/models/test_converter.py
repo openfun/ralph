@@ -29,7 +29,7 @@ from tests.fixtures.hypothesis_strategies import custom_given
 
 @pytest.mark.parametrize(
     (
-        "conversion_item,expected_dest,expected_src,expected_transfomers,"
+        "conversion_item,expected_dest,expected_src,expected_transformers,"
         "expected_raw_input"
     ),
     [
@@ -67,15 +67,15 @@ def test_converter_conversion_item_initialization(
     conversion_item,
     expected_dest,
     expected_src,
-    expected_transfomers,
+    expected_transformers,
     expected_raw_input,
 ):
     """Tests the ConversionItem initialization."""
     assert conversion_item.dest == expected_dest
     assert conversion_item.src == expected_src
-    for i, expected_transfomer in enumerate(expected_transfomers):
+    for i, expected_transformer in enumerate(expected_transformers):
         current_transformer_code = conversion_item.transformers[i].__code__.co_code
-        assert current_transformer_code == expected_transfomer.__code__.co_code
+        assert current_transformer_code == expected_transformer.__code__.co_code
     assert conversion_item.raw_input == expected_raw_input
 
 

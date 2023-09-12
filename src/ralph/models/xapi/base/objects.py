@@ -28,7 +28,7 @@ class BaseXapiSubStatement(BaseModelWithConfig):
         actor (dict): See BaseXapiAgent and BaseXapiGroup.
         verb (dict): See BaseXapiVerb.
         object (dict): See BaseXapiUnnestedObject.
-        objecType (dict): Consists of the value `SubStatement`.
+        objectType (dict): Consists of the value `SubStatement`.
     """
 
     actor: Union[BaseXapiAgent, BaseXapiGroup]

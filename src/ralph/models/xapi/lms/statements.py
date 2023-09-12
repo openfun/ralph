@@ -79,7 +79,7 @@ class LMSUnregisteredCourse(BaseLMSStatement):
 class LMSAccessedPage(BaseLMSStatement):
     """Pydantic model for LMS `accessed a page` statement.
 
-    Example: John has accessed a page of a LMS or a website.
+    Example: John has accessed a page of an LMS or a website.
 
     Attributes:
         verb (dict): See AccessedVerb.
