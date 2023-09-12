@@ -77,12 +77,11 @@ def auth_credentials(fs, user_scopes=None, agent=None):
     Args:
         fs: fixture provided by pyfakefs (not called in the code)
         user_scopes (List[str]): list of scopes to associate to the user
+        agent (dict): valid Agent (per xAPI specification) representing the user
 
     Returns:
         credentials (str): auth parameters that need to be passed
             through headers to authenticate the request.
-        user_scopes (List[str]): list of scopes for the created user
-        agent (dict): valid Agent (per xAPI specification) representing the user
     """
 
     username = "ralph"
