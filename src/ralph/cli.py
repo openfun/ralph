@@ -21,7 +21,7 @@ except ModuleNotFoundError as err:
 try:
     import uvicorn
 except ModuleNotFoundError:
-    # This error will be catched in the runserver command. We should be able to
+    # This error will be caught in the runserver command. We should be able to
     # use all commands except the runserver command when lrs optional
     # dependencies are not installed.
     pass
@@ -321,7 +321,7 @@ def auth(
     agent_ifi_account,
     agent_name,
 ):
-    """Generate credentials for LRS HTTP basic authentification."""
+    """Generate credentials for LRS HTTP basic authentication."""
     logger.info("Will generate credentials for user: %s", username)
 
     # Verify that exactly one agent representation has been provided

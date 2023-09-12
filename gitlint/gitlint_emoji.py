@@ -25,7 +25,7 @@ class GitmojiTitle(LineRule):
     def validate(self, title, _commit):
         """Validates Gitmoji title rule.
 
-        Downloads the list possible gitmojis from the project's github
+        Downloads the list possible gitmojis from the project's GitHub
         repository and check that title contains one of them.
         """
         gitmojis = requests.get(

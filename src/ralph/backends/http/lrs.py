@@ -41,7 +41,7 @@ class LRSHTTP(AsyncLRSHTTP):
 
     @_ensure_running_loop_uniqueness
     def list(self, *args, **kwargs):
-        """Raise error for unsuported `list` method."""
+        """Raise error for unsupported `list` method."""
         return asyncio.get_event_loop().run_until_complete(
             super().list(*args, **kwargs)
         )

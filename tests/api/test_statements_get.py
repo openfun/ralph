@@ -71,7 +71,7 @@ def insert_clickhouse_statements(statements):
 
 
 def create_mock_activity(id_: int = 0):
-    """Create distinct activites with valid IRIs.
+    """Create distinct activities with valid IRIs.
 
     args:
         id_: An integer used to uniquely identify the created agent.
@@ -144,7 +144,7 @@ def create_mock_agent(
 def insert_statements_and_monkeypatch_backend(
     request, es, mongo, clickhouse, monkeypatch
 ):
-    """Retuns a function that inserts statements into each backend."""
+    """Returns a function that inserts statements into each backend."""
     # pylint: disable=invalid-name
 
     def _insert_statements_and_monkeypatch_backend(statements):
@@ -538,7 +538,7 @@ def test_api_statements_get_statements_with_pagination(
     monkeypatch, insert_statements_and_monkeypatch_backend, auth_credentials
 ):
     """Test the get statements API route, given a request leading to more results than
-    can fit on the first page, should return a list of statements non exceeding the page
+    can fit on the first page, should return a list of statements non-exceeding the page
     limit and include a "more" property with a link to get the next page of results.
     """
     # pylint: disable=redefined-outer-name
@@ -609,7 +609,7 @@ def test_api_statements_get_statements_with_pagination_and_query(
 ):
     """Test the get statements API route, given a request with a query parameter
     leading to more results than can fit on the first page, should return a list
-    of statements non exceeding the page limit and include a "more" property with
+    of statements non-exceeding the page limit and include a "more" property with
     a link to get the next page of results.
     """
     # pylint: disable=redefined-outer-name
@@ -727,7 +727,7 @@ def test_api_statements_get_statements_with_database_query_failure(
 def test_api_statements_get_statements_invalid_query_parameters(
     auth_credentials, id_param
 ):
-    """Test error response for invalid query parametrs"""
+    """Test error response for invalid query parameters"""
 
     id_1 = "be67b160-d958-4f51-b8b8-1892002dbac6"
     id_2 = "66c81e98-1763-4730-8cfc-f5ab34f1bad5"

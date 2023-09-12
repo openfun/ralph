@@ -70,7 +70,7 @@ def get_dict_value_from_path(dict_: dict, path: List[str]):
     """Gets a nested dictionary value.
 
     Args:
-        dict_ (dict): dictionnary of values to which the reduction is
+        dict_ (dict): dictionary of values to which the reduction is
             applied
         path (List): array of keys representing the path to the value
     """
@@ -86,7 +86,7 @@ def set_dict_value_from_path(dict_: dict, path: List[str], value: any):
     """Sets a nested dictionary value.
 
     Args:
-        dict_ (dict): dictionnary where the given value is set
+        dict_ (dict): dictionary where the given value is set
         path (List): array of keys representing the path to the value
         value: value to be set
     """

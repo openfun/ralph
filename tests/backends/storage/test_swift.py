@@ -182,7 +182,7 @@ def test_backends_storage_swift_read_with_invalid_name_should_log_the_error(
 # pylint: disable=line-too-long
 @pytest.mark.parametrize("overwrite", [False, True])
 @pytest.mark.parametrize("new_archive", [False, True])
-def test_backends_storage_swift_write_should_write_to_history_new_or_overwriten_archives(  # noqa
+def test_backends_storage_swift_write_should_write_to_history_new_or_overwritten_archives(  # noqa
     overwrite, new_archive, swift, monkeypatch, fs, caplog, settings_fs
 ):  # pylint:disable=invalid-name, too-many-arguments, too-many-locals,unused-argument
     """Tests that given SwiftService list/upload method successfully connects to the

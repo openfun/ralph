@@ -43,7 +43,7 @@ class BaseXapiContext(BaseModelWithConfig):
         platform (str): The platform where the learning activity took place.
         language (dict): The language in which the experience occurred.
         statement (dict): Another Statement giving context for this Statement.
-        extensions (dict): Consists of an dictionary of other properties as needed.
+        extensions (dict): Consists of a dictionary of other properties as needed.
     """
 
     registration: Optional[UUID]

@@ -39,7 +39,7 @@ def test_models_xapi_base_object_interaction_component_with_valid_field(
 def test_models_xapi_base_object_interaction_component_with_invalid_field(
     id_value, field
 ):
-    """Tests a invalid `id` property in
+    """Tests an invalid `id` property in
     BaseXapiInteractionComponent raises a `ValidationError`.
     """
 

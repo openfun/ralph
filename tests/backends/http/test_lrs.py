@@ -75,7 +75,7 @@ def test_backends_http_lrs_inheritence(monkeypatch):
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
 
-    # Test class inheritence
+    # Test class inheritance
     assert issubclass(lrs.__class__, AsyncLRSHTTP)
 
     # Test "status"

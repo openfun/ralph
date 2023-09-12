@@ -26,7 +26,7 @@ def test_models_xapi_navigation_selectors_with_valid_statements(class_, data):
 
 @custom_given(PageTerminated)
 def test_models_xapi_navigation_page_terminated_with_valid_statement(statement):
-    """Tests that a valide page_terminated statement has the expected `verb`.`id` and
+    """Tests that a valid page_terminated statement has the expected `verb`.`id` and
     `object`.`definition`.`type` property values.
     """
     assert statement.verb.id == "http://adlnet.gov/expapi/verbs/terminated"

@@ -203,7 +203,7 @@ def test_backends_storage_ldp_list_method(monkeypatch):
 def test_backends_storage_ldp_list_method_history_management(
     monkeypatch, fs, settings_fs
 ):
-    """Tests the LDPStorage list method with an history."""
+    """Tests the LDPStorage list method with a history."""
     # pylint: disable=invalid-name,unused-argument
 
     def mock_list(url):

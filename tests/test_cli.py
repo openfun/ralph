@@ -409,7 +409,7 @@ def test_cli_auth_command_when_writing_auth_file(
 
 
 # pylint: disable=invalid-name
-def test_cli_auth_command_when_writing_auth_file_whith_incorrect_auth_file(fs):
+def test_cli_auth_command_when_writing_auth_file_with_incorrect_auth_file(fs):
     """Test ralph auth command when credentials are written in the authentication
     file with a badly formatted original authentication file.
     """

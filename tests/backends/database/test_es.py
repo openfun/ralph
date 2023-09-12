@@ -354,7 +354,7 @@ def test_backends_database_es_put_with_badly_formatted_data_in_force_mode(
         hosts=ES_TEST_HOSTS,
         index=ES_TEST_INDEX,
     )
-    # When forcing import, We expect the record with non expected type to have
+    # When forcing import, We expect the record with non-expected type to have
     # been dropped
     database.put(sys.stdin, chunk_size=5, ignore_errors=True)
     es.indices.refresh(index=ES_TEST_INDEX)

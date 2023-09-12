@@ -32,7 +32,7 @@ def test_models_edx_base_browser_model_with_valid_statement(statement):
 def test_models_edx_base_browser_model_with_invalid_statement(
     session, error, statement
 ):
-    """Tests that a invalid base browser statement raises a `ValidationError`."""
+    """Tests that an invalid base browser statement raises a `ValidationError`."""
     invalid_statement = json.loads(statement.json())
     invalid_statement["session"] = session
 

@@ -129,9 +129,9 @@ Dependencies:
 - [Kubectl](https://kubernetes.io/docs/tasks/tools/) (>`v.1.23.5`):
   This CLI is used to communicate with the running Kubernetes instance you
   will use.
-- [k3d](https://k3d.io/) (>`v.5.0.0`): This tool is used to setup
+- [k3d](https://k3d.io/) (>`v.5.0.0`): This tool is used to set up
   and run a lightweight Kubernetes cluster, in order to have a local
-  environment (it is required to complete below's quickstart instructions to
+  environment (it is required to complete quickstart instructions below to
   avoid depending on an existing Kubernetes cluster).
 - [curl](https://curl.se/) is required by Arnold's CLI.
 - [gnupg](https://gnupg.org/) to encrypt Ansible vaults passwords and
@@ -306,7 +306,7 @@ $ curl -sL \
 
 > This example command requires [`jq`](https://stedolan.github.io/jq/) to
 > serialize the request payload (xAPI statements). When dealing with JSON data,
-> we strongly recommend to install it to manipulate them from the command line.
+> we strongly recommend installing it to manipulate them from the command line.
 
 ### Perform Arnold's operations
 

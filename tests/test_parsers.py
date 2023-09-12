@@ -68,7 +68,7 @@ def test_parsers_gelfparser_parse_partially_invalid_file(caplog):
     with StringIO() as file:
         file.writelines(
             [
-                # This is invalid gelf but we assume it's valid in our case
+                # This is invalid gelf, but we assume it's valid in our case
                 '{"short_message": "This seems valid."}\n',
                 # Invalid json
                 "{ This is not valid json and raises json.decoder.JSONDecodeError\n",

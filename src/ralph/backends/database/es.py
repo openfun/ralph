@@ -94,7 +94,7 @@ class ESDatabase(BaseDatabase):
     def get(self, query: ESQuery = None, chunk_size: int = 500):
         """Gets index documents and yields them.
 
-        The `query` dictionary should only contains kwargs compatible with the
+        The `query` dictionary should only contain kwargs compatible with the
         elasticsearch.helpers.scan function signature (API reference
         documentation:
         https://elasticsearch-py.readthedocs.io/en/latest/helpers.html#scan).

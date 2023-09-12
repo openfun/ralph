@@ -22,7 +22,7 @@ def test_backends_storage_s3_storage_instantiation_should_raise_exception(
 
     Checks that S3Storage raises BackendParameterException on failure.
     """
-    # Regions outside of us-east-1 require the appropriate LocationConstraint
+    # Regions outside us-east-1 require the appropriate LocationConstraint
     s3_client = boto3.client("s3", region_name="us-east-1")
     # Create an invalid bucket in Moto's 'virtual' AWS account
     bucket_name = "my-test-bucket"
@@ -47,7 +47,7 @@ def test_backends_storage_s3_storage_instantiation_failure_should_not_raise_exce
     Checks that S3Storage doesn't raise exceptions when the connection is
     successful.
     """
-    # Regions outside of us-east-1 require the appropriate LocationConstraint
+    # Regions outside us-east-1 require the appropriate LocationConstraint
     s3_client = boto3.client("s3", region_name="us-east-1")
     # Create a valid bucket in Moto's 'virtual' AWS account
     bucket_name = "bucket_name"

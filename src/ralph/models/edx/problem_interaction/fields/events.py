@@ -50,7 +50,7 @@ class CorrectMap(BaseModelWithConfig):
 
 
 class State(BaseModelWithConfig):
-    """Pydantic modelfor problem interaction `event`.`state` field.
+    """Pydantic model for problem interaction `event`.`state` field.
 
     Attributes:
         correct_map (dict): see CorrectMapSubFields.
@@ -75,7 +75,7 @@ class SubmissionAnswerField(BaseModelWithConfig):
 
     Attributes:
         answer (str, list): Consists of the answer string or a list of the answer
-            strings if multiple choices are allorwed.
+            strings if multiple choices are allowed.
         correct (bool): `True` if the `answer` value is correct, else `False`.
         input_type (str): Consists of the type of value that the student supplies for
             the `response_type`.
@@ -116,7 +116,7 @@ class EdxProblemHintFeedbackDisplayedEventField(AbstractBaseEventField):
     """Pydantic model for `edx.problem.hint.feedback_displayed`.`event` field.
 
     Attributes:
-        choice_all (list): Lists all of the answer choices for problems with multiple
+        choice_all (list): Lists all the answer choices for problems with multiple
             possible answers defined.
         correctness (bool): `True` if the `student_answer` value is correct, else
             `False`.
@@ -164,7 +164,7 @@ class ProblemCheckEventField(AbstractBaseEventField):
         max_grade (int): Consists of the maximum possible grade value.
         problem_id (str): Consists of the ID of the problem that was checked.
         state (json): Consists of the current problem state.
-        submission (dict): Consists of a dictionnary of data about the given answer.
+        submission (dict): Consists of a dictionary of data about the given answer.
         success (str): Consists of either the `correct` or `incorrect` value.
     """
 

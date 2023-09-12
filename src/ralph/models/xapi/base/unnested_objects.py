@@ -19,7 +19,7 @@ class BaseXapiActivityDefinition(BaseModelWithConfig):
     """Pydantic model for `Activity` type `definition` property.
 
     Attributes:
-        name (LanguageMap): Consists of the human readable/visual name of the Activity.
+        name (LanguageMap): Consists of the human-readable/visual name of the Activity.
         description (LanguageMap): Consists of a description of the Activity.
         type (IRI): Consists of the type of the Activity.
         moreInfo (URL): Consists of an URL to a document about the Activity.
