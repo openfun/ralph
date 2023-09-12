@@ -21,7 +21,7 @@ def test_fields_edx_textbook_interaction_base_event_field_with_valid_content(fie
     """
 
     assert re.match(
-        (r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"),
+        r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$",
         field.chapter,
     )
 

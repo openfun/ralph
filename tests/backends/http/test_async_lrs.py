@@ -657,7 +657,7 @@ async def test_backends_http_lrs_write_without_data(caplog):
         assert (
             "ralph.backends.http.async_lrs",
             logging.INFO,
-            ("Data Iterator is empty; skipping write to target."),
+            "Data Iterator is empty; skipping write to target.",
         ) in caplog.record_tuples
 
     assert result == 0

@@ -163,7 +163,7 @@ class JSONStringParamType(click.ParamType):
             options = json.loads(value)
         except (json.JSONDecodeError, TypeError):
             self.fail(
-                ("You should provide a valid JSON string as input"),
+                "You should provide a valid JSON string as input",
                 param,
                 ctx,
             )
