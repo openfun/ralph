@@ -98,8 +98,8 @@ def get_authenticated_user(
     """Decode and validate OpenId Connect ID token against issuer in config.
 
     Args:
-        token (str): Base64 encoded OIDC Token. This is invoked behind the
-            scenes by Depends.
+        auth_header (str): Authentication header containing the Base64 encoded
+            OIDC Token. This is invoked behind the scenes by Depends.
 
     Return:
         AuthenticatedUser (AuthenticatedUser)
