@@ -424,7 +424,7 @@ def test_models_xapi_base_statement_with_invalid_context_value(path, value, stat
         BaseXapiStatement(**statement)
 
 
-@pytest.mark.parametrize("path", [("context.contextActivities.not_parent")])
+@pytest.mark.parametrize("path", ["context.contextActivities.not_parent"])
 @custom_given(BaseXapiStatement)
 def test_models_xapi_base_statement_with_invalid_context_activities(path, statement):
     """Tests that the statement does not accept invalid context activity properties.
