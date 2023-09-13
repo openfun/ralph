@@ -19,7 +19,7 @@ and this project adheres to
 - Refactor LRS Statements resource query parameters defined for `ralph` API
 - Helm chart: improve chart modularity
 - User credentials must now include an "agent" field which can be created
-using the cli
+  using the cli
 - `GET /statements` now has "mine" option which matches statements that
 have an authority field matching that of the user
 - CLI: change `push` to `write` and `fetch` to `read` [BC]
@@ -36,6 +36,8 @@ have an authority field matching that of the user
 - Backends: add `max_statements` option to `AsyncLRSHTTP`
 - API: Incoming statements are enriched with `id`, `timestamp`, `stored`
   and `authority`
+- API: Add `TODO: PUT NAME HERE WHEN DEFINITIVE`option making `?mine=True` 
+  implicit
 
 ### Removed
 

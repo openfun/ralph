@@ -22,7 +22,7 @@ STORED_CREDENTIALS = json.dumps(
         {
             "username": "ralph",
             "hash": bcrypt.hashpw(b"admin", bcrypt.gensalt()).decode("UTF-8"),
-            "scopes": ["ralph_test_scope"],
+            "scopes": ["statements/read/mine", "statements/write"],
             "agent": {"mbox": "mailto:ralph@example.com"},
         }
     ]
@@ -37,13 +37,13 @@ def test_api_auth_basic_model_serveruserscredentials():
             UserCredentials(
                 username="johndoe",
                 hash="notrealhash",
-                scopes=["johndoe_scope"],
+                scopes=["statements/read/mine", "statements/write"],
                 agent={"mbox": "mailto:johndoe@example.com"},
             ),
             UserCredentials(
                 username="foo",
                 hash="notsorealhash",
-                scopes=["foo_scope"],
+                scopes=["all"],
                 agent={"mbox": "mailto:foo@example.com"},
             ),
         ]
@@ -53,7 +53,7 @@ def test_api_auth_basic_model_serveruserscredentials():
             UserCredentials(
                 username="janedoe",
                 hash="notreallyrealhash",
-                scopes=["janedoe_scope"],
+                scopes=["statements/read/mine", "statements/write"],
                 agent={"mbox": "mailto:janedoe@example.com"},
             ),
         ]
@@ -85,7 +85,7 @@ def test_api_auth_basic_model_serveruserscredentials():
                 UserCredentials(
                     username="foo",
                     hash="notsorealhash",
-                    scopes=["foo_scope"],
+                    scopes=["statements/read/mine", "statements/write"],
                     agent={"mbox": "mailto:foo2@example.com"},
                 ),
             ]
@@ -108,7 +108,7 @@ def test_api_auth_basic_caching_credentials(fs):
         ("ralph", "admin"),
         AuthenticatedUser(
             agent={"mbox": "mailto:ralph@example.com"},
-            scopes=["ralph_test_scope"],
+            scopes=["statements/read/mine", "statements/write"],
         ),
     )
 
@@ -226,5 +226,5 @@ def test_get_whoami_correct_credentials(basic_auth_test_client, fs):
     assert response.status_code == 200
     assert response.json() == {
         "agent": {"mbox": "mailto:ralph@example.com"},
-        "scopes": ["ralph_test_scope"],
+        "scopes": ["statements/read/mine", "statements/write"],
     }

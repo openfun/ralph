@@ -376,11 +376,13 @@ class Settings(BaseSettings):
     RUNSERVER_AUTH_BACKEND: AuthBackends = AuthBackends.BASIC
     RUNSERVER_AUTH_OIDC_AUDIENCE: str = None
     RUNSERVER_AUTH_OIDC_ISSUER_URI: AnyHttpUrl = None
-    RUNSERVER_BACKEND: Literal["clickhouse", "es", "mongo"] = "es"
+    RUNSERVER_BACKEND: Literal["es", "mongo", "clickhouse"] = "es"
     RUNSERVER_HOST: str = "0.0.0.0"  # nosec
     RUNSERVER_MAX_SEARCH_HITS_COUNT: int = 100
     RUNSERVER_POINT_IN_TIME_KEEP_ALIVE: str = "1m"
     RUNSERVER_PORT: int = 8100
+    RUNSERVER_RESTRICT_BY_AUTHORITY: bool = False
+    RUNSERVER_RESTRICT_BY_SCOPES: bool = False
     SENTRY_CLI_TRACES_SAMPLE_RATE: float = 1.0
     SENTRY_DSN: str = None
     SENTRY_IGNORE_HEALTH_CHECKS: bool = False

@@ -20,12 +20,10 @@ The API server can be started up with the following command:
 $ ralph runserver --backend es
 ```
 
-The `--backend` (or `-b`) option specifies which database backend to use for
-LRS data storage and retrieval. See Ralph's [backends
+The `--backend` (or `-b`) option specifies which database backend to use for LRS data storage and retrieval. See Ralph's [backends
 documentation](./backends.md) for more details.
 
-However, before you can start your API server and make requests against it, you
-need to set up your credentials.
+However, before you can start your API server and make requests against it, you need to set up your credentials.
 
 #### Creating a credentials file
 
@@ -85,9 +83,6 @@ This command updates your credentials file with the new `janedoe` user.
 > optional dependencies, _e.g._ `pip install ralph-malph[cli]` (which we highly
 > recommend).
 
-#### Scopes
-
-(Work In Progress)
 
 #### Making a GET request
 
@@ -131,10 +126,6 @@ It is also strongly recommended that you set the optional `RALPH_RUNSERVER_AUTH_
 OIDC support is currently developed and tested against [Keycloak](https://www.keycloak.org/) but may work with other identity providers that implement the specification.
 
 The [Learning analytics playground](https://github.com/openfun/learning-analytics-playground/) repository contains a Docker Compose file and configuration for a demo instance of Keycloak with a `ralph` client.
-
-#### Scopes
-
-(Work In Progress)
 
 #### Making a GET request
 
@@ -180,6 +171,26 @@ $ curl http://localhost:8100/whoami --header "Authorization: Bearer eyJhbGciOiJS
 < HTTP/1.1 200 OK
 < {"username":"ralph_admin","scopes":["all"]}
 ```
+
+## Security
+
+By default, all authenticated users have full read and write access to the server. You may use the options below to restrict behavior.
+
+### Filtering results by authority (multitenancy)
+
+In Ralph, all incoming statements are assigned an `authority` (or ownership) derived from the user that makes the call. You may restrict read access to users "own" statements (thus enabling multitenancy) by setting the following environment variable: 
+
+```
+RALPH_RUNSERVER_RESTRICT_BY_AUTHORITY = True # Default: False
+```
+
+**WARNING**: Two accounts with different credentials may share the same `authority` meaning they can access the same statements. It is the administrators responsability to ensure that `authority` is properly assigned.
+
+NB: If not using "scopes", or for users with limited "scopes", using this option will make the use of option `?mine=True` implicit when fetching statement.
+
+#### Scopes
+
+(Work In Progress)
 
 ## Forwarding statements
 
