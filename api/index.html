@@ -1186,7 +1186,7 @@ To activate Sentry integration, one should define the following environment vari
 <h4 id="http_basic_auth_caching">HTTP Basic auth caching<a class="headerlink" href="#http_basic_auth_caching" title="Permanent link">&para;</a></h4>
 <p>HTTP basic auth implementation uses the secure and standard bcrypt algorithm to hash/salt passwords before storing them.
 This implementation comes with a performance cost.
-To speed up requests, credentials are stored in a LRU cache with a Time To Live.
+To speed up requests, credentials are stored in an LRU cache with a Time To Live.
 To configure this cache, you can define the following environment variables:
 - the maximum number of entries in the cache. Select a value greater than the maximum number of individual user credentials, for better performance. Defaults to 100. 
 <div class="highlight"><pre><span></span><code>RALPH_AUTH_CACHE_MAX_SIZE=100

@@ -4489,7 +4489,7 @@ BaseEdxModel            (<a class="autorefs autorefs-internal" title="ralph.mode
       <tr>
         <td><code>username</code></td>
         <td><code>str</code></td>
-        <td><p>Consists of the unique username identifying the logged in user.
+        <td><p>Consists of the unique username identifying the logged-in user.
 Retrieved with:
     <code>request.user.username</code> querying the <code>auth_user</code> table.
 Note:
@@ -4578,7 +4578,7 @@ Note:
 <span class="sd">    WARNING: it does not define the `event`, `event_type` and `event_source` fields.</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        username (str): Consists of the unique username identifying the logged in user.</span>
+<span class="sd">        username (str): Consists of the unique username identifying the logged-in user.</span>
 <span class="sd">            Retrieved with:</span>
 <span class="sd">                `request.user.username` querying the `auth_user` table.</span>
 <span class="sd">            Note:</span>
@@ -5089,7 +5089,7 @@ contain sensitive data: <code>username</code>, <code>referer</code>, <code>event
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid_namespace</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">platform_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes BaseXapiConverter.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize BaseXapiConverter.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">platform_url</span> <span class="o">=</span> <span class="n">platform_url</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">uuid_namespace</span> <span class="o">=</span> <span class="n">UUID</span><span class="p">(</span><span class="n">uuid_namespace</span><span class="p">)</span>
@@ -5098,7 +5098,7 @@ contain sensitive data: <code>username</code>, <code>referer</code>, <code>event
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="n">ConversionItem</span><span class="p">(</span>
                 <span class="s2">&quot;id&quot;</span><span class="p">,</span>
@@ -5133,9 +5133,9 @@ contain sensitive data: <code>username</code>, <code>referer</code>, <code>event
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">parse_course_id</span><span class="p">(</span><span class="n">course_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parses edX event&#39;s `context`.`course_id`.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse edX event&#39;s `context`.`course_id`.</span>
 
-<span class="sd">        Returns a dictionary with `course` and `module`.</span>
+<span class="sd">        Return a dictionary with `course` and `module`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^course-v1:.+\+(.+)\+(.+)$&quot;</span><span class="p">,</span> <span class="n">course_id</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
@@ -5171,12 +5171,12 @@ contain sensitive data: <code>username</code>, <code>referer</code>, <code>event
 
     <div class="doc doc-contents ">
 
-      <p>Initializes BaseXapiConverter.</p>
+      <p>Initialize BaseXapiConverter.</p>
 
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/base.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid_namespace</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">platform_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initializes BaseXapiConverter.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize BaseXapiConverter.&quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">platform_url</span> <span class="o">=</span> <span class="n">platform_url</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">uuid_namespace</span> <span class="o">=</span> <span class="n">UUID</span><span class="p">(</span><span class="n">uuid_namespace</span><span class="p">)</span>
@@ -5206,16 +5206,16 @@ contain sensitive data: <code>username</code>, <code>referer</code>, <code>event
 
     <div class="doc doc-contents ">
 
-      <p>Parses edX event&rsquo;s <code>context</code>.<code>course_id</code>.</p>
-<p>Returns a dictionary with <code>course</code> and <code>module</code>.</p>
+      <p>Parse edX event&rsquo;s <code>context</code>.<code>course_id</code>.</p>
+<p>Return a dictionary with <code>course</code> and <code>module</code>.</p>
 
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/base.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@staticmethod</span>
 <span class="k">def</span> <span class="nf">parse_course_id</span><span class="p">(</span><span class="n">course_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parses edX event&#39;s `context`.`course_id`.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse edX event&#39;s `context`.`course_id`.</span>
 
-<span class="sd">    Returns a dictionary with `course` and `module`.</span>
+<span class="sd">    Return a dictionary with `course` and `module`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^course-v1:.+\+(.+)\+(.+)$&quot;</span><span class="p">,</span> <span class="n">course_id</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
@@ -5873,7 +5873,7 @@ UIPageCloseToPageTerminated            (<a class="autorefs autorefs-internal" ti
 
     <div class="doc doc-contents ">
 
-      <p>Converts a common edX <code>page_close</code> event to xAPI.</p>
+      <p>Convert a common edX <code>page_close</code> event to xAPI.</p>
 <p>Example Statement: John terminated https://www.fun-mooc.fr/ page.</p>
 <p>WARNING: The converter does not use the <code>self.platform_url</code> in the <code>object__id</code>
 because the <code>platform_url</code> is present in the edX&rsquo;s event <code>page</code> field.</p>
@@ -5881,7 +5881,7 @@ because the <code>platform_url</code> is present in the edX&rsquo;s event <code>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/navigational.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UIPageCloseToPageTerminated</span><span class="p">(</span><span class="n">BaseXapiConverter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts a common edX `page_close` event to xAPI.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a common edX `page_close` event to xAPI.</span>
 
 <span class="sd">    Example Statement: John terminated https://www.fun-mooc.fr/ page.</span>
 
@@ -5893,7 +5893,7 @@ because the <code>platform_url</code> is present in the edX&rsquo;s event <code>
     <span class="n">__dest__</span> <span class="o">=</span> <span class="n">PageTerminated</span>
 
     <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
         <span class="n">conversion_items</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_conversion_items</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="n">ConversionItem</span><span class="p">(</span><span class="s2">&quot;object__id&quot;</span><span class="p">,</span> <span class="s2">&quot;page&quot;</span><span class="p">)})</span>
 </code></pre></div>
@@ -6165,13 +6165,13 @@ ServerEventToPageViewed            (<a class="autorefs autorefs-internal" title=
 
     <div class="doc doc-contents ">
 
-      <p>Converts a common edX server event to xAPI.</p>
+      <p>Convert a common edX server event to xAPI.</p>
 <p>Example Statement: John viewed https://www.fun-mooc.fr/ page.</p>
 
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/server.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ServerEventToPageViewed</span><span class="p">(</span><span class="n">BaseXapiConverter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts a common edX server event to xAPI.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a common edX server event to xAPI.</span>
 
 <span class="sd">    Example Statement: John viewed https://www.fun-mooc.fr/ page.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -6180,7 +6180,7 @@ ServerEventToPageViewed            (<a class="autorefs autorefs-internal" title=
     <span class="n">__dest__</span> <span class="o">=</span> <span class="n">PageViewed</span>
 
     <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
         <span class="n">conversion_items</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_conversion_items</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
             <span class="p">{</span>
@@ -6486,18 +6486,18 @@ UILoadVideoToVideoInitialized            (<a class="autorefs autorefs-internal" 
 
     <div class="doc doc-contents ">
 
-      <p>Converts a common edX <code>load_video</code> event to xAPI.</p>
+      <p>Convert a common edX <code>load_video</code> event to xAPI.</p>
 
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/video.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UILoadVideoToVideoInitialized</span><span class="p">(</span><span class="n">VideoBaseXapiConverter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts a common edX `load_video` event to xAPI.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a common edX `load_video` event to xAPI.&quot;&quot;&quot;</span>
 
     <span class="n">__src__</span> <span class="o">=</span> <span class="n">UILoadVideo</span>
     <span class="n">__dest__</span> <span class="o">=</span> <span class="n">VideoInitialized</span>
 
     <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
         <span class="n">conversion_items</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_conversion_items</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
             <span class="p">{</span>
@@ -6750,18 +6750,18 @@ UIPauseVideoToVideoPaused            (<a class="autorefs autorefs-internal" titl
 
     <div class="doc doc-contents ">
 
-      <p>Converts a common edX <code>pause_video</code> event to xAPI.</p>
+      <p>Convert a common edX <code>pause_video</code> event to xAPI.</p>
 
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/video.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UIPauseVideoToVideoPaused</span><span class="p">(</span><span class="n">VideoBaseXapiConverter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts a common edX `pause_video` event to xAPI.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a common edX `pause_video` event to xAPI.&quot;&quot;&quot;</span>
 
     <span class="n">__src__</span> <span class="o">=</span> <span class="n">UIPauseVideo</span>
     <span class="n">__dest__</span> <span class="o">=</span> <span class="n">VideoPaused</span>
 
     <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
         <span class="n">conversion_items</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_conversion_items</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
             <span class="p">{</span>
@@ -7022,18 +7022,18 @@ UIPlayVideoToVideoPlayed            (<a class="autorefs autorefs-internal" title
 
     <div class="doc doc-contents ">
 
-      <p>Converts a common edX <code>play_video</code> event to xAPI.</p>
+      <p>Convert a common edX <code>play_video</code> event to xAPI.</p>
 
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/video.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UIPlayVideoToVideoPlayed</span><span class="p">(</span><span class="n">VideoBaseXapiConverter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts a common edX `play_video` event to xAPI.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a common edX `play_video` event to xAPI.&quot;&quot;&quot;</span>
 
     <span class="n">__src__</span> <span class="o">=</span> <span class="n">UIPlayVideo</span>
     <span class="n">__dest__</span> <span class="o">=</span> <span class="n">VideoPlayed</span>
 
     <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
         <span class="n">conversion_items</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_conversion_items</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
             <span class="p">{</span>
@@ -7286,18 +7286,18 @@ UISeekVideoToVideoSeeked            (<a class="autorefs autorefs-internal" title
 
     <div class="doc doc-contents ">
 
-      <p>Converts a common edX <code>seek_video</code> event to xAPI.</p>
+      <p>Convert a common edX <code>seek_video</code> event to xAPI.</p>
 
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/video.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UISeekVideoToVideoSeeked</span><span class="p">(</span><span class="n">VideoBaseXapiConverter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts a common edX `seek_video` event to xAPI.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a common edX `seek_video` event to xAPI.&quot;&quot;&quot;</span>
 
     <span class="n">__src__</span> <span class="o">=</span> <span class="n">UISeekVideo</span>
     <span class="n">__dest__</span> <span class="o">=</span> <span class="n">VideoSeeked</span>
 
     <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
         <span class="n">conversion_items</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_conversion_items</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
             <span class="p">{</span>
@@ -7558,18 +7558,18 @@ UIStopVideoToVideoTerminated            (<a class="autorefs autorefs-internal" t
 
     <div class="doc doc-contents ">
 
-      <p>Converts a common edX <code>stop_video</code> event to xAPI.</p>
+      <p>Convert a common edX <code>stop_video</code> event to xAPI.</p>
 
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/converters/xapi/video.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UIStopVideoToVideoTerminated</span><span class="p">(</span><span class="n">VideoBaseXapiConverter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts a common edX `stop_video` event to xAPI.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a common edX `stop_video` event to xAPI.&quot;&quot;&quot;</span>
 
     <span class="n">__src__</span> <span class="o">=</span> <span class="n">UIStopVideo</span>
     <span class="n">__dest__</span> <span class="o">=</span> <span class="n">VideoTerminated</span>
 
     <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
         <span class="n">conversion_items</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_conversion_items</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
             <span class="p">{</span>
@@ -7846,7 +7846,7 @@ VideoBaseXapiConverter            (<a class="autorefs autorefs-internal" title="
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Base Video xAPI Converter.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
         <span class="n">conversion_items</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_conversion_items</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
             <span class="p">{</span>
@@ -9391,7 +9391,7 @@ sequence.</p>
     <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;event&quot;</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">validate_next_jump_event_field</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks that event.new is equal to event.old + 1.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check that event.new is equal to event.old + 1.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">new</span> <span class="o">!=</span> <span class="n">value</span><span class="o">.</span><span class="n">old</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;event.new - event.old should be equal to 1&quot;</span><span class="p">)</span>
 
@@ -9432,14 +9432,14 @@ sequence.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Checks that event.new is equal to event.old + 1.</p>
+      <p>Check that event.new is equal to event.old + 1.</p>
 
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/navigational/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;event&quot;</span><span class="p">)</span>
 <span class="nd">@classmethod</span>
 <span class="k">def</span> <span class="nf">validate_next_jump_event_field</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Checks that event.new is equal to event.old + 1.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check that event.new is equal to event.old + 1.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">new</span> <span class="o">!=</span> <span class="n">value</span><span class="o">.</span><span class="n">old</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;event.new - event.old should be equal to 1&quot;</span><span class="p">)</span>
 
@@ -9536,7 +9536,7 @@ sequence.</p>
     <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;event&quot;</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">validate_prev_jump_event_field</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks that event.new is equal to event.old - 1.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check that event.new is equal to event.old - 1.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">new</span> <span class="o">!=</span> <span class="n">value</span><span class="o">.</span><span class="n">old</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;event.old - event.new should be equal to 1&quot;</span><span class="p">)</span>
 
@@ -9577,14 +9577,14 @@ sequence.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Checks that event.new is equal to event.old - 1.</p>
+      <p>Check that event.new is equal to event.old - 1.</p>
 
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/navigational/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;event&quot;</span><span class="p">)</span>
 <span class="nd">@classmethod</span>
 <span class="k">def</span> <span class="nf">validate_prev_jump_event_field</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Checks that event.new is equal to event.old - 1.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check that event.new is equal to event.old - 1.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">new</span> <span class="o">!=</span> <span class="n">value</span><span class="o">.</span><span class="n">old</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;event.old - event.new should be equal to 1&quot;</span><span class="p">)</span>
 
@@ -9871,7 +9871,7 @@ ORAAssessEventPartsCriterionField            (<a class="autorefs autorefs-intern
 
     <div class="doc doc-contents ">
 
-      <p>Pydantic model for assessement <code>event</code>.<code>parts</code>.<code>criterion</code> field.</p>
+      <p>Pydantic model for assessment <code>event</code>.<code>parts</code>.<code>criterion</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -9899,7 +9899,7 @@ allocated to the criterion.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/open_response_assessment/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ORAAssessEventPartsCriterionField</span><span class="p">(</span><span class="n">BaseModelWithConfig</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for assessement `event`.`parts`.`criterion` field.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for assessment `event`.`parts`.`criterion` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        name (str): Consists of the criterion name.</span>
@@ -10494,7 +10494,7 @@ of the course team member who is retrieved the response for grading.</p></td>
         <td><code>type</code></td>
         <td><code>str</code></td>
         <td><p>Consists of the type of staff grading that is being performed.
-Currently set to <code>full-grade</code>.</p></td>
+Currently, set to <code>full-grade</code>.</p></td>
       </tr>
   </tbody>
 </table>
@@ -10514,7 +10514,7 @@ Currently set to <code>full-grade</code>.</p></td>
 <span class="sd">        requesting_staff_id (str): Consists of the course-specific anonymized user ID</span>
 <span class="sd">            of the course team member who is retrieved the response for grading.</span>
 <span class="sd">        type (str): Consists of the type of staff grading that is being performed.</span>
-<span class="sd">            Currently set to `full-grade`.</span>
+<span class="sd">            Currently, set to `full-grade`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">item_id</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span>
@@ -10594,7 +10594,7 @@ ORASaveSubmissionEventField            (<a class="autorefs autorefs-internal" ti
 Note:
     Responses have a length limit of 100000 in the front-end but not in the
     back-end. Events are truncated at <code>TRACK_MAX_EVENT</code> which is 50000 by
-    default. Also the <code>eventtracking.backends.logger.LoggerBackend</code>
+    default. Also, the <code>eventtracking.backends.logger.LoggerBackend</code>
     silently drops events when they exceed <code>TRACK_MAX_EVENT</code>.</p></td>
       </tr>
   </tbody>
@@ -10609,7 +10609,7 @@ Note:
 <span class="sd">            Note:</span>
 <span class="sd">                Responses have a length limit of 100000 in the front-end but not in the</span>
 <span class="sd">                back-end. Events are truncated at `TRACK_MAX_EVENT` which is 50000 by</span>
-<span class="sd">                default. Also the `eventtracking.backends.logger.LoggerBackend`</span>
+<span class="sd">                default. Also, the `eventtracking.backends.logger.LoggerBackend`</span>
 <span class="sd">                silently drops events when they exceed `TRACK_MAX_EVENT`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -10764,7 +10764,7 @@ ORAStaffAssessEventField            (<a class="autorefs autorefs-internal" title
         <td><code>type</code></td>
         <td><code>str</code></td>
         <td><p>Consists of the type of staff grading that is being performed. Can
-be either equalt to <code>regrade</code> in the case of a grade override or
+be either equal to <code>regrade</code> in the case of a grade override or
 <code>full-grade</code> in the case of an included staff assessment step.</p></td>
       </tr>
   </tbody>
@@ -10776,7 +10776,7 @@ be either equalt to <code>regrade</code> in the case of a grade override or
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        type (str): Consists of the type of staff grading that is being performed. Can</span>
-<span class="sd">            be either equalt to `regrade` in the case of a grade override or</span>
+<span class="sd">            be either equal to `regrade` in the case of a grade override or</span>
 <span class="sd">            `full-grade` in the case of an included staff assessment step.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -10955,7 +10955,7 @@ selected to evaluate the assessment process.</p></td>
       <tr>
         <td><code>submission_uuid</code></td>
         <td><code>str</code></td>
-        <td><p>Consists of the unique identifier for for the feedback.</p></td>
+        <td><p>Consists of the unique identifier for the feedback.</p></td>
       </tr>
   </tbody>
 </table>
@@ -10971,7 +10971,7 @@ selected to evaluate the assessment process.</p></td>
 <span class="sd">            process.</span>
 <span class="sd">        options (list): Consists of the label of each checkbox option that the learner</span>
 <span class="sd">            selected to evaluate the assessment process.</span>
-<span class="sd">        submission_uuid (str): Consists of the unique identifier for for the feedback.</span>
+<span class="sd">        submission_uuid (str): Consists of the unique identifier for the feedback.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">feedback_text</span><span class="p">:</span> <span class="nb">str</span>
@@ -13090,7 +13090,7 @@ EdxProblemHintFeedbackDisplayedEventField            (<a class="autorefs autoref
       <tr>
         <td><code>choice_all</code></td>
         <td><code>list</code></td>
-        <td><p>Lists all of the answer choices for problems with multiple
+        <td><p>Lists all the answer choices for problems with multiple
 possible answers defined.</p></td>
       </tr>
       <tr>
@@ -13147,7 +13147,7 @@ the user.</p></td>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for `edx.problem.hint.feedback_displayed`.`event` field.</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        choice_all (list): Lists all of the answer choices for problems with multiple</span>
+<span class="sd">        choice_all (list): Lists all the answer choices for problems with multiple</span>
 <span class="sd">            possible answers defined.</span>
 <span class="sd">        correctness (bool): `True` if the `student_answer` value is correct, else</span>
 <span class="sd">            `False`.</span>
@@ -13286,7 +13286,7 @@ the problem.</p></td>
       <tr>
         <td><code>submission</code></td>
         <td><code>dict</code></td>
-        <td><p>Consists of a dictionnary of data about the given answer.</p></td>
+        <td><p>Consists of a dictionary of data about the given answer.</p></td>
       </tr>
       <tr>
         <td><code>success</code></td>
@@ -13310,7 +13310,7 @@ the problem.</p></td>
 <span class="sd">        max_grade (int): Consists of the maximum possible grade value.</span>
 <span class="sd">        problem_id (str): Consists of the ID of the problem that was checked.</span>
 <span class="sd">        state (json): Consists of the current problem state.</span>
-<span class="sd">        submission (dict): Consists of a dictionnary of data about the given answer.</span>
+<span class="sd">        submission (dict): Consists of a dictionary of data about the given answer.</span>
 <span class="sd">        success (str): Consists of either the `correct` or `incorrect` value.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -14277,7 +14277,7 @@ State            (<a class="autorefs autorefs-internal" title="ralph.models.edx.
 
     <div class="doc doc-contents ">
 
-      <p>Pydantic modelfor problem interaction <code>event</code>.<code>state</code> field.</p>
+      <p>Pydantic model for problem interaction <code>event</code>.<code>state</code> field.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -14319,7 +14319,7 @@ State            (<a class="autorefs autorefs-internal" title="ralph.models.edx.
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/problem_interaction/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">State</span><span class="p">(</span><span class="n">BaseModelWithConfig</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic modelfor problem interaction `event`.`state` field.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for problem interaction `event`.`state` field.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        correct_map (dict): see CorrectMapSubFields.</span>
@@ -14403,7 +14403,7 @@ SubmissionAnswerField            (<a class="autorefs autorefs-internal" title="r
         <td><code>answer</code></td>
         <td><code>str, list</code></td>
         <td><p>Consists of the answer string or a list of the answer
-strings if multiple choices are allorwed.</p></td>
+strings if multiple choices are allowed.</p></td>
       </tr>
       <tr>
         <td><code>correct</code></td>
@@ -14441,7 +14441,7 @@ this user.</p></td>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        answer (str, list): Consists of the answer string or a list of the answer</span>
-<span class="sd">            strings if multiple choices are allorwed.</span>
+<span class="sd">            strings if multiple choices are allowed.</span>
 <span class="sd">        correct (bool): `True` if the `answer` value is correct, else `False`.</span>
 <span class="sd">        input_type (str): Consists of the type of value that the student supplies for</span>
 <span class="sd">            the `response_type`.</span>
@@ -17409,7 +17409,7 @@ TextbookPdfSearchExecutedEventField            (<a class="autorefs autorefs-inte
       <tr>
         <td><code>caseSensitive</code></td>
         <td><code>bool</code></td>
-        <td><p>Consists either of the <code>true</code> value if the case sensitive
+        <td><p>Consists either of the <code>true</code> value if the case-sensitive
 option is selected or <code>false</code> if this option is not selected.</p></td>
       </tr>
       <tr>
@@ -17438,7 +17438,7 @@ is unsuccessful or blank for successful search strings.</p></td>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        name (str): Consists of the value `textbook.pdf.search.executed`.</span>
-<span class="sd">        caseSensitive (bool): Consists either of the `true` value if the case sensitive</span>
+<span class="sd">        caseSensitive (bool): Consists either of the `true` value if the case-sensitive</span>
 <span class="sd">            option is selected or `false` if this option is not selected.</span>
 <span class="sd">        highlightAll (bool): Consists either of the `true` value if the option to</span>
 <span class="sd">            highlight all matches is selected or `false` if this option is not selected.</span>
@@ -17635,7 +17635,7 @@ TextbookPdfSearchNavigatedNextEventField            (<a class="autorefs autorefs
       <tr>
         <td><code>caseSensitive</code></td>
         <td><code>bool</code></td>
-        <td><p>Consists either of the <code>true</code> value if the case sensitive
+        <td><p>Consists either of the <code>true</code> value if the case-sensitive
 option is selected or <code>false</code> if this option is not selected.</p></td>
       </tr>
       <tr>
@@ -17671,7 +17671,7 @@ is unsuccessful or blank for successful search strings.</p></td>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        name (str): Consists of the value `textbook.pdf.search.navigatednext`.</span>
-<span class="sd">        caseSensitive (bool): Consists either of the `true` value if the case sensitive</span>
+<span class="sd">        caseSensitive (bool): Consists either of the `true` value if the case-sensitive</span>
 <span class="sd">            option is selected or `false` if this option is not selected.</span>
 <span class="sd">        findPrevious(bool): Consists either of the ‘true’ value if the user clicks the</span>
 <span class="sd">            Find Previous icon or ‘false’ if the user clicks the &lt;kbd&gt;Find Next&lt;/kbd&gt;</span>

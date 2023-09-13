@@ -5575,7 +5575,7 @@ IRI            (<span title="str">str</span>)
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">__get_validators__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>  <span class="c1"># noqa: D105</span>
         <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="n">iri</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;Checks whether the provided IRI is a valid RFC 3987 IRI.&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Check whether the provided IRI is a valid RFC 3987 IRI.&quot;&quot;&quot;</span>
             <span class="n">parse</span><span class="p">(</span><span class="n">iri</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="s2">&quot;IRI&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">iri</span><span class="p">)</span>
 
@@ -5631,7 +5631,7 @@ LanguageTag            (<span title="str">str</span>)
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">__get_validators__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>  <span class="c1"># noqa: D105</span>
         <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="n">tag</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;Checks whether the provided tag is a valid RFC 5646 Language tag.&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Check whether the provided tag is a valid RFC 5646 Language tag.&quot;&quot;&quot;</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">tag_is_valid</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Invalid RFC 5646 Language tag&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
@@ -5688,7 +5688,7 @@ MailtoEmail            (<span title="str">str</span>)
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">__get_validators__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>  <span class="c1"># noqa: D105</span>
         <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="n">mailto</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;Checks whether the provided value follows the `mailto:email` format.&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Check whether the provided value follows the `mailto:email` format.&quot;&quot;&quot;</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">mailto</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;mailto:&quot;</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Invalid `mailto:email` value&quot;</span><span class="p">)</span>
             <span class="n">valid</span> <span class="o">=</span> <span class="n">validate_email</span><span class="p">(</span><span class="n">mailto</span><span class="p">[</span><span class="mi">7</span><span class="p">:])</span>
@@ -5831,7 +5831,7 @@ BaseXapiContext            (<a class="autorefs autorefs-internal" title="ralph.m
       <tr>
         <td><code>extensions</code></td>
         <td><code>dict</code></td>
-        <td><p>Consists of an dictionary of other properties as needed.</p></td>
+        <td><p>Consists of a dictionary of other properties as needed.</p></td>
       </tr>
   </tbody>
 </table>
@@ -5849,7 +5849,7 @@ BaseXapiContext            (<a class="autorefs autorefs-internal" title="ralph.m
 <span class="sd">        platform (str): The platform where the learning activity took place.</span>
 <span class="sd">        language (dict): The language in which the experience occurred.</span>
 <span class="sd">        statement (dict): Another Statement giving context for this Statement.</span>
-<span class="sd">        extensions (dict): Consists of an dictionary of other properties as needed.</span>
+<span class="sd">        extensions (dict): Consists of a dictionary of other properties as needed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">registration</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">UUID</span><span class="p">]</span>
@@ -7015,7 +7015,7 @@ BaseXapiSubStatement            (<a class="autorefs autorefs-internal" title="ra
         <td><p>See BaseXapiUnnestedObject.</p></td>
       </tr>
       <tr>
-        <td><code>objecType</code></td>
+        <td><code>objectType</code></td>
         <td><code>dict</code></td>
         <td><p>Consists of the value <code>SubStatement</code>.</p></td>
       </tr>
@@ -7030,7 +7030,7 @@ BaseXapiSubStatement            (<a class="autorefs autorefs-internal" title="ra
 <span class="sd">        actor (dict): See BaseXapiAgent and BaseXapiGroup.</span>
 <span class="sd">        verb (dict): See BaseXapiVerb.</span>
 <span class="sd">        object (dict): See BaseXapiUnnestedObject.</span>
-<span class="sd">        objecType (dict): Consists of the value `SubStatement`.</span>
+<span class="sd">        objectType (dict): Consists of the value `SubStatement`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">actor</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">BaseXapiAgent</span><span class="p">,</span> <span class="n">BaseXapiGroup</span><span class="p">]</span>
@@ -7273,12 +7273,12 @@ BaseXapiResultScore            (<a class="autorefs autorefs-internal" title="ral
       <tr>
         <td><code>min</code></td>
         <td><code>Decimal</code></td>
-        <td><p>Consists of lowest possible score.</p></td>
+        <td><p>Consists of the lowest possible score.</p></td>
       </tr>
       <tr>
         <td><code>max</code></td>
         <td><code>Decimal</code></td>
-        <td><p>Consists of highest possible score.</p></td>
+        <td><p>Consists of the highest possible score.</p></td>
       </tr>
   </tbody>
 </table>
@@ -7290,8 +7290,8 @@ BaseXapiResultScore            (<a class="autorefs autorefs-internal" title="ral
 <span class="sd">    Attributes:</span>
 <span class="sd">        scaled (int): Consists of the normalized score related to the experience.</span>
 <span class="sd">        raw (Decimal): Consists of the non-normalized score achieved by the Actor.</span>
-<span class="sd">        min (Decimal): Consists of lowest possible score.</span>
-<span class="sd">        max (Decimal): Consists of highest possible score.</span>
+<span class="sd">        min (Decimal): Consists of the lowest possible score.</span>
+<span class="sd">        max (Decimal): Consists of the highest possible score.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">scaled</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">conint</span><span class="p">(</span><span class="n">ge</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
@@ -7302,7 +7302,7 @@ BaseXapiResultScore            (<a class="autorefs autorefs-internal" title="ral
     <span class="nd">@root_validator</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">check_raw_min_max_relation</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks the relationship `min &lt; raw &lt; max`.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check the relationship `min &lt; raw &lt; max`.&quot;&quot;&quot;</span>
         <span class="n">raw_value</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;raw&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">min_value</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">max_value</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -7353,14 +7353,14 @@ BaseXapiResultScore            (<a class="autorefs autorefs-internal" title="ral
 
     <div class="doc doc-contents ">
 
-      <p>Checks the relationship <code>min &lt; raw &lt; max</code>.</p>
+      <p>Check the relationship <code>min &lt; raw &lt; max</code>.</p>
 
         <details class="quote">
           <summary>Source code in <code>ralph/models/xapi/base/results.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@root_validator</span>
 <span class="nd">@classmethod</span>
 <span class="k">def</span> <span class="nf">check_raw_min_max_relation</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Checks the relationship `min &lt; raw &lt; max`.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check the relationship `min &lt; raw &lt; max`.&quot;&quot;&quot;</span>
     <span class="n">raw_value</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;raw&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="n">min_value</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="n">max_value</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -7551,9 +7551,9 @@ BaseXapiStatement            (<a class="autorefs autorefs-internal" title="ralph
     <span class="nd">@root_validator</span><span class="p">(</span><span class="n">pre</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">check_abscence_of_empty_and_invalid_values</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks the model for empty and invalid values.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check the model for empty and invalid values.</span>
 
-<span class="sd">        Checks that the `context` field contains `platform` and `revision` fields</span>
+<span class="sd">        Check that the `context` field contains `platform` and `revision` fields</span>
 <span class="sd">        only if the `object.objectType` property is equal to `Activity`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">field</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
@@ -7616,8 +7616,8 @@ BaseXapiStatement            (<a class="autorefs autorefs-internal" title="ralph
 
     <div class="doc doc-contents ">
 
-      <p>Checks the model for empty and invalid values.</p>
-<p>Checks that the <code>context</code> field contains <code>platform</code> and <code>revision</code> fields
+      <p>Check the model for empty and invalid values.</p>
+<p>Check that the <code>context</code> field contains <code>platform</code> and <code>revision</code> fields
 only if the <code>object.objectType</code> property is equal to <code>Activity</code>.</p>
 
         <details class="quote">
@@ -7625,9 +7625,9 @@ only if the <code>object.objectType</code> property is equal to <code>Activity</
           <div class="highlight"><pre><span></span><code><span class="nd">@root_validator</span><span class="p">(</span><span class="n">pre</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="nd">@classmethod</span>
 <span class="k">def</span> <span class="nf">check_abscence_of_empty_and_invalid_values</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Checks the model for empty and invalid values.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check the model for empty and invalid values.</span>
 
-<span class="sd">    Checks that the `context` field contains `platform` and `revision` fields</span>
+<span class="sd">    Check that the `context` field contains `platform` and `revision` fields</span>
 <span class="sd">    only if the `object.objectType` property is equal to `Activity`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">field</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
@@ -7834,7 +7834,7 @@ BaseXapiActivityDefinition            (<a class="autorefs autorefs-internal" tit
       <tr>
         <td><code>name</code></td>
         <td><code>LanguageMap</code></td>
-        <td><p>Consists of the human readable/visual name of the Activity.</p></td>
+        <td><p>Consists of the human-readable/visual name of the Activity.</p></td>
       </tr>
       <tr>
         <td><code>description</code></td>
@@ -7864,7 +7864,7 @@ BaseXapiActivityDefinition            (<a class="autorefs autorefs-internal" tit
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for `Activity` type `definition` property.</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        name (LanguageMap): Consists of the human readable/visual name of the Activity.</span>
+<span class="sd">        name (LanguageMap): Consists of the human-readable/visual name of the Activity.</span>
 <span class="sd">        description (LanguageMap): Consists of a description of the Activity.</span>
 <span class="sd">        type (IRI): Consists of the type of the Activity.</span>
 <span class="sd">        moreInfo (URL): Consists of an URL to a document about the Activity.</span>
@@ -8015,7 +8015,7 @@ BaseXapiActivityInteractionDefinition            (<a class="autorefs autorefs-in
     <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;choices&quot;</span><span class="p">,</span> <span class="s2">&quot;scale&quot;</span><span class="p">,</span> <span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="s2">&quot;steps&quot;</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">check_unique_ids</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks the uniqueness of interaction components IDs.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check the uniqueness of interaction components IDs.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">({</span><span class="n">x</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">value</span><span class="p">}):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Duplicate InteractionComponents are not valid&quot;</span><span class="p">)</span>
 </code></pre></div>
@@ -8057,14 +8057,14 @@ BaseXapiActivityInteractionDefinition            (<a class="autorefs autorefs-in
 
     <div class="doc doc-contents ">
 
-      <p>Checks the uniqueness of interaction components IDs.</p>
+      <p>Check the uniqueness of interaction components IDs.</p>
 
         <details class="quote">
           <summary>Source code in <code>ralph/models/xapi/base/unnested_objects.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;choices&quot;</span><span class="p">,</span> <span class="s2">&quot;scale&quot;</span><span class="p">,</span> <span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="s2">&quot;steps&quot;</span><span class="p">)</span>
 <span class="nd">@classmethod</span>
 <span class="k">def</span> <span class="nf">check_unique_ids</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Checks the uniqueness of interaction components IDs.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check the uniqueness of interaction components IDs.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">({</span><span class="n">x</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">value</span><span class="p">}):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Duplicate InteractionComponents are not valid&quot;</span><span class="p">)</span>
 </code></pre></div>
@@ -8326,7 +8326,7 @@ BaseXapiVerb            (<a class="autorefs autorefs-internal" title="ralph.mode
       <tr>
         <td><code>display</code></td>
         <td><code>LanguageMap</code></td>
-        <td><p>Consists of a human readable representation of the verb.</p></td>
+        <td><p>Consists of a human-readable representation of the verb.</p></td>
       </tr>
   </tbody>
 </table>
@@ -8337,7 +8337,7 @@ BaseXapiVerb            (<a class="autorefs autorefs-internal" title="ralph.mode
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        id (IRI): Consists of an identifier for the verb.</span>
-<span class="sd">        display (LanguageMap): Consists of a human readable representation of the verb.</span>
+<span class="sd">        display (LanguageMap): Consists of a human-readable representation of the verb.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nb">id</span><span class="p">:</span> <span class="n">IRI</span>
@@ -15223,7 +15223,7 @@ LMSAccessedPage            (<a class="autorefs autorefs-internal" title="ralph.m
     <div class="doc doc-contents ">
 
       <p>Pydantic model for LMS <code>accessed a page</code> statement.</p>
-<p>Example: John has accessed a page of a LMS or a website.</p>
+<p>Example: John has accessed a page of an LMS or a website.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -15252,7 +15252,7 @@ LMSAccessedPage            (<a class="autorefs autorefs-internal" title="ralph.m
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">LMSAccessedPage</span><span class="p">(</span><span class="n">BaseLMSStatement</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for LMS `accessed a page` statement.</span>
 
-<span class="sd">    Example: John has accessed a page of a LMS or a website.</span>
+<span class="sd">    Example: John has accessed a page of an LMS or a website.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        verb (dict): See AccessedVerb.</span>
