@@ -36,7 +36,7 @@ have an authority field matching that of the user
 - Backends: add `max_statements` option to `AsyncLRSHTTP`
 - API: Incoming statements are enriched with `id`, `timestamp`, `stored`
   and `authority`
-- API: Add `TODO: PUT NAME HERE WHEN DEFINITIVE`option making `?mine=True` 
+- API: Add `RALPH_LRS_RESTRICT_BY_AUTHORITY`option making `?mine=True` 
   implicit
 
 ### Removed
