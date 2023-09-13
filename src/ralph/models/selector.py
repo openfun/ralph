@@ -22,7 +22,7 @@ class LazyModelField:
     path: Tuple[str]
 
     def __init__(self, path: str):
-        """Initializes Lazy Model Field."""
+        """Initialize Lazy Model Field."""
         object.__setattr__(self, "path", tuple(path.split(MODEL_PATH_SEPARATOR)))
 
 
@@ -34,7 +34,7 @@ class Rule:
     value: Union[LazyModelField, Any]  # pylint: disable=unsubscriptable-object
 
     def check(self, event):
-        """Checks if event matches the rule.
+        """Check if event matches the rule.
 
         Args:
             event (dict): The event to check.
@@ -47,7 +47,7 @@ class Rule:
 
 
 def selector(**filters):
-    """Returns a list of rules that should match in order to select an event.
+    """Return a list of rules that should match in order to select an event.
 
     Args:
         **filters: Each keyword represents the path to a field, the corresponding
@@ -73,7 +73,7 @@ class ModelSelector:
 
     @staticmethod
     def build_model_rules(module: ModuleType):
-        """Builds the model_rules dictionary.
+        """Build the model_rules dictionary.
 
         Using BaseModel classes defined in the module.
         """
@@ -84,7 +84,7 @@ class ModelSelector:
         return model_rules
 
     def get_first_model(self, event: dict):
-        """Returns the first matching model for the event. See `self.get_models`."""
+        """Return the first matching model for the event. See `self.get_models`."""
         return self.get_models(event)[0]
 
     def get_models(self, event: dict, tree=None):
@@ -116,7 +116,7 @@ class ModelSelector:
         return self.get_models(event, subtree)
 
     def get_decision_tree(self, model_rules):
-        """Recursively constructs the decision tree."""
+        """Recursively construct the decision tree."""
         rule_counter = Counter(chain.from_iterable(model_rules.values()))
         if not rule_counter:
             return list(model_rules)

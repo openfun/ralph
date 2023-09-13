@@ -16,7 +16,7 @@ from tests.fixtures.hypothesis_strategies import custom_given
 
 @custom_given(TextbookInteractionBaseEventField)
 def test_fields_edx_textbook_interaction_base_event_field_with_valid_content(field):
-    """Tests that a valid `TextbookInteractionBaseEventField` does not raise
+    """Test that a valid `TextbookInteractionBaseEventField` does not raise
     a `ValidationError`.
     """
 
@@ -65,7 +65,7 @@ def test_fields_edx_textbook_interaction_base_event_field_with_valid_content(fie
 def test_fields_edx_textbook_interaction_base_event_field_with_invalid_content(
     chapter, field
 ):
-    """Tests that an invalid `TextbookInteractionBaseEventField` raises a
+    """Test that an invalid `TextbookInteractionBaseEventField` raises a
     `ValidationError`.
     """
 
@@ -80,7 +80,7 @@ def test_fields_edx_textbook_interaction_base_event_field_with_invalid_content(
 def test_fields_edx_textbook_pdf_chapter_navigated_event_field_with_valid_content(
     field,
 ):
-    """Tests that a valid `TextbookPdfChapterNavigatedEventField` does not raise a
+    """Test that a valid `TextbookPdfChapterNavigatedEventField` does not raise a
     `ValidationError`.
     """
 
@@ -125,7 +125,7 @@ def test_fields_edx_textbook_pdf_chapter_navigated_event_field_with_valid_conten
 def test_fields_edx_textbook_pdf_chapter_navigated_event_field_with_invalid_content(
     chapter, field
 ):
-    """Tests that an invalid `TextbookPdfChapterNavigatedEventField` raises a
+    """Test that an invalid `TextbookPdfChapterNavigatedEventField` raises a
     `ValidationError`.
     """
 

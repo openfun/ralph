@@ -12,7 +12,7 @@ from ralph.models.edx.converters.xapi.base import BaseXapiConverter
 def test_base_xapi_converter_successful_initialization(
     uuid_namespace,
 ):
-    """Tests BaseXapiConverter initialization."""
+    """Test BaseXapiConverter initialization."""
 
     class DummyBaseXapiConverter(BaseXapiConverter):
         """Dummy implementation of abstract BaseXapiConverter."""
@@ -27,7 +27,7 @@ def test_base_xapi_converter_successful_initialization(
 
 
 def test_base_xapi_converter_unsuccessful_initialization():
-    """Tests BaseXapiConverter failed initialization."""
+    """Test BaseXapiConverter failed initialization."""
 
     class DummyBaseXapiConverter(BaseXapiConverter):
         """Dummy implementation of abstract BaseXapiConverter."""
@@ -52,5 +52,5 @@ def test_base_xapi_converter_unsuccessful_initialization():
     ],
 )
 def test_base_xapi_converter_parse_course_id(course_id, expected):
-    """Tests that the parse_course_id method returns the expected value."""
+    """Test that the parse_course_id method returns the expected value."""
     assert BaseXapiConverter.parse_course_id(course_id) == expected

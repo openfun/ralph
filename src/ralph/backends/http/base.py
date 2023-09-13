@@ -42,7 +42,7 @@ class OperationType(Enum):
 
 
 def enforce_query_checks(method):
-    """Enforces query argument type checking for methods using it."""
+    """Enforce query argument type checking for methods using it."""
 
     @functools.wraps(method)
     def wrapper(*args, **kwargs):
@@ -73,7 +73,7 @@ class BaseHTTP(ABC):
     query = BaseQuery
 
     def validate_query(self, query: Union[str, dict, BaseQuery] = None) -> BaseQuery:
-        """Validates and transforms the query."""
+        """Validate and transforms the query."""
         if query is None:
             query = self.query()
 
@@ -134,4 +134,4 @@ class BaseHTTP(ABC):
         simultaneous: bool = False,
         max_num_simultaneous: Optional[int] = None,
     ) -> int:
-        """Writes statements into the HTTP server given an input endpoint."""
+        """Write statements into the HTTP server given an input endpoint."""

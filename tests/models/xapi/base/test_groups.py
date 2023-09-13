@@ -9,7 +9,7 @@ from tests.fixtures.hypothesis_strategies import custom_given
 def test_models_xapi_base_groups_group_common_properties_with_valid_field(
     field,
 ):
-    """Tests a valid BaseXapiGroupCommonProperties has the expected
+    """Test a valid BaseXapiGroupCommonProperties has the expected
     `objectType` value.
     """
 

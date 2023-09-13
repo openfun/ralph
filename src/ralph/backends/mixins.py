@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class HistoryMixin:
     """Backend history mixin.
 
-    Handles backend download history to avoid fetching same files multiple
+    Handle backend download history to avoid fetching same files multiple
     times if they are already available.
     """
 
@@ -59,7 +59,7 @@ class HistoryMixin:
         self.write_history(self.history + [event])
 
     def get_command_history(self, backend_name, command):
-        """Extracts entry ids from the history for a given command and backend_name."""
+        """Extract entry ids from the history for a given command and backend_name."""
         return [
             entry["id"]
             for entry in filter(

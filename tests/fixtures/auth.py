@@ -72,7 +72,7 @@ def create_user(
 # pylint: disable=invalid-name
 @pytest.fixture
 def auth_credentials(fs, user_scopes=None, agent=None):
-    """Sets up the credentials file for request authentication.
+    """Set up the credentials file for request authentication.
 
     Args:
         fs: fixture provided by pyfakefs (not called in the code)

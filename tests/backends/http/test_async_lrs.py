@@ -108,7 +108,7 @@ async def test_backends_http_lrs_status_with_successful_request(
 async def test_backends_http_lrs_status_with_request_error(
     httpx_mock: HTTPXMock, caplog
 ):
-    """Tests the LRS backend status method returns `AWAY` when a `RequestError`
+    """Test the LRS backend status method returns `AWAY` when a `RequestError`
     exception is caught.
     """
 
@@ -139,7 +139,7 @@ async def test_backends_http_lrs_status_with_request_error(
 async def test_backends_http_lrs_status_with_http_status_error(
     httpx_mock: HTTPXMock, caplog
 ):
-    """Tests the LRS backend status method returns `ERROR` when an `HTTPStatusError`
+    """Test the LRS backend status method returns `ERROR` when an `HTTPStatusError`
     is caught.
     """
 
@@ -601,7 +601,7 @@ async def test_backends_http_lrs_read_with_pagination(httpx_mock: HTTPXMock):
 async def test_backends_http_lrs_write_without_operation(
     httpx_mock: HTTPXMock, caplog, chunk_size, simultaneous, max_num_simultaneous
 ):
-    """Tests the LRS backend `write` method, given no operation_type should POST to
+    """Test the LRS backend `write` method, given no operation_type should POST to
     the LRS server.
     """
 
@@ -642,7 +642,7 @@ async def test_backends_http_lrs_write_without_operation(
 
 @pytest.mark.anyio
 async def test_backends_http_lrs_write_without_data(caplog):
-    """Tests the LRS backend `write` method returns null when no data to write
+    """Test the LRS backend `write` method returns null when no data to write
     in the target endpoint are given.
     """
 
@@ -675,7 +675,7 @@ async def test_backends_http_lrs_write_without_data(caplog):
 async def test_backends_http_lrs_write_with_unsupported_operation(
     operation_type, caplog, error_msg
 ):
-    """Tests the LRS backend `write` method, given an unsupported` `operation_type`,
+    """Test the LRS backend `write` method, given an unsupported` `operation_type`,
     should raise a `BackendParameterException`.
     """
 
@@ -708,7 +708,7 @@ async def test_backends_http_lrs_write_with_unsupported_operation(
 async def test_backends_http_lrs_write_with_invalid_parameters(
     caplog, simultaneous, max_num_simultaneous, error_msg
 ):
-    """Tests the LRS backend `write` method, given invalid_parameters
+    """Test the LRS backend `write` method, given invalid_parameters
     should raise a `BackendParameterException`.
     """
 
@@ -735,7 +735,7 @@ async def test_backends_http_lrs_write_with_invalid_parameters(
 
 @pytest.mark.anyio
 async def test_backends_http_lrs_write_without_target(httpx_mock: HTTPXMock, caplog):
-    """Tests the LRS backend `write` method without target parameter value writes
+    """Test the LRS backend `write` method without target parameter value writes
     statements to '/xAPI/statements' default endpoint."""
 
     base_url = "http://fake-lrs.com"
@@ -765,7 +765,7 @@ async def test_backends_http_lrs_write_without_target(httpx_mock: HTTPXMock, cap
 async def test_backends_http_lrs_write_with_create_or_index_operation(
     httpx_mock: HTTPXMock, caplog
 ):
-    """Tests the `LRSHTTP.write` method with `CREATE` or `INDEX` operation_type writes
+    """Test the `LRSHTTP.write` method with `CREATE` or `INDEX` operation_type writes
     statements to the given target endpoint.
     """
 
@@ -797,7 +797,7 @@ async def test_backends_http_lrs_write_backend_exception(
     httpx_mock: HTTPXMock,
     caplog,
 ):
-    """Tests the `LRSHTTP.write` method with HTTP error"""
+    """Test the `LRSHTTP.write` method with HTTP error"""
     base_url = "http://fake-lrs.com"
     target = "/xAPI/statements"
 

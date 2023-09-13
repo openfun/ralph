@@ -13,7 +13,7 @@ from tests.fixtures.hypothesis_strategies import custom_given
 
 @custom_given(NavigationalEventField)
 def test_fields_edx_navigational_events_event_field_with_valid_content(field):
-    """Tests that a valid `NavigationalEventField` does not raise a
+    """Test that a valid `NavigationalEventField` does not raise a
     `ValidationError`.
     """
 
@@ -57,7 +57,7 @@ def test_fields_edx_navigational_events_event_field_with_valid_content(field):
 def test_fields_edx_navigational_events_event_field_with_invalid_content(
     id, field  # pylint: disable=redefined-builtin, invalid-name
 ):
-    """Tests that an invalid `NavigationalEventField` raises a `ValidationError`."""
+    """Test that an invalid `NavigationalEventField` raises a `ValidationError`."""
 
     invalid_field = json.loads(field.json())
     invalid_field["id"] = id

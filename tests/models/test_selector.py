@@ -212,7 +212,7 @@ def test_models_selector_model_selector_decision_tree(model_rules, decision_tree
 
 
 def test_models_selector_model_selector_get_model_with_invalid_event():
-    """Tests given an invalid event the get_model method should raise
+    """Test given an invalid event the get_model method should raise
     UnknownEventException.
     """
     with pytest.raises(UnknownEventException):

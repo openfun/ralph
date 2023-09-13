@@ -62,7 +62,7 @@ class Validator:
         raise error
 
     def _validate_event(self, event_str: str):
-        """Validates a single JSON string event.
+        """Validate a single JSON string event.
 
         Raises:
             TypeError: When the event_str is not of type string.

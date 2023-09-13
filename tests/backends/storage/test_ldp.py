@@ -20,7 +20,7 @@ from ralph.exceptions import BackendParameterException
 
 
 def test_backends_storage_ldp_storage_instantiation():
-    """Tests the LDPStorage backend instantiation."""
+    """Test the LDPStorage backend instantiation."""
     # pylint: disable=protected-access
 
     assert LDPStorage.name == "ldp"
@@ -42,7 +42,7 @@ def test_backends_storage_ldp_storage_instantiation():
 
 
 def test_backends_storage_ldp_archive_endpoint_property():
-    """Tests the LDPStorage _archive_endpoint property."""
+    """Test the LDPStorage _archive_endpoint property."""
     # pylint: disable=protected-access, pointless-statement
 
     storage = LDPStorage(
@@ -90,11 +90,11 @@ def test_backends_storage_ldp_archive_endpoint_property():
 
 
 def test_backends_storage_ldp_details_method(monkeypatch):
-    """Tests the LDPStorage _details method."""
+    """Test the LDPStorage _details method."""
     # pylint: disable=protected-access
 
     def mock_get(url):
-        """Mocks the OVH client get request."""
+        """Mock the OVH client get request."""
         name = PurePath(urlparse(url).path).name
         return {
             "archiveId": str(uuid.UUID(name)),
@@ -124,10 +124,10 @@ def test_backends_storage_ldp_details_method(monkeypatch):
 
 
 def test_backends_storage_ldp_url_method(monkeypatch):
-    """Tests the LDPStorage url method."""
+    """Test the LDPStorage url method."""
 
     def mock_post(url):
-        """Mocks the OVH Client post request."""
+        """Mock the OVH Client post request."""
         # pylint: disable=unused-argument
         return {
             "expirationDate": "2020-10-13T12:59:37.326131+00:00",
@@ -164,10 +164,10 @@ def test_backends_storage_ldp_url_method(monkeypatch):
 
 
 def test_backends_storage_ldp_list_method(monkeypatch):
-    """Tests the LDPStorage list method with a blank history."""
+    """Test the LDPStorage list method with a blank history."""
 
     def mock_list(url):
-        """Mocks OVH client list stream archives get request."""
+        """Mock OVH client list stream archives get request."""
         # pylint: disable=unused-argument
         return [
             "5d5c4c93-04a4-42c5-9860-f51fa4044aa1",
@@ -203,11 +203,11 @@ def test_backends_storage_ldp_list_method(monkeypatch):
 def test_backends_storage_ldp_list_method_history_management(
     monkeypatch, fs, settings_fs
 ):
-    """Tests the LDPStorage list method with a history."""
+    """Test the LDPStorage list method with a history."""
     # pylint: disable=invalid-name,unused-argument
 
     def mock_list(url):
-        """Mocks the OVH client list stream archives get request."""
+        """Mock the OVH client list stream archives get request."""
         # pylint: disable=unused-argument
         return [
             "5d5c4c93-04a4-42c5-9860-f51fa4044aa1",
@@ -273,7 +273,7 @@ def test_backends_storage_ldp_list_method_history_management(
 
 
 def test_backends_storage_ldp_list_method_with_details(monkeypatch):
-    """Tests the LDPStorage list method with detailed output."""
+    """Test the LDPStorage list method with detailed output."""
     details_responses = [
         {
             "archiveId": "5d5c4c93-04a4-42c5-9860-f51fa4044aa1",
@@ -299,7 +299,7 @@ def test_backends_storage_ldp_list_method_with_details(monkeypatch):
     get_details_response = (response for response in details_responses)
 
     def mock_get(url):
-        """Mocks OVH client get requests."""
+        """Mock OVH client get requests."""
         # list request
         if url.endswith("archive"):
             return [
@@ -327,7 +327,7 @@ def test_backends_storage_ldp_list_method_with_details(monkeypatch):
 
 
 def test_backends_storage_ldp_read_method(monkeypatch, fs, settings_fs):
-    """Tests the LDPStorage read method with detailed output."""
+    """Test the LDPStorage read method with detailed output."""
     # pylint: disable=invalid-name,unused-argument
 
     # Create fake archive to stream
@@ -337,7 +337,7 @@ def test_backends_storage_ldp_read_method(monkeypatch, fs, settings_fs):
         archive_file.write(bytes(json.dumps(archive_content), encoding="utf-8"))
 
     def mock_ovh_post(url):
-        """Mocks the OVH Client post request."""
+        """Mock the OVH Client post request."""
         # pylint: disable=unused-argument
 
         return {
@@ -353,7 +353,7 @@ def test_backends_storage_ldp_read_method(monkeypatch, fs, settings_fs):
         }
 
     def mock_ovh_get(url):
-        """Mocks the OVH client get requests."""
+        """Mock the OVH client get requests."""
         # pylint: disable=unused-argument
 
         return {
@@ -377,7 +377,7 @@ def test_backends_storage_ldp_read_method(monkeypatch, fs, settings_fs):
             pass
 
         def iter_content(self, chunk_size):
-            """Fakes content file iteration."""
+            """Fake content file iteration."""
             # pylint: disable=no-self-use
 
             with archive_path.open("rb") as archive:
@@ -385,10 +385,10 @@ def test_backends_storage_ldp_read_method(monkeypatch, fs, settings_fs):
                     yield chunk
 
         def raise_for_status(self):
-            """Does nothing for now."""
+            """Do nothing for now."""
 
     def mock_requests_get(url, stream=True):
-        """Mocks the requests get method."""
+        """Mock the requests get method."""
         # pylint: disable=unused-argument
 
         return MockRequestsResponse()
@@ -401,7 +401,7 @@ def test_backends_storage_ldp_read_method(monkeypatch, fs, settings_fs):
 
         @classmethod
         def now(cls, **kwargs):
-            """Always returns the same testable now value."""
+            """Always return the same testable now value."""
             # pylint: disable=unused-argument
 
             return freezed_now
@@ -442,7 +442,7 @@ def test_backends_storage_ldp_read_method(monkeypatch, fs, settings_fs):
 
 
 def test_backends_storage_ldp_write_method_with_details():
-    """Tests the LDPStorage write method."""
+    """Test the LDPStorage write method."""
     storage = LDPStorage(
         endpoint="ovh-eu",
         application_key="fake_key",

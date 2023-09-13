@@ -8,7 +8,7 @@ from ralph.conf import InstantiableSettingsItem, settings
 
 
 def test_utils_import_string():
-    """Tests import_string utility taken from Django utilities."""
+    """Test import_string utility taken from Django utilities."""
     with pytest.raises(ImportError, match="foo doesn't look like a module path"):
         ralph_utils.import_string("foo")
 
@@ -22,7 +22,7 @@ def test_utils_import_string():
 
 
 def test_utils_get_backend_type():
-    """Tests get_backend_type utility."""
+    """Test get_backend_type utility."""
     assert (
         ralph_utils.get_backend_type(settings.BACKENDS, "es")
         == settings.BACKENDS.DATABASE
@@ -50,7 +50,7 @@ def test_utils_get_backend_type():
     ],
 )
 def test_utils_get_backend_instance(options, expected):
-    """Tests get_backend_instance utility should return the expected result."""
+    """Test get_backend_instance utility should return the expected result."""
 
     class DummyBackendSettings(InstantiableSettingsItem):
         """Represents a dummy backend setting."""
@@ -75,7 +75,7 @@ def test_utils_get_backend_instance(options, expected):
 
 @pytest.mark.parametrize("path,value", [(["foo", "bar"], "bar_value")])
 def test_utils_get_dict_value_from_path_should_return_given_value(path, value):
-    """Tests the get_dict_value_from_path function should return the value when it's
+    """Test the get_dict_value_from_path function should return the value when it's
     present.
     """
     dictionary = {"foo": {"bar": "bar_value"}}
@@ -94,7 +94,7 @@ def test_utils_get_dict_value_from_path_should_return_given_value(path, value):
 def test_utils_get_dict_value_from_path_should_return_none_when_value_does_not_exists(
     path,
 ):
-    """Tests the get_dict_value_from_path function should return None if the value is
+    """Test the get_dict_value_from_path function should return None if the value is
     not found.
     """
     dictionary = {"foo": {"bar": "bar_value"}}
@@ -102,7 +102,7 @@ def test_utils_get_dict_value_from_path_should_return_none_when_value_does_not_e
 
 
 def test_utils_set_dict_value_from_path_creating_new_fields():
-    """Tests when the fields are not present, set_dict_value_from_path should add
+    """Test when the fields are not present, set_dict_value_from_path should add
     them.
     """
     dictionary = {}
@@ -111,7 +111,7 @@ def test_utils_set_dict_value_from_path_creating_new_fields():
 
 
 def test_utils_set_dict_value_from_path_updating_fields():
-    """Tests when the fields are present, set_dict_value_from_path should update
+    """Test when the fields are present, set_dict_value_from_path should update
     them.
     """
     dictionary = {"foo": {"bar": "bar_value"}}

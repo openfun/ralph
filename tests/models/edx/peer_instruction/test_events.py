@@ -12,7 +12,7 @@ from tests.fixtures.hypothesis_strategies import custom_given
 
 @custom_given(PeerInstructionEventField)
 def test_models_edx_peer_instruction_event_field_with_valid_field(field):
-    """Tests that a valid `PeerInstructionEventField` does not raise a
+    """Test that a valid `PeerInstructionEventField` does not raise a
     `ValidationError`.
     """
     assert len(field.rationale) <= 12500
@@ -20,7 +20,7 @@ def test_models_edx_peer_instruction_event_field_with_valid_field(field):
 
 @custom_given(PeerInstructionEventField)
 def test_models_edx_peer_instruction_event_field_with_invalid_rationale(field):
-    """Tests that a valid `PeerInstructionEventField` does not raise a
+    """Test that a valid `PeerInstructionEventField` does not raise a
     `ValidationError`.
     """
     invalid_field = json.loads(field.json())

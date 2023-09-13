@@ -30,7 +30,7 @@ from tests.fixtures.backends import (
 
 
 def test_backends_database_es_database_instantiation(es):
-    """Tests the ES backend instantiation."""
+    """Test the ES backend instantiation."""
     # pylint: disable=invalid-name,unused-argument,protected-access
 
     assert ESDatabase.name == "es"
@@ -59,7 +59,7 @@ def test_backends_database_es_database_instantiation(es):
 
 
 def test_backends_database_es_database_instantiation_with_forbidden_op_type(es):
-    """Tests the ES backend instantiation with an op_type that is not allowed."""
+    """Test the ES backend instantiation with an op_type that is not allowed."""
     # pylint: disable=invalid-name,unused-argument,protected-access
 
     with pytest.raises(BackendParameterException):
@@ -67,7 +67,7 @@ def test_backends_database_es_database_instantiation_with_forbidden_op_type(es):
 
 
 def test_backends_database_es_client_kwargs(es):
-    """Tests the ES backend client instantiation using client_options that must be
+    """Test the ES backend client instantiation using client_options that must be
     passed to the http(s) connection pool.
     """
     # pylint: disable=invalid-name,unused-argument,protected-access
@@ -90,7 +90,7 @@ def test_backends_database_es_client_kwargs(es):
 
 
 def test_backends_database_es_to_documents_method(es):
-    """Tests to_documents method."""
+    """Test to_documents method."""
     # pylint: disable=invalid-name,unused-argument
 
     # Create stream data
@@ -118,7 +118,7 @@ def test_backends_database_es_to_documents_method(es):
 
 
 def test_backends_database_es_to_documents_method_with_create_op_type(es):
-    """Tests to_documents method using the create op_type."""
+    """Test to_documents method using the create op_type."""
     # pylint: disable=invalid-name,unused-argument
 
     # Create stream data
@@ -143,7 +143,7 @@ def test_backends_database_es_to_documents_method_with_create_op_type(es):
 
 
 def test_backends_database_es_get_method(es):
-    """Tests ES get method."""
+    """Test ES get method."""
     # pylint: disable=invalid-name
 
     # Insert documents
@@ -168,7 +168,7 @@ def test_backends_database_es_get_method(es):
 
 
 def test_backends_database_es_get_method_with_a_custom_query(es):
-    """Tests ES get method with a custom query."""
+    """Test ES get method with a custom query."""
     # pylint: disable=invalid-name
 
     # Insert documents
@@ -211,7 +211,7 @@ def test_backends_database_es_get_method_with_a_custom_query(es):
 
 
 def test_backends_database_es_put_method(es, fs, monkeypatch):
-    """Tests ES put method."""
+    """Test ES put method."""
     # pylint: disable=invalid-name
 
     # Prepare fake file system
@@ -243,7 +243,7 @@ def test_backends_database_es_put_method(es, fs, monkeypatch):
 
 
 def test_backends_database_es_put_method_with_update_op_type(es, fs, monkeypatch):
-    """Tests ES put method using the update op_type."""
+    """Test ES put method using the update op_type."""
     # pylint: disable=invalid-name
 
     # Prepare fake file system
@@ -303,7 +303,7 @@ def test_backends_database_es_put_method_with_update_op_type(es, fs, monkeypatch
 def test_backends_database_es_put_with_badly_formatted_data_raises_a_backend_exception(
     es, fs, monkeypatch
 ):
-    """Tests ES put method with badly formatted data."""
+    """Test ES put method with badly formatted data."""
     # pylint: disable=invalid-name,unused-argument
 
     records = [{"id": idx, "count": random.randint(0, 100)} for idx in range(10)]
@@ -336,7 +336,7 @@ def test_backends_database_es_put_with_badly_formatted_data_raises_a_backend_exc
 def test_backends_database_es_put_with_badly_formatted_data_in_force_mode(
     es, fs, monkeypatch
 ):
-    """Tests ES put method with badly formatted data when the force mode is active."""
+    """Test ES put method with badly formatted data when the force mode is active."""
     # pylint: disable=invalid-name,unused-argument
 
     records = [{"id": idx, "count": random.randint(0, 100)} for idx in range(10)]
@@ -366,7 +366,7 @@ def test_backends_database_es_put_with_badly_formatted_data_in_force_mode(
 
 
 def test_backends_database_es_put_with_datastream(es_data_stream, fs, monkeypatch):
-    """Tests ES put method when using a configured data stream."""
+    """Test ES put method when using a configured data stream."""
     # pylint: disable=invalid-name,unused-argument
 
     monkeypatch.setattr(
@@ -398,13 +398,13 @@ def test_backends_database_es_put_with_datastream(es_data_stream, fs, monkeypatc
 def test_backends_database_es_query_statements_with_pit_query_failure(
     monkeypatch, caplog, es
 ):
-    """Tests the ES query_statements method, given a point in time query failure, should
+    """Test the ES query_statements method, given a point in time query failure, should
     raise a BackendException and log the error.
     """
     # pylint: disable=invalid-name,unused-argument
 
     def mock_open_point_in_time(**_):
-        """Mocks the Elasticsearch.open_point_in_time method."""
+        """Mock the Elasticsearch.open_point_in_time method."""
         raise ValueError("ES failure")
 
     database = ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX)
@@ -424,13 +424,13 @@ def test_backends_database_es_query_statements_with_pit_query_failure(
 def test_backends_database_es_query_statements_with_search_query_failure(
     monkeypatch, caplog, es
 ):
-    """Tests the ES query_statements method, given a search query failure, should
+    """Test the ES query_statements method, given a search query failure, should
     raise a BackendException and log the error.
     """
     # pylint: disable=invalid-name,unused-argument
 
     def mock_search(**_):
-        """Mocks the Elasticsearch.search method."""
+        """Mock the Elasticsearch.search method."""
         raise ApiError("Something is wrong", ApiResponseMeta(*([None] * 5)), None)
 
     database = ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX)
@@ -450,13 +450,13 @@ def test_backends_database_es_query_statements_with_search_query_failure(
 def test_backends_database_es_query_statements_by_ids_with_search_query_failure(
     monkeypatch, caplog, es
 ):
-    """Tests the ES query_statements_by_ids method, given a search query failure, should
+    """Test the ES query_statements_by_ids method, given a search query failure, should
     raise a BackendException and log the error.
     """
     # pylint: disable=invalid-name,unused-argument
 
     def mock_search(**_):
-        """Mocks the Elasticsearch.search method."""
+        """Mock the Elasticsearch.search method."""
         raise ApiError("Something is wrong", ApiResponseMeta(*([None] * 5)), None)
 
     database = ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX)
@@ -476,7 +476,7 @@ def test_backends_database_es_query_statements_by_ids_with_search_query_failure(
 def test_backends_database_es_query_statements_by_ids_with_multiple_indexes(
     es, es_forwarding
 ):
-    """Tests the ES query_statements_by_ids method, given a valid search
+    """Test the ES query_statements_by_ids method, given a valid search
     query, should execute the query uniquely on the specified index and return the
     expected results.
     """

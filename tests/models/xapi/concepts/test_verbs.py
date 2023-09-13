@@ -91,6 +91,6 @@ from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 )
 @custom_given(st.data())
 def test_models_xapi_concept_verbs_with_valid_field(class_, verb_id, data):
-    """Tests that a valid xAPI verb has the expected the `id` value."""
+    """Test that a valid xAPI verb has the expected the `id` value."""
     field = json.loads(data.draw(custom_builds(class_)).json())
     assert field["id"] == verb_id

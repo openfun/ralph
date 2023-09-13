@@ -12,7 +12,7 @@ from ralph.conf import settings
 # pylint: disable=invalid-name
 # pylint: disable=unused-argument
 def test_backends_storage_fs_storage_instantiation(fs):
-    """Tests the FSStorage backend instantiation."""
+    """Test the FSStorage backend instantiation."""
     # pylint: disable=protected-access
 
     assert FSStorage.name == "fs"
@@ -35,7 +35,7 @@ def test_backends_storage_fs_storage_instantiation(fs):
 # pylint: disable=invalid-name
 # pylint: disable=unused-argument
 def test_backends_storage_fs_getfile(fs):
-    """Tests that an existing path can be returned, and throws an exception
+    """Test that an existing path can be returned, and throws an exception
     otherwise.
     """
     # pylint: disable=protected-access
@@ -57,7 +57,7 @@ def test_backends_storage_fs_getfile(fs):
 # pylint: disable=invalid-name
 # pylint: disable=unused-argument
 def test_backends_storage_fs_url(fs):
-    """Tests that the full URL of the file can be returned."""
+    """Test that the full URL of the file can be returned."""
     path = "test_fs/"
     filename = "some_file"
     storage = FSStorage(path)
@@ -70,7 +70,7 @@ def test_backends_storage_fs_url(fs):
 # pylint: disable=invalid-name
 # pylint: disable=unused-argument
 def test_backends_storage_fs_list(fs, settings_fs):
-    """Tests archives listing in FSStorage."""
+    """Test archives listing in FSStorage."""
     fs.create_dir(settings.APP_DIR)
 
     path = "test_fs/"

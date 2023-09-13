@@ -35,7 +35,7 @@ from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 @pytest.mark.parametrize("value", [None, "", {}])
 @custom_given(BaseXapiStatement)
 def test_models_xapi_base_statement_with_invalid_null_values(path, value, statement):
-    """Tests that the statement does not accept any null values.
+    """Test that the statement does not accept any null values.
 
     XAPI-00001
     An LRS rejects with error code 400 Bad Request any Statement having a property whose
@@ -59,7 +59,7 @@ def test_models_xapi_base_statement_with_invalid_null_values(path, value, statem
 @pytest.mark.parametrize("value", [None, "", {}])
 @custom_given(custom_builds(BaseXapiStatement, object=custom_builds(BaseXapiActivity)))
 def test_models_xapi_base_statement_with_valid_null_values(path, value, statement):
-    """Tests that the statement does accept valid null values in extensions fields.
+    """Test that the statement does accept valid null values in extensions fields.
 
     XAPI-00001
     An LRS rejects with error code 400 Bad Request any Statement having a property whose
@@ -85,7 +85,7 @@ def test_models_xapi_base_statement_with_valid_null_values(path, value, statemen
     )
 )
 def test_models_xapi_base_statement_with_valid_empty_array(path, statement):
-    """Tests that the statement does accept a valid empty array.
+    """Test that the statement does accept a valid empty array.
 
     Where the Correct Responses Pattern contains an empty array, the meaning of this is
     that there is no correct answer.
@@ -104,7 +104,7 @@ def test_models_xapi_base_statement_with_valid_empty_array(path, statement):
 )
 @custom_given(BaseXapiStatement)
 def test_models_xapi_base_statement_must_use_actor_verb_and_object(field, statement):
-    """Tests that the statement raises an exception if required fields are missing.
+    """Test that the statement raises an exception if required fields are missing.
 
     XAPI-00003
     An LRS rejects with error code 400 Bad Request a Statement which does not contain an
@@ -138,7 +138,7 @@ def test_models_xapi_base_statement_must_use_actor_verb_and_object(field, statem
     custom_builds(BaseXapiStatement, actor=custom_builds(BaseXapiAgentWithAccount))
 )
 def test_models_xapi_base_statement_with_invalid_data_types(path, value, statement):
-    """Tests that the statement does not accept values with wrong types.
+    """Test that the statement does not accept values with wrong types.
 
     XAPI-00006
     An LRS rejects with error code 400 Bad Request a Statement which uses the wrong data
@@ -164,7 +164,7 @@ def test_models_xapi_base_statement_with_invalid_data_types(path, value, stateme
     custom_builds(BaseXapiStatement, actor=custom_builds(BaseXapiAgentWithAccount))
 )
 def test_models_xapi_base_statement_with_invalid_data_format(path, value, statement):
-    """Tests that the statement does not accept values having a wrong format.
+    """Test that the statement does not accept values having a wrong format.
 
     XAPI-00007
     An LRS rejects with error code 400 Bad Request a Statement which uses any
@@ -184,7 +184,7 @@ def test_models_xapi_base_statement_with_invalid_data_format(path, value, statem
     custom_builds(BaseXapiStatement, actor=custom_builds(BaseXapiAgentWithAccount))
 )
 def test_models_xapi_base_statement_with_invalid_letter_cases(path, value, statement):
-    """Tests that the statement does not accept keys having invalid letter cases.
+    """Test that the statement does not accept keys having invalid letter cases.
 
     XAPI-00008
     An LRS rejects with error code 400 Bad Request a Statement where the case of a key
@@ -201,7 +201,7 @@ def test_models_xapi_base_statement_with_invalid_letter_cases(path, value, state
 
 @custom_given(BaseXapiStatement)
 def test_models_xapi_base_statement_should_not_accept_additional_properties(statement):
-    """Tests that the statement does not accept additional properties.
+    """Test that the statement does not accept additional properties.
 
     XAPI-00010
     An LRS rejects with error code 400 Bad Request a Statement where a key or value is
@@ -216,7 +216,7 @@ def test_models_xapi_base_statement_should_not_accept_additional_properties(stat
 @pytest.mark.parametrize("path,value", [("object__id", "w3id.org/xapi/video")])
 @custom_given(BaseXapiStatement)
 def test_models_xapi_base_statement_with_iri_without_scheme(path, value, statement):
-    """Tests that the statement does not accept IRIs without a scheme.
+    """Test that the statement does not accept IRIs without a scheme.
 
     XAPI-00011
     An LRS rejects with error code 400 Bad Request a Statement containing IRL or IRI
@@ -238,7 +238,7 @@ def test_models_xapi_base_statement_with_iri_without_scheme(path, value, stateme
 )
 @custom_given(custom_builds(BaseXapiStatement, object=custom_builds(BaseXapiActivity)))
 def test_models_xapi_base_statement_with_invalid_extensions(path, statement):
-    """Tests that the statement does not accept extensions keys with invalid IRIs.
+    """Test that the statement does not accept extensions keys with invalid IRIs.
 
     XAPI-00118
     An Extension "key" is an IRI. The LRS rejects with 400 a statement which has an
@@ -255,7 +255,7 @@ def test_models_xapi_base_statement_with_invalid_extensions(path, statement):
     custom_builds(BaseXapiStatement, actor=custom_builds(BaseXapiAgentWithAccount))
 )
 def test_models_xapi_base_statement_with_two_agent_types(path, value, statement):
-    """Tests that the statement does not accept multiple agent types.
+    """Test that the statement does not accept multiple agent types.
 
     An Agent MUST NOT include more than one Inverse Functional Identifier.
     """
@@ -269,7 +269,7 @@ def test_models_xapi_base_statement_with_two_agent_types(path, value, statement)
     custom_builds(BaseXapiStatement, actor=custom_builds(BaseXapiAnonymousGroup))
 )
 def test_models_xapi_base_statement_missing_member_property(statement):
-    """Tests that the statement does not accept group agents with missing members.
+    """Test that the statement does not accept group agents with missing members.
 
     An Anonymous Group MUST include a "member" property listing constituent Agents.
     """
@@ -312,7 +312,7 @@ def test_models_xapi_base_statement_missing_member_property(statement):
     st.data(),
 )
 def test_models_xapi_base_statement_with_invalid_group_objects(value, statement, data):
-    """Tests that the statement does not accept group agents with group members.
+    """Test that the statement does not accept group agents with group members.
 
     An Anonymous Group MUST NOT contain Group Objects in the "member" identifiers.
     An Identified Group MUST NOT contain Group Objects in the "member" property.
@@ -333,7 +333,7 @@ def test_models_xapi_base_statement_with_invalid_group_objects(value, statement,
     )
 )
 def test_models_xapi_base_statement_with_two_group_identifiers(path, value, statement):
-    """Tests that the statement does not accept multiple group identifiers.
+    """Test that the statement does not accept multiple group identifiers.
 
     An Identified Group MUST include exactly one Inverse Functional Identifier.
     """
@@ -356,7 +356,7 @@ def test_models_xapi_base_statement_with_two_group_identifiers(path, value, stat
     custom_builds(BaseXapiStatement, object=custom_builds(BaseXapiSubStatement))
 )
 def test_models_xapi_base_statement_with_sub_statement_ref(path, value, statement):
-    """Tests that the sub-statement does not accept invalid properties.
+    """Test that the sub-statement does not accept invalid properties.
 
     A SubStatement MUST NOT have the "id", "stored", "version" or "authority"
     properties.
@@ -385,7 +385,7 @@ def test_models_xapi_base_statement_with_sub_statement_ref(path, value, statemen
     )
 )
 def test_models_xapi_base_statement_with_invalid_interaction_object(value, statement):
-    """Tests that the statement does not accept invalid interaction fields.
+    """Test that the statement does not accept invalid interaction fields.
 
     An interaction component's id value SHOULD NOT have whitespace.
     Within an array of interaction components, all id values MUST be distinct.
@@ -412,7 +412,7 @@ def test_models_xapi_base_statement_with_invalid_interaction_object(value, state
     ),
 )
 def test_models_xapi_base_statement_with_invalid_context_value(path, value, statement):
-    """Tests that the statement does not accept an invalid revision/platform value.
+    """Test that the statement does not accept an invalid revision/platform value.
 
     The "revision" property MUST only be used if the Statement's Object is an Activity.
     The "platform" property MUST only be used if the Statement's Object is an Activity.
@@ -427,7 +427,7 @@ def test_models_xapi_base_statement_with_invalid_context_value(path, value, stat
 @pytest.mark.parametrize("path", ["context.contextActivities.not_parent"])
 @custom_given(BaseXapiStatement)
 def test_models_xapi_base_statement_with_invalid_context_activities(path, statement):
-    """Tests that the statement does not accept invalid context activity properties.
+    """Test that the statement does not accept invalid context activity properties.
 
     Every key in the contextActivities Object MUST be one of parent, grouping, category,
     or other.
@@ -448,7 +448,7 @@ def test_models_xapi_base_statement_with_invalid_context_activities(path, statem
 )
 @custom_given(BaseXapiStatement)
 def test_models_xapi_base_statement_with_valid_context_activities(value, statement):
-    """Tests that the statement does accept valid context activities fields.
+    """Test that the statement does accept valid context activities fields.
 
     Every value in the contextActivities Object MUST be either a single Activity Object
     or an array of Activity Objects.
@@ -466,7 +466,7 @@ def test_models_xapi_base_statement_with_valid_context_activities(value, stateme
 @pytest.mark.parametrize("value", ["0.0.0", "1.1.0", "1", "2", "1.10.1", "1.0.1.1"])
 @custom_given(BaseXapiStatement)
 def test_models_xapi_base_statement_with_invalid_version(value, statement):
-    """Tests that the statement does not accept an invalid version field.
+    """Test that the statement does not accept an invalid version field.
 
     An LRS MUST reject all Statements with a version specified that does not start with
     1.0..
@@ -479,7 +479,7 @@ def test_models_xapi_base_statement_with_invalid_version(value, statement):
 
 @custom_given(BaseXapiStatement)
 def test_models_xapi_base_statement_with_valid_version(statement):
-    """Tests that the statement does accept a valid version field.
+    """Test that the statement does accept a valid version field.
 
     Statements returned by an LRS MUST retain the version they are accepted with.
     If they lack a version, the version MUST be set to 1.0.0
@@ -500,7 +500,7 @@ def test_models_xapi_base_statement_with_valid_version(statement):
 def test_models_xapi_base_statement_should_consider_valid_all_defined_xapi_models(
     model, data
 ):
-    """Tests that all defined xAPI models in the ModelSelector make valid statements."""
+    """Test that all defined xAPI models in the ModelSelector make valid statements."""
     # All specific xAPI models should inherit BaseXapiStatement
     assert issubclass(model, BaseXapiStatement)
     statement = data.draw(custom_builds(model)).json(exclude_none=True, by_alias=True)

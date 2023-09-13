@@ -6,7 +6,7 @@ from ralph.backends.http.base import BaseHTTP, BaseQuery
 
 
 def test_backends_http_base_abstract_interface_with_implemented_abstract_method():
-    """Tests the interface mechanism with properly implemented abstract methods."""
+    """Test the interface mechanism with properly implemented abstract methods."""
 
     class GoodStorage(BaseHTTP):
         """Correct implementation with required abstract methods."""
@@ -14,18 +14,18 @@ def test_backends_http_base_abstract_interface_with_implemented_abstract_method(
         name = "good"
 
         async def status(self):
-            """Fakes the status method."""
+            """Fake the status method."""
 
         async def list(
             self, target: str = None, details: bool = False, new: bool = False
         ) -> Iterator[Union[str, dict]]:
-            """Fakes the list method."""
+            """Fake the list method."""
 
         async def read(self):  # pylint: disable=arguments-differ
-            """Fakes the read method."""
+            """Fake the read method."""
 
         async def write(self):  # pylint: disable=arguments-differ
-            """Fakes the write method."""
+            """Fake the write method."""
 
     GoodStorage()
 

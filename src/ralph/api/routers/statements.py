@@ -388,7 +388,7 @@ async def put(
     background_tasks: BackgroundTasks,
     _=Depends(strict_query_params),
 ):
-    """Stores a single statement as a single member of a set.
+    """Store a single statement as a single member of a set.
 
     LRS Specification:
     https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#211-put-statements
@@ -457,7 +457,7 @@ async def post(
     response: Response,
     _=Depends(strict_query_params),
 ):
-    """Stores a set of statements (or a single statement as a single member of a set).
+    """Store a set of statements (or a single statement as a single member of a set).
 
     NB: at this time, using POST to make a GET request, is not supported.
     LRS Specification:

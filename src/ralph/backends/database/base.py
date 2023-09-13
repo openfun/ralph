@@ -26,7 +26,7 @@ class BaseQuery(BaseModel):
 
 @dataclass
 class StatementQueryResult:
-    """Represents a common interface for results of an LRS statements query."""
+    """Represent a common interface for results of an LRS statements query."""
 
     statements: List[dict]
     pit_id: str
@@ -56,7 +56,7 @@ class AgentParameters(BaseModel):
 
 
 class RalphStatementsQuery(LRSStatementsQuery):
-    """Represents a dictionary of possible LRS query parameters."""
+    """Represent a dictionary of possible LRS query parameters."""
 
     # pylint: disable=too-many-instance-attributes
 
@@ -133,12 +133,12 @@ class BaseDatabase(ABC):
 
     @abstractmethod
     def status(self) -> DatabaseStatus:
-        """Implements database checks (e.g. connection, cluster status)."""
+        """Implement database checks (e.g. connection, cluster status)."""
 
     @abstractmethod
     @enforce_query_checks
     def get(self, query: BaseQuery = None, chunk_size: int = 10):
-        """Yields `chunk_size` records read from the database query results."""
+        """Yield `chunk_size` records read from the database query results."""
 
     @abstractmethod
     def put(
@@ -147,7 +147,7 @@ class BaseDatabase(ABC):
         chunk_size: int = 10,
         ignore_errors: bool = False,
     ) -> int:
-        """Writes `chunk_size` records from the `stream` to the database.
+        """Write `chunk_size` records from the `stream` to the database.
 
         Returns:
             int: The count of successfully written records.
@@ -155,8 +155,8 @@ class BaseDatabase(ABC):
 
     @abstractmethod
     def query_statements(self, params: RalphStatementsQuery) -> StatementQueryResult:
-        """Returns the statements query payload using xAPI parameters."""
+        """Return the statements query payload using xAPI parameters."""
 
     @abstractmethod
     def query_statements_by_ids(self, ids: List[str]) -> List:
-        """Returns the list of matching statement IDs from the database."""
+        """Return the list of matching statement IDs from the database."""

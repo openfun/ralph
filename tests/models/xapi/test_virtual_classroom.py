@@ -55,7 +55,7 @@ from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 )
 @custom_given(st.data())
 def test_models_xapi_virtual_classroom_selectors_with_valid_statements(class_, data):
-    """Tests given a valid virtual classroom xAPI statement the `get_first_model`
+    """Test given a valid virtual classroom xAPI statement the `get_first_model`
     selector method should return the expected model.
     """
     statement = json.loads(data.draw(custom_builds(class_)).json())
@@ -65,7 +65,7 @@ def test_models_xapi_virtual_classroom_selectors_with_valid_statements(class_, d
 
 @custom_given(VirtualClassroomInitialized)
 def test_models_xapi_virtual_classroom_initialized_with_valid_statement(statement):
-    """Tests that a valid virtual classroom initialized statement has the expected
+    """Test that a valid virtual classroom initialized statement has the expected
     `verb`.`id` and `object`.`definition`.`type` property values.
     """
     assert statement.verb.id == "http://adlnet.gov/expapi/verbs/initialized"
@@ -77,7 +77,7 @@ def test_models_xapi_virtual_classroom_initialized_with_valid_statement(statemen
 
 @custom_given(VirtualClassroomJoined)
 def test_models_xapi_virtual_classroom_joined_with_valid_statement(statement):
-    """Tests that a virtual classroom joined statement has the expected
+    """Test that a virtual classroom joined statement has the expected
     `verb`.`id` and `object`.`definition`.`type` property values."""
     assert statement.verb.id == "http://activitystrea.ms/join"
     assert (
@@ -88,7 +88,7 @@ def test_models_xapi_virtual_classroom_joined_with_valid_statement(statement):
 
 @custom_given(VirtualClassroomLeft)
 def test_models_xapi_virtual_classroom_left_with_valid_statement(statement):
-    """Tests that a virtual classroom left statement has the expected
+    """Test that a virtual classroom left statement has the expected
     `verb`.`id` and `object`.`definition`.`type` property values."""
     assert statement.verb.id == "http://activitystrea.ms/leave"
     assert (
@@ -99,7 +99,7 @@ def test_models_xapi_virtual_classroom_left_with_valid_statement(statement):
 
 @custom_given(VirtualClassroomTerminated)
 def test_models_xapi_virtual_classroom_terminated_with_valid_statement(statement):
-    """Tests that a virtual classroom terminated statement has the expected
+    """Test that a virtual classroom terminated statement has the expected
     `verb`.`id` and `object`.`definition`.`type` property values.
     """
     assert statement.verb.id == "http://adlnet.gov/expapi/verbs/terminated"
@@ -111,7 +111,7 @@ def test_models_xapi_virtual_classroom_terminated_with_valid_statement(statement
 
 @custom_given(VirtualClassroomMuted)
 def test_models_xapi_virtual_classroom_muted_with_valid_statement(statement):
-    """Tests that a virtual classroom muted statement has the expected
+    """Test that a virtual classroom muted statement has the expected
     `verb`.`id` and `object`.`definition`.`type` property values.
     """
     assert statement.verb.id == "https://w3id.org/xapi/virtual-classroom/verbs/muted"
@@ -123,7 +123,7 @@ def test_models_xapi_virtual_classroom_muted_with_valid_statement(statement):
 
 @custom_given(VirtualClassroomUnmuted)
 def test_models_xapi_virtual_classroom_unmuted_with_valid_statement(statement):
-    """Tests that a virtual classroom unmuted statement has the expected
+    """Test that a virtual classroom unmuted statement has the expected
     `verb`.`id` and `object`.`definition`.`type` property values.
     """
     assert statement.verb.id == "https://w3id.org/xapi/virtual-classroom/verbs/unmuted"
@@ -135,7 +135,7 @@ def test_models_xapi_virtual_classroom_unmuted_with_valid_statement(statement):
 
 @custom_given(VirtualClassroomSharedScreen)
 def test_models_xapi_virtual_classroom_shared_screen_with_valid_statement(statement):
-    """Tests that a virtual classroom shared screen statement has the expected
+    """Test that a virtual classroom shared screen statement has the expected
     `verb`.`id` and `object`.`definition`.`type` property values.
     """
     assert (
@@ -150,7 +150,7 @@ def test_models_xapi_virtual_classroom_shared_screen_with_valid_statement(statem
 
 @custom_given(VirtualClassroomUnsharedScreen)
 def test_models_xapi_virtual_classroom_unshared_screen_with_valid_statement(statement):
-    """Tests that a virtual classroom unshared screen statement has the expected
+    """Test that a virtual classroom unshared screen statement has the expected
     `verb`.`id` and `object`.`definition`.`type` property values.
     """
     assert (
@@ -165,7 +165,7 @@ def test_models_xapi_virtual_classroom_unshared_screen_with_valid_statement(stat
 
 @custom_given(VirtualClassroomStartedCamera)
 def test_models_xapi_virtual_classroom_started_camera_with_valid_statement(statement):
-    """Tests that a virtual classroom started camera statement has the expected
+    """Test that a virtual classroom started camera statement has the expected
     `verb`.`id` and `object`.`definition`.`type` property values.
     """
     assert (
@@ -180,7 +180,7 @@ def test_models_xapi_virtual_classroom_started_camera_with_valid_statement(state
 
 @custom_given(VirtualClassroomStoppedCamera)
 def test_models_xapi_virtual_classroom_stopped_camera_with_valid_statement(statement):
-    """Tests that a virtual classroom stopped camera statement has the expected
+    """Test that a virtual classroom stopped camera statement has the expected
     `verb`.`id` and `object`.`definition`.`type` property values.
     """
     assert (
@@ -195,7 +195,7 @@ def test_models_xapi_virtual_classroom_stopped_camera_with_valid_statement(state
 
 @custom_given(VirtualClassroomRaisedHand)
 def test_models_xapi_virtual_classroom_raised_hand_with_valid_statement(statement):
-    """Tests that a virtual classroom raised hand statement has the expected
+    """Test that a virtual classroom raised hand statement has the expected
     `verb`.`id` and `object`.`definition`.`type` property values.
     """
     assert (
@@ -209,7 +209,7 @@ def test_models_xapi_virtual_classroom_raised_hand_with_valid_statement(statemen
 
 @custom_given(VirtualClassroomLoweredHand)
 def test_models_xapi_virtual_classroom_lowered_hand_with_valid_statement(statement):
-    """Tests that a virtual classroom lowered hand statement has the expected
+    """Test that a virtual classroom lowered hand statement has the expected
     `verb`.`id` and `object`.`definition`.`type` property values.
     """
     assert (
@@ -224,7 +224,7 @@ def test_models_xapi_virtual_classroom_lowered_hand_with_valid_statement(stateme
 
 @custom_given(VirtualClassroomStartedPoll)
 def test_models_xapi_virtual_classroom_started_poll_with_valid_statement(statement):
-    """Tests that a virtual classroom started poll statement has the expected
+    """Test that a virtual classroom started poll statement has the expected
     `verb`.`id` and `object`.`definition`.`type` property values.
     """
     assert statement.verb.id == "http://adlnet.gov/expapi/verbs/asked"
@@ -236,7 +236,7 @@ def test_models_xapi_virtual_classroom_started_poll_with_valid_statement(stateme
 
 @custom_given(VirtualClassroomAnsweredPoll)
 def test_models_xapi_virtual_classroom_answered_poll_with_valid_statement(statement):
-    """Tests that a virtual classroom answered poll statement has the expected
+    """Test that a virtual classroom answered poll statement has the expected
     `verb`.`id` and `object`.`definition`.`type` property values.
     """
     assert statement.verb.id == "http://adlnet.gov/expapi/verbs/answered"
@@ -250,7 +250,7 @@ def test_models_xapi_virtual_classroom_answered_poll_with_valid_statement(statem
 def test_models_xapi_virtual_classroom_posted_public_message_with_valid_statement(
     statement,
 ):
-    """Tests that a virtual classroom posted public message statement has the expected
+    """Test that a virtual classroom posted public message statement has the expected
     `verb`.`id` and `object`.`definition`.`type` property values.
     """
     assert statement.verb.id == "https://w3id.org/xapi/acrossx/verbs/posted"

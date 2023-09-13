@@ -29,7 +29,7 @@ from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 )
 @custom_given(st.data())
 def test_models_edx_edx_course_enrollment_selectors_with_valid_statements(class_, data):
-    """Tests given a valid course enrollment edX statement the `get_first_model`
+    """Test given a valid course enrollment edX statement the `get_first_model`
     selector method should return the expected model.
     """
     statement = json.loads(data.draw(custom_builds(class_)).json())
@@ -41,7 +41,7 @@ def test_models_edx_edx_course_enrollment_selectors_with_valid_statements(class_
 def test_models_edx_edx_course_enrollment_activated_with_valid_statement(
     statement,
 ):
-    """Tests that a `edx.course.enrollment.activated` statement has the expected
+    """Test that a `edx.course.enrollment.activated` statement has the expected
     `event_type` and `name`.
     """
     assert statement.event_type == "edx.course.enrollment.activated"
@@ -52,7 +52,7 @@ def test_models_edx_edx_course_enrollment_activated_with_valid_statement(
 def test_models_edx_edx_course_enrollment_deactivated_with_valid_statement(
     statement,
 ):
-    """Tests that a `edx.course.enrollment.deactivated` statement has the expected
+    """Test that a `edx.course.enrollment.deactivated` statement has the expected
     `event_type` and `name`.
     """
     assert statement.event_type == "edx.course.enrollment.deactivated"
@@ -63,7 +63,7 @@ def test_models_edx_edx_course_enrollment_deactivated_with_valid_statement(
 def test_models_edx_edx_course_enrollment_mode_changed_with_valid_statement(
     statement,
 ):
-    """Tests that a `edx.course.enrollment.mode_changed` statement has the expected
+    """Test that a `edx.course.enrollment.mode_changed` statement has the expected
     `event_type` and `name`.
     """
     assert statement.event_type == "edx.course.enrollment.mode_changed"
@@ -74,7 +74,7 @@ def test_models_edx_edx_course_enrollment_mode_changed_with_valid_statement(
 def test_models_edx_ui_edx_course_enrollment_upgrade_clicked_with_valid_statement(
     statement,
 ):
-    """Tests that a `edx.course.enrollment.upgrade_clicked` statement has the expected
+    """Test that a `edx.course.enrollment.upgrade_clicked` statement has the expected
     `event_type` and `name`.
     """
     assert statement.event_type == "edx.course.enrollment.upgrade_clicked"
@@ -85,7 +85,7 @@ def test_models_edx_ui_edx_course_enrollment_upgrade_clicked_with_valid_statemen
 def test_models_edx_edx_course_enrollment_upgrade_succeeded_with_valid_statement(
     statement,
 ):
-    """Tests that a `edx.course.enrollment.upgrade.succeeded` statement has the expected
+    """Test that a `edx.course.enrollment.upgrade.succeeded` statement has the expected
     `event_type` and `name`.
     """
     assert statement.event_type == "edx.course.enrollment.upgrade.succeeded"

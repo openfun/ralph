@@ -13,7 +13,7 @@ from tests.fixtures.hypothesis_strategies import custom_given
 
 @custom_given(BaseBrowserModel)
 def test_models_edx_base_browser_model_with_valid_statement(statement):
-    """Tests that a valid base browser statement does not raise a `ValidationError`."""
+    """Test that a valid base browser statement does not raise a `ValidationError`."""
     assert re.match(r"^[a-f0-9]{32}$", statement.session) or statement.session == ""
 
 
@@ -32,7 +32,7 @@ def test_models_edx_base_browser_model_with_valid_statement(statement):
 def test_models_edx_base_browser_model_with_invalid_statement(
     session, error, statement
 ):
-    """Tests that an invalid base browser statement raises a `ValidationError`."""
+    """Test that an invalid base browser statement raises a `ValidationError`."""
     invalid_statement = json.loads(statement.json())
     invalid_statement["session"] = session
 

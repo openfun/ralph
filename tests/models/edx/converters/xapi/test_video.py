@@ -28,7 +28,7 @@ from tests.fixtures.hypothesis_strategies import custom_given
 @custom_given(UILoadVideo, provisional.urls())
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_ui_load_video_to_video_initialized(uuid_namespace, event, platform_url):
-    """Tests that converting with `UILoadVideoToVideoInitialized` returns the
+    """Test that converting with `UILoadVideoToVideoInitialized` returns the
     expected xAPI statement.
     """
 
@@ -84,7 +84,7 @@ def test_ui_load_video_to_video_initialized(uuid_namespace, event, platform_url)
 @custom_given(UIPlayVideo, provisional.urls())
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_ui_play_video_to_video_played(uuid_namespace, event, platform_url):
-    """Tests that converting with `UIPlayVideoToVideoPlayed` returns the expected
+    """Test that converting with `UIPlayVideoToVideoPlayed` returns the expected
     xAPI statement.
     """
 
@@ -144,7 +144,7 @@ def test_ui_play_video_to_video_played(uuid_namespace, event, platform_url):
 @custom_given(UIPauseVideo, provisional.urls())
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_ui_pause_video_to_video_paused(uuid_namespace, event, platform_url):
-    """Tests that converting with `UIPauseVideoToVideoPaused` returns the expected xAPI
+    """Test that converting with `UIPauseVideoToVideoPaused` returns the expected xAPI
     statement.
     """
 
@@ -205,7 +205,7 @@ def test_ui_pause_video_to_video_paused(uuid_namespace, event, platform_url):
 @custom_given(UIStopVideo, provisional.urls())
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_ui_stop_video_to_video_terminated(uuid_namespace, event, platform_url):
-    """Tests that converting with `UIStopVideoToVideoTerminated` returns the expected
+    """Test that converting with `UIStopVideoToVideoTerminated` returns the expected
     xAPI statement.
     """
 
@@ -267,7 +267,7 @@ def test_ui_stop_video_to_video_terminated(uuid_namespace, event, platform_url):
 @custom_given(UISeekVideo, provisional.urls())
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_ui_seek_video_to_video_seeked(uuid_namespace, event, platform_url):
-    """Tests that converting with `UISeekVideoToVideoSeeked` returns the expected
+    """Test that converting with `UISeekVideoToVideoSeeked` returns the expected
     xAPI statement.
     """
 

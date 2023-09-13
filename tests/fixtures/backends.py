@@ -84,7 +84,7 @@ WS_TEST_PORT = 8765
 
 @lru_cache()
 def get_clickhouse_test_backend():
-    """Returns a ClickHouseDatabase backend instance using test defaults."""
+    """Return a ClickHouseDatabase backend instance using test defaults."""
     return ClickHouseDatabase(
         host=CLICKHOUSE_TEST_HOST,
         port=CLICKHOUSE_TEST_PORT,
@@ -95,7 +95,7 @@ def get_clickhouse_test_backend():
 
 @lru_cache
 def get_es_test_backend():
-    """Returns a ESDatabase backend instance using test defaults."""
+    """Return a ESDatabase backend instance using test defaults."""
     return ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_INDEX)
 
 
@@ -129,7 +129,7 @@ class NamedClassEnum(Enum):
 
 
 def get_es_fixture(host=ES_TEST_HOSTS, index=ES_TEST_INDEX):
-    """Creates / deletes an ElasticSearch test index and yields an instantiated
+    """Create / delete an ElasticSearch test index and yields an instantiated
     client.
     """
     client = Elasticsearch(host)
@@ -145,7 +145,7 @@ def get_es_fixture(host=ES_TEST_HOSTS, index=ES_TEST_INDEX):
 
 @pytest.fixture
 def es():
-    """Yields an ElasticSearch test client. See get_es_fixture above."""
+    """Yield an ElasticSearch test client. See get_es_fixture above."""
     # pylint: disable=invalid-name
 
     for es_client in get_es_fixture():
@@ -154,7 +154,7 @@ def es():
 
 @pytest.fixture
 def es_forwarding():
-    """Yields a second ElasticSearch test client. See get_es_fixture above."""
+    """Yield a second ElasticSearch test client. See get_es_fixture above."""
     for es_client in get_es_fixture(index=ES_TEST_FORWARDING_INDEX):
         yield es_client
 
@@ -164,7 +164,7 @@ def get_mongo_fixture(
     database=MONGO_TEST_DATABASE,
     collection=MONGO_TEST_COLLECTION,
 ):
-    """Creates / deletes a Mongo test database + collection and yields an
+    """Create / delete a Mongo test database + collection and yields an
     instantiated client.
     """
     client = MongoClient(connection_uri)
@@ -182,14 +182,14 @@ def get_mongo_fixture(
 
 @pytest.fixture
 def mongo():
-    """Yields a Mongo test client. See get_mongo_fixture above."""
+    """Yield a Mongo test client. See get_mongo_fixture above."""
     for mongo_client in get_mongo_fixture():
         yield mongo_client
 
 
 @pytest.fixture
 def mongo_forwarding():
-    """Yields a second Mongo test client. See get_mongo_fixture above."""
+    """Yield a second Mongo test client. See get_mongo_fixture above."""
     for mongo_client in get_mongo_fixture(collection=MONGO_TEST_FORWARDING_COLLECTION):
         yield mongo_client
 
@@ -200,7 +200,7 @@ def get_clickhouse_fixture(
     database=CLICKHOUSE_TEST_DATABASE,
     event_table_name=CLICKHOUSE_TEST_TABLE_NAME,
 ):
-    """Creates / deletes a ClickHouse test database + table and yields an
+    """Create / delete a ClickHouse test database + table and yields an
     instantiated client.
     """
     client_options = ClickhouseClientOptions(
@@ -246,14 +246,14 @@ def get_clickhouse_fixture(
 
 @pytest.fixture
 def clickhouse():
-    """Yields a ClickHouse test client. See get_clickhouse_fixture above."""
+    """Yield a ClickHouse test client. See get_clickhouse_fixture above."""
     for clickhouse_client in get_clickhouse_fixture():
         yield clickhouse_client
 
 
 @pytest.fixture
 def es_data_stream():
-    """Creates / deletes an ElasticSearch test datastream and yields an instantiated
+    """Create / delete an ElasticSearch test datastream and yields an instantiated
     client.
     """
     client = Elasticsearch(ES_TEST_HOSTS)
@@ -306,7 +306,7 @@ def es_data_stream():
 
 @pytest.fixture
 def settings_fs(fs, monkeypatch):
-    """Forces Path instantiation with fake FS in Ralph's Settings."""
+    """Force Path instantiation with fake FS in Ralph's Settings."""
     # pylint:disable=invalid-name,unused-argument
 
     monkeypatch.setattr(
@@ -317,7 +317,7 @@ def settings_fs(fs, monkeypatch):
 
 @pytest.fixture
 def swift():
-    """Returns get_swift_storage function."""
+    """Return get_swift_storage function."""
 
     def get_swift_storage():
         """Returns an instance of SwiftStorage."""
@@ -345,7 +345,7 @@ def moto_fs(fs):
 
 @pytest.fixture
 def s3():
-    """Returns get_s3_storage function."""
+    """Return get_s3_storage function."""
     # pylint:disable=invalid-name
 
     def get_s3_storage():
@@ -365,13 +365,13 @@ def s3():
 
 @pytest.fixture
 def events():
-    """Returns test events fixture."""
+    """Return test events fixture."""
     return [{"id": idx} for idx in range(10)]
 
 
 @pytest.fixture
 def ws(events):
-    """Returns a websocket server instance."""
+    """Return a websocket server instance."""
     # pylint: disable=invalid-name,redefined-outer-name
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
@@ -397,7 +397,7 @@ def ws(events):
 
 @pytest.fixture
 def lrs():
-    """Returns a context manager that runs ralph's lrs server."""
+    """Return a context manager that runs ralph's lrs server."""
     # pylint: disable=invalid-name,redefined-outer-name
 
     @asynccontextmanager

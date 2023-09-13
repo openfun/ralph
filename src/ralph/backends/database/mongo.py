@@ -62,7 +62,7 @@ class MongoDatabase(BaseDatabase):
         self.collection = getattr(self.database, collection)
 
     def status(self) -> DatabaseStatus:
-        """Checks MongoDB cluster connection status."""
+        """Check MongoDB cluster connection status."""
         # Check Mongo cluster connection
         try:
             self.client.admin.command("ping")
@@ -77,7 +77,7 @@ class MongoDatabase(BaseDatabase):
 
     @enforce_query_checks
     def get(self, query: MongoQuery = None, chunk_size: int = 500):
-        """Gets collection documents and yields them.
+        """Get collection documents and yields them.
 
         The `query` dictionary should only contain kwargs compatible with the
         pymongo.collection.Collection.find method signature (API reference
@@ -92,7 +92,7 @@ class MongoDatabase(BaseDatabase):
     def to_documents(
         stream: Union[TextIO, list], ignore_errors: bool = False
     ) -> Generator[dict, None, None]:
-        """Converts `stream` lines (one statement per line) to Mongo documents.
+        """Convert `stream` lines (one statement per line) to Mongo documents.
 
         We expect statements to have at least an `id` and a `timestamp` field that will
         be used to compute a unique MongoDB Object ID. This ensures that we will not
@@ -135,7 +135,7 @@ class MongoDatabase(BaseDatabase):
             yield document
 
     def bulk_import(self, batch: list, ignore_errors: bool = False):
-        """Inserts a batch of documents into the selected database collection."""
+        """Insert a batch of documents into the selected database collection."""
         try:
             new_documents = self.collection.insert_many(batch)
         except BulkWriteError as error:
@@ -160,7 +160,7 @@ class MongoDatabase(BaseDatabase):
         chunk_size: int = 500,
         ignore_errors: bool = False,
     ) -> int:
-        """Writes documents from the `stream` to the instance collection."""
+        """Write documents from the `stream` to the instance collection."""
         logger.debug(
             "Start writing to the %s collection of the %s database (chunk size: %d)",
             self.collection,
@@ -280,14 +280,14 @@ class MongoDatabase(BaseDatabase):
         )
 
     def query_statements_by_ids(self, ids: List[str]) -> List:
-        """Returns the list of matching statements from the database."""
+        """Return the list of matching statements from the database."""
         return [
             {"_id": statement["_source"]["id"], "_source": statement["_source"]}
             for statement in self._find(filter={"_source.id": {"$in": ids}})
         ]
 
     def _find(self, **kwargs):
-        """Wraps the MongoClient.collection.find method.
+        """Wrap the MongoClient.collection.find method.
 
         Raises:
             BackendException: raised for any failure.
