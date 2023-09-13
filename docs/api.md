@@ -181,7 +181,7 @@ By default, all authenticated users have full read and write access to the serve
 In Ralph, all incoming statements are assigned an `authority` (or ownership) derived from the user that makes the call. You may restrict read access to users "own" statements (thus enabling multitenancy) by setting the following environment variable: 
 
 ```
-RALPH_RUNSERVER_RESTRICT_BY_AUTHORITY = True # Default: False
+RALPH_LRS_RESTRICT_BY_AUTHORITY = True # Default: False
 ```
 
 **WARNING**: Two accounts with different credentials may share the same `authority` meaning they can access the same statements. It is the administrators responsability to ensure that `authority` is properly assigned.

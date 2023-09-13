@@ -327,9 +327,9 @@ async def get(
         )
 
     if not mine:
-        if settings.RUNSERVER_RESTRICT_BY_AUTHORITY:
+        if settings.LRS_RESTRICT_BY_AUTHORITY:
             # If using scopes, only restrict results when appropriate
-            if settings.RUNSERVER_RESTRICT_BY_SCOPES:
+            if settings.LRS_RESTRICT_BY_SCOPES:
                 raise NotImplementedError("Scopes are not yet implemented in Ralph.")
 
             # Otherwise, enforce mine for all users
