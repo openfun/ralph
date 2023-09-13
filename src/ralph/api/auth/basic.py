@@ -9,12 +9,13 @@ from typing import List, Union
 import bcrypt
 from cachetools import TTLCache, cached
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.security import HTTPBasic, HTTPBasicCredentials, SecurityScopes
 from pydantic import BaseModel, root_validator
 from starlette.authentication import AuthenticationError
 
-from ralph.api.auth.user import AuthenticatedUser
+from ralph.api.auth.user import AuthenticatedUser, scope_is_authorized
 from ralph.conf import settings
+
 
 # Unused password used to avoid timing attacks, by comparing passwords supplied
 # with invalid credentials to something innocuous with the same method as if
@@ -118,6 +119,7 @@ def get_authenticated_user(
     against our own list of hashed credentials.
 
     Args:
+        security_scopes: scopes requested for access
         credentials (iterator): auth parameters from the Authorization header
 
     Return:
@@ -156,6 +158,7 @@ def get_authenticated_user(
             status_code=status.HTTP_403_FORBIDDEN, detail=str(exc)
         ) from exc
 
+    # Check that password was passed
     if not hashed_password:
         # We're doing a bogus password check anyway to avoid timing attacks on
         # usernames
@@ -168,6 +171,7 @@ def get_authenticated_user(
             headers={"WWW-Authenticate": "Basic"},
         )
 
+    # Check password validity
     if not bcrypt.checkpw(
         credentials.password.encode(settings.LOCALE_ENCODING),
         hashed_password.encode(settings.LOCALE_ENCODING),
@@ -180,6 +184,6 @@ def get_authenticated_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials",
             headers={"WWW-Authenticate": "Basic"},
-        )
+        )      
 
     return AuthenticatedUser(scopes=user.scopes, agent=user.agent)

@@ -1,38 +1,61 @@
 """Authenticated user for the Ralph API."""
 
 from enum import Enum
-from typing import Dict, List, Literal
+from functools import lru_cache
+from typing import Dict, List, Literal, Tuple
 
 from pydantic import BaseModel
 
-
-class Scopes(str, Enum):
-    """Authorized scopes to be associated with user accounts."""
-
-    STATEMENTS_WRITE = "statements/write"
-    STATEMENTS_READ_MINE = "statements/read/mine"
-    STATEMENTS_READ = "statements/read"
-    STATE = "state"
-    DEFINE = "define"
-    PROFILE_WRITE = "profile/write"
-    PROFILE_READ_MINE = "profile/read/mine"
-    PROFILE_READ = "profile/read"
-    ALL_READ = "all/read"
-    ALL = "all"
-
-
 Scope = Literal[
-    Scopes.STATEMENTS_WRITE,
-    Scopes.STATEMENTS_READ_MINE,
-    Scopes.STATEMENTS_READ,
-    Scopes.STATE,
-    Scopes.DEFINE,
-    Scopes.PROFILE_WRITE,
-    Scopes.PROFILE_READ_MINE,
-    Scopes.PROFILE_READ,
-    Scopes.ALL_READ,
-    Scopes.ALL,
+    "statements/write",
+    "statements/read/mine",
+    "statements/read",
+    "state/write",
+    "state/read",
+    "define",
+    "profile/write",
+    "profile/read",
+    "all/read",
+    "all"
 ]
+
+@lru_cache()
+def scope_is_authorized(requested_scope, user_scopes: Tuple[Scope]):
+    """Check if the requested scope can be accessed based on user scopes."""
+
+    expanded_scopes = {
+        'statements/read': {
+            'statements/read/mine', 
+            'statements/read'
+        },
+        'all/read': {
+            'statements/read/mine', 
+            'statements/read',
+            'state/read', 
+            'define', 
+            'profile/read', 
+            'all/read'
+        },
+        'all': {
+            'statements/write', 
+            'statements/read/mine', 
+            'statements/read',
+            'state/read', 
+            'state/write', 
+            'define', 
+            'profile/read', 
+            'profile/write', 
+            'all/read', 
+            'all'
+        }
+    }
+
+    # Create a set with all the scopes available to the user
+    expanded_user_scopes = set()
+    for scope in user_scopes:
+        expanded_user_scopes.update(expanded_scopes.get(scope, {scope}))
+
+    return requested_scope in expanded_user_scopes
 
 
 class AuthenticatedUser(BaseModel):
