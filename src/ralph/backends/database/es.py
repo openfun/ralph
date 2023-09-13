@@ -77,7 +77,7 @@ class ESDatabase(BaseDatabase):
         self.op_type = op_type
 
     def status(self) -> DatabaseStatus:
-        """Checks Elasticsearch cluster (connection) status."""
+        """Check Elasticsearch cluster (connection) status."""
         # Check ES cluster connection
         try:
             self.client.info()
@@ -92,7 +92,7 @@ class ESDatabase(BaseDatabase):
 
     @enforce_query_checks
     def get(self, query: ESQuery = None, chunk_size: int = 500):
-        """Gets index documents and yields them.
+        """Get index documents and yields them.
 
         The `query` dictionary should only contain kwargs compatible with the
         elasticsearch.helpers.scan function signature (API reference
@@ -107,7 +107,7 @@ class ESDatabase(BaseDatabase):
     def to_documents(
         self, stream: TextIO, get_id: Callable[[dict], str]
     ) -> Generator[dict, None, None]:
-        """Converts `stream` lines to ES documents."""
+        """Convert `stream` lines to ES documents."""
         for line in stream:
             item = json.loads(line) if isinstance(line, str) else line
             action = {
@@ -124,7 +124,7 @@ class ESDatabase(BaseDatabase):
     def put(
         self, stream: TextIO, chunk_size: int = 500, ignore_errors: bool = False
     ) -> int:
-        """Writes documents from the `stream` to the instance index."""
+        """Write documents from the `stream` to the instance index."""
         logger.debug(
             "Start writing to the %s index (chunk size: %d)", self.index, chunk_size
         )
@@ -194,7 +194,7 @@ class ESDatabase(BaseDatabase):
             ]
 
     def query_statements(self, params: RalphStatementsQuery) -> StatementQueryResult:
-        """Returns the results of a statements query using xAPI parameters."""
+        """Return the results of a statements query using xAPI parameters."""
         es_query_filters = []
 
         if params.statementId:
@@ -266,12 +266,12 @@ class ESDatabase(BaseDatabase):
         )
 
     def query_statements_by_ids(self, ids: List[str]) -> List:
-        """Returns the list of matching statement IDs from the database."""
+        """Return the list of matching statement IDs from the database."""
         body = {"query": {"terms": {"_id": ids}}}
         return self._search(index=self.index, body=body)["hits"]["hits"]
 
     def _search(self, **kwargs):
-        """Wraps the ElasticSearch.search method.
+        """Wrap the ElasticSearch.search method.
 
         Raises:
             BackendException: raised for any failure.
@@ -284,7 +284,7 @@ class ESDatabase(BaseDatabase):
             raise BackendException(msg, *error.args) from error
 
     def _open_point_in_time(self, **kwargs):
-        """Wraps the ElasticSearch.open_point_in_time method.
+        """Wrap the ElasticSearch.open_point_in_time method.
 
         Raises:
             BackendException: raised for any failure.

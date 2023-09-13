@@ -9,7 +9,7 @@ from click.testing import CliRunner
 
 
 def test_dependencies_ralph_command_requires_click(monkeypatch):
-    """Tests Click module installation while executing the ralph command."""
+    """Test Click module installation while executing the ralph command."""
 
     monkeypatch.setitem(sys.modules, "click", None)
 
@@ -28,7 +28,7 @@ def test_dependencies_ralph_command_requires_click(monkeypatch):
 
 
 def test_dependencies_runserver_subcommand_requires_uvicorn(monkeypatch):
-    """Tests Uvicorn module installation while executing the runserver sub command."""
+    """Test Uvicorn module installation while executing the runserver sub command."""
 
     monkeypatch.setitem(sys.modules, "uvicorn", None)
 

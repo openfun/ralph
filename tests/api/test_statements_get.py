@@ -1,4 +1,4 @@
-"""Test for the GET statements endpoint of the Ralph API."""
+"""Tests for the GET statements endpoint of the Ralph API."""
 
 
 import hashlib
@@ -35,7 +35,7 @@ client = TestClient(app)
 
 
 def insert_es_statements(es_client, statements):
-    """Inserts a bunch of example statements into Elasticsearch for testing."""
+    """Insert a bunch of example statements into Elasticsearch for testing."""
     bulk(
         es_client,
         [
@@ -52,14 +52,14 @@ def insert_es_statements(es_client, statements):
 
 
 def insert_mongo_statements(mongo_client, statements):
-    """Inserts a bunch of example statements into MongoDB for testing."""
+    """Insert a bunch of example statements into MongoDB for testing."""
     database = getattr(mongo_client, MONGO_TEST_DATABASE)
     collection = getattr(database, MONGO_TEST_COLLECTION)
     collection.insert_many(list(MongoDatabase.to_documents(statements)))
 
 
 def insert_clickhouse_statements(statements):
-    """Inserts a bunch of example statements into ClickHouse for testing."""
+    """Insert a bunch of example statements into ClickHouse for testing."""
     backend = ClickHouseDatabase(
         host=CLICKHOUSE_TEST_HOST,
         port=CLICKHOUSE_TEST_PORT,
@@ -144,11 +144,11 @@ def create_mock_agent(
 def insert_statements_and_monkeypatch_backend(
     request, es, mongo, clickhouse, monkeypatch
 ):
-    """Returns a function that inserts statements into each backend."""
+    """Return a function that inserts statements into each backend."""
     # pylint: disable=invalid-name
 
     def _insert_statements_and_monkeypatch_backend(statements):
-        """Inserts statements once into each backend."""
+        """Insert statements once into each backend."""
         database_client_class_path = "ralph.api.routers.statements.DATABASE_CLIENT"
         if request.param == "mongo":
             insert_mongo_statements(mongo, statements)
@@ -179,7 +179,7 @@ def insert_statements_and_monkeypatch_backend(
 def test_api_statements_get_statements_mine(
     fs, insert_statements_and_monkeypatch_backend, ifi
 ):
-    """Tests the get statements API route, given a "mine=True" query parameter, should
+    """Test the get statements API route, given a "mine=True" query parameter, should
     return a list of statements filtered by authority.
     """
     # pylint: disable=redefined-outer-name
@@ -707,7 +707,7 @@ def test_api_statements_get_statements_with_database_query_failure(
     # pylint: disable=redefined-outer-name
 
     def mock_query_statements(*_):
-        """Mocks the DATABASE_CLIENT.query_statements method."""
+        """Mock the DATABASE_CLIENT.query_statements method."""
         raise BackendException()
 
     monkeypatch.setattr(

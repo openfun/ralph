@@ -35,7 +35,7 @@ def import_string(dotted_path):
 
 
 def get_backend_type(backends: BaseModel, backend_name: str):
-    """Returns the backend type from a backend name."""
+    """Return the backend type from a backend name."""
     backend_name = backend_name.upper()
     for _, backend_type in backends:
         if hasattr(backend_type, backend_name):
@@ -44,7 +44,7 @@ def get_backend_type(backends: BaseModel, backend_name: str):
 
 
 def get_backend_instance(backend_type: BaseModel, backend_name: str, options: dict):
-    """Returns the instantiated backend instance given backend-name-prefixed options."""
+    """Return the instantiated backend instance given backend-name-prefixed options."""
     prefix = f"{backend_name}_"
     # Filter backend-related parameters. Parameter name is supposed to start
     # with the backend name
@@ -67,7 +67,7 @@ def now():
 
 
 def get_dict_value_from_path(dict_: dict, path: List[str]):
-    """Gets a nested dictionary value.
+    """Get a nested dictionary value.
 
     Args:
         dict_ (dict): dictionary of values to which the reduction is
@@ -83,7 +83,7 @@ def get_dict_value_from_path(dict_: dict, path: List[str]):
 
 
 def set_dict_value_from_path(dict_: dict, path: List[str], value: any):
-    """Sets a nested dictionary value.
+    """Set a nested dictionary value.
 
     Args:
         dict_ (dict): dictionary where the given value is set

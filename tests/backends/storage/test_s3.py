@@ -20,7 +20,7 @@ def test_backends_storage_s3_storage_instantiation_should_raise_exception(
 ):  # pylint:disable=invalid-name
     """S3 backend instantiation test.
 
-    Checks that S3Storage raises BackendParameterException on failure.
+    Check that S3Storage raises BackendParameterException on failure.
     """
     # Regions outside us-east-1 require the appropriate LocationConstraint
     s3_client = boto3.client("s3", region_name="us-east-1")
@@ -44,7 +44,7 @@ def test_backends_storage_s3_storage_instantiation_failure_should_not_raise_exce
 ):  # pylint:disable=invalid-name
     """S3 backend instantiation test.
 
-    Checks that S3Storage doesn't raise exceptions when the connection is
+    Check that S3Storage doesn't raise exceptions when the connection is
     successful.
     """
     # Regions outside us-east-1 require the appropriate LocationConstraint
@@ -65,7 +65,7 @@ def test_backends_storage_s3_list_should_yield_archive_names(
 ):  # pylint:disable=unused-argument, invalid-name
     """S3 backend list test.
 
-    Tests that given S3Service.list method successfully connects to the S3
+    Test that given S3Service.list method successfully connects to the S3
     storage, the S3Storage list method should yield the archives.
     """
     # Regions outside of us-east-1 require the appropriate LocationConstraint
@@ -124,7 +124,7 @@ def test_backends_storage_s3_list_on_empty_bucket_should_do_nothing(
 ):  # pylint:disable=unused-argument, invalid-name
     """S3 backend list test.
 
-    Tests that given S3Service.list method successfully connects to the S3
+    Test that given S3Service.list method successfully connects to the S3
     storage, the S3Storage list method on an empty bucket should do nothing.
     """
     # Regions outside of us-east-1 require the appropriate LocationConstraint
@@ -154,7 +154,7 @@ def test_backends_storage_s3_list_with_failed_connection_should_log_the_error(
 ):  # pylint:disable=unused-argument, invalid-name
     """S3 backend list test.
 
-    Tests that given S3Service.list method fails to retrieve the list of archives,
+    Test that given S3Service.list method fails to retrieve the list of archives,
     the S3Storage list method should log the error and raise a BackendException.
     """
     # Regions outside of us-east-1 require the appropriate LocationConstraint
@@ -193,7 +193,7 @@ def test_backends_storage_s3_read_with_valid_name_should_write_to_history(
 ):  # pylint:disable=unused-argument, invalid-name
     """S3 backend read test.
 
-    Tests that given S3Service.download method successfully retrieves from the
+    Test that given S3Service.download method successfully retrieves from the
     S3 storage the object with the provided name (the object exists),
     the S3Storage read method should write the entry to the history.
     """
@@ -238,7 +238,7 @@ def test_backends_storage_s3_read_with_invalid_name_should_log_the_error(
 ):  # pylint:disable=unused-argument, invalid-name
     """S3 backend read test.
 
-    Tests that given S3Service.download method fails to retrieve from the S3
+    Test that given S3Service.download method fails to retrieve from the S3
     storage the object with the provided name (the object does not exists on S3),
     the S3Storage read method should log the error, not write to history and raise a
     BackendException.
@@ -279,7 +279,7 @@ def test_backends_storage_s3_write_should_write_to_history_new_or_overwritten_ar
 ):  # pylint:disable=unused-argument, invalid-name, too-many-arguments, too-many-locals
     """S3 backend write test.
 
-    Tests that given S3Service list/upload method successfully connects to the
+    Test that given S3Service list/upload method successfully connects to the
     S3 storage, the S3Storage write method should update the history file when
     overwrite is True or when the name of the archive is not in the history.
     In case overwrite is False and the archive is in the history, the write method
@@ -340,7 +340,7 @@ def test_backends_storage_s3_write_should_log_the_error(
 ):  # pylint:disable=unused-argument, invalid-name,too-many-arguments
     """S3 backend write test.
 
-    Tests that given S3Service.upload method fails to write the archive,
+    Test that given S3Service.upload method fails to write the archive,
     the S3Storage write method should log the error, raise a BackendException
     and not write to history.
     """
@@ -386,7 +386,7 @@ def test_backends_storage_url_should_concatenate_the_storage_url_and_name(
 ):  # pylint:disable=invalid-name
     """S3 backend url test.
 
-    Checks the url method returns `bucket_name.s3.default_region
+    Check the url method returns `bucket_name.s3.default_region
     .amazonaws.com/name`.
     """
     # Regions outside of us-east-1 require the appropriate LocationConstraint

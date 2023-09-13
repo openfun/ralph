@@ -54,7 +54,7 @@ from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 def test_models_xapi_concept_activity_types_with_valid_field(
     class_, definition_type, data
 ):
-    """Tests that a valid xAPI activity has the expected the `definition`.`type`
+    """Test that a valid xAPI activity has the expected the `definition`.`type`
     value.
     """
     field = json.loads(data.draw(custom_builds(class_)).json())

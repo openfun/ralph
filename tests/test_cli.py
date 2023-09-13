@@ -891,7 +891,7 @@ def test_cli_runserver_command_with_host_and_port_arguments(host_, port_, monkey
     """Test the ralph runserver command should consider the host and port arguments."""
 
     def mock_uvicorn_run(_, host=None, port=None, **kwargs):
-        """Mocks uvicorn.run asserting host and port values."""
+        """Mock uvicorn.run asserting host and port values."""
         assert host == host_
         assert port == int(port_)
 
@@ -907,7 +907,7 @@ def test_cli_runserver_command_environment_file_generation(monkeypatch):
     """Test the ralph runserver command should create the expected environment file."""
 
     def mock_uvicorn_run(_, env_file=None, **kwargs):
-        """Mocks uvicorn.run asserting environment file content."""
+        """Mock uvicorn.run asserting environment file content."""
         with open(env_file, mode="r", encoding=settings.LOCALE_ENCODING) as file:
             env_lines = [
                 f"RALPH_RUNSERVER_BACKEND={settings.RUNSERVER_BACKEND}\n",

@@ -20,7 +20,7 @@ from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 @hypothesis_settings(suppress_health_check=(HealthCheck.function_scoped_fixture,))
 @custom_given(XapiForwardingConfigurationSettings)
 def test_api_forwarding_with_valid_configuration(monkeypatch, forwarding_settings):
-    """Tests the settings, given a valid forwarding configuration, should not raise an
+    """Test the settings, given a valid forwarding configuration, should not raise an
     exception.
     """
     monkeypatch.delenv("RALPH_XAPI_FORWARDINGS", raising=False)
@@ -41,7 +41,7 @@ def test_api_forwarding_with_valid_configuration(monkeypatch, forwarding_setting
 )
 @custom_given(XapiForwardingConfigurationSettings)
 def test_api_forwarding_configuration_with_missing_field(missing_key, forwarding):
-    """Tests the forwarding configuration, given a missing field, should raise a
+    """Test the forwarding configuration, given a missing field, should raise a
     validation exception.
     """
     forwarding_dict = json.loads(forwarding.json())
@@ -53,7 +53,7 @@ def test_api_forwarding_configuration_with_missing_field(missing_key, forwarding
 def test_api_forwarding_get_active_xapi_forwardings_with_empty_forwardings(
     monkeypatch, caplog
 ):
-    """Tests that the get_active_xapi_forwardings function, given an empty forwarding
+    """Test that the get_active_xapi_forwardings function, given an empty forwarding
     configuration, should log that forwarding is inactive and return an empty list.
     """
     expected_log = "No xAPI forwarding configured; forwarding is disabled."
@@ -86,7 +86,7 @@ def test_api_forwarding_get_active_xapi_forwardings_with_empty_forwardings(
 def test_api_forwarding_get_active_xapi_forwardings_with_inactive_forwardings(
     monkeypatch, caplog, active_forwarding, inactive_forwarding
 ):
-    """Tests that the get_active_xapi_forwardings function, given a forwarding
+    """Test that the get_active_xapi_forwardings function, given a forwarding
     configuration containing inactive forwardings, should log which forwarding
     configurations are inactive and return a list containing only active forwardings.
     """
@@ -142,7 +142,7 @@ def test_api_forwarding_get_active_xapi_forwardings_with_inactive_forwardings(
 def test_api_forwarding_forward_xapi_statements_with_successful_request(
     monkeypatch, caplog, statements, forwarding
 ):
-    """Tests the forward_xapi_statements function should log the forwarded statements
+    """Test the forward_xapi_statements function should log the forwarded statements
     count if the request was successful.
     """
 
@@ -154,7 +154,7 @@ def test_api_forwarding_forward_xapi_statements_with_successful_request(
             """Does not raise any exceptions."""
 
     async def post_success(*args, **kwargs):  # pylint: disable=unused-argument
-        """Returns a MockSuccessfulResponse instance."""
+        """Return a MockSuccessfulResponse instance."""
         return MockSuccessfulResponse()
 
     monkeypatch.setattr("ralph.api.forwarding.AsyncClient.post", post_success)
@@ -188,7 +188,7 @@ def test_api_forwarding_forward_xapi_statements_with_successful_request(
 def test_api_forwarding_forward_xapi_statements_with_unsuccessful_request(
     monkeypatch, caplog, statements, forwarding
 ):
-    """Tests the forward_xapi_statements function should log the error if the request
+    """Test the forward_xapi_statements function should log the error if the request
     was successful.
     """
 

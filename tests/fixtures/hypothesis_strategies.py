@@ -28,7 +28,7 @@ OVERWRITTEN_STRATEGIES = {}
 
 
 def is_base_model(klass):
-    """Returns True if the given class is a subclass of the pydantic BaseModel."""
+    """Return True if the given class is a subclass of the pydantic BaseModel."""
 
     try:
         return issubclass(klass, BaseModel)
@@ -37,7 +37,7 @@ def is_base_model(klass):
 
 
 def get_strategy_from(annotation):
-    """Infers a Hypothesis strategy from the given annotation."""
+    """Infer a Hypothesis strategy from the given annotation."""
     origin = getattr(annotation, "__origin__", None)
     args = getattr(annotation, "__args__", None)
     if is_base_model(annotation):
@@ -60,7 +60,7 @@ def get_strategy_from(annotation):
 def custom_builds(
     klass: BaseModel, _overwrite_default=True, **kwargs: Union[st.SearchStrategy, bool]
 ):
-    """Returns a fixed_dictionaries Hypothesis strategy for pydantic models.
+    """Return a fixed_dictionaries Hypothesis strategy for pydantic models.
 
     Args:
         klass (BaseModel): The pydantic model for which to generate a strategy.
@@ -96,7 +96,7 @@ def custom_builds(
 
 
 def custom_given(*args: Union[st.SearchStrategy, BaseModel], **kwargs):
-    """Wraps the Hypothesis `given` function. Replaces st.builds with custom_builds."""
+    """Wrap the Hypothesis `given` function. Replaces st.builds with custom_builds."""
     strategies = []
     for arg in args:
         strategies.append(custom_builds(arg) if is_base_model(arg) else arg)

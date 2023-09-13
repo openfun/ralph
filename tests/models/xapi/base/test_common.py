@@ -14,7 +14,7 @@ from ralph.models.xapi.base.common import IRI, LanguageMap, LanguageTag
     ],
 )
 def test_models_xapi_base_common_field_iri_with_valid_data(values):
-    """Tests that a valid verb field does not raise a `ValidationError`."""
+    """Test that a valid verb field does not raise a `ValidationError`."""
 
     class DummyIRIModel(BaseModel):
         """A dummy pydantic model with an IRI field."""
@@ -38,7 +38,7 @@ def test_models_xapi_base_common_field_iri_with_valid_data(values):
     ],
 )
 def test_models_xapi_base_common_field_iri_with_invalid_data(values, error):
-    """Tests that an invalid verb field raises a `ValidationError`."""
+    """Test that an invalid verb field raises a `ValidationError`."""
 
     class DummyIRIModel(BaseModel):
         """A dummy pydantic model with an IRI field."""
@@ -58,7 +58,7 @@ def test_models_xapi_base_common_field_iri_with_invalid_data(values, error):
     ],
 )
 def test_models_xapi_base_common_field_language_tag_with_valid_data(values):
-    """Tests that a valid verb field does not raise a `ValidationError`."""
+    """Test that a valid verb field does not raise a `ValidationError`."""
 
     class DummyLanguageTagModel(BaseModel):
         """A dummy pydantic model with a LanguageTag field."""
@@ -81,7 +81,7 @@ def test_models_xapi_base_common_field_language_tag_with_valid_data(values):
     ],
 )
 def test_models_xapi_base_common_field_language_tag_with_invalid_data(values, error):
-    """Tests that an invalid verb field raises a `ValidationError`."""
+    """Test that an invalid verb field raises a `ValidationError`."""
 
     class DummyLanguageTagModel(BaseModel):
         """A dummy pydantic model with a LanguageTag field."""
@@ -94,7 +94,7 @@ def test_models_xapi_base_common_field_language_tag_with_invalid_data(values, er
 
 @pytest.mark.parametrize("values", [({"map": {"en": "Hello"}})])
 def test_models_xapi_base_common_field_language_map_with_valid_data(values):
-    """Tests that a valid verb field does not raise a `ValidationError`."""
+    """Test that a valid verb field does not raise a `ValidationError`."""
 
     class DummyLanguageMapModel(BaseModel):
         """A dummy pydantic model with a LanguageTag field."""
@@ -117,7 +117,7 @@ def test_models_xapi_base_common_field_language_map_with_valid_data(values):
     ],
 )
 def test_models_xapi_base_common_field_language_map_with_invalid_data(values, error):
-    """Tests that an invalid verb field raises a `ValidationError`."""
+    """Test that an invalid verb field raises a `ValidationError`."""
 
     class DummyLanguageTagModel(BaseModel):
         """A dummy pydantic model with a LanguageTag field."""

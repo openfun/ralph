@@ -43,7 +43,7 @@ class UserCredentials(AuthenticatedUser):
 class ServerUsersCredentials(BaseModel):
     """Custom root pydantic model.
 
-    Describes expected list of all server users credentials as stored in
+    Describe expected list of all server users credentials as stored in
     the credentials file.
 
     Attributes:
@@ -81,7 +81,7 @@ class ServerUsersCredentials(BaseModel):
 def get_stored_credentials(auth_file: Path) -> ServerUsersCredentials:
     """Helper to read the credentials/scopes file.
 
-    Reads credentials from JSON file and stored them to avoid reloading them with every
+    Read credentials from JSON file and stored them to avoid reloading them with every
     request.
 
     Args:
@@ -114,7 +114,7 @@ def get_authenticated_user(
 ) -> AuthenticatedUser:
     """Checks valid auth parameters.
 
-    Gets the basic auth parameters from the Authorization header, and checks them
+    Get the basic auth parameters from the Authorization header, and checks them
     against our own list of hashed credentials.
 
     Args:

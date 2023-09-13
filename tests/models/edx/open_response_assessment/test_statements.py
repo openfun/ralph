@@ -39,7 +39,7 @@ from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 )
 @custom_given(st.data())
 def test_models_edx_ora_selectors_with_valid_statements(class_, data):
-    """Tests given a valid open response assessment edX statement the `get_first_model`
+    """Test given a valid open response assessment edX statement the `get_first_model`
     selector method should return the expected model.
     """
 
@@ -50,7 +50,7 @@ def test_models_edx_ora_selectors_with_valid_statements(class_, data):
 
 @custom_given(ORAGetPeerSubmission)
 def test_models_edx_ora_get_peer_submission_with_valid_statement(statement):
-    """Tests that a `openassessmentblock.get_peer_submission` statement has the expected
+    """Test that a `openassessmentblock.get_peer_submission` statement has the expected
     `event_type` and `page` fields.
     """
 
@@ -62,7 +62,7 @@ def test_models_edx_ora_get_peer_submission_with_valid_statement(statement):
 def test_models_edx_ora_get_submission_for_staff_grading_with_valid_statement(
     statement,
 ):
-    """Tests that a `openassessmentblock.get_submission_for_staff_grading` statement has
+    """Test that a `openassessmentblock.get_submission_for_staff_grading` statement has
     the expected `event_type` and `page` fields.
     """
 
@@ -74,7 +74,7 @@ def test_models_edx_ora_get_submission_for_staff_grading_with_valid_statement(
 
 @custom_given(ORAPeerAssess)
 def test_models_edx_ora_peer_assess_with_valid_statement(statement):
-    """Tests that a `openassessmentblock.peer_assess` statement has the expected
+    """Test that a `openassessmentblock.peer_assess` statement has the expected
     `event_type` and `page` fields.
     """
 
@@ -84,7 +84,7 @@ def test_models_edx_ora_peer_assess_with_valid_statement(statement):
 
 @custom_given(ORASelfAssess)
 def test_models_edx_ora_self_assess_with_valid_statement(statement):
-    """Tests that a `openassessmentblock.self_assess` statement has the expected
+    """Test that a `openassessmentblock.self_assess` statement has the expected
     `event_type` and `page` fields.
     """
 
@@ -94,7 +94,7 @@ def test_models_edx_ora_self_assess_with_valid_statement(statement):
 
 @custom_given(ORAStaffAssess)
 def test_models_edx_ora_staff_assess_with_valid_statement(statement):
-    """Tests that a `openassessmentblock.staff_assess` statement has the expected
+    """Test that a `openassessmentblock.staff_assess` statement has the expected
     `event_type` and `page` fields.
     """
 
@@ -104,7 +104,7 @@ def test_models_edx_ora_staff_assess_with_valid_statement(statement):
 
 @custom_given(ORASubmitFeedbackOnAssessments)
 def test_models_edx_ora_submit_feedback_on_assessments_with_valid_statement(statement):
-    """Tests that a `openassessmentblock.submit_feedback_on_assessments` statement has
+    """Test that a `openassessmentblock.submit_feedback_on_assessments` statement has
     the expected `event_type` and `page` fields.
     """
 
@@ -114,7 +114,7 @@ def test_models_edx_ora_submit_feedback_on_assessments_with_valid_statement(stat
 
 @custom_given(ORACreateSubmission)
 def test_models_edx_ora_create_submission_with_valid_statement(statement):
-    """Tests that a `openassessmentblock.create_submission` statement has the expected
+    """Test that a `openassessmentblock.create_submission` statement has the expected
     `event_type` and `page` fields.
     """
 
@@ -124,7 +124,7 @@ def test_models_edx_ora_create_submission_with_valid_statement(statement):
 
 @custom_given(ORASaveSubmission)
 def test_models_edx_ora_save_submission_with_valid_statement(statement):
-    """Tests that a `openassessmentblock.save_submission` statement has the expected
+    """Test that a `openassessmentblock.save_submission` statement has the expected
     `event_type` and `page` fields.
     """
 
@@ -134,7 +134,7 @@ def test_models_edx_ora_save_submission_with_valid_statement(statement):
 
 @custom_given(ORAStudentTrainingAssessExample)
 def test_models_edx_ora_student_training_assess_example_with_valid_statement(statement):
-    """Tests that a `openassessment.student_training_assess_example` statement
+    """Test that a `openassessment.student_training_assess_example` statement
     has the expected `event_type` and `page` fields.
     """
 
@@ -144,7 +144,7 @@ def test_models_edx_ora_student_training_assess_example_with_valid_statement(sta
 
 @custom_given(ORAUploadFile)
 def test_models_edx_ora_upload_file_example_with_valid_statement(statement):
-    """Tests that a `openassessment.upload_file` statement
+    """Test that a `openassessment.upload_file` statement
     has the expected `event_type` and `page` fields.
     """
 

@@ -11,4 +11,4 @@ class BaseStream(ABC):
 
     @abstractmethod
     def stream(self, target: BinaryIO):
-        """Reads records and streams them to target."""
+        """Read records and streams them to target."""

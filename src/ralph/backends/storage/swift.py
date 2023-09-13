@@ -63,7 +63,7 @@ class SwiftStorage(
 
     @cached_property
     def options(self):
-        """Returns the required options for the SwiftService."""
+        """Return the required options for the SwiftService."""
         return {
             "os_auth_url": self.os_auth_url,
             "os_identity_api_version": self.os_identity_api_version,
@@ -78,7 +78,7 @@ class SwiftStorage(
         }
 
     def list(self, details=False, new=False):
-        """Lists files in the storage backend."""
+        """List files in the storage backend."""
         archives_to_skip = set()
         if new:
             archives_to_skip = set(self.get_command_history(self.name, "read"))
@@ -94,12 +94,12 @@ class SwiftStorage(
                     yield archive if details else archive["name"]
 
     def url(self, name):
-        """Gets `name` file absolute URL."""
+        """Get `name` file absolute URL."""
         # What's the purpose of this function ? Seems not used anywhere.
         return f"{self.options.get('os_storage_url')}/{name}"
 
     def read(self, name, chunk_size=None):
-        """Reads `name` object and yields its content in chunks of (max) 2 ** 16.
+        """Read `name` object and yields its content in chunks of (max) 2 ** 16.
 
         Why chunks of (max) 2 ** 16 ?
             Because SwiftService opens a file to stream the object into:
@@ -134,7 +134,7 @@ class SwiftStorage(
         )
 
     def write(self, stream, name, overwrite=False):
-        """Writes data from `stream` to the `name` target in chunks of (max) 2 ** 16."""
+        """Write data from `stream` to the `name` target in chunks of (max) 2 ** 16."""
         if not overwrite and name in list(self.list()):
             msg = "%s already exists and overwrite is not allowed"
             logger.error(msg, name)

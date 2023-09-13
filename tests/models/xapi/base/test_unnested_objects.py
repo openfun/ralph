@@ -17,7 +17,7 @@ from tests.fixtures.hypothesis_strategies import custom_given
 
 @custom_given(BaseXapiStatementRef)
 def test_models_xapi_base_object_statement_ref_type_with_valid_field(field):
-    """Tests a valid BaseXapiStatementRef has the expected `objectType` value."""
+    """Test a valid BaseXapiStatementRef has the expected `objectType` value."""
 
     assert field.objectType == "StatementRef"
 
@@ -26,7 +26,7 @@ def test_models_xapi_base_object_statement_ref_type_with_valid_field(field):
 def test_models_xapi_base_object_interaction_component_with_valid_field(
     field,
 ):
-    """Tests a valid BaseXapiInteractionComponent has the expected `id` regex."""
+    """Test a valid BaseXapiInteractionComponent has the expected `id` regex."""
 
     assert re.match(r"^[^\s]+$", field.id)
 
@@ -39,7 +39,7 @@ def test_models_xapi_base_object_interaction_component_with_valid_field(
 def test_models_xapi_base_object_interaction_component_with_invalid_field(
     id_value, field
 ):
-    """Tests an invalid `id` property in
+    """Test an invalid `id` property in
     BaseXapiInteractionComponent raises a `ValidationError`.
     """
 
@@ -54,7 +54,7 @@ def test_models_xapi_base_object_interaction_component_with_invalid_field(
 def test_models_xapi_base_object_activity_type_interaction_definition_with_valid_field(
     field,
 ):
-    """Tests a valid BaseXapiActivityInteractionDefinition has the expected
+    """Test a valid BaseXapiActivityInteractionDefinition has the expected
     `objectType` value.
     """
 

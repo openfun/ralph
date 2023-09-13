@@ -24,7 +24,7 @@ from tests.fixtures.hypothesis_strategies import custom_given
 
 @custom_given(CorrectMap)
 def test_models_edx_correct_map_with_valid_content(subfield):
-    """Tests that a valid `CorrectMap` does not raise a `ValidationError`."""
+    """Test that a valid `CorrectMap` does not raise a `ValidationError`."""
     assert subfield.correctness in ("correct", "incorrect")
     assert subfield.hintmode in ("on_request", "always", None)
 
@@ -32,7 +32,7 @@ def test_models_edx_correct_map_with_valid_content(subfield):
 @pytest.mark.parametrize("correctness", ["corect", "incorect"])
 @custom_given(CorrectMap)
 def test_models_edx_correct_map_with_invalid_correctness_value(correctness, subfield):
-    """Tests that an invalid `correctness` value in `CorrectMap` raises a
+    """Test that an invalid `correctness` value in `CorrectMap` raises a
     `ValidationError`.
     """
     invalid_subfield = json.loads(subfield.json())
@@ -45,7 +45,7 @@ def test_models_edx_correct_map_with_invalid_correctness_value(correctness, subf
 @pytest.mark.parametrize("hintmode", ["onrequest", "alway"])
 @custom_given(CorrectMap)
 def test_models_edx_correct_map_with_invalid_hintmode_value(hintmode, subfield):
-    """Tests that an invalid `hintmode` value in `CorrectMap` raises a
+    """Test that an invalid `hintmode` value in `CorrectMap` raises a
     `ValidationError`.
     """
     invalid_subfield = json.loads(subfield.json())
@@ -57,7 +57,7 @@ def test_models_edx_correct_map_with_invalid_hintmode_value(hintmode, subfield):
 
 @custom_given(EdxProblemHintFeedbackDisplayedEventField)
 def test_models_edx_problem_hint_feedback_displayed_event_field_with_valid_field(field):
-    """Tests that a valid `EdxProblemHintFeedbackDisplayedEventField` does not raise a
+    """Test that a valid `EdxProblemHintFeedbackDisplayedEventField` does not raise a
     `ValidationError`.
     """
     assert field.question_type in (
@@ -85,7 +85,7 @@ def test_models_edx_problem_hint_feedback_displayed_event_field_with_valid_field
 def test_models_edx_problem_hint_feedback_displayed_event_field_with_invalid_question_type_value(  # noqa
     question_type, field
 ):
-    """Tests that an invalid `question_type` value in
+    """Test that an invalid `question_type` value in
     `EdxProblemHintFeedbackDisplayedEventField` raises a `ValidationError`.
     """
     invalid_field = json.loads(field.json())
@@ -101,7 +101,7 @@ def test_models_edx_problem_hint_feedback_displayed_event_field_with_invalid_que
 def test_models_edx_problem_hint_feedback_displayed_event_field_with_invalid_trigger_type_value(  # noqa
     trigger_type, field
 ):
-    """Tests that an invalid `question_type` value in
+    """Test that an invalid `question_type` value in
     `EdxProblemHintFeedbackDisplayedEventField` raises a `ValidationError`.
     """
     invalid_field = json.loads(field.json())
@@ -113,7 +113,7 @@ def test_models_edx_problem_hint_feedback_displayed_event_field_with_invalid_tri
 
 @custom_given(ProblemCheckEventField)
 def test_models_edx_problem_check_event_field_with_valid_field(field):
-    """Tests that a valid `ProblemCheckEventField` does not raise a
+    """Test that a valid `ProblemCheckEventField` does not raise a
     `ValidationError`.
     """
     assert re.match(
@@ -157,7 +157,7 @@ def test_models_edx_problem_check_event_field_with_valid_field(field):
 def test_models_edx_problem_check_event_field_with_invalid_problem_id_value(
     problem_id, field
 ):
-    """Tests that an invalid `problem_id` value in `ProblemCheckEventField` raises a
+    """Test that an invalid `problem_id` value in `ProblemCheckEventField` raises a
     `ValidationError`.
     """
     invalid_field = json.loads(field.json())
@@ -174,7 +174,7 @@ def test_models_edx_problem_check_event_field_with_invalid_problem_id_value(
 def test_models_edx_problem_check_event_field_with_invalid_success_value(
     success, field
 ):
-    """Tests that an invalid `success` value in `ProblemCheckEventField` raises a
+    """Test that an invalid `success` value in `ProblemCheckEventField` raises a
     `ValidationError`.
     """
     invalid_field = json.loads(field.json())
@@ -186,7 +186,7 @@ def test_models_edx_problem_check_event_field_with_invalid_success_value(
 
 @custom_given(ProblemCheckFailEventField)
 def test_models_edx_problem_check_fail_event_field_with_valid_field(field):
-    """Tests that a valid `ProblemCheckFailEventField` does not raise a
+    """Test that a valid `ProblemCheckFailEventField` does not raise a
     `ValidationError`.
     """
     assert re.match(
@@ -230,7 +230,7 @@ def test_models_edx_problem_check_fail_event_field_with_valid_field(field):
 def test_models_edx_problem_check_fail_event_field_with_invalid_problem_id_value(
     problem_id, field
 ):
-    """Tests that an invalid `problem_id` value in `ProblemCheckFailEventField` raises a
+    """Test that an invalid `problem_id` value in `ProblemCheckFailEventField` raises a
     `ValidationError`.
     """
     invalid_field = json.loads(field.json())
@@ -247,7 +247,7 @@ def test_models_edx_problem_check_fail_event_field_with_invalid_problem_id_value
 def test_models_edx_problem_check_fail_event_field_with_invalid_failure_value(
     failure, field
 ):
-    """Tests that an invalid `failure` value in `ProblemCheckFailEventField` raises a
+    """Test that an invalid `failure` value in `ProblemCheckFailEventField` raises a
     `ValidationError`.
     """
     invalid_field = json.loads(field.json())
@@ -259,7 +259,7 @@ def test_models_edx_problem_check_fail_event_field_with_invalid_failure_value(
 
 @custom_given(ProblemRescoreEventField)
 def test_models_edx_problem_rescore_event_field_with_valid_field(field):
-    """Tests that a valid `ProblemRescoreEventField` does not raise a
+    """Test that a valid `ProblemRescoreEventField` does not raise a
     `ValidationError`.
     """
     assert re.match(
@@ -303,7 +303,7 @@ def test_models_edx_problem_rescore_event_field_with_valid_field(field):
 def test_models_edx_problem_rescore_event_field_with_invalid_problem_id_value(
     problem_id, field
 ):
-    """Tests that an invalid `problem_id` value in `ProblemRescoreEventField` raises a
+    """Test that an invalid `problem_id` value in `ProblemRescoreEventField` raises a
     `ValidationError`.
     """
     invalid_field = json.loads(field.json())
@@ -320,7 +320,7 @@ def test_models_edx_problem_rescore_event_field_with_invalid_problem_id_value(
 def test_models_edx_problem_rescore_event_field_with_invalid_success_value(
     success, field
 ):
-    """Tests that an invalid `success` value in `ProblemRescoreEventField` raises a
+    """Test that an invalid `success` value in `ProblemRescoreEventField` raises a
     `ValidationError`.
     """
     invalid_field = json.loads(field.json())
@@ -332,7 +332,7 @@ def test_models_edx_problem_rescore_event_field_with_invalid_success_value(
 
 @custom_given(ProblemRescoreFailEventField)
 def test_models_edx_problem_rescore_fail_event_field_with_valid_field(field):
-    """Tests that a valid `ProblemRescoreFailEventField` does not raise a
+    """Test that a valid `ProblemRescoreFailEventField` does not raise a
     `ValidationError`.
     """
     assert re.match(
@@ -376,7 +376,7 @@ def test_models_edx_problem_rescore_fail_event_field_with_valid_field(field):
 def test_models_edx_problem_rescore_fail_event_field_with_invalid_problem_id_value(
     problem_id, field
 ):
-    """Tests that an invalid `problem_id` value in `ProblemRescoreFailEventField` raises
+    """Test that an invalid `problem_id` value in `ProblemRescoreFailEventField` raises
     a `ValidationError`.
     """
     invalid_field = json.loads(field.json())
@@ -393,7 +393,7 @@ def test_models_edx_problem_rescore_fail_event_field_with_invalid_problem_id_val
 def test_models_edx_problem_rescore_fail_event_field_with_invalid_failure_value(
     failure, field
 ):
-    """Tests that an invalid `failure` value in `ProblemRescoreFailEventField` raises a
+    """Test that an invalid `failure` value in `ProblemRescoreFailEventField` raises a
     `ValidationError`.
     """
     invalid_field = json.loads(field.json())
@@ -405,7 +405,7 @@ def test_models_edx_problem_rescore_fail_event_field_with_invalid_failure_value(
 
 @custom_given(ResetProblemEventField)
 def test_models_edx_reset_problem_event_field_with_valid_field(field):
-    """Tests that a valid `ResetProblemEventField` does not raise a
+    """Test that a valid `ResetProblemEventField` does not raise a
     `ValidationError`.
     """
     assert re.match(
@@ -448,7 +448,7 @@ def test_models_edx_reset_problem_event_field_with_valid_field(field):
 def test_models_edx_reset_problem_event_field_with_invalid_problem_id_value(
     problem_id, field
 ):
-    """Tests that an invalid `problem_id` value in `ResetProblemEventField` raises a
+    """Test that an invalid `problem_id` value in `ResetProblemEventField` raises a
     `ValidationError`.
     """
     invalid_field = json.loads(field.json())
@@ -462,7 +462,7 @@ def test_models_edx_reset_problem_event_field_with_invalid_problem_id_value(
 
 @custom_given(ResetProblemFailEventField)
 def test_models_edx_reset_problem_fail_event_field_with_valid_field(field):
-    """Tests that a valid `ResetProblemFailEventField` does not raise a
+    """Test that a valid `ResetProblemFailEventField` does not raise a
     `ValidationError`.
     """
     assert re.match(
@@ -506,7 +506,7 @@ def test_models_edx_reset_problem_fail_event_field_with_valid_field(field):
 def test_models_edx_reset_problem_fail_event_field_with_invalid_problem_id_value(
     problem_id, field
 ):
-    """Tests that an invalid `problem_id` value in `ResetProblemFailEventField` raises
+    """Test that an invalid `problem_id` value in `ResetProblemFailEventField` raises
     a `ValidationError`.
     """
     invalid_field = json.loads(field.json())
@@ -523,7 +523,7 @@ def test_models_edx_reset_problem_fail_event_field_with_invalid_problem_id_value
 def test_models_edx_reset_problem_fail_event_field_with_invalid_failure_value(
     failure, field
 ):
-    """Tests that an invalid `failure` value in `ResetProblemFailEventField` raises a
+    """Test that an invalid `failure` value in `ResetProblemFailEventField` raises a
     `ValidationError`.
     """
     invalid_field = json.loads(field.json())
@@ -535,7 +535,7 @@ def test_models_edx_reset_problem_fail_event_field_with_invalid_failure_value(
 
 @custom_given(SaveProblemFailEventField)
 def test_models_edx_save_problem_fail_event_field_with_valid_field(field):
-    """Tests that a valid `SaveProblemFailEventField` does not raise a
+    """Test that a valid `SaveProblemFailEventField` does not raise a
     `ValidationError`.
     """
     assert re.match(
@@ -579,7 +579,7 @@ def test_models_edx_save_problem_fail_event_field_with_valid_field(field):
 def test_models_edx_save_problem_fail_event_field_with_invalid_problem_id_value(
     problem_id, field
 ):
-    """Tests that an invalid `problem_id` value in `SaveProblemFailEventField` raises a
+    """Test that an invalid `problem_id` value in `SaveProblemFailEventField` raises a
     `ValidationError`.
     """
     invalid_field = json.loads(field.json())
@@ -596,7 +596,7 @@ def test_models_edx_save_problem_fail_event_field_with_invalid_problem_id_value(
 def test_models_edx_save_problem_fail_event_field_with_invalid_failure_value(
     failure, field
 ):
-    """Tests that an invalid `failure` value in `SaveProblemFailEventField` raises a
+    """Test that an invalid `failure` value in `SaveProblemFailEventField` raises a
     `ValidationError`.
     """
     invalid_field = json.loads(field.json())
@@ -608,7 +608,7 @@ def test_models_edx_save_problem_fail_event_field_with_invalid_failure_value(
 
 @custom_given(SaveProblemSuccessEventField)
 def test_models_edx_save_problem_success_event_field_with_valid_field(field):
-    """Tests that a valid `SaveProblemFailEventField` does not raise a
+    """Test that a valid `SaveProblemFailEventField` does not raise a
     `ValidationError`.
     """
     assert re.match(
@@ -651,7 +651,7 @@ def test_models_edx_save_problem_success_event_field_with_valid_field(field):
 def test_models_edx_save_problem_success_event_field_with_invalid_problem_id_value(
     problem_id, field
 ):
-    """Tests that an invalid `problem_id` value in `SaveProblemSuccessEventField`
+    """Test that an invalid `problem_id` value in `SaveProblemSuccessEventField`
     raises a `ValidationError`.
     """
     invalid_field = json.loads(field.json())

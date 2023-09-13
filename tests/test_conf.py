@@ -13,7 +13,7 @@ from ralph.utils import import_string
 
 
 def test_conf_settings_field_value_priority(fs, monkeypatch):
-    """Tests that the Settings object field values are defined in the following
+    """Test that the Settings object field values are defined in the following
     descending order of priority:
 
         1. Arguments passed to the initializer.
@@ -43,7 +43,7 @@ def test_conf_settings_field_value_priority(fs, monkeypatch):
     [("foo", ("foo",)), (("foo",), ("foo",)), ("foo,bar,baz", ("foo", "bar", "baz"))],
 )
 def test_conf_comma_separated_list_with_valid_values(value, expected, monkeypatch):
-    """Tests the CommaSeparatedTuple pydantic data type with valid values."""
+    """Test the CommaSeparatedTuple pydantic data type with valid values."""
     assert next(CommaSeparatedTuple.__get_validators__())(value) == expected
     monkeypatch.setenv("RALPH_BACKENDS__DATABASE__ES__HOSTS", "".join(value))
     assert Settings().BACKENDS.DATABASE.ES.HOSTS == expected
@@ -51,7 +51,7 @@ def test_conf_comma_separated_list_with_valid_values(value, expected, monkeypatc
 
 @pytest.mark.parametrize("value", [{}, [], None])
 def test_conf_comma_separated_list_with_invalid_values(value):
-    """Tests the CommaSeparatedTuple pydantic data type with invalid values."""
+    """Test the CommaSeparatedTuple pydantic data type with invalid values."""
     with pytest.raises(TypeError, match="Invalid comma separated list"):
         next(CommaSeparatedTuple.__get_validators__())(value)
 
@@ -67,7 +67,7 @@ def test_conf_comma_separated_list_with_invalid_values(value):
 def test_conf_es_client_options_with_valid_values(
     ca_certs, verify_certs, expected, monkeypatch
 ):
-    """Tests the ESClientOptions pydantic data type with valid values."""
+    """Test the ESClientOptions pydantic data type with valid values."""
     # Using None here as in "not set by user"
     if ca_certs is not None:
         monkeypatch.setenv(
@@ -92,7 +92,7 @@ def test_conf_es_client_options_with_valid_values(
 def test_conf_es_client_options_with_invalid_values(
     ca_certs, verify_certs, monkeypatch
 ):
-    """Tests the ESClientOptions pydantic data type with invalid values."""
+    """Test the ESClientOptions pydantic data type with invalid values."""
     monkeypatch.setenv(
         "RALPH_BACKENDS__DATABASE__ES__CLIENT_OPTIONS__ca_certs", f"{ca_certs}"
     )
@@ -115,7 +115,7 @@ def test_conf_es_client_options_with_invalid_values(
 def test_conf_mongo_client_options_with_valid_values(
     document_class, tz_aware, expected, monkeypatch
 ):
-    """Tests the MongoClientOptions pydantic data type with valid values."""
+    """Test the MongoClientOptions pydantic data type with valid values."""
     # Using None here as in "not set by user"
     if document_class is not None:
         monkeypatch.setenv(
@@ -141,7 +141,7 @@ def test_conf_mongo_client_options_with_valid_values(
 def test_conf_mongo_client_options_with_invalid_values(
     document_class, tz_aware, monkeypatch
 ):
-    """Tests the MongoClientOptions pydantic data type with invalid values."""
+    """Test the MongoClientOptions pydantic data type with invalid values."""
     monkeypatch.setenv(
         "RALPH_BACKENDS__DATABASE__MONGO__CLIENT_OPTIONS__document_class",
         f"{document_class}",
@@ -155,7 +155,7 @@ def test_conf_mongo_client_options_with_invalid_values(
 
 
 def test_conf_settings_should_define_all_backends_options():
-    """Tests that Settings model defines all backends options."""
+    """Test that Settings model defines all backends options."""
     for _, backends in settings.BACKENDS:
         for _, backend in backends:
             # pylint: disable=protected-access
@@ -167,7 +167,7 @@ def test_conf_settings_should_define_all_backends_options():
 
 
 def test_conf_core_settings_should_impact_settings_defaults(monkeypatch):
-    """Tests that core settings update application settings values."""
+    """Test that core settings update application settings values."""
     monkeypatch.setenv("RALPH_APP_DIR", "/foo")
     monkeypatch.setenv("RALPH_LOCALE_ENCODING", "ascii")
     reload(conf)

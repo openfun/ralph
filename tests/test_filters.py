@@ -7,7 +7,7 @@ from ralph.exceptions import EventKeyError
 
 
 def test_filters_anonymous_with_empty_events():
-    """Tests the anonymous filter when input dict has not the expected `username`
+    """Test the anonymous filter when input dict has not the expected `username`
     key.
     """
     event = {}
@@ -16,7 +16,7 @@ def test_filters_anonymous_with_empty_events():
 
 
 def test_filters_anonymous_filtering():
-    """Tests anonymous filtering reliability."""
+    """Test anonymous filtering reliability."""
     event = {"username": "john"}
     anonymous_event = {"username": ""}
     assert filters.anonymous(event) == event

@@ -15,7 +15,7 @@ from tests.fixtures.hypothesis_strategies import custom_given
 def test_models_xapi_base_agent_with_mbox_sha1_sum_ifi_with_valid_field(
     field,
 ):
-    """Tests a valid BaseXapiAgentWithMboxSha1Sum has the expected
+    """Test a valid BaseXapiAgentWithMboxSha1Sum has the expected
     `mbox_sha1sum` regex.
     """
 
@@ -34,7 +34,7 @@ def test_models_xapi_base_agent_with_mbox_sha1_sum_ifi_with_valid_field(
 def test_models_xapi_base_agent_with_mbox_sha1_sum_ifi_with_invalid_field(
     mbox_sha1sum, field
 ):
-    """Tests an invalid `mbox_sha1sum` property in
+    """Test an invalid `mbox_sha1sum` property in
     BaseXapiAgentWithMboxSha1Sum raises a `ValidationError`.
     """
 

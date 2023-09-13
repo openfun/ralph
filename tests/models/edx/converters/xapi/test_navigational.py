@@ -18,7 +18,7 @@ from tests.fixtures.hypothesis_strategies import custom_given
 def test_navigational_ui_page_close_to_page_terminated(
     uuid_namespace, event, platform_url
 ):
-    """Tests that converting with UIPageCloseToPageTerminated returns the expected xAPI
+    """Test that converting with UIPageCloseToPageTerminated returns the expected xAPI
     statement.
     """
     event.context.course_id = ""

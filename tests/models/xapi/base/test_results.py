@@ -22,7 +22,7 @@ from tests.fixtures.hypothesis_strategies import custom_given
 def test_models_xapi_base_result_score_with_invalid_raw_min_max_relation(
     raw_value, min_value, max_value, error_msg, field
 ):
-    """Tests invalids `raw`,`min`,`max` relation in BaseXapiResultScore raises
+    """Test invalids `raw`,`min`,`max` relation in BaseXapiResultScore raises
     ValidationError.
     """
 

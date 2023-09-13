@@ -253,7 +253,7 @@ def test_backends_db_clickhouse_to_documents_method_when_statement_has_no_id(
 def test_backends_db_clickhouse_to_documents_method_when_statement_has_no_timestamp(
     caplog,
 ):
-    """Tests the clickhouse to_documents method when a statement has no timestamp."""
+    """Test the clickhouse to_documents method when a statement has no timestamp."""
     timestamp = {"timestamp": "2022-06-27T15:36:50"}
     statements = [
         {"id": str(uuid.uuid4()), **timestamp},
@@ -285,7 +285,7 @@ def test_backends_db_clickhouse_to_documents_method_when_statement_has_no_timest
 def test_backends_db_clickhouse_to_documents_method_with_invalid_timestamp(
     caplog,
 ):
-    """Tests the clickhouse to_documents method with an invalid timestamp."""
+    """Test the clickhouse to_documents method with an invalid timestamp."""
     valid_timestamp = {"timestamp": "2022-06-27T15:36:50"}
     valid_timestamp_2 = {"timestamp": "2022-06-27T15:36:51"}
     invalid_timestamp = {"timestamp": "This is not a valid timestamp!"}
@@ -469,13 +469,13 @@ def test_backends_db_clickhouse_put_method_with_custom_chunk_size(clickhouse):
 def test_backends_db_clickhouse_query_statements_with_search_query_failure(
     monkeypatch, caplog, clickhouse
 ):
-    """Tests the clickhouse query_statements method, given a search query failure,
+    """Test the clickhouse query_statements method, given a search query failure,
     should raise a BackendException and log the error.
     """
     # pylint: disable=unused-argument
 
     def mock_query(*_, **__):
-        """Mocks the ClickHouseClient.collection.find method."""
+        """Mock the ClickHouseClient.collection.find method."""
         raise ClickHouseError("Something is wrong")
 
     backend = get_clickhouse_test_backend()
@@ -495,13 +495,13 @@ def test_backends_db_clickhouse_query_statements_with_search_query_failure(
 def test_backends_db_clickhouse_query_statements_by_ids_with_search_query_failure(
     monkeypatch, caplog, clickhouse
 ):
-    """Tests the clickhouse backend query_statements_by_ids method, given a search query
+    """Test the clickhouse backend query_statements_by_ids method, given a search query
     failure, should raise a BackendException and log the error.
     """
     # pylint: disable=unused-argument
 
     def mock_find(**_):
-        """Mocks the ClickHouseClient.collection.find method."""
+        """Mock the ClickHouseClient.collection.find method."""
         raise ClickHouseError("Something is wrong")
 
     backend = get_clickhouse_test_backend()

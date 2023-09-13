@@ -19,7 +19,7 @@ class FSStorage(HistoryMixin, BaseStorage):
     name = "fs"
 
     def __init__(self, path: str = settings.BACKENDS.STORAGE.FS.PATH):
-        """Creates the path directory if it does not exist."""
+        """Create the path directory if it does not exist."""
         self._path = Path(path)
         if not self._path.is_dir():
             logger.info("FS storage directory doesn't exist, creating: %s", self._path)
@@ -28,7 +28,7 @@ class FSStorage(HistoryMixin, BaseStorage):
         logger.debug("File system storage path: %s", self._path)
 
     def _get_filepath(self, name, strict=False):
-        """Gets path for `name` file.
+        """Get path for `name` file.
 
         Raises:
             FileNotFoundError: When the file_path is not found.
@@ -44,7 +44,7 @@ class FSStorage(HistoryMixin, BaseStorage):
         return file_path
 
     def _details(self, name):
-        """Gets `name` archive details."""
+        """Get `name` archive details."""
         file_path = self._get_filepath(name)
         stats = file_path.stat()
 
@@ -57,7 +57,7 @@ class FSStorage(HistoryMixin, BaseStorage):
         }
 
     def list(self, details=False, new=False):
-        """Lists files in the storage backend."""
+        """List files in the storage backend."""
         archives = [archive.name for archive in self._path.iterdir()]
         logger.debug("Found %d archives", len(archives))
 
@@ -69,11 +69,11 @@ class FSStorage(HistoryMixin, BaseStorage):
             yield self._details(archive) if details else archive
 
     def url(self, name):
-        """Gets `name` file absolute URL."""
+        """Get `name` file absolute URL."""
         return str(self._get_filepath(name).resolve(strict=True))
 
     def read(self, name, chunk_size: int = 4096):
-        """Reads `name` file and yields its content by chunks of a given size."""
+        """Read `name` file and yields its content by chunks of a given size."""
         logger.debug("Getting archive: %s", name)
 
         with self._get_filepath(name).open("rb") as file:
@@ -95,7 +95,7 @@ class FSStorage(HistoryMixin, BaseStorage):
         )
 
     def write(self, stream, name, overwrite=False):
-        """Writes content to the `name` target."""
+        """Write content to the `name` target."""
         logger.debug("Creating archive: %s", name)
 
         file_path = self._get_filepath(name)

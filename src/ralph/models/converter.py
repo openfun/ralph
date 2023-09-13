@@ -35,7 +35,7 @@ class ConversionItem:
     raw_input: bool
 
     def __init__(self, dest: str, src=None, transformers=lambda _: _, raw_input=False):
-        """Initializes ConversionItem.
+        """Initialize ConversionItem.
 
         Args:
             dest (str): The destination path where to place the converted value.
@@ -56,7 +56,7 @@ class ConversionItem:
         object.__setattr__(self, "raw_input", raw_input)
 
     def get_value(self, data: Union[dict, str]):
-        """Returns fetched source value after having applied all transformers to it.
+        """Return fetched source value after having applied all transformers to it.
 
         Args:
             data (dict or string): The event to convert.
@@ -99,7 +99,7 @@ class BaseConversionSet(ABC):
 def convert_dict_event(
     event: dict, event_str: str, conversion_set: BaseConversionSet
 ) -> BaseModel:
-    """Converts the event dictionary with a conversion_set.
+    """Convert the event dictionary with a conversion_set.
 
     Args:
         event (dict): The event to convert.
@@ -124,7 +124,7 @@ def convert_dict_event(
 
 
 def convert_str_event(event_str: str, conversion_set: BaseConversionSet) -> BaseModel:
-    """Converts the event string using the provided conversion_set.
+    """Convert the event string using the provided conversion_set.
 
     Args:
         event_str (str): The event to convert.
@@ -163,7 +163,7 @@ class Converter:
 
     @staticmethod
     def get_src_conversion_set(module: ModuleType, **conversion_set_kwargs):
-        """Returns a dictionary of initialized conversion_sets defined in the module."""
+        """Return a dictionary of initialized conversion_sets defined in the module."""
         src_conversion_set = {}
         for _, class_ in getmembers(module, isclass):
             if issubclass(class_, BaseConversionSet):
@@ -171,7 +171,7 @@ class Converter:
         return src_conversion_set
 
     def convert(self, input_file: TextIO, ignore_errors: bool, fail_on_unknown: bool):
-        """Converts JSON event strings line by line."""
+        """Convert JSON event strings line by line."""
         total = 0
         success = 0
         for event_str in input_file:
@@ -202,7 +202,7 @@ class Converter:
         logger.info("Total events: %d, Invalid events: %d", total, total - success)
 
     def _convert_event(self, event_str: str):
-        """Converts a single JSON string event.
+        """Convert a single JSON string event.
 
         Args:
             event_str (str): The event to convert.

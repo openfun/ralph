@@ -180,7 +180,7 @@ def test_backends_database_mongo_to_documents_method_when_statement_has_no_id(ca
 def test_backends_database_mongo_to_documents_method_when_statement_has_no_timestamp(
     caplog,
 ):
-    """Tests the mongo backend to_documents method when a statement has no timestamp."""
+    """Test the mongo backend to_documents method when a statement has no timestamp."""
     timestamp = {"timestamp": "2022-06-27T15:36:50"}
     statements = [{"id": "foo", **timestamp}, {"id": "bar"}, {"id": "baz", **timestamp}]
 
@@ -212,7 +212,7 @@ def test_backends_database_mongo_to_documents_method_when_statement_has_no_times
 
 
 def test_backends_database_mongo_to_documents_method_with_invalid_timestamp(caplog):
-    """Tests the mongo backend to_documents method given a statement with an invalid
+    """Test the mongo backend to_documents method given a statement with an invalid
     timestamp.
     """
     valid_timestamp = {"timestamp": "2022-06-27T15:36:50"}
@@ -391,13 +391,13 @@ def test_backends_database_mongo_put_method_with_custom_chunk_size(mongo):
 def test_backends_database_mongo_query_statements_with_search_query_failure(
     monkeypatch, caplog, mongo
 ):
-    """Tests the mongo backend query_statements method, given a search query failure,
+    """Test the mongo backend query_statements method, given a search query failure,
     should raise a BackendException and log the error.
     """
     # pylint: disable=unused-argument
 
     def mock_find(**_):
-        """Mocks the MongoClient.collection.find method."""
+        """Mock the MongoClient.collection.find method."""
         raise PyMongoError("Something is wrong")
 
     backend = MongoDatabase(
@@ -421,13 +421,13 @@ def test_backends_database_mongo_query_statements_with_search_query_failure(
 def test_backends_database_mongo_query_statements_by_ids_with_search_query_failure(
     monkeypatch, caplog, mongo
 ):
-    """Tests the mongo backend query_statements_by_ids method, given a search query
+    """Test the mongo backend query_statements_by_ids method, given a search query
     failure, should raise a BackendException and log the error.
     """
     # pylint: disable=unused-argument
 
     def mock_find(**_):
-        """Mocks the MongoClient.collection.find method."""
+        """Mock the MongoClient.collection.find method."""
         raise ValueError("Something is wrong")
 
     backend = MongoDatabase(
@@ -450,7 +450,7 @@ def test_backends_database_mongo_query_statements_by_ids_with_search_query_failu
 def test_backends_database_mongo_query_statements_by_ids_with_multiple_collections(
     mongo, mongo_forwarding
 ):
-    """Tests the mongo backend query_statements_by_ids method, given a valid search
+    """Test the mongo backend query_statements_by_ids method, given a valid search
     query, should execute the query uniquely on the specified collection and return the
     expected results.
     """

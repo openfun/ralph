@@ -18,7 +18,7 @@ from tests.fixtures.hypothesis_strategies import custom_given
 def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_constant_uuid(
     uuid_namespace, event, platform_url
 ):
-    """Tests that `ServerEventToPageViewed.convert` returns a JSON string with a
+    """Test that `ServerEventToPageViewed.convert` returns a JSON string with a
     constant UUID.
     """
     event_str = event.json()
@@ -38,7 +38,7 @@ def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_constant
 def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_with_valid_event(  # noqa
     uuid_namespace, event, platform_url
 ):
-    """Tests that converting with `ServerEventToPageViewed` returns the expected xAPI
+    """Test that converting with `ServerEventToPageViewed` returns the expected xAPI
     statement.
     """
     event.event_type = "/main/blog"
@@ -77,7 +77,7 @@ def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_with_val
 def test_models_edx_converters_xapi_server_server_event_to_xapi_convert_with_anonymous_user(  # noqa
     uuid_namespace, event, platform_url
 ):
-    """Tests that anonymous usernames are replaced with `anonymous`."""
+    """Test that anonymous usernames are replaced with `anonymous`."""
 
     event.context.user_id = ""
     event_str = event.json()

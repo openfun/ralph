@@ -8,7 +8,7 @@ from .base import BaseXapiConverter
 
 
 class UIPageCloseToPageTerminated(BaseXapiConverter):
-    """Converts a common edX `page_close` event to xAPI.
+    """Convert a common edX `page_close` event to xAPI.
 
     Example Statement: John terminated https://www.fun-mooc.fr/ page.
 
@@ -20,6 +20,6 @@ class UIPageCloseToPageTerminated(BaseXapiConverter):
     __dest__ = PageTerminated
 
     def _get_conversion_items(self):
-        """Returns a set of ConversionItems used for conversion."""
+        """Return a set of ConversionItems used for conversion."""
         conversion_items = super()._get_conversion_items()
         return conversion_items.union({ConversionItem("object__id", "page")})

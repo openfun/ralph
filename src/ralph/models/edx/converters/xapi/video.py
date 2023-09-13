@@ -33,7 +33,7 @@ class VideoBaseXapiConverter(BaseXapiConverter):
     """Base Video xAPI Converter."""
 
     def _get_conversion_items(self):
-        """Returns a set of ConversionItems used for conversion."""
+        """Return a set of ConversionItems used for conversion."""
         conversion_items = super()._get_conversion_items()
         return conversion_items.union(
             {
@@ -65,13 +65,13 @@ class VideoBaseXapiConverter(BaseXapiConverter):
 
 
 class UILoadVideoToVideoInitialized(VideoBaseXapiConverter):
-    """Converts a common edX `load_video` event to xAPI."""
+    """Convert a common edX `load_video` event to xAPI."""
 
     __src__ = UILoadVideo
     __dest__ = VideoInitialized
 
     def _get_conversion_items(self):
-        """Returns a set of ConversionItems used for conversion."""
+        """Return a set of ConversionItems used for conversion."""
         conversion_items = super()._get_conversion_items()
         return conversion_items.union(
             {
@@ -95,13 +95,13 @@ class UILoadVideoToVideoInitialized(VideoBaseXapiConverter):
 
 
 class UIPlayVideoToVideoPlayed(VideoBaseXapiConverter):
-    """Converts a common edX `play_video` event to xAPI."""
+    """Convert a common edX `play_video` event to xAPI."""
 
     __src__ = UIPlayVideo
     __dest__ = VideoPlayed
 
     def _get_conversion_items(self):
-        """Returns a set of ConversionItems used for conversion."""
+        """Return a set of ConversionItems used for conversion."""
         conversion_items = super()._get_conversion_items()
         return conversion_items.union(
             {
@@ -118,13 +118,13 @@ class UIPlayVideoToVideoPlayed(VideoBaseXapiConverter):
 
 
 class UIPauseVideoToVideoPaused(VideoBaseXapiConverter):
-    """Converts a common edX `pause_video` event to xAPI."""
+    """Convert a common edX `pause_video` event to xAPI."""
 
     __src__ = UIPauseVideo
     __dest__ = VideoPaused
 
     def _get_conversion_items(self):
-        """Returns a set of ConversionItems used for conversion."""
+        """Return a set of ConversionItems used for conversion."""
         conversion_items = super()._get_conversion_items()
         return conversion_items.union(
             {
@@ -149,13 +149,13 @@ class UIPauseVideoToVideoPaused(VideoBaseXapiConverter):
 
 
 class UIStopVideoToVideoTerminated(VideoBaseXapiConverter):
-    """Converts a common edX `stop_video` event to xAPI."""
+    """Convert a common edX `stop_video` event to xAPI."""
 
     __src__ = UIStopVideo
     __dest__ = VideoTerminated
 
     def _get_conversion_items(self):
-        """Returns a set of ConversionItems used for conversion."""
+        """Return a set of ConversionItems used for conversion."""
         conversion_items = super()._get_conversion_items()
         return conversion_items.union(
             {
@@ -188,13 +188,13 @@ class UIStopVideoToVideoTerminated(VideoBaseXapiConverter):
 
 
 class UISeekVideoToVideoSeeked(VideoBaseXapiConverter):
-    """Converts a common edX `seek_video` event to xAPI."""
+    """Convert a common edX `seek_video` event to xAPI."""
 
     __src__ = UISeekVideo
     __dest__ = VideoSeeked
 
     def _get_conversion_items(self):
-        """Returns a set of ConversionItems used for conversion."""
+        """Return a set of ConversionItems used for conversion."""
         conversion_items = super()._get_conversion_items()
         return conversion_items.union(
             {

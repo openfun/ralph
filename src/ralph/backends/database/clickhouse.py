@@ -90,7 +90,7 @@ class ClickHouseDatabase(BaseDatabase):  # pylint: disable=too-many-instance-att
 
     @property
     def client(self):
-        """Creates a ClickHouse client if it doesn't exist.
+        """Create a ClickHouse client if it doesn't exist.
 
         We do this here so that we don't interrupt initialization in the case
         where ClickHouse is not running when Ralph starts up, which will cause
@@ -110,7 +110,7 @@ class ClickHouseDatabase(BaseDatabase):  # pylint: disable=too-many-instance-att
         return self._client
 
     def status(self) -> DatabaseStatus:
-        """Checks ClickHouse connection status."""
+        """Check ClickHouse connection status."""
         try:
             self.client.query("SELECT 1")
         except ClickHouseError:
@@ -120,7 +120,7 @@ class ClickHouseDatabase(BaseDatabase):  # pylint: disable=too-many-instance-att
 
     @enforce_query_checks
     def get(self, query: ClickHouseQuery = None, chunk_size: int = 500):
-        """Gets table rows and yields them."""
+        """Get table rows and yields them."""
         fields = ",".join(query.return_fields) if query.return_fields else "event"
 
         sql = f"SELECT {fields} FROM {self.event_table_name}"  # nosec
@@ -137,7 +137,7 @@ class ClickHouseDatabase(BaseDatabase):  # pylint: disable=too-many-instance-att
     def to_documents(
         stream: Union[TextIO, List], ignore_errors: bool = False
     ) -> Generator[dict, None, None]:
-        """Converts `stream` lines (one statement per line) to insert tuples."""
+        """Convert `stream` lines (one statement per line) to insert tuples."""
         for line in stream:
             statement = json.loads(line) if isinstance(line, str) else line
 
@@ -165,7 +165,7 @@ class ClickHouseDatabase(BaseDatabase):  # pylint: disable=too-many-instance-att
             yield document
 
     def bulk_import(self, batch: List, ignore_errors: bool = False) -> int:
-        """Inserts a batch of documents into the selected database table."""
+        """Insert a batch of documents into the selected database table."""
         try:
             # ClickHouse does not do unique keys. This is a "best effort" to
             # at least check for duplicates in each batch. Overall ID checking
@@ -212,7 +212,7 @@ class ClickHouseDatabase(BaseDatabase):  # pylint: disable=too-many-instance-att
         chunk_size: int = 500,
         ignore_errors: bool = False,
     ) -> int:
-        """Writes documents from the `stream` to the instance table."""
+        """Write documents from the `stream` to the instance table."""
         logger.debug(
             "Start writing to the %s table of the %s database (chunk size: %d)",
             self.event_table_name,
@@ -239,7 +239,7 @@ class ClickHouseDatabase(BaseDatabase):  # pylint: disable=too-many-instance-att
         return rows_inserted
 
     def query_statements_by_ids(self, ids: List[str]) -> List[dict]:
-        """Returns the list of matching statements from the database."""
+        """Return the list of matching statements from the database."""
 
         def chunk_id_list(chunk_size=10000):
             for i in range(0, len(ids), chunk_size):
@@ -325,7 +325,7 @@ class ClickHouseDatabase(BaseDatabase):  # pylint: disable=too-many-instance-att
             )
 
     def query_statements(self, params: RalphStatementsQuery) -> StatementQueryResult:
-        """Returns the results of a statements query using xAPI parameters."""
+        """Return the results of a statements query using xAPI parameters."""
         # pylint: disable=too-many-branches
         # pylint: disable=invalid-name
 
@@ -408,7 +408,7 @@ class ClickHouseDatabase(BaseDatabase):  # pylint: disable=too-many-instance-att
     def _find(
         self, parameters: dict, where: List = None, limit: int = None, sort: str = None
     ):
-        """Wraps the ClickHouse query method.
+        """Wrap the ClickHouse query method.
 
         Raises:
             BackendException: raised for any failure.
