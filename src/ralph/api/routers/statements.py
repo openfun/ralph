@@ -138,9 +138,13 @@ async def get(
     ###
     # Query string parameters defined by the LRS specification
     ###
-    statement_id: Optional[str] = Query(None, description="Id of Statement to fetch", alias="statementId"),
+    statement_id: Optional[str] = Query(
+        None, description="Id of Statement to fetch", alias="statementId"
+    ),
     voided_statement_id: Optional[str] = Query(
-        None, description="**Not implemented** Id of voided Statement to fetch", alias="voidedStatementId"
+        None,
+        description="**Not implemented** Id of voided Statement to fetch",
+        alias="voidedStatementId",
     ),
     agent: Optional[Json] = Query(
         None,

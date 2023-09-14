@@ -36,6 +36,7 @@ have an authority field matching that of the user
 - Backends: add `max_statements` option to `AsyncLRSHTTP`
 - API: Incoming statements are enriched with `id`, `timestamp`, `stored`
   and `authority`
+- Backends: update `statementId` and `voidedStatementId` to snake_case, with camelCase alias, in `LRSStatementsQuery` 
 
 ### Removed
 
