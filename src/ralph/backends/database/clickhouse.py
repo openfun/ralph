@@ -332,7 +332,7 @@ class ClickHouseDatabase(BaseDatabase):  # pylint: disable=too-many-instance-att
         clickhouse_params = params.dict(exclude_none=True)
         where_clauses = []
 
-        if params.statementId:
+        if params.statement_id:
             where_clauses.append("event_id = {statementId:UUID}")
 
         self._add_agent_filters(

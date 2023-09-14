@@ -227,8 +227,8 @@ class MongoDatabase(BaseDatabase):
         # pylint: disable=too-many-branches
         mongo_query_filters = {}
 
-        if params.statementId:
-            mongo_query_filters.update({"_source.id": params.statementId})
+        if params.statement_id:
+            mongo_query_filters.update({"_source.id": params.statement_id})
 
         self._add_agent_filters(
             mongo_query_filters, params.__dict__["agent"], target_field="actor"

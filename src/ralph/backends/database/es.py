@@ -197,8 +197,8 @@ class ESDatabase(BaseDatabase):
         """Return the results of a statements query using xAPI parameters."""
         es_query_filters = []
 
-        if params.statementId:
-            es_query_filters += [{"term": {"_id": params.statementId}}]
+        if params.statement_id:
+            es_query_filters += [{"term": {"_id": params.statement_id}}]
 
         self._add_agent_filters(
             es_query_filters, params.__dict__["agent"], target_field="actor"
