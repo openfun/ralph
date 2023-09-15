@@ -27,16 +27,12 @@ service:
 ingress:
   enabled: false
   ingressClassName: ""
-  hostname: ""
+  hostname: "ralph.example.com"
   annotations: {}
-
-persistence:
-  enabled: true
-  storageClass: "local-storage"
-  accessModes:
-    - ReadWriteMany
-  size: 2Gi
-  existingClaim: ""
+  tls:
+    - hosts:
+        - "ralph.example.com"
+      secretName: "ralph-example-com-tls"
 
 affinity:
   podAntiAffinity:
@@ -64,7 +60,7 @@ tolerations: []
 
 resources: {}
 
-envFromSecret: 'ralph-env'
+envFromSecret: "ralph-env"
 envSecrets: {}
 existingSecret: false
 
@@ -79,10 +75,13 @@ volumes:
     size: 2Gi
     accessModes: ReadWriteMany
     storageClass: ""
+    # Use an existing claim. If specified, the **history**
+    # PersistentVolumeClaim will **not** be created.
+    existingClaim: ""
 
 lrs:
   port: 8080
-  authSecretName: 'ralph-lrs-auth'
+  authSecretName: "ralph-lrs-auth"
   # Authentication
   #
   # For each entry, we expect the following keys:

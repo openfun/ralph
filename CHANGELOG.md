@@ -46,6 +46,7 @@ have an authority field matching that of the user
   implicit
 - CLI: list cli usage strings in alphabetical order
 - Helm: Fix clickhouse version
+- Helm: improve volumes and ingress configurations
 
 ### Fixed
 
