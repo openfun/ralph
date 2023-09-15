@@ -1,4 +1,5 @@
 {{- if .Values.volumes.history.enabled }}
+{{- if not .Values.volumes.history.existingClaim -}}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -13,4 +14,5 @@ spec:
     requests:
       storage: {{ .Values.volumes.history.size }}
   storageClassName: {{ .Values.volumes.history.storageClass }}
+{{- end }}
 {{- end }}

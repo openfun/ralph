@@ -83,6 +83,8 @@ volumes:
     size: 2Gi
     accessModes: ReadWriteMany
     storageClass: ""
+    # -- Use an existing claim. If specified, the **history** PersistentVolumeClaim will not be created.
+    existingClaim: ""
 
 lrs:
   port: 8080
