@@ -15,8 +15,8 @@ from fastapi import (
     Query,
     Request,
     Response,
+    Security,
     status,
-    Security
 )
 from fastapi.dependencies.models import Dependant
 from pydantic import parse_obj_as
@@ -461,7 +461,9 @@ async def put(
 @router.post("/", responses=POST_PUT_RESPONSES)
 @router.post("", responses=POST_PUT_RESPONSES)
 async def post(
-    current_user: Annotated[AuthenticatedUser, Security(authenticate_user, scopes=["statements/write"])],
+    current_user: Annotated[
+        AuthenticatedUser, Security(authenticate_user, scopes=["statements/write"])
+    ],
     statements: Union[LaxStatement, List[LaxStatement]],
     background_tasks: BackgroundTasks,
     response: Response,

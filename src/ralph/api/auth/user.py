@@ -16,38 +16,36 @@ Scope = Literal[
     "profile/write",
     "profile/read",
     "all/read",
-    "all"
+    "all",
 ]
+
 
 @lru_cache()
 def scope_is_authorized(requested_scope, user_scopes: Tuple[Scope]):
     """Check if the requested scope can be accessed based on user scopes."""
 
     expanded_scopes = {
-        'statements/read': {
-            'statements/read/mine', 
-            'statements/read'
+        "statements/read": {"statements/read/mine", "statements/read"},
+        "all/read": {
+            "statements/read/mine",
+            "statements/read",
+            "state/read",
+            "define",
+            "profile/read",
+            "all/read",
         },
-        'all/read': {
-            'statements/read/mine', 
-            'statements/read',
-            'state/read', 
-            'define', 
-            'profile/read', 
-            'all/read'
+        "all": {
+            "statements/write",
+            "statements/read/mine",
+            "statements/read",
+            "state/read",
+            "state/write",
+            "define",
+            "profile/read",
+            "profile/write",
+            "all/read",
+            "all",
         },
-        'all': {
-            'statements/write', 
-            'statements/read/mine', 
-            'statements/read',
-            'state/read', 
-            'state/write', 
-            'define', 
-            'profile/read', 
-            'profile/write', 
-            'all/read', 
-            'all'
-        }
     }
 
     # Create a set with all the scopes available to the user

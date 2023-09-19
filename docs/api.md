@@ -135,7 +135,7 @@ Use curl to get `http://localhost:8100/whoami`:
 
 ```bash
 $ curl http://localhost:8100/whoami
-< HTTP/1.1" 401 Unauthorized
+< HTTP/1.1 401 Unauthorized
 < {"detail":"Could not validate credentials"}
 ```
 With the Keycloak instance running, use curl to get access token from Keycloak:

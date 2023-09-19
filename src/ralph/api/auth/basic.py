@@ -16,7 +16,6 @@ from starlette.authentication import AuthenticationError
 from ralph.api.auth.user import AuthenticatedUser, scope_is_authorized
 from ralph.conf import settings
 
-
 # Unused password used to avoid timing attacks, by comparing passwords supplied
 # with invalid credentials to something innocuous with the same method as if
 # it were a legitimate user.
@@ -184,6 +183,6 @@ def get_authenticated_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials",
             headers={"WWW-Authenticate": "Basic"},
-        )      
+        )
 
     return AuthenticatedUser(scopes=user.scopes, agent=user.agent)
