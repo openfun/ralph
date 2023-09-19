@@ -11,7 +11,7 @@ from uuid import UUID
 
 from httpx import AsyncClient, HTTPError, HTTPStatusError, RequestError
 from more_itertools import chunked
-from pydantic import AnyHttpUrl, BaseModel, NonNegativeInt, parse_obj_as
+from pydantic import AnyHttpUrl, BaseModel, Field, NonNegativeInt, parse_obj_as
 from pydantic.types import PositiveInt
 
 from ralph.conf import LRSHeaders, settings
@@ -49,8 +49,8 @@ class LRSStatementsQuery(BaseQuery):
 
     # pylint: disable=too-many-instance-attributes
 
-    statementId: Optional[str]  # pylint: disable=invalid-name
-    voidedStatementId: Optional[str]  # pylint: disable=invalid-name
+    statement_id: Optional[str] = Field(None, alias="statementId")
+    voided_statement_id: Optional[str] = Field(None, alias="voidedStatementId")
     agent: Optional[Union[BaseXapiAgent, BaseXapiGroup]]
     verb: Optional[IRI]
     activity: Optional[IRI]
