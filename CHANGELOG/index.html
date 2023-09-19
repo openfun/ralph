@@ -22,7 +22,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.2.8">
+      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.3.1">
     
     
       
@@ -1863,7 +1863,7 @@ have an authority field matching that of the user</li>
 <li>CLI: change <code>push</code> to <code>write</code> and <code>fetch</code> to <code>read</code> [BC]</li>
 <li>Upgrade <code>fastapi</code> to <code>0.103.1</code></li>
 <li>Upgrade <code>more-itertools</code> to <code>10.1.0</code></li>
-<li>Upgrade <code>sentry_sdk</code> to <code>1.30.0</code></li>
+<li>Upgrade <code>sentry_sdk</code> to <code>1.31.0</code></li>
 <li>Upgrade <code>uvicorn</code> to <code>0.23.2</code></li>
 <li>API: Invalid parameters now return 400 status code</li>
 <li>API: Forwarding PUT now uses PUT (instead of POST)</li>
@@ -1874,6 +1874,8 @@ have an authority field matching that of the user</li>
 <li>Backends: add <code>max_statements</code> option to <code>AsyncLRSHTTP</code></li>
 <li>API: Incoming statements are enriched with <code>id</code>, <code>timestamp</code>, <code>stored</code>
   and <code>authority</code></li>
+<li>Backends: update <code>statementId</code> and <code>voidedStatementId</code> to snake_case,
+  with camelCase alias, in <code>LRSStatementsQuery</code></li>
 </ul>
 <h3 id="removed">Removed<a class="headerlink" href="#removed" title="Permanent link">&para;</a></h3>
 <ul>
