@@ -1857,7 +1857,7 @@ and this project adheres to
 <li>Refactor LRS Statements resource query parameters defined for <code>ralph</code> API</li>
 <li>Helm chart: improve chart modularity</li>
 <li>User credentials must now include an &ldquo;agent&rdquo; field which can be created
-using the cli</li>
+  using the cli</li>
 <li><code>GET /statements</code> now has &ldquo;mine&rdquo; option which matches statements that
 have an authority field matching that of the user</li>
 <li>CLI: change <code>push</code> to <code>write</code> and <code>fetch</code> to <code>read</code> [BC]</li>
@@ -1876,6 +1876,8 @@ have an authority field matching that of the user</li>
   and <code>authority</code></li>
 <li>Backends: update <code>statementId</code> and <code>voidedStatementId</code> to snake_case,
   with camelCase alias, in <code>LRSStatementsQuery</code></li>
+<li>API: Add <code>RALPH_LRS_RESTRICT_BY_AUTHORITY</code> option making <code>?mine=True</code> 
+  implicit</li>
 </ul>
 <h3 id="removed">Removed<a class="headerlink" href="#removed" title="Permanent link">&para;</a></h3>
 <ul>

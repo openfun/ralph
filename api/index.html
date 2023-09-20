@@ -538,13 +538,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#scopes" class="md-nav__link">
-    Scopes
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#making_a_get_request" class="md-nav__link">
     Making a GET request
   </a>
@@ -572,15 +565,41 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#scopes_1" class="md-nav__link">
-    Scopes
+  <a href="#making_a_get_request_1" class="md-nav__link">
+    Making a GET request
   </a>
   
 </li>
         
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security" class="md-nav__link">
+    Security
+  </a>
+  
+    <nav class="md-nav" aria-label="Security">
+      <ul class="md-nav__list">
+        
           <li class="md-nav__item">
-  <a href="#making_a_get_request_1" class="md-nav__link">
-    Making a GET request
+  <a href="#filtering_results_by_authority_multitenancy" class="md-nav__link">
+    Filtering results by authority (multitenancy)
+  </a>
+  
+    <nav class="md-nav" aria-label="Filtering results by authority (multitenancy)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#scopes" class="md-nav__link">
+    Scopes
   </a>
   
 </li>
@@ -843,13 +862,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#scopes" class="md-nav__link">
-    Scopes
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#making_a_get_request" class="md-nav__link">
     Making a GET request
   </a>
@@ -877,15 +889,41 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#scopes_1" class="md-nav__link">
-    Scopes
+  <a href="#making_a_get_request_1" class="md-nav__link">
+    Making a GET request
   </a>
   
 </li>
         
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security" class="md-nav__link">
+    Security
+  </a>
+  
+    <nav class="md-nav" aria-label="Security">
+      <ul class="md-nav__list">
+        
           <li class="md-nav__item">
-  <a href="#making_a_get_request_1" class="md-nav__link">
-    Making a GET request
+  <a href="#filtering_results_by_authority_multitenancy" class="md-nav__link">
+    Filtering results by authority (multitenancy)
+  </a>
+  
+    <nav class="md-nav" aria-label="Filtering results by authority (multitenancy)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#scopes" class="md-nav__link">
+    Scopes
   </a>
   
 </li>
@@ -972,11 +1010,9 @@
 <p>The API server can be started up with the following command:</p>
 <div class="highlight"><pre><span></span><code>$<span class="w"> </span>ralph<span class="w"> </span>runserver<span class="w"> </span>--backend<span class="w"> </span>es
 </code></pre></div>
-<p>The <code>--backend</code> (or <code>-b</code>) option specifies which database backend to use for
-LRS data storage and retrieval. See Ralph&rsquo;s <a href="../backends/">backends
+<p>The <code>--backend</code> (or <code>-b</code>) option specifies which database backend to use for LRS data storage and retrieval. See Ralph&rsquo;s <a href="../backends/">backends
 documentation</a> for more details.</p>
-<p>However, before you can start your API server and make requests against it, you
-need to set up your credentials.</p>
+<p>However, before you can start your API server and make requests against it, you need to set up your credentials.</p>
 <h4 id="creating_a_credentials_file">Creating a credentials file<a class="headerlink" href="#creating_a_credentials_file" title="Permanent link">&para;</a></h4>
 <p>The credentials file is expected to be a valid JSON file. Its location is
 specified by the <code>RALPH_AUTH_FILE</code> configuration value. By default, <code>ralph</code>
@@ -1027,8 +1063,6 @@ access, and an <code>agent</code> object used to represent the user in the LRS. 
 optional dependencies, <em>e.g.</em> <code>pip install ralph-malph[cli]</code> (which we highly
 recommend).</p>
 </blockquote>
-<h4 id="scopes">Scopes<a class="headerlink" href="#scopes" title="Permanent link">&para;</a></h4>
-<p>(Work In Progress)</p>
 <h4 id="making_a_get_request">Making a GET request<a class="headerlink" href="#making_a_get_request" title="Permanent link">&para;</a></h4>
 <p>The first request that can be answered by the ralph API server is a <code>whoami</code> request, which checks if the user is authenticated and returns their username and permission scopes.</p>
 <p>Use curl to get <code>http://localhost:8100/whoami</code>:</p>
@@ -1054,14 +1088,12 @@ and you should define the <code>RALPH_RUNSERVER_AUTH_OIDC_ISSUER_URI</code> envi
 <h4 id="identity_providers">Identity Providers<a class="headerlink" href="#identity_providers" title="Permanent link">&para;</a></h4>
 <p>OIDC support is currently developed and tested against <a href="https://www.keycloak.org/">Keycloak</a> but may work with other identity providers that implement the specification.</p>
 <p>The <a href="https://github.com/openfun/learning-analytics-playground/">Learning analytics playground</a> repository contains a Docker Compose file and configuration for a demo instance of Keycloak with a <code>ralph</code> client.</p>
-<h4 id="scopes_1">Scopes<a class="headerlink" href="#scopes_1" title="Permanent link">&para;</a></h4>
-<p>(Work In Progress)</p>
 <h4 id="making_a_get_request_1">Making a GET request<a class="headerlink" href="#making_a_get_request_1" title="Permanent link">&para;</a></h4>
 <p>The first request that can be answered by the ralph API server is a <code>whoami</code> request, which checks if the user is authenticated and returns their username and permission scopes.</p>
 <p>Use curl to get <code>http://localhost:8100/whoami</code>:</p>
 <p><div class="highlight"><pre><span></span><code>$<span class="w"> </span>curl<span class="w"> </span>http://localhost:8100/whoami
-&lt;<span class="w"> </span>HTTP/1.1<span class="s2">&quot; 401 Unauthorized</span>
-<span class="s2">&lt; {&quot;</span>detail<span class="s2">&quot;:&quot;</span>Could<span class="w"> </span>not<span class="w"> </span>validate<span class="w"> </span>credentials<span class="s2">&quot;}</span>
+&lt;<span class="w"> </span>HTTP/1.1<span class="w"> </span><span class="m">401</span><span class="w"> </span>Unauthorized
+&lt;<span class="w"> </span><span class="o">{</span><span class="s2">&quot;detail&quot;</span>:<span class="s2">&quot;Could not validate credentials&quot;</span><span class="o">}</span>
 </code></pre></div>
 With the Keycloak instance running, use curl to get access token from Keycloak:
 <div class="highlight"><pre><span></span><code>curl<span class="w"> </span>--request<span class="w"> </span>POST<span class="w"> </span><span class="s1">&#39;http://localhost:8080/auth/realms/fun-mooc/protocol/openid-connect/token&#39;</span><span class="w"> </span><span class="se">\</span>
@@ -1089,6 +1121,16 @@ With the Keycloak instance running, use curl to get access token from Keycloak:
 &lt;<span class="w"> </span>HTTP/1.1<span class="w"> </span><span class="m">200</span><span class="w"> </span>OK
 &lt;<span class="w"> </span><span class="o">{</span><span class="s2">&quot;username&quot;</span>:<span class="s2">&quot;ralph_admin&quot;</span>,<span class="s2">&quot;scopes&quot;</span>:<span class="o">[</span><span class="s2">&quot;all&quot;</span><span class="o">]}</span>
 </code></pre></div>
+<h2 id="security">Security<a class="headerlink" href="#security" title="Permanent link">&para;</a></h2>
+<p>By default, all authenticated users have full read and write access to the server. You may use the options below to restrict behavior.</p>
+<h3 id="filtering_results_by_authority_multitenancy">Filtering results by authority (multitenancy)<a class="headerlink" href="#filtering_results_by_authority_multitenancy" title="Permanent link">&para;</a></h3>
+<p>In Ralph, all incoming statements are assigned an <code>authority</code> (or ownership) derived from the user that makes the call. You may restrict read access to users &ldquo;own&rdquo; statements (thus enabling multitenancy) by setting the following environment variable: </p>
+<div class="highlight"><pre><span></span><code>RALPH_LRS_RESTRICT_BY_AUTHORITY = True # Default: False
+</code></pre></div>
+<p><strong>WARNING</strong>: Two accounts with different credentials may share the same <code>authority</code> meaning they can access the same statements. It is the administrators responsability to ensure that <code>authority</code> is properly assigned.</p>
+<p>NB: If not using &ldquo;scopes&rdquo;, or for users with limited &ldquo;scopes&rdquo;, using this option will make the use of option <code>?mine=True</code> implicit when fetching statement.</p>
+<h4 id="scopes">Scopes<a class="headerlink" href="#scopes" title="Permanent link">&para;</a></h4>
+<p>(Work In Progress)</p>
 <h2 id="forwarding_statements">Forwarding statements<a class="headerlink" href="#forwarding_statements" title="Permanent link">&para;</a></h2>
 <p>Ralph&rsquo;s API server can be configured to forward xAPI statements it receives to other
 LRSes.</p>
