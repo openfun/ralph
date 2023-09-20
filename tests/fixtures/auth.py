@@ -22,7 +22,7 @@ ISSUER_URI = "http://providerHost:8080/auth/realms/real_name"
 PUBLIC_KEY_ID = "example-key-id"
 
 
-def create_user(
+def create_basic_user(
     fs_,
     username: str,
     password: str,
@@ -69,9 +69,13 @@ def create_user(
     return credentials
 
 
+def create_user():
+    create_basic_user()
+
+
 # pylint: disable=invalid-name
 @pytest.fixture
-def auth_credentials(fs, user_scopes=None, agent=None):
+def basic_auth_credentials(fs, user_scopes=None, agent=None):
     """Set up the credentials file for request authentication.
 
     Args:
@@ -240,16 +244,16 @@ def mock_oidc_jwks():
 
 
 @pytest.fixture
-def encoded_token():
+def encoded_token(sub="123|oidc", scopes=["all", "statements/read"]):
     """Encode token with the private key."""
     return jwt.encode(
         claims={
-            "sub": "123|oidc",
+            "sub": sub,
             "iss": "https://iss.example.com",
             "aud": AUDIENCE,
             "iat": 0,  # Issued the 1/1/1970
             "exp": 9999999999,  # Expiring in 11/20/2286
-            "scope": "all statements/read",
+            "scope": " ".join(scopes),
         },
         key=private_key.private_bytes(
             serialization.Encoding.PEM,

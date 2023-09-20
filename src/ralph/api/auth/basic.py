@@ -9,11 +9,11 @@ from typing import List, Union
 import bcrypt
 from cachetools import TTLCache, cached
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBasic, HTTPBasicCredentials, SecurityScopes
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel, root_validator
 from starlette.authentication import AuthenticationError
 
-from ralph.api.auth.user import AuthenticatedUser, scope_is_authorized
+from ralph.api.auth.user import AuthenticatedUser, UserScopes
 from ralph.conf import settings
 
 # Unused password used to avoid timing attacks, by comparing passwords supplied
@@ -121,12 +121,8 @@ def get_authenticated_user(
         security_scopes: scopes requested for access
         credentials (iterator): auth parameters from the Authorization header
 
-    Return:
-        AuthenticatedUser (AuthenticatedUser)
-
     Raises:
         HTTPException
-
     """
     if not credentials:
         logger.error("The basic authentication mode requires a Basic Auth header")
@@ -185,4 +181,4 @@ def get_authenticated_user(
             headers={"WWW-Authenticate": "Basic"},
         )
 
-    return AuthenticatedUser(scopes=user.scopes, agent=user.agent)
+    return AuthenticatedUser(scopes=UserScopes(user.scopes), agent=user.agent)

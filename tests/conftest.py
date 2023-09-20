@@ -5,7 +5,7 @@
 from .fixtures import hypothesis_configuration  # noqa: F401
 from .fixtures import hypothesis_strategies  # noqa: F401
 from .fixtures.auth import (  # noqa: F401
-    auth_credentials,
+    basic_auth_credentials,
     basic_auth_test_client,
     encoded_token,
     mock_discovery_response,

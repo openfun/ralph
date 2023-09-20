@@ -135,7 +135,10 @@ def strict_query_params(request: Request):
 # pylint: disable=too-many-arguments, too-many-locals
 async def get(
     request: Request,
-    current_user: Annotated[AuthenticatedUser, Depends(get_authenticated_user)],
+    current_user: Annotated[
+            AuthenticatedUser, 
+            Security(get_authenticated_user, scopes=["statements/read/mine"])
+        ],
     ###
     # Query string parameters defined by the LRS specification
     ###
@@ -462,7 +465,7 @@ async def put(
 @router.post("", responses=POST_PUT_RESPONSES)
 async def post(
     current_user: Annotated[
-        AuthenticatedUser, Security(authenticate_user, scopes=["statements/write"])
+        AuthenticatedUser, Security(get_authenticated_user, scopes=["statements/write"])
     ],
     statements: Union[LaxStatement, List[LaxStatement]],
     background_tasks: BackgroundTasks,
