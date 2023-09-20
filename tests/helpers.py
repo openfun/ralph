@@ -2,6 +2,7 @@
 import datetime
 import hashlib
 import uuid
+from typing import Optional
 
 from ralph.utils import statements_are_equivalent
 
@@ -54,7 +55,7 @@ def assert_statement_get_responses_are_equivalent(response_1: dict, response_2: 
 def create_mock_activity(id_: int = 0):
     """Create distinct activites with valid IRIs.
 
-    args:
+    Args:
         id_: An integer used to uniquely identify the created agent.
 
     """
@@ -67,20 +68,22 @@ def create_mock_activity(id_: int = 0):
 def create_mock_agent(
     ifi: str,
     id_: int,
-    home_page_id=None,
-    name: str = None,
+    home_page_id: Optional[int] = None,
+    name: Optional[str] = None,
     use_object_type: bool = True,
 ):
     """Create distinct mock agents with a given Inverse Functional Identifier.
 
-    args:
+    Args:
         ifi: Inverse Functional Identifier. Possible values are:
             'mbox', 'mbox_sha1sum', 'openid' and 'account'.
         id_: An integer used to uniquely identify the created agent.
-            If ifi=="account", agent equality requires same (id_, home_page_id)
-        home_page (optional): The value of homePage, if ifi=="account"
-        name (optional): name of the agent (NB: do not confuse with account.name
-            with ifi=="account", or "username", as used in credentials)
+            If ifi=="account", agent equality requires same (id_, home_page_id).
+        home_page_id: The value of homePage, if ifi=="account".
+        name: Name of the agent (NB: do not confuse with account.name
+            with ifi=="account", or "username", as used in credentials).
+        use_object_type: Whether or not to create an `objectType` field with
+            the value "Agent".
     """
     agent = {}
 

@@ -142,11 +142,13 @@ async def get(
     ###
     # Query string parameters defined by the LRS specification
     ###
-    # pylint: disable=invalid-name
-    statementId: Optional[str] = Query(None, description="Id of Statement to fetch"),
-    # pylint: disable=invalid-name, unused-argument
-    voidedStatementId: Optional[str] = Query(
-        None, description="**Not implemented** Id of voided Statement to fetch"
+    statement_id: Optional[str] = Query(
+        None, description="Id of Statement to fetch", alias="statementId"
+    ),
+    voided_statement_id: Optional[str] = Query(
+        None,
+        description="**Not implemented** Id of voided Statement to fetch",
+        alias="voidedStatementId",
     ),
     agent: Optional[Json] = Query(
         None,
@@ -285,8 +287,8 @@ async def get(
     # Make sure the limit does not go above max from settings
     limit = min(limit, settings.RUNSERVER_MAX_SEARCH_HITS_COUNT)
 
-    # 400 Bad Request for requests using both `statementId` and `voidedStatementId`
-    if (statementId is not None) and (voidedStatementId is not None):
+    # 400 Bad Request for requests using both `statement_id` and `voided_statement_id`
+    if (statement_id is not None) and (voided_statement_id is not None):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=(
@@ -295,8 +297,8 @@ async def get(
             ),
         )
 
-    # 400 Bad Request for any request containing `statementId` or
-    # `voidedStatementId` and any other parameter besides `attachments` or `format`.
+    # 400 Bad Request for any request containing `statement_id` or
+    # `voided_statement_id` and any other parameter besides `attachments` or `format`.
     # NB: `limit` and `ascending` are not handled to simplify implementation, and as it
     # has no incidence on UX, when fetching a single statement
     excluded_params = [
@@ -310,7 +312,7 @@ async def get(
         until,
     ]
     # NB: bool(param) relies on all defaults being None, 0, or False
-    if (statementId or voidedStatementId) and any(
+    if (statement_id or voided_statement_id) and any(
         bool(param) for param in excluded_params
     ):
         raise HTTPException(
@@ -330,14 +332,13 @@ async def get(
             json.loads(query_params["agent"])
         )
 
-    if not mine:
-        if settings.LRS_RESTRICT_BY_AUTHORITY:
-            # If using scopes, only restrict results when appropriate
-            if settings.LRS_RESTRICT_BY_SCOPES:
-                raise NotImplementedError("Scopes are not yet implemented in Ralph.")
+    if settings.LRS_RESTRICT_BY_AUTHORITY:
+        # If using scopes, only restrict results when appropriate
+        if settings.LRS_RESTRICT_BY_SCOPES:
+            raise NotImplementedError("Scopes are not yet implemented in Ralph.")
 
-            # Otherwise, enforce mine for all users
-            mine = True
+        # Otherwise, enforce mine for all users
+        mine = True
 
     if mine:
         query_params["authority"] = _parse_agent_parameters(current_user.agent)
@@ -395,10 +396,9 @@ async def get(
 # pylint: disable=unused-argument
 async def put(
     current_user: Annotated[AuthenticatedUser, Depends(get_authenticated_user)],
-    # pylint: disable=invalid-name
-    statementId: UUID,
     statement: LaxStatement,
     background_tasks: BackgroundTasks,
+    statement_id: UUID = Query(alias="statementId"),
     _=Depends(strict_query_params),
 ):
     """Store a single statement as a single member of a set.
@@ -407,10 +407,10 @@ async def put(
     https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#211-put-statements
     """
     statement_as_dict = statement.dict(exclude_unset=True)
-    statementId = str(statementId)
+    statement_id = str(statement_id)
 
-    statement_as_dict.update(id=str(statement_as_dict.get("id", statementId)))
-    if statementId != statement_as_dict["id"]:
+    statement_as_dict.update(id=str(statement_as_dict.get("id", statement_id)))
+    if statement_id != statement_as_dict["id"]:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="xAPI statement id does not match given statementId",
@@ -429,7 +429,7 @@ async def put(
     _enrich_statement_with_authority(statement_as_dict, current_user)
 
     try:
-        existing_statement = DATABASE_CLIENT.query_statements_by_ids([statementId])
+        existing_statement = DATABASE_CLIENT.query_statements_by_ids([statement_id])
     except BackendException as error:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
