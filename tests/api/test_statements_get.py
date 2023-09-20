@@ -765,6 +765,7 @@ def test_api_statements_get_statements_scopes(monkeypatch, fs, es, auth_method, 
         credentials = create_mock_basic_auth_user(fs, username, password, scopes, agent)
         headers = {"Authorization": f"Basic {credentials}"}
 
+        client = basic_auth_test_client
         #get_basic_user.cache_clear()
 
     elif auth_method == "oidc":
@@ -773,6 +774,7 @@ def test_api_statements_get_statements_scopes(monkeypatch, fs, es, auth_method, 
         oidc_token = create_mock_oidc_user(sub=sub, scopes=scopes)
         headers = {"Authorization": f"Bearer {oidc_token}"}
 
+        client = oidc_auth_test_client
         #get_oidc_user.cache_clear()
 
 

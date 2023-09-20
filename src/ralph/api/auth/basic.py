@@ -128,7 +128,7 @@ def get_authenticated_user(
         logger.error("The basic authentication mode requires a Basic Auth header")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
+            detail="Could not validate credentials BASIC",
             headers={"WWW-Authenticate": "Basic"},
         )
 

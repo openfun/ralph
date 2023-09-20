@@ -65,7 +65,7 @@ def discover_provider(base_url: AnyUrl) -> dict:
         )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
+            detail="Could not validate credentials habiba",
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
 
@@ -87,7 +87,7 @@ def get_public_keys(jwks_uri: AnyUrl) -> dict:
         )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
+            detail="Could not validate credentials BQSDB",
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
 
@@ -111,7 +111,7 @@ def get_authenticated_user(
         logger.error("The OpenID Connect authentication mode requires a Bearer token")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
+            detail="Could not validate credentials}" + f"{auth_header}",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -137,7 +137,7 @@ def get_authenticated_user(
         logger.error("Unable to decode the ID token: %s", exc)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
+            detail="Could not validate credentials TMPPPPP",
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
 
