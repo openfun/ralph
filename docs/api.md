@@ -20,12 +20,10 @@ The API server can be started up with the following command:
 $ ralph runserver --backend es
 ```
 
-The `--backend` (or `-b`) option specifies which database backend to use for
-LRS data storage and retrieval. See Ralph's [backends
+The `--backend` (or `-b`) option specifies which database backend to use for LRS data storage and retrieval. See Ralph's [backends
 documentation](./backends.md) for more details.
 
-However, before you can start your API server and make requests against it, you
-need to set up your credentials.
+However, before you can start your API server and make requests against it, you need to set up your credentials.
 
 #### Creating a credentials file
 
@@ -85,9 +83,6 @@ This command updates your credentials file with the new `janedoe` user.
 > optional dependencies, _e.g._ `pip install ralph-malph[cli]` (which we highly
 > recommend).
 
-#### Scopes
-
-(Work In Progress)
 
 #### Making a GET request
 
@@ -132,10 +127,6 @@ OIDC support is currently developed and tested against [Keycloak](https://www.ke
 
 The [Learning analytics playground](https://github.com/openfun/learning-analytics-playground/) repository contains a Docker Compose file and configuration for a demo instance of Keycloak with a `ralph` client.
 
-#### Scopes
-
-(Work In Progress)
-
 #### Making a GET request
 
 The first request that can be answered by the ralph API server is a `whoami` request, which checks if the user is authenticated and returns their username and permission scopes.
@@ -144,7 +135,7 @@ Use curl to get `http://localhost:8100/whoami`:
 
 ```bash
 $ curl http://localhost:8100/whoami
-< HTTP/1.1" 401 Unauthorized
+< HTTP/1.1 401 Unauthorized
 < {"detail":"Could not validate credentials"}
 ```
 With the Keycloak instance running, use curl to get access token from Keycloak:
@@ -180,6 +171,26 @@ $ curl http://localhost:8100/whoami --header "Authorization: Bearer eyJhbGciOiJS
 < HTTP/1.1 200 OK
 < {"username":"ralph_admin","scopes":["all"]}
 ```
+
+## Security
+
+By default, all authenticated users have full read and write access to the server. You may use the options below to restrict behavior.
+
+### Filtering results by authority (multitenancy)
+
+In Ralph, all incoming statements are assigned an `authority` (or ownership) derived from the user that makes the call. You may restrict read access to users "own" statements (thus enabling multitenancy) by setting the following environment variable: 
+
+```
+RALPH_LRS_RESTRICT_BY_AUTHORITY = True # Default: False
+```
+
+**WARNING**: Two accounts with different credentials may share the same `authority` meaning they can access the same statements. It is the administrators responsability to ensure that `authority` is properly assigned.
+
+NB: If not using "scopes", or for users with limited "scopes", using this option will make the use of option `?mine=True` implicit when fetching statement.
+
+#### Scopes
+
+(Work In Progress)
 
 ## Forwarding statements
 

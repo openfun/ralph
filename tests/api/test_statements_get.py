@@ -1,7 +1,5 @@
 """Tests for the GET statements endpoint of the Ralph API."""
 
-
-import hashlib
 import json
 from datetime import datetime, timedelta
 from urllib.parse import parse_qs, quote_plus, urlparse
@@ -30,6 +28,7 @@ from tests.fixtures.backends import (
 )
 
 from ..fixtures.auth import create_user
+from ..helpers import create_mock_activity, create_mock_agent
 
 client = TestClient(app)
 
@@ -70,81 +69,12 @@ def insert_clickhouse_statements(statements):
     assert success == len(statements)
 
 
-def create_mock_activity(id_: int = 0):
-    """Create distinct activities with valid IRIs.
-
-    args:
-        id_: An integer used to uniquely identify the created agent.
-
-    """
-    return {
-        "objectType": "Activity",
-        "id": f"http://example.com/activity_{id_}",
-    }
-
-
-def create_mock_agent(
-    ifi: str,
-    id_: int,
-    home_page_id=None,
-    name: str = None,
-    use_object_type: bool = True,
-):
-    """Create distinct mock agents with a given Inverse Functional Identifier.
-
-    args:
-        ifi: Inverse Functional Identifier. Possible values are:
-            'mbox', 'mbox_sha1sum', 'openid' and 'account'.
-        id_: An integer used to uniquely identify the created agent.
-            If ifi=="account", agent equality requires same (id_, home_page_id)
-        home_page (optional): The value of homePage, if ifi=="account"
-        name (optional): name of the agent (NB: do not confuse with account.name
-            with ifi=="account", or "username", as used in credentials)
-    """
-    agent = {}
-
-    if use_object_type:
-        agent["objectType"] = "Agent"
-
-    if name is not None:
-        agent["name"] = name
-
-    # Add IFI fields
-    if ifi == "mbox":
-        agent["mbox"] = f"mailto:user_{id_}@testmail.com"
-        return agent
-
-    if ifi == "mbox_sha1sum":
-        hash_object = hashlib.sha1(f"mailto:user_{id_}@testmail.com".encode("utf-8"))
-        mail_hash = hash_object.hexdigest()
-        agent["mbox_sha1sum"] = mail_hash
-        return agent
-
-    if ifi == "openid":
-        agent["openid"] = f"http://user_{id_}.openid.exmpl.org"
-        return agent
-
-    if ifi == "account":
-        if home_page_id is None:
-            raise ValueError(
-                "home_page_id must be defined if using create_mock_agent if "
-                "using ifi=='account'"
-            )
-        agent["account"] = {
-            "homePage": f"http://example_{home_page_id}.com",
-            "name": f"username_{id_}",
-        }
-        return agent
-
-    raise ValueError("No valid ifi was provided to create_mock_agent")
-
-
 @pytest.fixture(params=["es", "mongo", "clickhouse"])
 # pylint: disable=unused-argument
 def insert_statements_and_monkeypatch_backend(
     request, es, mongo, clickhouse, monkeypatch
 ):
-    """Return a function that inserts statements into each backend."""
+    """(Security) Return a function that inserts statements into each backend."""
     # pylint: disable=invalid-name
 
     def _insert_statements_and_monkeypatch_backend(statements):
@@ -177,10 +107,10 @@ def insert_statements_and_monkeypatch_backend(
     ],
 )
 def test_api_statements_get_statements_mine(
-    fs, insert_statements_and_monkeypatch_backend, ifi
+    monkeypatch, fs, insert_statements_and_monkeypatch_backend, ifi
 ):
-    """Test the get statements API route, given a "mine=True" query parameter, should
-    return a list of statements filtered by authority.
+    """(Security) Test that the get statements API route, given a "mine=True"
+    query parameter returns a list of statements filtered by authority.
     """
     # pylint: disable=redefined-outer-name
     # pylint: disable=invalid-name
@@ -205,7 +135,7 @@ def test_api_statements_get_statements_mine(
 
     username_1 = "jane"
     password_1 = "janepwd"
-    scopes = ["all"]
+    scopes = []
 
     credentials_1_bis = create_user(fs, username_1, password_1, scopes, agent_1_bis)
 
@@ -228,7 +158,7 @@ def test_api_statements_get_statements_mine(
     ]
     insert_statements_and_monkeypatch_backend(statements)
 
-    # No restriction on "mine" (implicit)
+    # No restriction on "mine" (implicit) : Return all statements
     response = client.get(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {credentials_1_bis}"},
@@ -236,7 +166,7 @@ def test_api_statements_get_statements_mine(
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[1], statements[0]]}
 
-    # No restriction on "mine" (explicit)
+    # No restriction on "mine" (explicit) : Return all statements
     response = client.get(
         "/xAPI/statements/?mine=False",
         headers={"Authorization": f"Basic {credentials_1_bis}"},
@@ -244,13 +174,42 @@ def test_api_statements_get_statements_mine(
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[1], statements[0]]}
 
-    # Only fetch mine (mandatory explicit)
+    # Only fetch mine (explicit) : Return filtered statements
     response = client.get(
         "/xAPI/statements/?mine=True",
         headers={"Authorization": f"Basic {credentials_1_bis}"},
     )
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[0]]}
+
+    # Only fetch mine (implicit with RALPH_LRS_RESTRICT_BY_AUTHORITY=True): Return
+    # filtered statements
+    monkeypatch.setattr(
+        "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_AUTHORITY", True
+    )
+    response = client.get(
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {credentials_1_bis}"},
+    )
+    assert response.status_code == 200
+    assert response.json() == {"statements": [statements[0]]}
+
+    # Only fetch mine (implicit) with contradictory user request: Return filtered
+    # statements
+    response = client.get(
+        "/xAPI/statements/?mine=False",
+        headers={"Authorization": f"Basic {credentials_1_bis}"},
+    )
+    assert response.status_code == 200
+    assert response.json() == {"statements": [statements[0]]}
+
+    # Fetch "mine" by id with a single forbidden statement : Return empty list
+    response = client.get(
+        f"/xAPI/statements/?statementId={statements[1]['id']}&mine=True",
+        headers={"Authorization": f"Basic {credentials_1_bis}"},
+    )
+    assert response.status_code == 200
+    assert response.json() == {"statements": []}
 
     # Check that invalid parameters returns an error
     response = client.get(

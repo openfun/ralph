@@ -1,6 +1,8 @@
 """Utilities for testing Ralph."""
 import datetime
+import hashlib
 import uuid
+from typing import Optional
 
 from ralph.utils import statements_are_equivalent
 
@@ -48,3 +50,74 @@ def assert_statement_get_responses_are_equivalent(response_1: dict, response_2: 
         assert statements_are_equivalent(
             statement_1, statement_2
         ), "Statements in get responses are not equivalent, or not in the same order."
+
+
+def create_mock_activity(id_: int = 0):
+    """Create distinct activites with valid IRIs.
+
+    Args:
+        id_: An integer used to uniquely identify the created agent.
+
+    """
+    return {
+        "objectType": "Activity",
+        "id": f"http://example.com/activity_{id_}",
+    }
+
+
+def create_mock_agent(
+    ifi: str,
+    id_: int,
+    home_page_id: Optional[int] = None,
+    name: Optional[str] = None,
+    use_object_type: bool = True,
+):
+    """Create distinct mock agents with a given Inverse Functional Identifier.
+
+    Args:
+        ifi: Inverse Functional Identifier. Possible values are:
+            'mbox', 'mbox_sha1sum', 'openid' and 'account'.
+        id_: An integer used to uniquely identify the created agent.
+            If ifi=="account", agent equality requires same (id_, home_page_id).
+        home_page_id: The value of homePage, if ifi=="account".
+        name: Name of the agent (NB: do not confuse with account.name
+            with ifi=="account", or "username", as used in credentials).
+        use_object_type: Whether or not to create an `objectType` field with
+            the value "Agent".
+    """
+    agent = {}
+
+    if use_object_type:
+        agent["objectType"] = "Agent"
+
+    if name is not None:
+        agent["name"] = name
+
+    # Add IFI fields
+    if ifi == "mbox":
+        agent["mbox"] = f"mailto:user_{id_}@testmail.com"
+        return agent
+
+    if ifi == "mbox_sha1sum":
+        hash_object = hashlib.sha1(f"mailto:user_{id_}@testmail.com".encode("utf-8"))
+        mail_hash = hash_object.hexdigest()
+        agent["mbox_sha1sum"] = mail_hash
+        return agent
+
+    if ifi == "openid":
+        agent["openid"] = f"http://user_{id_}.openid.exmpl.org"
+        return agent
+
+    if ifi == "account":
+        if home_page_id is None:
+            raise ValueError(
+                "home_page_id must be defined if using create_mock_agent if "
+                "using ifi=='account'"
+            )
+        agent["account"] = {
+            "homePage": f"http://example_{home_page_id}.com",
+            "name": f"username_{id_}",
+        }
+        return agent
+
+    raise ValueError("No valid ifi was provided to create_mock_agent")

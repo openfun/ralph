@@ -19,7 +19,7 @@ and this project adheres to
 - Refactor LRS Statements resource query parameters defined for `ralph` API
 - Helm chart: improve chart modularity
 - User credentials must now include an "agent" field which can be created
-using the cli
+  using the cli
 - `GET /statements` now has "mine" option which matches statements that
 have an authority field matching that of the user
 - CLI: change `push` to `write` and `fetch` to `read` [BC]
@@ -38,6 +38,8 @@ have an authority field matching that of the user
   and `authority`
 - Backends: update `statementId` and `voidedStatementId` to snake_case,
   with camelCase alias, in `LRSStatementsQuery`
+- API: Add `RALPH_LRS_RESTRICT_BY_AUTHORITY` option making `?mine=True` 
+  implicit
 
 ### Removed
 
