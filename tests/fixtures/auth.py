@@ -2,6 +2,7 @@
 import base64
 import json
 import os
+import responses
 
 import bcrypt
 import pytest
@@ -12,6 +13,7 @@ from jose.utils import long_to_base64
 
 from ralph.api import app, get_authenticated_user
 from ralph.api.auth.basic import get_stored_credentials
+from ralph.api.auth.oidc import discover_provider, get_public_keys
 from ralph.conf import settings
 
 from . import private_key, public_key
@@ -22,7 +24,7 @@ ISSUER_URI = "http://providerHost:8080/auth/realms/real_name"
 PUBLIC_KEY_ID = "example-key-id"
 
 
-def create_basic_user(
+def create_mock_basic_auth_user(
     fs_,
     username: str,
     password: str,
@@ -69,9 +71,6 @@ def create_basic_user(
     return credentials
 
 
-def create_user():
-    create_basic_user()
-
 
 # pylint: disable=invalid-name
 @pytest.fixture
@@ -95,10 +94,9 @@ def basic_auth_credentials(fs, user_scopes=None, agent=None):
     if agent is None:
         agent = {"mbox": "mailto:test_ralph@example.com"}
 
-    credentials = create_user(fs, username, password, user_scopes, agent)
+    credentials = create_mock_basic_auth_user(fs, username, password, user_scopes, agent)
 
     return credentials
-
 
 @pytest.fixture
 def basic_auth_test_client():
@@ -132,9 +130,7 @@ def oidc_auth_test_client(monkeypatch):
     with TestClient(app) as test_client:
         yield test_client
 
-
-@pytest.fixture
-def mock_discovery_response():
+def _mock_discovery_response():
     """Return an example discovery response."""
     return {
         "issuer": "http://providerHost",
@@ -222,6 +218,10 @@ def mock_discovery_response():
         ],
     }
 
+@pytest.fixture
+def mock_discovery_response():
+    return _mock_discovery_response()
+
 
 def get_jwk(pub_key):
     """Return a JWK representation of the public key."""
@@ -236,16 +236,17 @@ def get_jwk(pub_key):
         "e": long_to_base64(public_numbers.e).decode("ASCII"),
     }
 
+def _mock_oidc_jwks():
+    """Mock OpenID Connect keys."""
+    return {"keys": [get_jwk(public_key)]}
 
 @pytest.fixture
 def mock_oidc_jwks():
     """Mock OpenID Connect keys."""
-    return {"keys": [get_jwk(public_key)]}
+    return _mock_oidc_jwks()
 
 
-@pytest.fixture
-def encoded_token(sub="123|oidc", scopes=["all", "statements/read"]):
-    """Encode token with the private key."""
+def _create_oidc_token(sub, scopes):
     return jwt.encode(
         claims={
             "sub": sub,
@@ -265,3 +266,32 @@ def encoded_token(sub="123|oidc", scopes=["all", "statements/read"]):
             "kid": PUBLIC_KEY_ID,
         },
     )
+
+def create_mock_oidc_user(sub="123|oidc", scopes=["all", "statements/read"]):
+    # Clear LRU cache
+    discover_provider.cache_clear()
+    get_public_keys.cache_clear()
+
+    # Mock request to get provider configuration
+    responses.add(
+        responses.GET,
+        f"{ISSUER_URI}/.well-known/openid-configuration",
+        json=_mock_discovery_response(),
+        status=200,
+    )
+
+    # Mock request to get keys
+    responses.add(
+        responses.GET,
+        _mock_discovery_response()["jwks_uri"],
+        json=_mock_oidc_jwks(),
+        status=200,
+    )
+
+    oidc_token = _create_oidc_token(sub=sub, scopes=scopes)
+    return oidc_token
+
+@pytest.fixture
+def encoded_token():
+    """Encode token with the private key."""
+    return _create_oidc_token(sub="123|oidc", scopes=["all", "statements/read"])
