@@ -41,6 +41,11 @@ have an authority field matching that of the user
 - API: Add `RALPH_LRS_RESTRICT_BY_AUTHORITY` option making `?mine=True` 
   implicit
 
+### Fixed
+
+- API: Fix a typo ('attachements' -> 'attachments') to ensure compliance with
+    the LRS specification and prevent potential silent bugs.
+
 ### Removed
 
 - `name` field in `VideoActivity` xAPI model mistakenly used in `video` profile

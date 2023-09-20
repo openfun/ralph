@@ -131,7 +131,7 @@ def statements_are_equivalent(statement_1: dict, statement_2: dict):
     they may still be equivalent.
     """
     # Check that unmutable fields have the same values
-    fields = ["actor", "verb", "object", "id", "result", "context", "attachements"]
+    fields = ["actor", "verb", "object", "id", "result", "context", "attachments"]
 
     # Check that some fields enriched by the LRS are equal when in both statements
     # The LRS specification excludes the fields below from equivalency. It was
