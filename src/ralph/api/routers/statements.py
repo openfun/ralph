@@ -328,6 +328,14 @@ async def get(
             json.loads(query_params["agent"])
         )
 
+    if settings.LRS_RESTRICT_BY_AUTHORITY:
+        # If using scopes, only restrict results when appropriate
+        if settings.LRS_RESTRICT_BY_SCOPES:
+            raise NotImplementedError("Scopes are not yet implemented in Ralph.")
+
+        # Otherwise, enforce mine for all users
+        mine = True
+
     if mine:
         query_params["authority"] = _parse_agent_parameters(current_user.agent)
 

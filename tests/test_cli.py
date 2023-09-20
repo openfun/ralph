@@ -255,15 +255,15 @@ def _ifi_value_from_command(ifi_value, ifi_type):
 @pytest.mark.parametrize(
     "scopes,ifi_command,ifi_value",
     [
-        (["foo_scope"], "-M", "mailto:foo@bar.com"),  # mbox ifi
-        (["foo_scope", "admin_scope"], "-M", "mailto:foo@bar.com"),
+        (["all"], "-M", "mailto:foo@bar.com"),  # mbox ifi
+        (["all/read", "all"], "-M", "mailto:foo@bar.com"),
         (
-            ["foo_scope"],
+            ["all"],
             "-S",
             "ebd31e95054c018b10727ccffd2ef2ec3a016ee9",
         ),  # mbox_sha1sum ifi
-        (["foo_scope"], "-O", "http://foo.openid.example.org/"),  # mbox_openid ifi
-        (["foo_scope"], "-A", "foo_name http://www.bar.xyz"),  # account ifi
+        (["all"], "-O", "http://foo.openid.example.org/"),  # mbox_openid ifi
+        (["all"], "-A", "foo_name http://www.bar.xyz"),  # account ifi
     ],
 )
 def test_cli_auth_command_without_writing_auth_file(scopes, ifi_command, ifi_value):
@@ -344,7 +344,7 @@ def test_cli_auth_command_when_writing_auth_file(
 
     username_1 = "foo"
     password_1 = "bar"
-    scopes_1 = ["tele_scope"]
+    scopes_1 = ["all"]
 
     # The authentication file does not exist
 
@@ -375,7 +375,7 @@ def test_cli_auth_command_when_writing_auth_file(
     # Add a second user
     username_2 = "lol"
     password_2 = "baz"
-    scopes_2 = ["steto_scope", "peri_scope"]
+    scopes_2 = ["statements/write", "statements/read/mine"]
 
     cli_args = _gen_cli_auth_args(
         username_2, password_2, scopes_2, ifi_command_2, ifi_value_2, write=True

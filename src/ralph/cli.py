@@ -181,7 +181,13 @@ class JSONStringParamType(click.ParamType):
 )
 @click.version_option(version=ralph_version)
 def cli(verbosity=None):
-    """Ralph is a stream-based tool to play with your logs."""
+    """The cli is a stream-based tool to play with your logs.
+
+    It offers functionalities to:
+    - Validate or convert learning data in different standards
+    - Read and write learning data to various databases or servers
+    - Manage an instance of a Ralph LRS server
+    """
     configure_logging()
     if verbosity is not None:
         level = getattr(logging, verbosity, None)

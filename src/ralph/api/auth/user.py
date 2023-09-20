@@ -1,8 +1,21 @@
 """Authenticated user for the Ralph API."""
 
-from typing import Dict, List
+from typing import Dict, List, Literal
 
 from pydantic import BaseModel
+
+Scope = Literal[
+    "statements/write",
+    "statements/read/mine",
+    "statements/read",
+    "state/write",
+    "state/read",
+    "define",
+    "profile/write",
+    "profile/read",
+    "all/read",
+    "all",
+]
 
 
 class AuthenticatedUser(BaseModel):
@@ -14,4 +27,4 @@ class AuthenticatedUser(BaseModel):
     """
 
     agent: Dict
-    scopes: List[str]
+    scopes: List[Scope]
