@@ -71,7 +71,6 @@ def _enrich_statement_with_id(statement: dict):
     # id: Statement UUID identifier.
     # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#24-statement-properties
     statement["id"] = str(statement.get("id", uuid4()))
-    return statement["id"]
 
 
 def _enrich_statement_with_stored(statement: dict):
@@ -480,31 +479,28 @@ async def post(
     # Enrich statements before forwarding
     statements_dict = {}
     for statement in map(lambda x: x.dict(exclude_unset=True), statements):
-        statement_id = _enrich_statement_with_id(statement)
+        _enrich_statement_with_id(statement)
+        # Requests with duplicate statement IDs are considered invalid
+        if statement["id"] in statements_dict:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Duplicate statement IDs in the list of statements",
+            )
         _enrich_statement_with_stored(statement)
         _enrich_statement_with_timestamp(statement)
-        statements_dict[statement_id] = statement
+        _enrich_statement_with_authority(statement, current_user)
+        statements_dict[statement["id"]] = statement
 
-    # Requests with duplicate statement IDs are considered invalid
-    # statements_ids were deduplicated by the dict, statements list was not
-    statements_ids = list(statements_dict.keys())
-    if len(statements) != len(statements_ids):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Duplicate statement IDs in the list of statements",
-        )
-
+    # Forward statements
     if get_active_xapi_forwardings():
         background_tasks.add_task(
             forward_xapi_statements, list(statements_dict.values()), method="post"
         )
 
-    # Finish enriching statements after forwarding
-    for statement in statements_dict.values():
-        _enrich_statement_with_authority(statement, current_user)
-
     try:
-        existing_statements = DATABASE_CLIENT.query_statements_by_ids(statements_ids)
+        existing_statements = DATABASE_CLIENT.query_statements_by_ids(
+            list(statements_dict)
+        )
     except BackendException as error:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -517,10 +513,9 @@ async def post(
     # were skipped for being duplicates.
     # See: https://github.com/openfun/ralph/issues/345
     if existing_statements:
-        existing_ids = []
+        existing_ids = set()
         for existing in existing_statements:
-            existing_ids.append(existing["_id"])
-
+            existing_ids.add(existing["_id"])
             # The LRS specification calls for deep comparison of duplicates. This
             # is done here. If they are not exactly the same, we raise an error.
             if not statements_are_equivalent(
@@ -532,16 +527,15 @@ async def post(
                     f"{existing['_id']}",
                 )
 
-        # Overwrite our statements and ids with the deduplicated ones.
-        statements_ids = [id for id in statements_ids if id not in existing_ids]
-
+        # Filter existing statements from the incoming statements
         statements_dict = {
             key: value
             for key, value in statements_dict.items()
-            if key in statements_ids
+            if key not in existing_ids
         }
 
-        if not statements_ids:
+        # Return if all incoming statements already exist
+        if not statements_dict:
             response.status_code = status.HTTP_204_NO_CONTENT
             return
 
@@ -559,4 +553,5 @@ async def post(
 
     logger.info("Indexed %d statements with success", success_count)
 
-    return statements_ids
+    # Returns the list of IDs in the same order they were stored
+    return list(statements_dict)
