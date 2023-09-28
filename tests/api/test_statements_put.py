@@ -95,7 +95,8 @@ def test_api_statements_put_single_statement_directly(
     es.indices.refresh()
 
     response = client.get(
-        "/xAPI/statements/", headers={"Authorization": f"Basic {basic_auth_credentials}"}
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
     assert response.status_code == 200
     assert_statement_get_responses_are_equivalent(
@@ -136,7 +137,8 @@ def test_api_statements_put_enriching_without_existing_values(
     es.indices.refresh()
 
     response = client.get(
-        "/xAPI/statements/", headers={"Authorization": f"Basic {basic_auth_credentials}"}
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
 
     statement = response.json()["statements"][0]
@@ -203,7 +205,8 @@ def test_api_statements_put_enriching_with_existing_values(
     if status == 204:
         es.indices.refresh()
         response = client.get(
-            "/xAPI/statements/", headers={"Authorization": f"Basic {basic_auth_credentials}"}
+            "/xAPI/statements/",
+            headers={"Authorization": f"Basic {basic_auth_credentials}"},
         )
         statement = response.json()["statements"][0]
 

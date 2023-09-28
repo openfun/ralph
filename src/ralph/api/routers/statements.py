@@ -136,9 +136,9 @@ def strict_query_params(request: Request):
 async def get(
     request: Request,
     current_user: Annotated[
-            AuthenticatedUser, 
-            Security(get_authenticated_user, scopes=["statements/read/mine"])
-        ],
+        AuthenticatedUser,
+        Security(get_authenticated_user, scopes=["statements/read/mine"]),
+    ],
     ###
     # Query string parameters defined by the LRS specification
     ###

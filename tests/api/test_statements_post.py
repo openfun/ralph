@@ -102,7 +102,8 @@ def test_api_statements_post_single_statement_directly(
     es.indices.refresh()
 
     response = client.get(
-        "/xAPI/statements/", headers={"Authorization": f"Basic {basic_auth_credentials}"}
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
     assert response.status_code == 200
     assert_statement_get_responses_are_equivalent(
@@ -143,7 +144,8 @@ def test_api_statements_post_enriching_without_existing_values(
     es.indices.refresh()
 
     response = client.get(
-        "/xAPI/statements/", headers={"Authorization": f"Basic {basic_auth_credentials}"}
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
 
     statement = response.json()["statements"][0]
@@ -210,7 +212,8 @@ def test_api_statements_post_enriching_with_existing_values(
     if status == 200:
         es.indices.refresh()
         response = client.get(
-            "/xAPI/statements/", headers={"Authorization": f"Basic {basic_auth_credentials}"}
+            "/xAPI/statements/",
+            headers={"Authorization": f"Basic {basic_auth_credentials}"},
         )
         statement = response.json()["statements"][0]
 
@@ -297,7 +300,8 @@ def test_api_statements_post_list_of_one(
     es.indices.refresh()
 
     response = client.get(
-        "/xAPI/statements/", headers={"Authorization": f"Basic {basic_auth_credentials}"}
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
     assert response.status_code == 200
     assert_statement_get_responses_are_equivalent(
@@ -360,7 +364,8 @@ def test_api_statements_post_list(
     es.indices.refresh()
 
     get_response = client.get(
-        "/xAPI/statements/", headers={"Authorization": f"Basic {basic_auth_credentials}"}
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
     assert get_response.status_code == 200
 
@@ -415,7 +420,8 @@ def test_api_statements_post_list_with_duplicates(
     # The failure should imply no statement insertion.
     es_data_stream.indices.refresh()
     response = client.get(
-        "/xAPI/statements/", headers={"Authorization": f"Basic {basic_auth_credentials}"}
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
     assert response.status_code == 200
     assert response.json() == {"statements": []}
@@ -487,7 +493,8 @@ def test_api_statements_post_list_with_duplicate_of_existing_statement(
     }
 
     response = client.get(
-        "/xAPI/statements/", headers={"Authorization": f"Basic {basic_auth_credentials}"}
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
     assert response.status_code == 200
     assert_statement_get_responses_are_equivalent(

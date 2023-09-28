@@ -6,11 +6,10 @@ from typing import Annotated, Optional, Union
 
 import requests
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OpenIdConnect, HTTPBearer, SecurityScopes
+from fastapi.security import HTTPBearer, OpenIdConnect, SecurityScopes
 from jose import ExpiredSignatureError, JWTError, jwt
 from jose.exceptions import JWTClaimsError
 from pydantic import AnyUrl, BaseModel, Extra
-
 
 from ralph.api.auth.user import AuthenticatedUser, UserScopes
 from ralph.conf import settings
@@ -66,7 +65,7 @@ def discover_provider(base_url: AnyUrl) -> dict:
         )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials habiba",
+            detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
 
@@ -88,15 +87,15 @@ def get_public_keys(jwks_uri: AnyUrl) -> dict:
         )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials BQSDB",
+            detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
 
 
 def get_scoped_authenticated_user(
-        security_scopes: SecurityScopes,
-        auth_header: Optional[HTTPBearer] = Depends(oauth2_scheme)
-    ):
+    security_scopes: SecurityScopes,
+    auth_header: Optional[HTTPBearer] = Depends(oauth2_scheme),
+):
     user = get_authenticated_user(auth_header)
 
     # Restrict access by scopes
@@ -110,6 +109,7 @@ def get_scoped_authenticated_user(
                     headers={"WWW-Authenticate": "Basic"},
                 )
     return user
+
 
 def get_authenticated_user(
     auth_header: Annotated[Optional[str], Depends(oauth2_scheme)]
@@ -131,7 +131,7 @@ def get_authenticated_user(
         logger.error("The OpenID Connect authentication mode requires a Bearer token")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials}" + f"{auth_header}",
+            detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -157,7 +157,7 @@ def get_authenticated_user(
         logger.error("Unable to decode the ID token: %s", exc)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials TMPPPPP",
+            detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
 

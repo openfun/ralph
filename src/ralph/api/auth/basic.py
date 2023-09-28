@@ -98,21 +98,22 @@ def get_stored_credentials(auth_file: Path) -> ServerUsersCredentials:
         raise AuthenticationError(msg.format(auth_file))
     return ServerUsersCredentials.parse_file(auth_file)
 
+
 @cached(
     TTLCache(maxsize=settings.AUTH_CACHE_MAX_SIZE, ttl=settings.AUTH_CACHE_TTL),
     lock=Lock(),
     key=lambda security_scopes, credentials: (
         credentials.username,
         credentials.password,
-        security_scopes
+        security_scopes,
     )
     if credentials is not None
     else None,
 )
 def get_scoped_authenticated_user(
-        security_scopes: SecurityScopes, 
-        credentials: Union[HTTPBasicCredentials, None] = Depends(security)
-    ):
+    security_scopes: SecurityScopes,
+    credentials: Union[HTTPBasicCredentials, None] = Depends(security),
+):
     user = get_authenticated_user(credentials)
 
     # Restrict access by scopes
@@ -147,7 +148,7 @@ def get_authenticated_user(
         logger.error("The basic authentication mode requires a Basic Auth header")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials BASIC",
+            detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Basic"},
         )
 
@@ -199,7 +200,7 @@ def get_authenticated_user(
             detail="Invalid authentication credentials",
             headers={"WWW-Authenticate": "Basic"},
         )
-    
+
     user = AuthenticatedUser(scopes=UserScopes(user.scopes), agent=user.agent)
 
     return user

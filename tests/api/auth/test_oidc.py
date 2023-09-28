@@ -4,13 +4,11 @@ import responses
 
 from ralph.api.auth.oidc import discover_provider, get_public_keys
 
-from tests.fixtures.auth import create_mock_oidc_user, ISSUER_URI
+from tests.fixtures.auth import ISSUER_URI, create_mock_oidc_user
 
 
 @responses.activate
-def test_api_auth_oidc_valid(
-    oidc_auth_test_client
-):
+def test_api_auth_oidc_valid(oidc_auth_test_client):
     """Test a valid OpenId Connect authentication."""
 
     oidc_token = create_mock_oidc_user(scopes=["all", "profile/read"])
@@ -107,9 +105,7 @@ def test_api_auth_invalid_keys(
 
 
 @responses.activate
-def test_api_auth_invalid_header(
-    oidc_auth_test_client
-):
+def test_api_auth_invalid_header(oidc_auth_test_client):
     """Test API with an invalid request header."""
 
     oidc_token = create_mock_oidc_user()

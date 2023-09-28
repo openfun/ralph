@@ -2,10 +2,10 @@
 import base64
 import json
 import os
-import responses
 
 import bcrypt
 import pytest
+import responses
 from cryptography.hazmat.primitives import serialization
 from fastapi.testclient import TestClient
 from jose import jwt
@@ -71,7 +71,6 @@ def create_mock_basic_auth_user(
     return credentials
 
 
-
 # pylint: disable=invalid-name
 @pytest.fixture
 def basic_auth_credentials(fs, user_scopes=None, agent=None):
@@ -94,9 +93,12 @@ def basic_auth_credentials(fs, user_scopes=None, agent=None):
     if agent is None:
         agent = {"mbox": "mailto:test_ralph@example.com"}
 
-    credentials = create_mock_basic_auth_user(fs, username, password, user_scopes, agent)
+    credentials = create_mock_basic_auth_user(
+        fs, username, password, user_scopes, agent
+    )
 
     return credentials
+
 
 @pytest.fixture
 def basic_auth_test_client():
@@ -129,6 +131,7 @@ def oidc_auth_test_client(monkeypatch):
     app.dependency_overrides[get_authenticated_user] = get_oidc
     with TestClient(app) as test_client:
         yield test_client
+
 
 def _mock_discovery_response():
     """Return an example discovery response."""
@@ -218,6 +221,7 @@ def _mock_discovery_response():
         ],
     }
 
+
 @pytest.fixture
 def mock_discovery_response():
     return _mock_discovery_response()
@@ -236,9 +240,11 @@ def get_jwk(pub_key):
         "e": long_to_base64(public_numbers.e).decode("ASCII"),
     }
 
+
 def _mock_oidc_jwks():
     """Mock OpenID Connect keys."""
     return {"keys": [get_jwk(public_key)]}
+
 
 @pytest.fixture
 def mock_oidc_jwks():
@@ -267,6 +273,7 @@ def _create_oidc_token(sub, scopes):
         },
     )
 
+
 def create_mock_oidc_user(sub="123|oidc", scopes=["all", "statements/read"]):
     # Clear LRU cache
     discover_provider.cache_clear()
@@ -290,6 +297,7 @@ def create_mock_oidc_user(sub="123|oidc", scopes=["all", "statements/read"]):
 
     oidc_token = _create_oidc_token(sub=sub, scopes=scopes)
     return oidc_token
+
 
 @pytest.fixture
 def encoded_token():

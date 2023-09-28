@@ -2,14 +2,15 @@
 
 import json
 from datetime import datetime, timedelta
-import responses
 from urllib.parse import parse_qs, quote_plus, urlparse
 
 import pytest
+import responses
 from elasticsearch.helpers import bulk
 from fastapi.testclient import TestClient
 
 from ralph.api import app
+from ralph.api.auth import get_authenticated_user
 from ralph.api.auth.basic import get_scoped_authenticated_user as get_basic_user
 from ralph.api.auth.oidc import get_scoped_authenticated_user as get_oidc_user
 from ralph.backends.database.clickhouse import ClickHouseDatabase
@@ -139,7 +140,9 @@ def test_api_statements_get_mine(
     password_1 = "janepwd"
     scopes = []
 
-    credentials_1_bis = create_mock_basic_auth_user(fs, username_1, password_1, scopes, agent_1_bis)
+    credentials_1_bis = create_mock_basic_auth_user(
+        fs, username_1, password_1, scopes, agent_1_bis
+    )
 
     # Clear cache before each test iteration
     get_basic_user.cache_clear()
@@ -535,7 +538,8 @@ def test_api_statements_get_with_pagination(
     # First response gets the first two results, with a "more" entry as
     # we have more results to return on a later page.
     first_response = client.get(
-        "/xAPI/statements/", headers={"Authorization": f"Basic {basic_auth_credentials}"}
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
     assert first_response.status_code == 200
     assert first_response.json()["statements"] == [statements[4], statements[3]]
@@ -685,9 +689,7 @@ def test_api_statements_get_with_database_query_failure(
 
 
 @pytest.mark.parametrize("id_param", ["statementId", "voidedStatementId"])
-def test_api_statements_get_invalid_query_parameters(
-    basic_auth_credentials, id_param
-):
+def test_api_statements_get_invalid_query_parameters(basic_auth_credentials, id_param):
     """Test error response for invalid query parameters"""
 
     id_1 = "be67b160-d958-4f51-b8b8-1892002dbac6"
@@ -736,28 +738,26 @@ def test_api_statements_get_invalid_query_parameters(
         )
         assert response.status_code != 400
 
-from ralph.api.auth import get_authenticated_user
 
 @responses.activate()
 @pytest.mark.parametrize("auth_method", ["basic", "oidc"])
-@pytest.mark.parametrize("scopes,is_authorized", 
-                         [
-                            ([], False),
-
-                            (["all"], True), 
-                            (["all/read"], True), 
-                            (["statements/read/mine"], True),
-                            (["statements/read"], True),
-                            (["profile/write", "all/write", "statements/read"], True),
-
-                            ([], False),
-                            (["statements/write"], False),
-                            (["profile/read"], False),
-                            (["all/write"], False),
-                          ]
-                         )
-def test_api_statements_get_scopes(monkeypatch, fs, es, auth_method, scopes, is_authorized):
-
+@pytest.mark.parametrize(
+    "scopes,is_authorized",
+    [
+        (["all"], True),
+        (["all/read"], True),
+        (["statements/read/mine"], True),
+        (["statements/read"], True),
+        (["profile/write", "all/write", "statements/read"], True),
+        ([], False),
+        (["statements/write"], False),
+        (["profile/read"], False),
+        (["all/write"], False),
+    ],
+)
+def test_api_statements_get_scopes(
+    monkeypatch, fs, es, auth_method, scopes, is_authorized
+):
     monkeypatch.setattr(
         "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_SCOPES", True
     )
@@ -769,10 +769,7 @@ def test_api_statements_get_scopes(monkeypatch, fs, es, auth_method, scopes, is_
         credentials = create_mock_basic_auth_user(fs, username, password, scopes, agent)
         headers = {"Authorization": f"Basic {credentials}"}
 
-        # get_basic_user.cache_clear()
         app.dependency_overrides[get_authenticated_user] = get_basic_user
-        #client = basic_auth_test_client
-        #get_basic_user.cache_clear()
 
     elif auth_method == "oidc":
         sub = "123|oidc"
@@ -780,12 +777,13 @@ def test_api_statements_get_scopes(monkeypatch, fs, es, auth_method, scopes, is_
         oidc_token = create_mock_oidc_user(sub=sub, scopes=scopes)
         headers = {"Authorization": f"Bearer {oidc_token}"}
 
+        # OIDC parameters
         AUDIENCE = "http://clientHost:8100"
         ISSUER_URI = "http://providerHost:8080/auth/realms/real_name"
 
         monkeypatch.setattr(
-        "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_ISSUER_URI",
-        ISSUER_URI,
+            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_ISSUER_URI",
+            ISSUER_URI,
         )
         monkeypatch.setattr(
             "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_AUDIENCE",
@@ -793,11 +791,6 @@ def test_api_statements_get_scopes(monkeypatch, fs, es, auth_method, scopes, is_
         )
 
         app.dependency_overrides[get_authenticated_user] = get_oidc_user
-
-
-        # client = oidc_auth_test_client
-        #get_oidc_user.cache_clear()
-
 
     statements = [
         {
@@ -829,4 +822,6 @@ def test_api_statements_get_scopes(monkeypatch, fs, es, auth_method, scopes, is_
         assert response.json() == {"statements": [statements[1], statements[0]]}
     else:
         assert response.status_code == 401
-        assert response.json() == {'detail': 'Access not authorized to scope: "statements/read/mine".'}
+        assert response.json() == {
+            "detail": 'Access not authorized to scope: "statements/read/mine".'
+        }
