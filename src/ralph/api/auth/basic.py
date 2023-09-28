@@ -9,7 +9,7 @@ from typing import List, Union
 import bcrypt
 from cachetools import TTLCache, cached
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.security import HTTPBasic, HTTPBasicCredentials, SecurityScopes
 from pydantic import BaseModel, root_validator
 from starlette.authentication import AuthenticationError
 
@@ -99,6 +99,22 @@ def get_stored_credentials(auth_file: Path) -> ServerUsersCredentials:
     return ServerUsersCredentials.parse_file(auth_file)
 
 
+def get_scoped_authenticated_user(security_scopes: SecurityScopes, credentials: Union[HTTPBasicCredentials, None] = Depends(security)):
+    user = get_authenticated_user(credentials)
+
+    # Restrict access by scopes
+    if settings.LRS_RESTRICT_BY_SCOPES:
+        for requested_scope in security_scopes.scopes:
+            is_auth = user.scopes.is_authorized(requested_scope)
+            if not is_auth:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail=f'Access not authorized to scope: "{requested_scope}".',
+                    headers={"WWW-Authenticate": "Basic"},
+                )
+    return user
+
+
 @cached(
     TTLCache(maxsize=settings.AUTH_CACHE_MAX_SIZE, ttl=settings.AUTH_CACHE_TTL),
     lock=Lock(),
@@ -180,5 +196,8 @@ def get_authenticated_user(
             detail="Invalid authentication credentials",
             headers={"WWW-Authenticate": "Basic"},
         )
+    
+    user = AuthenticatedUser(scopes=UserScopes(user.scopes), agent=user.agent)
 
-    return AuthenticatedUser(scopes=UserScopes(user.scopes), agent=user.agent)
+
+    return user

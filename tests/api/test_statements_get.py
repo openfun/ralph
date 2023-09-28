@@ -2,6 +2,7 @@
 
 import json
 from datetime import datetime, timedelta
+import responses
 from urllib.parse import parse_qs, quote_plus, urlparse
 
 import pytest
@@ -9,8 +10,8 @@ from elasticsearch.helpers import bulk
 from fastapi.testclient import TestClient
 
 from ralph.api import app
-from ralph.api.auth.basic import get_authenticated_user as get_basic_user
-from ralph.api.auth.oidc import get_authenticated_user as get_oidc_user
+from ralph.api.auth.basic import get_scoped_authenticated_user as get_basic_user
+from ralph.api.auth.oidc import get_scoped_authenticated_user as get_oidc_user
 from ralph.backends.database.clickhouse import ClickHouseDatabase
 from ralph.backends.database.mongo import MongoDatabase
 from ralph.exceptions import BackendException
@@ -735,7 +736,7 @@ def insert_statements_and_monkeypatch_backend(
 #         )
 #         assert response.status_code != 400
 
-import responses
+from ralph.api.auth import get_authenticated_user
 
 @responses.activate()
 @pytest.mark.parametrize("auth_method", ["basic", "oidc"])
@@ -766,6 +767,8 @@ def test_api_statements_get_scopes(monkeypatch, fs, es, auth_method, scopes, is_
         credentials = create_mock_basic_auth_user(fs, username, password, scopes, agent)
         headers = {"Authorization": f"Basic {credentials}"}
 
+
+        app.dependency_overrides[get_authenticated_user] = get_basic_user
         #client = basic_auth_test_client
         #get_basic_user.cache_clear()
 
@@ -774,6 +777,9 @@ def test_api_statements_get_scopes(monkeypatch, fs, es, auth_method, scopes, is_
         agent = {"openid": sub}
         oidc_token = create_mock_oidc_user(sub=sub, scopes=scopes)
         headers = {"Authorization": f"Bearer {oidc_token}"}
+
+
+        app.dependency_overrides[get_authenticated_user] = get_oidc_user
 
         #client = oidc_auth_test_client
         #get_oidc_user.cache_clear()
@@ -808,8 +814,6 @@ def test_api_statements_get_scopes(monkeypatch, fs, es, auth_method, scopes, is_
     )
 
     if is_authorized:
-        print("yolon")
-        print(response.content)
         assert response.status_code == 200
         assert response.json() == {"statements": [statements[1], statements[0]]}
     else:
