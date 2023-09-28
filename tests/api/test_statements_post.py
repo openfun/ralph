@@ -265,7 +265,7 @@ def test_api_statements_post_single_statement_no_trailing_slash(
     [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
 )
 # pylint: disable=too-many-arguments
-def test_api_statements_post_statements_list_of_one(
+def test_api_statements_post_list_of_one(
     backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
     """Test the post statements API route with one statement in a list."""
@@ -310,7 +310,7 @@ def test_api_statements_post_statements_list_of_one(
     [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
 )
 # pylint: disable=too-many-arguments
-def test_api_statements_post_statements_list(
+def test_api_statements_post_list(
     backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
     """Test the post statements API route with two statements in a list."""
@@ -381,7 +381,7 @@ def test_api_statements_post_statements_list(
     ],
 )
 # pylint: disable=too-many-arguments
-def test_api_statements_post_statements_list_with_duplicates(
+def test_api_statements_post_list_with_duplicates(
     backend, monkeypatch, basic_auth_credentials, es_data_stream, mongo, clickhouse
 ):
     """Test the post statements API route with duplicate statement IDs should fail."""
@@ -426,7 +426,7 @@ def test_api_statements_post_statements_list_with_duplicates(
     [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
 )
 # pylint: disable=too-many-arguments
-def test_api_statements_post_statements_list_with_duplicate_of_existing_statement(
+def test_api_statements_post_list_with_duplicate_of_existing_statement(
     backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
     """Test the post statements API route, given a statement that already exist in the
@@ -499,7 +499,7 @@ def test_api_statements_post_statements_list_with_duplicate_of_existing_statemen
     "backend",
     [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
 )
-def test_api_statements_post_statements_with_a_failure_during_storage(
+def test_api_statements_post_with_a_failure_during_storage(
     backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
     """Test the post statements API route with a failure happening during storage."""
@@ -542,7 +542,7 @@ def test_api_statements_post_statements_with_a_failure_during_storage(
     "backend",
     [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
 )
-def test_api_statements_post_statements_with_a_failure_during_id_query(
+def test_api_statements_post_with_a_failure_during_id_query(
     backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
     """Test the post statements API route with a failure during query execution."""

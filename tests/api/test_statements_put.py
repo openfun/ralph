@@ -294,7 +294,7 @@ def test_api_statements_put_statement_id_mismatch(
     [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
 )
 # pylint: disable=too-many-arguments
-def test_api_statements_put_statements_list_of_one(
+def test_api_statements_put_list_of_one(
     backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
     # pylint: disable=invalid-name,unused-argument
