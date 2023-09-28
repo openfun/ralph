@@ -2,7 +2,7 @@
 
 import logging
 from functools import lru_cache
-from typing import Optional, Union
+from typing import Annotated, Optional, Union
 
 import requests
 from fastapi import Depends, HTTPException, status
@@ -11,7 +11,8 @@ from jose import ExpiredSignatureError, JWTError, jwt
 from jose.exceptions import JWTClaimsError
 from pydantic import AnyUrl, BaseModel, Extra
 
-from ralph.api.auth.user import AuthenticatedUser
+
+from ralph.api.auth.user import AuthenticatedUser, UserScopes
 from ralph.conf import settings
 
 OPENID_CONFIGURATION_PATH = "/.well-known/openid-configuration"
@@ -93,8 +94,9 @@ def get_public_keys(jwks_uri: AnyUrl) -> dict:
 
 
 def get_scoped_authenticated_user(
-    security_scopes: SecurityScopes,
-    auth_header: Union[HTTPBearer, None] = Depends(oauth2_scheme)):
+        security_scopes: SecurityScopes,
+        auth_header: Optional[HTTPBearer] = Depends(oauth2_scheme)
+    ):
     user = get_authenticated_user(auth_header)
 
     # Restrict access by scopes
@@ -107,12 +109,10 @@ def get_scoped_authenticated_user(
                     detail=f'Access not authorized to scope: "{requested_scope}".',
                     headers={"WWW-Authenticate": "Basic"},
                 )
-
-
+    return user
 
 def get_authenticated_user(
-    security_scopes: SecurityScopes,
-    auth_header: Union[HTTPBearer, None] = Depends(oauth2_scheme)
+    auth_header: Annotated[Optional[str], Depends(oauth2_scheme)]
 ) -> AuthenticatedUser:
     """Decode and validate OpenId Connect ID token against issuer in config.
 
@@ -126,6 +126,7 @@ def get_authenticated_user(
     Raises:
         HTTPException
     """
+
     if auth_header is None or "Bearer" not in auth_header:
         logger.error("The OpenID Connect authentication mode requires a Bearer token")
         raise HTTPException(
@@ -164,7 +165,7 @@ def get_authenticated_user(
 
     user = AuthenticatedUser(
         agent={"openid": id_token.sub},
-        scopes=id_token.scope.split(" ") if id_token.scope else [],
+        scopes=UserScopes(id_token.scope.split(" ") if id_token.scope else []),
     )
 
     return user
