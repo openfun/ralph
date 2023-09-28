@@ -107,7 +107,7 @@ def insert_statements_and_monkeypatch_backend(
 #         "account_different_home_page",
 #     ],
 # )
-# def test_api_statements_get_statements_mine(
+# def test_api_statements_get_mine(
 #     monkeypatch, fs, insert_statements_and_monkeypatch_backend, ifi
 # ):
 #     """(Security) Test that the get statements API route, given a "mine=True"
@@ -220,7 +220,7 @@ def insert_statements_and_monkeypatch_backend(
 #     assert response.status_code == 422
 
 
-# def test_api_statements_get_statements(
+# def test_api_statements_get(
 #     insert_statements_and_monkeypatch_backend, basic_auth_credentials
 # ):
 #     """Test the get statements API route without any filters set up."""
@@ -248,7 +248,7 @@ def insert_statements_and_monkeypatch_backend(
 #         assert response.json() == {"statements": [statements[1], statements[0]]}
 
 
-# def test_api_statements_get_statements_ascending(
+# def test_api_statements_get_ascending(
 #     insert_statements_and_monkeypatch_backend, basic_auth_credentials
 # ):
 #     """Test the get statements API route, given an "ascending" query parameter, should
@@ -277,7 +277,7 @@ def insert_statements_and_monkeypatch_backend(
 #     assert response.json() == {"statements": [statements[0], statements[1]]}
 
 
-# def test_api_statements_get_statements_by_statement_id(
+# def test_api_statements_get_by_statement_id(
 #     insert_statements_and_monkeypatch_backend, basic_auth_credentials
 # ):
 #     """Test the get statements API route, given a "statementId" query parameter, should
@@ -316,7 +316,7 @@ def insert_statements_and_monkeypatch_backend(
 #         "account_different_home_page",
 #     ],
 # )
-# def test_api_statements_get_statements_by_agent(
+# def test_api_statements_get_by_agent(
 #     ifi, insert_statements_and_monkeypatch_backend, basic_auth_credentials
 # ):
 #     """Test the get statements API route, given an "agent" query parameter, should
@@ -360,7 +360,7 @@ def insert_statements_and_monkeypatch_backend(
 #     assert response.json() == {"statements": [statements[0]]}
 
 
-# def test_api_statements_get_statements_by_verb(
+# def test_api_statements_get_by_verb(
 #     insert_statements_and_monkeypatch_backend, basic_auth_credentials
 # ):
 #     """Test the get statements API route, given a "verb" query parameter, should
@@ -391,7 +391,7 @@ def insert_statements_and_monkeypatch_backend(
 #     assert response.json() == {"statements": [statements[1]]}
 
 
-# def test_api_statements_get_statements_by_activity(
+# def test_api_statements_get_by_activity(
 #     insert_statements_and_monkeypatch_backend, basic_auth_credentials
 # ):
 #     """Test the get statements API route, given an "activity" query parameter, should
@@ -434,7 +434,7 @@ def insert_statements_and_monkeypatch_backend(
 #     assert response.json()["detail"][0]["msg"] == "'INVALID_IRI' is not a valid 'IRI'."
 
 
-# def test_api_statements_get_statements_since_timestamp(
+# def test_api_statements_get_since_timestamp(
 #     insert_statements_and_monkeypatch_backend, basic_auth_credentials
 # ):
 #     """Test the get statements API route, given a "since" query parameter, should
@@ -464,7 +464,7 @@ def insert_statements_and_monkeypatch_backend(
 #     assert response.json() == {"statements": [statements[1]]}
 
 
-# def test_api_statements_get_statements_until_timestamp(
+# def test_api_statements_get_until_timestamp(
 #     insert_statements_and_monkeypatch_backend, basic_auth_credentials
 # ):
 #     """Test the get statements API route, given an "until" query parameter,
@@ -494,7 +494,7 @@ def insert_statements_and_monkeypatch_backend(
 #     assert response.json() == {"statements": [statements[0]]}
 
 
-# def test_api_statements_get_statements_with_pagination(
+# def test_api_statements_get_with_pagination(
 #     monkeypatch, insert_statements_and_monkeypatch_backend, basic_auth_credentials
 # ):
 #     """Test the get statements API route, given a request leading to more results than
@@ -564,7 +564,7 @@ def insert_statements_and_monkeypatch_backend(
 #     assert third_response.json() == {"statements": [statements[0]]}
 
 
-# def test_api_statements_get_statements_with_pagination_and_query(
+# def test_api_statements_get_with_pagination_and_query(
 #     monkeypatch, insert_statements_and_monkeypatch_backend, basic_auth_credentials
 # ):
 #     """Test the get statements API route, given a request with a query parameter
@@ -629,7 +629,7 @@ def insert_statements_and_monkeypatch_backend(
 #     assert second_response.json() == {"statements": [statements[0]]}
 
 
-# def test_api_statements_get_statements_with_no_matching_statement(
+# def test_api_statements_get_with_no_matching_statement(
 #     insert_statements_and_monkeypatch_backend, basic_auth_credentials
 # ):
 #     """Test the get statements API route, given a query yielding no matching statement,
@@ -658,7 +658,7 @@ def insert_statements_and_monkeypatch_backend(
 #     assert response.json() == {"statements": []}
 
 
-# def test_api_statements_get_statements_with_database_query_failure(
+# def test_api_statements_get_with_database_query_failure(
 #     basic_auth_credentials, monkeypatch
 # ):
 #     """Test the get statements API route, given a query raising a BackendException,
@@ -684,7 +684,7 @@ def insert_statements_and_monkeypatch_backend(
 
 
 # @pytest.mark.parametrize("id_param", ["statementId", "voidedStatementId"])
-# def test_api_statements_get_statements_invalid_query_parameters(
+# def test_api_statements_get_invalid_query_parameters(
 #     basic_auth_credentials, id_param
 # ):
 #     """Test error response for invalid query parameters"""
@@ -735,8 +735,9 @@ def insert_statements_and_monkeypatch_backend(
 #         )
 #         assert response.status_code != 400
 
+import responses
 
-
+@responses.activate()
 @pytest.mark.parametrize("auth_method", ["basic", "oidc"])
 @pytest.mark.parametrize("scopes,is_authorized", 
                          [
@@ -752,7 +753,7 @@ def insert_statements_and_monkeypatch_backend(
                             (["all/write"], False),
                           ]
                          )
-def test_api_statements_get_statements_scopes(monkeypatch, fs, es, auth_method, scopes, is_authorized):
+def test_api_statements_get_scopes(monkeypatch, fs, es, auth_method, scopes, is_authorized):
 
     monkeypatch.setattr(
         "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_SCOPES", True
@@ -765,7 +766,7 @@ def test_api_statements_get_statements_scopes(monkeypatch, fs, es, auth_method, 
         credentials = create_mock_basic_auth_user(fs, username, password, scopes, agent)
         headers = {"Authorization": f"Basic {credentials}"}
 
-        client = basic_auth_test_client
+        #client = basic_auth_test_client
         #get_basic_user.cache_clear()
 
     elif auth_method == "oidc":
@@ -774,7 +775,7 @@ def test_api_statements_get_statements_scopes(monkeypatch, fs, es, auth_method, 
         oidc_token = create_mock_oidc_user(sub=sub, scopes=scopes)
         headers = {"Authorization": f"Bearer {oidc_token}"}
 
-        client = oidc_auth_test_client
+        #client = oidc_auth_test_client
         #get_oidc_user.cache_clear()
 
 
