@@ -333,13 +333,13 @@ async def get(
         )
 
     if settings.LRS_RESTRICT_BY_AUTHORITY:
-        # If using scopes, only restrict results when appropriate
-        if settings.LRS_RESTRICT_BY_SCOPES:
-            if not current_user.scopes.is_authorized('statements/read'):
-                mine = True            
-        else:
-            # Otherwise, enforce mine for all users
-            mine = True
+        # # If using scopes, only restrict results when appropriate
+        # if settings.LRS_RESTRICT_BY_SCOPES:
+        #     if not current_user.scopes.is_authorized('statements/read'):
+        #         mine = True            
+        # else:
+        #     # Otherwise, enforce mine for all users
+        mine = True
 
     if mine:
         query_params["authority"] = _parse_agent_parameters(current_user.agent)

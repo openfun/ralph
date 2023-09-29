@@ -58,6 +58,7 @@ def test_api_statements_post_invalid_parameters(basic_auth_credentials):
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=statement,
     )
+
     assert response.status_code == 400
     assert response.json() == {
         "detail": "The following parameter is not allowed: `mamamia`"

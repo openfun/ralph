@@ -1,11 +1,12 @@
 """Tests for the PUT statements endpoint of the Ralph API."""
-
+from importlib import reload
 from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
+from ralph import api
 from ralph.api import app
 from ralph.backends.database.es import ESDatabase
 from ralph.backends.database.mongo import MongoDatabase
@@ -27,8 +28,8 @@ from tests.fixtures.backends import (
 
 from ..helpers import assert_statement_get_responses_are_equivalent, string_is_date
 
+reload(api)
 client = TestClient(app)
-
 
 def test_api_statements_put_invalid_parameters(basic_auth_credentials):
     """Test that using invalid parameters returns the proper status code."""
