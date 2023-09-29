@@ -1,9 +1,9 @@
 """Tests for the PUT statements endpoint of the Ralph API."""
 from importlib import reload
-import responses
 from uuid import uuid4
 
 import pytest
+import responses
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
@@ -31,10 +31,16 @@ from tests.fixtures.backends import (
     get_mongo_test_backend,
 )
 
-from ..helpers import assert_statement_get_responses_are_equivalent, create_mock_agent, mock_statement, string_is_date
+from ..helpers import (
+    assert_statement_get_responses_are_equivalent,
+    create_mock_agent,
+    mock_statement,
+    string_is_date,
+)
 
 reload(api)
 client = TestClient(app)
+
 
 def test_api_statements_put_invalid_parameters(basic_auth_credentials):
     """Test that using invalid parameters returns the proper status code."""
@@ -668,7 +674,6 @@ async def test_put_statement_with_statement_forwarding(
     [
         (["all"], True),
         (["profile/read", "statements/write"], True),
-        
         (["all/read"], False),
         (["statements/read/mine"], False),
         (["profile/write"], False),
@@ -682,9 +687,7 @@ def test_api_statements_put_scopes(
     monkeypatch.setattr(
         "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_SCOPES", True
     )
-    monkeypatch.setattr(
-        "ralph.api.auth.basic.settings.LRS_RESTRICT_BY_SCOPES", True
-    )
+    monkeypatch.setattr("ralph.api.auth.basic.settings.LRS_RESTRICT_BY_SCOPES", True)
 
     if auth_method == "basic":
         agent = create_mock_agent("mbox", 1)
@@ -692,7 +695,7 @@ def test_api_statements_put_scopes(
         password = "janepwd"
         credentials = create_mock_basic_auth_user(fs, username, password, scopes, agent)
         headers = {"Authorization": f"Basic {credentials}"}
-        
+
         app.dependency_overrides[get_authenticated_user] = get_basic_user
         get_basic_user.cache_clear()
 
@@ -712,7 +715,6 @@ def test_api_statements_put_scopes(
         )
 
         app.dependency_overrides[get_authenticated_user] = get_oidc_user
-
 
     statement = mock_statement()
 

@@ -99,8 +99,6 @@ def get_stored_credentials(auth_file: Path) -> ServerUsersCredentials:
     return ServerUsersCredentials.parse_file(auth_file)
 
 
-
-
 @cached(
     TTLCache(maxsize=settings.AUTH_CACHE_MAX_SIZE, ttl=settings.AUTH_CACHE_TTL),
     lock=Lock(),
@@ -186,7 +184,7 @@ def get_authenticated_user(
         )
 
     user = AuthenticatedUser(scopes=UserScopes(user.scopes), agent=user.agent)
-    
+
     # Restrict access by scopes
     if settings.LRS_RESTRICT_BY_SCOPES:
         for requested_scope in security_scopes.scopes:

@@ -99,7 +99,6 @@ def insert_statements_and_monkeypatch_backend(
     return _insert_statements_and_monkeypatch_backend
 
 
-
 @pytest.mark.parametrize(
     "ifi",
     [
@@ -187,7 +186,6 @@ def test_api_statements_get_mine(
     )
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[0]]}
-
 
     # Only fetch mine (implicit with RALPH_LRS_RESTRICT_BY_AUTHORITY=True): Return
     # filtered statements
@@ -741,6 +739,7 @@ def test_api_statements_get_invalid_query_parameters(basic_auth_credentials, id_
         )
         assert response.status_code != 400
 
+
 @responses.activate()
 @pytest.mark.parametrize("auth_method", ["basic", "oidc"])
 @pytest.mark.parametrize(
@@ -751,7 +750,6 @@ def test_api_statements_get_invalid_query_parameters(basic_auth_credentials, id_
         (["statements/read/mine"], True),
         (["statements/read"], True),
         (["profile/write", "all/write", "statements/read"], True),
-        
         (["statements/write"], False),
         (["profile/read"], False),
         (["all/write"], False),
@@ -765,9 +763,7 @@ def test_api_statements_get_scopes(
     monkeypatch.setattr(
         "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_SCOPES", True
     )
-    monkeypatch.setattr(
-        "ralph.api.auth.basic.settings.LRS_RESTRICT_BY_SCOPES", True
-    )
+    monkeypatch.setattr("ralph.api.auth.basic.settings.LRS_RESTRICT_BY_SCOPES", True)
 
     if auth_method == "basic":
         agent = create_mock_agent("mbox", 1)
@@ -775,7 +771,7 @@ def test_api_statements_get_scopes(
         password = "janepwd"
         credentials = create_mock_basic_auth_user(fs, username, password, scopes, agent)
         headers = {"Authorization": f"Basic {credentials}"}
-        
+
         app.dependency_overrides[get_authenticated_user] = get_basic_user
         get_basic_user.cache_clear()
 
@@ -795,7 +791,6 @@ def test_api_statements_get_scopes(
         )
 
         app.dependency_overrides[get_authenticated_user] = get_oidc_user
-
 
     statements = [
         {
@@ -847,19 +842,17 @@ def test_api_statements_get_scopes_with_authority(
     monkeypatch, fs, es, scopes, read_all_access
 ):
     """Test that restricting by scope and by authority behaves properly.
-    
+
     Getting statements should be restricted to own for users which only have
     `statements/read/mine` scope but should not be restricted for wider scopes.
     """
     monkeypatch.setattr(
         "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_AUTHORITY", True
-    )  
+    )
     monkeypatch.setattr(
         "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_SCOPES", True
     )
-    monkeypatch.setattr(
-        "ralph.api.auth.basic.settings.LRS_RESTRICT_BY_SCOPES", True
-    )
+    monkeypatch.setattr("ralph.api.auth.basic.settings.LRS_RESTRICT_BY_SCOPES", True)
 
     agent = create_mock_agent("mbox", 1)
     agent_2 = create_mock_agent("mbox", 2)

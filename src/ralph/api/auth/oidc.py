@@ -92,7 +92,6 @@ def get_public_keys(jwks_uri: AnyUrl) -> dict:
         ) from exc
 
 
-
 def get_authenticated_user(
     auth_header: Annotated[Optional[str], Depends(oauth2_scheme)],
     security_scopes: SecurityScopes = SecurityScopes([]),

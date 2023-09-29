@@ -19,7 +19,6 @@ def test_api_auth_oidc_valid(oidc_auth_test_client):
     )
     assert response.status_code == 200
 
-    
     assert len(response.json().keys()) == 2
     assert response.json()["agent"] == {"openid": "123|oidc"}
     assert sorted(response.json()["scopes"]) == ["all", "profile/read"]

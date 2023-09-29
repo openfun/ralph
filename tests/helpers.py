@@ -1,11 +1,11 @@
 """Utilities for testing Ralph."""
-from datetime import datetime
 import hashlib
 import random
 import time
 import uuid
-from uuid import UUID
+from datetime import datetime
 from typing import Dict, Optional, Union
+from uuid import UUID
 
 from ralph.utils import statements_are_equivalent
 
@@ -125,15 +125,16 @@ def create_mock_agent(
 
     raise ValueError("No valid ifi was provided to create_mock_agent")
 
+
 def mock_statement(
-        id_:Optional[Union[UUID, int]]=None,
-        actor:Optional[Union[dict, int]]=None, 
-        verb:Optional[Union[dict, int]]=None,
-        object:Optional[Union[dict, int]]=None,
-        timestamp=None
-    ):
+    id_: Optional[Union[UUID, int]] = None,
+    actor: Optional[Union[dict, int]] = None,
+    verb: Optional[Union[dict, int]] = None,
+    object: Optional[Union[dict, int]] = None,
+    timestamp=None,
+):
     """Generate fake statements with random or provided parameters.
-    
+
     Fields `actor`, `verb`, `object` accept integer values which can be used to
     create distinct values identifiable by this integer.
     """
@@ -159,10 +160,8 @@ def mock_statement(
             "id": f"http://example.adlnet.gov/xapi/example/activity_{random.random()}"
         }
     elif isinstance(object, int):
-        object = {
-            "id": f"http://example.adlnet.gov/xapi/example/activity_{object}"
-        }
-    
+        object = {"id": f"http://example.adlnet.gov/xapi/example/activity_{object}"}
+
     # Timestamp
     if timestamp is None:
         timestamp = datetime.strftime(
@@ -174,4 +173,10 @@ def mock_statement(
             datetime.fromtimestamp((time.time() - timestamp), "%Y-%m-%dT%H:%M:%S")
         )
 
-    return {"id": id_, "actor": actor, "verb": verb, "object": object, "timestamp": timestamp}
+    return {
+        "id": id_,
+        "actor": actor,
+        "verb": verb,
+        "object": object,
+        "timestamp": timestamp,
+    }
