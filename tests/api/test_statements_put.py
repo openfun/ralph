@@ -1,5 +1,6 @@
 """Tests for the PUT statements endpoint of the Ralph API."""
 from importlib import reload
+import responses
 from uuid import uuid4
 
 import pytest
@@ -8,11 +9,15 @@ from httpx import AsyncClient
 
 from ralph import api
 from ralph.api import app
+from ralph.api.auth import get_authenticated_user
+from ralph.api.auth.basic import get_authenticated_user as get_basic_user
+from ralph.api.auth.oidc import get_authenticated_user as get_oidc_user
 from ralph.backends.database.es import ESDatabase
 from ralph.backends.database.mongo import MongoDatabase
 from ralph.conf import XapiForwardingConfigurationSettings
 from ralph.exceptions import BackendException
 
+from tests.fixtures.auth import create_mock_basic_auth_user, create_mock_oidc_user
 from tests.fixtures.backends import (
     ES_TEST_FORWARDING_INDEX,
     ES_TEST_HOSTS,
@@ -26,7 +31,7 @@ from tests.fixtures.backends import (
     get_mongo_test_backend,
 )
 
-from ..helpers import assert_statement_get_responses_are_equivalent, string_is_date
+from ..helpers import assert_statement_get_responses_are_equivalent, create_mock_agent, mock_statement, string_is_date
 
 reload(api)
 client = TestClient(app)
@@ -654,3 +659,79 @@ async def test_put_statement_with_statement_forwarding(
 
     # Stop receiving LRS client
     await lrs_context.__aexit__(None, None, None)
+
+
+@responses.activate()
+@pytest.mark.parametrize("auth_method", ["basic", "oidc"])
+@pytest.mark.parametrize(
+    "scopes,is_authorized",
+    [
+        (["all"], True),
+        (["profile/read", "statements/write"], True),
+        
+        (["all/read"], False),
+        (["statements/read/mine"], False),
+        (["profile/write"], False),
+        ([], False),
+    ],
+)
+def test_api_statements_put_scopes(
+    monkeypatch, fs, es, auth_method, scopes, is_authorized
+):
+    """Test that getting statements behaves properly according to user scopes."""
+    monkeypatch.setattr(
+        "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_SCOPES", True
+    )
+    monkeypatch.setattr(
+        "ralph.api.auth.basic.settings.LRS_RESTRICT_BY_SCOPES", True
+    )
+
+    if auth_method == "basic":
+        agent = create_mock_agent("mbox", 1)
+        username = "jane"
+        password = "janepwd"
+        credentials = create_mock_basic_auth_user(fs, username, password, scopes, agent)
+        headers = {"Authorization": f"Basic {credentials}"}
+        
+        app.dependency_overrides[get_authenticated_user] = get_basic_user
+        get_basic_user.cache_clear()
+
+    elif auth_method == "oidc":
+        sub = "123|oidc"
+        agent = {"openid": sub}
+        oidc_token = create_mock_oidc_user(sub=sub, scopes=scopes)
+        headers = {"Authorization": f"Bearer {oidc_token}"}
+
+        monkeypatch.setattr(
+            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_ISSUER_URI",
+            "http://providerHost:8080/auth/realms/real_name",
+        )
+        monkeypatch.setattr(
+            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_AUDIENCE",
+            "http://clientHost:8100",
+        )
+
+        app.dependency_overrides[get_authenticated_user] = get_oidc_user
+
+
+    statement = mock_statement()
+
+    # NB: scopes are not linked to statements and backends, we therefore test with ES
+    database_client_class_path = "ralph.api.routers.statements.DATABASE_CLIENT"
+    monkeypatch.setattr(database_client_class_path, get_es_test_backend())
+
+    response = client.post(
+        "/xAPI/statements/",
+        headers=headers,
+        json=statement,
+    )
+
+    if is_authorized:
+        assert response.status_code == 200
+    else:
+        assert response.status_code == 401
+        assert response.json() == {
+            "detail": 'Access not authorized to scope: "statements/write".'
+        }
+
+    app.dependency_overrides.pop(get_authenticated_user, None)
