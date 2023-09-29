@@ -4,7 +4,7 @@ import random
 import time
 import uuid
 from datetime import datetime
-from typing import Dict, Optional, Union
+from typing import Optional, Union
 from uuid import UUID
 
 from ralph.utils import statements_are_equivalent

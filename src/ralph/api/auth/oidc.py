@@ -2,11 +2,11 @@
 
 import logging
 from functools import lru_cache
-from typing import Annotated, Optional, Union
+from typing import Annotated, Optional
 
 import requests
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, OpenIdConnect, SecurityScopes
+from fastapi.security import OpenIdConnect, SecurityScopes
 from jose import ExpiredSignatureError, JWTError, jwt
 from jose.exceptions import JWTClaimsError
 from pydantic import AnyUrl, BaseModel, Extra

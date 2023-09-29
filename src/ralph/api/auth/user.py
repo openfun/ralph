@@ -1,7 +1,7 @@
 """Authenticated user for the Ralph API."""
 
 from functools import lru_cache
-from typing import Dict, FrozenSet, List, Literal
+from typing import Dict, FrozenSet, Literal
 
 from pydantic import BaseModel
 

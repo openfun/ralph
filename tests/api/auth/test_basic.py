@@ -105,7 +105,9 @@ def test_api_auth_basic_caching_credentials(fs):
     print(credentials)
 
     # Call function as in a first request with these credentials
-    get_authenticated_user(security_scopes=SecurityScopes(["profile/read"]), credentials=credentials)
+    get_authenticated_user(
+        security_scopes=SecurityScopes(["profile/read"]), credentials=credentials
+    )
 
     assert get_authenticated_user.cache.popitem() == (
         ("ralph", "admin", "profile/read"),
