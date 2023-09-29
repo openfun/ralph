@@ -98,13 +98,14 @@ def test_api_auth_basic_caching_credentials(fs):
     auth_file_path = settings.APP_DIR / "auth.json"
     fs.create_file(auth_file_path, contents=STORED_CREDENTIALS)
     get_authenticated_user.cache_clear()
+    get_stored_credentials.cache_clear()
 
     credentials = HTTPBasicCredentials(username="ralph", password="admin")
 
     print(credentials)
 
     # Call function as in a first request with these credentials
-    get_authenticated_user(SecurityScopes(["profile/read"]), credentials)
+    get_authenticated_user(security_scopes=SecurityScopes(["profile/read"]), credentials=credentials)
 
     assert get_authenticated_user.cache.popitem() == (
         ("ralph", "admin", "profile/read"),
