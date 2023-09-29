@@ -741,8 +741,6 @@ def test_api_statements_get_invalid_query_parameters(basic_auth_credentials, id_
         )
         assert response.status_code != 400
 
-
-
 @responses.activate()
 @pytest.mark.parametrize("auth_method", ["basic", "oidc"])
 @pytest.mark.parametrize(
@@ -763,6 +761,7 @@ def test_api_statements_get_invalid_query_parameters(basic_auth_credentials, id_
 def test_api_statements_get_scopes(
     monkeypatch, fs, es, auth_method, scopes, is_authorized
 ):
+    """Test that getting statements behaves properly according to user scopes."""
     monkeypatch.setattr(
         "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_SCOPES", True
     )
@@ -778,7 +777,6 @@ def test_api_statements_get_scopes(
         headers = {"Authorization": f"Basic {credentials}"}
         
         app.dependency_overrides[get_authenticated_user] = get_basic_user
-
         get_basic_user.cache_clear()
 
     elif auth_method == "oidc":
@@ -787,54 +785,121 @@ def test_api_statements_get_scopes(
         oidc_token = create_mock_oidc_user(sub=sub, scopes=scopes)
         headers = {"Authorization": f"Bearer {oidc_token}"}
 
-        # OIDC parameters
-        AUDIENCE = "http://clientHost:8100"
-        ISSUER_URI = "http://providerHost:8080/auth/realms/real_name"
-
         monkeypatch.setattr(
             "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_ISSUER_URI",
-            ISSUER_URI,
+            "http://providerHost:8080/auth/realms/real_name",
         )
         monkeypatch.setattr(
             "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_AUDIENCE",
-            AUDIENCE,
+            "http://clientHost:8100",
         )
 
         app.dependency_overrides[get_authenticated_user] = get_oidc_user
 
 
-        statements = [
-            {
-                "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
-                "timestamp": (datetime.now() - timedelta(hours=1)).isoformat(),
-                "actor": agent,
-                "authority": agent,
-            },
-            {
-                "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
-                "timestamp": datetime.now().isoformat(),
-                "actor": agent,
-                "authority": agent,
-            },
-        ]
+    statements = [
+        {
+            "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
+            "timestamp": (datetime.now() - timedelta(hours=1)).isoformat(),
+            "actor": agent,
+            "authority": agent,
+        },
+        {
+            "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
+            "timestamp": datetime.now().isoformat(),
+            "actor": agent,
+            "authority": agent,
+        },
+    ]
 
-        # NB: scopes are not linked to statements and backends, we therefore test with ES
-        database_client_class_path = "ralph.api.routers.statements.DATABASE_CLIENT"
-        insert_es_statements(es, statements)
-        monkeypatch.setattr(database_client_class_path, get_es_test_backend())
+    # NB: scopes are not linked to statements and backends, we therefore test with ES
+    database_client_class_path = "ralph.api.routers.statements.DATABASE_CLIENT"
+    insert_es_statements(es, statements)
+    monkeypatch.setattr(database_client_class_path, get_es_test_backend())
 
-        response = client.get(
-            "/xAPI/statements/",
-            headers=headers,
-        )
+    response = client.get(
+        "/xAPI/statements/",
+        headers=headers,
+    )
 
-        if is_authorized:
-            assert response.status_code == 200
-            assert response.json() == {"statements": [statements[1], statements[0]]}
-        else:
-            assert response.status_code == 401
-            assert response.json() == {
-                "detail": 'Access not authorized to scope: "statements/read/mine".'
-            }
+    if is_authorized:
+        assert response.status_code == 200
+        assert response.json() == {"statements": [statements[1], statements[0]]}
+    else:
+        assert response.status_code == 401
+        assert response.json() == {
+            "detail": 'Access not authorized to scope: "statements/read/mine".'
+        }
+
+    app.dependency_overrides.pop(get_authenticated_user, None)
+
+
+@pytest.mark.parametrize(
+    "scopes,read_all_access",
+    [
+        (["all"], True),
+        (["all/read", "statements/read/mine"], True),
+        (["statements/read"], True),
+        (["statements/read/mine"], False),
+    ],
+)
+def test_api_statements_get_scopes_with_authority(
+    monkeypatch, fs, es, scopes, read_all_access
+):
+    """Test that restricting by scope and by authority behaves properly.
+    
+    Getting statements should be restricted to own for users which only have
+    `statements/read/mine` scope but should not be restricted for wider scopes.
+    """
+    monkeypatch.setattr(
+        "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_AUTHORITY", True
+    )  
+    monkeypatch.setattr(
+        "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_SCOPES", True
+    )
+    monkeypatch.setattr(
+        "ralph.api.auth.basic.settings.LRS_RESTRICT_BY_SCOPES", True
+    )
+
+    agent = create_mock_agent("mbox", 1)
+    agent_2 = create_mock_agent("mbox", 2)
+    username = "jane"
+    password = "janepwd"
+    credentials = create_mock_basic_auth_user(fs, username, password, scopes, agent)
+    headers = {"Authorization": f"Basic {credentials}"}
+
+    get_basic_user.cache_clear()
+
+    statements = [
+        {
+            "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
+            "timestamp": (datetime.now() - timedelta(hours=1)).isoformat(),
+            "actor": agent,
+            "authority": agent,
+        },
+        {
+            "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
+            "timestamp": datetime.now().isoformat(),
+            "actor": agent,
+            "authority": agent_2,
+        },
+    ]
+
+    # NB: scopes are not linked to statements and backends, we therefore test with ES
+    database_client_class_path = "ralph.api.routers.statements.DATABASE_CLIENT"
+    insert_es_statements(es, statements)
+    monkeypatch.setattr(database_client_class_path, get_es_test_backend())
+
+    response = client.get(
+        "/xAPI/statements/",
+        headers=headers,
+    )
+
+    assert response.status_code == 200
+
+    if read_all_access:
+        assert response.json() == {"statements": [statements[1], statements[0]]}
+    else:
+        assert response.json() == {"statements": [statements[0]]}
 
     app.dependency_overrides.pop(get_authenticated_user, None)

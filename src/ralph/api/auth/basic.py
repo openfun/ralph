@@ -188,13 +188,10 @@ def get_authenticated_user(
     user = AuthenticatedUser(scopes=UserScopes(user.scopes), agent=user.agent)
     
     # Restrict access by scopes
-    print('U HERE')
     if settings.LRS_RESTRICT_BY_SCOPES:
-        print('U THERE ')
         for requested_scope in security_scopes.scopes:
             is_auth = user.scopes.is_authorized(requested_scope)
             if not is_auth:
-                print('U kloaky')
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail=f'Access not authorized to scope: "{requested_scope}".',

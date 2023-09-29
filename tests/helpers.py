@@ -1,8 +1,11 @@
 """Utilities for testing Ralph."""
-import datetime
+from datetime import datetime
 import hashlib
+import random
+import time
 import uuid
-from typing import Optional
+from uuid import UUID
+from typing import Dict, Optional, Union
 
 from ralph.utils import statements_are_equivalent
 
@@ -10,7 +13,7 @@ from ralph.utils import statements_are_equivalent
 def string_is_date(string: str):
     """Check if string can be parsed as a date."""
     try:
-        datetime.datetime.fromisoformat(string)
+        datetime.fromisoformat(string)
         return True
     except ValueError:
         return False
@@ -66,8 +69,8 @@ def create_mock_activity(id_: int = 0):
 
 
 def create_mock_agent(
-    ifi: str,
-    id_: int,
+    ifi: str = "mbox",
+    id_: int = 1,
     home_page_id: Optional[int] = None,
     name: Optional[str] = None,
     use_object_type: bool = True,
@@ -121,3 +124,54 @@ def create_mock_agent(
         return agent
 
     raise ValueError("No valid ifi was provided to create_mock_agent")
+
+def mock_statement(
+        id_:Optional[Union[UUID, int]]=None,
+        actor:Optional[Union[dict, int]]=None, 
+        verb:Optional[Union[dict, int]]=None,
+        object:Optional[Union[dict, int]]=None,
+        timestamp=None
+    ):
+    """Generate fake statements with random or provided parameters.
+    
+    Fields `actor`, `verb`, `object` accept integer values which can be used to
+    create distinct values identifiable by this integer.
+    """
+    # Id
+    if id_ is None:
+        id_ = str(uuid.uuid4())
+
+    # Actor
+    if actor is None:
+        actor = create_mock_agent()
+    elif isinstance(actor, int):
+        actor = create_mock_agent(id_=actor)
+
+    # Verb
+    if verb is None:
+        verb = {"id": f"https://w3id.org/xapi/video/verbs/{random.random()}"}
+    elif isinstance(verb, int):
+        verb = {"id": f"https://w3id.org/xapi/video/verbs/{verb}"}
+
+    # Object
+    if object is None:
+        object = {
+            "id": f"http://example.adlnet.gov/xapi/example/activity_{random.random()}"
+        }
+    elif isinstance(object, int):
+        object = {
+            "id": f"http://example.adlnet.gov/xapi/example/activity_{object}"
+        }
+    
+    # Timestamp
+    if timestamp is None:
+        timestamp = datetime.strftime(
+            datetime.fromtimestamp(time.time() - random.random()),
+            "%Y-%m-%dT%H:%M:%S",
+        )
+    elif isinstance(timestamp, int):
+        timestamp = datetime.strftime(
+            datetime.fromtimestamp((time.time() - timestamp), "%Y-%m-%dT%H:%M:%S")
+        )
+
+    return {"id": id_, "actor": actor, "verb": verb, "object": object, "timestamp": timestamp}

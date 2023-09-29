@@ -30,6 +30,7 @@ from ..helpers import (
     assert_statement_get_responses_are_equivalent,
     string_is_date,
     string_is_uuid,
+    mock_statement
 )
 
 client = TestClient(app)
@@ -38,19 +39,7 @@ client = TestClient(app)
 def test_api_statements_post_invalid_parameters(basic_auth_credentials):
     """Test that using invalid parameters returns the proper status code."""
 
-    statement = {
-        "actor": {
-            "account": {
-                "homePage": "https://example.com/homepage/",
-                "name": str(uuid4()),
-            },
-            "objectType": "Agent",
-        },
-        "id": str(uuid4()),
-        "object": {"id": "https://example.com/object-id/1/"},
-        "timestamp": "2022-06-22T08:31:38Z",
-        "verb": {"id": "https://example.com/verb-id/1/"},
-    }
+    statement = mock_statement()
 
     # Check for 400 status code when unknown parameters are provided
     response = client.post(
@@ -77,19 +66,7 @@ def test_api_statements_post_single_statement_directly(
     # pylint: disable=invalid-name,unused-argument
 
     monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
-    statement = {
-        "actor": {
-            "account": {
-                "homePage": "https://example.com/homepage/",
-                "name": str(uuid4()),
-            },
-            "objectType": "Agent",
-        },
-        "id": str(uuid4()),
-        "object": {"id": "https://example.com/object-id/1/"},
-        "timestamp": "2022-06-22T08:31:38Z",
-        "verb": {"id": "https://example.com/verb-id/1/"},
-    }
+    statement = mock_statement()
 
     response = client.post(
         "/xAPI/statements/",
@@ -187,17 +164,8 @@ def test_api_statements_post_enriching_with_existing_values(
     monkeypatch.setattr(
         "ralph.api.routers.statements.DATABASE_CLIENT", get_es_test_backend()
     )
-    statement = {
-        "actor": {
-            "account": {
-                "homePage": "https://example.com/homepage/",
-                "name": str(uuid4()),
-            },
-            "objectType": "Agent",
-        },
-        "object": {"id": "https://example.com/object-id/1/"},
-        "verb": {"id": "https://example.com/verb-id/1/"},
-    }
+    statement = mock_statement()
+
     # Add the field to be tested
     statement[field] = value
 
@@ -219,7 +187,6 @@ def test_api_statements_post_enriching_with_existing_values(
         statement = response.json()["statements"][0]
 
         # Test enriching
-
         assert field in statement
         if field == "stored":
             # Check that stored value was overwritten
@@ -240,19 +207,7 @@ def test_api_statements_post_single_statement_no_trailing_slash(
     # pylint: disable=invalid-name,unused-argument
 
     monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
-    statement = {
-        "actor": {
-            "account": {
-                "homePage": "https://example.com/homepage/",
-                "name": str(uuid4()),
-            },
-            "objectType": "Agent",
-        },
-        "id": str(uuid4()),
-        "object": {"id": "https://example.com/object-id/1/"},
-        "timestamp": "2022-06-22T08:31:38Z",
-        "verb": {"id": "https://example.com/verb-id/1/"},
-    }
+    statement = mock_statement()
 
     response = client.post(
         "/xAPI/statements",
@@ -276,19 +231,7 @@ def test_api_statements_post_list_of_one(
     # pylint: disable=invalid-name,unused-argument
 
     monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
-    statement = {
-        "actor": {
-            "account": {
-                "homePage": "https://example.com/homepage/",
-                "name": str(uuid4()),
-            },
-            "objectType": "Agent",
-        },
-        "id": str(uuid4()),
-        "object": {"id": "https://example.com/object-id/1/"},
-        "timestamp": "2022-03-15T14:07:51Z",
-        "verb": {"id": "https://example.com/verb-id/1/"},
-    }
+    statement = mock_statement()
 
     response = client.post(
         "/xAPI/statements/",
@@ -322,34 +265,14 @@ def test_api_statements_post_list(
     # pylint: disable=invalid-name,unused-argument
 
     monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
-    statements = [
-        {
-            "actor": {
-                "account": {
-                    "homePage": "https://example.com/homepage/",
-                    "name": str(uuid4()),
-                },
-                "objectType": "Agent",
-            },
-            "id": str(uuid4()),
-            "object": {"id": "https://example.com/object-id/1/"},
-            "timestamp": "2022-03-15T14:07:52Z",
-            "verb": {"id": "https://example.com/verb-id/1/"},
-        },
-        {
-            "actor": {
-                "account": {
-                    "homePage": "https://example.com/homepage/",
-                    "name": str(uuid4()),
-                },
-                "objectType": "Agent",
-            },
-            # Note the second statement has no preexisting ID
-            "object": {"id": "https://example.com/object-id/1/"},
-            "timestamp": "2022-03-15T14:07:51Z",
-            "verb": {"id": "https://example.com/verb-id/1/"},
-        },
-    ]
+    
+    statement_1 = mock_statement(timestamp="2022-03-15T14:07:52Z")
+
+    # Note the second statement has no preexisting ID
+    statement_2 = mock_statement(timestamp="2022-03-15T14:07:51Z")
+    statement_2.pop("id")
+    
+    statements = [statement_1, statement_2]
 
     response = client.post(
         "/xAPI/statements/",
@@ -394,19 +317,7 @@ def test_api_statements_post_list_with_duplicates(
     # pylint: disable=invalid-name,unused-argument
 
     monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
-    statement = {
-        "actor": {
-            "account": {
-                "homePage": "https://example.com/homepage/",
-                "name": str(uuid4()),
-            },
-            "objectType": "Agent",
-        },
-        "id": str(uuid4()),
-        "object": {"id": "https://example.com/object-id/1/"},
-        "timestamp": "2022-03-15T14:07:51Z",
-        "verb": {"id": "https://example.com/verb-id/1/"},
-    }
+    statement = mock_statement()
 
     response = client.post(
         "/xAPI/statements/",
@@ -444,19 +355,7 @@ def test_api_statements_post_list_with_duplicate_of_existing_statement(
     monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
 
     statement_uuid = str(uuid4())
-    statement = {
-        "actor": {
-            "account": {
-                "homePage": "https://example.com/homepage/",
-                "name": str(uuid4()),
-            },
-            "objectType": "Agent",
-        },
-        "id": statement_uuid,
-        "object": {"id": "https://example.com/object-id/1/"},
-        "timestamp": "2022-03-15T14:07:51Z",
-        "verb": {"id": "https://example.com/verb-id/1/"},
-    }
+    statement = mock_statement(id_=statement_uuid)
 
     # Post the statement once.
     response = client.post(
@@ -522,19 +421,7 @@ def test_api_statements_post_with_a_failure_during_storage(
     monkeypatch.setattr(
         "ralph.api.routers.statements.DATABASE_CLIENT", backend_instance
     )
-    statement = {
-        "actor": {
-            "account": {
-                "homePage": "https://example.com/homepage/",
-                "name": str(uuid4()),
-            },
-            "objectType": "Agent",
-        },
-        "id": str(uuid4()),
-        "object": {"id": "https://example.com/object-id/1/"},
-        "timestamp": "2022-03-15T14:07:51Z",
-        "verb": {"id": "https://example.com/verb-id/1/"},
-    }
+    statement = mock_statement()
 
     response = client.post(
         "/xAPI/statements/",
@@ -567,19 +454,7 @@ def test_api_statements_post_with_a_failure_during_id_query(
     monkeypatch.setattr(
         "ralph.api.routers.statements.DATABASE_CLIENT", backend_instance
     )
-    statement = {
-        "actor": {
-            "account": {
-                "homePage": "https://example.com/homepage/",
-                "name": str(uuid4()),
-            },
-            "objectType": "Agent",
-        },
-        "id": str(uuid4()),
-        "object": {"id": "https://example.com/object-id/1/"},
-        "timestamp": "2022-03-15T14:07:51Z",
-        "verb": {"id": "https://example.com/verb-id/1/"},
-    }
+    statement = mock_statement()
 
     response = client.post(
         "/xAPI/statements/",
@@ -619,19 +494,7 @@ def test_post_statements_list_without_statement_forwarding(
     )
     monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
 
-    statement = {
-        "actor": {
-            "account": {
-                "homePage": "https://example.com/homepage/",
-                "name": str(uuid4()),
-            },
-            "objectType": "Agent",
-        },
-        "id": str(uuid4()),
-        "object": {"id": "https://example.com/object-id/1/"},
-        "timestamp": "2022-06-22T08:31:38Z",
-        "verb": {"id": "https://example.com/verb-id/1/"},
-    }
+    statement = mock_statement()
 
     response = client.post(
         "/xAPI/statements/",
@@ -676,19 +539,7 @@ async def test_post_statements_list_with_statement_forwarding(
     """
     # pylint: disable=invalid-name,unused-argument,too-many-arguments,too-many-locals
 
-    statement = {
-        "actor": {
-            "account": {
-                "homePage": "https://example.com/homepage/",
-                "name": str(uuid4()),
-            },
-            "objectType": "Agent",
-        },
-        "id": str(uuid4()),
-        "object": {"id": "https://example.com/object-id/1/"},
-        "timestamp": "2022-03-15T14:07:51Z",
-        "verb": {"id": "https://example.com/verb-id/1/"},
-    }
+    statement = mock_statement()
 
     # Set-up receiving LRS client
     with monkeypatch.context() as receiving_patch:
@@ -768,3 +619,104 @@ async def test_post_statements_list_with_statement_forwarding(
 
     # Stop receiving LRS client
     await lrs_context.__aexit__(None, None, None)
+
+
+# import responses
+# from ralph.api.auth import get_authenticated_user
+# from ralph.api.auth.basic import get_authenticated_user as get_basic_user
+# from ralph.api.auth.oidc import get_authenticated_user as get_oidc_user
+
+# from ..helpers import create_mock_agent
+# from ..fixtures.auth import create_mock_basic_auth_user, create_mock_oidc_user
+
+# @responses.activate()
+# @pytest.mark.parametrize("auth_method", ["basic", "oidc"])
+# @pytest.mark.parametrize(
+#     "scopes,is_authorized",
+#     [
+#         (["all"], True),
+#         (["all/read"], True),
+#         (["statements/read/mine"], True),
+#         (["statements/read"], True),
+#         (["profile/write", "all/write", "statements/read"], True),
+        
+#         (["statements/write"], False),
+#         (["profile/read"], False),
+#         (["all/write"], False),
+#         ([], False),
+#     ],
+# )
+# def test_api_statements_post_scopes(
+#     monkeypatch, fs, es, auth_method, scopes, is_authorized
+# ):
+#     """Test that getting statements behaves properly according to user scopes."""
+#     monkeypatch.setattr(
+#         "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_SCOPES", True
+#     )
+#     monkeypatch.setattr(
+#         "ralph.api.auth.basic.settings.LRS_RESTRICT_BY_SCOPES", True
+#     )
+
+#     if auth_method == "basic":
+#         agent = create_mock_agent("mbox", 1)
+#         username = "jane"
+#         password = "janepwd"
+#         credentials = create_mock_basic_auth_user(fs, username, password, scopes, agent)
+#         headers = {"Authorization": f"Basic {credentials}"}
+        
+#         app.dependency_overrides[get_authenticated_user] = get_basic_user
+#         get_basic_user.cache_clear()
+
+#     elif auth_method == "oidc":
+#         sub = "123|oidc"
+#         agent = {"openid": sub}
+#         oidc_token = create_mock_oidc_user(sub=sub, scopes=scopes)
+#         headers = {"Authorization": f"Bearer {oidc_token}"}
+
+#         monkeypatch.setattr(
+#             "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_ISSUER_URI",
+#             "http://providerHost:8080/auth/realms/real_name",
+#         )
+#         monkeypatch.setattr(
+#             "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_AUDIENCE",
+#             "http://clientHost:8100",
+#         )
+
+#         app.dependency_overrides[get_authenticated_user] = get_oidc_user
+
+
+#     statements = [
+#         {
+#             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
+#             "timestamp": (datetime.now() - timedelta(hours=1)).isoformat(),
+#             "actor": agent,
+#             "authority": agent,
+#         },
+#         {
+#             "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
+#             "timestamp": datetime.now().isoformat(),
+#             "actor": agent,
+#             "authority": agent,
+#         },
+#     ]
+
+#     # NB: scopes are not linked to statements and backends, we therefore test with ES
+#     database_client_class_path = "ralph.api.routers.statements.DATABASE_CLIENT"
+#     insert_es_statements(es, statements)
+#     monkeypatch.setattr(database_client_class_path, get_es_test_backend())
+
+#     response = client.get(
+#         "/xAPI/statements/",
+#         headers=headers,
+#     )
+
+#     if is_authorized:
+#         assert response.status_code == 200
+#         assert response.json() == {"statements": [statements[1], statements[0]]}
+#     else:
+#         assert response.status_code == 401
+#         assert response.json() == {
+#             "detail": 'Access not authorized to scope: "statements/read/mine".'
+#         }
+
+#     app.dependency_overrides.pop(get_authenticated_user, None)
