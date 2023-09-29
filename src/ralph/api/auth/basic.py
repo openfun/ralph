@@ -99,37 +99,21 @@ def get_stored_credentials(auth_file: Path) -> ServerUsersCredentials:
     return ServerUsersCredentials.parse_file(auth_file)
 
 
+
+
 @cached(
     TTLCache(maxsize=settings.AUTH_CACHE_MAX_SIZE, ttl=settings.AUTH_CACHE_TTL),
     lock=Lock(),
     key=lambda security_scopes, credentials: (
         credentials.username,
         credentials.password,
-        security_scopes,
+        security_scopes.scope_str,
     )
     if credentials is not None
     else None,
 )
-def get_scoped_authenticated_user(
-    security_scopes: SecurityScopes,
-    credentials: Union[HTTPBasicCredentials, None] = Depends(security),
-):
-    user = get_authenticated_user(credentials)
-
-    # Restrict access by scopes
-    if settings.LRS_RESTRICT_BY_SCOPES:
-        for requested_scope in security_scopes.scopes:
-            is_auth = user.scopes.is_authorized(requested_scope)
-            if not is_auth:
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail=f'Access not authorized to scope: "{requested_scope}".',
-                    headers={"WWW-Authenticate": "Basic"},
-                )
-    return user
-
-
 def get_authenticated_user(
+    security_scopes: SecurityScopes = SecurityScopes([]),
     credentials: Union[HTTPBasicCredentials, None] = Depends(security),
 ) -> AuthenticatedUser:
     """Checks valid auth parameters.
@@ -202,5 +186,20 @@ def get_authenticated_user(
         )
 
     user = AuthenticatedUser(scopes=UserScopes(user.scopes), agent=user.agent)
+    
+    # Restrict access by scopes
+    print('U HERE')
+    if settings.LRS_RESTRICT_BY_SCOPES:
+        print('U THERE ')
+        for requested_scope in security_scopes.scopes:
+            is_auth = user.scopes.is_authorized(requested_scope)
+            if not is_auth:
+                print('U kloaky')
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail=f'Access not authorized to scope: "{requested_scope}".',
+                    headers={"WWW-Authenticate": "Basic"},
+                )
+    return user
 
     return user

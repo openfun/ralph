@@ -6,7 +6,7 @@ import json
 import bcrypt
 import pytest
 from fastapi.exceptions import HTTPException
-from fastapi.security import HTTPBasicCredentials
+from fastapi.security import HTTPBasicCredentials, SecurityScopes
 
 from ralph.api.auth.basic import (
     ServerUsersCredentials,
@@ -14,7 +14,7 @@ from ralph.api.auth.basic import (
     get_authenticated_user,
     get_stored_credentials,
 )
-from ralph.api.auth.user import AuthenticatedUser
+from ralph.api.auth.user import AuthenticatedUser, UserScopes
 from ralph.conf import Settings, settings
 
 STORED_CREDENTIALS = json.dumps(
@@ -102,13 +102,13 @@ def test_api_auth_basic_caching_credentials(fs):
     credentials = HTTPBasicCredentials(username="ralph", password="admin")
 
     # Call function as in a first request with these credentials
-    get_authenticated_user(credentials)
+    get_authenticated_user(SecurityScopes(['profile/read']), credentials)
 
     assert get_authenticated_user.cache.popitem() == (
-        ("ralph", "admin"),
+        ("ralph", "admin", 'profile/read'),
         AuthenticatedUser(
             agent={"mbox": "mailto:ralph@example.com"},
-            scopes=["statements/read/mine", "statements/write"],
+            scopes=UserScopes(["statements/read/mine", "statements/write"]),
         ),
     )
 
@@ -124,7 +124,7 @@ def test_api_auth_basic_with_wrong_password(fs):
 
     # Call function as in a first request with these credentials
     with pytest.raises(HTTPException):
-        get_authenticated_user(credentials)
+        get_authenticated_user(SecurityScopes(['all']), credentials)
 
 
 def test_api_auth_basic_no_credential_file_found(fs, monkeypatch):
@@ -132,12 +132,12 @@ def test_api_auth_basic_no_credential_file_found(fs, monkeypatch):
 
     monkeypatch.setenv("RALPH_AUTH_FILE", "other_file")
     monkeypatch.setattr("ralph.api.auth.basic.settings", Settings())
-    get_stored_credentials.cache_clear()
+    get_authenticated_user.cache_clear()
 
     credentials = HTTPBasicCredentials(username="ralph", password="admin")
 
     with pytest.raises(HTTPException):
-        get_authenticated_user(credentials)
+        get_authenticated_user(SecurityScopes(['all']), credentials)
 
 
 def test_get_whoami_no_credentials(basic_auth_test_client):
@@ -224,7 +224,7 @@ def test_get_whoami_correct_credentials(basic_auth_test_client, fs):
     )
 
     assert response.status_code == 200
-    assert response.json() == {
-        "agent": {"mbox": "mailto:ralph@example.com"},
-        "scopes": ["statements/read/mine", "statements/write"],
-    }
+    assert len(response.json().keys()) == 2
+    assert response.json()["agent"] == {"mbox": "mailto:ralph@example.com"}
+    assert sorted(response.json()["scopes"]) == ["statements/read/mine", "statements/write"]
+    

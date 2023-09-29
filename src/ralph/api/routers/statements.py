@@ -335,10 +335,11 @@ async def get(
     if settings.LRS_RESTRICT_BY_AUTHORITY:
         # If using scopes, only restrict results when appropriate
         if settings.LRS_RESTRICT_BY_SCOPES:
-            raise NotImplementedError("Scopes are not yet implemented in Ralph.")
-
-        # Otherwise, enforce mine for all users
-        mine = True
+            if not current_user.scopes.is_authorized('statements/read'):
+                mine = True            
+        else:
+            # Otherwise, enforce mine for all users
+            mine = True
 
     if mine:
         query_params["authority"] = _parse_agent_parameters(current_user.agent)
@@ -395,7 +396,10 @@ async def get(
 @router.put("", responses=POST_PUT_RESPONSES, status_code=status.HTTP_204_NO_CONTENT)
 # pylint: disable=unused-argument
 async def put(
-    current_user: Annotated[AuthenticatedUser, Depends(get_authenticated_user)],
+    current_user: Annotated[
+        AuthenticatedUser,
+        Security(get_authenticated_user, scopes=["statements/write"]),
+    ],
     statement: LaxStatement,
     background_tasks: BackgroundTasks,
     statement_id: UUID = Query(alias="statementId"),
@@ -465,7 +469,8 @@ async def put(
 @router.post("", responses=POST_PUT_RESPONSES)
 async def post(
     current_user: Annotated[
-        AuthenticatedUser, Security(get_authenticated_user, scopes=["statements/write"])
+        AuthenticatedUser,
+        Security(get_authenticated_user, scopes=["statements/write"]),
     ],
     statements: Union[LaxStatement, List[LaxStatement]],
     background_tasks: BackgroundTasks,

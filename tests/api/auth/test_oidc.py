@@ -18,10 +18,11 @@ def test_api_auth_oidc_valid(oidc_auth_test_client):
         headers={"Authorization": f"Bearer {oidc_token}"},
     )
     assert response.status_code == 200
-    assert response.json() == {
-        "scopes": ["all", "profile/read"],
-        "agent": {"openid": "123|oidc"},
-    }
+
+    
+    assert len(response.json().keys()) == 2
+    assert response.json()["agent"] == {"openid": "123|oidc"}
+    assert sorted(response.json()["scopes"]) == ["all", "profile/read"]
 
 
 @responses.activate

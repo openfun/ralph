@@ -92,27 +92,10 @@ def get_public_keys(jwks_uri: AnyUrl) -> dict:
         ) from exc
 
 
-def get_scoped_authenticated_user(
-    security_scopes: SecurityScopes,
-    auth_header: Optional[HTTPBearer] = Depends(oauth2_scheme),
-):
-    user = get_authenticated_user(auth_header)
-
-    # Restrict access by scopes
-    if settings.LRS_RESTRICT_BY_SCOPES:
-        for requested_scope in security_scopes.scopes:
-            is_auth = user.scopes.is_authorized(requested_scope)
-            if not is_auth:
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail=f'Access not authorized to scope: "{requested_scope}".',
-                    headers={"WWW-Authenticate": "Basic"},
-                )
-    return user
-
 
 def get_authenticated_user(
-    auth_header: Annotated[Optional[str], Depends(oauth2_scheme)]
+    auth_header: Annotated[Optional[str], Depends(oauth2_scheme)],
+    security_scopes: SecurityScopes = SecurityScopes([]),
 ) -> AuthenticatedUser:
     """Decode and validate OpenId Connect ID token against issuer in config.
 
@@ -167,5 +150,16 @@ def get_authenticated_user(
         agent={"openid": id_token.sub},
         scopes=UserScopes(id_token.scope.split(" ") if id_token.scope else []),
     )
+
+    # Restrict access by scopes
+    if settings.LRS_RESTRICT_BY_SCOPES:
+        for requested_scope in security_scopes.scopes:
+            is_auth = user.scopes.is_authorized(requested_scope)
+            if not is_auth:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail=f'Access not authorized to scope: "{requested_scope}".',
+                    headers={"WWW-Authenticate": "Basic"},
+                )
 
     return user

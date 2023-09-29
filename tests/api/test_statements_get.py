@@ -11,8 +11,8 @@ from fastapi.testclient import TestClient
 
 from ralph.api import app
 from ralph.api.auth import get_authenticated_user
-from ralph.api.auth.basic import get_scoped_authenticated_user as get_basic_user
-from ralph.api.auth.oidc import get_scoped_authenticated_user as get_oidc_user
+from ralph.api.auth.basic import get_authenticated_user as get_basic_user
+from ralph.api.auth.oidc import get_authenticated_user as get_oidc_user
 from ralph.backends.database.clickhouse import ClickHouseDatabase
 from ralph.backends.database.mongo import MongoDatabase
 from ralph.exceptions import BackendException
@@ -145,7 +145,7 @@ def test_api_statements_get_mine(
     )
 
     # Clear cache before each test iteration
-    get_basic_user.cache_clear()
+    # get_basic_user.cache_clear()
 
     statements = [
         {
@@ -749,10 +749,11 @@ def test_api_statements_get_invalid_query_parameters(basic_auth_credentials, id_
         (["statements/read/mine"], True),
         (["statements/read"], True),
         (["profile/write", "all/write", "statements/read"], True),
-        ([], False),
+        
         (["statements/write"], False),
         (["profile/read"], False),
         (["all/write"], False),
+        ([], False),
     ],
 )
 def test_api_statements_get_scopes(
@@ -762,6 +763,7 @@ def test_api_statements_get_scopes(
         "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_SCOPES", True
     )
 
+
     if auth_method == "basic":
         agent = create_mock_agent("mbox", 1)
         username = "jane"
@@ -770,6 +772,8 @@ def test_api_statements_get_scopes(
         headers = {"Authorization": f"Basic {credentials}"}
 
         app.dependency_overrides[get_authenticated_user] = get_basic_user
+
+        # get_basic_user.cache_clear()
 
     elif auth_method == "oidc":
         sub = "123|oidc"
@@ -791,6 +795,7 @@ def test_api_statements_get_scopes(
         )
 
         app.dependency_overrides[get_authenticated_user] = get_oidc_user
+
 
     statements = [
         {
