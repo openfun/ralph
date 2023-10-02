@@ -553,7 +553,7 @@ def test_api_statements_put_scopes(
     monkeypatch, fs, es, auth_method, scopes, is_authorized
 ):
     """Test that getting statements behaves properly according to user scopes."""
-    # pylint: disable=invalid-name,unused-argument
+    # pylint: disable=invalid-name,unused-argument,duplicate-code
     monkeypatch.setattr(
         "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_SCOPES", True
     )
@@ -591,13 +591,13 @@ def test_api_statements_put_scopes(
     monkeypatch.setattr(database_client_class_path, get_es_test_backend())
 
     response = client.put(
-        "/xAPI/statements/",
+        f"/xAPI/statements/?statementId={statement['id']}",
         headers=headers,
         json=statement,
     )
 
     if is_authorized:
-        assert response.status_code == 200
+        assert response.status_code == 204
     else:
         assert response.status_code == 401
         assert response.json() == {
