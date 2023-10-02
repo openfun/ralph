@@ -20,7 +20,7 @@ Scope = Literal[
 
 
 class UserScopes(FrozenSet[Scope]):
-    @lru_cache()  # LRU raises unhashable type
+    @lru_cache()
     def is_authorized(self, requested_scope: Scope):
         """Check if the requested scope can be accessed based on user scopes."""
 
@@ -30,7 +30,6 @@ class UserScopes(FrozenSet[Scope]):
                 "statements/read/mine",
                 "statements/read",
                 "state/read",
-                "define",
                 "profile/read",
                 "all/read",
             },
@@ -48,7 +47,6 @@ class UserScopes(FrozenSet[Scope]):
             },
         }
 
-        # Create a set with all the scopes available to the user
         expanded_user_scopes = set()
         for scope in self:
             expanded_user_scopes.update(expanded_scopes.get(scope, {scope}))

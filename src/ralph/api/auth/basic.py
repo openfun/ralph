@@ -102,7 +102,7 @@ def get_stored_credentials(auth_file: Path) -> ServerUsersCredentials:
 @cached(
     TTLCache(maxsize=settings.AUTH_CACHE_MAX_SIZE, ttl=settings.AUTH_CACHE_TTL),
     lock=Lock(),
-    key=lambda security_scopes, credentials: (
+    key=lambda credentials, security_scopes: (
         credentials.username,
         credentials.password,
         security_scopes.scope_str,
@@ -111,8 +111,8 @@ def get_stored_credentials(auth_file: Path) -> ServerUsersCredentials:
     else None,
 )
 def get_authenticated_user(
-    security_scopes: SecurityScopes = SecurityScopes([]),
     credentials: Union[HTTPBasicCredentials, None] = Depends(security),
+    security_scopes: SecurityScopes = SecurityScopes([]),
 ) -> AuthenticatedUser:
     """Checks valid auth parameters.
 
@@ -195,6 +195,4 @@ def get_authenticated_user(
                     detail=f'Access not authorized to scope: "{requested_scope}".',
                     headers={"WWW-Authenticate": "Basic"},
                 )
-    return user
-
     return user

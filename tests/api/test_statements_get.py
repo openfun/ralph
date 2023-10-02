@@ -843,8 +843,9 @@ def test_api_statements_get_scopes_with_authority(
 ):
     """Test that restricting by scope and by authority behaves properly.
 
-    Getting statements should be restricted to own for users which only have
-    `statements/read/mine` scope but should not be restricted for wider scopes.
+    Getting statements should be restricted to mine for users which only have
+    `statements/read/mine` scope but should not be restricted when the user
+    has wider scopes.
     """
     monkeypatch.setattr(
         "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_AUTHORITY", True

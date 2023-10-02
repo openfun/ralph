@@ -376,7 +376,7 @@ class Settings(BaseSettings):
     RUNSERVER_AUTH_BACKEND: AuthBackends = AuthBackends.BASIC
     RUNSERVER_AUTH_OIDC_AUDIENCE: str = None
     RUNSERVER_AUTH_OIDC_ISSUER_URI: AnyHttpUrl = None
-    RUNSERVER_BACKEND: Literal["es", "mongo", "clickhouse"] = "es"
+    RUNSERVER_BACKEND: Literal["clickhouse", "es", "mongo"] = "es"
     RUNSERVER_HOST: str = "0.0.0.0"  # nosec
     RUNSERVER_MAX_SEARCH_HITS_COUNT: int = 100
     RUNSERVER_POINT_IN_TIME_KEEP_ALIVE: str = "1m"

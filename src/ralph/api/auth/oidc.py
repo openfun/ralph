@@ -108,7 +108,6 @@ def get_authenticated_user(
     Raises:
         HTTPException
     """
-
     if auth_header is None or "Bearer" not in auth_header:
         logger.error("The OpenID Connect authentication mode requires a Bearer token")
         raise HTTPException(

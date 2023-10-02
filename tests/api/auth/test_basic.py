@@ -102,8 +102,6 @@ def test_api_auth_basic_caching_credentials(fs):
 
     credentials = HTTPBasicCredentials(username="ralph", password="admin")
 
-    print(credentials)
-
     # Call function as in a first request with these credentials
     get_authenticated_user(
         security_scopes=SecurityScopes(["profile/read"]), credentials=credentials
@@ -129,7 +127,7 @@ def test_api_auth_basic_with_wrong_password(fs):
 
     # Call function as in a first request with these credentials
     with pytest.raises(HTTPException):
-        get_authenticated_user(SecurityScopes(["all"]), credentials)
+        get_authenticated_user(credentials, SecurityScopes(["all"]))
 
 
 def test_api_auth_basic_no_credential_file_found(fs, monkeypatch):
@@ -142,7 +140,7 @@ def test_api_auth_basic_no_credential_file_found(fs, monkeypatch):
     credentials = HTTPBasicCredentials(username="ralph", password="admin")
 
     with pytest.raises(HTTPException):
-        get_authenticated_user(SecurityScopes(["all"]), credentials)
+        get_authenticated_user(credentials, SecurityScopes(["all"]))
 
 
 def test_get_whoami_no_credentials(basic_auth_test_client):
