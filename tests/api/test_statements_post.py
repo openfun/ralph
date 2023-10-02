@@ -627,7 +627,7 @@ async def test_post_statements_list_with_statement_forwarding(
     await lrs_context.__aexit__(None, None, None)
 
 
-@responses.activate()
+@responses.activate
 @pytest.mark.parametrize("auth_method", ["basic", "oidc"])
 @pytest.mark.parametrize(
     "scopes,is_authorized",
@@ -644,6 +644,7 @@ def test_api_statements_post_scopes(
     monkeypatch, fs, es, auth_method, scopes, is_authorized
 ):
     """Test that getting statements behaves properly according to user scopes."""
+    # pylint: disable=invalid-name,unused-argument
     monkeypatch.setattr(
         "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_SCOPES", True
     )
@@ -651,9 +652,7 @@ def test_api_statements_post_scopes(
 
     if auth_method == "basic":
         agent = create_mock_agent("mbox", 1)
-        username = "jane"
-        password = "janepwd"
-        credentials = create_mock_basic_auth_user(fs, username, password, scopes, agent)
+        credentials = create_mock_basic_auth_user(fs, scopes=scopes, agent=agent)
         headers = {"Authorization": f"Basic {credentials}"}
 
         app.dependency_overrides[get_authenticated_user] = get_basic_user

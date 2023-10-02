@@ -2,6 +2,7 @@
 import base64
 import json
 import os
+from typing import Optional
 
 import bcrypt
 import pytest
@@ -26,10 +27,10 @@ PUBLIC_KEY_ID = "example-key-id"
 
 def create_mock_basic_auth_user(
     fs_,
-    username: str,
-    password: str,
-    scopes: list,
-    agent: dict,
+    username: str = "jane",
+    password: str = "pwd",
+    scopes: Optional[list] = None,
+    agent: Optional[dict] = None,
 ):
     """Create a user using Basic Auth in the (fake) file system.
 
@@ -40,6 +41,12 @@ def create_mock_basic_auth_user(
         scopes (List[str]): list of scopes available to the user
         agent (dict): an agent that represents the user and may be used as authority
     """
+
+    # Default values for `scopes` and `agent`
+    if scopes is None:
+        scopes = []
+    if agent is None:
+        agent = {"mbox": "mailto:jane@ralphlrs.com"}
 
     # Basic HTTP auth
     credential_bytes = base64.b64encode(f"{username}:{password}".encode("utf-8"))
@@ -224,6 +231,7 @@ def _mock_discovery_response():
 
 @pytest.fixture
 def mock_discovery_response():
+    """Return an example discovery response (fixture)."""
     return _mock_discovery_response()
 
 
@@ -248,11 +256,12 @@ def _mock_oidc_jwks():
 
 @pytest.fixture
 def mock_oidc_jwks():
-    """Mock OpenID Connect keys."""
+    """Mock OpenID Connect keys (fixture)."""
     return _mock_oidc_jwks()
 
 
 def _create_oidc_token(sub, scopes):
+    """Encode token with the private key."""
     return jwt.encode(
         claims={
             "sub": sub,
@@ -274,7 +283,12 @@ def _create_oidc_token(sub, scopes):
     )
 
 
-def create_mock_oidc_user(sub="123|oidc", scopes=["all", "statements/read"]):
+def create_mock_oidc_user(sub="123|oidc", scopes=None):
+    """Instantiate mock oidc user and return auth token."""
+    # Default value for scope
+    if scopes is None:
+        scopes = ["all", "statements/read"]
+
     # Clear LRU cache
     discover_provider.cache_clear()
     get_public_keys.cache_clear()
@@ -301,5 +315,5 @@ def create_mock_oidc_user(sub="123|oidc", scopes=["all", "statements/read"]):
 
 @pytest.fixture
 def encoded_token():
-    """Encode token with the private key."""
+    """Encode token with the private key (fixture)."""
     return _create_oidc_token(sub="123|oidc", scopes=["all", "statements/read"])

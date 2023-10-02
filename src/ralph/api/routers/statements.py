@@ -132,7 +132,6 @@ def strict_query_params(request: Request):
 
 @router.get("")
 @router.get("/")
-# pylint: disable=too-many-arguments, too-many-locals
 async def get(
     request: Request,
     current_user: Annotated[
@@ -168,7 +167,6 @@ async def get(
             "of the Statement is an Activity with the specified id"
         ),
     ),
-    # pylint: disable=unused-argument
     registration: Optional[UUID] = Query(
         None,
         description=(
@@ -176,7 +174,6 @@ async def get(
             "Filter, only return Statements matching the specified registration id"
         ),
     ),
-    # pylint: disable=unused-argument
     related_activities: Optional[bool] = Query(
         False,
         description=(
@@ -187,7 +184,6 @@ async def get(
             "instead of that parameter's normal behaviour"
         ),
     ),
-    # pylint: disable=unused-argument
     related_agents: Optional[bool] = Query(
         False,
         description=(
@@ -219,7 +215,6 @@ async def get(
             "0 indicates return the maximum the server will allow"
         ),
     ),
-    # pylint: disable=unused-argument, redefined-builtin
     format: Optional[Literal["ids", "exact", "canonical"]] = Query(
         "exact",
         description=(
@@ -238,7 +233,6 @@ async def get(
             'as in "exact" mode.'
         ),
     ),
-    # pylint: disable=unused-argument
     attachments: Optional[bool] = Query(
         False,
         description=(
@@ -284,6 +278,7 @@ async def get(
     LRS Specification:
     https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#213-get-statements
     """
+    # pylint: disable=unused-argument,redefined-builtin,too-many-arguments,too-many-locals
     # Make sure the limit does not go above max from settings
     limit = min(limit, settings.RUNSERVER_MAX_SEARCH_HITS_COUNT)
 

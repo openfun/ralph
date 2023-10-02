@@ -740,7 +740,7 @@ def test_api_statements_get_invalid_query_parameters(basic_auth_credentials, id_
         assert response.status_code != 400
 
 
-@responses.activate()
+@responses.activate
 @pytest.mark.parametrize("auth_method", ["basic", "oidc"])
 @pytest.mark.parametrize(
     "scopes,is_authorized",
@@ -760,6 +760,10 @@ def test_api_statements_get_scopes(
     monkeypatch, fs, es, auth_method, scopes, is_authorized
 ):
     """Test that getting statements behaves properly according to user scopes."""
+    # pylint: disable=invalid-name
+    # pylint: disable=too-many-locals
+    # pylint: disable=too-many-arguments
+
     monkeypatch.setattr(
         "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_SCOPES", True
     )
@@ -767,9 +771,7 @@ def test_api_statements_get_scopes(
 
     if auth_method == "basic":
         agent = create_mock_agent("mbox", 1)
-        username = "jane"
-        password = "janepwd"
-        credentials = create_mock_basic_auth_user(fs, username, password, scopes, agent)
+        credentials = create_mock_basic_auth_user(fs, scopes=scopes, agent=agent)
         headers = {"Authorization": f"Basic {credentials}"}
 
         app.dependency_overrides[get_authenticated_user] = get_basic_user
@@ -847,6 +849,7 @@ def test_api_statements_get_scopes_with_authority(
     `statements/read/mine` scope but should not be restricted when the user
     has wider scopes.
     """
+    # pylint: disable=invalid-name
     monkeypatch.setattr(
         "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_AUTHORITY", True
     )

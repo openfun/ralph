@@ -20,6 +20,8 @@ Scope = Literal[
 
 
 class UserScopes(FrozenSet[Scope]):
+    """Scopes available to users."""
+
     @lru_cache()
     def is_authorized(self, requested_scope: Scope):
         """Check if the requested scope can be accessed based on user scopes."""

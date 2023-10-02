@@ -138,6 +138,8 @@ def mock_statement(
     Fields `actor`, `verb`, `object` accept integer values which can be used to
     create distinct values identifiable by this integer.
     """
+    # pylint: disable=redefined-builtin
+
     # Id
     if id_ is None:
         id_ = str(uuid.uuid4())
