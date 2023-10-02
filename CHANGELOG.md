@@ -23,7 +23,7 @@ and this project adheres to
 - `GET /statements` now has "mine" option which matches statements that
 have an authority field matching that of the user
 - CLI: change `push` to `write` and `fetch` to `read` [BC]
-- Upgrade `fastapi` to `0.103.1`
+- Upgrade `fastapi` to `0.103.2`
 - Upgrade `more-itertools` to `10.1.0`
 - Upgrade `sentry_sdk` to `1.31.0`
 - Upgrade `uvicorn` to `0.23.2`
@@ -38,8 +38,13 @@ have an authority field matching that of the user
   and `authority`
 - Backends: update `statementId` and `voidedStatementId` to snake_case,
   with camelCase alias, in `LRSStatementsQuery`
-- API: Add `RALPH_LRS_RESTRICT_BY_AUTHORITY` option making `?mine=True` 
+- API: Add `RALPH_LRS_RESTRICT_BY_AUTHORITY` option making `?mine=True`
   implicit
+
+### Fixed
+
+- API: Fix a typo ('attachements' -> 'attachments') to ensure compliance with
+    the LRS specification and prevent potential silent bugs.
 
 ### Removed
 
