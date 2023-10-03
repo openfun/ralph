@@ -2,7 +2,7 @@
 
 import logging
 from functools import lru_cache
-from typing import Annotated, Optional
+from typing import Optional
 
 import requests
 from fastapi import Depends, HTTPException, status
@@ -10,6 +10,7 @@ from fastapi.security import OpenIdConnect, SecurityScopes
 from jose import ExpiredSignatureError, JWTError, jwt
 from jose.exceptions import JWTClaimsError
 from pydantic import AnyUrl, BaseModel, Extra
+from typing_extensions import Annotated
 
 from ralph.api.auth.user import AuthenticatedUser, UserScopes
 from ralph.conf import settings
