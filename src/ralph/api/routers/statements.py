@@ -277,7 +277,8 @@ async def get(
     LRS Specification:
     https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#213-get-statements
     """
-    # pylint: disable=unused-argument,redefined-builtin,too-many-arguments,too-many-locals
+    # pylint: disable=unused-argument,redefined-builtin,too-many-arguments
+    # pylint: disable=too-many-locals
     # Make sure the limit does not go above max from settings
     limit = min(limit, settings.RUNSERVER_MAX_SEARCH_HITS_COUNT)
 
@@ -326,15 +327,16 @@ async def get(
             json.loads(query_params["agent"])
         )
 
+    # If using authority, always restrict to mine
     if settings.LRS_RESTRICT_BY_AUTHORITY:
-        # If using scopes, restrict to "mine" when user does not have
-        # scopes wider than `statements/read/mine`
-        if settings.LRS_RESTRICT_BY_SCOPES:
-            if not current_user.scopes.is_authorized("statements/read"):
-                mine = True
-        else:
-            # If not using scopes, enforce "mine" for all users
-            mine = True
+        mine = True
+
+    # If using scopes, restrict to "mine" when user does not have
+    # scopes wider than `statements/read/mine`
+    if settings.LRS_RESTRICT_BY_SCOPES and current_user.scopes.is_authorized(
+        "statements/read"
+    ):
+        mine = False
 
     if mine:
         query_params["authority"] = _parse_agent_parameters(current_user.agent)

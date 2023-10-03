@@ -9,6 +9,7 @@ from pydantic import ValidationError
 
 from ralph import conf
 from ralph.conf import CommaSeparatedTuple, Settings, settings
+from ralph.exceptions import ConfigurationException
 from ralph.utils import import_string
 
 
@@ -182,3 +183,20 @@ def test_conf_core_settings_should_impact_settings_defaults(monkeypatch):
     # Defaults.
     assert str(conf.settings.AUTH_FILE) == "/foo/auth.json"
     assert conf.settings.BACKENDS.STORAGE.FS.PATH == "/foo/archives"
+
+
+def test_conf_forbidden_scopes_without_authority(monkeypatch):
+    """Test that using RESTRICT_BY_SCOPES without RESTRICT_BY_AUTHORITY raises an
+    error."""
+
+    monkeypatch.setenv("RALPH_LRS_RESTRICT_BY_AUTHORITY", False)
+    monkeypatch.setenv("RALPH_LRS_RESTRICT_BY_SCOPES", True)
+
+    with pytest.raises(
+        ConfigurationException,
+        match=(
+            "`LRS_RESTRICT_BY_AUTHORITY` must be set to `True` if using "
+            "`LRS_RESTRICT_BY_SCOPES=True`"
+        ),
+    ):
+        reload(conf)
