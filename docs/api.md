@@ -108,9 +108,9 @@ $ curl --user john.doe@example.com:PASSWORD http://localhost:8100/whoami
 
 Ralph LRS API server supports OpenID Connect (OIDC) on top of OAuth 2.0 for authentication and authorization.
 
-To enable OIDC auth, you should set the `RALPH_RUNSERVER_AUTH_BACKEND` environment variable as follows:
+To enable OIDC auth, you should modify the `RALPH_RUNSERVER_AUTH_BACKEND` environment variable by adding (or replacing) `oidc`:
 ```bash
-RALPH_RUNSERVER_AUTH_BACKEND=oidc
+RALPH_RUNSERVER_AUTH_BACKEND=basic,oidc
 ```
 and you should define the `RALPH_RUNSERVER_AUTH_OIDC_ISSUER_URI` environment variable with your identity provider's Issuer Identifier URI as follows:
 ```bash

@@ -326,11 +326,12 @@ class Settings(BaseSettings):
         env_file = ".env"
         env_file_encoding = core_settings.LOCALE_ENCODING
 
-    class AuthBackends(Enum):
+    class AuthBackend(Enum):
         """Enum of the authentication backends."""
-
         BASIC = "basic"
         OIDC = "oidc"
+
+    AuthBackends = List[AuthBackend]
 
     _CORE: CoreSettings = core_settings
     AUTH_FILE: Path = _CORE.APP_DIR / "auth.json"
@@ -373,7 +374,7 @@ class Settings(BaseSettings):
         },
     }
     PARSERS: ParserSettings = ParserSettings()
-    RUNSERVER_AUTH_BACKEND: AuthBackends = AuthBackends.BASIC
+    RUNSERVER_AUTH_BACKEND: AuthBackends = [AuthBackend.BASIC]
     RUNSERVER_AUTH_OIDC_AUDIENCE: str = None
     RUNSERVER_AUTH_OIDC_ISSUER_URI: AnyHttpUrl = None
     RUNSERVER_BACKEND: Literal["clickhouse", "es", "mongo"] = "es"

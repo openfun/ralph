@@ -168,6 +168,8 @@ def test_api_statements_get_mine(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {credentials_1_bis}"},
     )
+    print('yeah')
+    print(response.content)
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[1], statements[0]]}
 

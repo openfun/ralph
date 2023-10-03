@@ -6,7 +6,7 @@ from typing import Annotated, Optional
 
 import requests
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OpenIdConnect, SecurityScopes
+from fastapi.security import OpenIdConnect, SecurityScopes, HTTPBearer
 from jose import ExpiredSignatureError, JWTError, jwt
 from jose.exceptions import JWTClaimsError
 from pydantic import AnyUrl, BaseModel, Extra
@@ -93,7 +93,7 @@ def get_public_keys(jwks_uri: AnyUrl) -> dict:
 
 
 def get_authenticated_user(
-    auth_header: Annotated[Optional[str], Depends(oauth2_scheme)],
+    auth_header: Annotated[Optional[HTTPBearer], Depends(oauth2_scheme)],
     security_scopes: SecurityScopes = SecurityScopes([]),
 ) -> AuthenticatedUser:
     """Decode and validate OpenId Connect ID token against issuer in config.
