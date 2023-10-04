@@ -28,7 +28,7 @@ from tests.fixtures.backends import (
 )
 
 from ..fixtures.auth import mock_basic_auth_user
-from ..helpers import mock_activity, mock_agent, mock_statement
+from ..helpers import mock_activity, mock_agent
 
 client = TestClient(app)
 
@@ -137,7 +137,9 @@ def test_api_statements_get_mine(
     password_1 = "janepwd"
     scopes = []
 
-    credentials_1_bis = mock_basic_auth_user(fs, username_1, password_1, scopes, agent_1_bis)
+    credentials_1_bis = mock_basic_auth_user(
+        fs, username_1, password_1, scopes, agent_1_bis
+    )
 
     # Clear cache before each test iteration
     get_authenticated_user.cache_clear()
@@ -657,9 +659,7 @@ def test_api_statements_get_with_no_matching_statement(
     assert response.json() == {"statements": []}
 
 
-def test_api_statements_get_with_database_query_failure(
-    auth_credentials, monkeypatch
-):
+def test_api_statements_get_with_database_query_failure(auth_credentials, monkeypatch):
     """Test the get statements API route, given a query raising a BackendException,
     should return an error response with HTTP code 500.
     """
@@ -683,9 +683,7 @@ def test_api_statements_get_with_database_query_failure(
 
 
 @pytest.mark.parametrize("id_param", ["statementId", "voidedStatementId"])
-def test_api_statements_get_invalid_query_parameters(
-    auth_credentials, id_param
-):
+def test_api_statements_get_invalid_query_parameters(auth_credentials, id_param):
     """Test error response for invalid query parameters"""
 
     id_1 = "be67b160-d958-4f51-b8b8-1892002dbac6"

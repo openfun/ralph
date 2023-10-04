@@ -3,12 +3,9 @@
 import asyncio
 import json
 import logging
-import random
 import time
-from datetime import datetime
 from functools import partial
 from urllib.parse import ParseResult, parse_qsl, urlencode, urljoin, urlparse
-from uuid import uuid4
 
 import httpx
 import pytest

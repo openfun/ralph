@@ -25,7 +25,11 @@ from tests.fixtures.backends import (
     get_mongo_test_backend,
 )
 
-from ..helpers import assert_statement_get_responses_are_equivalent, string_is_date, mock_statement
+from ..helpers import (
+    assert_statement_get_responses_are_equivalent,
+    mock_statement,
+    string_is_date,
+)
 
 client = TestClient(app)
 
@@ -58,7 +62,7 @@ def test_api_statements_put_single_statement_directly(
     # pylint: disable=invalid-name,unused-argument
 
     monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
-    
+
     statement = mock_statement()
 
     response = client.put(
@@ -186,7 +190,7 @@ def test_api_statements_put_single_statement_no_trailing_slash(
     # pylint: disable=invalid-name,unused-argument
 
     monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
-    
+
     statement = mock_statement()
 
     response = client.put(
@@ -210,7 +214,7 @@ def test_api_statements_put_id_mismatch(
     """Test the put statements API route when the statementId doesn't match."""
     monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
 
-    statement = mock_statement(id_ = str(uuid4()))
+    statement = mock_statement(id_=str(uuid4()))
 
     different_statement_id = str(uuid4())
     response = client.put(

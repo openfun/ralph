@@ -1,9 +1,11 @@
 """Utilities for testing Ralph."""
-import datetime
 import hashlib
+import random
+import time
 import uuid
-from uuid import UUID
+from datetime import datetime
 from typing import Optional, Union
+from uuid import UUID
 
 from ralph.utils import statements_are_equivalent
 
@@ -11,7 +13,7 @@ from ralph.utils import statements_are_equivalent
 def string_is_date(string: str):
     """Check if string can be parsed as a date."""
     try:
-        datetime.datetime.fromisoformat(string)
+        datetime.fromisoformat(string)
         return True
     except ValueError:
         return False
@@ -129,11 +131,20 @@ def mock_statement(
     actor: Optional[Union[dict, int]] = None,
     verb: Optional[Union[dict, int]] = None,
     object: Optional[Union[dict, int]] = None,
-    timestamp=None,
+    timestamp: Optional[Union[str, int]] = None,
 ):
     """Generate fake statements with random or provided parameters.
-    Fields `actor`, `verb`, `object` accept integer values which can be used to
-    create distinct values identifiable by this integer.
+    Fields `actor`, `verb`, `object`, `timestamp` accept integer values which
+    can be used to create distinct values identifiable by this integer. For each
+    variable, using `None` will assign a default value. `timestamp` may be ommited
+    by using value `""`
+
+    Args:
+        id_: id of the statement
+        actor: actor of the statement
+        verb: verb of the statement
+        object: object of the statement
+        timestamp: timestamp of the statement. Use `""` to omit timestamp
     """
     # pylint: disable=redefined-builtin
 
@@ -165,12 +176,19 @@ def mock_statement(
     if timestamp is None:
         timestamp = datetime.strftime(
             datetime.fromtimestamp(time.time() - random.random()),
-            "%Y-%m-%dT%H:%M:%S",
+            "%Y-%m-%dT%H:%M:%SZ",
         )
     elif isinstance(timestamp, int):
         timestamp = datetime.strftime(
-            datetime.fromtimestamp((1696236665 + timestamp), "%Y-%m-%dT%H:%M:%S")
+            datetime.fromtimestamp(1696236665 + timestamp), "%Y-%m-%dT%H:%M:%SZ"
         )
+    elif timestamp == "":
+        return {
+            "id": id_,
+            "actor": actor,
+            "verb": verb,
+            "object": object,
+        }
 
     return {
         "id": id_,

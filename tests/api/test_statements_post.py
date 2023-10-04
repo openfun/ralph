@@ -28,9 +28,9 @@ from tests.fixtures.backends import (
 
 from ..helpers import (
     assert_statement_get_responses_are_equivalent,
+    mock_statement,
     string_is_date,
     string_is_uuid,
-    mock_statement
 )
 
 client = TestClient(app)
@@ -316,7 +316,7 @@ def test_api_statements_post_list_with_duplicates(
     # pylint: disable=invalid-name,unused-argument
 
     monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
-    
+
     statement = mock_statement()
 
     response = client.post(
@@ -354,7 +354,7 @@ def test_api_statements_post_list_with_duplicate_of_existing_statement(
     monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend())
 
     statement_uuid = str(uuid4())
-    
+
     statement = mock_statement(id_=statement_uuid)
 
     # Post the statement once.
@@ -420,7 +420,7 @@ def test_api_statements_post_with_a_failure_during_storage(
     monkeypatch.setattr(
         "ralph.api.routers.statements.DATABASE_CLIENT", backend_instance
     )
-    
+
     statement = mock_statement()
 
     response = client.post(
@@ -454,7 +454,7 @@ def test_api_statements_post_with_a_failure_during_id_query(
     monkeypatch.setattr(
         "ralph.api.routers.statements.DATABASE_CLIENT", backend_instance
     )
-    
+
     statement = mock_statement()
 
     response = client.post(
