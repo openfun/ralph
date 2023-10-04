@@ -28,7 +28,7 @@ from tests.fixtures.backends import (
 )
 
 from ..fixtures.auth import create_user
-from ..helpers import create_mock_activity, create_mock_agent
+from ..helpers import mock_activity, mock_agent, mock_statement
 
 client = TestClient(app)
 
@@ -106,7 +106,7 @@ def insert_statements_and_monkeypatch_backend(
         "account_different_home_page",
     ],
 )
-def test_api_statements_get_statements_mine(
+def test_api_statements_get_mine(
     monkeypatch, fs, insert_statements_and_monkeypatch_backend, ifi
 ):
     """(Security) Test that the get statements API route, given a "mine=True"
@@ -117,21 +117,21 @@ def test_api_statements_get_statements_mine(
 
     # Create two distinct agents
     if ifi == "account_same_home_page":
-        agent_1 = create_mock_agent("account", 1, home_page_id=1)
-        agent_1_bis = create_mock_agent(
+        agent_1 = mock_agent("account", 1, home_page_id=1)
+        agent_1_bis = mock_agent(
             "account", 1, home_page_id=1, name="name", use_object_type=False
         )
-        agent_2 = create_mock_agent("account", 2, home_page_id=1)
+        agent_2 = mock_agent("account", 2, home_page_id=1)
     elif ifi == "account_different_home_page":
-        agent_1 = create_mock_agent("account", 1, home_page_id=1)
-        agent_1_bis = create_mock_agent(
+        agent_1 = mock_agent("account", 1, home_page_id=1)
+        agent_1_bis = mock_agent(
             "account", 1, home_page_id=1, name="name", use_object_type=False
         )
-        agent_2 = create_mock_agent("account", 1, home_page_id=2)
+        agent_2 = mock_agent("account", 1, home_page_id=2)
     else:
-        agent_1 = create_mock_agent(ifi, 1)
-        agent_1_bis = create_mock_agent(ifi, 1, name="name", use_object_type=False)
-        agent_2 = create_mock_agent(ifi, 2)
+        agent_1 = mock_agent(ifi, 1)
+        agent_1_bis = mock_agent(ifi, 1, name="name", use_object_type=False)
+        agent_2 = mock_agent(ifi, 2)
 
     username_1 = "jane"
     password_1 = "janepwd"
@@ -219,7 +219,7 @@ def test_api_statements_get_statements_mine(
     assert response.status_code == 422
 
 
-def test_api_statements_get_statements(
+def test_api_statements_get(
     insert_statements_and_monkeypatch_backend, auth_credentials
 ):
     """Test the get statements API route without any filters set up."""
@@ -247,7 +247,7 @@ def test_api_statements_get_statements(
         assert response.json() == {"statements": [statements[1], statements[0]]}
 
 
-def test_api_statements_get_statements_ascending(
+def test_api_statements_get_ascending(
     insert_statements_and_monkeypatch_backend, auth_credentials
 ):
     """Test the get statements API route, given an "ascending" query parameter, should
@@ -276,7 +276,7 @@ def test_api_statements_get_statements_ascending(
     assert response.json() == {"statements": [statements[0], statements[1]]}
 
 
-def test_api_statements_get_statements_by_statement_id(
+def test_api_statements_get_by_statement_id(
     insert_statements_and_monkeypatch_backend, auth_credentials
 ):
     """Test the get statements API route, given a "statementId" query parameter, should
@@ -315,7 +315,7 @@ def test_api_statements_get_statements_by_statement_id(
         "account_different_home_page",
     ],
 )
-def test_api_statements_get_statements_by_agent(
+def test_api_statements_get_by_agent(
     ifi, insert_statements_and_monkeypatch_backend, auth_credentials
 ):
     """Test the get statements API route, given an "agent" query parameter, should
@@ -325,14 +325,14 @@ def test_api_statements_get_statements_by_agent(
 
     # Create two distinct agents
     if ifi == "account_same_home_page":
-        agent_1 = create_mock_agent("account", 1, home_page_id=1)
-        agent_2 = create_mock_agent("account", 2, home_page_id=1)
+        agent_1 = mock_agent("account", 1, home_page_id=1)
+        agent_2 = mock_agent("account", 2, home_page_id=1)
     elif ifi == "account_different_home_page":
-        agent_1 = create_mock_agent("account", 1, home_page_id=1)
-        agent_2 = create_mock_agent("account", 1, home_page_id=2)
+        agent_1 = mock_agent("account", 1, home_page_id=1)
+        agent_2 = mock_agent("account", 1, home_page_id=2)
     else:
-        agent_1 = create_mock_agent(ifi, 1)
-        agent_2 = create_mock_agent(ifi, 2)
+        agent_1 = mock_agent(ifi, 1)
+        agent_2 = mock_agent(ifi, 2)
 
     statements = [
         {
@@ -359,7 +359,7 @@ def test_api_statements_get_statements_by_agent(
     assert response.json() == {"statements": [statements[0]]}
 
 
-def test_api_statements_get_statements_by_verb(
+def test_api_statements_get_by_verb(
     insert_statements_and_monkeypatch_backend, auth_credentials
 ):
     """Test the get statements API route, given a "verb" query parameter, should
@@ -390,7 +390,7 @@ def test_api_statements_get_statements_by_verb(
     assert response.json() == {"statements": [statements[1]]}
 
 
-def test_api_statements_get_statements_by_activity(
+def test_api_statements_get_by_activity(
     insert_statements_and_monkeypatch_backend, auth_credentials
 ):
     """Test the get statements API route, given an "activity" query parameter, should
@@ -398,8 +398,8 @@ def test_api_statements_get_statements_by_activity(
     """
     # pylint: disable=redefined-outer-name
 
-    activity_0 = create_mock_activity(0)
-    activity_1 = create_mock_activity(1)
+    activity_0 = mock_activity(0)
+    activity_1 = mock_activity(1)
 
     statements = [
         {
@@ -433,7 +433,7 @@ def test_api_statements_get_statements_by_activity(
     assert response.json()["detail"][0]["msg"] == "'INVALID_IRI' is not a valid 'IRI'."
 
 
-def test_api_statements_get_statements_since_timestamp(
+def test_api_statements_get_since_timestamp(
     insert_statements_and_monkeypatch_backend, auth_credentials
 ):
     """Test the get statements API route, given a "since" query parameter, should
@@ -463,7 +463,7 @@ def test_api_statements_get_statements_since_timestamp(
     assert response.json() == {"statements": [statements[1]]}
 
 
-def test_api_statements_get_statements_until_timestamp(
+def test_api_statements_get_until_timestamp(
     insert_statements_and_monkeypatch_backend, auth_credentials
 ):
     """Test the get statements API route, given an "until" query parameter,
@@ -493,7 +493,7 @@ def test_api_statements_get_statements_until_timestamp(
     assert response.json() == {"statements": [statements[0]]}
 
 
-def test_api_statements_get_statements_with_pagination(
+def test_api_statements_get_with_pagination(
     monkeypatch, insert_statements_and_monkeypatch_backend, auth_credentials
 ):
     """Test the get statements API route, given a request leading to more results than
@@ -563,7 +563,7 @@ def test_api_statements_get_statements_with_pagination(
     assert third_response.json() == {"statements": [statements[0]]}
 
 
-def test_api_statements_get_statements_with_pagination_and_query(
+def test_api_statements_get_with_pagination_and_query(
     monkeypatch, insert_statements_and_monkeypatch_backend, auth_credentials
 ):
     """Test the get statements API route, given a request with a query parameter
@@ -628,7 +628,7 @@ def test_api_statements_get_statements_with_pagination_and_query(
     assert second_response.json() == {"statements": [statements[0]]}
 
 
-def test_api_statements_get_statements_with_no_matching_statement(
+def test_api_statements_get_with_no_matching_statement(
     insert_statements_and_monkeypatch_backend, auth_credentials
 ):
     """Test the get statements API route, given a query yielding no matching statement,
@@ -657,7 +657,7 @@ def test_api_statements_get_statements_with_no_matching_statement(
     assert response.json() == {"statements": []}
 
 
-def test_api_statements_get_statements_with_database_query_failure(
+def test_api_statements_get_with_database_query_failure(
     auth_credentials, monkeypatch
 ):
     """Test the get statements API route, given a query raising a BackendException,
@@ -683,7 +683,7 @@ def test_api_statements_get_statements_with_database_query_failure(
 
 
 @pytest.mark.parametrize("id_param", ["statementId", "voidedStatementId"])
-def test_api_statements_get_statements_invalid_query_parameters(
+def test_api_statements_get_invalid_query_parameters(
     auth_credentials, id_param
 ):
     """Test error response for invalid query parameters"""
@@ -710,8 +710,8 @@ def test_api_statements_get_statements_invalid_query_parameters(
 
     # Check for 400 status code when invalid parameters are provided with a statementId
     for invalid_param, value in [
-        ("activity", create_mock_activity()["id"]),
-        ("agent", json.dumps(create_mock_agent("mbox", 1))),
+        ("activity", mock_activity()["id"]),
+        ("agent", json.dumps(mock_agent("mbox", 1))),
         ("verb", "verb_1"),
     ]:
         response = client.get(
