@@ -41,7 +41,6 @@ from ralph.models.xapi.base.agents import (
 from ralph.models.xapi.base.common import IRI
 from ralph.utils import (
     await_if_coroutine,
-    desync,
     get_backend_instance,
     now,
     statements_are_equivalent,
@@ -423,9 +422,7 @@ async def put(
     _enrich_statement_with_authority(statement_as_dict, current_user)
 
     try:
-        existing_statements = desync(
-            BACKEND_CLIENT.query_statements_by_ids([statementId])
-        )
+        existing_statements = BACKEND_CLIENT.query_statements_by_ids([statementId])
     except BackendException as error:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -546,9 +543,7 @@ async def post(
         _enrich_statement_with_authority(statement, current_user)
 
     try:
-        existing_statements = desync(
-            BACKEND_CLIENT.query_statements_by_ids(statements_ids)
-        )
+        existing_statements = BACKEND_CLIENT.query_statements_by_ids(statements_ids)
     except BackendException as error:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

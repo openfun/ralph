@@ -8,7 +8,7 @@ import operator
 from functools import reduce
 from importlib import import_module
 from inspect import getmembers, isclass, iscoroutine
-from typing import Any, Dict, Iterable, Iterator, List, Optional, Union
+from typing import Any, Dict, Iterable, Iterator, List, Union
 
 from pydantic import BaseModel
 
@@ -280,9 +280,3 @@ async def await_if_coroutine(value):
     if iscoroutine(value):
         return await value
     return value
-
-
-async def desync(generator):
-    """Wrap a synchronous generator to be able to asynchronously iterate over it."""
-    for element in generator:
-        yield element
