@@ -168,12 +168,20 @@ def mock_statement(
     if timestamp is None:
         timestamp = datetime.strftime(
             datetime.fromtimestamp(time.time() - random.random()),
-            "%Y-%m-%dT%H:%M:%S",
+            "%Y-%m-%dT%H:%M:%SZ",
         )
     elif isinstance(timestamp, int):
         timestamp = datetime.strftime(
-            datetime.fromtimestamp((1696236665 + timestamp), "%Y-%m-%dT%H:%M:%S")
+            datetime.fromtimestamp(1696236665 + timestamp), "%Y-%m-%dT%H:%M:%SZ"
         )
+    elif timestamp == "":
+        return {
+            "id": id_,
+            "actor": actor,
+            "verb": verb,
+            "object": object,
+        }
+
 
     return {
         "id": id_,
