@@ -27,7 +27,7 @@ from tests.fixtures.backends import (
     get_mongo_test_backend,
 )
 
-from ..fixtures.auth import create_user
+from ..fixtures.auth import mock_basic_auth_user
 from ..helpers import mock_activity, mock_agent, mock_statement
 
 client = TestClient(app)
@@ -137,7 +137,7 @@ def test_api_statements_get_mine(
     password_1 = "janepwd"
     scopes = []
 
-    credentials_1_bis = create_user(fs, username_1, password_1, scopes, agent_1_bis)
+    credentials_1_bis = mock_basic_auth_user(fs, username_1, password_1, scopes, agent_1_bis)
 
     # Clear cache before each test iteration
     get_authenticated_user.cache_clear()
