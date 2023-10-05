@@ -9,15 +9,6 @@ from ralph.api.auth.basic import get_authenticated_user as get_basic_user
 from ralph.api.auth.oidc import get_authenticated_user as get_oidc_user
 from ralph.conf import settings
 
-# At startup, select the authentication mode that will be used
-# if :
-#     get_authenticated_user = get_oidc_user
-# else:
-#     get_authenticated_user = get_basic_user
-
-
-get_authenticated_user = get_basic_user
-
 def get_authenticated_user(
     security_scopes: SecurityScopes = SecurityScopes([]),
     basic_auth_user = Depends(get_basic_user), 

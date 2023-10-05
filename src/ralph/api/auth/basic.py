@@ -118,7 +118,6 @@ def get_authenticated_user(
     against our own list of hashed credentials.
 
     Args:
-        # TODO: remove security_scopes: scopes requested for access
         credentials (iterator): auth parameters from the Authorization header
 
     Raises:
