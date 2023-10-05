@@ -102,18 +102,13 @@ def get_backend_instance(
     if not options:
         return backend_class(backend_settings)
 
-    settings_instance = backend_settings.copy()
     prefix = f"{backend_name}_"
     # Filter backend-related parameters. Parameter name is supposed to start
     # with the backend name
     names = filter(lambda key: key.startswith(prefix), options.keys())
     options = {name.replace(prefix, "").upper(): options[name] for name in names}
 
-    # Override settings with CLI options
-    for option, value in options.items():
-        setattr(settings_instance, option, value)
-
-    return backend_class(settings_instance)
+    return backend_class(backend_settings.__class__(**options))
 
 
 def get_root_logger():
