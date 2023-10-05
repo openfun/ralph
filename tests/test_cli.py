@@ -830,36 +830,46 @@ def test_cli_list_command_with_fs_backend(fs, monkeypatch):
 def test_cli_write_command_with_fs_backend(fs):
     """Test the write command using the FS backend."""
     fs.create_dir(str(settings.APP_DIR))
+    fs.create_dir("foo")
 
-    filename = Path("file1")
-    file_path = Path(FSDataBackendSettings().DEFAULT_DIRECTORY_PATH) / filename
+    filename = Path("foo/file1")
 
     # Create a file
     runner = CliRunner()
-    result = runner.invoke(cli, "write -b fs -t file1".split(), input=b"test content")
+    result = runner.invoke(
+        cli,
+        "write -b fs -t file1 --fs-default-directory-path foo".split(),
+        input=b"test content"
+    )
 
     assert result.exit_code == 0
 
-    with file_path.open("rb") as test_file:
+    with filename.open("rb") as test_file:
         content = test_file.read()
 
     assert b"test content" in content
 
     # Trying to create the same file without -f should raise an error
     runner = CliRunner()
-    result = runner.invoke(cli, "write -b fs -t file1".split(), input=b"other content")
+    result = runner.invoke(
+        cli,
+        "write -b fs -t file1 --fs-default-directory-path foo".split(),
+        input=b"other content"
+    )
     assert result.exit_code == 1
     assert "file1 already exists and overwrite is not allowed" in result.output
 
     # Try to create the same file with -f
     runner = CliRunner()
     result = runner.invoke(
-        cli, "write -b fs -t file1 -f".split(), input=b"other content"
+        cli,
+        "write -b fs -t file1 -f --fs-default-directory-path foo".split(),
+        input=b"other content"
     )
 
     assert result.exit_code == 0
 
-    with file_path.open("rb") as test_file:
+    with filename.open("rb") as test_file:
         content = test_file.read()
 
     assert b"other content" in content
