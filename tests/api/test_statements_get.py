@@ -168,8 +168,6 @@ def test_api_statements_get_mine(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {credentials_1_bis}"},
     )
-    print('yeah')
-    print(response.content)
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[1], statements[0]]}
 
@@ -776,7 +774,7 @@ def test_api_statements_get_scopes(
         credentials = create_mock_basic_auth_user(fs, scopes=scopes, agent=agent)
         headers = {"Authorization": f"Basic {credentials}"}
 
-        app.dependency_overrides[get_authenticated_user] = get_basic_user
+        #app.dependency_overrides[get_authenticated_user] = get_basic_user
         get_basic_user.cache_clear()
 
     elif auth_method == "oidc":
@@ -794,7 +792,7 @@ def test_api_statements_get_scopes(
             "http://clientHost:8100",
         )
 
-        app.dependency_overrides[get_authenticated_user] = get_oidc_user
+        #app.dependency_overrides[get_authenticated_user] = get_oidc_user
 
     statements = [
         {
@@ -830,7 +828,7 @@ def test_api_statements_get_scopes(
             "detail": 'Access not authorized to scope: "statements/read/mine".'
         }
 
-    app.dependency_overrides.pop(get_authenticated_user, None)
+    #app.dependency_overrides.pop(get_authenticated_user, None)
 
 
 @pytest.mark.parametrize(
@@ -901,4 +899,4 @@ def test_api_statements_get_scopes_with_authority(
     else:
         assert response.json() == {"statements": [statements[0]]}
 
-    app.dependency_overrides.pop(get_authenticated_user, None)
+    #app.dependency_overrides.pop(get_authenticated_user, None)

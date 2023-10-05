@@ -564,7 +564,7 @@ def test_api_statements_put_scopes(
         credentials = create_mock_basic_auth_user(fs, scopes=scopes, agent=agent)
         headers = {"Authorization": f"Basic {credentials}"}
 
-        app.dependency_overrides[get_authenticated_user] = get_basic_user
+        #app.dependency_overrides[get_authenticated_user] = get_basic_user
         get_basic_user.cache_clear()
 
     elif auth_method == "oidc":
@@ -582,7 +582,7 @@ def test_api_statements_put_scopes(
             "http://clientHost:8100",
         )
 
-        app.dependency_overrides[get_authenticated_user] = get_oidc_user
+        #app.dependency_overrides[get_authenticated_user] = get_oidc_user
 
     statement = mock_statement()
 
@@ -604,4 +604,4 @@ def test_api_statements_put_scopes(
             "detail": 'Access not authorized to scope: "statements/write".'
         }
 
-    app.dependency_overrides.pop(get_authenticated_user, None)
+    #app.dependency_overrides.pop(get_authenticated_user, None)

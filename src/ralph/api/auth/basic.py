@@ -102,17 +102,15 @@ def get_stored_credentials(auth_file: Path) -> ServerUsersCredentials:
 @cached(
     TTLCache(maxsize=settings.AUTH_CACHE_MAX_SIZE, ttl=settings.AUTH_CACHE_TTL),
     lock=Lock(),
-    key=lambda credentials, security_scopes: (
+    key=lambda credentials: (
         credentials.username,
         credentials.password,
-        security_scopes.scope_str,
     )
     if credentials is not None
     else None,
 )
 def get_authenticated_user(
     credentials: Union[HTTPBasicCredentials, None] = Depends(security),
-    security_scopes: SecurityScopes = SecurityScopes([]),
 ) -> AuthenticatedUser:
     """Checks valid auth parameters.
 
@@ -120,7 +118,7 @@ def get_authenticated_user(
     against our own list of hashed credentials.
 
     Args:
-        security_scopes: scopes requested for access
+        # TODO: remove security_scopes: scopes requested for access
         credentials (iterator): auth parameters from the Authorization header
 
     Raises:
@@ -128,11 +126,7 @@ def get_authenticated_user(
     """
     if not credentials:
         logger.error("The basic authentication mode requires a Basic Auth header")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Basic"},
-        )
+        return None
 
     try:
         user = next(
@@ -151,9 +145,7 @@ def get_authenticated_user(
         )
         hashed_password = None
     except AuthenticationError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail=str(exc)
-        ) from exc
+        return None
 
     # Check that password was passed
     if not hashed_password:
@@ -162,12 +154,8 @@ def get_authenticated_user(
         bcrypt.checkpw(
             credentials.password.encode(settings.LOCALE_ENCODING), UNUSED_PASSWORD
         )
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Basic"},
-        )
-
+        return None
+    
     # Check password validity
     if not bcrypt.checkpw(
         credentials.password.encode(settings.LOCALE_ENCODING),
@@ -177,22 +165,8 @@ def get_authenticated_user(
             "Authentication failed for user %s",
             credentials.username,
         )
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Basic"},
-        )
+        return None
 
     user = AuthenticatedUser(scopes=UserScopes(user.scopes), agent=user.agent)
 
-    # Restrict access by scopes
-    if settings.LRS_RESTRICT_BY_SCOPES:
-        for requested_scope in security_scopes.scopes:
-            is_auth = user.scopes.is_authorized(requested_scope)
-            if not is_auth:
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail=f'Access not authorized to scope: "{requested_scope}".',
-                    headers={"WWW-Authenticate": "Basic"},
-                )
     return user

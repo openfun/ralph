@@ -115,7 +115,7 @@ def basic_auth_test_client():
         get_authenticated_user as get_basic,  # pylint:disable=import-outside-toplevel
     )
 
-    app.dependency_overrides[get_authenticated_user] = get_basic
+    #app.dependency_overrides[get_authenticated_user] = get_basic
 
     with TestClient(app) as test_client:
         yield test_client
@@ -135,7 +135,7 @@ def oidc_auth_test_client(monkeypatch):
     )
     from ralph.api.auth.oidc import get_authenticated_user as get_oidc
 
-    app.dependency_overrides[get_authenticated_user] = get_oidc
+    #app.dependency_overrides[get_authenticated_user] = get_oidc
     with TestClient(app) as test_client:
         yield test_client
 
