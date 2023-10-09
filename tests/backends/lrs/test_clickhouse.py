@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 import pytest
 from clickhouse_connect.driver.exceptions import ClickHouseError
 
-from ralph.backends.lrs.base import StatementParameters
+from ralph.backends.lrs.base import RalphStatementsQuery
 from ralph.exceptions import BackendException
 
 
@@ -19,42 +19,62 @@ from ralph.exceptions import BackendException
             {},
             {
                 "where": [],
-                "params": {"format": "exact"},
-                "limit": None,
+                "params": {
+                    "ascending": False,
+                    "attachments": False,
+                    "format": "exact",
+                    "limit": 0,
+                    "related_activities": False,
+                    "related_agents": False,
+                },
+                "limit": 0,
                 "sort": "emission_time DESCENDING, event_id DESCENDING",
             },
         ),
         # 1. Query by statementId.
         (
-            {"statementId": "test_id"},
+            {"statement_id": "test_id"},
             {
                 "where": ["event_id = {statementId:UUID}"],
-                "params": {"statementId": "test_id", "format": "exact"},
-                "limit": None,
+                "params": {
+                    "ascending": False,
+                    "attachments": False,
+                    "format": "exact",
+                    "limit": 0,
+                    "related_activities": False,
+                    "related_agents": False,
+                    "statement_id": "test_id",
+                },
+                "limit": 0,
                 "sort": "emission_time DESCENDING, event_id DESCENDING",
             },
         ),
         # # 2. Query by statementId and agent with mbox IFI.
         (
-            {"statementId": "test_id", "agent": {"mbox": "mailto:foo@bar.baz"}},
+            {"statement_id": "test_id", "agent": {"mbox": "mailto:foo@bar.baz"}},
             {
                 "where": [
                     "event_id = {statementId:UUID}",
                     "event.actor.mbox = {actor__mbox:String}",
                 ],
                 "params": {
-                    "statementId": "test_id",
                     "actor__mbox": "mailto:foo@bar.baz",
+                    "ascending": False,
+                    "attachments": False,
                     "format": "exact",
+                    "limit": 0,
+                    "related_activities": False,
+                    "related_agents": False,
+                    "statement_id": "test_id",
                 },
-                "limit": None,
+                "limit": 0,
                 "sort": "emission_time DESCENDING, event_id DESCENDING",
             },
         ),
         # # 3. Query by statementId and agent with mbox_sha1sum IFI.
         (
             {
-                "statementId": "test_id",
+                "statement_id": "test_id",
                 "agent": {"mbox_sha1sum": "a7a5b7462b862c8c8767d43d43e865ffff754a64"},
             },
             {
@@ -63,18 +83,23 @@ from ralph.exceptions import BackendException
                     "event.actor.mbox_sha1sum = {actor__mbox_sha1sum:String}",
                 ],
                 "params": {
-                    "statementId": "test_id",
                     "actor__mbox_sha1sum": "a7a5b7462b862c8c8767d43d43e865ffff754a64",
+                    "ascending": False,
+                    "attachments": False,
                     "format": "exact",
+                    "limit": 0,
+                    "related_activities": False,
+                    "related_agents": False,
+                    "statement_id": "test_id",
                 },
-                "limit": None,
+                "limit": 0,
                 "sort": "emission_time DESCENDING, event_id DESCENDING",
             },
         ),
         # 4. Query by statementId and agent with openid IFI.
         (
             {
-                "statementId": "test_id",
+                "statement_id": "test_id",
                 "agent": {"openid": "http://toby.openid.example.org/"},
             },
             {
@@ -83,18 +108,23 @@ from ralph.exceptions import BackendException
                     "event.actor.openid = {actor__openid:String}",
                 ],
                 "params": {
-                    "statementId": "test_id",
                     "actor__openid": "http://toby.openid.example.org/",
+                    "ascending": False,
+                    "attachments": False,
                     "format": "exact",
+                    "limit": 0,
+                    "related_activities": False,
+                    "related_agents": False,
+                    "statement_id": "test_id",
                 },
-                "limit": None,
+                "limit": 0,
                 "sort": "emission_time DESCENDING, event_id DESCENDING",
             },
         ),
         # 5. Query by statementId and agent with account IFI.
         (
             {
-                "statementId": "test_id",
+                "statement_id": "test_id",
                 "agent": {
                     "account__home_page": "http://www.example.com",
                     "account__name": "13936749",
@@ -108,13 +138,17 @@ from ralph.exceptions import BackendException
                     "event.actor.account.homePage = {actor__account_home_page:String}",
                 ],
                 "params": {
-                    "statementId": "test_id",
                     "actor__account__name": "13936749",
                     "actor__account_home_page": "http://www.example.com",
                     "ascending": True,
+                    "attachments": False,
                     "format": "exact",
+                    "limit": 0,
+                    "related_activities": False,
+                    "related_agents": False,
+                    "statement_id": "test_id",
                 },
-                "limit": None,
+                "limit": 0,
                 "sort": "emission_time ASCENDING, event_id ASCENDING",
             },
         ),
@@ -132,10 +166,14 @@ from ralph.exceptions import BackendException
                     "event.object.id = {activity:String}",
                 ],
                 "params": {
-                    "verb": "http://adlnet.gov/expapi/verbs/attended",
+                    "ascending": False,
                     "activity": "http://www.example.com/meetings/34534",
-                    "limit": 100,
+                    "attachments": False,
                     "format": "exact",
+                    "limit": 100,
+                    "related_activities": False,
+                    "related_agents": False,
+                    "verb": "http://adlnet.gov/expapi/verbs/attended",
                 },
                 "limit": 100,
                 "sort": "emission_time DESCENDING, event_id DESCENDING",
@@ -153,15 +191,20 @@ from ralph.exceptions import BackendException
                     "emission_time <= {until:DateTime64(6)}",
                 ],
                 "params": {
+                    "ascending": False,
+                    "attachments": False,
+                    "format": "exact",
+                    "limit": 0,
+                    "related_activities": False,
+                    "related_agents": False,
                     "since": datetime(
                         2021, 6, 24, 0, 0, 20, 194929, tzinfo=timezone.utc
-                    ),
+                    ).isoformat(),
                     "until": datetime(
                         2023, 6, 24, 0, 0, 20, 194929, tzinfo=timezone.utc
-                    ),
-                    "format": "exact",
+                    ).isoformat(),
                 },
-                "limit": None,
+                "limit": 0,
                 "sort": "emission_time DESCENDING, event_id DESCENDING",
             },
         ),
@@ -179,17 +222,22 @@ from ralph.exceptions import BackendException
                     ),
                 ],
                 "params": {
-                    "search_after": "1686557542970|0",
-                    "pit_id": "46ToAwMDaWR5BXV1a",
+                    "ascending": False,
+                    "attachments": False,
                     "format": "exact",
+                    "limit": 0,
+                    "pit_id": "46ToAwMDaWR5BXV1a",
+                    "related_activities": False,
+                    "related_agents": False,
+                    "search_after": "1686557542970|0",
                 },
-                "limit": None,
+                "limit": 0,
                 "sort": "emission_time DESCENDING, event_id DESCENDING",
             },
         ),
     ],
 )
-def test_backends_database_clickhouse_query_statements(
+def test_backends_database_clickhouse_query_statements_query(
     params,
     expected_params,
     monkeypatch,
@@ -216,8 +264,7 @@ def test_backends_database_clickhouse_query_statements(
 
     backend = clickhouse_lrs_backend()
     monkeypatch.setattr(backend, "read", mock_read)
-
-    backend.query_statements(StatementParameters(**params))
+    backend.query_statements(RalphStatementsQuery.construct(**params))
     backend.close()
 
 
@@ -249,7 +296,7 @@ def test_backends_lrs_clickhouse_lrs_backend_query_statements(
 
     # Check the expected search query results.
     result = backend.query_statements(
-        StatementParameters(statementId=test_id, limit=10)
+        RalphStatementsQuery.construct(statement_id=test_id, limit=10)
     )
     assert result.statements == statements
     backend.close()
@@ -279,7 +326,7 @@ def test_backends_lrs_clickhouse_lrs_backend__find(clickhouse, clickhouse_lrs_ba
     assert success == 1
 
     # Check the expected search query results.
-    result = backend.query_statements(StatementParameters())
+    result = backend.query_statements(RalphStatementsQuery.construct())
     assert result.statements == statements
     backend.close()
 
@@ -335,7 +382,7 @@ def test_backends_lrs_clickhouse_lrs_backend_query_statements_client_failure(
 
     msg = "Failed to read documents: Query error"
     with pytest.raises(BackendException, match=msg):
-        next(backend.query_statements(StatementParameters()))
+        next(backend.query_statements(RalphStatementsQuery.construct()))
 
     assert (
         "ralph.backends.lrs.clickhouse",
