@@ -33,7 +33,7 @@ from ralph.exceptions import BackendException
         ),
         # 1. Query by statementId.
         (
-            {"statement_id": "test_id"},
+            {"statementId": "test_id"},
             {
                 "where": ["event_id = {statementId:UUID}"],
                 "params": {
@@ -43,6 +43,7 @@ from ralph.exceptions import BackendException
                     "limit": 0,
                     "related_activities": False,
                     "related_agents": False,
+                    "statementId": "test_id",
                     "statement_id": "test_id",
                 },
                 "limit": 0,
@@ -51,7 +52,7 @@ from ralph.exceptions import BackendException
         ),
         # # 2. Query by statementId and agent with mbox IFI.
         (
-            {"statement_id": "test_id", "agent": {"mbox": "mailto:foo@bar.baz"}},
+            {"statementId": "test_id", "agent": {"mbox": "mailto:foo@bar.baz"}},
             {
                 "where": [
                     "event_id = {statementId:UUID}",
@@ -65,6 +66,7 @@ from ralph.exceptions import BackendException
                     "limit": 0,
                     "related_activities": False,
                     "related_agents": False,
+                    "statementId": "test_id",
                     "statement_id": "test_id",
                 },
                 "limit": 0,
@@ -74,7 +76,7 @@ from ralph.exceptions import BackendException
         # # 3. Query by statementId and agent with mbox_sha1sum IFI.
         (
             {
-                "statement_id": "test_id",
+                "statementId": "test_id",
                 "agent": {"mbox_sha1sum": "a7a5b7462b862c8c8767d43d43e865ffff754a64"},
             },
             {
@@ -90,6 +92,7 @@ from ralph.exceptions import BackendException
                     "limit": 0,
                     "related_activities": False,
                     "related_agents": False,
+                    "statementId": "test_id",
                     "statement_id": "test_id",
                 },
                 "limit": 0,
@@ -99,7 +102,7 @@ from ralph.exceptions import BackendException
         # 4. Query by statementId and agent with openid IFI.
         (
             {
-                "statement_id": "test_id",
+                "statementId": "test_id",
                 "agent": {"openid": "http://toby.openid.example.org/"},
             },
             {
@@ -115,6 +118,7 @@ from ralph.exceptions import BackendException
                     "limit": 0,
                     "related_activities": False,
                     "related_agents": False,
+                    "statementId": "test_id",
                     "statement_id": "test_id",
                 },
                 "limit": 0,
@@ -124,7 +128,7 @@ from ralph.exceptions import BackendException
         # 5. Query by statementId and agent with account IFI.
         (
             {
-                "statement_id": "test_id",
+                "statementId": "test_id",
                 "agent": {
                     "account__home_page": "http://www.example.com",
                     "account__name": "13936749",
@@ -146,6 +150,7 @@ from ralph.exceptions import BackendException
                     "limit": 0,
                     "related_activities": False,
                     "related_agents": False,
+                    "statementId": "test_id",
                     "statement_id": "test_id",
                 },
                 "limit": 0,
@@ -296,7 +301,7 @@ def test_backends_lrs_clickhouse_lrs_backend_query_statements(
 
     # Check the expected search query results.
     result = backend.query_statements(
-        RalphStatementsQuery.construct(statement_id=test_id, limit=10)
+        RalphStatementsQuery.construct(statementId=test_id, limit=10)
     )
     assert result.statements == statements
     backend.close()
