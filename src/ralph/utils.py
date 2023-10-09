@@ -21,7 +21,6 @@ def import_subclass(dotted_path, parent_class):
     Return the class that is a subclass of `parent_class` inside this module.
     Raise ImportError if the import failed.
     """
-
     module = import_module(dotted_path)
 
     for _, class_ in getmembers(module, isclass):
@@ -97,7 +96,6 @@ def get_backend_instance(
     options: Union[dict, None] = None,
 ):
     """Return the instantiated backend given the backend type, name and options."""
-
     backend_class = get_backend_class(backend_type, backend_name)
     backend_settings = getattr(backend_type, backend_name.upper())
 
