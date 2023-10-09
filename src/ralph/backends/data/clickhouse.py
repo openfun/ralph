@@ -5,17 +5,7 @@ import logging
 from datetime import datetime
 from io import IOBase
 from itertools import chain
-from typing import (
-    Any,
-    Dict,
-    Generator,
-    Iterable,
-    Iterator,
-    List,
-    Literal,
-    NamedTuple,
-    Union,
-)
+from typing import Any, Dict, Generator, Iterable, Iterator, List, NamedTuple, Union
 from uuid import UUID, uuid4
 
 import clickhouse_connect
