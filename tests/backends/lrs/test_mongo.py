@@ -268,7 +268,7 @@ def test_backends_lrs_mongo_lrs_backend_query_statements_with_success(
     assert backend.write(documents) == 2
 
     statement_parameters = RalphStatementsQuery.construct(
-        statement_id="62b9ce922c26b46b68ffc68f",
+        statementId="62b9ce922c26b46b68ffc68f",
         agent=AgentParameters.construct(
             account__name="test_name",
             account__home_page="http://example.com",
