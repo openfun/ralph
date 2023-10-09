@@ -236,7 +236,7 @@ jobs:
               -wait tcp://${HOSTNAME}:27017 \
               -wait tcp://${HOSTNAME}:9000 \
               -timeout 60s \
-              ~/.local/bin/pytest tests/test_cli.py
+              ~/.local/bin/pytest tests/test_logger.py
 
   test-library:
     parameters:
