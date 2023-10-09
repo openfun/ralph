@@ -21,8 +21,7 @@ from ralph.backends.http.async_lrs import (
     LRSHeaders,
     LRSHTTPBackendSettings,
     LRSStatementsQuery,
-    LRSQuery,
-    OperationType
+    OperationType,
 )
 from ralph.backends.http.base import HTTPBackendStatus
 from ralph.exceptions import BackendException, BackendParameterException
@@ -77,7 +76,7 @@ def test_backend_http_lrs_default_instanciation(
     assert AsyncLRSHTTPBackend.name == "async_lrs"
     assert AsyncLRSHTTPBackend.settings_class == LRSHTTPBackendSettings
     backend = AsyncLRSHTTPBackend()
-    assert backend.query == LRSQuery
+    assert backend.query == LRSStatementsQuery
     assert backend.base_url == parse_obj_as(AnyHttpUrl, "http://0.0.0.0:8100")
     assert backend.auth == ("ralph", "secret")
     assert backend.settings.HEADERS == LRSHeaders()
@@ -103,7 +102,7 @@ def test_backends_http_lrs_http_instantiation():
     assert AsyncLRSHTTPBackend.name == "async_lrs"
     assert AsyncLRSHTTPBackend.settings_class == LRSHTTPBackendSettings
     backend = AsyncLRSHTTPBackend(settings)
-    assert backend.query == LRSQuery
+    assert backend.query == LRSStatementsQuery
     assert isinstance(backend.base_url, AnyHttpUrl)
     assert backend.auth == ("user", "pass")
     assert backend.settings.HEADERS.CONTENT_TYPE == "application/json"
@@ -339,7 +338,7 @@ async def test_backends_http_lrs_read_without_target(
         url=ParseResult(
             scheme=urlparse(base_url).scheme,
             netloc=urlparse(base_url).netloc,
-            path=backend.statements_endpoint,
+            path=backend.settings.STATEMENTS_ENDPOINT,
             query=urlencode(default_params).lower(),
             params="",
             fragment="",

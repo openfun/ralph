@@ -12,7 +12,7 @@ from ralph.backends.http.async_lrs import (
     HTTPBackendStatus,
     LRSHeaders,
     LRSHTTPBackendSettings,
-    LRSQuery,
+    LRSStatementsQuery,
 )
 from ralph.backends.http.lrs import LRSHTTPBackend
 
@@ -79,7 +79,7 @@ def test_backend_http_lrs_default_instanciation(
     assert LRSHTTPBackend.name == "lrs"
     assert LRSHTTPBackend.settings_class == LRSHTTPBackendSettings
     backend = LRSHTTPBackend()
-    assert backend.query == LRSQuery
+    assert backend.query == LRSStatementsQuery
     assert backend.base_url == parse_obj_as(AnyHttpUrl, "http://0.0.0.0:8100")
     assert backend.auth == ("ralph", "secret")
     assert backend.settings.HEADERS == LRSHeaders()
@@ -105,7 +105,7 @@ def test_backends_http_lrs_http_instantiation():
     assert LRSHTTPBackend.name == "lrs"
     assert LRSHTTPBackend.settings_class == LRSHTTPBackendSettings
     backend = LRSHTTPBackend(settings)
-    assert backend.query == LRSQuery
+    assert backend.query == LRSStatementsQuery
     assert isinstance(backend.base_url, AnyHttpUrl)
     assert backend.auth == ("user", "pass")
     assert backend.settings.HEADERS.CONTENT_TYPE == "application/json"
