@@ -1,9 +1,10 @@
 """API routes related to statements."""
-from itertools import chain
-from inspect import isasyncgen, isgenerator
+
 import json
 import logging
 from datetime import datetime
+from inspect import isasyncgen, isgenerator
+from itertools import chain
 from typing import List, Literal, Optional, Union
 from urllib.parse import ParseResult, urlencode
 from uuid import UUID, uuid4
@@ -27,9 +28,13 @@ from ralph.api.auth import get_authenticated_user
 from ralph.api.auth.user import AuthenticatedUser
 from ralph.api.forwarding import forward_xapi_statements, get_active_xapi_forwardings
 from ralph.api.models import ErrorDetail, LaxStatement
-from ralph.backends.lrs.base import AgentParameters, BaseLRSBackend, StatementParameters
-from ralph.conf import settings
 from ralph.backends.conf import backends_settings
+from ralph.backends.lrs.base import (
+    AgentParameters,
+    BaseLRSBackend,
+    RalphStatementsQuery,
+)
+from ralph.conf import settings
 from ralph.exceptions import BackendException, BadFormatException
 from ralph.models.xapi.base.agents import (
     BaseXapiAgent,
@@ -349,7 +354,7 @@ async def get(
     try:
         query_result = await await_if_coroutine(
             BACKEND_CLIENT.query_statements(
-                StatementParameters(**{**query_params, "limit": limit})
+                RalphStatementsQuery.construct(**{**query_params, "limit": limit})
             )
         )
     except BackendException as error:
@@ -394,7 +399,7 @@ async def get(
 
 @router.put("/", responses=POST_PUT_RESPONSES, status_code=status.HTTP_204_NO_CONTENT)
 @router.put("", responses=POST_PUT_RESPONSES, status_code=status.HTTP_204_NO_CONTENT)
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument, too-many-branches
 async def put(
     current_user: Annotated[AuthenticatedUser, Depends(get_authenticated_user)],
     statement: LaxStatement,
@@ -430,13 +435,12 @@ async def put(
     _enrich_statement_with_authority(statement_as_dict, current_user)
 
     try:
-        existing_statements = BACKEND_CLIENT.query_statements_by_ids([statementId])
+        existing_statements = BACKEND_CLIENT.query_statements_by_ids([statement_id])
     except BackendException as error:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="xAPI statements query failed",
         ) from error
-
 
     if isasyncgen(existing_statements):
         try:
@@ -445,15 +449,16 @@ async def put(
         except StopIteration as exc:
             logger.debug("No statements with given ID exist: %s", exc)
             first_statement = None
-            pass
 
         if not first_statement:
             pass
         else:
             existing_statements = chain((first_statement,), existing_statements)
-            # The LRS specification calls for deep comparison of duplicate statement ids.
+            # The LRS specification calls for deep comparison of duplicate statement
+            # ids.
             # In the case that the current statement is not equivalent to one found
             # in the database we return a 409, otherwise the usual 204.
+            # pylint: disable= not-an-iterable
             async for existing in existing_statements:
                 if not statements_are_equivalent(statement_as_dict, existing):
                     raise HTTPException(
@@ -461,7 +466,6 @@ async def put(
                         detail="A different statement already exists with the same ID",
                     )
             return
-
 
     # Check if existing_statements is a generator
     if isgenerator(existing_statements):
@@ -471,14 +475,14 @@ async def put(
         except StopIteration as exc:
             logger.debug("No statements with given ID exist: %s", exc)
             first_statement = None
-            pass
 
         if not first_statement:
             pass
         else:
             existing_statements = chain((first_statement,), existing_statements)
             # existing_statements = chain(first_statement, existing_statements)
-            # The LRS specification calls for deep comparison of duplicate statement ids.
+            # The LRS specification calls for deep comparison of duplicate statement
+            # ids.
             # In the case that the current statement is not equivalent to one found
             # in the database we return a 409, otherwise the usual 204.
             for existing in existing_statements:
@@ -506,6 +510,7 @@ async def put(
 
 @router.post("/", responses=POST_PUT_RESPONSES)
 @router.post("", responses=POST_PUT_RESPONSES)
+# pylint: disable = too-many-branches
 async def post(
     current_user: Annotated[AuthenticatedUser, Depends(get_authenticated_user)],
     statements: Union[LaxStatement, List[LaxStatement]],
@@ -546,7 +551,9 @@ async def post(
         )
 
     try:
-        existing_statements = BACKEND_CLIENT.query_statements_by_ids(statements_ids)
+        existing_statements = BACKEND_CLIENT.query_statements_by_ids(
+            list(statements_dict)
+        )
     except BackendException as error:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -559,9 +566,9 @@ async def post(
     # were skipped for being duplicates.
     # See: https://github.com/openfun/ralph/issues/345
     if isasyncgen(existing_statements):
-        existing_ids = []
+        existing_ids = set()
         async for existing in existing_statements:
-            existing_ids.append(existing["id"])
+            existing_ids.add(existing["id"])
 
             # The LRS specification calls for deep comparison of duplicates. This
             # is done here. If they are not exactly the same, we raise an error.
@@ -578,14 +585,14 @@ async def post(
             for key, value in statements_dict.items()
             if key not in existing_ids
         }
-        if not statements_ids:
+        if not statements_dict:
             response.status_code = status.HTTP_204_NO_CONTENT
             return
 
     if isgenerator(existing_statements):
-        existing_ids = []
+        existing_ids = set()
         for existing in existing_statements:
-            existing_ids.append(existing["id"])
+            existing_ids.add(existing["id"])
 
             # The LRS specification calls for deep comparison of duplicates. This
             # is done here. If they are not exactly the same, we raise an error.
@@ -596,15 +603,12 @@ async def post(
                     f"{existing['id']}",
                 )
 
-        # Overwrite our statements and ids with the deduplicated ones.
-        statements_ids = [id for id in statements_ids if id not in existing_ids]
-
         statements_dict = {
             key: value
             for key, value in statements_dict.items()
-            if key in statements_ids
+            if key not in existing_ids
         }
-        if not statements_ids:
+        if not statements_dict:
             response.status_code = status.HTTP_204_NO_CONTENT
             return
 
