@@ -7,7 +7,7 @@ from ralph.backends.data.es import ESDataBackend, ESQuery, ESQueryPit
 from ralph.backends.lrs.base import (
     AgentParameters,
     BaseLRSBackend,
-    StatementParameters,
+    RalphStatementsQuery,
     StatementQueryResult,
 )
 from ralph.exceptions import BackendException, BackendParameterException
@@ -20,7 +20,7 @@ class ESLRSBackend(BaseLRSBackend, ESDataBackend):
 
     settings_class = ESDataBackend.settings_class
 
-    def query_statements(self, params: StatementParameters) -> StatementQueryResult:
+    def query_statements(self, params: RalphStatementsQuery) -> StatementQueryResult:
         """Return the statements query payload using xAPI parameters."""
         query = self.get_query(params=params)
         try:
@@ -46,12 +46,12 @@ class ESLRSBackend(BaseLRSBackend, ESDataBackend):
             raise error
 
     @staticmethod
-    def get_query(params: StatementParameters) -> ESQuery:
+    def get_query(params: RalphStatementsQuery) -> ESQuery:
         """Construct query from statement parameters."""
         es_query_filters = []
 
-        if params.statementId:
-            es_query_filters += [{"term": {"_id": params.statementId}}]
+        if params.statement_id:
+            es_query_filters += [{"term": {"_id": params.statement_id}}]
 
         ESLRSBackend._add_agent_filters(es_query_filters, params.agent, "actor")
         ESLRSBackend._add_agent_filters(es_query_filters, params.authority, "authority")
@@ -95,17 +95,23 @@ class ESLRSBackend(BaseLRSBackend, ESDataBackend):
         """Add filters relative to agents to `es_query_filters`."""
         if not agent_params:
             return
-        if agent_params.mbox:
+
+        if not isinstance(agent_params, dict):
+            agent_params = agent_params.dict()
+
+        if agent_params.get("mbox"):
             field = f"{target_field}.mbox.keyword"
-            es_query_filters += [{"term": {field: agent_params.mbox}}]
-        elif agent_params.mbox_sha1sum:
+            es_query_filters += [{"term": {field: agent_params.get("mbox")}}]
+        elif agent_params.get("mbox_sha1sum"):
             field = f"{target_field}.mbox_sha1sum.keyword"
-            es_query_filters += [{"term": {field: agent_params.mbox_sha1sum}}]
-        elif agent_params.openid:
+            es_query_filters += [{"term": {field: agent_params.get("mbox_sha1sum")}}]
+        elif agent_params.get("openid"):
             field = f"{target_field}.openid.keyword"
-            es_query_filters += [{"term": {field: agent_params.openid}}]
-        elif agent_params.account__name:
+            es_query_filters += [{"term": {field: agent_params.get("openid")}}]
+        elif agent_params.get("account__name"):
             field = f"{target_field}.account.name.keyword"
-            es_query_filters += [{"term": {field: agent_params.account__name}}]
+            es_query_filters += [{"term": {field: agent_params.get("account__name")}}]
             field = f"{target_field}.account.homePage.keyword"
-            es_query_filters += [{"term": {field: agent_params.account__home_page}}]
+            es_query_filters += [
+                {"term": {field: agent_params.get("account__home_page")}}
+            ]

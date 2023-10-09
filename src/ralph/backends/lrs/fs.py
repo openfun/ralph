@@ -12,7 +12,7 @@ from ralph.backends.lrs.base import (
     AgentParameters,
     BaseLRSBackend,
     BaseLRSBackendSettings,
-    StatementParameters,
+    RalphStatementsQuery,
     StatementQueryResult,
 )
 
@@ -49,10 +49,10 @@ class FSLRSBackend(BaseLRSBackend, FSDataBackend):
         target = target if target else self.settings.DEFAULT_LRS_FILE
         return super().write(data, target, chunk_size, ignore_errors, operation_type)
 
-    def query_statements(self, params: StatementParameters) -> StatementQueryResult:
+    def query_statements(self, params: RalphStatementsQuery) -> StatementQueryResult:
         """Return the statements query payload using xAPI parameters."""
         filters = []
-        self._add_filter_by_id(filters, params.statementId)
+        self._add_filter_by_id(filters, params.statement_id)
         self._add_filter_by_agent(filters, params.agent, params.related_agents)
         self._add_filter_by_authority(filters, params.authority)
         self._add_filter_by_verb(filters, params.verb)
@@ -105,11 +105,18 @@ class FSLRSBackend(BaseLRSBackend, FSDataBackend):
         if not agent:
             return
 
-        FSLRSBackend._add_filter_by_mbox(filters, agent.mbox, related)
-        FSLRSBackend._add_filter_by_sha1sum(filters, agent.mbox_sha1sum, related)
-        FSLRSBackend._add_filter_by_openid(filters, agent.openid, related)
+        if not isinstance(agent, dict):
+            agent = agent.dict()
+        FSLRSBackend._add_filter_by_mbox(filters, agent.get("mbox", None), related)
+        FSLRSBackend._add_filter_by_sha1sum(
+            filters, agent.get("mbox_sha1sum", None), related
+        )
+        FSLRSBackend._add_filter_by_openid(filters, agent.get("openid", None), related)
         FSLRSBackend._add_filter_by_account(
-            filters, agent.account__name, agent.account__home_page, related
+            filters,
+            agent.get("account__name", None),
+            agent.get("account__home_page", None),
+            related,
         )
 
     @staticmethod
@@ -121,15 +128,21 @@ class FSLRSBackend(BaseLRSBackend, FSDataBackend):
         if not authority:
             return
 
-        FSLRSBackend._add_filter_by_mbox(filters, authority.mbox, field="authority")
-        FSLRSBackend._add_filter_by_sha1sum(
-            filters, authority.mbox_sha1sum, field="authority"
+        if not isinstance(authority, dict):
+            authority = authority.dict()
+        FSLRSBackend._add_filter_by_mbox(
+            filters, authority.get("mbox", None), field="authority"
         )
-        FSLRSBackend._add_filter_by_openid(filters, authority.openid, field="authority")
+        FSLRSBackend._add_filter_by_sha1sum(
+            filters, authority.get("mbox_sha1sum", None), field="authority"
+        )
+        FSLRSBackend._add_filter_by_openid(
+            filters, authority.get("openid", None), field="authority"
+        )
         FSLRSBackend._add_filter_by_account(
             filters,
-            authority.account__name,
-            authority.account__home_page,
+            authority.get("account__name", None),
+            authority.get("account__home_page", None),
             field="authority",
         )
 
@@ -312,6 +325,8 @@ class FSLRSBackend(BaseLRSBackend, FSDataBackend):
         filters: list, timestamp: Union[datetime, None]
     ) -> None:
         """Add the `match_since` filter if `timestamp` is set."""
+        if isinstance(timestamp, str):
+            timestamp = datetime.fromisoformat(timestamp)
 
         def match_since(statement: dict) -> bool:
             """Return `True` if the statement was created after `timestamp`."""
@@ -331,6 +346,8 @@ class FSLRSBackend(BaseLRSBackend, FSDataBackend):
         filters: list, timestamp: Union[datetime, None]
     ) -> None:
         """Add the `match_until` function if `timestamp` is set."""
+        if isinstance(timestamp, str):
+            timestamp = datetime.fromisoformat(timestamp)
 
         def match_until(statement: dict) -> bool:
             """Return `True` if the statement was created before `timestamp`."""
