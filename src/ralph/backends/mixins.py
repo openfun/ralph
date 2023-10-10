@@ -59,11 +59,14 @@ class HistoryMixin:
         self.write_history(self.history + [event])
 
     def get_command_history(self, backend_name, command):
-        """Extract entry ids from the history for a given command and backend_name."""
-        return [
-            entry["id"]
-            for entry in filter(
-                lambda e: e["backend"] == backend_name and e["command"] == command,
-                self.history,
+        """Extracts entry ids from the history for a given command and backend_name."""
+
+        def filter_by_name_and_command(entry):
+            """Checks whether the history entry matches the backend_name and command."""
+            return entry.get("backend") == backend_name and (
+                command in [entry.get("command"), entry.get("action")]
             )
+
+        return [
+            entry["id"] for entry in filter(filter_by_name_and_command, self.history)
         ]

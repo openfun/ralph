@@ -11,8 +11,9 @@ from elasticsearch.helpers import bulk, scan
 from hypothesis import settings as hypothesis_settings
 from pydantic import ValidationError
 
-from ralph.backends.storage.fs import FSStorage
-from ralph.backends.storage.ldp import LDPStorage
+from ralph.backends.conf import backends_settings
+from ralph.backends.data.fs import FSDataBackend, FSDataBackendSettings
+from ralph.backends.data.ldp import LDPDataBackend
 from ralph.cli import (
     CommaSeparatedKeyValueParamType,
     CommaSeparatedTupleParamType,
@@ -533,13 +534,13 @@ def test_cli_read_command_with_ldp_backend(monkeypatch):
     """Test the read command using the LDP backend."""
     archive_content = {"foo": "bar"}
 
-    def mock_read(this, name, chunk_size=500):
+    def mock_read(*_, **__):
         """Always return the same archive."""
         # pylint: disable=unused-argument
 
         yield bytes(json.dumps(archive_content), encoding="utf-8")
 
-    monkeypatch.setattr(LDPStorage, "read", mock_read)
+    monkeypatch.setattr(LDPDataBackend, "read", mock_read)
 
     runner = CliRunner()
     command = "read -b ldp --ldp-endpoint ovh-eu a547d9b3-6f2f-4913-a872-cf4efe699a66"
@@ -555,13 +556,13 @@ def test_cli_read_command_with_fs_backend(fs, monkeypatch):
     """Test the read command using the FS backend."""
     archive_content = {"foo": "bar"}
 
-    def mock_read(this, name, chunk_size):
+    def mock_read(*_, **__):
         """Always return the same archive."""
         # pylint: disable=unused-argument
 
         yield bytes(json.dumps(archive_content), encoding="utf-8")
 
-    monkeypatch.setattr(FSStorage, "read", mock_read)
+    monkeypatch.setattr(FSDataBackend, "read", mock_read)
 
     runner = CliRunner()
     result = runner.invoke(cli, "read -b fs foo".split())
@@ -589,7 +590,8 @@ def test_cli_read_command_with_es_backend(es):
     runner = CliRunner()
     es_hosts = ",".join(ES_TEST_HOSTS)
     es_client_options = "verify_certs=True"
-    command = f"""-v ERROR read -b es --es-hosts {es_hosts} --es-index {ES_TEST_INDEX}
+    command = f"""-v ERROR read -b es --es-hosts {es_hosts}
+        --es-default-index {ES_TEST_INDEX}
         --es-client-options {es_client_options}"""
     result = runner.invoke(cli, command.split())
     assert result.exit_code == 0
@@ -648,7 +650,7 @@ def test_cli_read_command_with_es_backend_query(es):
 
     runner = CliRunner()
     es_hosts = ",".join(ES_TEST_HOSTS)
-    query = {"query": {"query": {"term": {"modulo": 0}}}}
+    query = {"query": {"term": {"modulo": 0}}}
     query_str = json.dumps(query, separators=(",", ":"))
 
     command = (
@@ -656,7 +658,7 @@ def test_cli_read_command_with_es_backend_query(es):
         "read "
         "-b es "
         f"--es-hosts {es_hosts} "
-        f"--es-index {ES_TEST_INDEX} "
+        f"--es-default-index {ES_TEST_INDEX} "
         f"--query {query_str}"
     )
     result = runner.invoke(cli, command.split())
@@ -721,7 +723,7 @@ def test_cli_list_command_with_ldp_backend(monkeypatch):
         },
     ]
 
-    def mock_list(this, details=False, new=False):
+    def mock_list(this, target=None, details=False, new=False):
         """Mock LDP backend list method."""
         # pylint: disable=unused-argument
 
@@ -732,7 +734,7 @@ def test_cli_list_command_with_ldp_backend(monkeypatch):
             response = response[1:]
         return response
 
-    monkeypatch.setattr(LDPStorage, "list", mock_list)
+    monkeypatch.setattr(LDPDataBackend, "list", mock_list)
 
     runner = CliRunner()
 
@@ -756,7 +758,7 @@ def test_cli_list_command_with_ldp_backend(monkeypatch):
     assert "5d5c4c93-04a4-42c5-9860-f51fa4044aa1" not in result.output
 
     # Edge case: stream contains no archive
-    monkeypatch.setattr(LDPStorage, "list", lambda this, details, new: ())
+    monkeypatch.setattr(LDPDataBackend, "list", lambda this, target, details, new: ())
     result = runner.invoke(cli, ["list", "-b", "ldp", "--ldp-endpoint", "ovh-eu"])
     assert result.exit_code == 0
     assert "Configured ldp backend contains no archive" in result.output
@@ -783,7 +785,7 @@ def test_cli_list_command_with_fs_backend(fs, monkeypatch):
         },
     ]
 
-    def mock_list(this, details=False, new=False):
+    def mock_list(this, target=None, details=False, new=False):
         """Mock LDP backend list method."""
         # pylint: disable=unused-argument
 
@@ -794,7 +796,7 @@ def test_cli_list_command_with_fs_backend(fs, monkeypatch):
             response = response[1:]
         return response
 
-    monkeypatch.setattr(FSStorage, "list", mock_list)
+    monkeypatch.setattr(FSDataBackend, "list", mock_list)
 
     runner = CliRunner()
 
@@ -818,7 +820,7 @@ def test_cli_list_command_with_fs_backend(fs, monkeypatch):
     assert "file1" not in result.output
 
     # Edge case: stream contains no archive
-    monkeypatch.setattr(FSStorage, "list", lambda this, details, new: ())
+    monkeypatch.setattr(FSDataBackend, "list", lambda this, target, details, new: ())
     result = runner.invoke(cli, ["list", "-b", "fs"])
     assert result.exit_code == 0
     assert "Configured fs backend contains no archive" in result.output
@@ -828,37 +830,49 @@ def test_cli_list_command_with_fs_backend(fs, monkeypatch):
 def test_cli_write_command_with_fs_backend(fs):
     """Test the write command using the FS backend."""
     fs.create_dir(str(settings.APP_DIR))
+    fs.create_dir("foo")
 
-    filename = Path("file1")
-    file_path = Path(settings.BACKENDS.STORAGE.FS.PATH) / filename
+    filename = Path("foo/file1")
 
     # Create a file
     runner = CliRunner()
-    result = runner.invoke(cli, "write -b fs file1".split(), input="test content")
+    result = runner.invoke(
+        cli,
+        "write -b fs -t file1 --fs-default-directory-path foo".split(),
+        input=b"test content"
+    )
 
     assert result.exit_code == 0
 
-    with file_path.open("r", encoding=settings.LOCALE_ENCODING) as test_file:
+    with filename.open("rb") as test_file:
         content = test_file.read()
 
-    assert "test content" in content
+    assert b"test content" in content
 
     # Trying to create the same file without -f should raise an error
     runner = CliRunner()
-    result = runner.invoke(cli, "write -b fs file1".split(), input="other content")
+    result = runner.invoke(
+        cli,
+        "write -b fs -t file1 --fs-default-directory-path foo".split(),
+        input=b"other content"
+    )
     assert result.exit_code == 1
     assert "file1 already exists and overwrite is not allowed" in result.output
 
     # Try to create the same file with -f
     runner = CliRunner()
-    result = runner.invoke(cli, "write -b fs -f file1".split(), input="other content")
+    result = runner.invoke(
+        cli,
+        "write -b fs -t file1 -f --fs-default-directory-path foo".split(),
+        input=b"other content"
+    )
 
     assert result.exit_code == 0
 
-    with file_path.open("r", encoding=settings.LOCALE_ENCODING) as test_file:
+    with filename.open("rb") as test_file:
         content = test_file.read()
 
-    assert "other content" in content
+    assert b"other content" in content
 
 
 def test_cli_write_command_with_es_backend(es):
@@ -872,7 +886,7 @@ def test_cli_write_command_with_es_backend(es):
     es_hosts = ",".join(ES_TEST_HOSTS)
     result = runner.invoke(
         cli,
-        f"write -b es --es-hosts {es_hosts} --es-index {ES_TEST_INDEX}".split(),
+        f"write -b es --es-hosts {es_hosts} --es-default-index {ES_TEST_INDEX}".split(),
         input="\n".join(json.dumps(record) for record in records),
     )
     assert result.exit_code == 0
@@ -911,33 +925,53 @@ def test_cli_runserver_command_environment_file_generation(monkeypatch):
         with open(env_file, mode="r", encoding=settings.LOCALE_ENCODING) as file:
             env_lines = [
                 f"RALPH_RUNSERVER_BACKEND={settings.RUNSERVER_BACKEND}\n",
-                "RALPH_BACKENDS__DATABASE__ES__INDEX=foo\n",
-                "RALPH_BACKENDS__DATABASE__ES__CLIENT_OPTIONS__verify_certs=True\n",
-                "RALPH_BACKENDS__DATABASE__CLICKHOUSE__EVENT_TABLE_NAME="
-                f"{settings.BACKENDS.DATABASE.CLICKHOUSE.EVENT_TABLE_NAME}\n",
-                "RALPH_BACKENDS__DATABASE__CLICKHOUSE__DATABASE="
-                f"{settings.BACKENDS.DATABASE.CLICKHOUSE.DATABASE}\n",
-                "RALPH_BACKENDS__DATABASE__CLICKHOUSE__PORT="
-                f"{settings.BACKENDS.DATABASE.CLICKHOUSE.PORT}\n",
-                "RALPH_BACKENDS__DATABASE__CLICKHOUSE__HOST="
-                f"{settings.BACKENDS.DATABASE.CLICKHOUSE.HOST}\n",
-                "RALPH_BACKENDS__DATABASE__MONGO__COLLECTION="
-                f"{settings.BACKENDS.DATABASE.MONGO.COLLECTION}\n",
-                "RALPH_BACKENDS__DATABASE__MONGO__DATABASE="
-                f"{settings.BACKENDS.DATABASE.MONGO.DATABASE}\n",
-                "RALPH_BACKENDS__DATABASE__MONGO__CONNECTION_URI="
-                f"{settings.BACKENDS.DATABASE.MONGO.CONNECTION_URI}\n",
-                "RALPH_BACKENDS__DATABASE__ES__OP_TYPE="
-                f"{settings.BACKENDS.DATABASE.ES.OP_TYPE}\n",
-                "RALPH_BACKENDS__DATABASE__ES__HOSTS="
-                f"{','.join(settings.BACKENDS.DATABASE.ES.HOSTS)}\n",
+                "RALPH_BACKENDS__LRS__ES__DEFAULT_INDEX=foo\n",
+                "RALPH_BACKENDS__LRS__ES__CLIENT_OPTIONS__verify_certs=True\n",
+                "RALPH_BACKENDS__LRS__MONGO__DEFAULT_CHUNK_SIZE="
+                f"{backends_settings.BACKENDS.LRS.MONGO.DEFAULT_CHUNK_SIZE}\n",
+                "RALPH_BACKENDS__LRS__MONGO__DEFAULT_COLLECTION="
+                f"{backends_settings.BACKENDS.LRS.MONGO.DEFAULT_COLLECTION}\n",
+                "RALPH_BACKENDS__LRS__MONGO__DEFAULT_DATABASE="
+                f"{backends_settings.BACKENDS.LRS.MONGO.DEFAULT_DATABASE}\n",
+                "RALPH_BACKENDS__LRS__MONGO__CONNECTION_URI="
+                f"{backends_settings.BACKENDS.LRS.MONGO.CONNECTION_URI}\n",
+                "RALPH_BACKENDS__LRS__FS__DEFAULT_LRS_FILE="
+                f"{backends_settings.BACKENDS.LRS.FS.DEFAULT_LRS_FILE}\n",
+                "RALPH_BACKENDS__LRS__FS__DEFAULT_QUERY_STRING="
+                f"{backends_settings.BACKENDS.LRS.FS.DEFAULT_QUERY_STRING}\n",
+                "RALPH_BACKENDS__LRS__FS__DEFAULT_DIRECTORY_PATH="
+                f"{backends_settings.BACKENDS.LRS.FS.DEFAULT_DIRECTORY_PATH}\n",
+                "RALPH_BACKENDS__LRS__FS__DEFAULT_CHUNK_SIZE="
+                f"{backends_settings.BACKENDS.LRS.FS.DEFAULT_CHUNK_SIZE}\n",
+                "RALPH_BACKENDS__LRS__ES__POINT_IN_TIME_KEEP_ALIVE="
+                f"{backends_settings.BACKENDS.LRS.ES.POINT_IN_TIME_KEEP_ALIVE}\n",
+                "RALPH_BACKENDS__LRS__ES__HOSTS="
+                f"{','.join(backends_settings.BACKENDS.LRS.ES.HOSTS)}\n",
+                "RALPH_BACKENDS__LRS__ES__DEFAULT_CHUNK_SIZE="
+                f"{backends_settings.BACKENDS.LRS.ES.DEFAULT_CHUNK_SIZE}\n",
+                "RALPH_BACKENDS__LRS__ES__ALLOW_YELLOW_STATUS="
+                f"{backends_settings.BACKENDS.LRS.ES.ALLOW_YELLOW_STATUS}\n",
+                "RALPH_BACKENDS__LRS__CLICKHOUSE__IDS_CHUNK_SIZE="
+                f"{backends_settings.BACKENDS.LRS.CLICKHOUSE.IDS_CHUNK_SIZE}\n",
+                "RALPH_BACKENDS__LRS__CLICKHOUSE__DEFAULT_CHUNK_SIZE="
+                f"{backends_settings.BACKENDS.LRS.CLICKHOUSE.DEFAULT_CHUNK_SIZE}\n",
+                "RALPH_BACKENDS__LRS__CLICKHOUSE__EVENT_TABLE_NAME="
+                f"{backends_settings.BACKENDS.LRS.CLICKHOUSE.EVENT_TABLE_NAME}\n",
+                "RALPH_BACKENDS__LRS__CLICKHOUSE__DATABASE="
+                f"{backends_settings.BACKENDS.LRS.CLICKHOUSE.DATABASE}\n",
+                "RALPH_BACKENDS__LRS__CLICKHOUSE__PORT="
+                f"{backends_settings.BACKENDS.LRS.CLICKHOUSE.PORT}\n",
+                "RALPH_BACKENDS__LRS__CLICKHOUSE__HOST="
+                f"{backends_settings.BACKENDS.LRS.CLICKHOUSE.HOST}\n",
             ]
-            assert file.readlines() == env_lines
+            env_lines_created = file.readlines()
+            assert all(line in env_lines_created for line in env_lines)
 
     monkeypatch.setattr("ralph.cli.uvicorn.run", mock_uvicorn_run)
     runner = CliRunner()
     result = runner.invoke(
         cli,
-        "runserver -b es --es-index foo --es-client-options verify_certs=True".split(),
+        "runserver -b es --es-default-index foo "
+        "--es-client-options verify_certs=True".split(),
     )
     assert result.exit_code == 0

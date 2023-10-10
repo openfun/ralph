@@ -7,8 +7,8 @@ from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
 from ralph.api import app
-from ralph.backends.database.es import ESDatabase
-from ralph.backends.database.mongo import MongoDatabase
+from ralph.backends.lrs.es import ESLRSBackend
+from ralph.backends.lrs.mongo import MongoLRSBackend
 from ralph.conf import XapiForwardingConfigurationSettings
 from ralph.exceptions import BackendException
 
@@ -311,16 +311,14 @@ def test_api_statements_put_statements_with_a_failure_during_storage(
     """Test the put statements API route with a failure happening during storage."""
     # pylint: disable=invalid-name,unused-argument, too-many-arguments
 
-    def put_mock(*args, **kwargs):
-        """Raise an exception. Mock the database.put method."""
+    def write_mock(*args, **kwargs):
+        """Raises an exception. Mocks the database.write method."""
         raise BackendException()
 
     backend_instance = backend()
-    monkeypatch.setattr(backend_instance, "put", put_mock)
-    monkeypatch.setattr(
-        "ralph.api.routers.statements.DATABASE_CLIENT", backend_instance
-    )
-
+    monkeypatch.setattr(backend_instance, "write", write_mock)
+    monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend_instance)
+    
     statement = mock_statement()
 
     response = client.put(
@@ -351,9 +349,7 @@ def test_api_statements_put_with_failure_during_id_query(
     monkeypatch.setattr(
         backend_instance, "query_statements_by_ids", query_statements_by_ids_mock
     )
-    monkeypatch.setattr(
-        "ralph.api.routers.statements.DATABASE_CLIENT", backend_instance
-    )
+    monkeypatch.setattr("ralph.api.routers.statements.DATABASE_CLIENT", backend_instance)
 
     statement = mock_statement()
 
@@ -413,11 +409,17 @@ def test_api_statements_put_statement_without_forwarding(
 @pytest.mark.parametrize(
     "forwarding_backend",
     [
-        lambda: ESDatabase(hosts=ES_TEST_HOSTS, index=ES_TEST_FORWARDING_INDEX),
-        lambda: MongoDatabase(
-            connection_uri=MONGO_TEST_CONNECTION_URI,
-            database=MONGO_TEST_DATABASE,
-            collection=MONGO_TEST_FORWARDING_COLLECTION,
+        lambda: ESLRSBackend(
+            settings=ESLRSBackend.settings_class(
+                HOSTS=ES_TEST_HOSTS, DEFAULT_INDEX=ES_TEST_FORWARDING_INDEX
+            )
+        ),
+        lambda: MongoLRSBackend(
+            settings=MongoLRSBackend.settings_class(
+                CONNECTION_URI=MONGO_TEST_CONNECTION_URI,
+                DEFAULT_DATABASE=MONGO_TEST_DATABASE,
+                DEFAULT_COLLECTION=MONGO_TEST_FORWARDING_COLLECTION,
+            )
         ),
     ],
 )

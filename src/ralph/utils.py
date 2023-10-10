@@ -2,13 +2,34 @@
 
 import asyncio
 import datetime
+import json
 import logging
 import operator
 from functools import reduce
 from importlib import import_module
-from typing import List, Union
+from inspect import getmembers, isclass, iscoroutine
+from typing import Any, Dict, Iterable, Iterator, List, Union
 
 from pydantic import BaseModel
+
+from ralph.exceptions import BackendException
+
+
+def import_subclass(dotted_path, parent_class):
+    """Import a dotted module path.
+
+    Return the class that is a subclass of `parent_class` inside this module.
+    Raise ImportError if the import failed.
+    """
+    module = import_module(dotted_path)
+
+    for _, class_ in getmembers(module, isclass):
+        if issubclass(class_, parent_class):
+            return class_
+
+    raise ImportError(
+        f'Module "{dotted_path}" does not define a subclass of "{parent_class}" class'
+    )
 
 
 # Taken from Django utilities
@@ -16,7 +37,7 @@ from pydantic import BaseModel
 def import_string(dotted_path):
     """Import a dotted module path.
 
-    Returns the attribute/class designated by the last name in the path.
+    Return the attribute/class designated by the last name in the path.
     Raise ImportError if the import failed.
     """
     try:
@@ -34,23 +55,60 @@ def import_string(dotted_path):
         ) from err
 
 
-def get_backend_type(backends: BaseModel, backend_name: str):
+def get_backend_type(backend_types: List[BaseModel], backend_name: str):
     """Return the backend type from a backend name."""
     backend_name = backend_name.upper()
-    for _, backend_type in backends:
+    for backend_type in backend_types:
         if hasattr(backend_type, backend_name):
             return backend_type
     return None
 
 
-def get_backend_instance(backend_type: BaseModel, backend_name: str, options: dict):
-    """Return the instantiated backend instance given backend-name-prefixed options."""
+def get_backend_class(backend_type: BaseModel, backend_name: str):
+    """Return the backend class given the backend type and backend name."""
+    # Get type name from backend_type class name
+    backend_type_name = backend_type.__class__.__name__[
+        : -len("BackendSettings")
+    ].lower()
+    backend_name = backend_name.lower()
+
+    module = import_module(f"ralph.backends.{backend_type_name}.{backend_name}")
+    for _, class_ in getmembers(module, isclass):
+        if (
+            getattr(class_, "type", None) == backend_type_name
+            and getattr(class_, "name", None) == backend_name
+        ):
+            backend_class = class_
+            break
+
+    if not backend_class:
+        raise BackendException(
+            f'No backend named "{backend_name}" '
+            f'under the backend type "{backend_type_name}"'
+        )
+
+    return backend_class
+
+
+def get_backend_instance(
+    backend_type: BaseModel,
+    backend_name: str,
+    options: Union[dict, None] = None,
+):
+    """Return the instantiated backend given the backend type, name and options."""
+    backend_class = get_backend_class(backend_type, backend_name)
+    backend_settings = getattr(backend_type, backend_name.upper())
+
+    if not options:
+        return backend_class(backend_settings)
+
     prefix = f"{backend_name}_"
     # Filter backend-related parameters. Parameter name is supposed to start
     # with the backend name
     names = filter(lambda key: key.startswith(prefix), options.keys())
-    options = {name.replace(prefix, ""): options[name] for name in names}
-    return getattr(backend_type, backend_name.upper()).get_instance(**options)
+    options = {name.replace(prefix, "").upper(): options[name] for name in names}
+
+    return backend_class(backend_settings.__class__(**options))
 
 
 def get_root_logger():
@@ -142,3 +200,76 @@ def statements_are_equivalent(statement_1: dict, statement_2: dict):
     if any(statement_1.get(field) != statement_2.get(field) for field in fields):
         return False
     return True
+
+
+def parse_bytes_to_dict(
+    raw_documents: Iterable[bytes], ignore_errors: bool, logger_class: logging.Logger
+) -> Iterator[dict]:
+    """Read the `raw_documents` Iterable and yield dictionaries."""
+    for raw_document in raw_documents:
+        try:
+            yield json.loads(raw_document)
+        except (TypeError, json.JSONDecodeError) as error:
+            msg = "Failed to decode JSON: %s, for document: %s"
+            if ignore_errors:
+                logger_class.warning(msg, error, raw_document)
+                continue
+            logger_class.error(msg, error, raw_document)
+            raise BackendException(msg % (error, raw_document)) from error
+
+
+def read_raw(
+    documents: Iterable[Dict[str, Any]],
+    encoding: str,
+    ignore_errors: bool,
+    logger_class: logging.Logger,
+) -> Iterator[bytes]:
+    """Read the `documents` Iterable with the `encoding` and yield bytes."""
+    for document in documents:
+        try:
+            yield json.dumps(document).encode(encoding)
+        except (TypeError, ValueError) as error:
+            msg = "Failed to convert document to bytes: %s"
+            if ignore_errors:
+                logger_class.warning(msg, error)
+                continue
+            logger_class.error(msg, error)
+            raise BackendException(msg % error) from error
+
+
+def iter_over_async(agenerator) -> Iterable:
+    """Iterate synchronously over an asynchronous generator."""
+    loop = asyncio.get_event_loop()
+    aiterator = aiter(agenerator)
+
+    async def get_next():
+        """Get the next element from the async iterator."""
+        try:
+            obj = await anext(aiterator)
+            return False, obj
+        except StopAsyncIteration:
+            return True, None
+
+    while True:
+        done, obj = loop.run_until_complete(get_next())
+        if done:
+            break
+        yield obj
+
+
+def execute_async(method):
+    """Run asynchronous method in a synchronous context."""
+
+    def wrapper(*args, **kwargs):
+        """Wrap method execution."""
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(method(*args, **kwargs))
+
+    return wrapper
+
+
+async def await_if_coroutine(value):
+    """Await the value if it is a coroutine, else return synchronously."""
+    if iscoroutine(value):
+        return await value
+    return value

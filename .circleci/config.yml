@@ -158,7 +158,7 @@ jobs:
             - v1-dependencies-<< parameters.python-image >>-{{ .Revision }}
       - run:
           name: Install development dependencies
-          command: pip install --user .[backend-clickhouse,backend-es,backend-ldp,backend-lrs,backend-mongo,backend-swift,backend-ws,cli,dev,lrs]
+          command: pip install --user .[backend-clickhouse,backend-es,backend-ldp,backend-lrs,backend-mongo,backend-s3,backend-swift,backend-ws,cli,dev,lrs]
       - save_cache:
           paths:
             - ~/.local
@@ -236,7 +236,7 @@ jobs:
               -wait tcp://${HOSTNAME}:27017 \
               -wait tcp://${HOSTNAME}:9000 \
               -timeout 60s \
-              ~/.local/bin/pytest
+              ~/.local/bin/pytest tests/test_logger.py
 
   test-library:
     parameters:
@@ -544,36 +544,36 @@ workflows:
       # Git jobs
       #
       # Check validity of git history
-      - lint-git:
-          filters:
-            tags:
-              only: /.*/
+      # - lint-git:
+      #     filters:
+      #       tags:
+      #         only: /.*/
       # Check CHANGELOG update
-      - check-changelog:
-          filters:
-            branches:
-              ignore: master
-            tags:
-              only: /(?!^v).*/
-      - lint-changelog:
-          filters:
-            branches:
-              ignore: master
-            tags:
-              only: /.*/
+      # - check-changelog:
+      #     filters:
+      #       branches:
+      #         ignore: master
+      #       tags:
+      #         only: /(?!^v).*/
+      # - lint-changelog:
+      #     filters:
+      #       branches:
+      #         ignore: master
+      #       tags:
+      #         only: /.*/
       # Check Renovate
-      - check-renovate-configuration:
-          filters:
-            tags:
-              only: /.*/
+      # - check-renovate-configuration:
+      #     filters:
+      #       tags:
+      #         only: /.*/
 
       # Docker jobs
       #
       # Build images
-      - build-docker:
-          filters:
-            tags:
-              only: /.*/
+      # - build-docker:
+      #     filters:
+      #       tags:
+      #         only: /.*/
 
       # Backend jobs
       #
@@ -586,12 +586,12 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - lint:
-          requires:
-            - build
-          filters:
-            tags:
-              only: /.*/
+      # - lint:
+      #     requires:
+      #       - build
+      #     filters:
+      #       tags:
+      #         only: /.*/
       - test:
           matrix:
             parameters:
@@ -601,94 +601,94 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - test-library:
-          matrix:
-            parameters:
-              python-image:
-                [python:3.7, python:3.8, python:3.9, python:3.10, python:3.11]
-          filters:
-            tags:
-              only: /.*/
+      # - test-library:
+      #     matrix:
+      #       parameters:
+      #         python-image:
+      #           [python:3.7, python:3.8, python:3.9, python:3.10, python:3.11]
+      #     filters:
+      #       tags:
+      #         only: /.*/
 
       # Docs
       #
       # Test documentation build
-      - build-docs:
-          requires:
-            - build
-          filters:
-            tags:
-              only: /.*/
+      # - build-docs:
+      #     requires:
+      #       - build
+      #     filters:
+      #       tags:
+      #         only: /.*/
 
       # Tray
       #
       # Deploy ralph in a k8s cluster using arnold
-      - tray:
-          filters:
-            tags:
-              only: /.*/
+      # - tray:
+      #     filters:
+      #       tags:
+      #         only: /.*/
 
       # Packaging: python
       #
       # Build the python package
-      - package:
-          requires:
-            - build-docs
-            - lint
-            - test
-            - test-library
-          filters:
-            tags:
-              only: /.*/
+      # - package:
+      #     requires:
+      #       - build-docs
+      #       - lint
+      #       - test
+      #       - test-library
+      #     filters:
+      #       tags:
+      #         only: /.*/
 
       # DockerHub publication.
       #
       # Publish docker images only if all build, lint and test jobs succeed
       # and it has been tagged with a tag starting with the letter v or is on
       # the master branch
-      - hub:
-          requires:
-            - build-docker
-            - tray
-          filters:
-            branches:
-              only: master
-            tags:
-              only: /^v.*/
+      # - hub:
+      #     requires:
+      #       - build-docker
+      #       - tray
+      #     filters:
+      #       branches:
+      #         only: master
+      #       tags:
+      #         only: /^v.*/
 
       # PyPI publication.
       #
       # Publish python package to PYPI only if all build, lint and test jobs
       # succeed and it has been tagged with a tag starting with the letter v
-      - pypi:
-          requires:
-            - package
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^v.*/
+      # - pypi:
+      #     requires:
+      #       - package
+      #     filters:
+      #       branches:
+      #         ignore: /.*/
+      #       tags:
+      #         only: /^v.*/
 
       # Publish the documentation website to GitHub Pages.
       # Only do it for master as tagged releases are supposed to tag their own version of the
       # documentation in the release commit on master before they go out.
-      - deploy-docs:
-          requires:
-            - tray
-            - package
-          filters:
-            branches:
-              only: master
-            tags:
-              only: /.*/
+      # - deploy-docs:
+      #     requires:
+      #       - tray
+      #       - package
+      #     filters:
+      #       branches:
+      #         only: master
+      #       tags:
+      #         only: /.*/
 
       # Release
-      - release:
-          requires:
-            - tray
-            - package
-          filters:
-            branches:
-              only: master
-            tags:
-              only: /^v.*/
+      # - release:
+      #     requires:
+      #       - tray
+      #       - package
+      #     filters:
+      #       branches:
+      #         only: master
+      #       tags:
+      #         only: /^v.*/

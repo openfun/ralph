@@ -36,18 +36,19 @@ def test_logger_exists(fs, monkeypatch):
     }
 
     fs.create_dir("/dev")
+    fs.create_dir("foo")
 
     monkeypatch.setattr(ralph.logger.settings, "LOGGING", mock_default_config)
 
     runner = CliRunner()
     result = runner.invoke(
         cli,
-        ["write", "-b", "fs", "test_file"],
+        ["write", "-b", "fs", "-t", "test_file", "--fs-default-directory-path", "foo"],
         input="test input",
     )
 
     assert result.exit_code == 0
-    assert "Writing archive test_file to the configured fs backend" in result.output
+    assert "Writing to target test_file for the configured fs backend" in result.output
     assert "Backend parameters:" in result.output
 
 

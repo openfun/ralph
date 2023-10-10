@@ -10,18 +10,22 @@ from urllib.parse import ParseResult, parse_qsl, urlencode, urljoin, urlparse
 import httpx
 import pytest
 from httpx import HTTPStatusError, RequestError
-from pydantic import AnyHttpUrl
+from pydantic import AnyHttpUrl, parse_obj_as
 from pytest_httpx import HTTPXMock
 
-from ralph.backends.http.async_lrs import LRSStatementsQuery, OperationType
+from ralph.backends.http.async_lrs import (
+    AsyncLRSHTTPBackend,
+    LRSHeaders,
+    LRSHTTPBackendSettings,
+    LRSStatementsQuery,
+    OperationType,
+)
 from ralph.backends.http.base import HTTPBackendStatus
-from ralph.backends.http.lrs import AsyncLRSHTTP
-from ralph.conf import LRSHeaders, settings
 from ralph.exceptions import BackendException, BackendParameterException
 
 from ...helpers import mock_statement
 
-lrs_settings = settings.BACKENDS.HTTP.LRS
+#lrs_settings = settings.BACKENDS.HTTP.LRS
 
 
 async def _unpack_async_generator(async_gen):
@@ -31,30 +35,58 @@ async def _unpack_async_generator(async_gen):
         result.append(value)
     return result
 
+def test_backend_http_lrs_default_instanciation(
+    monkeypatch, fs
+):  # pylint:disable = invalid-name
+    """Test the `LRSHTTPBackend` default instanciation."""
+    fs.create_file(".env")
+    backend_settings_names = [
+        "BASE_URL",
+        "USERNAME",
+        "PASSWORD",
+        "HEADERS",
+        "STATUS_ENDPOINT",
+        "STATEMENTS_ENDPOINT",
+    ]
+    for name in backend_settings_names:
+        monkeypatch.delenv(f"RALPH_BACKENDS__HTTP__LRS__{name}", raising=False)
+
+    assert AsyncLRSHTTPBackend.name == "async_lrs"
+    assert AsyncLRSHTTPBackend.settings_class == LRSHTTPBackendSettings
+    backend = AsyncLRSHTTPBackend()
+    assert backend.query == LRSStatementsQuery
+    assert backend.base_url == parse_obj_as(AnyHttpUrl, "http://0.0.0.0:8100")
+    assert backend.auth == ("ralph", "secret")
+    assert backend.settings.HEADERS == LRSHeaders()
+    assert backend.settings.STATUS_ENDPOINT == "/__heartbeat__"
+    assert backend.settings.STATEMENTS_ENDPOINT == "/xAPI/statements"
+
 
 def test_backends_http_lrs_http_instantiation():
-    """Test the LRS backend instantiation."""
-    assert AsyncLRSHTTP.name == "async_lrs"
-    assert AsyncLRSHTTP.query == LRSStatementsQuery
+    """Test the LRS backend default instantiation."""
 
     headers = LRSHeaders(
         X_EXPERIENCE_API_VERSION="1.0.3", CONTENT_TYPE="application/json"
     )
-    backend = AsyncLRSHTTP(
-        base_url="http://fake-lrs.com",
-        username="user",
-        password="pass",
-        headers=headers,
-        status_endpoint="/fake-status-endpoint",
-        statements_endpoint="/xAPI/statements",
+    settings = LRSHTTPBackendSettings(
+        BASE_URL="http://fake-lrs.com",
+        USERNAME="user",
+        PASSWORD="pass",
+        HEADERS=headers,
+        STATUS_ENDPOINT="/fake-status-endpoint",
+        STATEMENTS_ENDPOINT="/xAPI/statements",
     )
 
+    assert AsyncLRSHTTPBackend.name == "async_lrs"
+    assert AsyncLRSHTTPBackend.settings_class == LRSHTTPBackendSettings
+    backend = AsyncLRSHTTPBackend(settings)
+    assert backend.query == LRSStatementsQuery
     assert isinstance(backend.base_url, AnyHttpUrl)
     assert backend.auth == ("user", "pass")
-    assert backend.headers.CONTENT_TYPE == "application/json"
-    assert backend.headers.X_EXPERIENCE_API_VERSION == "1.0.3"
-    assert backend.status_endpoint == "/fake-status-endpoint"
-    assert backend.statements_endpoint == "/xAPI/statements"
+    assert backend.settings.HEADERS.CONTENT_TYPE == "application/json"
+    assert backend.settings.HEADERS.X_EXPERIENCE_API_VERSION == "1.0.3"
+    assert backend.settings.STATUS_ENDPOINT == "/fake-status-endpoint"
+    assert backend.settings.STATEMENTS_ENDPOINT == "/xAPI/statements"
 
 
 @pytest.mark.anyio
@@ -67,12 +99,13 @@ async def test_backends_http_lrs_status_with_successful_request(
     base_url = "http://fake-lrs.com"
     status_endpoint = "/__heartbeat__"
 
-    backend = AsyncLRSHTTP(
-        base_url=base_url,
-        username="user",
-        password="pass",
-        status_endpoint=status_endpoint,
+    settings = LRSHTTPBackendSettings(
+        BASE_URL=base_url,
+        USERNAME="user",
+        PASSWORD="pass",
+        STATUS_ENDPOINT=status_endpoint,
     )
+    backend = AsyncLRSHTTPBackend(settings)
 
     # Mock GET response of HTTPX
     httpx_mock.add_response(
@@ -94,12 +127,13 @@ async def test_backends_http_lrs_status_with_request_error(
     base_url = "http://fake-lrs.com"
     status_endpoint = "/__heartbeat__"
 
-    backend = AsyncLRSHTTP(
-        base_url=base_url,
-        username="user",
-        password="pass",
-        status_endpoint=status_endpoint,
+    settings = LRSHTTPBackendSettings(
+        BASE_URL=base_url,
+        USERNAME="user",
+        PASSWORD="pass",
+        STATUS_ENDPOINT=status_endpoint,
     )
+    backend = AsyncLRSHTTPBackend(settings)
 
     httpx_mock.add_exception(RequestError("Test Request Error"))
 
@@ -125,12 +159,13 @@ async def test_backends_http_lrs_status_with_http_status_error(
     base_url = "http://fake-lrs.com"
     status_endpoint = "/__heartbeat__"
 
-    backend = AsyncLRSHTTP(
-        base_url=base_url,
-        username="user",
-        password="pass",
-        status_endpoint=status_endpoint,
+    settings = LRSHTTPBackendSettings(
+        BASE_URL=base_url,
+        USERNAME="user",
+        PASSWORD="pass",
+        STATUS_ENDPOINT=status_endpoint,
     )
+    backend = AsyncLRSHTTPBackend(settings)
 
     httpx_mock.add_exception(
         HTTPStatusError("Test HTTP Status Error", request=None, response=None)
@@ -154,7 +189,12 @@ async def test_backends_http_lrs_list(caplog):
     base_url = "http://fake-lrs.com"
     target = "/xAPI/statements/"
 
-    backend = AsyncLRSHTTP(base_url=base_url, username="user", password="pass")
+    settings = LRSHTTPBackendSettings(
+        BASE_URL=base_url,
+        USERNAME="user",
+        PASSWORD="pass",
+    )
+    backend = AsyncLRSHTTPBackend(settings)
 
     msg = (
         "LRS HTTP backend does not support `list` method, "
@@ -227,7 +267,10 @@ async def test_backends_http_lrs_read_max_statements(
             json=more_statements,
         )
 
-    backend = AsyncLRSHTTP(base_url=base_url, username="user", password="pass")
+    settings = AsyncLRSHTTPBackend.settings_class(
+        BASE_URL=base_url, USERNAME="user", PASSWORD="pass"
+    )
+    backend = AsyncLRSHTTPBackend(settings)
 
     # Return an iterable of dict
     result = await _unpack_async_generator(
@@ -256,7 +299,12 @@ async def test_backends_http_lrs_read_without_target(
 
     base_url = "http://fake-lrs.com"
 
-    backend = AsyncLRSHTTP(base_url=base_url, username="user", password="pass")
+    settings = LRSHTTPBackendSettings(
+        BASE_URL=base_url,
+        USERNAME="user",
+        PASSWORD="pass",
+    )
+    backend = AsyncLRSHTTPBackend(settings)
 
     statements = {"statements": [mock_statement() for _ in range(3)]}
 
@@ -268,7 +316,7 @@ async def test_backends_http_lrs_read_without_target(
         url=ParseResult(
             scheme=urlparse(base_url).scheme,
             netloc=urlparse(base_url).netloc,
-            path=backend.statements_endpoint,
+            path=backend.settings.STATEMENTS_ENDPOINT,
             query=urlencode(default_params).lower(),
             params="",
             fragment="",
@@ -294,7 +342,12 @@ async def test_backends_http_lrs_read_backend_error(
     base_url = "http://fake-lrs.com"
     target = "/xAPI/statements/"
 
-    backend = AsyncLRSHTTP(base_url=base_url, username="user", password="pass")
+    settings = LRSHTTPBackendSettings(
+        BASE_URL=base_url,
+        USERNAME="user",
+        PASSWORD="pass",
+    )
+    backend = AsyncLRSHTTPBackend(settings)
 
     # Mock GET response of HTTPX
     default_params = LRSStatementsQuery(limit=500).dict(
@@ -335,7 +388,12 @@ async def test_backends_http_lrs_read_without_pagination(
     base_url = "http://fake-lrs.com"
     target = "/xAPI/statements/"
 
-    backend = AsyncLRSHTTP(base_url=base_url, username="user", password="pass")
+    settings = LRSHTTPBackendSettings(
+        BASE_URL=base_url,
+        USERNAME="user",
+        PASSWORD="pass",
+    )
+    backend = AsyncLRSHTTPBackend(settings)
 
     statements = {
         "statements": [
@@ -427,7 +485,12 @@ async def test_backends_http_lrs_read_with_pagination(httpx_mock: HTTPXMock):
     base_url = "http://fake-lrs.com"
     target = "/xAPI/statements/"
 
-    backend = AsyncLRSHTTP(base_url=base_url, username="user", password="pass")
+    settings = LRSHTTPBackendSettings(
+        BASE_URL=base_url,
+        USERNAME="user",
+        PASSWORD="pass",
+    )
+    backend = AsyncLRSHTTPBackend(settings)
 
     more_target = "/xAPI/statements/?pit_id=fake-pit-id"
     statements = {
@@ -589,7 +652,12 @@ async def test_backends_http_lrs_write_without_operation(
 
     data = [mock_statement() for _ in range(6)]
 
-    backend = AsyncLRSHTTP(base_url=base_url, username="user", password="pass")
+    settings = LRSHTTPBackendSettings(
+        BASE_URL=base_url,
+        USERNAME="user",
+        PASSWORD="pass",
+    )
+    backend = AsyncLRSHTTPBackend(settings)
 
     # Mock HTTPX POST
     httpx_mock.add_response(url=urljoin(base_url, target), method="POST", json=data)
@@ -628,7 +696,12 @@ async def test_backends_http_lrs_write_without_data(caplog):
     base_url = "http://fake-lrs.com"
     target = "/xAPI/statements/"
 
-    backend = AsyncLRSHTTP(base_url=base_url, username="user", password="pass")
+    settings = LRSHTTPBackendSettings(
+        BASE_URL=base_url,
+        USERNAME="user",
+        PASSWORD="pass",
+    )
+    backend = AsyncLRSHTTPBackend(settings)
 
     with caplog.at_level(logging.INFO):
         result = await backend.write(target=target, data=[])
@@ -661,7 +734,12 @@ async def test_backends_http_lrs_write_with_unsupported_operation(
     base_url = "http://fake-lrs.com"
     target = "/xAPI/statements/"
 
-    backend = AsyncLRSHTTP(base_url=base_url, username="user", password="pass")
+    settings = LRSHTTPBackendSettings(
+        BASE_URL=base_url,
+        USERNAME="user",
+        PASSWORD="pass",
+    )
+    backend = AsyncLRSHTTPBackend(settings)
 
     with pytest.raises(BackendParameterException, match=error_msg):
         with caplog.at_level(logging.ERROR):
@@ -694,7 +772,12 @@ async def test_backends_http_lrs_write_with_invalid_parameters(
     base_url = "http://fake-lrs.com"
     target = "/xAPI/statements/"
 
-    backend = AsyncLRSHTTP(base_url=base_url, username="user", password="pass")
+    settings = LRSHTTPBackendSettings(
+        BASE_URL=base_url,
+        USERNAME="user",
+        PASSWORD="pass",
+    )
+    backend = AsyncLRSHTTPBackend(settings)
 
     with pytest.raises(BackendParameterException, match=error_msg):
         with caplog.at_level(logging.ERROR):
@@ -719,13 +802,20 @@ async def test_backends_http_lrs_write_without_target(httpx_mock: HTTPXMock, cap
 
     base_url = "http://fake-lrs.com"
 
-    backend = AsyncLRSHTTP(base_url=base_url, username="user", password="pass")
+    settings = LRSHTTPBackendSettings(
+        BASE_URL=base_url,
+        USERNAME="user",
+        PASSWORD="pass",
+    )
+    backend = AsyncLRSHTTPBackend(settings)
 
     data = [mock_statement() for _ in range(3)]
 
     # Mock HTTPX POST
     httpx_mock.add_response(
-        url=urljoin(base_url, backend.statements_endpoint), method="POST", json=data
+        url=urljoin(base_url, backend.settings.STATEMENTS_ENDPOINT),
+        method="POST",
+        json=data,
     )
 
     with caplog.at_level(logging.DEBUG):
@@ -733,7 +823,8 @@ async def test_backends_http_lrs_write_without_target(httpx_mock: HTTPXMock, cap
         assert (
             "ralph.backends.http.async_lrs",
             logging.DEBUG,
-            f"Start writing to the {base_url}{lrs_settings.STATEMENTS_ENDPOINT} "
+            "Start writing to the "
+            f"{base_url}{LRSHTTPBackendSettings().STATEMENTS_ENDPOINT} "
             "endpoint (chunk size: 500)",
         ) in caplog.record_tuples
 
@@ -751,7 +842,12 @@ async def test_backends_http_lrs_write_with_create_or_index_operation(
     base_url = "http://fake-lrs.com"
     target = "/xAPI/statements"
 
-    backend = AsyncLRSHTTP(base_url=base_url, username="user", password="pass")
+    settings = LRSHTTPBackendSettings(
+        BASE_URL=base_url,
+        USERNAME="user",
+        PASSWORD="pass",
+    )
+    backend = AsyncLRSHTTPBackend(settings)
 
     data = [mock_statement() for _ in range(3)]
 
@@ -780,7 +876,12 @@ async def test_backends_http_lrs_write_backend_exception(
     base_url = "http://fake-lrs.com"
     target = "/xAPI/statements"
 
-    backend = AsyncLRSHTTP(base_url=base_url, username="user", password="pass")
+    settings = LRSHTTPBackendSettings(
+        BASE_URL=base_url,
+        USERNAME="user",
+        PASSWORD="pass",
+    )
+    backend = AsyncLRSHTTPBackend(settings)
 
     data = [mock_statement()]
 
@@ -850,7 +951,12 @@ async def test_backends_http_lrs_read_concurrency(
         if index < num_pages - 1:
             all_statements[index]["more"] = targets[index + 1]
 
-    backend = AsyncLRSHTTP(base_url=base_url, username="user", password="pass")
+    settings = LRSHTTPBackendSettings(
+        BASE_URL=base_url,
+        USERNAME="user",
+        PASSWORD="pass",
+    )
+    backend = AsyncLRSHTTPBackend(settings)
 
     # Mock HTTPX GET
     params = {"limit": chunk_size}
@@ -909,7 +1015,12 @@ async def test_backends_http_lrs_write_concurrency(
     # Changing data length might break tests
     assert len(data) == 6
 
-    backend = AsyncLRSHTTP(base_url=base_url, username="user", password="pass")
+    settings = LRSHTTPBackendSettings(
+        BASE_URL=base_url,
+        USERNAME="user",
+        PASSWORD="pass",
+    )
+    backend = AsyncLRSHTTPBackend(settings)
 
     # Mock HTTPX POST
     async def simulate_network_latency(request: httpx.Request):
