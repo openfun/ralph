@@ -387,8 +387,14 @@ async def get(
             }
         )
 
-    # for statement in query_result.statements:
-    #     statement["version"] = statement.get("version", "1.0.0")
+    # Statements returned by an LRS MUST retain the version they are accepted with. 
+    # If they lack a version, the version MUST be set to 1.0.0.
+    for statement in query_result.statements:
+        # Delete `version` if it is an empty string. Necessary for clickhouse.
+        if "version" in statement and not statement["version"]:
+            statement.pop("version")
+        statement["version"] = statement.get("version", settings.LRS_DEFAULT_STATEMENT_VERSION)
+        
 
     return {**more_query_parameters, "statements": query_result.statements}
 

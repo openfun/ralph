@@ -398,7 +398,7 @@ class ClickHouseDatabase(BaseDatabase):  # pylint: disable=too-many-instance-att
             # same timestamp, and also avoid sending the same event twice.
             new_search_after = response[-1]["emission_time"].isoformat()
             new_pit_id = str(response[-1]["event_id"])
-
+            
         return StatementQueryResult(
             statements=[document["event"] for document in response],
             search_after=new_search_after,
