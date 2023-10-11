@@ -3,7 +3,7 @@ from functools import lru_cache
 from urllib.parse import urlparse
 
 import sentry_sdk
-from fastapi import Depends, FastAPI
+from fastapi import Depends, Header, FastAPI
 
 from ralph.conf import settings
 
@@ -38,6 +38,7 @@ if settings.SENTRY_DSN is not None:
         max_breadcrumbs=50,
         before_send_transaction=filter_transactions,
     )
+
 
 app = FastAPI()
 app.include_router(statements.router)

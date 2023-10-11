@@ -304,6 +304,9 @@ def test_api_statements_post_statements_list_of_one(
         response.json(), {"statements": [statement]}
     )
 
+    # Test that version is in response header
+    assert response.headers["X-Experience-API-Version"] == "1.0.3"
+
 
 @pytest.mark.parametrize(
     "backend",

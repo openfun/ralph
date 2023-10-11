@@ -148,12 +148,14 @@ def test_api_statements_get_statements_mine(
             "timestamp": (datetime.now() - timedelta(hours=1)).isoformat(),
             "actor": agent_1,
             "authority": agent_1,
+            "version": "1.0.0"
         },
         {
             "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
             "timestamp": datetime.now().isoformat(),
             "actor": agent_1,
             "authority": agent_2,
+            "version": "1.0.3"
         },
     ]
     insert_statements_and_monkeypatch_backend(statements)
@@ -164,6 +166,7 @@ def test_api_statements_get_statements_mine(
         headers={"Authorization": f"Basic {credentials_1_bis}"},
     )
     assert response.status_code == 200
+    assert len(response.json()["statements"]) == 2
     assert response.json() == {"statements": [statements[1], statements[0]]}
 
     # No restriction on "mine" (explicit) : Return all statements
@@ -229,10 +232,12 @@ def test_api_statements_get_statements(
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
             "timestamp": (datetime.now() - timedelta(hours=1)).isoformat(),
+            "version": "1.0.0"
         },
         {
             "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
             "timestamp": datetime.now().isoformat(),
+            "version": "1.0.0"
         },
     ]
     insert_statements_and_monkeypatch_backend(statements)
@@ -246,6 +251,39 @@ def test_api_statements_get_statements(
         assert response.status_code == 200
         assert response.json() == {"statements": [statements[1], statements[0]]}
 
+        # Test that version is in response header
+        assert response.headers["X-Experience-API-Version"] == "1.0.3"
+
+def test_api_statements_get_statements_version(
+        insert_statements_and_monkeypatch_backend,
+        auth_credentials
+):
+    """Test that statements are returned with the proper version according to 
+    xAPI specification (existing version or 1.0.0)."""
+
+    statements = [
+        {
+            "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
+            "timestamp": (datetime.now() + timedelta(hours=1)).isoformat(),
+            "version": "1.0.3"
+        },
+        {
+            "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
+            "timestamp": datetime.now().isoformat(),
+        },
+    ]
+    insert_statements_and_monkeypatch_backend(statements)
+
+    response = client.get(
+        "xAPI/statements", headers={"Authorization": f"Basic {auth_credentials}"}
+    )
+    assert response.status_code == 200
+
+    # Test that statement with existing `version` is unchanged
+    assert response.json()["statements"][0]["version"] == "1.0.3"
+
+    # Test that statement with no `version` is assigned 1.0.0
+    assert response.json()["statements"][1]["version"] == "1.0.0"
 
 def test_api_statements_get_statements_ascending(
     insert_statements_and_monkeypatch_backend, auth_credentials
@@ -259,10 +297,12 @@ def test_api_statements_get_statements_ascending(
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
             "timestamp": (datetime.now() - timedelta(hours=1)).isoformat(),
+            "version": "1.0.0"
         },
         {
             "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
             "timestamp": datetime.now().isoformat(),
+            "version": "1.0.0"
         },
     ]
     insert_statements_and_monkeypatch_backend(statements)
@@ -288,10 +328,12 @@ def test_api_statements_get_statements_by_statement_id(
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
             "timestamp": (datetime.now() - timedelta(hours=1)).isoformat(),
+            "version": "1.0.0"
         },
         {
             "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
             "timestamp": datetime.now().isoformat(),
+            "version": "1.0.0"
         },
     ]
     insert_statements_and_monkeypatch_backend(statements)
@@ -340,12 +382,14 @@ def test_api_statements_get_statements_by_agent(
             "timestamp": datetime.now().isoformat(),
             "actor": agent_1,
             "authority": agent_1,
+            "version": "1.0.0"
         },
         {
             "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
             "timestamp": datetime.now().isoformat(),
             "actor": agent_2,
             "authority": agent_1,
+            "version": "1.0.0"
         },
     ]
     insert_statements_and_monkeypatch_backend(statements)
@@ -372,11 +416,13 @@ def test_api_statements_get_statements_by_verb(
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
             "timestamp": datetime.now().isoformat(),
             "verb": {"id": "http://adlnet.gov/expapi/verbs/experienced"},
+            "version": "1.0.0"
         },
         {
             "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
             "timestamp": datetime.now().isoformat(),
             "verb": {"id": "http://adlnet.gov/expapi/verbs/played"},
+            "version": "1.0.0"
         },
     ]
     insert_statements_and_monkeypatch_backend(statements)
@@ -406,11 +452,13 @@ def test_api_statements_get_statements_by_activity(
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
             "timestamp": datetime.now().isoformat(),
             "object": activity_0,
+            "version": "1.0.0"
         },
         {
             "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
             "timestamp": datetime.now().isoformat(),
             "object": activity_1,
+            "version": "1.0.0"
         },
     ]
     insert_statements_and_monkeypatch_backend(statements)
@@ -445,10 +493,12 @@ def test_api_statements_get_statements_since_timestamp(
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
             "timestamp": (datetime.now() - timedelta(hours=1)).isoformat(),
+            "version": "1.0.0"
         },
         {
             "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
             "timestamp": datetime.now().isoformat(),
+            "version": "1.0.0"
         },
     ]
     insert_statements_and_monkeypatch_backend(statements)
@@ -475,10 +525,12 @@ def test_api_statements_get_statements_until_timestamp(
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
             "timestamp": (datetime.now() - timedelta(hours=1)).isoformat(),
+            "version": "1.0.0"
         },
         {
             "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
             "timestamp": datetime.now().isoformat(),
+            "version": "1.0.0"
         },
     ]
     insert_statements_and_monkeypatch_backend(statements)
@@ -510,22 +562,27 @@ def test_api_statements_get_statements_with_pagination(
         {
             "id": "5d345b99-517c-4b54-848e-45010904b177",
             "timestamp": (datetime.now() - timedelta(hours=4)).isoformat(),
+            "version": "1.0.0"
         },
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
             "timestamp": (datetime.now() - timedelta(hours=3)).isoformat(),
+            "version": "1.0.0"
         },
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac5",
             "timestamp": (datetime.now() - timedelta(hours=2)).isoformat(),
+            "version": "1.0.0"
         },
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac4",
             "timestamp": (datetime.now() - timedelta(hours=1)).isoformat(),
+            "version": "1.0.0"
         },
         {
             "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
             "timestamp": datetime.now().isoformat(),
+            "version": "1.0.0"
         },
     ]
     insert_statements_and_monkeypatch_backend(statements)
@@ -585,6 +642,7 @@ def test_api_statements_get_statements_with_pagination_and_query(
                 "display": {"en-US": "played"},
             },
             "timestamp": (datetime.now() - timedelta(hours=2)).isoformat(),
+            "version": "1.0.0"
         },
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac1",
@@ -593,6 +651,7 @@ def test_api_statements_get_statements_with_pagination_and_query(
                 "display": {"en-US": "played"},
             },
             "timestamp": (datetime.now() - timedelta(hours=1)).isoformat(),
+            "version": "1.0.0"
         },
         {
             "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
@@ -601,6 +660,7 @@ def test_api_statements_get_statements_with_pagination_and_query(
                 "display": {"en-US": "played"},
             },
             "timestamp": datetime.now().isoformat(),
+            "version": "1.0.0"
         },
     ]
     insert_statements_and_monkeypatch_backend(statements)
@@ -640,10 +700,12 @@ def test_api_statements_get_statements_with_no_matching_statement(
         {
             "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
             "timestamp": (datetime.now() - timedelta(hours=1)).isoformat(),
+            "version": "1.0.0"
         },
         {
             "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
             "timestamp": datetime.now().isoformat(),
+            "version": "1.0.0"
         },
     ]
     insert_statements_and_monkeypatch_backend(statements)

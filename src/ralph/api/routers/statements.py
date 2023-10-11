@@ -132,6 +132,7 @@ def strict_query_params(request: Request):
 @router.get("/")
 # pylint: disable=too-many-arguments, too-many-locals
 async def get(
+    response: Response,
     request: Request,
     current_user: Annotated[AuthenticatedUser, Depends(get_authenticated_user)],
     ###
@@ -279,6 +280,9 @@ async def get(
     LRS Specification:
     https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#213-get-statements
     """
+    # The LRS MUST include the "X-Experience-API-Version" header in every response
+    response.headers["X-Experience-API-Version"] = settings.LRS_HEADER_XAPI_VERSION
+
     # Make sure the limit does not go above max from settings
     limit = min(limit, settings.RUNSERVER_MAX_SEARCH_HITS_COUNT)
 
@@ -357,7 +361,7 @@ async def get(
     # NB: There is an unhandled edge case where the total number of results is
     # exactly a multiple of the "limit", in which case we'll offer an extra page
     # with 0 results.
-    response = {}
+    more_query_parameters = {}
     if len(query_result.statements) == limit:
         # Search after relies on sorting info located in the last hit
         path = request.url.path
@@ -370,7 +374,7 @@ async def get(
             }
         )
 
-        response.update(
+        more_query_parameters.update(
             {
                 "more": ParseResult(
                     scheme="",
@@ -383,13 +387,23 @@ async def get(
             }
         )
 
-    return {**response, "statements": query_result.statements}
+    # Statements returned by an LRS MUST retain the version they are accepted with. 
+    # If they lack a version, the version MUST be set to 1.0.0.
+    for statement in query_result.statements:
+        # Delete `version` if it is an empty string. Necessary for clickhouse.
+        if "version" in statement and not statement["version"]:
+            statement.pop("version")
+        statement["version"] = statement.get("version", settings.LRS_GET_STATEMENT_DEFAULT_XAPI_VERSION)
+        
+
+    return {**more_query_parameters, "statements": query_result.statements}
 
 
 @router.put("/", responses=POST_PUT_RESPONSES, status_code=status.HTTP_204_NO_CONTENT)
 @router.put("", responses=POST_PUT_RESPONSES, status_code=status.HTTP_204_NO_CONTENT)
 # pylint: disable=unused-argument
 async def put(
+    response: Response,
     current_user: Annotated[AuthenticatedUser, Depends(get_authenticated_user)],
     statement: LaxStatement,
     background_tasks: BackgroundTasks,
@@ -401,6 +415,10 @@ async def put(
     LRS Specification:
     https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#211-put-statements
     """
+
+    # The LRS MUST include the "X-Experience-API-Version" header in every response
+    response.headers["X-Experience-API-Version"] = settings.LRS_HEADER_XAPI_VERSION
+
     statement_as_dict = statement.dict(exclude_unset=True)
     statement_id = str(statement_id)
 
@@ -459,10 +477,10 @@ async def put(
 @router.post("/", responses=POST_PUT_RESPONSES)
 @router.post("", responses=POST_PUT_RESPONSES)
 async def post(
+    response: Response,
     current_user: Annotated[AuthenticatedUser, Depends(get_authenticated_user)],
     statements: Union[LaxStatement, List[LaxStatement]],
     background_tasks: BackgroundTasks,
-    response: Response,
     _=Depends(strict_query_params),
 ):
     """Store a set of statements (or a single statement as a single member of a set).
@@ -471,6 +489,10 @@ async def post(
     LRS Specification:
     https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#212-post-statements
     """
+
+    # The LRS MUST include the "X-Experience-API-Version" header in every response
+    response.headers["X-Experience-API-Version"] = settings.LRS_HEADER_XAPI_VERSION
+
     # As we accept both a single statement as a dict, and multiple statements as a list,
     # we need to normalize the data into a list in all cases before we can process it.
     if not isinstance(statements, list):

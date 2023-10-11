@@ -91,6 +91,9 @@ def test_api_statements_put_single_statement_directly(
     )
 
     assert response.status_code == 204
+    
+    # Test that version is in response header
+    assert response.headers["X-Experience-API-Version"] == "1.0.3"
 
     es.indices.refresh()
 
