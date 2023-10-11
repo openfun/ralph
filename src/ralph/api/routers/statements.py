@@ -281,7 +281,7 @@ async def get(
     https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#213-get-statements
     """
     # The LRS MUST include the "X-Experience-API-Version" header in every response
-    response.headers["X-Experience-API-Version"] = "1.0.3" # TODO: change this ?
+    response.headers["X-Experience-API-Version"] = settings.LRS_HEADER_XAPI_VERSION
 
     # Make sure the limit does not go above max from settings
     limit = min(limit, settings.RUNSERVER_MAX_SEARCH_HITS_COUNT)
@@ -393,7 +393,7 @@ async def get(
         # Delete `version` if it is an empty string. Necessary for clickhouse.
         if "version" in statement and not statement["version"]:
             statement.pop("version")
-        statement["version"] = statement.get("version", settings.LRS_DEFAULT_STATEMENT_VERSION)
+        statement["version"] = statement.get("version", settings.LRS_GET_STATEMENT_DEFAULT_XAPI_VERSION)
         
 
     return {**more_query_parameters, "statements": query_result.statements}
@@ -417,7 +417,7 @@ async def put(
     """
 
     # The LRS MUST include the "X-Experience-API-Version" header in every response
-    response.headers["X-Experience-API-Version"] = "1.0.3" # TODO: change this ?
+    response.headers["X-Experience-API-Version"] = settings.LRS_HEADER_XAPI_VERSION
 
     statement_as_dict = statement.dict(exclude_unset=True)
     statement_id = str(statement_id)
@@ -491,7 +491,7 @@ async def post(
     """
 
     # The LRS MUST include the "X-Experience-API-Version" header in every response
-    response.headers["X-Experience-API-Version"] = "1.0.3" # TODO: change this ?
+    response.headers["X-Experience-API-Version"] = settings.LRS_HEADER_XAPI_VERSION
 
     # As we accept both a single statement as a dict, and multiple statements as a list,
     # we need to normalize the data into a list in all cases before we can process it.
