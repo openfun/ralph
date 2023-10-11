@@ -5,6 +5,7 @@ from click.testing import CliRunner
 
 import ralph.logger
 from ralph.cli import cli
+from ralph.conf import settings
 from ralph.exceptions import ConfigurationException
 
 
@@ -35,14 +36,15 @@ def test_logger_exists(fs, monkeypatch):
         },
     }
 
-    fs.create_dir("/dev")
+    fs.create_dir(str(settings.APP_DIR))
+    fs.create_dir("foo")
 
     monkeypatch.setattr(ralph.logger.settings, "LOGGING", mock_default_config)
 
     runner = CliRunner()
     result = runner.invoke(
         cli,
-        ["write", "-b", "fs", "-t", "test_file"],
+        ["write", "-b", "fs", "-t", "test_file", "--fs-default-directory-path", "foo"],
         input="test input",
     )
 
