@@ -22,7 +22,7 @@ ISSUER_URI = "http://providerHost:8080/auth/realms/real_name"
 PUBLIC_KEY_ID = "example-key-id"
 
 
-def create_user(
+def mock_basic_auth_user(
     fs_,
     username: str,
     password: str,
@@ -91,7 +91,7 @@ def auth_credentials(fs, user_scopes=None, agent=None):
     if agent is None:
         agent = {"mbox": "mailto:test_ralph@example.com"}
 
-    credentials = create_user(fs, username, password, user_scopes, agent)
+    credentials = mock_basic_auth_user(fs, username, password, user_scopes, agent)
 
     return credentials
 

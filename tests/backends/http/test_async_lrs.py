@@ -3,12 +3,9 @@
 import asyncio
 import json
 import logging
-import random
 import time
-from datetime import datetime
 from functools import partial
 from urllib.parse import ParseResult, parse_qsl, urlencode, urljoin, urlparse
-from uuid import uuid4
 
 import httpx
 import pytest
@@ -26,6 +23,8 @@ from ralph.backends.http.async_lrs import (
 from ralph.backends.http.base import HTTPBackendStatus
 from ralph.exceptions import BackendException, BackendParameterException
 
+from ...helpers import mock_statement
+
 # pylint: disable=too-many-lines
 
 
@@ -35,26 +34,6 @@ async def _unpack_async_generator(async_gen):
     async for value in async_gen:
         result.append(value)
     return result
-
-
-def _gen_statement(id_=None, verb=None, timestamp=None):
-    """Generate fake statements with random or provided parameters."""
-    if id_ is None:
-        id_ = str(uuid4())
-    if verb is None:
-        verb = {"id": f"https://w3id.org/xapi/video/verbs/{random.random()}"}
-    elif isinstance(verb, int):
-        verb = {"id": f"https://w3id.org/xapi/video/verbs/{verb}"}
-    if timestamp is None:
-        timestamp = datetime.strftime(
-            datetime.fromtimestamp(time.time() - random.random()),
-            "%Y-%m-%dT%H:%M:%S",
-        )
-    elif isinstance(timestamp, int):
-        timestamp = datetime.strftime(
-            datetime.fromtimestamp((time.time() - timestamp), "%Y-%m-%dT%H:%M:%S")
-        )
-    return {"id": id_, "verb": verb, "timestamp": timestamp}
 
 
 def test_backend_http_lrs_default_instantiation(
@@ -250,11 +229,11 @@ async def test_backends_http_lrs_read_max_statements(
     chunk_size = 3
 
     statements = {
-        "statements": [_gen_statement() for _ in range(chunk_size)],
+        "statements": [mock_statement() for _ in range(chunk_size)],
         "more": more_target,
     }
     more_statements = {
-        "statements": [_gen_statement() for _ in range(chunk_size)],
+        "statements": [mock_statement() for _ in range(chunk_size)],
     }
 
     # Mock GET response of HTTPX for target and "more" target without query parameter
@@ -328,7 +307,7 @@ async def test_backends_http_lrs_read_without_target(
     )
     backend = AsyncLRSHTTPBackend(settings)
 
-    statements = {"statements": [_gen_statement() for _ in range(3)]}
+    statements = {"statements": [mock_statement() for _ in range(3)]}
 
     # Mock HTTPX GET
     default_params = LRSStatementsQuery(limit=500).dict(
@@ -419,9 +398,9 @@ async def test_backends_http_lrs_read_without_pagination(
 
     statements = {
         "statements": [
-            _gen_statement(verb={"id": "https://w3id.org/xapi/video/verbs/played"}),
-            _gen_statement(verb={"id": "https://w3id.org/xapi/video/verbs/played"}),
-            _gen_statement(verb={"id": "https://w3id.org/xapi/video/verbs/paused"}),
+            mock_statement(verb={"id": "https://w3id.org/xapi/video/verbs/played"}),
+            mock_statement(verb={"id": "https://w3id.org/xapi/video/verbs/played"}),
+            mock_statement(verb={"id": "https://w3id.org/xapi/video/verbs/paused"}),
         ]
     }
 
@@ -517,19 +496,19 @@ async def test_backends_http_lrs_read_with_pagination(httpx_mock: HTTPXMock):
     more_target = "/xAPI/statements/?pit_id=fake-pit-id"
     statements = {
         "statements": [
-            _gen_statement(verb={"id": "https://w3id.org/xapi/video/verbs/played"}),
-            _gen_statement(
+            mock_statement(verb={"id": "https://w3id.org/xapi/video/verbs/played"}),
+            mock_statement(
                 verb={"id": "https://w3id.org/xapi/video/verbs/initialized"}
             ),
-            _gen_statement(verb={"id": "https://w3id.org/xapi/video/verbs/paused"}),
+            mock_statement(verb={"id": "https://w3id.org/xapi/video/verbs/paused"}),
         ],
         "more": more_target,
     }
     more_statements = {
         "statements": [
-            _gen_statement(verb={"id": "https://w3id.org/xapi/video/verbs/seeked"}),
-            _gen_statement(verb={"id": "https://w3id.org/xapi/video/verbs/played"}),
-            _gen_statement(verb={"id": "https://w3id.org/xapi/video/verbs/paused"}),
+            mock_statement(verb={"id": "https://w3id.org/xapi/video/verbs/seeked"}),
+            mock_statement(verb={"id": "https://w3id.org/xapi/video/verbs/played"}),
+            mock_statement(verb={"id": "https://w3id.org/xapi/video/verbs/paused"}),
         ]
     }
 
@@ -672,7 +651,7 @@ async def test_backends_http_lrs_write_without_operation(
     base_url = "http://fake-lrs.com"
     target = "/xAPI/statements/"
 
-    data = [_gen_statement() for _ in range(6)]
+    data = [mock_statement() for _ in range(6)]
 
     settings = LRSHTTPBackendSettings(
         BASE_URL=base_url,
@@ -831,7 +810,7 @@ async def test_backends_http_lrs_write_without_target(httpx_mock: HTTPXMock, cap
     )
     backend = AsyncLRSHTTPBackend(settings)
 
-    data = [_gen_statement() for _ in range(3)]
+    data = [mock_statement() for _ in range(3)]
 
     # Mock HTTPX POST
     httpx_mock.add_response(
@@ -871,7 +850,7 @@ async def test_backends_http_lrs_write_with_create_or_index_operation(
     )
     backend = AsyncLRSHTTPBackend(settings)
 
-    data = [_gen_statement() for _ in range(3)]
+    data = [mock_statement() for _ in range(3)]
 
     # Mock HTTPX POST
     httpx_mock.add_response(url=urljoin(base_url, target), method="POST", json=data)
@@ -905,7 +884,7 @@ async def test_backends_http_lrs_write_backend_exception(
     )
     backend = AsyncLRSHTTPBackend(settings)
 
-    data = [_gen_statement()]
+    data = [mock_statement()]
 
     # Mock HTTPX POST
     httpx_mock.add_response(
@@ -968,7 +947,7 @@ async def test_backends_http_lrs_read_concurrency(
     all_statements = {}
     for index in range(num_pages):
         all_statements[index] = {
-            "statements": [_gen_statement() for _ in range(chunk_size)]
+            "statements": [mock_statement() for _ in range(chunk_size)]
         }
         if index < num_pages - 1:
             all_statements[index]["more"] = targets[index + 1]
@@ -1032,7 +1011,7 @@ async def test_backends_http_lrs_write_concurrency(
 
     base_url = "http://fake-lrs.com"
 
-    data = [_gen_statement() for _ in range(6)]
+    data = [mock_statement() for _ in range(6)]
 
     # Changing data length might break tests
     assert len(data) == 6
