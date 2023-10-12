@@ -52,7 +52,7 @@ spec:
                 - name: RALPH_SENTRY_IGNORE_HEALTH_CHECKS
                   value: "{{ .Values.sentryIgnoreHealthChecks }}"
                 {{- if and .Values.elastic.enabled .Values.elastic.mountCACert }}
-                - name: RALPH_BACKENDS__DATABASE__ES__CLIENT_OPTIONS__ca_certs
+                - name: RALPH_BACKENDS__DATA__ES__CLIENT_OPTIONS__ca_certs
                   value: "/usr/local/share/ca-certificates/ca.crt"
                 {{- end }}
               envFrom:
