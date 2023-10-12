@@ -25,26 +25,18 @@ from tests.fixtures.backends import (
     get_mongo_test_backend,
 )
 
-from ..helpers import assert_statement_get_responses_are_equivalent, string_is_date
+from ..helpers import (
+    assert_statement_get_responses_are_equivalent,
+    mock_statement,
+    string_is_date,
+)
 
 client = TestClient(app)
 
 
 def test_api_statements_put_invalid_parameters(auth_credentials):
     """Test that using invalid parameters returns the proper status code."""
-    statement = {
-        "actor": {
-            "account": {
-                "homePage": "https://example.com/homepage/",
-                "name": str(uuid4()),
-            },
-            "objectType": "Agent",
-        },
-        "id": str(uuid4()),
-        "object": {"id": "https://example.com/object-id/1/"},
-        "timestamp": "2022-06-22T08:31:38Z",
-        "verb": {"id": "https://example.com/verb-id/1/"},
-    }
+    statement = mock_statement()
 
     # Check for 400 status code when unknown parameters are provided
     response = client.put(
@@ -70,19 +62,7 @@ def test_api_statements_put_single_statement_directly(
     # pylint: disable=invalid-name,unused-argument
 
     monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
-    statement = {
-        "actor": {
-            "account": {
-                "homePage": "https://example.com/homepage/",
-                "name": str(uuid4()),
-            },
-            "objectType": "Agent",
-        },
-        "id": str(uuid4()),
-        "object": {"id": "https://example.com/object-id/1/"},
-        "timestamp": "2022-06-22T08:31:38Z",
-        "verb": {"id": "https://example.com/verb-id/1/"},
-    }
+    statement = mock_statement()
 
     response = client.put(
         f"/xAPI/statements/?statementId={statement['id']}",
@@ -113,18 +93,7 @@ def test_api_statements_put_enriching_without_existing_values(
     monkeypatch.setattr(
         "ralph.api.routers.statements.BACKEND_CLIENT", get_es_test_backend()
     )
-    statement = {
-        "actor": {
-            "account": {
-                "homePage": "https://example.com/homepage/",
-                "name": str(uuid4()),
-            },
-            "objectType": "Agent",
-        },
-        "object": {"id": "https://example.com/object-id/1/"},
-        "verb": {"id": "https://example.com/verb-id/1/"},
-        "id": str(uuid4()),
-    }
+    statement = mock_statement()
 
     response = client.put(
         f"/xAPI/statements/?statementId={statement['id']}",
@@ -176,18 +145,8 @@ def test_api_statements_put_enriching_with_existing_values(
     monkeypatch.setattr(
         "ralph.api.routers.statements.BACKEND_CLIENT", get_es_test_backend()
     )
-    statement = {
-        "actor": {
-            "account": {
-                "homePage": "https://example.com/homepage/",
-                "name": str(uuid4()),
-            },
-            "objectType": "Agent",
-        },
-        "object": {"id": "https://example.com/object-id/1/"},
-        "verb": {"id": "https://example.com/verb-id/1/"},
-        "id": str(uuid4()),
-    }
+    statement = mock_statement()
+
     # Add the field to be tested
     statement[field] = value
 
@@ -228,19 +187,7 @@ def test_api_statements_put_single_statement_no_trailing_slash(
     # pylint: disable=invalid-name,unused-argument
 
     monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
-    statement = {
-        "actor": {
-            "account": {
-                "homePage": "https://example.com/homepage/",
-                "name": str(uuid4()),
-            },
-            "objectType": "Agent",
-        },
-        "id": str(uuid4()),
-        "object": {"id": "https://example.com/object-id/1/"},
-        "timestamp": "2022-06-22T08:31:38Z",
-        "verb": {"id": "https://example.com/verb-id/1/"},
-    }
+    statement = mock_statement()
 
     response = client.put(
         f"/xAPI/statements?statementId={statement['id']}",
@@ -256,25 +203,13 @@ def test_api_statements_put_single_statement_no_trailing_slash(
     [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
 )
 # pylint: disable=too-many-arguments
-def test_api_statements_put_statement_id_mismatch(
+def test_api_statements_put_id_mismatch(
     backend, monkeypatch, auth_credentials, es, mongo, clickhouse
 ):
     # pylint: disable=invalid-name,unused-argument
     """Test the put statements API route when the statementId doesn't match."""
     monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
-    statement = {
-        "actor": {
-            "account": {
-                "homePage": "https://example.com/homepage/",
-                "name": str(uuid4()),
-            },
-            "objectType": "Agent",
-        },
-        "id": str(uuid4()),
-        "object": {"id": "https://example.com/object-id/1/"},
-        "timestamp": "2022-06-22T08:31:38Z",
-        "verb": {"id": "https://example.com/verb-id/1/"},
-    }
+    statement = mock_statement(id_=str(uuid4()))
 
     different_statement_id = str(uuid4())
     response = client.put(
@@ -294,25 +229,13 @@ def test_api_statements_put_statement_id_mismatch(
     [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
 )
 # pylint: disable=too-many-arguments
-def test_api_statements_put_statements_list_of_one(
+def test_api_statements_put_list_of_one(
     backend, monkeypatch, auth_credentials, es, mongo, clickhouse
 ):
     # pylint: disable=invalid-name,unused-argument
     """Test that we fail on PUTs with a list, even if it's one statement."""
     monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
-    statement = {
-        "actor": {
-            "account": {
-                "homePage": "https://example.com/homepage/",
-                "name": str(uuid4()),
-            },
-            "objectType": "Agent",
-        },
-        "id": str(uuid4()),
-        "object": {"id": "https://example.com/object-id/1/"},
-        "timestamp": "2022-03-15T14:07:51Z",
-        "verb": {"id": "https://example.com/verb-id/1/"},
-    }
+    statement = mock_statement()
 
     response = client.put(
         f"/xAPI/statements/?statementId={statement['id']}",
@@ -328,7 +251,7 @@ def test_api_statements_put_statements_list_of_one(
     [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
 )
 # pylint: disable=too-many-arguments
-def test_api_statements_put_statement_duplicate_of_existing_statement(
+def test_api_statements_put_duplicate_of_existing_statement(
     backend, monkeypatch, auth_credentials, es, mongo, clickhouse
 ):
     """Test the put statements API route, given a statement that already exist in the
@@ -337,19 +260,7 @@ def test_api_statements_put_statement_duplicate_of_existing_statement(
     # pylint: disable=invalid-name,unused-argument
 
     monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
-    statement = {
-        "actor": {
-            "account": {
-                "homePage": "https://example.com/homepage/",
-                "name": str(uuid4()),
-            },
-            "objectType": "Agent",
-        },
-        "id": str(uuid4()),
-        "object": {"id": "https://example.com/object-id/1/"},
-        "timestamp": "2022-03-15T14:07:51Z",
-        "verb": {"id": "https://example.com/verb-id/1/"},
-    }
+    statement = mock_statement()
 
     # Put the statement once.
     response = client.put(
@@ -387,7 +298,7 @@ def test_api_statements_put_statement_duplicate_of_existing_statement(
     "backend",
     [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
 )
-def test_api_statements_put_statements_with_a_failure_during_storage(
+def test_api_statements_put_with_failure_during_storage(
     backend, monkeypatch, auth_credentials, es, mongo, clickhouse
 ):
     """Test the put statements API route with a failure happening during storage."""
@@ -400,19 +311,7 @@ def test_api_statements_put_statements_with_a_failure_during_storage(
     backend_instance = backend()
     monkeypatch.setattr(backend_instance, "write", write_mock)
     monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend_instance)
-    statement = {
-        "actor": {
-            "account": {
-                "homePage": "https://example.com/homepage/",
-                "name": str(uuid4()),
-            },
-            "objectType": "Agent",
-        },
-        "id": str(uuid4()),
-        "object": {"id": "https://example.com/object-id/1/"},
-        "timestamp": "2022-03-15T14:07:51Z",
-        "verb": {"id": "https://example.com/verb-id/1/"},
-    }
+    statement = mock_statement()
 
     response = client.put(
         f"/xAPI/statements/?statementId={statement['id']}",
@@ -428,7 +327,7 @@ def test_api_statements_put_statements_with_a_failure_during_storage(
     "backend",
     [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
 )
-def test_api_statements_put_statement_with_a_failure_during_id_query(
+def test_api_statements_put_with_a_failure_during_id_query(
     backend, monkeypatch, auth_credentials, es, mongo, clickhouse
 ):
     """Test the put statements API route with a failure during query execution."""
@@ -443,19 +342,7 @@ def test_api_statements_put_statement_with_a_failure_during_id_query(
         backend_instance, "query_statements_by_ids", query_statements_by_ids_mock
     )
     monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend_instance)
-    statement = {
-        "actor": {
-            "account": {
-                "homePage": "https://example.com/homepage/",
-                "name": str(uuid4()),
-            },
-            "objectType": "Agent",
-        },
-        "id": str(uuid4()),
-        "object": {"id": "https://example.com/object-id/1/"},
-        "timestamp": "2022-03-15T14:07:51Z",
-        "verb": {"id": "https://example.com/verb-id/1/"},
-    }
+    statement = mock_statement()
 
     response = client.put(
         f"/xAPI/statements/?statementId={statement['id']}",
@@ -472,7 +359,7 @@ def test_api_statements_put_statement_with_a_failure_during_id_query(
     [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
 )
 # pylint: disable=too-many-arguments
-def test_api_statements_put_statement_without_statement_forwarding(
+def test_api_statements_put_without_forwarding(
     backend, auth_credentials, monkeypatch, es, mongo, clickhouse
 ):
     """Test the put statements API route, given an empty forwarding configuration,
@@ -495,19 +382,7 @@ def test_api_statements_put_statement_without_statement_forwarding(
     )
     monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
 
-    statement = {
-        "actor": {
-            "account": {
-                "homePage": "https://example.com/homepage/",
-                "name": str(uuid4()),
-            },
-            "objectType": "Agent",
-        },
-        "id": str(uuid4()),
-        "object": {"id": "https://example.com/object-id/1/"},
-        "timestamp": "2022-06-22T08:31:38Z",
-        "verb": {"id": "https://example.com/verb-id/1/"},
-    }
+    statement = mock_statement()
 
     response = client.put(
         f"/xAPI/statements/?statementId={statement['id']}",
@@ -539,7 +414,7 @@ def test_api_statements_put_statement_without_statement_forwarding(
         ),
     ],
 )
-async def test_api_statements_put_statement_with_statement_forwarding(
+async def test_api_statements_put_with_forwarding(
     receiving_backend,
     forwarding_backend,
     monkeypatch,
@@ -557,19 +432,7 @@ async def test_api_statements_put_statement_with_statement_forwarding(
     """
     # pylint: disable=invalid-name,unused-argument,too-many-arguments,too-many-locals
 
-    statement = {
-        "actor": {
-            "account": {
-                "homePage": "https://example.com/homepage/",
-                "name": str(uuid4()),
-            },
-            "objectType": "Agent",
-        },
-        "id": str(uuid4()),
-        "object": {"id": "https://example.com/object-id/1/"},
-        "timestamp": "2022-03-15T14:07:51Z",
-        "verb": {"id": "https://example.com/verb-id/1/"},
-    }
+    statement = mock_statement()
 
     # Set-up receiving LRS client
     with monkeypatch.context() as receiving_patch:
