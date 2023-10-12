@@ -151,6 +151,7 @@ class FSDataBackend(HistoryMixin, BaseDataBackend):
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
+        # pylint: disable=too-many-arguments
         """Read files matching the query in the target folder and yield them.
 
         Args:

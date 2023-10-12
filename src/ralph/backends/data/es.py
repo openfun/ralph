@@ -205,6 +205,7 @@ class ESDataBackend(BaseDataBackend):
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
+        # pylint: disable=too-many-arguments
         """Read documents matching the query in the target index and yield them.
 
         Args:

@@ -167,6 +167,7 @@ class BaseDataBackend(ABC):
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
+        # pylint: disable=too-many-arguments
         """Read records matching the `query` in the `target` container and yield them.
 
         Args:
@@ -339,6 +340,7 @@ class BaseAsyncDataBackend(ABC):
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
+        # pylint: disable=too-many-arguments
         """Read records matching the `query` in the `target` container and yield them.
 
         Args:

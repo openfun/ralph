@@ -156,6 +156,7 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend):
         raw_output: bool = True,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
+        # pylint: disable=too-many-arguments
         """Read an archive matching the query in the target stream_id and yield it.
 
         Args:
