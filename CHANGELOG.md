@@ -16,6 +16,10 @@ and this project adheres to
 
 ### Changed
 
+- Refactor `database` and `storage` backends under the unified `data` backend
+interface [BC]
+- Refactor LRS `query_statements` and `query_statements_by_ids` backends
+methods under the unified `lrs` backend interface [BC]
 - Refactor LRS Statements resource query parameters defined for `ralph` API
 - Helm chart: improve chart modularity
 - User credentials must now include an "agent" field which can be created
