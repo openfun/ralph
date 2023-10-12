@@ -77,7 +77,7 @@ spec:
             - name: RALPH_SENTRY_IGNORE_HEALTH_CHECKS
               value: "{{ ralph_sentry_ignore_health_checks }}"
 {% if ralph_mount_es_ca_secret %}
-            - name: RALPH_BACKENDS__DATABASE__ES__CLIENT_OPTIONS__ca_certs
+            - name: RALPH_BACKENDS__DATA__ES__CLIENT_OPTIONS__ca_certs
               value: "/usr/local/share/ca-certificates/es-cluster.pem"
 {% endif %}
           envFrom:

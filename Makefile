@@ -79,7 +79,7 @@ arnold-bootstrap: \
 	  $(ARNOLD) -d -c $(ARNOLD_CUSTOMER) -e $(ARNOLD_ENVIRONMENT) -a $(ARNOLD_APP) create_app_vaults && \
 	  $(ARNOLD) -d -c $(ARNOLD_CUSTOMER) -e $(ARNOLD_ENVIRONMENT) -a elasticsearch create_app_vaults && \
 	  $(ARNOLD) -d -c $(ARNOLD_CUSTOMER) -e $(ARNOLD_ENVIRONMENT) -- vault -a $(ARNOLD_APP) decrypt
-	sed -i 's/^# RALPH_BACKENDS__DATABASE__ES/RALPH_BACKENDS__DATABASE__ES/g' group_vars/customer/$(ARNOLD_CUSTOMER)/$(ARNOLD_ENVIRONMENT)/secrets/$(ARNOLD_APP).vault.yml
+	sed -i 's/^# RALPH_BACKENDS__DATA__ES/RALPH_BACKENDS__DATA__ES/g' group_vars/customer/$(ARNOLD_CUSTOMER)/$(ARNOLD_ENVIRONMENT)/secrets/$(ARNOLD_APP).vault.yml
 	source .k3d-cluster.env.sh && \
 	  $(ARNOLD) -d -c $(ARNOLD_CUSTOMER) -e $(ARNOLD_ENVIRONMENT) -- vault -a $(ARNOLD_APP) encrypt
 	echo "skip_verification: True" > $(ARNOLD_APP_VARS)
