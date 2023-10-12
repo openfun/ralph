@@ -1878,6 +1878,10 @@ and this project adheres to
 </ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <ul>
+<li>Refactor <code>database</code> and <code>storage</code> backends under the unified <code>data</code> backend
+interface [BC]</li>
+<li>Refactor LRS <code>query_statements</code> and <code>query_statements_by_ids</code> backends
+methods under the unified <code>lrs</code> backend interface [BC]</li>
 <li>Refactor LRS Statements resource query parameters defined for <code>ralph</code> API</li>
 <li>Helm chart: improve chart modularity</li>
 <li>User credentials must now include an &ldquo;agent&rdquo; field which can be created
