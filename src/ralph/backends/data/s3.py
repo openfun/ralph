@@ -71,11 +71,11 @@ class S3DataBackend(HistoryMixin, BaseDataBackend):
     name = "s3"
     default_operation_type = BaseOperationType.CREATE
     settings_class = S3DataBackendSettings
+    settings: settings_class
 
     def __init__(self, settings: Union[settings_class, None] = None):
         """Instantiate the AWS S3 client."""
-        self.settings = settings if settings else self.settings_class()
-
+        super().__init__(settings)
         self.default_bucket_name = self.settings.DEFAULT_BUCKET_NAME
         self.default_chunk_size = self.settings.DEFAULT_CHUNK_SIZE
         self.locale_encoding = self.settings.LOCALE_ENCODING

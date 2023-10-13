@@ -21,9 +21,6 @@ def test_backends_data_base_enforce_query_checks_with_valid_input(value, expecte
     class MockBaseDataBackend(BaseDataBackend):
         """A class mocking the base database class."""
 
-        def __init__(self, settings=None):
-            """Instantiate the Mock data backend."""
-
         @enforce_query_checks
         def read(self, query=None):  # pylint: disable=no-self-use,arguments-differ
             """Mock the base database read method."""
@@ -64,9 +61,6 @@ def test_backends_data_base_enforce_query_checks_with_invalid_input(
 
     class MockBaseDataBackend(BaseDataBackend):
         """A class mocking the base database class."""
-
-        def __init__(self, settings=None):
-            """Instantiate the Mock data backend."""
 
         @enforce_query_checks
         def read(self, query=None):  # pylint: disable=no-self-use,arguments-differ
