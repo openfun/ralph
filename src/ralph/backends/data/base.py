@@ -27,6 +27,9 @@ class BaseDataBackendSettings(BaseBackendSettings):
 
         env_prefix = "RALPH_BACKENDS__DATA__"
 
+    DEFAULT_CHUNK_SIZE: int = 500
+    LOCALE_ENCODING: str = "utf8"
+
 
 class BaseQuery(BaseModel):
     """Base query model."""

@@ -59,7 +59,6 @@ class SwiftDataBackendSettings(BaseDataBackendSettings):
     OBJECT_STORAGE_URL: str = None
     USER_DOMAIN_NAME: str = "Default"
     DEFAULT_CONTAINER: str = None
-    LOCALE_ENCODING: str = "utf8"
 
 
 class SwiftDataBackend(HistoryMixin, BaseDataBackend):

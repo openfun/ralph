@@ -46,7 +46,6 @@ class FSDataBackendSettings(BaseDataBackendSettings):
     DEFAULT_CHUNK_SIZE: int = 4096
     DEFAULT_DIRECTORY_PATH: Path = Path(".")
     DEFAULT_QUERY_STRING: str = "*"
-    LOCALE_ENCODING: str = "utf8"
 
 
 class FSDataBackend(HistoryMixin, BaseDataBackend):

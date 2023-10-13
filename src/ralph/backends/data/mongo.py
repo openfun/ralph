@@ -69,8 +69,6 @@ class MongoDataBackendSettings(BaseDataBackendSettings):
         regex=r"^(?!.*\.\.)[^.$\x00]+(?:\.[^.$\x00]+)*$"  # noqa : F722
     ) = "marsha"
     CLIENT_OPTIONS: MongoClientOptions = MongoClientOptions()
-    DEFAULT_CHUNK_SIZE: int = 500
-    LOCALE_ENCODING: str = "utf8"
 
 
 class BaseMongoQuery(BaseQuery):

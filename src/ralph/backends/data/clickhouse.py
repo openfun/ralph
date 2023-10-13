@@ -77,8 +77,6 @@ class ClickHouseDataBackendSettings(BaseDataBackendSettings):
     USERNAME: str = None
     PASSWORD: str = None
     CLIENT_OPTIONS: ClickHouseClientOptions = ClickHouseClientOptions()
-    DEFAULT_CHUNK_SIZE: int = 500
-    LOCALE_ENCODING: str = "utf8"
 
 
 class BaseClickHouseQuery(BaseQuery):

@@ -62,7 +62,6 @@ class S3DataBackendSettings(BaseDataBackendSettings):
     DEFAULT_REGION: str = None
     DEFAULT_BUCKET_NAME: str = None
     DEFAULT_CHUNK_SIZE: int = 4096
-    LOCALE_ENCODING: str = "utf8"
 
 
 class S3DataBackend(HistoryMixin, BaseDataBackend):

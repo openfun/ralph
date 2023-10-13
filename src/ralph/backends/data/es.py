@@ -59,10 +59,8 @@ class ESDataBackendSettings(BaseDataBackendSettings):
 
     ALLOW_YELLOW_STATUS: bool = False
     CLIENT_OPTIONS: ESClientOptions = ESClientOptions()
-    DEFAULT_CHUNK_SIZE: int = 500
     DEFAULT_INDEX: str = "statements"
     HOSTS: CommaSeparatedTuple = ("http://localhost:9200",)
-    LOCALE_ENCODING: str = "utf8"
     POINT_IN_TIME_KEEP_ALIVE: str = "1m"
     REFRESH_AFTER_WRITE: Union[Literal["false", "true", "wait_for"], bool, str, None]
 
