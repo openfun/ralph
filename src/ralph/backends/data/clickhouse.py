@@ -106,6 +106,7 @@ class ClickHouseDataBackend(BaseDataBackend):
     query_model = ClickHouseQuery
     default_operation_type = BaseOperationType.CREATE
     settings_class = ClickHouseDataBackendSettings
+    settings: settings_class
 
     def __init__(self, settings: Union[settings_class, None] = None):
         """Instantiate the ClickHouse configuration.
@@ -114,7 +115,7 @@ class ClickHouseDataBackend(BaseDataBackend):
             settings (ClickHouseDataBackendSettings or None): The ClickHouse
                 data backend settings.
         """
-        self.settings = settings if settings else self.settings_class()
+        super().__init__(settings)
         self.database = self.settings.DATABASE
         self.event_table_name = self.settings.EVENT_TABLE_NAME
         self.default_chunk_size = self.settings.DEFAULT_CHUNK_SIZE

@@ -29,6 +29,7 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
     name = "async_es"
     query_model = ESQuery
     settings_class = ESDataBackendSettings
+    settings: settings_class
 
     def __init__(self, settings: Union[settings_class, None] = None):
         """Instantiate the asynchronous Elasticsearch client.
@@ -37,7 +38,7 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
             settings (ESDataBackendSettings or None): The data backend settings.
                 If `settings` is `None`, a default settings instance is used instead.
         """
-        self.settings = settings if settings else self.settings_class()
+        super().__init__(settings)
         self._client = None
 
     @property

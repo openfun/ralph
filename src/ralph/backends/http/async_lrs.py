@@ -104,6 +104,7 @@ class AsyncLRSHTTPBackend(BaseHTTPBackend):
     query = LRSStatementsQuery
     default_operation_type = OperationType.CREATE
     settings_class = LRSHTTPBackendSettings
+    settings: settings_class
 
     def __init__(  # pylint: disable=too-many-arguments
         self, settings: settings_class = None
@@ -114,8 +115,7 @@ class AsyncLRSHTTPBackend(BaseHTTPBackend):
             settings (LRSHTTPBackendSettings or None): The LRS HTTP backend settings.
                 If `settings` is `None`, a default settings instance is used instead.
         """
-        self.settings = settings if settings else self.settings_class()
-
+        super().__init__(settings)
         self.base_url = parse_obj_as(AnyHttpUrl, self.settings.BASE_URL)
         self.auth = (self.settings.USERNAME, self.settings.PASSWORD)
 

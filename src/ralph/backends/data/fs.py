@@ -55,6 +55,7 @@ class FSDataBackend(HistoryMixin, BaseDataBackend):
     name = "fs"
     default_operation_type = BaseOperationType.CREATE
     settings_class = FSDataBackendSettings
+    settings: settings_class
 
     def __init__(self, settings: Union[settings_class, None] = None):
         """Create the default target directory if it does not exist.
@@ -63,7 +64,7 @@ class FSDataBackend(HistoryMixin, BaseDataBackend):
             settings (FSDataBackendSettings or None): The data backend settings.
                 If `settings` is `None`, a default settings instance is used instead.
         """
-        self.settings = settings if settings else self.settings_class()
+        super().__init__(settings)
         self.default_chunk_size = self.settings.DEFAULT_CHUNK_SIZE
         self.default_directory = self.settings.DEFAULT_DIRECTORY_PATH
         self.default_query_string = self.settings.DEFAULT_QUERY_STRING

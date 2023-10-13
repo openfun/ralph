@@ -1,25 +1,25 @@
 """Base Stream backend for Ralph."""
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import BinaryIO
 
-from pydantic import BaseSettings
+from ralph.backends.base import (
+    BaseBackend,
+    BaseBackendSettings,
+    BaseBackendSettingsConfig,
+)
 
-from ralph.conf import BaseSettingsConfig, core_settings
 
-
-class BaseStreamBackendSettings(BaseSettings):
+class BaseStreamBackendSettings(BaseBackendSettings):
     """Data backend default configuration."""
 
-    class Config(BaseSettingsConfig):
+    class Config(BaseBackendSettingsConfig):
         """Pydantic Configuration."""
 
         env_prefix = "RALPH_BACKENDS__STREAM__"
-        env_file = ".env"
-        env_file_encoding = core_settings.LOCALE_ENCODING
 
 
-class BaseStreamBackend(ABC):
+class BaseStreamBackend(BaseBackend):
     """Base stream backend interface."""
 
     type = "stream"

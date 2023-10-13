@@ -95,6 +95,7 @@ class MongoDataBackend(BaseDataBackend):
     name = "mongo"
     query_model = MongoQuery
     settings_class = MongoDataBackendSettings
+    settings: settings_class
 
     def __init__(self, settings: Union[settings_class, None] = None):
         """Instantiate the MongoDB client.
@@ -103,7 +104,7 @@ class MongoDataBackend(BaseDataBackend):
             settings (MongoDataBackendSettings or None): The data backend settings.
                 If `settings` is `None`, a default settings instance is used instead.
         """
-        self.settings = settings if settings else self.settings_class()
+        super().__init__(settings)
         self.client = MongoClient(
             self.settings.CONNECTION_URI, **self.settings.CLIENT_OPTIONS.dict()
         )

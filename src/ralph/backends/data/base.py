@@ -2,28 +2,30 @@
 
 import functools
 import logging
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from enum import Enum, unique
 from io import IOBase
 from typing import Iterable, Iterator, Union
 
-from pydantic import BaseModel, BaseSettings, ValidationError
+from pydantic import BaseModel, ValidationError
 
-from ralph.conf import BaseSettingsConfig, core_settings
+from ralph.backends.base import (
+    BaseBackend,
+    BaseBackendSettings,
+    BaseBackendSettingsConfig,
+)
 from ralph.exceptions import BackendParameterException
 
 logger = logging.getLogger(__name__)
 
 
-class BaseDataBackendSettings(BaseSettings):
+class BaseDataBackendSettings(BaseBackendSettings):
     """Data backend default configuration."""
 
-    class Config(BaseSettingsConfig):
+    class Config(BaseBackendSettingsConfig):
         """Pydantic Configuration."""
 
         env_prefix = "RALPH_BACKENDS__DATA__"
-        env_file = ".env"
-        env_file_encoding = core_settings.LOCALE_ENCODING
 
 
 class BaseQuery(BaseModel):
@@ -34,7 +36,7 @@ class BaseQuery(BaseModel):
 
         extra = "forbid"
 
-    query_string: Union[str, None]
+    query_string: Union[str, None] = None
 
 
 @unique
@@ -79,7 +81,7 @@ def enforce_query_checks(method):
     return wrapper
 
 
-class BaseDataBackend(ABC):
+class BaseDataBackend(BaseBackend):
     """Base data backend interface."""
 
     type = "data"
@@ -87,15 +89,6 @@ class BaseDataBackend(ABC):
     query_model = BaseQuery
     default_operation_type = BaseOperationType.INDEX
     settings_class = BaseDataBackendSettings
-
-    @abstractmethod
-    def __init__(self, settings: Union[settings_class, None] = None):
-        """Instantiate the data backend.
-
-        Args:
-            settings (BaseDataBackendSettings or None): The data backend settings.
-                If `settings` is `None`, a default settings instance is used instead.
-        """
 
     def validate_query(
         self, query: Union[str, dict, BaseQuery, None] = None
@@ -252,7 +245,7 @@ def async_enforce_query_checks(method):
     return wrapper
 
 
-class BaseAsyncDataBackend(ABC):
+class BaseAsyncDataBackend(BaseBackend):
     """Base async data backend interface."""
 
     type = "data"
@@ -260,15 +253,6 @@ class BaseAsyncDataBackend(ABC):
     query_model = BaseQuery
     default_operation_type = BaseOperationType.INDEX
     settings_class = BaseDataBackendSettings
-
-    @abstractmethod
-    def __init__(self, settings: Union[settings_class, None] = None):
-        """Instantiate the data backend.
-
-        Args:
-            settings (BaseDataBackendSettings or None): The backend settings.
-                If `settings` is `None`, a default settings instance is used instead.
-        """
 
     def validate_query(
         self, query: Union[str, dict, BaseQuery, None] = None

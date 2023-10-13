@@ -62,6 +62,7 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend):
 
     name = "ldp"
     settings_class = LDPDataBackendSettings
+    settings: settings_class
 
     def __init__(self, settings: Union[settings_class, None] = None):
         """Instantiate the OVH LDP client.
@@ -70,7 +71,7 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend):
             settings (LDPDataBackendSettings or None): The data backend settings.
                 If `settings` is `None`, a default settings instance is used instead.
         """
-        self.settings = settings if settings else self.settings_class()
+        super().__init__(settings)
         self.service_name = self.settings.SERVICE_NAME
         self.stream_id = self.settings.DEFAULT_STREAM_ID
         self.timeout = self.settings.REQUEST_TIMEOUT

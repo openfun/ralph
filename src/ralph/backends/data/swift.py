@@ -70,11 +70,11 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend):
     name = "swift"
     default_operation_type = BaseOperationType.CREATE
     settings_class = SwiftDataBackendSettings
+    settings: settings_class
 
     def __init__(self, settings: Union[settings_class, None] = None):
         """Prepares the options for the SwiftService."""
-        self.settings = settings if settings else self.settings_class()
-
+        super().__init__(settings)
         self.default_container = self.settings.DEFAULT_CONTAINER
         self.locale_encoding = self.settings.LOCALE_ENCODING
         self._connection = None

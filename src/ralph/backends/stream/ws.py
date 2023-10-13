@@ -33,15 +33,7 @@ class WSStreamBackend(BaseStreamBackend):
 
     name = "ws"
     settings_class = WSStreamBackendSettings
-
-    def __init__(self, settings: settings_class = None):
-        """Instantiate the websocket client.
-
-        Args:
-            settings (WSStreamBackendSettings or None): The stream backend settings.
-                If `settings` is `None`, a default settings instance is used instead.
-        """
-        self.settings = settings if settings else self.settings_class()
+    settings: settings_class
 
     def stream(self, target: BinaryIO):
         """Stream websocket content to target."""
