@@ -34,8 +34,6 @@ services:
       xpack.security.enabled: "false"
     ports:
       - "9200:9200"
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
     mem_limit: 2g
     ulimits:
       memlock:
@@ -74,7 +72,3 @@ services:
   # -- tools
   dockerize:
     image: jwilder/dockerize
-
-volumes:
-  esdata:
-    driver: local
