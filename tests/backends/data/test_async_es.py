@@ -53,7 +53,7 @@ async def test_backends_data_async_es_data_backend_default_instantiation(
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__ES__{name}", raising=False)
 
     assert AsyncESDataBackend.name == "async_es"
-    assert AsyncESDataBackend.query_model == ESQuery
+    assert AsyncESDataBackend.query_class == ESQuery
     assert AsyncESDataBackend.default_operation_type == BaseOperationType.INDEX
     assert AsyncESDataBackend.settings_class == ESDataBackendSettings
     backend = AsyncESDataBackend()
@@ -466,7 +466,7 @@ async def test_backends_data_async_es_data_backend_read_method_with_query(
             ]
 
     assert (
-        "ralph.backends.data.base",
+        "ralph.backends.data.async_es",
         logging.ERROR,
         "The 'query' argument is expected to be a ESQuery instance. "
         "[{'loc': ('not_query',), 'msg': 'extra fields not permitted', "
@@ -614,7 +614,7 @@ async def test_backends_data_async_es_data_backend_write_method_with_append_oper
     should raise a `BackendParameterException`.
     """
     backend = async_es_backend()
-    msg = "Append operation_type is not supported."
+    msg = "Append operation_type is not allowed."
     with pytest.raises(BackendParameterException, match=msg):
         with caplog.at_level(logging.ERROR):
             await backend.write(data=[{}], operation_type=BaseOperationType.APPEND)
@@ -622,7 +622,7 @@ async def test_backends_data_async_es_data_backend_write_method_with_append_oper
     assert (
         "ralph.backends.data.async_es",
         logging.ERROR,
-        "Append operation_type is not supported.",
+        "Append operation_type is not allowed.",
     ) in caplog.record_tuples
 
     await backend.close()
@@ -730,7 +730,7 @@ async def test_backends_data_async_es_data_backend_write_method_without_ignore_e
     # By default, we should raise an error and stop the importation.
     msg = (
         r"Failed to decode JSON: Expecting value: line 1 column 1 \(char 0\), "
-        r"for document: b'This is invalid JSON'"
+        r"for document: b'This is invalid JSON', at line 1"
     )
     with pytest.raises(BackendException, match=msg):
         with caplog.at_level(logging.ERROR):
@@ -760,7 +760,7 @@ async def test_backends_data_async_es_data_backend_write_method_with_ignore_erro
 
     msg = (
         "Failed to decode JSON: Expecting value: line 1 column 1 (char 0), "
-        "for document: b'This is invalid JSON'"
+        "for document: b'This is invalid JSON', at line 1"
     )
     records = [{"id": idx, "count": random.randint(0, 100)} for idx in range(10)]
     # Patch a record with a non-expected type for the count field (should be

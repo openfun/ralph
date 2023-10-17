@@ -8,7 +8,16 @@ import operator
 from functools import reduce
 from importlib import import_module
 from inspect import getmembers, isclass, iscoroutine
-from typing import Any, Dict, Iterable, Iterator, List, Union
+from typing import (
+    Any,
+    AsyncIterable,
+    AsyncIterator,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Union,
+)
 
 from pydantic import BaseModel
 
@@ -206,19 +215,19 @@ def parse_bytes_to_dict(
     raw_documents: Iterable[bytes], ignore_errors: bool, logger_class: logging.Logger
 ) -> Iterator[dict]:
     """Read the `raw_documents` Iterable and yield dictionaries."""
-    for raw_document in raw_documents:
+    for i, raw_document in enumerate(raw_documents):
         try:
             yield json.loads(raw_document)
         except (TypeError, json.JSONDecodeError) as error:
-            msg = "Failed to decode JSON: %s, for document: %s"
+            msg = "Failed to decode JSON: %s, for document: %s, at line %s"
             if ignore_errors:
-                logger_class.warning(msg, error, raw_document)
+                logger_class.warning(msg, error, raw_document, i)
                 continue
-            logger_class.error(msg, error, raw_document)
-            raise BackendException(msg % (error, raw_document)) from error
+            logger_class.error(msg, error, raw_document, i)
+            raise BackendException(msg % (error, raw_document, i)) from error
 
 
-def read_raw(
+def parse_dict_to_bytes(
     documents: Iterable[Dict[str, Any]],
     encoding: str,
     ignore_errors: bool,
@@ -227,14 +236,45 @@ def read_raw(
     """Read the `documents` Iterable with the `encoding` and yield bytes."""
     for document in documents:
         try:
-            yield json.dumps(document).encode(encoding)
+            yield bytes(f"{json.dumps(document)}\n", encoding=encoding)
         except (TypeError, ValueError) as error:
-            msg = "Failed to convert document to bytes: %s"
+            msg = "Failed to convert document to bytes: %s, for document: %s"
             if ignore_errors:
-                logger_class.warning(msg, error)
+                logger_class.warning(msg, error, document)
                 continue
-            logger_class.error(msg, error)
-            raise BackendException(msg % error) from error
+            logger_class.error(msg, error, document)
+            raise BackendException(msg % (error, document)) from error
+
+
+async def async_parse_dict_to_bytes(
+    documents: AsyncIterable[Dict[str, Any]],
+    encoding: str,
+    ignore_errors: bool,
+    logger_class: logging.Logger,
+) -> AsyncIterator[bytes]:
+    """Read the `documents` Iterable with the `encoding` and yield bytes."""
+    async for document in documents:
+        try:
+            yield bytes(f"{json.dumps(document)}\n", encoding=encoding)
+        except (TypeError, ValueError) as error:
+            msg = "Failed to convert document to bytes: %s, for document: %s"
+            if ignore_errors:
+                logger_class.warning(msg, error, document)
+                continue
+            logger_class.error(msg, error, document)
+            raise BackendException(msg % (error, document)) from error
+
+
+def iter_by_batch(data: Iterable[Any], batch_size: int):
+    """Iterate over `data` Iterable and yield batches of size `batch_size`."""
+    batch = []
+    for document in data:
+        batch.append(document)
+        if len(batch) >= batch_size:
+            yield batch
+            batch = []
+    if batch:
+        yield batch
 
 
 def iter_over_async(agenerator) -> Iterable:

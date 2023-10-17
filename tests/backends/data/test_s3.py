@@ -3,6 +3,7 @@
 import datetime
 import json
 import logging
+from collections import namedtuple
 
 import boto3
 import pytest
@@ -33,13 +34,11 @@ def test_backends_data_s3_backend_default_instantiation(
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__S3__{name}", raising=False)
 
     assert S3DataBackend.name == "s3"
-    assert S3DataBackend.query_model == BaseQuery
+    assert S3DataBackend.query_class == BaseQuery
     assert S3DataBackend.default_operation_type == BaseOperationType.CREATE
     assert S3DataBackend.settings_class == S3DataBackendSettings
     backend = S3DataBackend()
     assert backend.default_bucket_name is None
-    assert backend.default_chunk_size == 4096
-    assert backend.locale_encoding == "utf8"
 
 
 def test_backends_data_s3_data_backend_instantiation_with_settings():
@@ -56,8 +55,6 @@ def test_backends_data_s3_data_backend_instantiation_with_settings():
     )
     backend = S3DataBackend(settings_)
     assert backend.default_bucket_name == "bucket"
-    assert backend.default_chunk_size == 1000
-    assert backend.locale_encoding == "utf-16"
 
     try:
         S3DataBackend(settings_)
@@ -316,7 +313,8 @@ def test_backends_data_s3_read_with_invalid_output_should_log_the_error(
     assert (
         "ralph.backends.data.s3",
         logging.ERROR,
-        "Raised error: Expecting value: line 1 column 1 (char 0)",
+        "Failed to decode JSON: Expecting value: line 1 column 1 (char 0),"
+        " for document: b'some contents in the body', at line 0",
     ) in caplog.record_tuples
 
     backend.clean_history(lambda *_: True)
@@ -424,13 +422,18 @@ def test_backends_data_s3_read_with_iter_error_should_log_the_error(
         Body=body,
     )
 
-    def mock_read_raw(*args, **kwargs):
-        raise ResponseStreamingError(error="error")
+    def mock_get_object(*args, **kwargs):  # pylint: disable=unused-argument
+        """Mock the boto3 client.get_object method raising an exception on iteration."""
+
+        def raising_iter_chunks(*_, **__):  # pylint: disable=unused-argument
+            raise ResponseStreamingError(error="error")
+
+        return {"Body": namedtuple("_", "iter_chunks")(raising_iter_chunks)}
 
     with caplog.at_level(logging.ERROR):
         with pytest.raises(BackendException):
             backend = s3_backend()
-            monkeypatch.setattr(backend, "_read_raw", mock_read_raw)
+            monkeypatch.setattr(backend.client, "get_object", mock_get_object)
             backend.clean_history(lambda *_: True)
             list(backend.read(query=object_name, target=bucket_name, raw_output=True))
 
@@ -504,7 +507,7 @@ def test_backends_data_s3_data_backend_write_method_with_append_or_delete_operat
     backend = s3_backend()
     with pytest.raises(
         BackendParameterException,
-        match=f"{operation_type.name} operation_type is not allowed.",
+        match=f"{operation_type.name.capitalize()} operation_type is not allowed.",
     ):
         backend.write(data=[b"foo"], operation_type=operation_type)
     backend.close()
@@ -582,7 +585,7 @@ def test_backends_data_s3_write_method_with_create_index_operation(
 
     error = "Object of type datetime is not JSON serializable"
 
-    with caplog.at_level(logging.ERROR):
+    with caplog.at_level(logging.WARNING):
         # Without ignoring error
         with pytest.raises(BackendException, match=error):
             response = backend.write(
@@ -602,7 +605,7 @@ def test_backends_data_s3_write_method_with_create_index_operation(
 
     assert list(
         filter(
-            lambda record: record[1] == logging.ERROR,
+            lambda record: record[1] in [logging.ERROR, logging.WARNING],
             caplog.record_tuples,
         )
     ) == (
@@ -610,10 +613,16 @@ def test_backends_data_s3_write_method_with_create_index_operation(
             (
                 "ralph.backends.data.s3",
                 logging.ERROR,
-                f"Failed to encode JSON: {error}, for document {data[0]}",
-            )
+                f"Failed to convert document to bytes: {error}, "
+                f"for document: {data[0]}",
+            ),
+            (
+                "ralph.backends.data.s3",
+                logging.WARNING,
+                f"Failed to convert document to bytes: {error}, "
+                f"for document: {data[0]}",
+            ),
         ]
-        * 2
     )
     backend.close()
 

@@ -1,14 +1,11 @@
 """Async MongoDB data backend for Ralph."""
 
-import json
 import logging
 from io import IOBase
-from itertools import chain
-from typing import Any, Dict, Iterable, Iterator, Union
+from typing import AsyncIterator, Dict, Iterable, List, Union
 
 from bson.errors import BSONError
-from motor.motor_asyncio import AsyncIOMotorClient
-from pymongo.collection import Collection
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorCollection
 from pymongo.errors import BulkWriteError, ConnectionFailure, InvalidName, PyMongoError
 
 from ralph.backends.data.base import BaseOperationType
@@ -18,13 +15,9 @@ from ralph.backends.data.mongo import (
     MongoQuery,
 )
 from ralph.exceptions import BackendException, BackendParameterException
-from ralph.utils import parse_bytes_to_dict
+from ralph.utils import async_parse_dict_to_bytes, iter_by_batch, parse_bytes_to_dict
 
-from ..data.base import (
-    BaseAsyncDataBackend,
-    DataBackendStatus,
-    async_enforce_query_checks,
-)
+from ..data.base import BaseAsyncDataBackend, DataBackendStatus
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +26,9 @@ class AsyncMongoDataBackend(BaseAsyncDataBackend):
     """Async MongoDB data backend."""
 
     name = "async_mongo"
-    query_model = MongoQuery
+    unsupported_operation_types = {BaseOperationType.APPEND}
+    logger = logger
+    query_class = MongoQuery
     settings_class = MongoDataBackendSettings
     settings: settings_class
 
@@ -60,23 +55,23 @@ class AsyncMongoDataBackend(BaseAsyncDataBackend):
         try:
             await self.client.admin.command("ping")
         except (ConnectionFailure, PyMongoError) as error:
-            logger.error("Failed to connect to MongoDB: %s", error)
+            self.logger.error("Failed to connect to MongoDB: %s", error)
             return DataBackendStatus.AWAY
 
         # Check MongoDB server status.
         try:
             if (await self.client.admin.command("serverStatus")).get("ok") != 1.0:
-                logger.error("MongoDB `serverStatus` command did not return 1.0")
+                self.logger.error("MongoDB `serverStatus` command did not return 1.0")
                 return DataBackendStatus.ERROR
         except PyMongoError as error:
-            logger.error("Failed to get MongoDB server status: %s", error)
+            self.logger.error("Failed to get MongoDB server status: %s", error)
             return DataBackendStatus.ERROR
 
         return DataBackendStatus.OK
 
     async def list(
         self, target: Union[str, None] = None, details: bool = False, new: bool = False
-    ) -> Iterator[Union[str, dict]]:
+    ) -> AsyncIterator[Union[str, dict]]:
         """List collections in the target database.
 
         Args:
@@ -94,13 +89,13 @@ class AsyncMongoDataBackend(BaseAsyncDataBackend):
             BackendParameterException: If the `target` is not a valid database name.
         """
         if new:
-            logger.warning("The `new` argument is ignored")
+            self.logger.warning("The `new` argument is ignored")
 
         try:
             database = self.client[target] if target else self.database
         except InvalidName as error:
             msg = "The target=`%s` is not a valid database name: %s"
-            logger.error(msg, target, error)
+            self.logger.error(msg, target, error)
             raise BackendParameterException(msg % (target, error)) from error
 
         try:
@@ -112,19 +107,18 @@ class AsyncMongoDataBackend(BaseAsyncDataBackend):
                     yield collection_info.get("name")
         except PyMongoError as error:
             msg = "Failed to list MongoDB collections: %s"
-            logger.error(msg, error)
+            self.logger.error(msg, error)
             raise BackendException(msg % error) from error
 
-    @async_enforce_query_checks
     async def read(
         self,
-        *,
-        query: Union[str, MongoQuery] = None,
+        query: Union[str, dict, MongoQuery, None] = None,
         target: Union[str, None] = None,
         chunk_size: Union[int, None] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-    ) -> Iterator[Union[bytes, dict]]:
+        max_statements: Union[int, None] = None,
+    ) -> AsyncIterator[Union[bytes, dict]]:
         # pylint: disable=too-many-arguments
         """Read documents matching the `query` from `target` collection and yield them.
 
@@ -136,6 +130,7 @@ class AsyncMongoDataBackend(BaseAsyncDataBackend):
                 If chunk_size is `None` the `DEFAULT_CHUNK_SIZE` is used instead.
             raw_output (bool): Whether to yield dictionaries or bytes.
             ignore_errors (bool): Whether to ignore errors when reading documents.
+            max_statements: The maximum number of statements to yield.
 
         Yield:
             bytes: The next raw document if `raw_output` is True.
@@ -145,39 +140,46 @@ class AsyncMongoDataBackend(BaseAsyncDataBackend):
             BackendException: If a failure occurs during MongoDB connection.
             BackendParameterException: If a failure occurs with MongoDB collection.
         """
-        if not chunk_size:
-            chunk_size = self.settings.DEFAULT_CHUNK_SIZE
+        async for statement in super().read(
+            query, target, chunk_size, raw_output, ignore_errors, max_statements
+        ):
+            yield statement
 
-        query = (query.query_string if query.query_string else query).dict(
-            exclude={"query_string"}, exclude_unset=True
-        )
-        try:
-            collection = self.database[target] if target else self.collection
-        except InvalidName as error:
-            msg = "The target=`%s` is not a valid collection name: %s"
-            logger.error(msg, target, error)
-            raise BackendParameterException(msg % (target, error)) from error
+    async def _read_bytes(
+        self,
+        query: query_class,
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+    ) -> AsyncIterator[bytes]:
+        """Method called by `self.read` yielding bytes. See `self.read`."""
+        statements = self._read_dicts(query, target, chunk_size, ignore_errors)
+        async for statement in async_parse_dict_to_bytes(
+            statements, self.settings.LOCALE_ENCODING, ignore_errors, self.logger
+        ):
+            yield statement
 
-        reader = self._read_raw if raw_output else lambda _: _
+    async def _read_dicts(
+        self,
+        query: query_class,
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+    ) -> AsyncIterator[dict]:
+        """Method called by `self.read` yielding dictionaries. See `self.read`."""
+        base_query = query.query_string if query.query_string else query
+        query_dict = base_query.dict(exclude={"query_string"}, exclude_unset=True)
+        collection = self._get_target_collection(target)
         try:
-            async for document in collection.find(batch_size=chunk_size, **query):
+            async for document in collection.find(batch_size=chunk_size, **query_dict):
                 document.update({"_id": str(document.get("_id"))})
-                try:
-                    yield reader(document)
-                except (TypeError, ValueError) as error:
-                    msg = "Failed to encode MongoDB document with ID %s: %s"
-                    document_id = document.get("_id")
-                    logger.error(msg, document_id, error)
-                    if ignore_errors:
-                        logger.warning(msg, document_id, error)
-                        continue
-                    raise BackendException(msg % (document_id, error)) from error
+                yield document
         except (PyMongoError, IndexError, TypeError, ValueError) as error:
             msg = "Failed to execute MongoDB query: %s"
-            logger.error(msg, error)
+            self.logger.error(msg, error)
             raise BackendException(msg % error) from error
 
-    async def write(  # pylint: disable=too-many-arguments
+    async def write(  # pylint: disable=too-many-arguments,useless-parent-delegation
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Union[str, None] = None,
@@ -206,55 +208,44 @@ class AsyncMongoDataBackend(BaseAsyncDataBackend):
             BackendParameterException: If the `operation_type` is `APPEND` as it is not
                 supported.
         """
-        if not operation_type:
-            operation_type = self.default_operation_type
+        return await super().write(
+            data, target, chunk_size, ignore_errors, operation_type
+        )
 
-        if operation_type == BaseOperationType.APPEND:
-            msg = "Append operation_type is not allowed."
-            logger.error(msg)
-            raise BackendParameterException(msg)
-
-        if not chunk_size:
-            chunk_size = self.settings.DEFAULT_CHUNK_SIZE
-
-        collection = self.database[target] if target else self.collection
-        logger.debug(
+    async def _write_dicts(  # pylint: disable=too-many-arguments
+        self,
+        data: Iterable[dict],
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing dictionaries. See `self.write`."""
+        collection = self._get_target_collection(target)
+        self.logger.debug(
             "Start writing to the %s collection of the %s database (chunk size: %d)",
             collection,
             self.database,
             chunk_size,
         )
-
         count = 0
-        data = iter(data)
-        try:
-            first_record = next(data)
-        except StopIteration:
-            logger.warning("Data Iterator is empty; skipping write to target.")
-            return count
-        data = chain([first_record], data)
-        if isinstance(first_record, bytes):
-            data = parse_bytes_to_dict(data, ignore_errors, logger)
-
         if operation_type == BaseOperationType.UPDATE:
-            for batch in MongoDataBackend.iter_by_batch(
+            for batch in iter_by_batch(
                 MongoDataBackend.to_replace_one(data), chunk_size
             ):
                 count += await self._bulk_update(batch, ignore_errors, collection)
-            logger.info("Updated %d documents with success", count)
+            self.logger.info("Updated %d documents with success", count)
         elif operation_type == BaseOperationType.DELETE:
-            for batch in MongoDataBackend.iter_by_batch(
-                MongoDataBackend.to_ids(data), chunk_size
-            ):
+            for batch in iter_by_batch(MongoDataBackend.to_ids(data), chunk_size):
                 count += await self._bulk_delete(batch, ignore_errors, collection)
-            logger.info("Deleted %d documents with success", count)
+            self.logger.info("Deleted %d documents with success", count)
         else:
             data = MongoDataBackend.to_documents(
-                data, ignore_errors, operation_type, logger
+                data, ignore_errors, operation_type, self.logger
             )
-            for batch in MongoDataBackend.iter_by_batch(data, chunk_size):
+            for batch in iter_by_batch(data, chunk_size):
                 count += await self._bulk_import(batch, ignore_errors, collection)
-            logger.info("Inserted %d documents with success", count)
+            self.logger.info("Inserted %d documents with success", count)
 
         return count
 
@@ -268,27 +259,55 @@ class AsyncMongoDataBackend(BaseAsyncDataBackend):
             self.client.close()
         except PyMongoError as error:
             msg = "Failed to close AsyncIOMotorClient: %s"
-            logger.error(msg, error)
+            self.logger.error(msg, error)
             raise BackendException(msg % error) from error
 
-    @staticmethod
-    async def _bulk_import(batch: list, ignore_errors: bool, collection: Collection):
+    async def _write_bytes(  # pylint: disable=too-many-arguments
+        self,
+        data: Iterable[bytes],
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing bytes. See `self.write`."""
+        statements = parse_bytes_to_dict(data, ignore_errors, self.logger)
+        return await self._write_dicts(
+            statements, target, chunk_size, ignore_errors, operation_type
+        )
+
+    def _get_target_collection(
+        self, target: Union[str, None]
+    ) -> AsyncIOMotorCollection:
+        """Return the validated target collection."""
+        # pylint: disable=no-self-use
+        try:
+            return self.database[target] if target else self.collection
+        except InvalidName as error:
+            msg = "The target=`%s` is not a valid collection name: %s"
+            self.logger.error(msg, target, error)
+            raise BackendParameterException(msg % (target, error)) from error
+
+    async def _bulk_import(
+        self, batch: List[Dict], ignore_errors: bool, collection: AsyncIOMotorCollection
+    ):
         """Insert a batch of documents into the selected database collection."""
         try:
             new_documents = await collection.insert_many(batch)
         except (BulkWriteError, PyMongoError, BSONError, ValueError) as error:
             msg = "Failed to insert document chunk: %s"
             if ignore_errors:
-                logger.warning(msg, error)
+                self.logger.warning(msg, error)
                 return getattr(error, "details", {}).get("nInserted", 0)
             raise BackendException(msg % error) from error
 
         inserted_count = len(new_documents.inserted_ids)
-        logger.debug("Inserted %d documents chunk with success", inserted_count)
+        self.logger.debug("Inserted %d documents chunk with success", inserted_count)
         return inserted_count
 
-    @staticmethod
-    async def _bulk_delete(batch: list, ignore_errors: bool, collection: Collection):
+    async def _bulk_delete(
+        self, batch: List[Dict], ignore_errors: bool, collection: AsyncIOMotorCollection
+    ):
         """Delete a batch of documents from the selected database collection."""
         try:
             deleted_documents = await collection.delete_many(
@@ -297,31 +316,28 @@ class AsyncMongoDataBackend(BaseAsyncDataBackend):
         except (BulkWriteError, PyMongoError, BSONError, ValueError) as error:
             msg = "Failed to delete document chunk: %s"
             if ignore_errors:
-                logger.warning(msg, error)
+                self.logger.warning(msg, error)
                 return getattr(error, "details", {}).get("nRemoved", 0)
             raise BackendException(msg % error) from error
 
         deleted_count = deleted_documents.deleted_count
-        logger.debug("Deleted %d documents chunk with success", deleted_count)
+        self.logger.debug("Deleted %d documents chunk with success", deleted_count)
         return deleted_count
 
-    @staticmethod
-    async def _bulk_update(batch: list, ignore_errors: bool, collection: Collection):
+    async def _bulk_update(
+        self, batch: List[Dict], ignore_errors: bool, collection: AsyncIOMotorCollection
+    ):
         """Update a batch of documents into the selected database collection."""
         try:
             updated_documents = await collection.bulk_write(batch)
         except (BulkWriteError, PyMongoError, BSONError, ValueError) as error:
             msg = "Failed to update document chunk: %s"
             if ignore_errors:
-                logger.warning(msg, error)
+                self.logger.warning(msg, error)
                 return getattr(error, "details", {}).get("nModified", 0)
-            logger.error(msg, error)
+            self.logger.error(msg, error)
             raise BackendException(msg % error) from error
 
         modified_count = updated_documents.modified_count
-        logger.debug("Updated %d documents chunk with success", modified_count)
+        self.logger.debug("Updated %d documents chunk with success", modified_count)
         return modified_count
-
-    def _read_raw(self, document: Dict[str, Any]) -> bytes:
-        """Read the `document` dictionary and return bytes."""
-        return json.dumps(document).encode(self.settings.LOCALE_ENCODING)

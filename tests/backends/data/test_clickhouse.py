@@ -3,6 +3,7 @@
 import json
 import logging
 import uuid
+from collections import namedtuple
 from datetime import datetime, timedelta
 
 import pytest
@@ -44,7 +45,7 @@ def test_backends_data_clickhouse_data_backend_default_instantiation(monkeypatch
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__CLICKHOUSE__{name}", raising=False)
 
     assert ClickHouseDataBackend.name == "clickhouse"
-    assert ClickHouseDataBackend.query_model == ClickHouseQuery
+    assert ClickHouseDataBackend.query_class == ClickHouseQuery
     assert ClickHouseDataBackend.default_operation_type == BaseOperationType.CREATE
     assert ClickHouseDataBackend.settings_class == ClickHouseDataBackendSettings
     backend = ClickHouseDataBackend()
@@ -216,18 +217,16 @@ def test_backends_data_clickhouse_data_backend_read_method_with_failures(
     """Test the `ClickHouseDataBackend.read` method with failures."""
     backend = clickhouse_backend()
 
-    statement = {"id": str(uuid.uuid4()), "timestamp": str(datetime.utcnow())}
-    document = {"event": statement}
-    backend.write([statement])
-
     # JSON encoding error
-    def mock_read_raw(*args, **kwargs):
-        """Mock the `ClickHouseDataBackend._read_raw` method."""
-        raise TypeError("Error")
+    def mock_clickhouse_client_query(*args, **kwargs):
+        """Mock the `clickhouse.Client.query` returning an unparsable complex number."""
+        return namedtuple("_", "named_results")(lambda: (1j for _ in [0]))
 
-    monkeypatch.setattr(backend, "_read_raw", mock_read_raw)
-
-    msg = f"Failed to encode document {document}: Error"
+    monkeypatch.setattr(backend.client, "query", mock_clickhouse_client_query)
+    msg = (
+        "Failed to convert document to bytes: "
+        "Object of type complex is not JSON serializable, for document: 1j"
+    )
 
     # Not ignoring errors
     with caplog.at_level(logging.ERROR):
@@ -546,7 +545,12 @@ def test_backends_data_clickhouse_data_backend_write_method_bytes_failed(
     byte_data.append(json_str.encode("utf-8"))
 
     count = 0
-    with pytest.raises(json.JSONDecodeError):
+    msg = (
+        r"Failed to decode JSON: "
+        r"Expecting value: line 1 column 1 \(char 0\), for document: b'failed_json_str'"
+        r", at line 0"
+    )
+    with pytest.raises(BackendException, match=msg):
         count = backend.write(byte_data)
 
     assert count == 0
@@ -601,8 +605,7 @@ def test_backends_data_clickhouse_data_backend_write_method_wrong_operation_type
 
     backend = clickhouse_backend()
     with pytest.raises(
-        BackendParameterException,
-        match=f"{BaseOperationType.APPEND.name} operation_type is not allowed.",
+        BackendParameterException, match="Append operation_type is not allowed."
     ):
         backend.write(data=statements, operation_type=BaseOperationType.APPEND)
     backend.close()

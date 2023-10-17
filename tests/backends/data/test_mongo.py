@@ -40,7 +40,7 @@ def test_backends_data_mongo_data_backend_default_instantiation(monkeypatch, fs)
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__MONGO__{name}", raising=False)
 
     assert MongoDataBackend.name == "mongo"
-    assert MongoDataBackend.query_model == MongoQuery
+    assert MongoDataBackend.query_class == MongoQuery
     assert MongoDataBackend.default_operation_type == BaseOperationType.INDEX
     assert MongoDataBackend.settings_class == MongoDataBackendSettings
     backend = MongoDataBackend()
@@ -259,9 +259,9 @@ def test_backends_data_mongo_data_backend_read_method_with_raw_output(
         {"_id": ObjectId("64945e530468d817b1f756db"), "id": "baz"},
     ]
     expected = [
-        b'{"_id": "64945e53a4ee2699573e0d6f", "id": "foo"}',
-        b'{"_id": "64945e530468d817b1f756da", "id": "bar"}',
-        b'{"_id": "64945e530468d817b1f756db", "id": "baz"}',
+        b'{"_id": "64945e53a4ee2699573e0d6f", "id": "foo"}\n',
+        b'{"_id": "64945e530468d817b1f756da", "id": "bar"}\n',
+        b'{"_id": "64945e530468d817b1f756db", "id": "baz"}\n',
     ]
     backend.collection.insert_many(documents)
     backend.database.foobar.insert_many(documents[:2])
@@ -363,8 +363,8 @@ def test_backends_data_mongo_data_backend_read_method_with_ignore_errors(
         {"_id": ObjectId("64945e530468d817b1f756db"), "id": "baz"},
     ]
     expected = [
-        b'{"_id": "64945e53a4ee2699573e0d6f", "id": "foo"}',
-        b'{"_id": "64945e530468d817b1f756db", "id": "baz"}',
+        b'{"_id": "64945e53a4ee2699573e0d6f", "id": "foo"}\n',
+        b'{"_id": "64945e530468d817b1f756db", "id": "baz"}\n',
     ]
     backend.collection.insert_many(documents)
     backend.database.foobar.insert_many(documents[:2])
@@ -375,12 +375,17 @@ def test_backends_data_mongo_data_backend_read_method_with_ignore_errors(
         assert list(backend.read(**kwargs, chunk_size=2)) == expected
         assert list(backend.read(**kwargs, chunk_size=1000)) == expected
 
-    assert (
-        "ralph.backends.data.mongo",
-        logging.WARNING,
-        "Failed to convert document to bytes: "
-        "Object of type ObjectId is not JSON serializable",
-    ) in caplog.record_tuples
+    assert [
+        record
+        for record in caplog.record_tuples
+        if record[0] == "ralph.backends.data.mongo"
+        and record[1] == logging.WARNING
+        and record[2].startswith(
+            "Failed to convert document to bytes: "
+            "Object of type ObjectId is not JSON serializable, for document: "
+            "{'_id': '64945e530468d817b1f756da', 'id': ObjectId("
+        )
+    ]
     backend.close()
 
 
@@ -398,7 +403,7 @@ def test_backends_data_mongo_data_backend_read_method_without_ignore_errors(
         {"_id": ObjectId("64945e530468d817b1f756da"), "id": ObjectId()},
         {"_id": ObjectId("64945e530468d817b1f756db"), "id": "baz"},
     ]
-    expected = b'{"_id": "64945e53a4ee2699573e0d6f", "id": "foo"}'
+    expected = b'{"_id": "64945e53a4ee2699573e0d6f", "id": "foo"}\n'
     backend.collection.insert_many(documents)
     backend.database.foobar.insert_many(documents[:2])
     kwargs = {"raw_output": True, "ignore_errors": False}
@@ -424,8 +429,22 @@ def test_backends_data_mongo_data_backend_read_method_without_ignore_errors(
             assert next(result) == expected
             next(result)
 
-    error_log = ("ralph.backends.data.mongo", logging.ERROR, msg)
-    assert len(list(filter(lambda x: x == error_log, caplog.record_tuples))) == 4
+    assert (
+        len(
+            [
+                record
+                for record in caplog.record_tuples
+                if record[0] == "ralph.backends.data.mongo"
+                and record[1] == logging.ERROR
+                and record[2].startswith(
+                    "Failed to convert document to bytes: "
+                    "Object of type ObjectId is not JSON serializable, for document: "
+                    "{'_id': '64945e530468d817b1f756da', 'id': ObjectId("
+                )
+            ]
+        )
+        == 4
+    )
     backend.close()
 
 
@@ -812,7 +831,7 @@ def test_backends_data_mongo_data_backend_write_method_with_unparsable_documents
     backend = mongo_backend()
     msg = (
         "Failed to decode JSON: Expecting value: line 1 column 1 (char 0), "
-        "for document: b'not valid JSON!'"
+        "for document: b'not valid JSON!', at line 0"
     )
     msg_regex = msg.replace("(", r"\(").replace(")", r"\)")
     with caplog.at_level(logging.ERROR):

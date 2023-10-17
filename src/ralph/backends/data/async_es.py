@@ -2,8 +2,7 @@
 
 import logging
 from io import IOBase
-from itertools import chain
-from typing import Iterable, Iterator, Union
+from typing import AsyncIterator, Iterable, Union
 
 from elasticsearch import ApiError, AsyncElasticsearch, TransportError
 from elasticsearch.helpers import BulkIndexError, async_streaming_bulk
@@ -12,13 +11,10 @@ from ralph.backends.data.base import (
     BaseAsyncDataBackend,
     BaseOperationType,
     DataBackendStatus,
-    async_enforce_query_checks,
 )
 from ralph.backends.data.es import ESDataBackend, ESDataBackendSettings, ESQuery
-from ralph.exceptions import BackendException, BackendParameterException
-from ralph.utils import parse_bytes_to_dict, read_raw
-
-# pylint: disable=duplicate-code
+from ralph.exceptions import BackendException
+from ralph.utils import async_parse_dict_to_bytes, parse_bytes_to_dict
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +23,9 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
     """Asynchronous Elasticsearch data backend."""
 
     name = "async_es"
-    query_model = ESQuery
+    unsupported_operation_types = {BaseOperationType.APPEND}
+    logger = logger
+    query_class = ESQuery
     settings_class = ESDataBackendSettings
     settings: settings_class
 
@@ -42,7 +40,7 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
         self._client = None
 
     @property
-    def client(self):
+    def client(self) -> AsyncElasticsearch:
         """Create an AsyncElasticsearch client if it doesn't exist."""
         if not self._client:
             self._client = AsyncElasticsearch(
@@ -56,23 +54,23 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
             await self.client.info()
             cluster_status = await self.client.cat.health()
         except TransportError as error:
-            logger.error("Failed to connect to Elasticsearch: %s", error)
+            self.logger.error("Failed to connect to Elasticsearch: %s", error)
             return DataBackendStatus.AWAY
 
         if "green" in cluster_status:
             return DataBackendStatus.OK
 
         if "yellow" in cluster_status and self.settings.ALLOW_YELLOW_STATUS:
-            logger.info("Cluster status is yellow.")
+            self.logger.info("Cluster status is yellow.")
             return DataBackendStatus.OK
 
-        logger.error("Cluster status is not green: %s", cluster_status)
+        self.logger.error("Cluster status is not green: %s", cluster_status)
 
         return DataBackendStatus.ERROR
 
     async def list(
         self, target: str = None, details: bool = False, new: bool = False
-    ) -> Iterator[Union[str, dict]]:
+    ) -> AsyncIterator[Union[str, dict]]:
         """List available Elasticsearch indices, data streams and aliases.
 
         Args:
@@ -80,7 +78,7 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
                 and aliases to limit the request. Supports wildcards (*).
                 If target is `None`, lists all available indices, data streams and
                     aliases. Equivalent to (`target` = "*").
-            details (bool): Get detailed informations instead of just names.
+            details (bool): Get detailed information instead of just names.
             new (bool): Ignored.
 
         Yield:
@@ -95,11 +93,11 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
             indices = await self.client.indices.get(index=target)
         except (ApiError, TransportError) as error:
             msg = "Failed to read indices: %s"
-            logger.error(msg, error)
+            self.logger.error(msg, error)
             raise BackendException(msg % error) from error
 
         if new:
-            logger.warning("The `new` argument is ignored")
+            self.logger.warning("The `new` argument is ignored")
 
         if details:
             for index, value in indices.items():
@@ -110,16 +108,15 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
         for index in indices:
             yield index
 
-    @async_enforce_query_checks
     async def read(
         self,
-        *,
         query: Union[str, ESQuery] = None,
         target: str = None,
         chunk_size: Union[None, int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-    ) -> Iterator[Union[bytes, dict]]:
+        max_statements: Union[int, None] = None,
+    ) -> AsyncIterator[Union[bytes, dict]]:
         # pylint: disable=too-many-arguments
         """Read documents matching the query in the target index and yield them.
 
@@ -133,6 +130,7 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
                 If chunk_size is `None` it defaults to `DEFAULT_CHUNK_SIZE`.
             raw_output (bool): Controls whether to yield dictionaries or bytes.
             ignore_errors (bool): Ignored.
+            max_statements: The maximum number of statements to yield.
 
         Yield:
             bytes: The next raw document if `raw_output` is True.
@@ -141,11 +139,36 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
         Raise:
             BackendException: If a failure occurs during Elasticsearch connection.
         """
-        target = target if target else self.settings.DEFAULT_INDEX
-        chunk_size = chunk_size if chunk_size else self.settings.DEFAULT_CHUNK_SIZE
         if ignore_errors:
-            logger.warning("The `ignore_errors` argument is ignored")
+            self.logger.warning("The `ignore_errors` argument is ignored")
+        async for statement in super().read(
+            query, target, chunk_size, raw_output, ignore_errors, max_statements
+        ):
+            yield statement
 
+    async def _read_bytes(
+        self,
+        query: query_class,
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+    ) -> AsyncIterator[bytes]:
+        """Method called by `self.read` yielding bytes. See `self.read`."""
+        statements = self._read_dicts(query, target, chunk_size, ignore_errors)
+        async for statement in async_parse_dict_to_bytes(
+            statements, self.settings.LOCALE_ENCODING, ignore_errors, self.logger
+        ):
+            yield statement
+
+    async def _read_dicts(
+        self,
+        query: query_class,
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+    ) -> AsyncIterator[dict]:
+        """Method called by `self.read` yielding dictionaries. See `self.read`."""
+        target = target if target else self.settings.DEFAULT_INDEX
         if not query.pit.keep_alive:
             query.pit.keep_alive = self.settings.POINT_IN_TIME_KEEP_ALIVE
         if not query.pit.id:
@@ -157,7 +180,7 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
                 )["id"]
             except (ApiError, TransportError, ValueError) as error:
                 msg = "Failed to open Elasticsearch point in time: %s"
-                logger.error(msg, error)
+                self.logger.error(msg, error)
                 raise BackendException(msg % error) from error
 
         limit = query.size
@@ -175,7 +198,7 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
                 documents = (await self.client.search(**kwargs))["hits"]["hits"]
             except (ApiError, TransportError, TypeError) as error:
                 msg = "Failed to execute Elasticsearch query: %s"
-                logger.error(msg, error)
+                self.logger.error(msg, error)
                 raise BackendException(msg % error) from error
             count = len(documents)
             if limit:
@@ -184,14 +207,10 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
             if count:
                 query.search_after = [str(part) for part in documents[-1]["sort"]]
             kwargs["search_after"] = query.search_after
-            if raw_output:
-                documents = read_raw(
-                    documents, self.settings.LOCALE_ENCODING, ignore_errors, logger
-                )
             for document in documents:
                 yield document
 
-    async def write(  # pylint: disable=too-many-arguments
+    async def write(  # pylint: disable=too-many-arguments,useless-parent-delegation
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Union[None, str] = None,
@@ -223,27 +242,36 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
             BackendParameterException: If the `operation_type` is `APPEND` as it is not
                 supported.
         """
-        count = 0
-        data = iter(data)
-        try:
-            first_record = next(data)
-        except StopIteration:
-            logger.info("Data Iterator is empty; skipping write to target.")
-            return count
-        if not operation_type:
-            operation_type = self.default_operation_type
+        return await super().write(
+            data, target, chunk_size, ignore_errors, operation_type
+        )
+
+    async def _write_bytes(  # pylint: disable=too-many-arguments
+        self,
+        data: Iterable[bytes],
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing bytes. See `self.write`."""
+        statements = parse_bytes_to_dict(data, ignore_errors, self.logger)
+        return await self._write_dicts(
+            statements, target, chunk_size, ignore_errors, operation_type
+        )
+
+    async def _write_dicts(  # pylint: disable=too-many-arguments
+        self,
+        data: Iterable[dict],
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing dictionaries. See `self.write`."""
         target = target if target else self.settings.DEFAULT_INDEX
-        chunk_size = chunk_size if chunk_size else self.settings.DEFAULT_CHUNK_SIZE
-        if operation_type == BaseOperationType.APPEND:
-            msg = "Append operation_type is not supported."
-            logger.error(msg)
-            raise BackendParameterException(msg)
-
-        data = chain((first_record,), data)
-        if isinstance(first_record, bytes):
-            data = parse_bytes_to_dict(data, ignore_errors, logger)
-
-        logger.debug(
+        count = 0
+        self.logger.debug(
             "Start writing to the %s index (chunk size: %d)", target, chunk_size
         )
         try:
@@ -255,13 +283,13 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
                 refresh=self.settings.REFRESH_AFTER_WRITE,
             ):
                 count += success
-                logger.debug("Wrote %d document [action: %s]", success, action)
+                self.logger.debug("Wrote %d document [action: %s]", success, action)
 
-            logger.info("Finished writing %d documents with success", count)
+            self.logger.info("Finished writing %d documents with success", count)
         except (BulkIndexError, ApiError, TransportError) as error:
             msg = "%s %s Total succeeded writes: %s"
             details = getattr(error, "errors", "")
-            logger.error(msg, error, details, count)
+            self.logger.error(msg, error, details, count)
             raise BackendException(msg % (error, details, count)) from error
         return count
 
@@ -272,12 +300,12 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
             BackendException: If a failure occurs during the close operation.
         """
         if not self._client:
-            logger.warning("No backend client to close.")
+            self.logger.warning("No backend client to close.")
             return
 
         try:
             await self.client.close()
         except TransportError as error:
             msg = "Failed to close Elasticsearch client: %s"
-            logger.error(msg, error)
+            self.logger.error(msg, error)
             raise BackendException(msg % error) from error

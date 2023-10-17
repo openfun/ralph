@@ -1,10 +1,9 @@
-"""Base data backend for Ralph."""
+"""Swift data backend for Ralph."""
 
-import json
 import logging
 from functools import cached_property
 from io import IOBase
-from typing import Iterable, Iterator, Union
+from typing import Iterable, Iterator, Tuple, Union
 from uuid import uuid4
 
 from swiftclient.service import ClientException, Connection
@@ -15,18 +14,17 @@ from ralph.backends.data.base import (
     BaseOperationType,
     BaseQuery,
     DataBackendStatus,
-    enforce_query_checks,
 )
 from ralph.backends.mixins import HistoryMixin
 from ralph.conf import BaseSettingsConfig
 from ralph.exceptions import BackendException, BackendParameterException
-from ralph.utils import now
+from ralph.utils import now, parse_bytes_to_dict, parse_dict_to_bytes
 
 logger = logging.getLogger(__name__)
 
 
 class SwiftDataBackendSettings(BaseDataBackendSettings):
-    """Represent the SWIFT data backend default configuration.
+    """Swift data backend default configuration.
 
     Attributes:
         AUTH_URL (str): The authentication URL.
@@ -68,6 +66,13 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend):
 
     name = "swift"
     default_operation_type = BaseOperationType.CREATE
+    unsupported_operation_types = {
+        BaseOperationType.APPEND,
+        BaseOperationType.DELETE,
+        BaseOperationType.UPDATE,
+    }
+    logger = logger
+    query_class = BaseQuery
     settings_class = SwiftDataBackendSettings
     settings: settings_class
 
@@ -113,7 +118,7 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend):
             self.connection.head_account()
         except ClientException as err:
             msg = "Unable to connect to the Swift account: %s"
-            logger.error(msg, err.msg)
+            self.logger.error(msg, err.msg)
             return DataBackendStatus.ERROR
 
         return DataBackendStatus.OK
@@ -149,7 +154,7 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend):
             )
         except ClientException as err:
             msg = "Failed to list container %s: %s"
-            logger.error(msg, target, err.msg)
+            self.logger.error(msg, target, err.msg)
             raise BackendException(msg % (target, err.msg)) from err
 
         for obj in objects:
@@ -157,15 +162,14 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend):
                 continue
             yield self._details(target, obj) if details else obj
 
-    @enforce_query_checks
     def read(
         self,
-        *,
-        query: Union[str, BaseQuery] = None,
+        query: Union[str, dict, query_class, None] = None,
         target: Union[str, None] = None,
         chunk_size: Union[int, None] = 500,
         raw_output: bool = False,
         ignore_errors: bool = False,
+        max_statements: Union[int, None] = None,
     ) -> Iterator[Union[bytes, dict]]:
         # pylint: disable=too-many-arguments
         """Read objects matching the `query` in the `target` container and yields them.
@@ -184,6 +188,7 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend):
             ignore_errors (bool): If `True`, errors during the read operation
                 are be ignored and logged. If `False` (default), a `BackendException`
                 is raised if an error occurs.
+            max_statements: The maximum number of statements or chunks to yield.
 
         Yields:
             dict: If `raw_output` is False.
@@ -194,36 +199,21 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend):
                 `ignore_errors` is set to `False`.
             BackendParameterException: If a backend argument value is not valid.
         """
-        if query.query_string is None:
-            msg = "Invalid query. The query should be a valid archive name."
-            logger.error(msg)
-            if not ignore_errors:
-                raise BackendParameterException(msg)
-
-        target = target if target else self.default_container
-
-        logger.info(
-            "Getting object from container: %s (query_string: %s)",
-            target,
-            query.query_string,
+        yield from super().read(
+            query, target, chunk_size, raw_output, ignore_errors, max_statements
         )
 
-        try:
-            resp_headers, content = self.connection.get_object(
-                container=target,
-                obj=query.query_string,
-                resp_chunk_size=chunk_size,
-            )
-        except ClientException as err:
-            msg = "Failed to read %s: %s"
-            error = err.msg
-            logger.error(msg, query.query_string, error)
-            if not ignore_errors:
-                raise BackendException(msg % (query.query_string, error)) from err
-
-        reader = self._read_raw if raw_output else self._read_dict
-
-        for chunk in reader(content, chunk_size, ignore_errors):
+    def _read_bytes(
+        self,
+        query: query_class,
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+    ) -> Iterator[bytes]:
+        """Method called by `self.read` yielding bytes. See `self.read`."""
+        container, obj = self._get_container_and_object_name(target, query)
+        resp_headers, content = self._get_object(container, obj, chunk_size)
+        while chunk := content.read(chunk_size):
             yield chunk
 
         # Archive read, add a new entry to the history
@@ -231,13 +221,35 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend):
             {
                 "backend": self.name,
                 "action": "read",
-                "id": f"{target}/{query.query_string}",
-                "size": resp_headers["Content-Length"],
+                "id": f"{container}/{obj}",
+                "size": resp_headers["content-length"],
                 "timestamp": now(),
             }
         )
 
-    def write(  # pylint: disable=too-many-arguments, disable=too-many-branches
+    def _read_dicts(
+        self,
+        query: query_class,
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+    ) -> Iterator[dict]:
+        """Method called by `self.read` yielding dictionaries. See `self.read`."""
+        container, obj = self._get_container_and_object_name(target, query)
+        resp_headers, content = self._get_object(container, obj, chunk_size)
+        yield from parse_bytes_to_dict(content, ignore_errors, self.logger)
+        # Archive read, add a new entry to the history
+        self.append_to_history(
+            {
+                "backend": self.name,
+                "action": "read",
+                "id": f"{container}/{obj}",
+                "size": resp_headers["content-length"],
+                "timestamp": now(),
+            }
+        )
+
+    def write(  # pylint: disable=too-many-arguments,useless-parent-delegation
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Union[str, None] = None,
@@ -267,72 +279,56 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend):
                 `ignore_errors` is set to `False`.
             BackendParameterException: If a backend argument value is not valid.
         """
-        try:
-            first_record = next(iter(data))
-        except StopIteration:
-            logger.info("Data Iterator is empty; skipping write to target.")
-            return 0
-        if not operation_type:
-            operation_type = self.default_operation_type
+        return super().write(data, target, chunk_size, ignore_errors, operation_type)
 
+    def _write_bytes(  # pylint: disable=too-many-arguments
+        self,
+        data: Iterable[bytes],
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing bytes. See `self.write`."""
         if not target:
             target = f"{self.default_container}/{now()}-{uuid4()}"
-            logger.info(
-                (
-                    "Target not specified; using default container "
-                    "with random object name: %s"
-                ),
+            self.logger.info(
+                "Target not specified; using default container with random object name:"
+                " %s",
                 target,
             )
-        elif "/" not in target:
+
+        if "/" not in target:
             target = f"{self.default_container}/{target}"
-            logger.info(
-                "Container not specified; using default container: %s",
-                self.default_container,
-            )
+            msg = "Container not specified; using default container: %s"
+            self.logger.info(msg, self.default_container)
 
         target_container, target_object = target.split("/", 1)
+        if target_object in list(self.list(target=target_container)):
+            msg = "%s already exists and overwrite is not allowed for operation %s"
+            self.logger.error(msg, target_object, operation_type)
+            raise BackendException(msg % (target_object, operation_type))
 
-        if operation_type in [
-            BaseOperationType.APPEND,
-            BaseOperationType.DELETE,
-            BaseOperationType.UPDATE,
-        ]:
-            msg = "%s operation_type is not allowed."
-            logger.error(msg, operation_type.name)
-            if not ignore_errors:
-                raise BackendParameterException(msg % operation_type.name)
+        counter = {"count": 0}
+        data = self._count(data, counter)
 
-        if operation_type in [BaseOperationType.CREATE, BaseOperationType.INDEX]:
-            if target_object in list(self.list(target=target_container)):
-                msg = "%s already exists and overwrite is not allowed for operation %s"
-                logger.error(msg, target_object, operation_type)
-                if not ignore_errors:
-                    raise BackendException(msg % (target_object, operation_type))
+        try:
+            self.connection.put_object(
+                container=target_container,
+                obj=target_object,
+                contents=data,
+                chunk_size=chunk_size,
+            )
+            resp = self.connection.head_object(
+                container=target_container, obj=target_object
+            )
+        except ClientException as error:
+            msg = "Failed to write to object %s: %s"
+            self.logger.error(msg, target_object, error.msg)
+            raise BackendException(msg % (target_object, error.msg)) from error
 
-            if isinstance(first_record, dict):
-                data = [
-                    json.dumps(statement).encode(self.locale_encoding)
-                    for statement in data
-                ]
-
-            try:
-                self.connection.put_object(
-                    container=target_container, obj=target_object, contents=data
-                )
-                resp = self.connection.head_object(
-                    container=target_container, obj=target_object
-                )
-            except ClientException as err:
-                msg = "Failed to write to object %s: %s"
-                error = err.msg
-                logger.error(msg, target_object, error)
-                if not ignore_errors:
-                    raise BackendException(msg % (target_object, error)) from err
-
-        count = sum(1 for _ in data)
-        logging.info("Successfully written %s statements to %s", count, target)
-
+        msg = "Successfully written %s statements to %s"
+        logging.info(msg, counter["count"], target)
         # Archive written, add a new entry to the history
         self.append_to_history(
             {
@@ -340,11 +336,27 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend):
                 "action": "write",
                 "operation_type": operation_type.value,
                 "id": target,
-                "size": resp["Content-Length"],
+                "size": resp["content-length"],
                 "timestamp": now(),
             }
         )
-        return count
+        return counter["count"]
+
+    def _write_dicts(  # pylint: disable=too-many-arguments
+        self,
+        data: Iterable[dict],
+        target: str,
+        chunk_size: int,
+        ignore_errors: bool,
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing dictionaries. See `self.write`."""
+        bytes_data = parse_dict_to_bytes(
+            data, self.settings.LOCALE_ENCODING, ignore_errors, self.logger
+        )
+        return self._write_bytes(
+            bytes_data, target, chunk_size, ignore_errors, operation_type
+        )
 
     def close(self) -> None:
         """Close the Swift backend client.
@@ -353,15 +365,38 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend):
             BackendException: If a failure occurs during the close operation.
         """
         if not self._connection:
-            logger.warning("No backend client to close.")
+            self.logger.warning("No backend client to close.")
             return
 
         try:
             self.connection.close()
         except ClientException as error:
             msg = "Failed to close Swift backend client: %s"
-            logger.error(msg, error)
+            self.logger.error(msg, error)
             raise BackendException(msg % error) from error
+
+    def _get_container_and_object_name(
+        self, target: Union[str, None], query: query_class
+    ) -> Tuple[str, str]:
+        """Return the validated target container and object name."""
+        if query.query_string is None:
+            msg = "Invalid query. The query should be a valid archive name."
+            self.logger.error(msg)
+            raise BackendParameterException(msg)
+
+        obj = query.query_string
+        container = target if target else self.default_container
+        msg = "Getting object from container: %s (object: %s)"
+        self.logger.info(msg, container, obj)
+        return container, obj
+
+    def _get_object(self, container: str, obj: str, chunk_size: int):
+        try:
+            return self.connection.get_object(container, obj, chunk_size)
+        except ClientException as error:
+            msg = "Failed to read %s: %s"
+            self.logger.error(msg, obj, error.msg)
+            raise BackendException(msg % (obj, error.msg)) from error
 
     def _details(self, container: str, name: str):
         """Return `name` object details from `container`."""
@@ -369,33 +404,21 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend):
             resp = self.connection.head_object(container=container, obj=name)
         except ClientException as err:
             msg = "Unable to retrieve details for object %s: %s"
-            logger.error(msg, name, err.msg)
+            self.logger.error(msg, name, err.msg)
             raise BackendException(msg % (name, err.msg)) from err
 
         return {
             "name": name,
-            "lastModified": resp["Last-Modified"],
-            "size": resp["Content-Length"],
+            "lastModified": resp["last-modified"],
+            "size": resp["content-length"],
         }
 
     @staticmethod
-    def _read_dict(
-        obj: Iterable, _chunk_size: int, ignore_errors: bool
-    ) -> Iterator[dict]:
-        """Read the `object` by line and yield JSON parsed dictionaries."""
-        for i, line in enumerate(obj):
-            try:
-                yield json.loads(line)
-            except (TypeError, json.JSONDecodeError) as err:
-                msg = "Raised error: %s, at line %s"
-                logger.error(msg, err, i)
-                if not ignore_errors:
-                    raise BackendException(msg % (err, i)) from err
-
-    @staticmethod
-    def _read_raw(
-        obj: Iterable, chunk_size: int, _ignore_errors: bool
-    ) -> Iterator[bytes]:
-        """Read the `object` by line and yield bytes."""
-        while chunk := obj.read(chunk_size):
-            yield chunk
+    def _count(
+        statements: Union[Iterable[bytes], Iterable[dict]],
+        counter: dict,
+    ) -> Iterator:
+        """Count the elements in the `statements` Iterable and yield element."""
+        for statement in statements:
+            counter["count"] += 1
+            yield statement

@@ -37,7 +37,7 @@ def test_backends_data_ldp_data_backend_default_instantiation(monkeypatch, fs):
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__LDP__{name}", raising=False)
 
     assert LDPDataBackend.name == "ldp"
-    assert LDPDataBackend.query_model == BaseQuery
+    assert LDPDataBackend.query_class == BaseQuery
     assert LDPDataBackend.default_operation_type == BaseOperationType.INDEX
     backend = LDPDataBackend()
     assert isinstance(backend.client, ovh.Client)
@@ -429,31 +429,20 @@ def test_backends_data_ldp_data_backend_list_method_with_history_and_details(
 
 
 def test_backends_data_ldp_data_backend_read_method_without_raw_ouput(
-    ldp_backend, caplog, monkeypatch
+    ldp_backend, caplog
 ):
     """Test the `LDPDataBackend.read method, given `raw_output` set to `False`, should
-    log a warning message.
+    log an error message and raise a NotImplemented exception.
     """
-
-    def mock_get(url):
-        """Mock the OVH client get request."""
-        # pylint: disable=unused-argument
-        return {"filename": "archive_name", "size": 10}
-
     backend = ldp_backend()
-    monkeypatch.setattr(backend, "_url", lambda *_: "http://example.com")
-    monkeypatch.setattr(backend.client, "get", mock_get)
+    error = (
+        "LDP data backend doesn't support yielding dictionaries with `raw_output=False`"
+    )
+    with caplog.at_level(logging.ERROR):
+        with pytest.raises(NotImplementedError, match=error):
+            list(backend.read(query="archiveID", raw_output=False))
 
-    with caplog.at_level(logging.WARNING):
-        with requests_mock.Mocker() as request_mocker:
-            request_mocker.get("http://example.com")
-            assert not list(backend.read(query="archiveID", raw_output=False))
-
-    assert (
-        "ralph.backends.data.ldp",
-        logging.WARNING,
-        "The `raw_output` and `ignore_errors` arguments are ignored",
-    ) in caplog.record_tuples
+    assert ("ralph.backends.data.ldp", logging.ERROR, error) in caplog.record_tuples
 
 
 def test_backends_data_ldp_data_backend_read_method_without_ignore_errors(
@@ -482,7 +471,7 @@ def test_backends_data_ldp_data_backend_read_method_without_ignore_errors(
     assert (
         "ralph.backends.data.ldp",
         logging.WARNING,
-        "The `raw_output` and `ignore_errors` arguments are ignored",
+        "The `ignore_errors` argument is ignored",
     ) in caplog.record_tuples
 
 

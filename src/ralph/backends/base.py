@@ -27,6 +27,7 @@ class BaseBackendSettings(BaseSettings):
 class BaseBackend(ABC):
     """Base ralph backend class."""
 
+    name: str = "base"
     settings_class = BaseBackendSettings
     settings: settings_class
 

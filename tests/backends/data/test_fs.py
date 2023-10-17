@@ -28,14 +28,12 @@ def test_backends_data_fs_data_backend_default_instantiation(monkeypatch, fs):
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__FS__{name}", raising=False)
 
     assert FSDataBackend.name == "fs"
-    assert FSDataBackend.query_model == BaseQuery
-    assert FSDataBackend.default_operation_type == BaseOperationType.CREATE
+    assert FSDataBackend.query_class == BaseQuery
+    assert FSDataBackend.default_operation_type == BaseOperationType.INDEX
     assert FSDataBackend.settings_class == FSDataBackendSettings
     backend = FSDataBackend()
     assert str(backend.default_directory) == "."
     assert backend.default_query_string == "*"
-    assert backend.default_chunk_size == 4096
-    assert backend.locale_encoding == "utf8"
 
 
 def test_backends_data_fs_data_backend_instantiation_with_settings(fs):
@@ -54,8 +52,6 @@ def test_backends_data_fs_data_backend_instantiation_with_settings(fs):
     assert str(backend.default_directory) == deep_path
     assert backend.default_directory.is_dir()
     assert backend.default_query_string == "foo.txt"
-    assert backend.default_chunk_size == 1
-    assert backend.locale_encoding == "utf-16"
 
     try:
         FSDataBackend(settings)
@@ -638,7 +634,11 @@ def test_backends_data_fs_data_backend_read_method_without_ignore_errors(
     result = backend.read(ignore_errors=False)
     assert isinstance(result, Iterable)
     assert next(result) == valid_dictionary
-    with pytest.raises(BackendException, match="Raised error:"):
+    msg = (
+        r"Failed to decode JSON: Expecting value: line 1 column 1 \(char 0\), "
+        r"for document: b'baz\\n', at line 1"
+    )
+    with pytest.raises(BackendException, match=msg):
         next(result)
 
     # When the `read` method fails to read a file entirely, then no entry should be
@@ -653,7 +653,11 @@ def test_backends_data_fs_data_backend_read_method_without_ignore_errors(
     result = backend.read(ignore_errors=False, target=absolute_path)
     assert isinstance(result, Iterable)
     assert next(result) == valid_dictionary
-    with pytest.raises(BackendException, match="Raised error:"):
+    msg = (
+        r"Failed to decode JSON: Expecting value: line 1 column 1 \(char 0\), "
+        r"for document: b'baz', at line 0"
+    )
+    with pytest.raises(BackendException, match=msg):
         next(result)
 
     # When the `read` method succeeds to read one file entirely, and fails to read
@@ -676,7 +680,11 @@ def test_backends_data_fs_data_backend_read_method_without_ignore_errors(
     # line, the `read` method should raise a `BackendException`.
     result = backend.read(ignore_errors=False, target="bar")
     assert isinstance(result, Iterable)
-    with pytest.raises(BackendException, match="Raised error:"):
+    msg = (
+        r"Failed to decode JSON: Expecting value: line 1 column 1 \(char 0\), "
+        r"for document: b'baz\\n', at line 0"
+    )
+    with pytest.raises(BackendException, match=msg):
         next(result)
 
     # When the `read` method fails to read a file entirely, then no new entry should be

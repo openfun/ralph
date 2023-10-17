@@ -1,10 +1,8 @@
 """S3 data backend for Ralph."""
 
-import json
 import logging
 from io import IOBase
-from itertools import chain
-from typing import Iterable, Iterator, Union
+from typing import Iterable, Iterator, Tuple, Union
 from uuid import uuid4
 
 import boto3
@@ -16,7 +14,6 @@ from botocore.exceptions import (
     ReadTimeoutError,
     ResponseStreamingError,
 )
-from botocore.response import StreamingBody
 from requests_toolbelt import StreamingIterator
 
 from ralph.backends.data.base import (
@@ -25,12 +22,11 @@ from ralph.backends.data.base import (
     BaseOperationType,
     BaseQuery,
     DataBackendStatus,
-    enforce_query_checks,
 )
 from ralph.backends.mixins import HistoryMixin
 from ralph.conf import BaseSettingsConfig
 from ralph.exceptions import BackendException, BackendParameterException
-from ralph.utils import now
+from ralph.utils import now, parse_bytes_to_dict, parse_dict_to_bytes
 
 logger = logging.getLogger(__name__)
 
@@ -69,15 +65,20 @@ class S3DataBackend(HistoryMixin, BaseDataBackend):
 
     name = "s3"
     default_operation_type = BaseOperationType.CREATE
+    unsupported_operation_types = {
+        BaseOperationType.APPEND,
+        BaseOperationType.DELETE,
+        BaseOperationType.UPDATE,
+    }
+    logger = logger
     settings_class = S3DataBackendSettings
     settings: settings_class
+    query_class = BaseQuery
 
     def __init__(self, settings: Union[settings_class, None] = None):
         """Instantiate the AWS S3 client."""
         super().__init__(settings)
         self.default_bucket_name = self.settings.DEFAULT_BUCKET_NAME
-        self.default_chunk_size = self.settings.DEFAULT_CHUNK_SIZE
-        self.locale_encoding = self.settings.LOCALE_ENCODING
         self._client = None
 
     @property
@@ -149,18 +150,17 @@ class S3DataBackend(HistoryMixin, BaseDataBackend):
         except ClientError as err:
             error_msg = err.response["Error"]["Message"]
             msg = "Failed to list the bucket %s: %s"
-            logger.error(msg, target, error_msg)
+            self.logger.error(msg, target, error_msg)
             raise BackendException(msg % (target, error_msg)) from err
 
-    @enforce_query_checks
     def read(
         self,
-        *,
-        query: Union[str, BaseQuery] = None,
+        query: Union[str, dict, query_class, None] = None,
         target: Union[str, None] = None,
         chunk_size: Union[int, None] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
+        max_statements: Union[int, None] = None,
     ) -> Iterator[Union[bytes, dict]]:
         # pylint: disable=too-many-arguments
         """Read an object matching the `query` in the `target` bucket and yields it.
@@ -174,6 +174,7 @@ class S3DataBackend(HistoryMixin, BaseDataBackend):
             ignore_errors (bool): If `True`, errors during the read operation
                 will be ignored and logged. If `False` (default), a `BackendException`
                 will be raised if an error occurs.
+            max_statements: The maximum number of statements or chunks to yield.
 
         Yields:
             dict: If `raw_output` is False.
@@ -185,48 +186,68 @@ class S3DataBackend(HistoryMixin, BaseDataBackend):
             BackendParameterException: If a backend argument value is not valid and
                 `ignore_errors` is set to `False`.
         """
-        if query.query_string is None:
-            msg = "Invalid query. The query should be a valid object name."
-            logger.error(msg)
-            raise BackendParameterException(msg)
+        yield from super().read(
+            query, target, chunk_size, raw_output, ignore_errors, max_statements
+        )
 
-        if not chunk_size:
-            chunk_size = self.default_chunk_size
-
-        if target is None:
-            target = self.default_bucket_name
-
+    def _read_bytes(
+        self,
+        query: query_class,
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+    ) -> Iterator[bytes]:
+        """Method called by `self.read` yielding bytes. See `self.read`."""
+        bucket, key = self._get_bucket_and_object_key(target, query)
+        response = self._get_object(bucket=bucket, key=key)
         try:
-            response = self.client.get_object(Bucket=target, Key=query.query_string)
-        except (ClientError, EndpointConnectionError) as err:
-            error_msg = err.response["Error"]["Message"]
-            msg = "Failed to download %s: %s"
-            logger.error(msg, query.query_string, error_msg)
-            if not ignore_errors:
-                raise BackendException(msg % (query.query_string, error_msg)) from err
-
-        reader = self._read_raw if raw_output else self._read_dict
-        try:
-            for chunk in reader(response["Body"], chunk_size, ignore_errors):
-                yield chunk
-        except (ReadTimeoutError, ResponseStreamingError) as err:
+            yield from response["Body"].iter_chunks(chunk_size)
+        except (ReadTimeoutError, ResponseStreamingError) as error:
             msg = "Failed to read chunk from object %s"
-            logger.error(msg, query.query_string)
-            if not ignore_errors:
-                raise BackendException(msg % (query.query_string)) from err
+            self.logger.error(msg, key)
+            raise BackendException(msg % (key)) from error
 
         # Archive fetched, add a new entry to the history.
         self.append_to_history(
             {
                 "backend": self.name,
                 "action": "read",
-                "id": target + "/" + query.query_string,
+                "id": bucket + "/" + key,
                 "size": response["ContentLength"],
                 "timestamp": now(),
             }
         )
 
-    def write(  # pylint: disable=too-many-arguments
+    def _read_dicts(
+        self,
+        query: query_class,
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+    ) -> Iterator[dict]:
+        """Method called by `self.read` yielding dictionaries. See `self.read`."""
+        bucket, key = self._get_bucket_and_object_key(target, query)
+        response = self._get_object(bucket=bucket, key=key)
+        try:
+            lines = response["Body"].iter_lines(chunk_size)
+            yield from parse_bytes_to_dict(lines, ignore_errors, self.logger)
+        except (ReadTimeoutError, ResponseStreamingError) as error:
+            msg = "Failed to read chunk from object %s"
+            self.logger.error(msg, key)
+            raise BackendException(msg % (query)) from error
+
+        # Archive fetched, add a new entry to the history.
+        self.append_to_history(
+            {
+                "backend": self.name,
+                "action": "read",
+                "id": bucket + "/" + key,
+                "size": response["ContentLength"],
+                "timestamp": now(),
+            }
+        )
+
+    def write(  # pylint: disable=too-many-arguments,useless-parent-delegation
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Union[str, None] = None,
@@ -261,70 +282,70 @@ class S3DataBackend(HistoryMixin, BaseDataBackend):
             BackendException: If a failure during the write operation occurs.
             BackendParameterException: If a backend argument value is not valid.
         """
-        data = iter(data)
+        return super().write(data, target, chunk_size, ignore_errors, operation_type)
+
+    def close(self) -> None:
+        """Close the S3 backend client.
+
+        Raise:
+            BackendException: If a failure occurs during the close operation.
+        """
+        if not self._client:
+            self.logger.warning("No backend client to close.")
+            return
+
         try:
-            first_record = next(data)
-        except StopIteration:
-            logger.info("Data Iterator is empty; skipping write to target.")
-            return 0
+            self.client.close()
+        except ClientError as error:
+            msg = "Failed to close S3 backend client: %s"
+            self.logger.error(msg, error)
+            raise BackendException(msg % error) from error
 
-        if not operation_type:
-            operation_type = self.default_operation_type
-
+    def _write_bytes(  # pylint: disable=too-many-arguments
+        self,
+        data: Iterable[bytes],
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing bytes. See `self.write`."""
         if not target:
             target = f"{self.default_bucket_name}/{now()}-{uuid4()}"
-            logger.info(
-                "Target not specified; using default bucket with random file name: %s",
-                target,
-            )
-
+            msg = "Target not specified; using default bucket with random file name: %s"
+            self.logger.info(msg, target)
         elif "/" not in target:
             target = f"{self.default_bucket_name}/{target}"
-            logger.info(
-                "Target not specified; using default bucket: %s",
-                target,
-            )
+            msg = "Target bucket not specified; using default bucket: %s"
+            self.logger.info(msg, target)
 
         target_bucket, target_object = target.split("/", 1)
 
-        if operation_type in [
-            BaseOperationType.APPEND,
-            BaseOperationType.DELETE,
-            BaseOperationType.UPDATE,
-        ]:
-            msg = "%s operation_type is not allowed."
-            logger.error(msg, operation_type.name)
-            raise BackendParameterException(msg % operation_type.name)
-
         if target_object in list(self.list(target=target_bucket)):
             msg = "%s already exists and overwrite is not allowed for operation %s"
-            logger.error(msg, target_object, operation_type)
+            self.logger.error(msg, target_object, operation_type)
             raise BackendException(msg % (target_object, operation_type))
 
-        logger.info("Creating archive: %s", target_object)
-
-        data = chain((first_record,), data)
-        if isinstance(first_record, dict):
-            data = self._parse_dict_to_bytes(data, ignore_errors)
+        self.logger.info("Creating archive: %s", target_object)
 
         counter = {"count": 0}
         data = self._count(data, counter)
 
         # Using StreamingIterator from requests-toolbelt but without specifying a size
         # as we will not use it. It implements the `read` method for iterators.
-        data = StreamingIterator(0, data)
+        file_object = StreamingIterator(0, data)
 
         try:
             self.client.upload_fileobj(
                 Bucket=target_bucket,
                 Key=target_object,
-                Fileobj=data,
+                Fileobj=file_object,
                 Config=TransferConfig(multipart_chunksize=chunk_size),
             )
             response = self.client.head_object(Bucket=target_bucket, Key=target_object)
         except (ClientError, ParamValidationError, EndpointConnectionError) as exc:
             msg = "Failed to upload %s"
-            logger.error(msg, target)
+            self.logger.error(msg, target)
             raise BackendException(msg % target) from exc
 
         # Archive written, add a new entry to the history
@@ -341,59 +362,47 @@ class S3DataBackend(HistoryMixin, BaseDataBackend):
 
         return counter["count"]
 
-    def close(self) -> None:
-        """Close the S3 backend client.
+    def _write_dicts(  # pylint: disable=too-many-arguments
+        self,
+        data: Iterable[dict],
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing dictionaries. See `self.write`."""
+        bytes_data = parse_dict_to_bytes(
+            data, self.settings.LOCALE_ENCODING, ignore_errors, self.logger
+        )
+        return self._write_bytes(
+            bytes_data, target, chunk_size, ignore_errors, operation_type
+        )
 
-        Raise:
-            BackendException: If a failure occurs during the close operation.
-        """
-        if not self._client:
-            logger.warning("No backend client to close.")
-            return
+    def _get_bucket_and_object_key(
+        self, target: Union[str, None], query: query_class
+    ) -> Tuple[str, str]:
+        """Return the validated target bucket and object key."""
+        if query.query_string is None:
+            msg = "Invalid query. The query should be a valid object name."
+            self.logger.error(msg)
+            raise BackendParameterException(msg)
 
+        if target is None:
+            target = self.default_bucket_name
+
+        return target, query.query_string
+
+    def _get_object(self, bucket: str, key: str) -> dict:
+        """Retrieve objects from Amazon S3 wrapping the exception."""
         try:
-            self.client.close()
-        except ClientError as error:
-            msg = "Failed to close S3 backend client: %s"
-            logger.error(msg, error)
-            raise BackendException(msg % error) from error
-
-    @staticmethod
-    def _read_raw(
-        obj: StreamingBody, chunk_size: int, _ignore_errors: bool
-    ) -> Iterator[bytes]:
-        """Read the `object` in chunks of size `chunk_size` and yield them."""
-        for chunk in obj.iter_chunks(chunk_size):
-            yield chunk
-
-    @staticmethod
-    def _read_dict(
-        obj: StreamingBody, chunk_size: int, ignore_errors: bool
-    ) -> Iterator[dict]:
-        """Read the `object` by line and yield JSON parsed dictionaries."""
-        for line in obj.iter_lines(chunk_size):
-            try:
-                yield json.loads(line)
-            except (TypeError, json.JSONDecodeError) as err:
-                msg = "Raised error: %s"
-                logger.error(msg, err)
-                if not ignore_errors:
-                    raise BackendException(msg % err) from err
-
-    @staticmethod
-    def _parse_dict_to_bytes(
-        statements: Iterable[dict], ignore_errors: bool
-    ) -> Iterator[bytes]:
-        """Read the `statements` Iterable and yield bytes."""
-        for statement in statements:
-            try:
-                yield bytes(f"{json.dumps(statement)}\n", encoding="utf-8")
-            except TypeError as error:
-                msg = "Failed to encode JSON: %s, for document %s"
-                logger.error(msg, error, statement)
-                if ignore_errors:
-                    continue
-                raise BackendException(msg % (error, statement)) from error
+            return self.client.get_object(Bucket=bucket, Key=key)
+        except (ClientError, EndpointConnectionError) as err:
+            error_msg = (
+                err.response["Error"]["Message"] if hasattr(err, "response") else err
+            )
+            msg = "Failed to download %s: %s"
+            self.logger.error(msg, key, error_msg)
+            raise BackendException(msg % (key, error_msg)) from err
 
     @staticmethod
     def _count(

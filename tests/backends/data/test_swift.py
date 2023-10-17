@@ -39,7 +39,7 @@ def test_backends_data_swift_data_backend_default_instantiation(monkeypatch, fs)
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__SWIFT__{name}", raising=False)
 
     assert SwiftDataBackend.name == "swift"
-    assert SwiftDataBackend.query_model == BaseQuery
+    assert SwiftDataBackend.query_class == BaseQuery
     assert SwiftDataBackend.default_operation_type == BaseOperationType.CREATE
     assert SwiftDataBackend.settings_class == SwiftDataBackendSettings
     backend = SwiftDataBackend()
@@ -182,8 +182,8 @@ def test_backends_data_swift_data_backend_list_method(
     def mock_head_object(container, obj):  # pylint:disable=unused-argument
         resp = next((x for x in listing if x["name"] == obj), None)
         return {
-            "Last-Modified": resp["lastModified"],
-            "Content-Length": resp["size"],
+            "last-modified": resp["lastModified"],
+            "content-length": resp["size"],
         }
 
     backend = swift_backend()
@@ -279,7 +279,7 @@ def test_backends_data_swift_data_backend_read_method_with_raw_output(
     backend = swift_backend()
 
     def mock_get_object(*args, **kwargs):  # pylint:disable=unused-argument
-        resp_headers = {"Content-Length": 14}
+        resp_headers = {"content-length": 14}
         return (resp_headers, BytesIO(content))
 
     monkeypatch.setattr(backend.connection, "get_object", mock_get_object)
@@ -341,7 +341,7 @@ def test_backends_data_swift_data_backend_read_method_without_raw_output(
     backend = swift_backend()
 
     def mock_get_object(*args, **kwargs):  # pylint:disable=unused-argument
-        resp_headers = {"Content-Length": 14}
+        resp_headers = {"content-length": 14}
         return (resp_headers, BytesIO(content_bytes))
 
     monkeypatch.setattr(backend.connection, "get_object", mock_get_object)
@@ -401,7 +401,7 @@ def test_backends_data_swift_data_backend_read_method_with_ignore_errors(
     backend = swift_backend()
 
     def mock_get_object_1(*args, **kwargs):  # pylint:disable=unused-argument
-        resp_headers = {"Content-Length": 14}
+        resp_headers = {"content-length": 14}
         return (resp_headers, BytesIO(valid_invalid_json))
 
     monkeypatch.setattr(backend.connection, "get_object", mock_get_object_1)
@@ -412,7 +412,7 @@ def test_backends_data_swift_data_backend_read_method_with_ignore_errors(
     assert list(result) == [valid_dictionary, valid_dictionary]
 
     def mock_get_object_2(*args, **kwargs):  # pylint:disable=unused-argument
-        resp_headers = {"Content-Length": 14}
+        resp_headers = {"content-length": 14}
         return (resp_headers, BytesIO(invalid_valid_json))
 
     monkeypatch.setattr(backend.connection, "get_object", mock_get_object_2)
@@ -448,7 +448,7 @@ def test_backends_data_swift_data_backend_read_method_without_ignore_errors(
     backend = swift_backend()
 
     def mock_get_object_1(*args, **kwargs):  # pylint:disable=unused-argument
-        resp_headers = {"Content-Length": 14}
+        resp_headers = {"content-length": 14}
         return (resp_headers, BytesIO(valid_invalid_json))
 
     monkeypatch.setattr(backend.connection, "get_object", mock_get_object_1)
@@ -459,7 +459,11 @@ def test_backends_data_swift_data_backend_read_method_without_ignore_errors(
     result = backend.read(ignore_errors=False, query="2020-06-02.gz")
     assert isinstance(result, Iterable)
     assert next(result) == valid_dictionary
-    with pytest.raises(BackendException, match="Raised error:"):
+    error = (
+        r"Failed to decode JSON: Expecting value: line 1 column 1 \(char 0\), "
+        r"for document: b'baz\\n', at line 1"
+    )
+    with pytest.raises(BackendException, match=error):
         next(result)
 
     # When the `read` method fails to read a file entirely, then no entry should be
@@ -467,7 +471,7 @@ def test_backends_data_swift_data_backend_read_method_without_ignore_errors(
     assert not backend.history
 
     def mock_get_object_2(*args, **kwargs):  # pylint:disable=unused-argument
-        resp_headers = {"Content-Length": 14}
+        resp_headers = {"content-length": 14}
         return (resp_headers, BytesIO(invalid_valid_json))
 
     monkeypatch.setattr(backend.connection, "get_object", mock_get_object_2)
@@ -476,7 +480,11 @@ def test_backends_data_swift_data_backend_read_method_without_ignore_errors(
     # method should raise a `BackendException` at the second line.
     result = backend.read(ignore_errors=False, query="2020-06-03.gz")
     assert isinstance(result, Iterable)
-    with pytest.raises(BackendException, match="Raised error:"):
+    error = (
+        r"Failed to decode JSON: Expecting value: line 1 column 1 \(char 0\), "
+        r"for document: b'baz\\n', at line 0"
+    )
+    with pytest.raises(BackendException, match=error):
         next(result)
     backend.close()
 
@@ -593,7 +601,7 @@ def test_backends_data_swift_data_backend_write_method_with_invalid_operation(
 
     backend = swift_backend()
 
-    msg = f"{operation_type.name} operation_type is not allowed."
+    msg = f"{operation_type.name.capitalize()} operation_type is not allowed."
     with pytest.raises(BackendParameterException, match=msg):
         backend.write(data=[b"foo"], operation_type=operation_type)
 
@@ -631,11 +639,13 @@ def test_backends_data_swift_data_backend_write_method_without_target(
     def mock_get_container(*args, **kwargs):  # pylint:disable=unused-argument
         return (None, [x["name"] for x in listing])
 
-    def mock_put_object(*args, **kwargs):  # pylint:disable=unused-argument
+    def mock_put_object(container, obj, contents, chunk_size):
+        # pylint:disable=unused-argument
+        list(contents)
         return 1
 
     def mock_head_object(*args, **kwargs):  # pylint:disable=unused-argument
-        return {"Content-Length": 3}
+        return {"content-length": 3}
 
     expected_filename = f"{frozen_now}-{frozen_uuid4}"
     monkeypatch.setattr(backend.connection, "get_container", mock_get_container)
@@ -652,7 +662,7 @@ def test_backends_data_swift_data_backend_write_method_without_target(
             "action": "write",
             "operation_type": BaseOperationType.CREATE.value,
             "id": f"container_name/{expected_filename}",
-            "size": mock_head_object()["Content-Length"],
+            "size": mock_head_object()["content-length"],
             "timestamp": frozen_now,
         }
     ]

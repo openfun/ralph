@@ -43,7 +43,7 @@ async def test_backends_data_async_mongo_data_backend_default_instantiation(
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__MONGO__{name}", raising=False)
 
     assert AsyncMongoDataBackend.name == "async_mongo"
-    assert AsyncMongoDataBackend.query_model == MongoQuery
+    assert AsyncMongoDataBackend.query_class == MongoQuery
     assert AsyncMongoDataBackend.default_operation_type == BaseOperationType.INDEX
     assert AsyncMongoDataBackend.settings_class == MongoDataBackendSettings
     backend = AsyncMongoDataBackend()
@@ -320,9 +320,9 @@ async def test_backends_data_async_mongo_data_backend_read_method_with_raw_outpu
         {"_id": ObjectId("64945e530468d817b1f756db"), "id": "baz"},
     ]
     expected = [
-        b'{"_id": "64945e53a4ee2699573e0d6f", "id": "foo"}',
-        b'{"_id": "64945e530468d817b1f756da", "id": "bar"}',
-        b'{"_id": "64945e530468d817b1f756db", "id": "baz"}',
+        b'{"_id": "64945e53a4ee2699573e0d6f", "id": "foo"}\n',
+        b'{"_id": "64945e530468d817b1f756da", "id": "bar"}\n',
+        b'{"_id": "64945e530468d817b1f756db", "id": "baz"}\n',
     ]
     await backend.collection.insert_many(documents)
     await backend.database.foobar.insert_many(documents[:2])
@@ -454,8 +454,8 @@ async def test_backends_data_async_mongo_data_backend_read_method_with_ignore_er
         {"_id": ObjectId("64945e530468d817b1f756db"), "id": "baz"},
     ]
     expected = [
-        b'{"_id": "64945e53a4ee2699573e0d6f", "id": "foo"}',
-        b'{"_id": "64945e530468d817b1f756db", "id": "baz"}',
+        b'{"_id": "64945e53a4ee2699573e0d6f", "id": "foo"}\n',
+        b'{"_id": "64945e530468d817b1f756db", "id": "baz"}\n',
     ]
     await backend.collection.insert_many(documents)
     await backend.database.foobar.insert_many(documents[:2])
@@ -472,12 +472,17 @@ async def test_backends_data_async_mongo_data_backend_read_method_with_ignore_er
             statement async for statement in backend.read(**kwargs, chunk_size=1000)
         ] == expected
 
-    assert (
-        "ralph.backends.data.async_mongo",
-        logging.WARNING,
-        "Failed to encode MongoDB document with ID 64945e530468d817b1f756da: "
-        "Object of type ObjectId is not JSON serializable",
-    ) in caplog.record_tuples
+    assert [
+        record
+        for record in caplog.record_tuples
+        if record[0] == "ralph.backends.data.async_mongo"
+        and record[1] == logging.WARNING
+        and record[2].startswith(
+            "Failed to convert document to bytes: Object of type ObjectId is not "
+            "JSON serializable, for document: {'_id': '64945e530468d817b1f756da', "
+            "'id': ObjectId("
+        )
+    ]
 
 
 @pytest.mark.anyio
@@ -500,8 +505,8 @@ async def test_backends_data_async_mongo_data_backend_read_method_without_ignore
     await backend.database.foobar.insert_many(documents[:2])
     kwargs = {"raw_output": True, "ignore_errors": False}
     msg = (
-        "Failed to encode MongoDB document with ID 64945e530468d817b1f756da: "
-        "Object of type ObjectId is not JSON serializable"
+        "Failed to convert document to bytes: Object of type ObjectId is not JSON "
+        "serializable, for document: {'_id': '64945e530468d817b1f756da', 'id': ObjectId"
     )
     with caplog.at_level(logging.ERROR):
         with pytest.raises(BackendException, match=msg):
@@ -527,11 +532,13 @@ async def test_backends_data_async_mongo_data_backend_read_method_without_ignore
             assert next(result) == expected
             next(result)
 
-    assert (
-        "ralph.backends.data.async_mongo",
-        logging.ERROR,
-        msg,
-    ) in caplog.record_tuples
+    assert [
+        record
+        for record in caplog.record_tuples
+        if record[0] == "ralph.backends.data.async_mongo"
+        and record[1] == logging.ERROR
+        and record[2].startswith(msg)
+    ]
 
 
 @pytest.mark.parametrize(
@@ -941,7 +948,7 @@ async def test_backends_data_async_mongo_data_backend_write_method_with_unparsab
     backend = async_mongo_backend()
     msg = (
         "Failed to decode JSON: Expecting value: line 1 column 1 (char 0), "
-        "for document: b'not valid JSON!'"
+        "for document: b'not valid JSON!', at line 0"
     )
     msg_regex = msg.replace("(", r"\(").replace(")", r"\)")
     with pytest.raises(BackendException, match=msg_regex):
@@ -967,13 +974,13 @@ async def test_backends_data_async_mongo_data_backend_write_method_with_no_data(
     0.
     """
     backend = async_mongo_backend()
-    with caplog.at_level(logging.WARNING):
+    with caplog.at_level(logging.INFO):
         assert await backend.write(data=[]) == 0
 
     msg = "Data Iterator is empty; skipping write to target."
     assert (
         "ralph.backends.data.async_mongo",
-        logging.WARNING,
+        logging.INFO,
         msg,
     ) in caplog.record_tuples
 

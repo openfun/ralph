@@ -4,8 +4,7 @@ import json
 import logging
 from datetime import datetime
 from io import IOBase
-from itertools import chain
-from typing import Any, Dict, Generator, Iterable, Iterator, List, NamedTuple, Union
+from typing import Dict, Generator, Iterable, Iterator, List, NamedTuple, Union
 from uuid import UUID, uuid4
 
 import clickhouse_connect
@@ -18,10 +17,10 @@ from ralph.backends.data.base import (
     BaseOperationType,
     BaseQuery,
     DataBackendStatus,
-    enforce_query_checks,
 )
 from ralph.conf import BaseSettingsConfig, ClientOptions
-from ralph.exceptions import BackendException, BackendParameterException
+from ralph.exceptions import BackendException
+from ralph.utils import iter_by_batch, parse_bytes_to_dict, parse_dict_to_bytes
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +49,7 @@ class InsertTuple(NamedTuple):
 
 
 class ClickHouseDataBackendSettings(BaseDataBackendSettings):
-    """Represent the ClickHouse data backend default configuration.
+    """ClickHouse data backend default configuration.
 
     Attributes:
         HOST (str): ClickHouse server host to connect to.
@@ -101,8 +100,14 @@ class ClickHouseDataBackend(BaseDataBackend):
     """ClickHouse database backend."""
 
     name = "clickhouse"
-    query_model = ClickHouseQuery
+    query_class = ClickHouseQuery
     default_operation_type = BaseOperationType.CREATE
+    unsupported_operation_types = {
+        BaseOperationType.APPEND,
+        BaseOperationType.DELETE,
+        BaseOperationType.UPDATE,
+    }
+    logger = logger
     settings_class = ClickHouseDataBackendSettings
     settings: settings_class
 
@@ -177,7 +182,7 @@ class ClickHouseDataBackend(BaseDataBackend):
             tables = self.client.query(sql).named_results()
         except (ClickHouseError, IndexError, TypeError, ValueError) as error:
             msg = "Failed to read tables: %s"
-            logger.error(msg, error)
+            self.logger.error(msg, error)
             raise BackendException(msg % error) from error
 
         for table in tables:
@@ -186,15 +191,14 @@ class ClickHouseDataBackend(BaseDataBackend):
             else:
                 yield str(table.get("name"))
 
-    @enforce_query_checks
     def read(
         self,
-        *,
-        query: Union[str, ClickHouseQuery] = None,
+        query: Union[str, dict, query_class, None] = None,
         target: Union[str, None] = None,
         chunk_size: Union[int, None] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
+        max_statements: Union[int, None] = None,
     ) -> Iterator[Union[bytes, dict]]:
         # pylint: disable=too-many-arguments
         """Read documents matching the query in the target table and yield them.
@@ -209,6 +213,7 @@ class ClickHouseDataBackend(BaseDataBackend):
             ignore_errors (bool): If `True`, errors during the encoding operation
                 will be ignored and logged. If `False` (default), a `BackendException`
                 will be raised if an error occurs.
+            max_statements: The maximum number of statements to yield.
 
         Yield:
             bytes: The next raw document if `raw_output` is True.
@@ -217,71 +222,79 @@ class ClickHouseDataBackend(BaseDataBackend):
         Raise:
             BackendException: If a failure occurs during ClickHouse connection.
         """
-        if target is None:
-            target = self.event_table_name
+        yield from super().read(
+            query, target, chunk_size, raw_output, ignore_errors, max_statements
+        )
 
-        if chunk_size is None:
-            chunk_size = self.default_chunk_size
+    def _read_bytes(
+        self,
+        query: query_class,
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+    ) -> Iterator[bytes]:
+        """Method called by `self.read` yielding bytes. See `self.read`."""
+        locale = self.settings.LOCALE_ENCODING
+        statements = self._read_dicts(query, target, chunk_size, ignore_errors)
+        yield from parse_dict_to_bytes(statements, locale, ignore_errors, self.logger)
 
-        query = (
-            BaseClickHouseQuery(query.query_string)
+    def _read_dicts(
+        self,
+        query: query_class,
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+    ) -> Iterator[dict]:
+        """Method called by `self.read` yielding dictionaries. See `self.read`."""
+        target = target if target else self.event_table_name
+        base_query: BaseClickHouseQuery = (
+            query.query_string.copy(exclude={"query_string"})
             if query.query_string
             else query.copy(exclude={"query_string"})
         )
+        if isinstance(base_query.select, str):
+            base_query.select = [base_query.select]
 
-        if isinstance(query.select, str):
-            query.select = [query.select]
-        select = ",".join(query.select)
+        if isinstance(base_query.where, str):
+            base_query.where = [base_query.where]
+
+        select = ",".join(base_query.select)
         sql = f"SELECT {select} FROM {target}"  # nosec
 
-        if query.where:
-            if isinstance(query.where, str):
-                query.where = [query.where]
+        if base_query.where:
             filter_str = "\nWHERE 1=1 AND "
             filter_str += """
             AND
             """.join(
-                query.where
+                base_query.where
             )
             sql += filter_str
 
-        if query.sort:
-            sql += f"\nORDER BY {query.sort}"
+        if base_query.sort:
+            sql += f"\nORDER BY {base_query.sort}"
 
-        if query.limit:
-            sql += f"\nLIMIT {query.limit}"
+        if base_query.limit:
+            sql += f"\nLIMIT {base_query.limit}"
 
-        reader = self._read_raw if raw_output else lambda _: _
-
-        logger.debug(
+        self.logger.debug(
             "Start reading the %s table of the %s database (chunk size: %d)",
             target,
             self.database,
             chunk_size,
         )
         try:
-            result = self.client.query(
+            yield from self.client.query(
                 sql,
-                parameters=query.parameters,
+                parameters=base_query.parameters,
                 settings={"buffer_size": chunk_size},
-                column_oriented=query.column_oriented,
+                column_oriented=base_query.column_oriented,
             ).named_results()
-            for statement in result:
-                try:
-                    yield reader(statement)
-                except (TypeError, ValueError) as error:
-                    msg = "Failed to encode document %s: %s"
-                    if ignore_errors:
-                        logger.warning(msg, statement, error)
-                        continue
-                    logger.error(msg, statement, error)
-                    raise BackendException(msg % (statement, error)) from error
         except (ClickHouseError, IndexError, TypeError, ValueError) as error:
             msg = "Failed to read documents: %s"
-            logger.error(msg, error)
+            self.logger.error(msg, error)
             raise BackendException(msg % error) from error
 
-    def write(  # pylint: disable=too-many-arguments
+    def write(  # pylint: disable=too-many-arguments,useless-parent-delegation
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Union[str, None] = None,
@@ -313,63 +326,45 @@ class ClickHouseDataBackend(BaseDataBackend):
             BackendParameterException: If the `operation_type` is `APPEND`, `UPDATE`
                 or `DELETE` as it is not supported.
         """
-        target = target if target else self.event_table_name
-        if not operation_type:
-            operation_type = self.default_operation_type
-        if not chunk_size:
-            chunk_size = self.default_chunk_size
-        logger.debug(
+        return super().write(data, target, chunk_size, ignore_errors, operation_type)
+
+    def _write_bytes(  # pylint: disable=too-many-arguments
+        self,
+        data: Iterable[bytes],
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing bytes. See `self.write`."""
+        statements = parse_bytes_to_dict(data, ignore_errors, self.logger)
+        return self._write_dicts(
+            statements, target, chunk_size, ignore_errors, operation_type
+        )
+
+    def _write_dicts(  # pylint: disable=too-many-arguments
+        self,
+        data: Iterable[dict],
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing dictionaries. See `self.write`."""
+        # operation_type is either CREATE or INDEX
+        target = self.event_table_name if target is None else target
+        self.logger.debug(
             "Start writing to the %s table of the %s database (chunk size: %d)",
             target,
             self.database,
             chunk_size,
         )
-
-        data = iter(data)
-        try:
-            first_record = next(data)
-        except StopIteration:
-            logger.info("Data Iterator is empty; skipping write to target.")
-            return 0
-
-        data = chain([first_record], data)
-        if isinstance(first_record, bytes):
-            data = self._parse_bytes_to_dict(data, ignore_errors)
-
-        if operation_type not in [BaseOperationType.CREATE, BaseOperationType.INDEX]:
-            msg = "%s operation_type is not allowed."
-            logger.error(msg, operation_type.name)
-            raise BackendParameterException(msg % operation_type.name)
-
-        # operation_type is either CREATE or INDEX
         count = 0
-        batch = []
+        insert_tuples = self._to_insert_tuples(data, ignore_errors)
+        for batch in iter_by_batch(insert_tuples, chunk_size):
+            count += self._bulk_import(batch, ignore_errors, target)
 
-        for insert_tuple in self._to_insert_tuples(
-            data,
-            ignore_errors=ignore_errors,
-        ):
-            batch.append(insert_tuple)
-            if len(batch) < chunk_size:
-                continue
-
-            count += self._bulk_import(
-                batch,
-                ignore_errors=ignore_errors,
-                event_table_name=target,
-            )
-            batch = []
-
-        # Edge case: if the total number of documents is lower than the chunk size
-        if len(batch) > 0:
-            count += self._bulk_import(
-                batch,
-                ignore_errors=ignore_errors,
-                event_table_name=target,
-            )
-
-        logger.info("Inserted a total of %d documents with success", count)
-
+        self.logger.info("Inserted a total of %d documents with success", count)
         return count
 
     def close(self) -> None:
@@ -379,18 +374,18 @@ class ClickHouseDataBackend(BaseDataBackend):
             BackendException: If a failure occurs during the close operation.
         """
         if not self._client:
-            logger.warning("No backend client to close.")
+            self.logger.warning("No backend client to close.")
             return
 
         try:
             self.client.close()
         except ClickHouseError as error:
             msg = "Failed to close ClickHouse client: %s"
-            logger.error(msg, error)
+            self.logger.error(msg, error)
             raise BackendException(msg % error) from error
 
-    @staticmethod
     def _to_insert_tuples(
+        self,
         data: Iterable[dict],
         ignore_errors: bool = False,
     ) -> Generator[InsertTuple, None, None]:
@@ -404,9 +399,9 @@ class ClickHouseDataBackend(BaseDataBackend):
             except (KeyError, ValidationError) as error:
                 msg = "Statement %s has an invalid 'id' or 'timestamp' field"
                 if ignore_errors:
-                    logger.warning(msg, statement)
+                    self.logger.warning(msg, statement)
                     continue
-                logger.error(msg, statement)
+                self.logger.error(msg, statement)
                 raise BackendException(msg % statement) from error
 
             insert_tuple = InsertTuple(
@@ -419,7 +414,7 @@ class ClickHouseDataBackend(BaseDataBackend):
             yield insert_tuple
 
     def _bulk_import(
-        self, batch: list, ignore_errors: bool = False, event_table_name: str = None
+        self, batch: List[InsertTuple], ignore_errors: bool, event_table_name: str
     ):
         """Insert a batch of documents into the selected database table."""
         try:
@@ -445,35 +440,12 @@ class ClickHouseDataBackend(BaseDataBackend):
         except (ClickHouseError, BackendException) as error:
             if not ignore_errors:
                 raise BackendException(*error.args) from error
-            logger.warning(
-                "Bulk import failed for current chunk but you choose to ignore it.",
-            )
+            msg = "Bulk import failed for current chunk but you choose to ignore it."
+            self.logger.warning(msg)
             # There is no current way of knowing how many rows from the batch
             # succeeded, we assume 0 here.
             return 0
 
         inserted_count = len(batch)
-        logger.debug("Inserted %d documents chunk with success", inserted_count)
-
+        self.logger.debug("Inserted %d documents chunk with success", inserted_count)
         return inserted_count
-
-    @staticmethod
-    def _parse_bytes_to_dict(
-        raw_documents: Iterable[bytes], ignore_errors: bool
-    ) -> Iterator[dict]:
-        """Read the `raw_documents` Iterable and yield dictionaries."""
-        for raw_document in raw_documents:
-            try:
-                yield json.loads(raw_document)
-            except (TypeError, json.JSONDecodeError) as error:
-                if ignore_errors:
-                    logger.warning(
-                        "Raised error: %s, for document %s", error, raw_document
-                    )
-                    continue
-                logger.error("Raised error: %s, for document %s", error, raw_document)
-                raise error
-
-    def _read_raw(self, document: Dict[str, Any]) -> bytes:
-        """Read the `documents` Iterable and yield bytes."""
-        return json.dumps(document).encode(self.locale_encoding)

@@ -33,6 +33,7 @@ class FSLRSBackend(BaseLRSBackend, FSDataBackend):
     """FileSystem LRS Backend."""
 
     settings_class = FSLRSBackendSettings
+    settings: settings_class
 
     def write(  # pylint: disable=too-many-arguments
         self,

@@ -3,7 +3,7 @@ import logging
 
 import pytest
 
-from ralph.backends.data.base import BaseDataBackend, BaseQuery, enforce_query_checks
+from ralph.backends.data.base import BaseDataBackend, BaseQuery
 from ralph.exceptions import BackendParameterException
 
 
@@ -15,17 +15,21 @@ from ralph.exceptions import BackendParameterException
         (BaseQuery(query_string="foo"), BaseQuery(query_string="foo")),
     ],
 )
-def test_backends_data_base_enforce_query_checks_with_valid_input(value, expected):
-    """Test the enforce_query_checks function given valid input."""
+def test_backends_data_base_validate_backend_query_with_valid_input(value, expected):
+    """Test the validate_backend_query function given valid input."""
 
     class MockBaseDataBackend(BaseDataBackend):
-        """A class mocking the base database class."""
+        """A class mocking the base data backend class."""
 
-        @enforce_query_checks
-        def read(self, query=None):  # pylint: disable=no-self-use,arguments-differ
-            """Mock the base database read method."""
-
+        def _read_bytes(self, query, target, chunk_size, ignore_errors):
+            """Mock the base database read_bytes method."""
             assert query == expected
+            yield
+
+        def _read_dicts(self, query, target, chunk_size, ignore_errors):
+            """Mock the base database read_dicts method."""
+            assert query == expected
+            yield
 
         def status(self):  # pylint: disable=arguments-differ,missing-function-docstring
             pass
@@ -33,13 +37,18 @@ def test_backends_data_base_enforce_query_checks_with_valid_input(value, expecte
         def list(self):  # pylint: disable=arguments-differ,missing-function-docstring
             pass
 
-        def write(self):  # pylint: disable=arguments-differ,missing-function-docstring
+        def _write_bytes(self):
+            # pylint: disable=arguments-differ,missing-function-docstring
+            pass
+
+        def _write_dicts(self):
+            # pylint: disable=arguments-differ,missing-function-docstring
             pass
 
         def close(self):  # pylint: disable=arguments-differ,missing-function-docstring
             pass
 
-    MockBaseDataBackend().read(query=value)
+    list(MockBaseDataBackend().read(query=value))
 
 
 @pytest.mark.parametrize(
@@ -54,19 +63,21 @@ def test_backends_data_base_enforce_query_checks_with_valid_input(value, expecte
         ),
     ],
 )
-def test_backends_data_base_enforce_query_checks_with_invalid_input(
+def test_backends_data_base_validate_backend_query_with_invalid_input(
     value, error, caplog
 ):
     """Test the enforce_query_checks function given invalid input."""
 
     class MockBaseDataBackend(BaseDataBackend):
-        """A class mocking the base database class."""
+        """A class mocking the base data backend class."""
 
-        @enforce_query_checks
-        def read(self, query=None):  # pylint: disable=no-self-use,arguments-differ
-            """Mock the base database read method."""
+        def _read_bytes(self, query, target, chunk_size, ignore_errors):
+            """Mock the base database read_bytes method."""
+            yield
 
-            return None
+        def _read_dicts(self, query, target, chunk_size, ignore_errors):
+            """Mock the base database read_dicts method."""
+            yield
 
         def status(self):  # pylint: disable=arguments-differ,missing-function-docstring
             pass
@@ -74,7 +85,12 @@ def test_backends_data_base_enforce_query_checks_with_invalid_input(
         def list(self):  # pylint: disable=arguments-differ,missing-function-docstring
             pass
 
-        def write(self):  # pylint: disable=arguments-differ,missing-function-docstring
+        def _write_bytes(self):
+            # pylint: disable=arguments-differ,missing-function-docstring
+            pass
+
+        def _write_dicts(self):
+            # pylint: disable=arguments-differ,missing-function-docstring
             pass
 
         def close(self):  # pylint: disable=arguments-differ,missing-function-docstring
@@ -82,7 +98,7 @@ def test_backends_data_base_enforce_query_checks_with_invalid_input(
 
     with pytest.raises(BackendParameterException, match=error):
         with caplog.at_level(logging.ERROR):
-            MockBaseDataBackend().read(query=value)
+            list(MockBaseDataBackend().read(query=value))
 
     error = error.replace("\\", "")
     assert ("ralph.backends.data.base", logging.ERROR, error) in caplog.record_tuples

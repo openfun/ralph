@@ -12,7 +12,6 @@ from ralph.backends.data.base import (
     BaseOperationType,
     BaseQuery,
     DataBackendStatus,
-    enforce_query_checks,
 )
 from ralph.backends.mixins import HistoryMixin
 from ralph.conf import BaseSettingsConfig
@@ -61,6 +60,15 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend):
     """OVH LDP (Log Data Platform) data backend."""
 
     name = "ldp"
+    query_class = BaseQuery
+    unsupported_operation_types = {
+        BaseOperationType.APPEND,
+        BaseOperationType.CREATE,
+        BaseOperationType.DELETE,
+        BaseOperationType.INDEX,
+        BaseOperationType.UPDATE,
+    }
+    logger = logger
     settings_class = LDPDataBackendSettings
     settings: settings_class
 
@@ -94,7 +102,7 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend):
         try:
             self.client.get(self._get_archive_endpoint())
         except ovh.exceptions.APIError as error:
-            logger.error("Failed to connect to the LDP: %s", error)
+            self.logger.error("Failed to connect to the LDP: %s", error)
             return DataBackendStatus.ERROR
         except BackendParameterException:
             return DataBackendStatus.ERROR
@@ -122,21 +130,21 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend):
             BackendException: If a failure during retrieval of archives list occurs.
         """
         list_archives_endpoint = self._get_archive_endpoint(stream_id=target)
-        logger.info("List archives endpoint: %s", list_archives_endpoint)
-        logger.info("List archives details: %s", str(details))
+        self.logger.info("List archives endpoint: %s", list_archives_endpoint)
+        self.logger.info("List archives details: %s", str(details))
 
         try:
             archives = self.client.get(list_archives_endpoint)
         except ovh.exceptions.APIError as error:
             msg = "Failed to get archives list: %s"
-            logger.error(msg, error)
+            self.logger.error(msg, error)
             raise BackendException(msg % error) from error
 
-        logger.info("Found %d archives", len(archives))
+        self.logger.info("Found %d archives", len(archives))
 
         if new:
             archives = set(archives) - set(self.get_command_history(self.name, "read"))
-            logger.debug("New archives: %d", len(archives))
+            self.logger.debug("New archives: %d", len(archives))
 
         if not details:
             for archive in archives:
@@ -147,15 +155,14 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend):
         for archive in archives:
             yield self._details(target, archive)
 
-    @enforce_query_checks
     def read(
         self,
-        *,
-        query: Union[str, BaseQuery] = None,
+        query: Union[str, dict, query_class, None] = None,
         target: Union[str, None] = None,
         chunk_size: Union[int, None] = 4096,
         raw_output: bool = True,
         ignore_errors: bool = False,
+        max_statements: Union[int, None] = None,
     ) -> Iterator[Union[bytes, dict]]:
         # pylint: disable=too-many-arguments
         """Read an archive matching the query in the target stream_id and yield it.
@@ -167,6 +174,7 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend):
             chunk_size (int or None): The chunk size when reading archives by batch.
             raw_output (bool): Ignored. Always set to `True`.
             ignore_errors (bool): Ignored.
+            max_statements: The maximum number of chunks to yield.
 
         Yields:
             bytes: The content of the archive matching the query.
@@ -175,18 +183,31 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend):
             BackendException: If a failure during the read operation occurs.
             BackendParameterException: If the `query` argument is not an archive name.
         """
+        yield from super().read(
+            query, target, chunk_size, raw_output, ignore_errors, max_statements
+        )
+
+    def _read_bytes(
+        self,
+        query: query_class,
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+    ) -> Iterator[bytes]:
+        """Method called by `self.read` yielding bytes. See `self.read`."""
+        if not ignore_errors:
+            self.logger.warning("The `ignore_errors` argument is ignored")
+
         if query.query_string is None:
             msg = "Invalid query. The query should be a valid archive name"
             raise BackendParameterException(msg)
 
-        if not raw_output or not ignore_errors:
-            logger.warning("The `raw_output` and `ignore_errors` arguments are ignored")
-
+        archive_id = query.query_string
         target = target if target else self.stream_id
-        logger.debug("Getting archive: %s from stream: %s", query.query_string, target)
-
+        msg = "Getting archive: %s from stream: %s"
+        self.logger.debug(msg, archive_id, target)
         # Stream response (archive content)
-        url = self._url(query.query_string)
+        url = self._url(archive_id)
         try:
             with requests.get(url, stream=True, timeout=self.timeout) as result:
                 result.raise_for_status()
@@ -194,11 +215,11 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend):
                     yield chunk
         except requests.exceptions.HTTPError as error:
             msg = "Failed to read archive %s: %s"
-            logger.error(msg, query.query_string, error)
-            raise BackendException(msg % (query.query_string, error)) from error
+            self.logger.error(msg, archive_id, error)
+            raise BackendException(msg % (archive_id, error)) from error
 
         # Get detailed information about the archive to fetch
-        details = self._details(target, query.query_string)
+        details = self._details(target, archive_id)
         # Archive is supposed to have been fully read, add a new entry to
         # the history.
         self.append_to_history(
@@ -208,12 +229,27 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend):
                 # WARNING: previously only the filename was used as the ID
                 # By changing this and prepending the `target` stream_id previously
                 # fetched archives will not be marked as read anymore.
-                "id": f"{target}/{query.query_string}",
+                "id": f"{target}/{archive_id}",
                 "filename": details.get("filename"),
                 "size": details.get("size"),
                 "timestamp": now(),
             }
         )
+
+    def _read_dicts(
+        self,
+        query: query_class,
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+    ) -> Iterator[dict]:
+        """Method called by `self.read` yielding dictionaries. See `self.read`."""
+        msg = (
+            "LDP data backend doesn't support yielding dictionaries with "
+            "`raw_output=False`"
+        )
+        self.logger.error(msg)
+        raise NotImplementedError(msg)
 
     def write(  # pylint: disable=too-many-arguments
         self,
@@ -225,13 +261,37 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend):
     ) -> int:
         """LDP data backend is read-only, calling this method will raise an error."""
         msg = "LDP data backend is read-only, cannot write to %s"
-        logger.error(msg, target)
+        self.logger.error(msg, target)
         raise NotImplementedError(msg % target)
+
+    def _write_bytes(  # pylint: disable=too-many-arguments
+        self,
+        data: Iterable[bytes],
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing bytes. See `self.write`."""
+        # Never reached as this backend has no supported operation types.
+        return 0
+
+    def _write_dicts(  # pylint: disable=too-many-arguments
+        self,
+        data: Iterable[dict],
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing dictionaries. See `self.write`."""
+        # Never reached as this backend has no supported operation types.
+        return 0
 
     def close(self) -> None:
         """LDP client does not support close, this method is not implemented."""
         msg = "LDP data backend does not support `close` method"
-        logger.error(msg)
+        self.logger.error(msg)
         raise NotImplementedError(msg)
 
     def _get_archive_endpoint(self, stream_id: Union[None, str] = None) -> str:
@@ -239,7 +299,7 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend):
         stream_id = stream_id if stream_id else self.stream_id
         if None in (self.service_name, stream_id):
             msg = "LDPDataBackend requires to set both service_name and stream_id"
-            logger.error(msg)
+            self.logger.error(msg)
             raise BackendParameterException(msg)
         return (
             f"/dbaas/logs/{self.service_name}/output/graylog/stream/{stream_id}/archive"
@@ -250,7 +310,7 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend):
         download_url_endpoint = f"{self._get_archive_endpoint()}/{name}/url"
         response = self.client.post(download_url_endpoint)
         download_url = response.get("url")
-        logger.debug("Temporary URL: %s", download_url)
+        self.logger.debug("Temporary URL: %s", download_url)
         return download_url
 
     def _details(self, stream_id: str, name: str) -> dict:
@@ -269,4 +329,9 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend):
                 "size": 67906662,
             }
         """
-        return self.client.get(f"{self._get_archive_endpoint(stream_id)}/{name}")
+        try:
+            return self.client.get(f"{self._get_archive_endpoint(stream_id)}/{name}")
+        except ovh.exceptions.APIError as error:
+            msg = "Failed to get '%s' archive details: %s"
+            self.logger.error(msg, name, error)
+            raise BackendException(msg % (name, error)) from error

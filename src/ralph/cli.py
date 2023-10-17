@@ -640,7 +640,7 @@ def read(
             iter_over_async(statements) if isasyncgen(statements) else statements
         )
         for statement in statements:
-            click.echo(statement)
+            click.echo(statement, nl=False)
     elif backend_type == backends_settings.BACKENDS.STREAM:
         backend.stream(sys.stdout.buffer)
     elif backend_type == backends_settings.BACKENDS.HTTP:
