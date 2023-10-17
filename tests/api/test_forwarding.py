@@ -1,6 +1,5 @@
 """Tests for the xAPI statements forwarding background task."""
 
-import asyncio
 import json
 import logging
 
@@ -139,7 +138,7 @@ def test_api_forwarding_get_active_xapi_forwardings_with_inactive_forwardings(
         is_active=st.just(True),
     )
 )
-def test_api_forwarding_forward_xapi_statements_with_successful_request(
+async def test_api_forwarding_forward_xapi_statements_with_successful_request(
     monkeypatch, caplog, statements, forwarding
 ):
     """Test the forward_xapi_statements function should log the forwarded statements
@@ -164,7 +163,7 @@ def test_api_forwarding_forward_xapi_statements_with_successful_request(
 
     caplog.clear()
     with caplog.at_level(logging.DEBUG):
-        asyncio.run(forward_xapi_statements(statements, method="post"))
+        await forward_xapi_statements(statements, method="post")
 
     assert [
         f"Forwarded {len(statements)} statements to {forwarding.url} with success."
@@ -185,7 +184,7 @@ def test_api_forwarding_forward_xapi_statements_with_successful_request(
         is_active=st.just(True),
     )
 )
-def test_api_forwarding_forward_xapi_statements_with_unsuccessful_request(
+async def test_api_forwarding_forward_xapi_statements_with_unsuccessful_request(
     monkeypatch, caplog, statements, forwarding
 ):
     """Test the forward_xapi_statements function should log the error if the request
@@ -211,7 +210,7 @@ def test_api_forwarding_forward_xapi_statements_with_unsuccessful_request(
 
     caplog.clear()
     with caplog.at_level(logging.ERROR):
-        asyncio.run(forward_xapi_statements(statements, method="post"))
+        await forward_xapi_statements(statements, method="post")
 
     assert ["Failed to forward xAPI statements. Failure during request."] == [
         message

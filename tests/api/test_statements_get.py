@@ -7,7 +7,6 @@ from urllib.parse import parse_qs, quote_plus, urlparse
 import pytest
 import responses
 from elasticsearch.helpers import bulk
-from fastapi.testclient import TestClient
 
 from ralph.api import app
 from ralph.api.auth import get_authenticated_user
@@ -26,6 +25,8 @@ from tests.fixtures.backends import (
     ES_TEST_INDEX,
     MONGO_TEST_COLLECTION,
     MONGO_TEST_DATABASE,
+    get_async_es_test_backend,
+    get_async_mongo_test_backend,
     get_clickhouse_test_backend,
     get_es_test_backend,
     get_mongo_test_backend,
@@ -33,8 +34,6 @@ from tests.fixtures.backends import (
 
 from ..fixtures.auth import mock_basic_auth_user, mock_oidc_user
 from ..helpers import mock_activity, mock_agent
-
-client = TestClient(app)
 
 
 def insert_es_statements(es_client, statements):
@@ -83,7 +82,7 @@ def insert_clickhouse_statements(statements):
     assert success == len(statements)
 
 
-@pytest.fixture(params=["es", "mongo", "clickhouse"])
+@pytest.fixture(params=["async_es", "async_mongo", "es", "mongo", "clickhouse"])
 def insert_statements_and_monkeypatch_backend(
     request, es, mongo, clickhouse, monkeypatch
 ):
@@ -93,6 +92,20 @@ def insert_statements_and_monkeypatch_backend(
     def _insert_statements_and_monkeypatch_backend(statements):
         """Inserts statements once into each backend."""
         backend_client_class_path = "ralph.api.routers.statements.BACKEND_CLIENT"
+        if request.param == "async_es":
+            insert_es_statements(es, statements)
+            monkeypatch.setattr(backend_client_class_path, get_async_es_test_backend())
+            return
+        if request.param == "async_mongo":
+            insert_mongo_statements(mongo, statements)
+            monkeypatch.setattr(
+                backend_client_class_path, get_async_mongo_test_backend()
+            )
+            return
+        if request.param == "es":
+            insert_es_statements(es, statements)
+            monkeypatch.setattr(backend_client_class_path, get_es_test_backend())
+            return
         if request.param == "mongo":
             insert_mongo_statements(mongo, statements)
             monkeypatch.setattr(backend_client_class_path, get_mongo_test_backend())
@@ -103,12 +116,11 @@ def insert_statements_and_monkeypatch_backend(
                 backend_client_class_path, get_clickhouse_test_backend()
             )
             return
-        insert_es_statements(es, statements)
-        monkeypatch.setattr(backend_client_class_path, get_es_test_backend())
 
     return _insert_statements_and_monkeypatch_backend
 
 
+@pytest.mark.anyio
 @pytest.mark.parametrize(
     "ifi",
     [
@@ -119,8 +131,8 @@ def insert_statements_and_monkeypatch_backend(
         "account_different_home_page",
     ],
 )
-def test_api_statements_get_mine(
-    monkeypatch, fs, insert_statements_and_monkeypatch_backend, ifi
+async def test_api_statements_get_mine(
+    client, monkeypatch, fs, insert_statements_and_monkeypatch_backend, ifi
 ):
     """(Security) Test that the get statements API route, given a "mine=True"
     query parameter returns a list of statements filtered by authority.
@@ -173,7 +185,7 @@ def test_api_statements_get_mine(
     insert_statements_and_monkeypatch_backend(statements)
 
     # No restriction on "mine" (implicit) : Return all statements
-    response = client.get(
+    response = await client.get(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {credentials_1_bis}"},
     )
@@ -181,7 +193,7 @@ def test_api_statements_get_mine(
     assert response.json() == {"statements": [statements[1], statements[0]]}
 
     # No restriction on "mine" (explicit) : Return all statements
-    response = client.get(
+    response = await client.get(
         "/xAPI/statements/?mine=False",
         headers={"Authorization": f"Basic {credentials_1_bis}"},
     )
@@ -189,7 +201,7 @@ def test_api_statements_get_mine(
     assert response.json() == {"statements": [statements[1], statements[0]]}
 
     # Only fetch mine (explicit) : Return filtered statements
-    response = client.get(
+    response = await client.get(
         "/xAPI/statements/?mine=True",
         headers={"Authorization": f"Basic {credentials_1_bis}"},
     )
@@ -201,7 +213,7 @@ def test_api_statements_get_mine(
     monkeypatch.setattr(
         "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_AUTHORITY", True
     )
-    response = client.get(
+    response = await client.get(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {credentials_1_bis}"},
     )
@@ -210,7 +222,7 @@ def test_api_statements_get_mine(
 
     # Only fetch mine (implicit) with contradictory user request: Return filtered
     # statements
-    response = client.get(
+    response = await client.get(
         "/xAPI/statements/?mine=False",
         headers={"Authorization": f"Basic {credentials_1_bis}"},
     )
@@ -218,7 +230,7 @@ def test_api_statements_get_mine(
     assert response.json() == {"statements": [statements[0]]}
 
     # Fetch "mine" by id with a single forbidden statement : Return empty list
-    response = client.get(
+    response = await client.get(
         f"/xAPI/statements/?statementId={statements[1]['id']}&mine=True",
         headers={"Authorization": f"Basic {credentials_1_bis}"},
     )
@@ -226,15 +238,16 @@ def test_api_statements_get_mine(
     assert response.json() == {"statements": []}
 
     # Check that invalid parameters returns an error
-    response = client.get(
+    response = await client.get(
         "/xAPI/statements/?mine=BigBoat",
         headers={"Authorization": f"Basic {credentials_1_bis}"},
     )
     assert response.status_code == 422
 
 
-def test_api_statements_get(
-    insert_statements_and_monkeypatch_backend, basic_auth_credentials
+@pytest.mark.anyio
+async def test_api_statements_get(
+    client, insert_statements_and_monkeypatch_backend, basic_auth_credentials
 ):
     """Test the get statements API route without any filters set up."""
     # pylint: disable=redefined-outer-name
@@ -253,7 +266,7 @@ def test_api_statements_get(
 
     # Confirm that calling this with and without the trailing slash both work
     for path in ("/xAPI/statements", "/xAPI/statements/"):
-        response = client.get(
+        response = await client.get(
             path, headers={"Authorization": f"Basic {basic_auth_credentials}"}
         )
 
@@ -261,8 +274,9 @@ def test_api_statements_get(
         assert response.json() == {"statements": [statements[1], statements[0]]}
 
 
-def test_api_statements_get_ascending(
-    insert_statements_and_monkeypatch_backend, basic_auth_credentials
+@pytest.mark.anyio
+async def test_api_statements_get_ascending(
+    client, insert_statements_and_monkeypatch_backend, basic_auth_credentials
 ):
     """Test the get statements API route, given an "ascending" query parameter, should
     return statements in ascending order by their timestamp.
@@ -281,7 +295,7 @@ def test_api_statements_get_ascending(
     ]
     insert_statements_and_monkeypatch_backend(statements)
 
-    response = client.get(
+    response = await client.get(
         "/xAPI/statements/?ascending=true",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
@@ -290,8 +304,9 @@ def test_api_statements_get_ascending(
     assert response.json() == {"statements": [statements[0], statements[1]]}
 
 
-def test_api_statements_get_by_statement_id(
-    insert_statements_and_monkeypatch_backend, basic_auth_credentials
+@pytest.mark.anyio
+async def test_api_statements_get_by_statement_id(
+    client, insert_statements_and_monkeypatch_backend, basic_auth_credentials
 ):
     """Test the get statements API route, given a "statementId" query parameter, should
     return a list of statements matching the given statementId.
@@ -310,7 +325,7 @@ def test_api_statements_get_by_statement_id(
     ]
     insert_statements_and_monkeypatch_backend(statements)
 
-    response = client.get(
+    response = await client.get(
         f"/xAPI/statements/?statementId={statements[1]['id']}",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
@@ -319,6 +334,7 @@ def test_api_statements_get_by_statement_id(
     assert response.json() == {"statements": [statements[1]]}
 
 
+@pytest.mark.anyio
 @pytest.mark.parametrize(
     "ifi",
     [
@@ -329,8 +345,8 @@ def test_api_statements_get_by_statement_id(
         "account_different_home_page",
     ],
 )
-def test_api_statements_get_by_agent(
-    ifi, insert_statements_and_monkeypatch_backend, basic_auth_credentials
+async def test_api_statements_get_by_agent(
+    client, ifi, insert_statements_and_monkeypatch_backend, basic_auth_credentials
 ):
     """Test the get statements API route, given an "agent" query parameter, should
     return a list of statements filtered by the given agent.
@@ -364,7 +380,7 @@ def test_api_statements_get_by_agent(
     ]
     insert_statements_and_monkeypatch_backend(statements)
 
-    response = client.get(
+    response = await client.get(
         f"/xAPI/statements/?agent={quote_plus(json.dumps(agent_1))}",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
@@ -373,8 +389,9 @@ def test_api_statements_get_by_agent(
     assert response.json() == {"statements": [statements[0]]}
 
 
-def test_api_statements_get_by_verb(
-    insert_statements_and_monkeypatch_backend, basic_auth_credentials
+@pytest.mark.anyio
+async def test_api_statements_get_by_verb(
+    client, insert_statements_and_monkeypatch_backend, basic_auth_credentials
 ):
     """Test the get statements API route, given a "verb" query parameter, should
     return a list of statements filtered by the given verb id.
@@ -395,7 +412,7 @@ def test_api_statements_get_by_verb(
     ]
     insert_statements_and_monkeypatch_backend(statements)
 
-    response = client.get(
+    response = await client.get(
         "/xAPI/statements/?verb=" + quote_plus("http://adlnet.gov/expapi/verbs/played"),
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
@@ -404,8 +421,9 @@ def test_api_statements_get_by_verb(
     assert response.json() == {"statements": [statements[1]]}
 
 
-def test_api_statements_get_by_activity(
-    insert_statements_and_monkeypatch_backend, basic_auth_credentials
+@pytest.mark.anyio
+async def test_api_statements_get_by_activity(
+    client, insert_statements_and_monkeypatch_backend, basic_auth_credentials
 ):
     """Test the get statements API route, given an "activity" query parameter, should
     return a list of statements filtered by the given activity id.
@@ -429,7 +447,7 @@ def test_api_statements_get_by_activity(
     ]
     insert_statements_and_monkeypatch_backend(statements)
 
-    response = client.get(
+    response = await client.get(
         f"/xAPI/statements/?activity={activity_1['id']}",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
@@ -438,7 +456,7 @@ def test_api_statements_get_by_activity(
     assert response.json() == {"statements": [statements[1]]}
 
     # Check that badly formated activity returns an error
-    response = client.get(
+    response = await client.get(
         "/xAPI/statements/?activity=INVALID_IRI",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
@@ -447,8 +465,9 @@ def test_api_statements_get_by_activity(
     assert response.json()["detail"][0]["msg"] == "'INVALID_IRI' is not a valid 'IRI'."
 
 
-def test_api_statements_get_since_timestamp(
-    insert_statements_and_monkeypatch_backend, basic_auth_credentials
+@pytest.mark.anyio
+async def test_api_statements_get_since_timestamp(
+    client, insert_statements_and_monkeypatch_backend, basic_auth_credentials
 ):
     """Test the get statements API route, given a "since" query parameter, should
     return a list of statements filtered by the given timestamp.
@@ -468,7 +487,7 @@ def test_api_statements_get_since_timestamp(
     insert_statements_and_monkeypatch_backend(statements)
 
     since = (datetime.now() - timedelta(minutes=30)).isoformat()
-    response = client.get(
+    response = await client.get(
         f"/xAPI/statements/?since={since}",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
@@ -477,8 +496,9 @@ def test_api_statements_get_since_timestamp(
     assert response.json() == {"statements": [statements[1]]}
 
 
-def test_api_statements_get_until_timestamp(
-    insert_statements_and_monkeypatch_backend, basic_auth_credentials
+@pytest.mark.anyio
+async def test_api_statements_get_until_timestamp(
+    client, insert_statements_and_monkeypatch_backend, basic_auth_credentials
 ):
     """Test the get statements API route, given an "until" query parameter,
     should return a list of statements filtered by the given timestamp.
@@ -498,7 +518,7 @@ def test_api_statements_get_until_timestamp(
     insert_statements_and_monkeypatch_backend(statements)
 
     until = (datetime.now() - timedelta(minutes=30)).isoformat()
-    response = client.get(
+    response = await client.get(
         f"/xAPI/statements/?until={until}",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
@@ -507,8 +527,12 @@ def test_api_statements_get_until_timestamp(
     assert response.json() == {"statements": [statements[0]]}
 
 
-def test_api_statements_get_with_pagination(
-    monkeypatch, insert_statements_and_monkeypatch_backend, basic_auth_credentials
+@pytest.mark.anyio
+async def test_api_statements_get_with_pagination(
+    client,
+    monkeypatch,
+    insert_statements_and_monkeypatch_backend,
+    basic_auth_credentials,
 ):
     """Test the get statements API route, given a request leading to more results than
     can fit on the first page, should return a list of statements non-exceeding the page
@@ -546,7 +570,7 @@ def test_api_statements_get_with_pagination(
 
     # First response gets the first two results, with a "more" entry as
     # we have more results to return on a later page.
-    first_response = client.get(
+    first_response = await client.get(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
@@ -558,7 +582,7 @@ def test_api_statements_get_with_pagination(
     assert all(key in more_query_params for key in ("pit_id", "search_after"))
 
     # Second response gets the missing result from the first response.
-    second_response = client.get(
+    second_response = await client.get(
         first_response.json()["more"],
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
@@ -570,7 +594,7 @@ def test_api_statements_get_with_pagination(
     assert all(key in more_query_params for key in ("pit_id", "search_after"))
 
     # Third response gets the missing result from the first response
-    third_response = client.get(
+    third_response = await client.get(
         second_response.json()["more"],
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
@@ -578,8 +602,12 @@ def test_api_statements_get_with_pagination(
     assert third_response.json() == {"statements": [statements[0]]}
 
 
-def test_api_statements_get_with_pagination_and_query(
-    monkeypatch, insert_statements_and_monkeypatch_backend, basic_auth_credentials
+@pytest.mark.anyio
+async def test_api_statements_get_with_pagination_and_query(
+    client,
+    monkeypatch,
+    insert_statements_and_monkeypatch_backend,
+    basic_auth_credentials,
 ):
     """Test the get statements API route, given a request with a query parameter
     leading to more results than can fit on the first page, should return a list
@@ -622,7 +650,7 @@ def test_api_statements_get_with_pagination_and_query(
 
     # First response gets the first two results, with a "more" entry as
     # we have more results to return on a later page.
-    first_response = client.get(
+    first_response = await client.get(
         "/xAPI/statements/?verb="
         + quote_plus("https://w3id.org/xapi/video/verbs/played"),
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
@@ -635,7 +663,7 @@ def test_api_statements_get_with_pagination_and_query(
     assert all(key in more_query_params for key in ("verb", "pit_id", "search_after"))
 
     # Second response gets the missing result from the first response.
-    second_response = client.get(
+    second_response = await client.get(
         first_response.json()["more"],
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
@@ -643,8 +671,9 @@ def test_api_statements_get_with_pagination_and_query(
     assert second_response.json() == {"statements": [statements[0]]}
 
 
-def test_api_statements_get_with_no_matching_statement(
-    insert_statements_and_monkeypatch_backend, basic_auth_credentials
+@pytest.mark.anyio
+async def test_api_statements_get_with_no_matching_statement(
+    client, insert_statements_and_monkeypatch_backend, basic_auth_credentials
 ):
     """Test the get statements API route, given a query yielding no matching statement,
     should return an empty list.
@@ -663,7 +692,7 @@ def test_api_statements_get_with_no_matching_statement(
     ]
     insert_statements_and_monkeypatch_backend(statements)
 
-    response = client.get(
+    response = await client.get(
         "/xAPI/statements/?statementId=66c81e98-1763-4730-8cfc-f5ab34f1bad5",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
@@ -672,8 +701,9 @@ def test_api_statements_get_with_no_matching_statement(
     assert response.json() == {"statements": []}
 
 
-def test_api_statements_get_with_database_query_failure(
-    basic_auth_credentials, monkeypatch
+@pytest.mark.anyio
+async def test_api_statements_get_with_database_query_failure(
+    client, basic_auth_credentials, monkeypatch
 ):
     """Test the get statements API route, given a query raising a BackendException,
     should return an error response with HTTP code 500.
@@ -689,7 +719,7 @@ def test_api_statements_get_with_database_query_failure(
         mock_query_statements,
     )
 
-    response = client.get(
+    response = await client.get(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
@@ -697,15 +727,18 @@ def test_api_statements_get_with_database_query_failure(
     assert response.json() == {"detail": "xAPI statements query failed"}
 
 
+@pytest.mark.anyio
 @pytest.mark.parametrize("id_param", ["statementId", "voidedStatementId"])
-def test_api_statements_get_invalid_query_parameters(basic_auth_credentials, id_param):
+async def test_api_statements_get_invalid_query_parameters(
+    client, basic_auth_credentials, id_param
+):
     """Test error response for invalid query parameters"""
 
     id_1 = "be67b160-d958-4f51-b8b8-1892002dbac6"
     id_2 = "66c81e98-1763-4730-8cfc-f5ab34f1bad5"
 
     # Check for 400 status code when unknown parameters are provided
-    response = client.get(
+    response = await client.get(
         "/xAPI/statements/?mamamia=herewegoagain",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
@@ -715,7 +748,7 @@ def test_api_statements_get_invalid_query_parameters(basic_auth_credentials, id_
     }
 
     # Check for 400 status code when both statementId and voidedStatementId are provided
-    response = client.get(
+    response = await client.get(
         f"/xAPI/statements/?statementId={id_1}&voidedStatementId={id_2}",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
@@ -727,7 +760,7 @@ def test_api_statements_get_invalid_query_parameters(basic_auth_credentials, id_
         ("agent", json.dumps(mock_agent("mbox", 1))),
         ("verb", "verb_1"),
     ]:
-        response = client.get(
+        response = await client.get(
             f"/xAPI/statements/?{id_param}={id_1}&{invalid_param}={value}",
             headers={"Authorization": f"Basic {basic_auth_credentials}"},
         )
@@ -741,13 +774,14 @@ def test_api_statements_get_invalid_query_parameters(basic_auth_credentials, id_
 
     # Check for NO 400 status code when statementId is passed with authorized parameters
     for valid_param, value in [("format", "ids"), ("attachments", "true")]:
-        response = client.get(
+        response = await client.get(
             f"/xAPI/statements/?{id_param}={id_1}&{valid_param}={value}",
             headers={"Authorization": f"Basic {basic_auth_credentials}"},
         )
         assert response.status_code != 400
 
 
+@pytest.mark.anyio
 @responses.activate
 @pytest.mark.parametrize("auth_method", ["basic", "oidc"])
 @pytest.mark.parametrize(
@@ -764,8 +798,8 @@ def test_api_statements_get_invalid_query_parameters(basic_auth_credentials, id_
         ([], False),
     ],
 )
-def test_api_statements_get_scopes(
-    monkeypatch, fs, es, auth_method, scopes, is_authorized
+async def test_api_statements_get_scopes(
+    client, monkeypatch, fs, es, auth_method, scopes, is_authorized
 ):
     """Test that getting statements behaves properly according to user scopes."""
     # pylint: disable=invalid-name,too-many-locals,too-many-arguments
@@ -821,7 +855,7 @@ def test_api_statements_get_scopes(
     insert_es_statements(es, statements)
     monkeypatch.setattr(backend_client_class_path, get_es_test_backend())
 
-    response = client.get(
+    response = await client.get(
         "/xAPI/statements/",
         headers=headers,
     )
@@ -838,6 +872,7 @@ def test_api_statements_get_scopes(
     app.dependency_overrides.pop(get_authenticated_user, None)
 
 
+@pytest.mark.anyio
 @pytest.mark.parametrize(
     "scopes,read_all_access",
     [
@@ -847,15 +882,15 @@ def test_api_statements_get_scopes(
         (["statements/read/mine"], False),
     ],
 )
-def test_api_statements_get_scopes_with_authority(
-    monkeypatch, fs, es, scopes, read_all_access
+async def test_api_statements_get_scopes_with_authority(
+    client, monkeypatch, fs, es, scopes, read_all_access
 ):
     """Test that restricting by scope and by authority behaves properly.
     Getting statements should be restricted to mine for users which only have
     `statements/read/mine` scope but should not be restricted when the user
     has wider scopes.
     """
-    # pylint: disable=invalid-name
+    # pylint: disable=invalid-name,too-many-arguments
     monkeypatch.setattr(
         "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_AUTHORITY", True
     )
@@ -893,7 +928,7 @@ def test_api_statements_get_scopes_with_authority(
     insert_es_statements(es, statements)
     monkeypatch.setattr(backend_client_class_path, get_es_test_backend())
 
-    response = client.get(
+    response = await client.get(
         "/xAPI/statements/",
         headers=headers,
     )

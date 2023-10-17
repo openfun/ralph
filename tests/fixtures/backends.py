@@ -107,7 +107,7 @@ def get_clickhouse_test_backend():
 
 @lru_cache
 def get_es_test_backend():
-    """Returns a ESLRSBackend backend instance using test defaults."""
+    """Return a ESLRSBackend backend instance using test defaults."""
     settings = ESLRSBackend.settings_class(
         HOSTS=ES_TEST_HOSTS, DEFAULT_INDEX=ES_TEST_INDEX
     )
@@ -115,14 +115,48 @@ def get_es_test_backend():
 
 
 @lru_cache
+def get_async_es_test_backend(index: str = ES_TEST_INDEX):
+    """Return an AsyncESLRSBackend backend instance using test defaults."""
+    settings = AsyncESLRSBackend.settings_class(
+        ALLOW_YELLOW_STATUS=False,
+        CLIENT_OPTIONS={"ca_certs": None, "verify_certs": None},
+        DEFAULT_CHUNK_SIZE=500,
+        DEFAULT_INDEX=index,
+        HOSTS=ES_TEST_HOSTS,
+        LOCALE_ENCODING="utf8",
+        POINT_IN_TIME_KEEP_ALIVE="1m",
+        REFRESH_AFTER_WRITE=True,
+    )
+    return AsyncESLRSBackend(settings)
+
+
+@lru_cache
 def get_mongo_test_backend():
-    """Returns a MongoDatabase backend instance using test defaults."""
+    """Return a MongoDatabase backend instance using test defaults."""
     settings = MongoLRSBackend.settings_class(
         CONNECTION_URI=MONGO_TEST_CONNECTION_URI,
         DEFAULT_DATABASE=MONGO_TEST_DATABASE,
         DEFAULT_COLLECTION=MONGO_TEST_COLLECTION,
     )
     return MongoLRSBackend(settings)
+
+
+@lru_cache
+def get_async_mongo_test_backend(
+    connection_uri: str = MONGO_TEST_CONNECTION_URI,
+    default_collection: str = MONGO_TEST_COLLECTION,
+    client_options: dict = None,
+):
+    """Return an AsyncMongoDatabase backend instance using test defaults."""
+    settings = AsyncMongoLRSBackend.settings_class(
+        CONNECTION_URI=connection_uri,
+        DEFAULT_DATABASE=MONGO_TEST_DATABASE,
+        DEFAULT_COLLECTION=default_collection,
+        CLIENT_OPTIONS=client_options if client_options else {},
+        DEFAULT_CHUNK_SIZE=500,
+        LOCALE_ENCODING="utf8",
+    )
+    return AsyncMongoLRSBackend(settings)
 
 
 def get_es_fixture(host=ES_TEST_HOSTS, index=ES_TEST_INDEX):
@@ -191,7 +225,7 @@ def fs_lrs_backend(fs, settings_fs):
     return get_fs_lrs_backend
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def anyio_backend():
     """Select asyncio backend for pytest anyio."""
     return "asyncio"
@@ -222,25 +256,11 @@ def async_mongo_backend():
 
 @pytest.fixture
 def async_mongo_lrs_backend():
-    """Return the `async_get_mongo_lrs_backend` function."""
+    """Return the `get_async_mongo_test_backend` function."""
 
-    def async_get_mongo_lrs_backend(
-        connection_uri: str = MONGO_TEST_CONNECTION_URI,
-        default_collection: str = MONGO_TEST_COLLECTION,
-        client_options: dict = None,
-    ):
-        """Return an instance of AsyncMongoLRSBackend."""
-        settings = AsyncMongoLRSBackend.settings_class(
-            CONNECTION_URI=connection_uri,
-            DEFAULT_DATABASE=MONGO_TEST_DATABASE,
-            DEFAULT_COLLECTION=default_collection,
-            CLIENT_OPTIONS=client_options if client_options else {},
-            DEFAULT_CHUNK_SIZE=500,
-            LOCALE_ENCODING="utf8",
-        )
-        return AsyncMongoLRSBackend(settings)
+    get_async_mongo_test_backend.cache_clear()
 
-    return async_get_mongo_lrs_backend
+    return get_async_mongo_test_backend
 
 
 def get_mongo_fixture(
@@ -488,24 +508,11 @@ def async_es_backend():
 
 @pytest.fixture
 def async_es_lrs_backend():
-    """Return the `get_async_es_lrs_backend` function."""
-    # pylint: disable=invalid-name,redefined-outer-name,unused-argument
+    """Return the `get_async_es_test_backend` function."""
 
-    def get_async_es_lrs_backend(index: str = ES_TEST_INDEX):
-        """Return an instance of AsyncESLRSBackend."""
-        settings = AsyncESLRSBackend.settings_class(
-            ALLOW_YELLOW_STATUS=False,
-            CLIENT_OPTIONS={"ca_certs": None, "verify_certs": None},
-            DEFAULT_CHUNK_SIZE=500,
-            DEFAULT_INDEX=index,
-            HOSTS=ES_TEST_HOSTS,
-            LOCALE_ENCODING="utf8",
-            POINT_IN_TIME_KEEP_ALIVE="1m",
-            REFRESH_AFTER_WRITE=True,
-        )
-        return AsyncESLRSBackend(settings)
+    get_async_es_test_backend.cache_clear()
 
-    return get_async_es_lrs_backend
+    return get_async_es_test_backend
 
 
 @pytest.fixture
