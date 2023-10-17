@@ -52,7 +52,7 @@ def test_backends_data_es_data_backend_default_instantiation(monkeypatch, fs):
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__ES__{name}", raising=False)
 
     assert ESDataBackend.name == "es"
-    assert ESDataBackend.query_model == ESQuery
+    assert ESDataBackend.query_class == ESQuery
     assert ESDataBackend.default_operation_type == BaseOperationType.INDEX
     assert ESDataBackend.settings_class == ESDataBackendSettings
     backend = ESDataBackend()
@@ -415,7 +415,7 @@ def test_backends_data_es_data_backend_read_method_with_query(es, es_backend, ca
             list(backend.read(query={"not_query": "foo"}))
 
     assert (
-        "ralph.backends.data.base",
+        "ralph.backends.data.es",
         logging.ERROR,
         "The 'query' argument is expected to be a ESQuery instance. "
         "[{'loc': ('not_query',), 'msg': 'extra fields not permitted', "
@@ -554,7 +554,7 @@ def test_backends_data_es_data_backend_write_method_with_append_operation(
     should raise a `BackendParameterException`.
     """
     backend = es_backend()
-    msg = "Append operation_type is not supported."
+    msg = "Append operation_type is not allowed."
     with pytest.raises(BackendParameterException, match=msg):
         with caplog.at_level(logging.ERROR):
             backend.write(data=[{}], operation_type=BaseOperationType.APPEND)
@@ -562,7 +562,7 @@ def test_backends_data_es_data_backend_write_method_with_append_operation(
     assert (
         "ralph.backends.data.es",
         logging.ERROR,
-        "Append operation_type is not supported.",
+        "Append operation_type is not allowed.",
     ) in caplog.record_tuples
 
     backend.close()
@@ -655,7 +655,7 @@ def test_backends_data_es_data_backend_write_method_without_ignore_errors(
     # By default, we should raise an error and stop the importation.
     msg = (
         r"Failed to decode JSON: Expecting value: line 1 column 1 \(char 0\), "
-        r"for document: b'This is invalid JSON'"
+        r"for document: b'This is invalid JSON', at line 1"
     )
     with pytest.raises(BackendException, match=msg):
         with caplog.at_level(logging.ERROR):

@@ -5,7 +5,8 @@ import logging
 from abc import abstractmethod
 from enum import Enum, unique
 from io import IOBase
-from typing import Iterable, Iterator, Union
+from itertools import chain
+from typing import Iterable, Iterator, Set, Type, Union
 
 from pydantic import BaseModel, ValidationError
 
@@ -26,6 +27,9 @@ class BaseDataBackendSettings(BaseBackendSettings):
         """Pydantic Configuration."""
 
         env_prefix = "RALPH_BACKENDS__DATA__"
+
+    DEFAULT_CHUNK_SIZE: int = 500
+    LOCALE_ENCODING: str = "utf8"
 
 
 class BaseQuery(BaseModel):
@@ -67,6 +71,37 @@ class DataBackendStatus(Enum):
     ERROR = "error"
 
 
+def validate_backend_query(
+    query: Union[str, dict, BaseQuery, None],
+    query_class: Type[BaseQuery],
+    logger_: logging.Logger,
+) -> BaseQuery:
+    """Validate and transform the backend query."""
+    if query is None:
+        return query_class()
+
+    if isinstance(query, str):
+        return query_class(query_string=query)
+
+    if isinstance(query, dict):
+        try:
+            return query_class(**query)
+        except ValidationError as error:
+            msg = "The 'query' argument is expected to be a %s instance. %s"
+            name = query_class.__name__
+            errors = error.errors()
+            logger_.error(msg, name, errors)
+            raise BackendParameterException(msg % (name, errors)) from error
+
+    if isinstance(query, query_class):
+        return query
+
+    msg = "The 'query' argument is expected to be a %s instance."
+    logger_.error(msg, query_class.__name__)
+    raise BackendParameterException(msg % (query_class.__name__,))
+
+
+# Replaced by `validate_backend_query`
 def enforce_query_checks(method):
     """Enforce query argument type checking for methods using it."""
 
@@ -86,10 +121,15 @@ class BaseDataBackend(BaseBackend):
 
     type = "data"
     name = "base"
+    logger = logger
+    query_class = BaseQuery  # we rename query_model to query_class
     query_model = BaseQuery
-    default_operation_type = BaseOperationType.INDEX
+    default_operation_type: BaseOperationType = BaseOperationType.INDEX
+    unsupported_operation_types: Set[BaseOperationType] = set()
     settings_class = BaseDataBackendSettings
+    settings: settings_class
 
+    # This method is replaced by validate_backend_query
     def validate_query(
         self, query: Union[str, dict, BaseQuery, None] = None
     ) -> BaseQuery:
@@ -149,16 +189,16 @@ class BaseDataBackend(BaseBackend):
             BackendParameterException: If a backend argument value is not valid.
         """
 
-    @abstractmethod
-    @enforce_query_checks
     def read(
         self,
-        *,
-        query: Union[str, BaseQuery] = None,
+        *,  # We could allow positional arguments once we use validate_backend_query
+        query: Union[str, dict, query_class, None] = None,
         target: Union[str, None] = None,
         chunk_size: Union[int, None] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
+        # (uncomment once all backends use the pattern)
+        # max_statements: Union[int, None] = None,
     ) -> Iterator[Union[bytes, dict]]:
         # pylint: disable=too-many-arguments
         """Read records matching the `query` in the `target` container and yield them.
@@ -177,6 +217,7 @@ class BaseDataBackend(BaseBackend):
             ignore_errors (bool): If `True`, errors during the read operation
                 are be ignored and logged. If `False` (default), a `BackendException`
                 is raised if an error occurs.
+            max_statements: The maximum number of statements to yield.
 
         Yield:
             dict: If `raw_output` is False.
@@ -187,8 +228,42 @@ class BaseDataBackend(BaseBackend):
                 `ignore_errors` is set to `False`.
             BackendParameterException: If a backend argument value is not valid.
         """
+        chunk_size = chunk_size if chunk_size else self.settings.DEFAULT_CHUNK_SIZE
+        query = validate_backend_query(query, self.query_class, self.logger)
+        reader = self._read_bytes if raw_output else self._read_dicts
+        # pylint: disable=assignment-from-no-return
+        # NB: this pylint warning goes away once the methods are abstract
+        statements = reader(query, target, chunk_size, ignore_errors)
+        yield from statements
+        # (uncomment once all backends use the pattern)
+        # if max_statements is None:
+        #     yield from statements
+        #     return
+        # for i, statement in enumerate(statements):
+        #     if i >= max_statements:
+        #         return
+        #     yield statement
 
-    @abstractmethod
+    # @abstractmethod (uncomment once all backends use the pattern)
+    def _read_bytes(
+        self,
+        query: query_class,
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+    ) -> Iterator[bytes]:
+        """Method called by `self.read` yielding bytes. See `self.read`."""
+
+    # @abstractmethod (uncomment once all backends use the pattern)
+    def _read_dicts(
+        self,
+        query: query_class,
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+    ) -> Iterator[dict]:
+        """Method called by `self.read` yielding dictionaries. See `self.read`."""
+
     def write(  # pylint: disable=too-many-arguments
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
@@ -221,6 +296,47 @@ class BaseDataBackend(BaseBackend):
                 `ignore_errors` is set to `False`.
             BackendParameterException: If a backend argument value is not valid.
         """
+        if not operation_type:
+            operation_type = self.default_operation_type
+        if operation_type in self.unsupported_operation_types:
+            msg = f"{operation_type.value.capitalize()} operation_type is not allowed."
+            self.logger.error(msg)
+            raise BackendParameterException(msg)
+
+        data = iter(data)
+        try:
+            first_record = next(data)
+        except StopIteration:
+            self.logger.info("Data Iterator is empty; skipping write to target.")
+            return 0
+        data = chain((first_record,), data)
+
+        chunk_size = chunk_size if chunk_size else self.settings.DEFAULT_CHUNK_SIZE
+        is_bytes = isinstance(first_record, bytes)
+        writer = self._write_bytes if is_bytes else self._write_dicts
+        return writer(data, target, chunk_size, ignore_errors, operation_type)
+
+    # @abstractmethod (uncomment once all backends use the pattern)
+    def _write_bytes(  # pylint: disable=too-many-arguments
+        self,
+        data: Iterable[bytes],
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing bytes. See `self.write`."""
+
+    # @abstractmethod (uncomment once all backends use the pattern)
+    def _write_dicts(  # pylint: disable=too-many-arguments
+        self,
+        data: Iterable[dict],
+        target: Union[str, None],
+        chunk_size: int,
+        ignore_errors: bool,
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing dictionaries. See `self.write`."""
 
     @abstractmethod
     def close(self) -> None:

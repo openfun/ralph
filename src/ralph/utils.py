@@ -202,6 +202,9 @@ def statements_are_equivalent(statement_1: dict, statement_2: dict):
     return True
 
 
+# We change the implementation of parse_bytes_to_dict. The previous behavior is
+# moved to parse_bytes_to_dict to keep tests passing.
+# We want to remove this method once all backends adapt the new behavior.
 def parse_bytes_to_dict(
     raw_documents: Iterable[bytes], ignore_errors: bool, logger_class: logging.Logger
 ) -> Iterator[dict]:
@@ -218,6 +221,44 @@ def parse_bytes_to_dict(
             raise BackendException(msg % (error, raw_document)) from error
 
 
+# We change the implementation of parse_bytes_to_dict.
+# Once
+def parse_bytes_to_dict_new(
+    raw_documents: Iterable[bytes], ignore_errors: bool, logger_class: logging.Logger
+) -> Iterator[dict]:
+    """Read the `raw_documents` Iterable and yield dictionaries."""
+    for i, raw_document in enumerate(raw_documents):
+        try:
+            yield json.loads(raw_document)
+        except (TypeError, json.JSONDecodeError) as error:
+            msg = "Failed to decode JSON: %s, for document: %s, at line %s"
+            if ignore_errors:
+                logger_class.warning(msg, error, raw_document, i)
+                continue
+            logger_class.error(msg, error, raw_document, i)
+            raise BackendException(msg % (error, raw_document, i)) from error
+
+
+def parse_dict_to_bytes(
+    documents: Iterable[Dict[str, Any]],
+    encoding: str,
+    ignore_errors: bool,
+    logger_class: logging.Logger,
+) -> Iterator[bytes]:
+    """Read the `documents` Iterable with the `encoding` and yield bytes."""
+    for document in documents:
+        try:
+            yield bytes(f"{json.dumps(document)}\n", encoding=encoding)
+        except (TypeError, ValueError) as error:
+            msg = "Failed to convert document to bytes: %s, for document: %s"
+            if ignore_errors:
+                logger_class.warning(msg, error, document)
+                continue
+            logger_class.error(msg, error, document)
+            raise BackendException(msg % (error, document)) from error
+
+
+# parse_dict_to_bytes replaces `read_raw`` (read_raw will be removed)
 def read_raw(
     documents: Iterable[Dict[str, Any]],
     encoding: str,
