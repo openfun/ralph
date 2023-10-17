@@ -205,44 +205,47 @@ def backends_options(name=None, backend_types: List[BaseModel] = None):
 
     def wrapper(command):
         backend_names = []
-        for backend_type in backend_types:
-            for backend_name, backend in backend_type:
-                backend_name = backend_name.lower()
-                backend_names.append(backend_name)
-                for field_name, field in backend:
-                    field_type = backend.__fields__[field_name].type_
-                    field_name = f"{backend_name}-{field_name.lower()}".replace(
-                        "_", "-"
-                    )
-                    option = f"--{field_name}"
-                    option_kwargs = {}
-                    # If the field is a boolean, convert it to a flag option
-                    if field_type is bool:
-                        option = f"{option}/--no-{field_name}"
-                        option_kwargs["is_flag"] = True
-                    elif field_type is dict:
-                        option_kwargs["type"] = CommaSeparatedKeyValueParamType()
-                    elif field_type is CommaSeparatedTuple:
-                        option_kwargs["type"] = CommaSeparatedTupleParamType()
-                    elif isclass(field_type) and issubclass(field_type, ClientOptions):
-                        option_kwargs["type"] = ClientOptionsParamType(field_type)
-                    elif isclass(field_type) and issubclass(
-                        field_type, HeadersParameters
-                    ):
-                        option_kwargs["type"] = HeadersParametersParamType(field_type)
-                    elif field_type is Path:
-                        option_kwargs["type"] = click.Path()
+        for backend_name, backend in sorted(
+            [
+                name_backend
+                for backend_type in backend_types
+                for name_backend in backend_type
+            ],
+            key=lambda x: x[0],
+            reverse=True,
+        ):
+            backend_name = backend_name.lower()
+            backend_names.append(backend_name)
+            for field_name, field in sorted(backend, key=lambda x: x[0], reverse=True):
+                field_type = backend.__fields__[field_name].type_
+                field_name = f"{backend_name}-{field_name.lower()}".replace("_", "-")
+                option = f"--{field_name}"
+                option_kwargs = {}
+                # If the field is a boolean, convert it to a flag option
+                if field_type is bool:
+                    option = f"{option}/--no-{field_name}"
+                    option_kwargs["is_flag"] = True
+                elif field_type is dict:
+                    option_kwargs["type"] = CommaSeparatedKeyValueParamType()
+                elif field_type is CommaSeparatedTuple:
+                    option_kwargs["type"] = CommaSeparatedTupleParamType()
+                elif isclass(field_type) and issubclass(field_type, ClientOptions):
+                    option_kwargs["type"] = ClientOptionsParamType(field_type)
+                elif isclass(field_type) and issubclass(field_type, HeadersParameters):
+                    option_kwargs["type"] = HeadersParametersParamType(field_type)
+                elif field_type is Path:
+                    option_kwargs["type"] = click.Path()
 
-                    command = optgroup.option(
-                        option.lower(), default=field, **option_kwargs
-                    )(command)
+                command = optgroup.option(
+                    option.lower(), default=field, **option_kwargs
+                )(command)
 
-                command = (optgroup.group(f"{backend_name} backend"))(command)
+            command = (optgroup.group(f"{backend_name} backend"))(command)
 
         command = click.option(
             "-b",
             "--backend",
-            type=click.Choice(backend_names),
+            type=click.Choice(sorted(backend_names)),
             required=True,
             help="Backend",
         )(command)
