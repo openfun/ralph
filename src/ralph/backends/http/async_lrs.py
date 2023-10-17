@@ -335,7 +335,6 @@ class AsyncLRSHTTPBackend(BaseHTTPBackend):
             while True:
                 response = await client.get(target, params=query_params)
                 response.raise_for_status()
-
                 statements_response = StatementResponse.parse_obj(response.json())
                 statements = statements_response.statements
                 statements = (
@@ -370,7 +369,6 @@ class AsyncLRSHTTPBackend(BaseHTTPBackend):
                     target=target, raw_output=raw_output, query_params=query_params
                 ):
                     await queue.put(statement)
-
             # Re-raising exceptions is necessary as create_task fails silently
             except Exception as exception:
                 # None signals that the queue is done

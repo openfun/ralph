@@ -253,20 +253,19 @@ async def test_backends_http_lrs_read_max_statements(
         json=statements,
     )
 
-    if (max_statements is None) or (max_statements > chunk_size):
-        default_params.update(dict(parse_qsl(urlparse(more_target).query)))
-        httpx_mock.add_response(
-            url=ParseResult(
-                scheme=urlparse(base_url).scheme,
-                netloc=urlparse(base_url).netloc,
-                path=urlparse(more_target).path,
-                query=urlencode(default_params).lower(),
-                params="",
-                fragment="",
-            ).geturl(),
-            method="GET",
-            json=more_statements,
-        )
+    default_params.update(dict(parse_qsl(urlparse(more_target).query)))
+    httpx_mock.add_response(
+        url=ParseResult(
+            scheme=urlparse(base_url).scheme,
+            netloc=urlparse(base_url).netloc,
+            path=urlparse(more_target).path,
+            query=urlencode(default_params).lower(),
+            params="",
+            fragment="",
+        ).geturl(),
+        method="GET",
+        json=more_statements,
+    )
 
     settings = AsyncLRSHTTPBackend.settings_class(
         BASE_URL=base_url, USERNAME="user", PASSWORD="pass"

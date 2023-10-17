@@ -5,7 +5,6 @@ from uuid import uuid4
 
 import pytest
 import responses
-from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
 from ralph.api import app
@@ -26,6 +25,8 @@ from tests.fixtures.backends import (
     MONGO_TEST_FORWARDING_COLLECTION,
     RUNSERVER_TEST_HOST,
     RUNSERVER_TEST_PORT,
+    get_async_es_test_backend,
+    get_async_mongo_test_backend,
     get_clickhouse_test_backend,
     get_es_test_backend,
     get_mongo_test_backend,
@@ -39,16 +40,15 @@ from ..helpers import (
     string_is_uuid,
 )
 
-client = TestClient(app)
 
-
-def test_api_statements_post_invalid_parameters(basic_auth_credentials):
+@pytest.mark.anyio
+async def test_api_statements_post_invalid_parameters(client, basic_auth_credentials):
     """Test that using invalid parameters returns the proper status code."""
 
     statement = mock_statement()
 
     # Check for 400 status code when unknown parameters are provided
-    response = client.post(
+    response = await client.post(
         "/xAPI/statements/?mamamia=herewegoagain",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=statement,
@@ -59,13 +59,20 @@ def test_api_statements_post_invalid_parameters(basic_auth_credentials):
     }
 
 
+@pytest.mark.anyio
 @pytest.mark.parametrize(
     "backend",
-    [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
+    [
+        get_async_es_test_backend,
+        get_async_mongo_test_backend,
+        get_es_test_backend,
+        get_clickhouse_test_backend,
+        get_mongo_test_backend,
+    ],
 )
 # pylint: disable=too-many-arguments
-def test_api_statements_post_single_statement_directly(
-    backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
+async def test_api_statements_post_single_statement_directly(
+    client, backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
     """Test the post statements API route with one statement."""
     # pylint: disable=invalid-name,unused-argument
@@ -73,7 +80,7 @@ def test_api_statements_post_single_statement_directly(
     monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
     statement = mock_statement()
 
-    response = client.post(
+    response = await client.post(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=statement,
@@ -84,7 +91,7 @@ def test_api_statements_post_single_statement_directly(
 
     es.indices.refresh()
 
-    response = client.get(
+    response = await client.get(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
@@ -94,12 +101,12 @@ def test_api_statements_post_single_statement_directly(
     )
 
 
-# pylint: disable=too-many-arguments
-def test_api_statements_post_enriching_without_existing_values(
-    monkeypatch, basic_auth_credentials, es
+@pytest.mark.anyio
+async def test_api_statements_post_enriching_without_existing_values(
+    client, monkeypatch, basic_auth_credentials, es
 ):
     """Test that statements are properly enriched when statement provides no values."""
-    # pylint: disable=invalid-name,unused-argument
+    # pylint: disable=invalid-name
 
     monkeypatch.setattr(
         "ralph.api.routers.statements.BACKEND_CLIENT", get_es_test_backend()
@@ -116,7 +123,7 @@ def test_api_statements_post_enriching_without_existing_values(
         "verb": {"id": "https://example.com/verb-id/1/"},
     }
 
-    response = client.post(
+    response = await client.post(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=statement,
@@ -126,7 +133,7 @@ def test_api_statements_post_enriching_without_existing_values(
 
     es.indices.refresh()
 
-    response = client.get(
+    response = await client.get(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
@@ -150,6 +157,7 @@ def test_api_statements_post_enriching_without_existing_values(
     assert statement["authority"] == {"mbox": "mailto:test_ralph@example.com"}
 
 
+@pytest.mark.anyio
 @pytest.mark.parametrize(
     "field,value,status",
     [
@@ -159,12 +167,11 @@ def test_api_statements_post_enriching_without_existing_values(
         ("authority", {"mbox": "mailto:test_ralph@example.com"}, 200),
     ],
 )
-# pylint: disable=too-many-arguments
-def test_api_statements_post_enriching_with_existing_values(
-    field, value, status, monkeypatch, basic_auth_credentials, es
+async def test_api_statements_post_enriching_with_existing_values(
+    client, field, value, status, monkeypatch, basic_auth_credentials, es
 ):
     """Test that statements are properly enriched when values are provided."""
-    # pylint: disable=invalid-name,unused-argument
+    # pylint: disable=invalid-name,unused-argument,too-many-arguments
 
     monkeypatch.setattr(
         "ralph.api.routers.statements.BACKEND_CLIENT", get_es_test_backend()
@@ -174,7 +181,7 @@ def test_api_statements_post_enriching_with_existing_values(
     # Add the field to be tested
     statement[field] = value
 
-    response = client.post(
+    response = await client.post(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=statement,
@@ -185,7 +192,7 @@ def test_api_statements_post_enriching_with_existing_values(
     # Check that values match when they should
     if status == 200:
         es.indices.refresh()
-        response = client.get(
+        response = await client.get(
             "/xAPI/statements/",
             headers={"Authorization": f"Basic {basic_auth_credentials}"},
         )
@@ -201,21 +208,27 @@ def test_api_statements_post_enriching_with_existing_values(
             assert statement[field] == value
 
 
+@pytest.mark.anyio
 @pytest.mark.parametrize(
     "backend",
-    [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
+    [
+        get_async_es_test_backend,
+        get_async_mongo_test_backend,
+        get_es_test_backend,
+        get_clickhouse_test_backend,
+        get_mongo_test_backend,
+    ],
 )
-# pylint: disable=too-many-arguments
-def test_api_statements_post_single_statement_no_trailing_slash(
-    backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
+async def test_api_statements_post_single_statement_no_trailing_slash(
+    client, backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
     """Test that the statements endpoint also works without the trailing slash."""
-    # pylint: disable=invalid-name,unused-argument
+    # pylint: disable=invalid-name,unused-argument,too-many-arguments
 
     monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
     statement = mock_statement()
 
-    response = client.post(
+    response = await client.post(
         "/xAPI/statements",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=statement,
@@ -225,21 +238,27 @@ def test_api_statements_post_single_statement_no_trailing_slash(
     assert response.json() == [statement["id"]]
 
 
+@pytest.mark.anyio
 @pytest.mark.parametrize(
     "backend",
-    [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
+    [
+        get_async_es_test_backend,
+        get_async_mongo_test_backend,
+        get_es_test_backend,
+        get_clickhouse_test_backend,
+        get_mongo_test_backend,
+    ],
 )
-# pylint: disable=too-many-arguments
-def test_api_statements_post_list_of_one(
-    backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
+async def test_api_statements_post_list_of_one(
+    client, backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
     """Test the post statements API route with one statement in a list."""
-    # pylint: disable=invalid-name,unused-argument
+    # pylint: disable=invalid-name,unused-argument,too-many-arguments
 
     monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
     statement = mock_statement()
 
-    response = client.post(
+    response = await client.post(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=[statement],
@@ -249,7 +268,7 @@ def test_api_statements_post_list_of_one(
     assert response.json() == [statement["id"]]
     es.indices.refresh()
 
-    response = client.get(
+    response = await client.get(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
@@ -259,16 +278,22 @@ def test_api_statements_post_list_of_one(
     )
 
 
+@pytest.mark.anyio
 @pytest.mark.parametrize(
     "backend",
-    [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
+    [
+        get_async_es_test_backend,
+        get_async_mongo_test_backend,
+        get_es_test_backend,
+        get_clickhouse_test_backend,
+        get_mongo_test_backend,
+    ],
 )
-# pylint: disable=too-many-arguments
-def test_api_statements_post_list(
-    backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
+async def test_api_statements_post_list(
+    client, backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
     """Test the post statements API route with two statements in a list."""
-    # pylint: disable=invalid-name,unused-argument
+    # pylint: disable=invalid-name,unused-argument,too-many-arguments
 
     monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
 
@@ -280,7 +305,7 @@ def test_api_statements_post_list(
 
     statements = [statement_1, statement_2]
 
-    response = client.post(
+    response = await client.post(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=statements,
@@ -293,7 +318,7 @@ def test_api_statements_post_list(
     assert regex.match(generated_id)
     es.indices.refresh()
 
-    get_response = client.get(
+    get_response = await client.get(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
@@ -307,25 +332,33 @@ def test_api_statements_post_list(
     )
 
 
+@pytest.mark.anyio
 @pytest.mark.parametrize(
     "backend",
     [
+        get_async_es_test_backend,
+        get_async_mongo_test_backend,
         get_es_test_backend,
         get_clickhouse_test_backend,
         get_mongo_test_backend,
     ],
 )
-# pylint: disable=too-many-arguments
-def test_api_statements_post_list_with_duplicates(
-    backend, monkeypatch, basic_auth_credentials, es_data_stream, mongo, clickhouse
+async def test_api_statements_post_list_with_duplicates(
+    client,
+    backend,
+    monkeypatch,
+    basic_auth_credentials,
+    es_data_stream,
+    mongo,
+    clickhouse,
 ):
     """Test the post statements API route with duplicate statement IDs should fail."""
-    # pylint: disable=invalid-name,unused-argument
+    # pylint: disable=invalid-name,unused-argument,too-many-arguments
 
     monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
     statement = mock_statement()
 
-    response = client.post(
+    response = await client.post(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=[statement, statement],
@@ -337,7 +370,7 @@ def test_api_statements_post_list_with_duplicates(
     }
     # The failure should imply no statement insertion.
     es_data_stream.indices.refresh()
-    response = client.get(
+    response = await client.get(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
@@ -345,18 +378,24 @@ def test_api_statements_post_list_with_duplicates(
     assert response.json() == {"statements": []}
 
 
+@pytest.mark.anyio
 @pytest.mark.parametrize(
     "backend",
-    [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
+    [
+        get_async_es_test_backend,
+        get_async_mongo_test_backend,
+        get_es_test_backend,
+        get_clickhouse_test_backend,
+        get_mongo_test_backend,
+    ],
 )
-# pylint: disable=too-many-arguments
-def test_api_statements_post_list_with_duplicate_of_existing_statement(
-    backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
+async def test_api_statements_post_list_with_duplicate_of_existing_statement(
+    client, backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
     """Test the post statements API route, given a statement that already exist in the
     database (has the same ID), should fail.
     """
-    # pylint: disable=invalid-name,unused-argument
+    # pylint: disable=invalid-name,unused-argument,too-many-arguments
 
     monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
 
@@ -364,7 +403,7 @@ def test_api_statements_post_list_with_duplicate_of_existing_statement(
     statement = mock_statement(id_=statement_uuid)
 
     # Post the statement once.
-    response = client.post(
+    response = await client.post(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=statement,
@@ -376,7 +415,7 @@ def test_api_statements_post_list_with_duplicate_of_existing_statement(
 
     # Post the statement twice, the data is identical so it should succeed but not
     # include the ID in the response as it wasn't inserted.
-    response = client.post(
+    response = await client.post(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=statement,
@@ -386,7 +425,7 @@ def test_api_statements_post_list_with_duplicate_of_existing_statement(
     es.indices.refresh()
 
     # Post the statement again, trying to change the timestamp which is not allowed.
-    response = client.post(
+    response = await client.post(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=[dict(statement, **{"timestamp": "2023-03-15T14:07:51Z"})],
@@ -398,7 +437,7 @@ def test_api_statements_post_list_with_duplicate_of_existing_statement(
         f"{statement_uuid}"
     }
 
-    response = client.get(
+    response = await client.get(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
@@ -408,17 +447,24 @@ def test_api_statements_post_list_with_duplicate_of_existing_statement(
     )
 
 
+@pytest.mark.anyio
 @pytest.mark.parametrize(
     "backend",
-    [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
+    [
+        get_async_es_test_backend,
+        get_async_mongo_test_backend,
+        get_es_test_backend,
+        get_clickhouse_test_backend,
+        get_mongo_test_backend,
+    ],
 )
-def test_api_statements_post_with_failure_during_storage(
-    backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
+async def test_api_statements_post_with_failure_during_storage(
+    client, backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
     """Test the post statements API route with a failure happening during storage."""
-    # pylint: disable=invalid-name,unused-argument, too-many-arguments
+    # pylint: disable=invalid-name,unused-argument,too-many-arguments
 
-    def write_mock(*args, **kwargs):
+    async def write_mock(*args, **kwargs):
         """Raises an exception. Mocks the database.write method."""
         raise BackendException()
 
@@ -427,7 +473,7 @@ def test_api_statements_post_with_failure_during_storage(
     monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend_instance)
     statement = mock_statement()
 
-    response = client.post(
+    response = await client.post(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=statement,
@@ -437,12 +483,19 @@ def test_api_statements_post_with_failure_during_storage(
     assert response.json() == {"detail": "Statements bulk indexation failed"}
 
 
+@pytest.mark.anyio
 @pytest.mark.parametrize(
     "backend",
-    [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
+    [
+        get_async_es_test_backend,
+        get_async_mongo_test_backend,
+        get_es_test_backend,
+        get_clickhouse_test_backend,
+        get_mongo_test_backend,
+    ],
 )
-def test_api_statements_post_with_failure_during_id_query(
-    backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
+async def test_api_statements_post_with_failure_during_id_query(
+    client, backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
     """Test the post statements API route with a failure during query execution."""
     # pylint: disable=invalid-name,unused-argument,too-many-arguments
@@ -458,7 +511,7 @@ def test_api_statements_post_with_failure_during_id_query(
     monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend_instance)
     statement = mock_statement()
 
-    response = client.post(
+    response = await client.post(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=statement,
@@ -468,22 +521,28 @@ def test_api_statements_post_with_failure_during_id_query(
     assert response.json() == {"detail": "xAPI statements query failed"}
 
 
+@pytest.mark.anyio
 @pytest.mark.parametrize(
     "backend",
-    [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
+    [
+        get_async_es_test_backend,
+        get_async_mongo_test_backend,
+        get_es_test_backend,
+        get_clickhouse_test_backend,
+        get_mongo_test_backend,
+    ],
 )
-# pylint: disable=too-many-arguments
-def test_api_statements_post_list_without_forwarding(
-    backend, basic_auth_credentials, monkeypatch, es, mongo, clickhouse
+async def test_api_statements_post_list_without_forwarding(
+    client, backend, basic_auth_credentials, monkeypatch, es, mongo, clickhouse
 ):
     """Test the post statements API route, given an empty forwarding configuration,
     should not start the forwarding background task.
     """
-    # pylint: disable=invalid-name,unused-argument
+    # pylint: disable=invalid-name,unused-argument,too-many-arguments
 
     spy = {}
 
-    def spy_mock_forward_xapi_statements(_):
+    async def spy_mock_forward_xapi_statements(_):
         """Mock the forward_xapi_statements; spies over whether it has been called."""
         spy["error"] = "forward_xapi_statements should not have been called!"
 
@@ -498,7 +557,7 @@ def test_api_statements_post_list_without_forwarding(
 
     statement = mock_statement()
 
-    response = client.post(
+    response = await client.post(
         "/xAPI/statements/",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=statement,
@@ -508,9 +567,13 @@ def test_api_statements_post_list_without_forwarding(
     assert "error" not in spy
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 @pytest.mark.parametrize(
-    "receiving_backend", [get_es_test_backend, get_mongo_test_backend]
+    "receiving_backend",
+    [
+        get_es_test_backend,
+        get_mongo_test_backend,
+    ],
 )
 @pytest.mark.parametrize(
     "forwarding_backend",
@@ -555,10 +618,11 @@ async def test_api_statements_post_list_with_forwarding(
         receiving_patch.setattr(
             "ralph.api.forwarding.get_active_xapi_forwardings", lambda: []
         )
-        # Receiving client should use the receiving Elasticsearch client for storage
+        # Receiving client should use the receiving backend for storage
         receiving_patch.setattr(
             "ralph.api.routers.statements.BACKEND_CLIENT", receiving_backend()
         )
+
         lrs_context = lrs(app)
         # Start receiving LRS client
         await lrs_context.__aenter__()  # pylint: disable=unnecessary-dunder-call
@@ -629,6 +693,7 @@ async def test_api_statements_post_list_with_forwarding(
     await lrs_context.__aexit__(None, None, None)
 
 
+@pytest.mark.anyio
 @responses.activate
 @pytest.mark.parametrize("auth_method", ["basic", "oidc"])
 @pytest.mark.parametrize(
@@ -642,11 +707,11 @@ async def test_api_statements_post_list_with_forwarding(
         ([], False),
     ],
 )
-def test_api_statements_post_scopes(
-    monkeypatch, fs, es, auth_method, scopes, is_authorized
+async def test_api_statements_post_scopes(
+    client, monkeypatch, fs, es, auth_method, scopes, is_authorized
 ):
     """Test that posting statements behaves properly according to user scopes."""
-    # pylint: disable=invalid-name,unused-argument
+    # pylint: disable=invalid-name,unused-argument,too-many-arguments
     monkeypatch.setattr(
         "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_SCOPES", True
     )
@@ -683,7 +748,7 @@ def test_api_statements_post_scopes(
     backend_client_class_path = "ralph.api.routers.statements.BACKEND_CLIENT"
     monkeypatch.setattr(backend_client_class_path, get_es_test_backend())
 
-    response = client.post(
+    response = await client.post(
         "/xAPI/statements/",
         headers=headers,
         json=statement,
