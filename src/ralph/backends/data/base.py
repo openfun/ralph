@@ -6,7 +6,7 @@ from abc import abstractmethod
 from enum import Enum, unique
 from io import IOBase
 from itertools import chain
-from typing import Iterable, Iterator, Set, Type, Union
+from typing import Generic, Iterable, Iterator, Set, Type, TypeVar, Union
 
 from pydantic import BaseModel, ValidationError
 
@@ -71,11 +71,15 @@ class DataBackendStatus(Enum):
     ERROR = "error"
 
 
+Settings = TypeVar("Settings", bound=BaseDataBackendSettings)
+Query = TypeVar("Query", bound=BaseQuery)
+
+
 def validate_backend_query(
-    query: Union[str, dict, BaseQuery, None],
-    query_class: Type[BaseQuery],
+    query: Union[str, dict, Query, None],
+    query_class: Type[Query],
     logger_: logging.Logger,
-) -> BaseQuery:
+) -> Query:
     """Validate and transform the backend query."""
     if query is None:
         return query_class()
@@ -116,18 +120,25 @@ def enforce_query_checks(method):
     return wrapper
 
 
-class BaseDataBackend(BaseBackend):
+class BaseDataBackend(Generic[Settings, Query], BaseBackend[Settings]):
     """Base data backend interface."""
 
     type = "data"
     name = "base"
     logger = logger
-    query_class = BaseQuery  # we rename query_model to query_class
+    query_class: Type[Query]  # we rename query_model to query_class
     query_model = BaseQuery
     default_operation_type: BaseOperationType = BaseOperationType.INDEX
     unsupported_operation_types: Set[BaseOperationType] = set()
-    settings_class = BaseDataBackendSettings
-    settings: settings_class
+
+    def __init_subclass__(cls, **kwargs):  # noqa: D105
+        super().__init_subclass__(**kwargs)
+        # pylint: disable=no-member
+        # To let generic backends co-exist with previous approach.
+        # Remove this if condition to force all backends to define generic parameters.
+        if isinstance(cls.__orig_bases__[0].__args__[0], TypeVar):
+            return
+        cls.query_class = cls.__orig_bases__[0].__args__[1]
 
     # This method is replaced by validate_backend_query
     def validate_query(
@@ -192,7 +203,7 @@ class BaseDataBackend(BaseBackend):
     def read(
         self,
         *,  # We could allow positional arguments once we use validate_backend_query
-        query: Union[str, dict, query_class, None] = None,
+        query: Union[str, dict, Query, None] = None,
         target: Union[str, None] = None,
         chunk_size: Union[int, None] = None,
         raw_output: bool = False,
@@ -247,7 +258,7 @@ class BaseDataBackend(BaseBackend):
     # @abstractmethod (uncomment once all backends use the pattern)
     def _read_bytes(
         self,
-        query: query_class,
+        query: Query,
         target: Union[str, None],
         chunk_size: int,
         ignore_errors: bool,
@@ -257,7 +268,7 @@ class BaseDataBackend(BaseBackend):
     # @abstractmethod (uncomment once all backends use the pattern)
     def _read_dicts(
         self,
-        query: query_class,
+        query: Query,
         target: Union[str, None],
         chunk_size: int,
         ignore_errors: bool,

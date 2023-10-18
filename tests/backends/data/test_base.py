@@ -3,7 +3,12 @@ import logging
 
 import pytest
 
-from ralph.backends.data.base import BaseDataBackend, BaseQuery, enforce_query_checks
+from ralph.backends.data.base import (
+    BaseDataBackend,
+    BaseDataBackendSettings,
+    BaseQuery,
+    enforce_query_checks,
+)
 from ralph.exceptions import BackendParameterException
 
 
@@ -18,7 +23,7 @@ from ralph.exceptions import BackendParameterException
 def test_backends_data_base_enforce_query_checks_with_valid_input(value, expected):
     """Test the enforce_query_checks function given valid input."""
 
-    class MockBaseDataBackend(BaseDataBackend):
+    class MockBaseDataBackend(BaseDataBackend[BaseDataBackendSettings, BaseQuery]):
         """A class mocking the base database class."""
 
         @enforce_query_checks
@@ -59,7 +64,7 @@ def test_backends_data_base_enforce_query_checks_with_invalid_input(
 ):
     """Test the enforce_query_checks function given invalid input."""
 
-    class MockBaseDataBackend(BaseDataBackend):
+    class MockBaseDataBackend(BaseDataBackend[BaseDataBackendSettings, BaseQuery]):
         """A class mocking the base database class."""
 
         @enforce_query_checks

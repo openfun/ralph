@@ -105,17 +105,14 @@ class ESQuery(BaseQuery):
     track_total_hits: Literal[False] = False
 
 
-class ESDataBackend(BaseDataBackend):
+class ESDataBackend(BaseDataBackend[ESDataBackendSettings, ESQuery]):
     """Elasticsearch data backend."""
 
     name = "es"
     unsupported_operation_types = {BaseOperationType.APPEND}
     logger = logger
-    query_class = ESQuery
-    settings_class = ESDataBackendSettings
-    settings: settings_class
 
-    def __init__(self, settings: Union[settings_class, None] = None):
+    def __init__(self, settings: Union[ESDataBackendSettings, None] = None):
         """Instantiate the Elasticsearch data backend.
 
         Args:
@@ -197,7 +194,7 @@ class ESDataBackend(BaseDataBackend):
     def read(
         self,
         *,  # We could allow positional arguments once we use validate_backend_query
-        query: Union[str, dict, query_class, None] = None,
+        query: Union[str, dict, ESQuery, None] = None,
         target: Union[str, None] = None,
         chunk_size: Union[int, None] = None,
         raw_output: bool = False,
@@ -241,7 +238,7 @@ class ESDataBackend(BaseDataBackend):
         # )
 
     def _read_bytes(
-        self, query: query_class, target: str, chunk_size: int, ignore_errors: bool
+        self, query: ESQuery, target: str, chunk_size: int, ignore_errors: bool
     ) -> Iterator[bytes]:
         """Method called by `self.read` yielding bytes. See `self.read`."""
         locale = self.settings.LOCALE_ENCODING
@@ -249,7 +246,7 @@ class ESDataBackend(BaseDataBackend):
         yield from parse_dict_to_bytes(statements, locale, ignore_errors, self.logger)
 
     def _read_dicts(
-        self, query: query_class, target: str, chunk_size: int, ignore_errors: bool
+        self, query: ESQuery, target: str, chunk_size: int, ignore_errors: bool
     ) -> Iterator[dict]:
         """Method called by `self.read` yielding dictionaries. See `self.read`."""
         target = target if target else self.settings.DEFAULT_INDEX

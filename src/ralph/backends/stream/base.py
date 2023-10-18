@@ -1,7 +1,7 @@
 """Base Stream backend for Ralph."""
 
 from abc import abstractmethod
-from typing import BinaryIO
+from typing import BinaryIO, TypeVar
 
 from ralph.backends.base import (
     BaseBackend,
@@ -19,12 +19,14 @@ class BaseStreamBackendSettings(BaseBackendSettings):
         env_prefix = "RALPH_BACKENDS__STREAM__"
 
 
-class BaseStreamBackend(BaseBackend):
+Settings = TypeVar("Settings", bound=BaseStreamBackendSettings)
+
+
+class BaseStreamBackend(BaseBackend[Settings]):
     """Base stream backend interface."""
 
     type = "stream"
     name = "base"
-    settings_class = BaseStreamBackendSettings
 
     @abstractmethod
     def stream(self, target: BinaryIO):

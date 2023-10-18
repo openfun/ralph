@@ -28,12 +28,10 @@ class WSStreamBackendSettings(BaseStreamBackendSettings):
     URI: str = None
 
 
-class WSStreamBackend(BaseStreamBackend):
+class WSStreamBackend(BaseStreamBackend[WSStreamBackendSettings]):
     """Websocket stream backend."""
 
     name = "ws"
-    settings_class = WSStreamBackendSettings
-    settings: settings_class
 
     def stream(self, target: BinaryIO):
         """Stream websocket content to target."""

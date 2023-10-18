@@ -202,9 +202,6 @@ def statements_are_equivalent(statement_1: dict, statement_2: dict):
     return True
 
 
-# We change the implementation of parse_bytes_to_dict. The previous behavior is
-# moved to parse_bytes_to_dict to keep tests passing.
-# We want to remove this method once all backends adapt the new behavior.
 def parse_bytes_to_dict(
     raw_documents: Iterable[bytes], ignore_errors: bool, logger_class: logging.Logger
 ) -> Iterator[dict]:
@@ -222,7 +219,7 @@ def parse_bytes_to_dict(
 
 
 # We change the implementation of parse_bytes_to_dict.
-# Once
+# We temporarily name it parse_bytes_to_dict_new.
 def parse_bytes_to_dict_new(
     raw_documents: Iterable[bytes], ignore_errors: bool, logger_class: logging.Logger
 ) -> Iterator[dict]:

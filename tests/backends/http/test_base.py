@@ -2,7 +2,7 @@
 
 from typing import Iterator, Union
 
-from ralph.backends.http.base import BaseHTTPBackend, BaseQuery
+from ralph.backends.http.base import BaseHTTPBackend, BaseHTTPBackendSettings, BaseQuery
 
 
 def test_backends_http_base_abstract_interface_with_implemented_abstract_method():
@@ -12,6 +12,7 @@ def test_backends_http_base_abstract_interface_with_implemented_abstract_method(
         """Correct implementation with required abstract methods."""
 
         name = "good"
+        settings_class = BaseHTTPBackendSettings
 
         async def status(self):
             """Fake the status method."""
