@@ -941,85 +941,85 @@
 <div class="highlight"><pre><span></span><code>ralph list [OPTIONS]
 </code></pre></div>
 <p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  -b, --backend [async_es|async_mongo|clickhouse|es|fs|ldp|mongo|swift|s3]
+<div class="highlight"><pre><span></span><code>  -b, --backend [async_es|async_mongo|clickhouse|es|fs|ldp|mongo|s3|swift]
                                   Backend  [required]
-  s3 backend: 
-    --s3-locale-encoding TEXT
-    --s3-default-chunk-size INTEGER
-    --s3-default-bucket-name TEXT
-    --s3-default-region TEXT
-    --s3-endpoint-url TEXT
-    --s3-session-token TEXT
-    --s3-secret-access-key TEXT
-    --s3-access-key-id TEXT
-  swift backend: 
-    --swift-locale-encoding TEXT
-    --swift-default-container TEXT
-    --swift-user-domain-name TEXT
-    --swift-object-storage-url TEXT
-    --swift-region-name TEXT
-    --swift-project-domain-name TEXT
-    --swift-tenant-name TEXT
-    --swift-tenant-id TEXT
-    --swift-identity-api-version TEXT
-    --swift-password TEXT
-    --swift-username TEXT
-    --swift-auth-url TEXT
-  mongo backend: 
-    --mongo-locale-encoding TEXT
-    --mongo-default-chunk-size INTEGER
-    --mongo-client-options KEY=VALUE,KEY=VALUE
-    --mongo-default-collection TEXT
-    --mongo-default-database TEXT
-    --mongo-connection-uri TEXT
-  ldp backend: 
-    --ldp-service-name TEXT
-    --ldp-request-timeout TEXT
-    --ldp-endpoint TEXT
-    --ldp-default-stream-id TEXT
-    --ldp-consumer-key TEXT
-    --ldp-application-secret TEXT
-    --ldp-application-key TEXT
-  fs backend: 
-    --fs-locale-encoding TEXT
-    --fs-default-query-string TEXT
-    --fs-default-directory-path PATH
-    --fs-default-chunk-size INTEGER
-  es backend: 
-    --es-refresh-after-write TEXT
-    --es-point-in-time-keep-alive TEXT
-    --es-locale-encoding TEXT
-    --es-hosts VALUE1,VALUE2,VALUE3
-    --es-default-index TEXT
-    --es-default-chunk-size INTEGER
-    --es-client-options KEY=VALUE,KEY=VALUE
-    --es-allow-yellow-status / --no-es-allow-yellow-status
-  clickhouse backend: 
-    --clickhouse-locale-encoding TEXT
-    --clickhouse-default-chunk-size INTEGER
-    --clickhouse-client-options KEY=VALUE,KEY=VALUE
-    --clickhouse-password TEXT
-    --clickhouse-username TEXT
-    --clickhouse-event-table-name TEXT
-    --clickhouse-database TEXT
-    --clickhouse-port INTEGER
-    --clickhouse-host TEXT
+  async_es backend: 
+    --async-es-allow-yellow-status / --no-async-es-allow-yellow-status
+    --async-es-client-options KEY=VALUE,KEY=VALUE
+    --async-es-default-chunk-size INTEGER
+    --async-es-default-index TEXT
+    --async-es-hosts VALUE1,VALUE2,VALUE3
+    --async-es-locale-encoding TEXT
+    --async-es-point-in-time-keep-alive TEXT
+    --async-es-refresh-after-write TEXT
   async_mongo backend: 
-    --async-mongo-locale-encoding TEXT
-    --async-mongo-default-chunk-size INTEGER
     --async-mongo-client-options KEY=VALUE,KEY=VALUE
+    --async-mongo-connection-uri TEXT
+    --async-mongo-default-chunk-size INTEGER
     --async-mongo-default-collection TEXT
     --async-mongo-default-database TEXT
-    --async-mongo-connection-uri TEXT
-  async_es backend: 
-    --async-es-refresh-after-write TEXT
-    --async-es-point-in-time-keep-alive TEXT
-    --async-es-locale-encoding TEXT
-    --async-es-hosts VALUE1,VALUE2,VALUE3
-    --async-es-default-index TEXT
-    --async-es-default-chunk-size INTEGER
-    --async-es-client-options KEY=VALUE,KEY=VALUE
-    --async-es-allow-yellow-status / --no-async-es-allow-yellow-status
+    --async-mongo-locale-encoding TEXT
+  clickhouse backend: 
+    --clickhouse-client-options KEY=VALUE,KEY=VALUE
+    --clickhouse-database TEXT
+    --clickhouse-default-chunk-size INTEGER
+    --clickhouse-event-table-name TEXT
+    --clickhouse-host TEXT
+    --clickhouse-locale-encoding TEXT
+    --clickhouse-password TEXT
+    --clickhouse-port INTEGER
+    --clickhouse-username TEXT
+  es backend: 
+    --es-allow-yellow-status / --no-es-allow-yellow-status
+    --es-client-options KEY=VALUE,KEY=VALUE
+    --es-default-chunk-size INTEGER
+    --es-default-index TEXT
+    --es-hosts VALUE1,VALUE2,VALUE3
+    --es-locale-encoding TEXT
+    --es-point-in-time-keep-alive TEXT
+    --es-refresh-after-write TEXT
+  fs backend: 
+    --fs-default-chunk-size INTEGER
+    --fs-default-directory-path PATH
+    --fs-default-query-string TEXT
+    --fs-locale-encoding TEXT
+  ldp backend: 
+    --ldp-application-key TEXT
+    --ldp-application-secret TEXT
+    --ldp-consumer-key TEXT
+    --ldp-default-stream-id TEXT
+    --ldp-endpoint TEXT
+    --ldp-request-timeout TEXT
+    --ldp-service-name TEXT
+  mongo backend: 
+    --mongo-client-options KEY=VALUE,KEY=VALUE
+    --mongo-connection-uri TEXT
+    --mongo-default-chunk-size INTEGER
+    --mongo-default-collection TEXT
+    --mongo-default-database TEXT
+    --mongo-locale-encoding TEXT
+  s3 backend: 
+    --s3-access-key-id TEXT
+    --s3-default-bucket-name TEXT
+    --s3-default-chunk-size INTEGER
+    --s3-default-region TEXT
+    --s3-endpoint-url TEXT
+    --s3-locale-encoding TEXT
+    --s3-secret-access-key TEXT
+    --s3-session-token TEXT
+  swift backend: 
+    --swift-auth-url TEXT
+    --swift-default-container TEXT
+    --swift-identity-api-version TEXT
+    --swift-locale-encoding TEXT
+    --swift-object-storage-url TEXT
+    --swift-password TEXT
+    --swift-project-domain-name TEXT
+    --swift-region-name TEXT
+    --swift-tenant-id TEXT
+    --swift-tenant-name TEXT
+    --swift-username TEXT
+    --swift-user-domain-name TEXT
   -t, --target TEXT               Container to list events from
   -n, --new / -a, --all           List not fetched (or all) documents
   -D, --details / -I, --ids       Get documents detailed output (JSON)
@@ -1031,94 +1031,94 @@
 <div class="highlight"><pre><span></span><code>ralph read [OPTIONS] [ARCHIVE]
 </code></pre></div>
 <p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  -b, --backend [async_es|async_mongo|clickhouse|es|fs|ldp|mongo|swift|s3|lrs|ws]
+<div class="highlight"><pre><span></span><code>  -b, --backend [async_es|async_mongo|clickhouse|es|fs|ldp|lrs|mongo|s3|swift|ws]
                                   Backend  [required]
-  ws backend: 
-    --ws-uri TEXT
-  lrs backend: 
-    --lrs-statements-endpoint TEXT
-    --lrs-status-endpoint TEXT
-    --lrs-headers KEY=VALUE,KEY=VALUE
-    --lrs-password TEXT
-    --lrs-username TEXT
-    --lrs-base-url TEXT
-  s3 backend: 
-    --s3-locale-encoding TEXT
-    --s3-default-chunk-size INTEGER
-    --s3-default-bucket-name TEXT
-    --s3-default-region TEXT
-    --s3-endpoint-url TEXT
-    --s3-session-token TEXT
-    --s3-secret-access-key TEXT
-    --s3-access-key-id TEXT
-  swift backend: 
-    --swift-locale-encoding TEXT
-    --swift-default-container TEXT
-    --swift-user-domain-name TEXT
-    --swift-object-storage-url TEXT
-    --swift-region-name TEXT
-    --swift-project-domain-name TEXT
-    --swift-tenant-name TEXT
-    --swift-tenant-id TEXT
-    --swift-identity-api-version TEXT
-    --swift-password TEXT
-    --swift-username TEXT
-    --swift-auth-url TEXT
-  mongo backend: 
-    --mongo-locale-encoding TEXT
-    --mongo-default-chunk-size INTEGER
-    --mongo-client-options KEY=VALUE,KEY=VALUE
-    --mongo-default-collection TEXT
-    --mongo-default-database TEXT
-    --mongo-connection-uri TEXT
-  ldp backend: 
-    --ldp-service-name TEXT
-    --ldp-request-timeout TEXT
-    --ldp-endpoint TEXT
-    --ldp-default-stream-id TEXT
-    --ldp-consumer-key TEXT
-    --ldp-application-secret TEXT
-    --ldp-application-key TEXT
-  fs backend: 
-    --fs-locale-encoding TEXT
-    --fs-default-query-string TEXT
-    --fs-default-directory-path PATH
-    --fs-default-chunk-size INTEGER
-  es backend: 
-    --es-refresh-after-write TEXT
-    --es-point-in-time-keep-alive TEXT
-    --es-locale-encoding TEXT
-    --es-hosts VALUE1,VALUE2,VALUE3
-    --es-default-index TEXT
-    --es-default-chunk-size INTEGER
-    --es-client-options KEY=VALUE,KEY=VALUE
-    --es-allow-yellow-status / --no-es-allow-yellow-status
-  clickhouse backend: 
-    --clickhouse-locale-encoding TEXT
-    --clickhouse-default-chunk-size INTEGER
-    --clickhouse-client-options KEY=VALUE,KEY=VALUE
-    --clickhouse-password TEXT
-    --clickhouse-username TEXT
-    --clickhouse-event-table-name TEXT
-    --clickhouse-database TEXT
-    --clickhouse-port INTEGER
-    --clickhouse-host TEXT
+  async_es backend: 
+    --async-es-allow-yellow-status / --no-async-es-allow-yellow-status
+    --async-es-client-options KEY=VALUE,KEY=VALUE
+    --async-es-default-chunk-size INTEGER
+    --async-es-default-index TEXT
+    --async-es-hosts VALUE1,VALUE2,VALUE3
+    --async-es-locale-encoding TEXT
+    --async-es-point-in-time-keep-alive TEXT
+    --async-es-refresh-after-write TEXT
   async_mongo backend: 
-    --async-mongo-locale-encoding TEXT
-    --async-mongo-default-chunk-size INTEGER
     --async-mongo-client-options KEY=VALUE,KEY=VALUE
+    --async-mongo-connection-uri TEXT
+    --async-mongo-default-chunk-size INTEGER
     --async-mongo-default-collection TEXT
     --async-mongo-default-database TEXT
-    --async-mongo-connection-uri TEXT
-  async_es backend: 
-    --async-es-refresh-after-write TEXT
-    --async-es-point-in-time-keep-alive TEXT
-    --async-es-locale-encoding TEXT
-    --async-es-hosts VALUE1,VALUE2,VALUE3
-    --async-es-default-index TEXT
-    --async-es-default-chunk-size INTEGER
-    --async-es-client-options KEY=VALUE,KEY=VALUE
-    --async-es-allow-yellow-status / --no-async-es-allow-yellow-status
+    --async-mongo-locale-encoding TEXT
+  clickhouse backend: 
+    --clickhouse-client-options KEY=VALUE,KEY=VALUE
+    --clickhouse-database TEXT
+    --clickhouse-default-chunk-size INTEGER
+    --clickhouse-event-table-name TEXT
+    --clickhouse-host TEXT
+    --clickhouse-locale-encoding TEXT
+    --clickhouse-password TEXT
+    --clickhouse-port INTEGER
+    --clickhouse-username TEXT
+  es backend: 
+    --es-allow-yellow-status / --no-es-allow-yellow-status
+    --es-client-options KEY=VALUE,KEY=VALUE
+    --es-default-chunk-size INTEGER
+    --es-default-index TEXT
+    --es-hosts VALUE1,VALUE2,VALUE3
+    --es-locale-encoding TEXT
+    --es-point-in-time-keep-alive TEXT
+    --es-refresh-after-write TEXT
+  fs backend: 
+    --fs-default-chunk-size INTEGER
+    --fs-default-directory-path PATH
+    --fs-default-query-string TEXT
+    --fs-locale-encoding TEXT
+  ldp backend: 
+    --ldp-application-key TEXT
+    --ldp-application-secret TEXT
+    --ldp-consumer-key TEXT
+    --ldp-default-stream-id TEXT
+    --ldp-endpoint TEXT
+    --ldp-request-timeout TEXT
+    --ldp-service-name TEXT
+  lrs backend: 
+    --lrs-base-url TEXT
+    --lrs-headers KEY=VALUE,KEY=VALUE
+    --lrs-password TEXT
+    --lrs-statements-endpoint TEXT
+    --lrs-status-endpoint TEXT
+    --lrs-username TEXT
+  mongo backend: 
+    --mongo-client-options KEY=VALUE,KEY=VALUE
+    --mongo-connection-uri TEXT
+    --mongo-default-chunk-size INTEGER
+    --mongo-default-collection TEXT
+    --mongo-default-database TEXT
+    --mongo-locale-encoding TEXT
+  s3 backend: 
+    --s3-access-key-id TEXT
+    --s3-default-bucket-name TEXT
+    --s3-default-chunk-size INTEGER
+    --s3-default-region TEXT
+    --s3-endpoint-url TEXT
+    --s3-locale-encoding TEXT
+    --s3-secret-access-key TEXT
+    --s3-session-token TEXT
+  swift backend: 
+    --swift-auth-url TEXT
+    --swift-default-container TEXT
+    --swift-identity-api-version TEXT
+    --swift-locale-encoding TEXT
+    --swift-object-storage-url TEXT
+    --swift-password TEXT
+    --swift-project-domain-name TEXT
+    --swift-region-name TEXT
+    --swift-tenant-id TEXT
+    --swift-tenant-name TEXT
+    --swift-username TEXT
+    --swift-user-domain-name TEXT
+  ws backend: 
+    --ws-uri TEXT
   -c, --chunk-size INTEGER        Get events by chunks of size #
   -t, --target TEXT               Endpoint from which to read events (e.g.
                                   `/statements`)
@@ -1138,55 +1138,55 @@
 <p><strong>Options:</strong></p>
 <div class="highlight"><pre><span></span><code>  -b, --backend [async_es|async_mongo|clickhouse|es|fs|mongo]
                                   Backend  [required]
-  mongo backend: 
-    --mongo-locale-encoding TEXT
-    --mongo-default-chunk-size INTEGER
-    --mongo-client-options KEY=VALUE,KEY=VALUE
-    --mongo-default-collection TEXT
-    --mongo-default-database TEXT
-    --mongo-connection-uri TEXT
-  fs backend: 
-    --fs-default-lrs-file TEXT
-    --fs-locale-encoding TEXT
-    --fs-default-query-string TEXT
-    --fs-default-directory-path PATH
-    --fs-default-chunk-size INTEGER
-  es backend: 
-    --es-refresh-after-write TEXT
-    --es-point-in-time-keep-alive TEXT
-    --es-locale-encoding TEXT
-    --es-hosts VALUE1,VALUE2,VALUE3
-    --es-default-index TEXT
-    --es-default-chunk-size INTEGER
-    --es-client-options KEY=VALUE,KEY=VALUE
-    --es-allow-yellow-status / --no-es-allow-yellow-status
-  clickhouse backend: 
-    --clickhouse-ids-chunk-size INTEGER
-    --clickhouse-locale-encoding TEXT
-    --clickhouse-default-chunk-size INTEGER
-    --clickhouse-client-options KEY=VALUE,KEY=VALUE
-    --clickhouse-password TEXT
-    --clickhouse-username TEXT
-    --clickhouse-event-table-name TEXT
-    --clickhouse-database TEXT
-    --clickhouse-port INTEGER
-    --clickhouse-host TEXT
+  async_es backend: 
+    --async-es-allow-yellow-status / --no-async-es-allow-yellow-status
+    --async-es-client-options KEY=VALUE,KEY=VALUE
+    --async-es-default-chunk-size INTEGER
+    --async-es-default-index TEXT
+    --async-es-hosts VALUE1,VALUE2,VALUE3
+    --async-es-locale-encoding TEXT
+    --async-es-point-in-time-keep-alive TEXT
+    --async-es-refresh-after-write TEXT
   async_mongo backend: 
-    --async-mongo-locale-encoding TEXT
-    --async-mongo-default-chunk-size INTEGER
     --async-mongo-client-options KEY=VALUE,KEY=VALUE
+    --async-mongo-connection-uri TEXT
+    --async-mongo-default-chunk-size INTEGER
     --async-mongo-default-collection TEXT
     --async-mongo-default-database TEXT
-    --async-mongo-connection-uri TEXT
-  async_es backend: 
-    --async-es-refresh-after-write TEXT
-    --async-es-point-in-time-keep-alive TEXT
-    --async-es-locale-encoding TEXT
-    --async-es-hosts VALUE1,VALUE2,VALUE3
-    --async-es-default-index TEXT
-    --async-es-default-chunk-size INTEGER
-    --async-es-client-options KEY=VALUE,KEY=VALUE
-    --async-es-allow-yellow-status / --no-async-es-allow-yellow-status
+    --async-mongo-locale-encoding TEXT
+  clickhouse backend: 
+    --clickhouse-client-options KEY=VALUE,KEY=VALUE
+    --clickhouse-database TEXT
+    --clickhouse-default-chunk-size INTEGER
+    --clickhouse-event-table-name TEXT
+    --clickhouse-host TEXT
+    --clickhouse-ids-chunk-size INTEGER
+    --clickhouse-locale-encoding TEXT
+    --clickhouse-password TEXT
+    --clickhouse-port INTEGER
+    --clickhouse-username TEXT
+  es backend: 
+    --es-allow-yellow-status / --no-es-allow-yellow-status
+    --es-client-options KEY=VALUE,KEY=VALUE
+    --es-default-chunk-size INTEGER
+    --es-default-index TEXT
+    --es-hosts VALUE1,VALUE2,VALUE3
+    --es-locale-encoding TEXT
+    --es-point-in-time-keep-alive TEXT
+    --es-refresh-after-write TEXT
+  fs backend: 
+    --fs-default-chunk-size INTEGER
+    --fs-default-directory-path PATH
+    --fs-default-lrs-file TEXT
+    --fs-default-query-string TEXT
+    --fs-locale-encoding TEXT
+  mongo backend: 
+    --mongo-client-options KEY=VALUE,KEY=VALUE
+    --mongo-connection-uri TEXT
+    --mongo-default-chunk-size INTEGER
+    --mongo-default-collection TEXT
+    --mongo-default-database TEXT
+    --mongo-locale-encoding TEXT
   -h, --host TEXT                 LRS server host name
   -p, --port INTEGER              LRS server port
   --help                          Show this message and exit.
@@ -1208,92 +1208,92 @@
 <div class="highlight"><pre><span></span><code>ralph write [OPTIONS]
 </code></pre></div>
 <p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  -b, --backend [async_es|async_mongo|clickhouse|es|fs|ldp|mongo|swift|s3|lrs]
+<div class="highlight"><pre><span></span><code>  -b, --backend [async_es|async_mongo|clickhouse|es|fs|ldp|lrs|mongo|s3|swift]
                                   Backend  [required]
-  lrs backend: 
-    --lrs-statements-endpoint TEXT
-    --lrs-status-endpoint TEXT
-    --lrs-headers KEY=VALUE,KEY=VALUE
-    --lrs-password TEXT
-    --lrs-username TEXT
-    --lrs-base-url TEXT
-  s3 backend: 
-    --s3-locale-encoding TEXT
-    --s3-default-chunk-size INTEGER
-    --s3-default-bucket-name TEXT
-    --s3-default-region TEXT
-    --s3-endpoint-url TEXT
-    --s3-session-token TEXT
-    --s3-secret-access-key TEXT
-    --s3-access-key-id TEXT
-  swift backend: 
-    --swift-locale-encoding TEXT
-    --swift-default-container TEXT
-    --swift-user-domain-name TEXT
-    --swift-object-storage-url TEXT
-    --swift-region-name TEXT
-    --swift-project-domain-name TEXT
-    --swift-tenant-name TEXT
-    --swift-tenant-id TEXT
-    --swift-identity-api-version TEXT
-    --swift-password TEXT
-    --swift-username TEXT
-    --swift-auth-url TEXT
-  mongo backend: 
-    --mongo-locale-encoding TEXT
-    --mongo-default-chunk-size INTEGER
-    --mongo-client-options KEY=VALUE,KEY=VALUE
-    --mongo-default-collection TEXT
-    --mongo-default-database TEXT
-    --mongo-connection-uri TEXT
-  ldp backend: 
-    --ldp-service-name TEXT
-    --ldp-request-timeout TEXT
-    --ldp-endpoint TEXT
-    --ldp-default-stream-id TEXT
-    --ldp-consumer-key TEXT
-    --ldp-application-secret TEXT
-    --ldp-application-key TEXT
-  fs backend: 
-    --fs-locale-encoding TEXT
-    --fs-default-query-string TEXT
-    --fs-default-directory-path PATH
-    --fs-default-chunk-size INTEGER
-  es backend: 
-    --es-refresh-after-write TEXT
-    --es-point-in-time-keep-alive TEXT
-    --es-locale-encoding TEXT
-    --es-hosts VALUE1,VALUE2,VALUE3
-    --es-default-index TEXT
-    --es-default-chunk-size INTEGER
-    --es-client-options KEY=VALUE,KEY=VALUE
-    --es-allow-yellow-status / --no-es-allow-yellow-status
-  clickhouse backend: 
-    --clickhouse-locale-encoding TEXT
-    --clickhouse-default-chunk-size INTEGER
-    --clickhouse-client-options KEY=VALUE,KEY=VALUE
-    --clickhouse-password TEXT
-    --clickhouse-username TEXT
-    --clickhouse-event-table-name TEXT
-    --clickhouse-database TEXT
-    --clickhouse-port INTEGER
-    --clickhouse-host TEXT
+  async_es backend: 
+    --async-es-allow-yellow-status / --no-async-es-allow-yellow-status
+    --async-es-client-options KEY=VALUE,KEY=VALUE
+    --async-es-default-chunk-size INTEGER
+    --async-es-default-index TEXT
+    --async-es-hosts VALUE1,VALUE2,VALUE3
+    --async-es-locale-encoding TEXT
+    --async-es-point-in-time-keep-alive TEXT
+    --async-es-refresh-after-write TEXT
   async_mongo backend: 
-    --async-mongo-locale-encoding TEXT
-    --async-mongo-default-chunk-size INTEGER
     --async-mongo-client-options KEY=VALUE,KEY=VALUE
+    --async-mongo-connection-uri TEXT
+    --async-mongo-default-chunk-size INTEGER
     --async-mongo-default-collection TEXT
     --async-mongo-default-database TEXT
-    --async-mongo-connection-uri TEXT
-  async_es backend: 
-    --async-es-refresh-after-write TEXT
-    --async-es-point-in-time-keep-alive TEXT
-    --async-es-locale-encoding TEXT
-    --async-es-hosts VALUE1,VALUE2,VALUE3
-    --async-es-default-index TEXT
-    --async-es-default-chunk-size INTEGER
-    --async-es-client-options KEY=VALUE,KEY=VALUE
-    --async-es-allow-yellow-status / --no-async-es-allow-yellow-status
+    --async-mongo-locale-encoding TEXT
+  clickhouse backend: 
+    --clickhouse-client-options KEY=VALUE,KEY=VALUE
+    --clickhouse-database TEXT
+    --clickhouse-default-chunk-size INTEGER
+    --clickhouse-event-table-name TEXT
+    --clickhouse-host TEXT
+    --clickhouse-locale-encoding TEXT
+    --clickhouse-password TEXT
+    --clickhouse-port INTEGER
+    --clickhouse-username TEXT
+  es backend: 
+    --es-allow-yellow-status / --no-es-allow-yellow-status
+    --es-client-options KEY=VALUE,KEY=VALUE
+    --es-default-chunk-size INTEGER
+    --es-default-index TEXT
+    --es-hosts VALUE1,VALUE2,VALUE3
+    --es-locale-encoding TEXT
+    --es-point-in-time-keep-alive TEXT
+    --es-refresh-after-write TEXT
+  fs backend: 
+    --fs-default-chunk-size INTEGER
+    --fs-default-directory-path PATH
+    --fs-default-query-string TEXT
+    --fs-locale-encoding TEXT
+  ldp backend: 
+    --ldp-application-key TEXT
+    --ldp-application-secret TEXT
+    --ldp-consumer-key TEXT
+    --ldp-default-stream-id TEXT
+    --ldp-endpoint TEXT
+    --ldp-request-timeout TEXT
+    --ldp-service-name TEXT
+  lrs backend: 
+    --lrs-base-url TEXT
+    --lrs-headers KEY=VALUE,KEY=VALUE
+    --lrs-password TEXT
+    --lrs-statements-endpoint TEXT
+    --lrs-status-endpoint TEXT
+    --lrs-username TEXT
+  mongo backend: 
+    --mongo-client-options KEY=VALUE,KEY=VALUE
+    --mongo-connection-uri TEXT
+    --mongo-default-chunk-size INTEGER
+    --mongo-default-collection TEXT
+    --mongo-default-database TEXT
+    --mongo-locale-encoding TEXT
+  s3 backend: 
+    --s3-access-key-id TEXT
+    --s3-default-bucket-name TEXT
+    --s3-default-chunk-size INTEGER
+    --s3-default-region TEXT
+    --s3-endpoint-url TEXT
+    --s3-locale-encoding TEXT
+    --s3-secret-access-key TEXT
+    --s3-session-token TEXT
+  swift backend: 
+    --swift-auth-url TEXT
+    --swift-default-container TEXT
+    --swift-identity-api-version TEXT
+    --swift-locale-encoding TEXT
+    --swift-object-storage-url TEXT
+    --swift-password TEXT
+    --swift-project-domain-name TEXT
+    --swift-region-name TEXT
+    --swift-tenant-id TEXT
+    --swift-tenant-name TEXT
+    --swift-username TEXT
+    --swift-user-domain-name TEXT
   -c, --chunk-size INTEGER        Get events by chunks of size #
   -f, --force                     Overwrite existing archives or records
   -I, --ignore-errors             Continue writing regardless of raised errors
