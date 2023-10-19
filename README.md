@@ -171,6 +171,39 @@ We try to raise our code quality standards and expect contributors to follow
 the recommendations from our
 [handbook](https://handbook.openfun.fr).
 
+### Useful commands
+
+Bootstrap the project:
+
+```
+$ make bootstrap
+```
+
+Run tests:
+
+```
+$ make test
+```
+
+Run all linters:
+
+```
+$ make lint
+```
+
+If you add new dependencies to the project, you will have to rebuild the Docker
+image (and the development environment):
+
+```
+$ make down && make bootstrap
+```
+
+You can explore all available rules using:
+
+```
+$ make help
+```
+
 ## License
 
 This work is released under the MIT License (see [LICENSE](./LICENSE.md)).
