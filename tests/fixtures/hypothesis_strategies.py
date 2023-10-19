@@ -5,7 +5,7 @@ from typing import Union
 
 from hypothesis import given
 from hypothesis import strategies as st
-from pydantic import BaseModel
+from pydantic import AnyUrl, BaseModel
 
 from ralph.models.edx.navigational.fields.events import NavigationalEventField
 from ralph.models.edx.navigational.statements import UISeqNext, UISeqPrev
@@ -15,6 +15,7 @@ from ralph.models.xapi.lms.contexts import (
     LMSContextContextActivities,
     LMSProfileActivity,
 )
+from ralph.models.xapi.profile import ProfilePattern, ProfileTemplateRule
 from ralph.models.xapi.video.contexts import (
     VideoContextContextActivities,
     VideoProfileActivity,
@@ -120,6 +121,18 @@ OVERWRITTEN_STRATEGIES = {
         "max": False,
     },
     LMSContextContextActivities: {"category": custom_builds(LMSProfileActivity)},
+    ProfilePattern: {
+        "primary": False,
+        "alternates": False,
+        "optional": st.from_type(AnyUrl),
+        "oneOrMore": False,
+        "sequence": False,
+        "zeroOrMore": False,
+    },
+    ProfileTemplateRule: {
+        "location": st.just("$.timestamp"),
+        "selector": False,
+    },
     VideoContextContextActivities: {"category": custom_builds(VideoProfileActivity)},
     VirtualClassroomContextContextActivities: {
         "category": custom_builds(VirtualClassroomProfileActivity)

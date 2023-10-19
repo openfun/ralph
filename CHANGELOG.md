@@ -13,6 +13,8 @@ and this project adheres to
 - Implement Pydantic model for LRS Statements resource query parameters
 - Implement xAPI LMS Profile statements validation
 - `EdX` to `xAPI` converters for enrollment events
+- Implement xAPI JSON-LD profile validation
+  (CLI command: `ralph validate -f xapi.profile`)
 
 ### Changed
 
