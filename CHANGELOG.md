@@ -13,6 +13,7 @@ and this project adheres to
 - Implement Pydantic model for LRS Statements resource query parameters
 - Implement xAPI LMS Profile statements validation
 - `EdX` to `xAPI` converters for enrollment events
+- Helm: Add variable ``ingress.hosts``
 
 ### Changed
 
@@ -55,6 +56,7 @@ have an authority field matching that of the user
 
 - `school`, `course`, `module` context extensions in Edx to xAPI base converter
 - `name` field in `VideoActivity` xAPI model mistakenly used in `video` profile
+- Helm: remove variable ``ingress.hostname`` and ``ingress.tls``
 
 ## [3.9.0] - 2023-07-21
 
