@@ -45,6 +45,7 @@ have an authority field matching that of the user
 - API: Add `RALPH_LRS_RESTRICT_BY_AUTHORITY` option making `?mine=True`
   implicit
 - CLI: list cli usage strings in alphabetical order
+- Helm: Fix clickhouse version
 
 ### Fixed
 
