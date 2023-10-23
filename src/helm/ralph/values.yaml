@@ -27,12 +27,12 @@ service:
 ingress:
   enabled: false
   ingressClassName: ""
-  hostname: "ralph.example.com"
+  hosts:
+    - domains:
+        - ralph.example.com
+      tls:
+        secretName: "ralph-example-com-tls"
   annotations: {}
-  tls:
-    - hosts:
-        - "ralph.example.com"
-      secretName: "ralph-example-com-tls"
 
 affinity:
   podAntiAffinity:
