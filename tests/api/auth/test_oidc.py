@@ -1,47 +1,29 @@
 """Tests for the api.auth.oidc module."""
 
 import responses
+from pydantic import parse_obj_as
 
 from ralph.api.auth.oidc import discover_provider, get_public_keys
+from ralph.models.xapi.base.agents import BaseXapiAgentWithOpenId
 
-from tests.fixtures.auth import ISSUER_URI
+from tests.fixtures.auth import ISSUER_URI, mock_oidc_user
 
 
 @responses.activate
-def test_api_auth_oidc_valid(
-    oidc_auth_test_client, mock_discovery_response, mock_oidc_jwks, encoded_token
-):
+def test_api_auth_oidc_valid(oidc_auth_test_client):
     """Test a valid OpenId Connect authentication."""
 
-    # Clear LRU cache
-    discover_provider.cache_clear()
-    get_public_keys.cache_clear()
-
-    # Mock request to get provider configuration
-    responses.add(
-        responses.GET,
-        f"{ISSUER_URI}/.well-known/openid-configuration",
-        json=mock_discovery_response,
-        status=200,
-    )
-
-    # Mock request to get keys
-    responses.add(
-        responses.GET,
-        mock_discovery_response["jwks_uri"],
-        json=mock_oidc_jwks,
-        status=200,
-    )
+    oidc_token = mock_oidc_user(scopes=["all", "profile/read"])
 
     response = oidc_auth_test_client.get(
         "/whoami",
-        headers={"Authorization": f"Bearer {encoded_token}"},
+        headers={"Authorization": f"Bearer {oidc_token}"},
     )
     assert response.status_code == 200
-    assert response.json() == {
-        "scopes": ["all", "statements/read"],
-        "agent": {"openid": "123|oidc"},
-    }
+    assert len(response.json().keys()) == 2
+    assert response.json()["agent"] == {"openid": "https://iss.example.com/123|oidc"}
+    assert parse_obj_as(BaseXapiAgentWithOpenId, response.json()["agent"])
+    assert sorted(response.json()["scopes"]) == ["all", "profile/read"]
 
 
 @responses.activate
@@ -50,25 +32,7 @@ def test_api_auth_invalid_token(
 ):
     """Test API with an invalid audience."""
 
-    # Clear LRU cache
-    discover_provider.cache_clear()
-    get_public_keys.cache_clear()
-
-    # Mock request to get provider configuration
-    responses.add(
-        responses.GET,
-        f"{ISSUER_URI}/.well-known/openid-configuration",
-        json=mock_discovery_response,
-        status=200,
-    )
-
-    # Mock request to get keys
-    responses.add(
-        responses.GET,
-        mock_discovery_response["jwks_uri"],
-        json=mock_oidc_jwks,
-        status=200,
-    )
+    mock_oidc_user()
 
     response = oidc_auth_test_client.get(
         "/whoami",
@@ -143,34 +107,14 @@ def test_api_auth_invalid_keys(
 
 
 @responses.activate
-def test_api_auth_invalid_header(
-    oidc_auth_test_client, mock_discovery_response, mock_oidc_jwks, encoded_token
-):
+def test_api_auth_invalid_header(oidc_auth_test_client):
     """Test API with an invalid request header."""
 
-    # Clear LRU cache
-    discover_provider.cache_clear()
-    get_public_keys.cache_clear()
-
-    # Mock request to get provider configuration
-    responses.add(
-        responses.GET,
-        f"{ISSUER_URI}/.well-known/openid-configuration",
-        json=mock_discovery_response,
-        status=200,
-    )
-
-    # Mock request to get keys
-    responses.add(
-        responses.GET,
-        mock_discovery_response["jwks_uri"],
-        json=mock_oidc_jwks,
-        status=200,
-    )
+    oidc_token = mock_oidc_user()
 
     response = oidc_auth_test_client.get(
         "/whoami",
-        headers={"Authorization": f"Wrong header {encoded_token}"},
+        headers={"Authorization": f"Wrong header {oidc_token}"},
     )
 
     assert response.status_code == 401

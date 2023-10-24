@@ -2,16 +2,17 @@
 
 import logging
 from functools import lru_cache
-from typing import Optional, Union
+from typing import Optional
 
 import requests
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OpenIdConnect
+from fastapi.security import OpenIdConnect, SecurityScopes
 from jose import ExpiredSignatureError, JWTError, jwt
 from jose.exceptions import JWTClaimsError
 from pydantic import AnyUrl, BaseModel, Extra
+from typing_extensions import Annotated
 
-from ralph.api.auth.user import AuthenticatedUser
+from ralph.api.auth.user import AuthenticatedUser, UserScopes
 from ralph.conf import settings
 
 OPENID_CONFIGURATION_PATH = "/.well-known/openid-configuration"
@@ -92,8 +93,9 @@ def get_public_keys(jwks_uri: AnyUrl) -> dict:
         ) from exc
 
 
-def get_authenticated_user(
-    auth_header: Union[str, None] = Depends(oauth2_scheme)
+def get_oidc_user(
+    auth_header: Annotated[Optional[str], Depends(oauth2_scheme)],
+    security_scopes: SecurityScopes = SecurityScopes([]),
 ) -> AuthenticatedUser:
     """Decode and validate OpenId Connect ID token against issuer in config.
 
@@ -143,7 +145,19 @@ def get_authenticated_user(
 
     id_token = IDToken.parse_obj(decoded_token)
 
-    return AuthenticatedUser(
-        agent={"openid": id_token.sub},
-        scopes=id_token.scope.split(" ") if id_token.scope else [],
+    user = AuthenticatedUser(
+        agent={"openid": f"{id_token.iss}/{id_token.sub}"},
+        scopes=UserScopes(id_token.scope.split(" ") if id_token.scope else []),
     )
+
+    # Restrict access by scopes
+    if settings.LRS_RESTRICT_BY_SCOPES:
+        for requested_scope in security_scopes.scopes:
+            if not user.scopes.is_authorized(requested_scope):
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail=f'Access not authorized to scope: "{requested_scope}".',
+                    headers={"WWW-Authenticate": "Basic"},
+                )
+
+    return user

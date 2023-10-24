@@ -6,15 +6,15 @@ import json
 import bcrypt
 import pytest
 from fastapi.exceptions import HTTPException
-from fastapi.security import HTTPBasicCredentials
+from fastapi.security import HTTPBasicCredentials, SecurityScopes
 
 from ralph.api.auth.basic import (
     ServerUsersCredentials,
     UserCredentials,
-    get_authenticated_user,
+    get_basic_auth_user,
     get_stored_credentials,
 )
-from ralph.api.auth.user import AuthenticatedUser
+from ralph.api.auth.user import AuthenticatedUser, UserScopes
 from ralph.conf import Settings, settings
 
 STORED_CREDENTIALS = json.dumps(
@@ -97,18 +97,21 @@ def test_api_auth_basic_caching_credentials(fs):
 
     auth_file_path = settings.APP_DIR / "auth.json"
     fs.create_file(auth_file_path, contents=STORED_CREDENTIALS)
-    get_authenticated_user.cache_clear()
+    get_basic_auth_user.cache_clear()
+    get_stored_credentials.cache_clear()
 
     credentials = HTTPBasicCredentials(username="ralph", password="admin")
 
     # Call function as in a first request with these credentials
-    get_authenticated_user(credentials)
+    get_basic_auth_user(
+        security_scopes=SecurityScopes(["profile/read"]), credentials=credentials
+    )
 
-    assert get_authenticated_user.cache.popitem() == (
-        ("ralph", "admin"),
+    assert get_basic_auth_user.cache.popitem() == (
+        ("ralph", "admin", "profile/read"),
         AuthenticatedUser(
             agent={"mbox": "mailto:ralph@example.com"},
-            scopes=["statements/read/mine", "statements/write"],
+            scopes=UserScopes(["statements/read/mine", "statements/write"]),
         ),
     )
 
@@ -118,13 +121,13 @@ def test_api_auth_basic_with_wrong_password(fs):
 
     auth_file_path = settings.APP_DIR / "auth.json"
     fs.create_file(auth_file_path, contents=STORED_CREDENTIALS)
-    get_authenticated_user.cache_clear()
+    get_basic_auth_user.cache_clear()
 
     credentials = HTTPBasicCredentials(username="ralph", password="wrong_password")
 
     # Call function as in a first request with these credentials
     with pytest.raises(HTTPException):
-        get_authenticated_user(credentials)
+        get_basic_auth_user(credentials, SecurityScopes(["all"]))
 
 
 def test_api_auth_basic_no_credential_file_found(fs, monkeypatch):
@@ -132,12 +135,12 @@ def test_api_auth_basic_no_credential_file_found(fs, monkeypatch):
 
     monkeypatch.setenv("RALPH_AUTH_FILE", "other_file")
     monkeypatch.setattr("ralph.api.auth.basic.settings", Settings())
-    get_stored_credentials.cache_clear()
+    get_basic_auth_user.cache_clear()
 
     credentials = HTTPBasicCredentials(username="ralph", password="admin")
 
     with pytest.raises(HTTPException):
-        get_authenticated_user(credentials)
+        get_basic_auth_user(credentials, SecurityScopes(["all"]))
 
 
 def test_get_whoami_no_credentials(basic_auth_test_client):
@@ -173,7 +176,7 @@ def test_get_whoami_username_not_found(basic_auth_test_client, fs):
     """Whoami route returns a 401 error when the username cannot be found."""
     credential_bytes = base64.b64encode("john:admin".encode("utf-8"))
     credentials = str(credential_bytes, "utf-8")
-    get_authenticated_user.cache_clear()
+    get_basic_auth_user.cache_clear()
 
     auth_file_path = settings.APP_DIR / "auth.json"
     fs.create_file(auth_file_path, contents=STORED_CREDENTIALS)
@@ -195,7 +198,7 @@ def test_get_whoami_wrong_password(basic_auth_test_client, fs):
 
     auth_file_path = settings.APP_DIR / "auth.json"
     fs.create_file(auth_file_path, contents=STORED_CREDENTIALS)
-    get_authenticated_user.cache_clear()
+    get_basic_auth_user.cache_clear()
 
     response = basic_auth_test_client.get(
         "/whoami", headers={"Authorization": f"Basic {credentials}"}
@@ -217,14 +220,17 @@ def test_get_whoami_correct_credentials(basic_auth_test_client, fs):
 
     auth_file_path = settings.APP_DIR / "auth.json"
     fs.create_file(auth_file_path, contents=STORED_CREDENTIALS)
-    get_authenticated_user.cache_clear()
+    get_basic_auth_user.cache_clear()
 
     response = basic_auth_test_client.get(
         "/whoami", headers={"Authorization": f"Basic {credentials}"}
     )
 
     assert response.status_code == 200
-    assert response.json() == {
-        "agent": {"mbox": "mailto:ralph@example.com"},
-        "scopes": ["statements/read/mine", "statements/write"],
-    }
+
+    assert len(response.json().keys()) == 2
+    assert response.json()["agent"] == {"mbox": "mailto:ralph@example.com"}
+    assert sorted(response.json()["scopes"]) == [
+        "statements/read/mine",
+        "statements/write",
+    ]

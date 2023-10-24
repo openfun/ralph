@@ -212,7 +212,7 @@ def _assert_matching_basic_auth_credentials(
     assert "hash" in credentials
     if hash_:
         assert credentials["hash"] == hash_
-    assert credentials["scopes"] == scopes
+    assert sorted(credentials["scopes"]) == sorted(scopes)
     assert "agent" in credentials
 
     if agent_name is not None:

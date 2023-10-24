@@ -178,7 +178,7 @@ By default, all authenticated users have full read and write access to the serve
 
 ### Filtering results by authority (multitenancy)
 
-In Ralph, all incoming statements are assigned an `authority` (or ownership) derived from the user that makes the call. You may restrict read access to users "own" statements (thus enabling multitenancy) by setting the following environment variable: 
+In Ralph LRS, all incoming statements are assigned an `authority` (or ownership) derived from the user that makes the call. You may restrict read access to users "own" statements (thus enabling multitenancy) by setting the following environment variable: 
 
 ```
 RALPH_LRS_RESTRICT_BY_AUTHORITY = True # Default: False
@@ -190,7 +190,27 @@ NB: If not using "scopes", or for users with limited "scopes", using this option
 
 #### Scopes
 
-(Work In Progress)
+In Ralph, users are assigned scopes which may be used to restrict endpoint access or 
+functionalities. You may enable this option by setting the following environment variable:
+
+```
+RALPH_LRS_RESTRICT_BY_SCOPES = True # Default: False
+```
+
+Valid scopes are a slight variation on those proposed by the
+[xAPI specification](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#details-15):
+
+
+- statements/write
+- statements/read/mine
+- statements/read
+- state/write
+- state/read
+- define
+- profile/write
+- profile/read
+- all/read
+- all
 
 ## Forwarding statements
 

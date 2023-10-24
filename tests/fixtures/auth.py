@@ -2,9 +2,11 @@
 import base64
 import json
 import os
+from typing import Optional
 
 import bcrypt
 import pytest
+import responses
 from cryptography.hazmat.primitives import serialization
 from fastapi.testclient import TestClient
 from jose import jwt
@@ -12,6 +14,7 @@ from jose.utils import long_to_base64
 
 from ralph.api import app, get_authenticated_user
 from ralph.api.auth.basic import get_stored_credentials
+from ralph.api.auth.oidc import discover_provider, get_public_keys
 from ralph.conf import settings
 
 from . import private_key, public_key
@@ -24,10 +27,10 @@ PUBLIC_KEY_ID = "example-key-id"
 
 def mock_basic_auth_user(
     fs_,
-    username: str,
-    password: str,
-    scopes: list,
-    agent: dict,
+    username: str = "jane",
+    password: str = "pwd",
+    scopes: Optional[list] = None,
+    agent: Optional[dict] = None,
 ):
     """Create a user using Basic Auth in the (fake) file system.
 
@@ -38,6 +41,12 @@ def mock_basic_auth_user(
         scopes (List[str]): list of scopes available to the user
         agent (dict): an agent that represents the user and may be used as authority
     """
+
+    # Default values for `scopes` and `agent`
+    if scopes is None:
+        scopes = []
+    if agent is None:
+        agent = {"mbox": "mailto:jane@ralphlrs.com"}
 
     # Basic HTTP auth
     credential_bytes = base64.b64encode(f"{username}:{password}".encode("utf-8"))
@@ -71,7 +80,7 @@ def mock_basic_auth_user(
 
 # pylint: disable=invalid-name
 @pytest.fixture
-def auth_credentials(fs, user_scopes=None, agent=None):
+def basic_auth_credentials(fs, user_scopes=None, agent=None):
     """Set up the credentials file for request authentication.
 
     Args:
@@ -92,7 +101,6 @@ def auth_credentials(fs, user_scopes=None, agent=None):
         agent = {"mbox": "mailto:test_ralph@example.com"}
 
     credentials = mock_basic_auth_user(fs, username, password, user_scopes, agent)
-
     return credentials
 
 
@@ -101,10 +109,10 @@ def basic_auth_test_client():
     """Return a TestClient with HTTP basic authentication mode."""
     # pylint:disable=import-outside-toplevel
     from ralph.api.auth.basic import (
-        get_authenticated_user as get_basic,  # pylint:disable=import-outside-toplevel
+        get_basic_auth_user,  # pylint:disable=import-outside-toplevel
     )
 
-    app.dependency_overrides[get_authenticated_user] = get_basic
+    app.dependency_overrides[get_authenticated_user] = get_basic_auth_user
 
     with TestClient(app) as test_client:
         yield test_client
@@ -122,15 +130,14 @@ def oidc_auth_test_client(monkeypatch):
         "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_AUDIENCE",
         AUDIENCE,
     )
-    from ralph.api.auth.oidc import get_authenticated_user as get_oidc
+    from ralph.api.auth.oidc import get_oidc_user
 
-    app.dependency_overrides[get_authenticated_user] = get_oidc
+    app.dependency_overrides[get_authenticated_user] = get_oidc_user
     with TestClient(app) as test_client:
         yield test_client
 
 
-@pytest.fixture
-def mock_discovery_response():
+def _mock_discovery_response():
     """Return an example discovery response."""
     return {
         "issuer": "http://providerHost",
@@ -219,6 +226,12 @@ def mock_discovery_response():
     }
 
 
+@pytest.fixture
+def mock_discovery_response():
+    """Return an example discovery response (fixture)."""
+    return _mock_discovery_response()
+
+
 def get_jwk(pub_key):
     """Return a JWK representation of the public key."""
     public_numbers = pub_key.public_numbers()
@@ -233,23 +246,27 @@ def get_jwk(pub_key):
     }
 
 
-@pytest.fixture
-def mock_oidc_jwks():
+def _mock_oidc_jwks():
     """Mock OpenID Connect keys."""
     return {"keys": [get_jwk(public_key)]}
 
 
 @pytest.fixture
-def encoded_token():
+def mock_oidc_jwks():
+    """Mock OpenID Connect keys (fixture)."""
+    return _mock_oidc_jwks()
+
+
+def _create_oidc_token(sub, scopes):
     """Encode token with the private key."""
     return jwt.encode(
         claims={
-            "sub": "123|oidc",
+            "sub": sub,
             "iss": "https://iss.example.com",
             "aud": AUDIENCE,
             "iat": 0,  # Issued the 1/1/1970
             "exp": 9999999999,  # Expiring in 11/20/2286
-            "scope": "all statements/read",
+            "scope": " ".join(scopes),
         },
         key=private_key.private_bytes(
             serialization.Encoding.PEM,
@@ -261,3 +278,39 @@ def encoded_token():
             "kid": PUBLIC_KEY_ID,
         },
     )
+
+
+def mock_oidc_user(sub="123|oidc", scopes=None):
+    """Instantiate mock oidc user and return auth token."""
+    # Default value for scope
+    if scopes is None:
+        scopes = ["all", "statements/read"]
+
+    # Clear LRU cache
+    discover_provider.cache_clear()
+    get_public_keys.cache_clear()
+
+    # Mock request to get provider configuration
+    responses.add(
+        responses.GET,
+        f"{ISSUER_URI}/.well-known/openid-configuration",
+        json=_mock_discovery_response(),
+        status=200,
+    )
+
+    # Mock request to get keys
+    responses.add(
+        responses.GET,
+        _mock_discovery_response()["jwks_uri"],
+        json=_mock_oidc_jwks(),
+        status=200,
+    )
+
+    oidc_token = _create_oidc_token(sub=sub, scopes=scopes)
+    return oidc_token
+
+
+@pytest.fixture
+def encoded_token():
+    """Encode token with the private key (fixture)."""
+    return _create_oidc_token(sub="123|oidc", scopes=["all", "statements/read"])
