@@ -1134,13 +1134,30 @@ With the Keycloak instance running, use curl to get access token from Keycloak:
 <h2 id="security">Security<a class="headerlink" href="#security" title="Permanent link">&para;</a></h2>
 <p>By default, all authenticated users have full read and write access to the server. You may use the options below to restrict behavior.</p>
 <h3 id="filtering_results_by_authority_multitenancy">Filtering results by authority (multitenancy)<a class="headerlink" href="#filtering_results_by_authority_multitenancy" title="Permanent link">&para;</a></h3>
-<p>In Ralph, all incoming statements are assigned an <code>authority</code> (or ownership) derived from the user that makes the call. You may restrict read access to users &ldquo;own&rdquo; statements (thus enabling multitenancy) by setting the following environment variable: </p>
+<p>In Ralph LRS, all incoming statements are assigned an <code>authority</code> (or ownership) derived from the user that makes the call. You may restrict read access to users &ldquo;own&rdquo; statements (thus enabling multitenancy) by setting the following environment variable: </p>
 <div class="highlight"><pre><span></span><code>RALPH_LRS_RESTRICT_BY_AUTHORITY = True # Default: False
 </code></pre></div>
 <p><strong>WARNING</strong>: Two accounts with different credentials may share the same <code>authority</code> meaning they can access the same statements. It is the administrators responsability to ensure that <code>authority</code> is properly assigned.</p>
 <p>NB: If not using &ldquo;scopes&rdquo;, or for users with limited &ldquo;scopes&rdquo;, using this option will make the use of option <code>?mine=True</code> implicit when fetching statement.</p>
 <h4 id="scopes">Scopes<a class="headerlink" href="#scopes" title="Permanent link">&para;</a></h4>
-<p>(Work In Progress)</p>
+<p>In Ralph, users are assigned scopes which may be used to restrict endpoint access or 
+functionalities. You may enable this option by setting the following environment variable:</p>
+<div class="highlight"><pre><span></span><code>RALPH_LRS_RESTRICT_BY_SCOPES = True # Default: False
+</code></pre></div>
+<p>Valid scopes are a slight variation on those proposed by the
+<a href="https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#details-15">xAPI specification</a>:</p>
+<ul>
+<li>statements/write</li>
+<li>statements/read/mine</li>
+<li>statements/read</li>
+<li>state/write</li>
+<li>state/read</li>
+<li>define</li>
+<li>profile/write</li>
+<li>profile/read</li>
+<li>all/read</li>
+<li>all</li>
+</ul>
 <h2 id="forwarding_statements">Forwarding statements<a class="headerlink" href="#forwarding_statements" title="Permanent link">&para;</a></h2>
 <p>Ralph&rsquo;s API server can be configured to forward xAPI statements it receives to other
 LRSes.</p>
