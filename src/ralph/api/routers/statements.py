@@ -15,6 +15,7 @@ from fastapi import (
     Query,
     Request,
     Response,
+    Security,
     status,
 )
 from fastapi.dependencies.models import Dependant
@@ -101,6 +102,7 @@ def _enrich_statement_with_authority(statement: dict, current_user: Authenticate
 def _parse_agent_parameters(agent_obj: dict):
     """Parse a dict and return an AgentParameters object to use in queries."""
     # Transform agent to `dict` as FastAPI cannot parse JSON (seen as string)
+
     agent = parse_obj_as(BaseXapiAgent, agent_obj)
 
     agent_query_params = {}
@@ -137,10 +139,12 @@ def strict_query_params(request: Request):
 
 @router.get("")
 @router.get("/")
-# pylint: disable=too-many-arguments, too-many-locals
 async def get(
     request: Request,
-    current_user: Annotated[AuthenticatedUser, Depends(get_authenticated_user)],
+    current_user: Annotated[
+        AuthenticatedUser,
+        Security(get_authenticated_user, scopes=["statements/read/mine"]),
+    ],
     ###
     # Query string parameters defined by the LRS specification
     ###
@@ -170,7 +174,6 @@ async def get(
             "of the Statement is an Activity with the specified id"
         ),
     ),
-    # pylint: disable=unused-argument
     registration: Optional[UUID] = Query(
         None,
         description=(
@@ -178,7 +181,6 @@ async def get(
             "Filter, only return Statements matching the specified registration id"
         ),
     ),
-    # pylint: disable=unused-argument
     related_activities: Optional[bool] = Query(
         False,
         description=(
@@ -189,7 +191,6 @@ async def get(
             "instead of that parameter's normal behaviour"
         ),
     ),
-    # pylint: disable=unused-argument
     related_agents: Optional[bool] = Query(
         False,
         description=(
@@ -221,7 +222,6 @@ async def get(
             "0 indicates return the maximum the server will allow"
         ),
     ),
-    # pylint: disable=unused-argument, redefined-builtin
     format: Optional[Literal["ids", "exact", "canonical"]] = Query(
         "exact",
         description=(
@@ -240,7 +240,6 @@ async def get(
             'as in "exact" mode.'
         ),
     ),
-    # pylint: disable=unused-argument
     attachments: Optional[bool] = Query(
         False,
         description=(
@@ -286,6 +285,9 @@ async def get(
     LRS Specification:
     https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#213-get-statements
     """
+    # pylint: disable=unused-argument,redefined-builtin,too-many-arguments
+    # pylint: disable=too-many-locals
+
     # Make sure the limit does not go above max from settings
     limit = min(limit, settings.RUNSERVER_MAX_SEARCH_HITS_COUNT)
 
@@ -334,14 +336,15 @@ async def get(
             json.loads(query_params["agent"])
         )
 
-    if settings.LRS_RESTRICT_BY_AUTHORITY:
-        # If using scopes, only restrict results when appropriate
-        if settings.LRS_RESTRICT_BY_SCOPES:
-            raise NotImplementedError("Scopes are not yet implemented in Ralph.")
-
-        # Otherwise, enforce mine for all users
+    # mine: If using scopes, only restrict users with limited scopes
+    if settings.LRS_RESTRICT_BY_SCOPES:
+        if not current_user.scopes.is_authorized("statements/read"):
+            mine = True
+    # mine: If using only authority, always restrict (otherwise, use the default value)
+    elif settings.LRS_RESTRICT_BY_AUTHORITY:
         mine = True
 
+    # Filter by authority if using `mine`
     if mine:
         query_params["authority"] = _parse_agent_parameters(current_user.agent)
 
@@ -399,7 +402,10 @@ async def get(
 @router.put("", responses=POST_PUT_RESPONSES, status_code=status.HTTP_204_NO_CONTENT)
 # pylint: disable=unused-argument, too-many-branches
 async def put(
-    current_user: Annotated[AuthenticatedUser, Depends(get_authenticated_user)],
+    current_user: Annotated[
+        AuthenticatedUser,
+        Security(get_authenticated_user, scopes=["statements/write"]),
+    ],
     statement: LaxStatement,
     background_tasks: BackgroundTasks,
     statement_id: UUID = Query(alias="statementId"),
@@ -478,7 +484,10 @@ async def put(
 @router.post("", responses=POST_PUT_RESPONSES)
 # pylint: disable = too-many-branches
 async def post(
-    current_user: Annotated[AuthenticatedUser, Depends(get_authenticated_user)],
+    current_user: Annotated[
+        AuthenticatedUser,
+        Security(get_authenticated_user, scopes=["statements/write"]),
+    ],
     statements: Union[LaxStatement, List[LaxStatement]],
     background_tasks: BackgroundTasks,
     response: Response,

@@ -9,7 +9,7 @@ from typing import List, Union
 import bcrypt
 from cachetools import TTLCache, cached
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.security import HTTPBasic, HTTPBasicCredentials, SecurityScopes
 from pydantic import BaseModel, root_validator
 from starlette.authentication import AuthenticationError
 
@@ -102,15 +102,17 @@ def get_stored_credentials(auth_file: Path) -> ServerUsersCredentials:
 @cached(
     TTLCache(maxsize=settings.AUTH_CACHE_MAX_SIZE, ttl=settings.AUTH_CACHE_TTL),
     lock=Lock(),
-    key=lambda credentials: (
+    key=lambda credentials, security_scopes: (
         credentials.username,
         credentials.password,
+        security_scopes.scope_str,
     )
     if credentials is not None
     else None,
 )
-def get_authenticated_user(
+def get_basic_auth_user(
     credentials: Union[HTTPBasicCredentials, None] = Depends(security),
+    security_scopes: SecurityScopes = SecurityScopes([]),
 ) -> AuthenticatedUser:
     """Checks valid auth parameters.
 
@@ -119,13 +121,10 @@ def get_authenticated_user(
 
     Args:
         credentials (iterator): auth parameters from the Authorization header
-
-    Return:
-        AuthenticatedUser (AuthenticatedUser)
+        security_scopes: scopes requested for access
 
     Raises:
         HTTPException
-
     """
     if not credentials:
         logger.error("The basic authentication mode requires a Basic Auth header")
@@ -156,6 +155,7 @@ def get_authenticated_user(
             status_code=status.HTTP_403_FORBIDDEN, detail=str(exc)
         ) from exc
 
+    # Check that a password was passed
     if not hashed_password:
         # We're doing a bogus password check anyway to avoid timing attacks on
         # usernames
@@ -168,6 +168,7 @@ def get_authenticated_user(
             headers={"WWW-Authenticate": "Basic"},
         )
 
+    # Check password validity
     if not bcrypt.checkpw(
         credentials.password.encode(settings.LOCALE_ENCODING),
         hashed_password.encode(settings.LOCALE_ENCODING),
@@ -182,4 +183,15 @@ def get_authenticated_user(
             headers={"WWW-Authenticate": "Basic"},
         )
 
-    return AuthenticatedUser(scopes=user.scopes, agent=user.agent)
+    user = AuthenticatedUser(scopes=user.scopes, agent=dict(user.agent))
+
+    # Restrict access by scopes
+    if settings.LRS_RESTRICT_BY_SCOPES:
+        for requested_scope in security_scopes.scopes:
+            if not user.scopes.is_authorized(requested_scope):
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail=f'Access not authorized to scope: "{requested_scope}".',
+                    headers={"WWW-Authenticate": "Basic"},
+                )
+    return user

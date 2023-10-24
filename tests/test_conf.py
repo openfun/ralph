@@ -7,6 +7,7 @@ import pytest
 from ralph import conf
 from ralph.backends.conf import BackendSettings
 from ralph.conf import CommaSeparatedTuple, Settings, settings
+from ralph.exceptions import ConfigurationException
 
 
 def test_conf_settings_field_value_priority(fs, monkeypatch):
@@ -73,3 +74,20 @@ def test_conf_core_settings_should_impact_settings_defaults(monkeypatch):
 
     # Defaults.
     assert str(conf.settings.AUTH_FILE) == "/foo/auth.json"
+
+
+def test_conf_forbidden_scopes_without_authority(monkeypatch):
+    """Test that using RESTRICT_BY_SCOPES without RESTRICT_BY_AUTHORITY raises an
+    error."""
+
+    monkeypatch.setenv("RALPH_LRS_RESTRICT_BY_AUTHORITY", False)
+    monkeypatch.setenv("RALPH_LRS_RESTRICT_BY_SCOPES", True)
+
+    with pytest.raises(
+        ConfigurationException,
+        match=(
+            "LRS_RESTRICT_BY_AUTHORITY must be set to True if using "
+            "LRS_RESTRICT_BY_SCOPES=True"
+        ),
+    ):
+        reload(conf)

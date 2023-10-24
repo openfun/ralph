@@ -5,11 +5,14 @@ from datetime import datetime, timedelta
 from urllib.parse import parse_qs, quote_plus, urlparse
 
 import pytest
+import responses
 from elasticsearch.helpers import bulk
 from fastapi.testclient import TestClient
 
 from ralph.api import app
-from ralph.api.auth.basic import get_authenticated_user
+from ralph.api.auth import get_authenticated_user
+from ralph.api.auth.basic import get_basic_auth_user
+from ralph.api.auth.oidc import get_oidc_user
 from ralph.backends.data.base import BaseOperationType
 from ralph.backends.data.clickhouse import ClickHouseDataBackend
 from ralph.backends.data.mongo import MongoDataBackend
@@ -28,7 +31,7 @@ from tests.fixtures.backends import (
     get_mongo_test_backend,
 )
 
-from ..fixtures.auth import mock_basic_auth_user
+from ..fixtures.auth import mock_basic_auth_user, mock_oidc_user
 from ..helpers import mock_activity, mock_agent
 
 client = TestClient(app)
@@ -81,28 +84,27 @@ def insert_clickhouse_statements(statements):
 
 
 @pytest.fixture(params=["es", "mongo", "clickhouse"])
-# pylint: disable=unused-argument
 def insert_statements_and_monkeypatch_backend(
     request, es, mongo, clickhouse, monkeypatch
 ):
     """(Security) Return a function that inserts statements into each backend."""
-    # pylint: disable=invalid-name
+    # pylint: disable=invalid-name,unused-argument
 
     def _insert_statements_and_monkeypatch_backend(statements):
         """Inserts statements once into each backend."""
-        database_client_class_path = "ralph.api.routers.statements.BACKEND_CLIENT"
+        backend_client_class_path = "ralph.api.routers.statements.BACKEND_CLIENT"
         if request.param == "mongo":
             insert_mongo_statements(mongo, statements)
-            monkeypatch.setattr(database_client_class_path, get_mongo_test_backend())
+            monkeypatch.setattr(backend_client_class_path, get_mongo_test_backend())
             return
         if request.param == "clickhouse":
             insert_clickhouse_statements(statements)
             monkeypatch.setattr(
-                database_client_class_path, get_clickhouse_test_backend()
+                backend_client_class_path, get_clickhouse_test_backend()
             )
             return
         insert_es_statements(es, statements)
-        monkeypatch.setattr(database_client_class_path, get_es_test_backend())
+        monkeypatch.setattr(backend_client_class_path, get_es_test_backend())
 
     return _insert_statements_and_monkeypatch_backend
 
@@ -123,8 +125,7 @@ def test_api_statements_get_mine(
     """(Security) Test that the get statements API route, given a "mine=True"
     query parameter returns a list of statements filtered by authority.
     """
-    # pylint: disable=redefined-outer-name
-    # pylint: disable=invalid-name
+    # pylint: disable=redefined-outer-name,invalid-name
 
     # Create two distinct agents
     if ifi == "account_same_home_page":
@@ -153,7 +154,7 @@ def test_api_statements_get_mine(
     )
 
     # Clear cache before each test iteration
-    get_authenticated_user.cache_clear()
+    get_basic_auth_user.cache_clear()
 
     statements = [
         {
@@ -233,7 +234,7 @@ def test_api_statements_get_mine(
 
 
 def test_api_statements_get(
-    insert_statements_and_monkeypatch_backend, auth_credentials
+    insert_statements_and_monkeypatch_backend, basic_auth_credentials
 ):
     """Test the get statements API route without any filters set up."""
     # pylint: disable=redefined-outer-name
@@ -253,7 +254,7 @@ def test_api_statements_get(
     # Confirm that calling this with and without the trailing slash both work
     for path in ("/xAPI/statements", "/xAPI/statements/"):
         response = client.get(
-            path, headers={"Authorization": f"Basic {auth_credentials}"}
+            path, headers={"Authorization": f"Basic {basic_auth_credentials}"}
         )
 
         assert response.status_code == 200
@@ -261,7 +262,7 @@ def test_api_statements_get(
 
 
 def test_api_statements_get_ascending(
-    insert_statements_and_monkeypatch_backend, auth_credentials
+    insert_statements_and_monkeypatch_backend, basic_auth_credentials
 ):
     """Test the get statements API route, given an "ascending" query parameter, should
     return statements in ascending order by their timestamp.
@@ -282,7 +283,7 @@ def test_api_statements_get_ascending(
 
     response = client.get(
         "/xAPI/statements/?ascending=true",
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
 
     assert response.status_code == 200
@@ -290,7 +291,7 @@ def test_api_statements_get_ascending(
 
 
 def test_api_statements_get_by_statement_id(
-    insert_statements_and_monkeypatch_backend, auth_credentials
+    insert_statements_and_monkeypatch_backend, basic_auth_credentials
 ):
     """Test the get statements API route, given a "statementId" query parameter, should
     return a list of statements matching the given statementId.
@@ -311,7 +312,7 @@ def test_api_statements_get_by_statement_id(
 
     response = client.get(
         f"/xAPI/statements/?statementId={statements[1]['id']}",
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
 
     assert response.status_code == 200
@@ -329,7 +330,7 @@ def test_api_statements_get_by_statement_id(
     ],
 )
 def test_api_statements_get_by_agent(
-    ifi, insert_statements_and_monkeypatch_backend, auth_credentials
+    ifi, insert_statements_and_monkeypatch_backend, basic_auth_credentials
 ):
     """Test the get statements API route, given an "agent" query parameter, should
     return a list of statements filtered by the given agent.
@@ -365,7 +366,7 @@ def test_api_statements_get_by_agent(
 
     response = client.get(
         f"/xAPI/statements/?agent={quote_plus(json.dumps(agent_1))}",
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
 
     assert response.status_code == 200
@@ -373,7 +374,7 @@ def test_api_statements_get_by_agent(
 
 
 def test_api_statements_get_by_verb(
-    insert_statements_and_monkeypatch_backend, auth_credentials
+    insert_statements_and_monkeypatch_backend, basic_auth_credentials
 ):
     """Test the get statements API route, given a "verb" query parameter, should
     return a list of statements filtered by the given verb id.
@@ -396,7 +397,7 @@ def test_api_statements_get_by_verb(
 
     response = client.get(
         "/xAPI/statements/?verb=" + quote_plus("http://adlnet.gov/expapi/verbs/played"),
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
 
     assert response.status_code == 200
@@ -404,7 +405,7 @@ def test_api_statements_get_by_verb(
 
 
 def test_api_statements_get_by_activity(
-    insert_statements_and_monkeypatch_backend, auth_credentials
+    insert_statements_and_monkeypatch_backend, basic_auth_credentials
 ):
     """Test the get statements API route, given an "activity" query parameter, should
     return a list of statements filtered by the given activity id.
@@ -430,7 +431,7 @@ def test_api_statements_get_by_activity(
 
     response = client.get(
         f"/xAPI/statements/?activity={activity_1['id']}",
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
 
     assert response.status_code == 200
@@ -439,7 +440,7 @@ def test_api_statements_get_by_activity(
     # Check that badly formated activity returns an error
     response = client.get(
         "/xAPI/statements/?activity=INVALID_IRI",
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
 
     assert response.status_code == 422
@@ -447,7 +448,7 @@ def test_api_statements_get_by_activity(
 
 
 def test_api_statements_get_since_timestamp(
-    insert_statements_and_monkeypatch_backend, auth_credentials
+    insert_statements_and_monkeypatch_backend, basic_auth_credentials
 ):
     """Test the get statements API route, given a "since" query parameter, should
     return a list of statements filtered by the given timestamp.
@@ -469,7 +470,7 @@ def test_api_statements_get_since_timestamp(
     since = (datetime.now() - timedelta(minutes=30)).isoformat()
     response = client.get(
         f"/xAPI/statements/?since={since}",
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
 
     assert response.status_code == 200
@@ -477,7 +478,7 @@ def test_api_statements_get_since_timestamp(
 
 
 def test_api_statements_get_until_timestamp(
-    insert_statements_and_monkeypatch_backend, auth_credentials
+    insert_statements_and_monkeypatch_backend, basic_auth_credentials
 ):
     """Test the get statements API route, given an "until" query parameter,
     should return a list of statements filtered by the given timestamp.
@@ -499,7 +500,7 @@ def test_api_statements_get_until_timestamp(
     until = (datetime.now() - timedelta(minutes=30)).isoformat()
     response = client.get(
         f"/xAPI/statements/?until={until}",
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
 
     assert response.status_code == 200
@@ -507,7 +508,7 @@ def test_api_statements_get_until_timestamp(
 
 
 def test_api_statements_get_with_pagination(
-    monkeypatch, insert_statements_and_monkeypatch_backend, auth_credentials
+    monkeypatch, insert_statements_and_monkeypatch_backend, basic_auth_credentials
 ):
     """Test the get statements API route, given a request leading to more results than
     can fit on the first page, should return a list of statements non-exceeding the page
@@ -546,7 +547,8 @@ def test_api_statements_get_with_pagination(
     # First response gets the first two results, with a "more" entry as
     # we have more results to return on a later page.
     first_response = client.get(
-        "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
     assert first_response.status_code == 200
     assert first_response.json()["statements"] == [statements[4], statements[3]]
@@ -558,7 +560,7 @@ def test_api_statements_get_with_pagination(
     # Second response gets the missing result from the first response.
     second_response = client.get(
         first_response.json()["more"],
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
     assert second_response.status_code == 200
     assert second_response.json()["statements"] == [statements[2], statements[1]]
@@ -570,14 +572,14 @@ def test_api_statements_get_with_pagination(
     # Third response gets the missing result from the first response
     third_response = client.get(
         second_response.json()["more"],
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
     assert third_response.status_code == 200
     assert third_response.json() == {"statements": [statements[0]]}
 
 
 def test_api_statements_get_with_pagination_and_query(
-    monkeypatch, insert_statements_and_monkeypatch_backend, auth_credentials
+    monkeypatch, insert_statements_and_monkeypatch_backend, basic_auth_credentials
 ):
     """Test the get statements API route, given a request with a query parameter
     leading to more results than can fit on the first page, should return a list
@@ -623,7 +625,7 @@ def test_api_statements_get_with_pagination_and_query(
     first_response = client.get(
         "/xAPI/statements/?verb="
         + quote_plus("https://w3id.org/xapi/video/verbs/played"),
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
     assert first_response.status_code == 200
     assert first_response.json()["statements"] == [statements[2], statements[1]]
@@ -635,14 +637,14 @@ def test_api_statements_get_with_pagination_and_query(
     # Second response gets the missing result from the first response.
     second_response = client.get(
         first_response.json()["more"],
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
     assert second_response.status_code == 200
     assert second_response.json() == {"statements": [statements[0]]}
 
 
 def test_api_statements_get_with_no_matching_statement(
-    insert_statements_and_monkeypatch_backend, auth_credentials
+    insert_statements_and_monkeypatch_backend, basic_auth_credentials
 ):
     """Test the get statements API route, given a query yielding no matching statement,
     should return an empty list.
@@ -663,14 +665,16 @@ def test_api_statements_get_with_no_matching_statement(
 
     response = client.get(
         "/xAPI/statements/?statementId=66c81e98-1763-4730-8cfc-f5ab34f1bad5",
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
 
     assert response.status_code == 200
     assert response.json() == {"statements": []}
 
 
-def test_api_statements_get_with_database_query_failure(auth_credentials, monkeypatch):
+def test_api_statements_get_with_database_query_failure(
+    basic_auth_credentials, monkeypatch
+):
     """Test the get statements API route, given a query raising a BackendException,
     should return an error response with HTTP code 500.
     """
@@ -687,14 +691,14 @@ def test_api_statements_get_with_database_query_failure(auth_credentials, monkey
 
     response = client.get(
         "/xAPI/statements/",
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
     assert response.status_code == 500
     assert response.json() == {"detail": "xAPI statements query failed"}
 
 
 @pytest.mark.parametrize("id_param", ["statementId", "voidedStatementId"])
-def test_api_statements_get_invalid_query_parameters(auth_credentials, id_param):
+def test_api_statements_get_invalid_query_parameters(basic_auth_credentials, id_param):
     """Test error response for invalid query parameters"""
 
     id_1 = "be67b160-d958-4f51-b8b8-1892002dbac6"
@@ -703,7 +707,7 @@ def test_api_statements_get_invalid_query_parameters(auth_credentials, id_param)
     # Check for 400 status code when unknown parameters are provided
     response = client.get(
         "/xAPI/statements/?mamamia=herewegoagain",
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
     assert response.status_code == 400
     assert response.json() == {
@@ -713,7 +717,7 @@ def test_api_statements_get_invalid_query_parameters(auth_credentials, id_param)
     # Check for 400 status code when both statementId and voidedStatementId are provided
     response = client.get(
         f"/xAPI/statements/?statementId={id_1}&voidedStatementId={id_2}",
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
     assert response.status_code == 400
 
@@ -725,7 +729,7 @@ def test_api_statements_get_invalid_query_parameters(auth_credentials, id_param)
     ]:
         response = client.get(
             f"/xAPI/statements/?{id_param}={id_1}&{invalid_param}={value}",
-            headers={"Authorization": f"Basic {auth_credentials}"},
+            headers={"Authorization": f"Basic {basic_auth_credentials}"},
         )
         assert response.status_code == 400
         assert response.json() == {
@@ -739,6 +743,166 @@ def test_api_statements_get_invalid_query_parameters(auth_credentials, id_param)
     for valid_param, value in [("format", "ids"), ("attachments", "true")]:
         response = client.get(
             f"/xAPI/statements/?{id_param}={id_1}&{valid_param}={value}",
-            headers={"Authorization": f"Basic {auth_credentials}"},
+            headers={"Authorization": f"Basic {basic_auth_credentials}"},
         )
         assert response.status_code != 400
+
+
+@responses.activate
+@pytest.mark.parametrize("auth_method", ["basic", "oidc"])
+@pytest.mark.parametrize(
+    "scopes,is_authorized",
+    [
+        (["all"], True),
+        (["all/read"], True),
+        (["statements/read/mine"], True),
+        (["statements/read"], True),
+        (["profile/write", "statements/read", "all/write"], True),
+        (["statements/write"], False),
+        (["profile/read"], False),
+        (["all/write"], False),
+        ([], False),
+    ],
+)
+def test_api_statements_get_scopes(
+    monkeypatch, fs, es, auth_method, scopes, is_authorized
+):
+    """Test that getting statements behaves properly according to user scopes."""
+    # pylint: disable=invalid-name,too-many-locals,too-many-arguments
+
+    monkeypatch.setattr(
+        "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_SCOPES", True
+    )
+    monkeypatch.setattr("ralph.api.auth.basic.settings.LRS_RESTRICT_BY_SCOPES", True)
+
+    if auth_method == "basic":
+        agent = mock_agent("mbox", 1)
+        credentials = mock_basic_auth_user(fs, scopes=scopes, agent=agent)
+        headers = {"Authorization": f"Basic {credentials}"}
+
+        app.dependency_overrides[get_authenticated_user] = get_basic_auth_user
+        get_basic_auth_user.cache_clear()
+
+    elif auth_method == "oidc":
+        sub = "123|oidc"
+        iss = "https://iss.example.com"
+        agent = {"openid": f"{iss}/{sub}"}
+        oidc_token = mock_oidc_user(sub=sub, scopes=scopes)
+        headers = {"Authorization": f"Bearer {oidc_token}"}
+
+        monkeypatch.setattr(
+            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_ISSUER_URI",
+            "http://providerHost:8080/auth/realms/real_name",
+        )
+        monkeypatch.setattr(
+            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_AUDIENCE",
+            "http://clientHost:8100",
+        )
+
+        app.dependency_overrides[get_authenticated_user] = get_oidc_user
+
+    statements = [
+        {
+            "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
+            "timestamp": (datetime.now() - timedelta(hours=1)).isoformat(),
+            "actor": agent,
+            "authority": agent,
+        },
+        {
+            "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
+            "timestamp": datetime.now().isoformat(),
+            "actor": agent,
+            "authority": agent,
+        },
+    ]
+
+    # NB: scopes are not linked to statements and backends, we therefore test with ES
+    backend_client_class_path = "ralph.api.routers.statements.BACKEND_CLIENT"
+    insert_es_statements(es, statements)
+    monkeypatch.setattr(backend_client_class_path, get_es_test_backend())
+
+    response = client.get(
+        "/xAPI/statements/",
+        headers=headers,
+    )
+
+    if is_authorized:
+        assert response.status_code == 200
+        assert response.json() == {"statements": [statements[1], statements[0]]}
+    else:
+        assert response.status_code == 401
+        assert response.json() == {
+            "detail": 'Access not authorized to scope: "statements/read/mine".'
+        }
+
+    app.dependency_overrides.pop(get_authenticated_user, None)
+
+
+@pytest.mark.parametrize(
+    "scopes,read_all_access",
+    [
+        (["all"], True),
+        (["all/read", "statements/read/mine"], True),
+        (["statements/read"], True),
+        (["statements/read/mine"], False),
+    ],
+)
+def test_api_statements_get_scopes_with_authority(
+    monkeypatch, fs, es, scopes, read_all_access
+):
+    """Test that restricting by scope and by authority behaves properly.
+    Getting statements should be restricted to mine for users which only have
+    `statements/read/mine` scope but should not be restricted when the user
+    has wider scopes.
+    """
+    # pylint: disable=invalid-name
+    monkeypatch.setattr(
+        "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_AUTHORITY", True
+    )
+    monkeypatch.setattr(
+        "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_SCOPES", True
+    )
+    monkeypatch.setattr("ralph.api.auth.basic.settings.LRS_RESTRICT_BY_SCOPES", True)
+
+    agent = mock_agent("mbox", 1)
+    agent_2 = mock_agent("mbox", 2)
+    username = "jane"
+    password = "janepwd"
+    credentials = mock_basic_auth_user(fs, username, password, scopes, agent)
+    headers = {"Authorization": f"Basic {credentials}"}
+
+    get_basic_auth_user.cache_clear()
+
+    statements = [
+        {
+            "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
+            "timestamp": (datetime.now() - timedelta(hours=1)).isoformat(),
+            "actor": agent,
+            "authority": agent,
+        },
+        {
+            "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
+            "timestamp": datetime.now().isoformat(),
+            "actor": agent,
+            "authority": agent_2,
+        },
+    ]
+
+    # NB: scopes are not linked to statements and backends, we therefore test with ES
+    backend_client_class_path = "ralph.api.routers.statements.BACKEND_CLIENT"
+    insert_es_statements(es, statements)
+    monkeypatch.setattr(backend_client_class_path, get_es_test_backend())
+
+    response = client.get(
+        "/xAPI/statements/",
+        headers=headers,
+    )
+
+    assert response.status_code == 200
+
+    if read_all_access:
+        assert response.json() == {"statements": [statements[1], statements[0]]}
+    else:
+        assert response.json() == {"statements": [statements[0]]}
+
+    app.dependency_overrides.pop(get_authenticated_user, None)

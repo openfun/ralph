@@ -48,6 +48,8 @@ have an authority field matching that of the user
 - CLI: list cli usage strings in alphabetical order
 - Helm: Fix clickhouse version
 - Helm: improve volumes and ingress configurations
+- API: Add `RALPH_LRS_RESTRICT_BY_SCOPE` option enabling endpoint access
+  control by user scopes
 
 ### Fixed
 

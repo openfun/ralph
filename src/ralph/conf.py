@@ -19,7 +19,10 @@ except ImportError:
     from unittest.mock import Mock
 
     get_app_dir = Mock(return_value=".")
-from pydantic import AnyHttpUrl, AnyUrl, BaseModel, BaseSettings, Extra
+
+from pydantic import AnyHttpUrl, AnyUrl, BaseModel, BaseSettings, Extra, root_validator
+
+from ralph.exceptions import ConfigurationException
 
 from .utils import import_string
 
@@ -209,6 +212,19 @@ class Settings(BaseSettings):
     def LOCALE_ENCODING(self) -> str:  # pylint: disable=invalid-name
         """Returns Ralph's default locale encoding."""
         return self._CORE.LOCALE_ENCODING
+
+    @root_validator(allow_reuse=True)
+    @classmethod
+    def check_restriction_compatibility(cls, values):
+        """Raise an error if scopes are being used without authority restriction."""
+        if values.get("LRS_RESTRICT_BY_SCOPES") and not values.get(
+            "LRS_RESTRICT_BY_AUTHORITY"
+        ):
+            raise ConfigurationException(
+                "LRS_RESTRICT_BY_AUTHORITY must be set to True if using "
+                "LRS_RESTRICT_BY_SCOPES=True"
+            )
+        return values
 
 
 settings = Settings()

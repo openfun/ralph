@@ -4,15 +4,20 @@ import re
 from uuid import uuid4
 
 import pytest
+import responses
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
 from ralph.api import app
+from ralph.api.auth import get_authenticated_user
+from ralph.api.auth.basic import get_basic_auth_user
+from ralph.api.auth.oidc import get_oidc_user
 from ralph.backends.lrs.es import ESLRSBackend
 from ralph.backends.lrs.mongo import MongoLRSBackend
 from ralph.conf import XapiForwardingConfigurationSettings
 from ralph.exceptions import BackendException
 
+from tests.fixtures.auth import mock_basic_auth_user, mock_oidc_user
 from tests.fixtures.backends import (
     ES_TEST_FORWARDING_INDEX,
     ES_TEST_HOSTS,
@@ -28,6 +33,7 @@ from tests.fixtures.backends import (
 
 from ..helpers import (
     assert_statement_get_responses_are_equivalent,
+    mock_agent,
     mock_statement,
     string_is_date,
     string_is_uuid,
@@ -36,7 +42,7 @@ from ..helpers import (
 client = TestClient(app)
 
 
-def test_api_statements_post_invalid_parameters(auth_credentials):
+def test_api_statements_post_invalid_parameters(basic_auth_credentials):
     """Test that using invalid parameters returns the proper status code."""
 
     statement = mock_statement()
@@ -44,7 +50,7 @@ def test_api_statements_post_invalid_parameters(auth_credentials):
     # Check for 400 status code when unknown parameters are provided
     response = client.post(
         "/xAPI/statements/?mamamia=herewegoagain",
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=statement,
     )
     assert response.status_code == 400
@@ -59,7 +65,7 @@ def test_api_statements_post_invalid_parameters(auth_credentials):
 )
 # pylint: disable=too-many-arguments
 def test_api_statements_post_single_statement_directly(
-    backend, monkeypatch, auth_credentials, es, mongo, clickhouse
+    backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
     """Test the post statements API route with one statement."""
     # pylint: disable=invalid-name,unused-argument
@@ -69,7 +75,7 @@ def test_api_statements_post_single_statement_directly(
 
     response = client.post(
         "/xAPI/statements/",
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=statement,
     )
 
@@ -79,7 +85,8 @@ def test_api_statements_post_single_statement_directly(
     es.indices.refresh()
 
     response = client.get(
-        "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
     assert response.status_code == 200
     assert_statement_get_responses_are_equivalent(
@@ -89,7 +96,7 @@ def test_api_statements_post_single_statement_directly(
 
 # pylint: disable=too-many-arguments
 def test_api_statements_post_enriching_without_existing_values(
-    monkeypatch, auth_credentials, es
+    monkeypatch, basic_auth_credentials, es
 ):
     """Test that statements are properly enriched when statement provides no values."""
     # pylint: disable=invalid-name,unused-argument
@@ -111,7 +118,7 @@ def test_api_statements_post_enriching_without_existing_values(
 
     response = client.post(
         "/xAPI/statements/",
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=statement,
     )
 
@@ -120,7 +127,8 @@ def test_api_statements_post_enriching_without_existing_values(
     es.indices.refresh()
 
     response = client.get(
-        "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
 
     statement = response.json()["statements"][0]
@@ -153,7 +161,7 @@ def test_api_statements_post_enriching_without_existing_values(
 )
 # pylint: disable=too-many-arguments
 def test_api_statements_post_enriching_with_existing_values(
-    field, value, status, monkeypatch, auth_credentials, es
+    field, value, status, monkeypatch, basic_auth_credentials, es
 ):
     """Test that statements are properly enriched when values are provided."""
     # pylint: disable=invalid-name,unused-argument
@@ -168,7 +176,7 @@ def test_api_statements_post_enriching_with_existing_values(
 
     response = client.post(
         "/xAPI/statements/",
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=statement,
     )
 
@@ -178,7 +186,8 @@ def test_api_statements_post_enriching_with_existing_values(
     if status == 200:
         es.indices.refresh()
         response = client.get(
-            "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
+            "/xAPI/statements/",
+            headers={"Authorization": f"Basic {basic_auth_credentials}"},
         )
         statement = response.json()["statements"][0]
 
@@ -198,7 +207,7 @@ def test_api_statements_post_enriching_with_existing_values(
 )
 # pylint: disable=too-many-arguments
 def test_api_statements_post_single_statement_no_trailing_slash(
-    backend, monkeypatch, auth_credentials, es, mongo, clickhouse
+    backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
     """Test that the statements endpoint also works without the trailing slash."""
     # pylint: disable=invalid-name,unused-argument
@@ -208,7 +217,7 @@ def test_api_statements_post_single_statement_no_trailing_slash(
 
     response = client.post(
         "/xAPI/statements",
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=statement,
     )
 
@@ -222,7 +231,7 @@ def test_api_statements_post_single_statement_no_trailing_slash(
 )
 # pylint: disable=too-many-arguments
 def test_api_statements_post_list_of_one(
-    backend, monkeypatch, auth_credentials, es, mongo, clickhouse
+    backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
     """Test the post statements API route with one statement in a list."""
     # pylint: disable=invalid-name,unused-argument
@@ -232,7 +241,7 @@ def test_api_statements_post_list_of_one(
 
     response = client.post(
         "/xAPI/statements/",
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=[statement],
     )
 
@@ -241,7 +250,8 @@ def test_api_statements_post_list_of_one(
     es.indices.refresh()
 
     response = client.get(
-        "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
     assert response.status_code == 200
     assert_statement_get_responses_are_equivalent(
@@ -255,7 +265,7 @@ def test_api_statements_post_list_of_one(
 )
 # pylint: disable=too-many-arguments
 def test_api_statements_post_list(
-    backend, monkeypatch, auth_credentials, es, mongo, clickhouse
+    backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
     """Test the post statements API route with two statements in a list."""
     # pylint: disable=invalid-name,unused-argument
@@ -272,7 +282,7 @@ def test_api_statements_post_list(
 
     response = client.post(
         "/xAPI/statements/",
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=statements,
     )
 
@@ -284,7 +294,8 @@ def test_api_statements_post_list(
     es.indices.refresh()
 
     get_response = client.get(
-        "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
     assert get_response.status_code == 200
 
@@ -306,7 +317,7 @@ def test_api_statements_post_list(
 )
 # pylint: disable=too-many-arguments
 def test_api_statements_post_list_with_duplicates(
-    backend, monkeypatch, auth_credentials, es_data_stream, mongo, clickhouse
+    backend, monkeypatch, basic_auth_credentials, es_data_stream, mongo, clickhouse
 ):
     """Test the post statements API route with duplicate statement IDs should fail."""
     # pylint: disable=invalid-name,unused-argument
@@ -316,7 +327,7 @@ def test_api_statements_post_list_with_duplicates(
 
     response = client.post(
         "/xAPI/statements/",
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=[statement, statement],
     )
 
@@ -327,7 +338,8 @@ def test_api_statements_post_list_with_duplicates(
     # The failure should imply no statement insertion.
     es_data_stream.indices.refresh()
     response = client.get(
-        "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
     assert response.status_code == 200
     assert response.json() == {"statements": []}
@@ -339,7 +351,7 @@ def test_api_statements_post_list_with_duplicates(
 )
 # pylint: disable=too-many-arguments
 def test_api_statements_post_list_with_duplicate_of_existing_statement(
-    backend, monkeypatch, auth_credentials, es, mongo, clickhouse
+    backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
     """Test the post statements API route, given a statement that already exist in the
     database (has the same ID), should fail.
@@ -354,7 +366,7 @@ def test_api_statements_post_list_with_duplicate_of_existing_statement(
     # Post the statement once.
     response = client.post(
         "/xAPI/statements/",
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=statement,
     )
     assert response.status_code == 200
@@ -366,7 +378,7 @@ def test_api_statements_post_list_with_duplicate_of_existing_statement(
     # include the ID in the response as it wasn't inserted.
     response = client.post(
         "/xAPI/statements/",
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=statement,
     )
     assert response.status_code == 204
@@ -376,7 +388,7 @@ def test_api_statements_post_list_with_duplicate_of_existing_statement(
     # Post the statement again, trying to change the timestamp which is not allowed.
     response = client.post(
         "/xAPI/statements/",
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=[dict(statement, **{"timestamp": "2023-03-15T14:07:51Z"})],
     )
 
@@ -387,7 +399,8 @@ def test_api_statements_post_list_with_duplicate_of_existing_statement(
     }
 
     response = client.get(
-        "/xAPI/statements/", headers={"Authorization": f"Basic {auth_credentials}"}
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
     assert response.status_code == 200
     assert_statement_get_responses_are_equivalent(
@@ -400,7 +413,7 @@ def test_api_statements_post_list_with_duplicate_of_existing_statement(
     [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
 )
 def test_api_statements_post_with_failure_during_storage(
-    backend, monkeypatch, auth_credentials, es, mongo, clickhouse
+    backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
     """Test the post statements API route with a failure happening during storage."""
     # pylint: disable=invalid-name,unused-argument, too-many-arguments
@@ -416,7 +429,7 @@ def test_api_statements_post_with_failure_during_storage(
 
     response = client.post(
         "/xAPI/statements/",
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=statement,
     )
 
@@ -429,7 +442,7 @@ def test_api_statements_post_with_failure_during_storage(
     [get_es_test_backend, get_clickhouse_test_backend, get_mongo_test_backend],
 )
 def test_api_statements_post_with_failure_during_id_query(
-    backend, monkeypatch, auth_credentials, es, mongo, clickhouse
+    backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
     """Test the post statements API route with a failure during query execution."""
     # pylint: disable=invalid-name,unused-argument,too-many-arguments
@@ -447,7 +460,7 @@ def test_api_statements_post_with_failure_during_id_query(
 
     response = client.post(
         "/xAPI/statements/",
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=statement,
     )
 
@@ -461,7 +474,7 @@ def test_api_statements_post_with_failure_during_id_query(
 )
 # pylint: disable=too-many-arguments
 def test_api_statements_post_list_without_forwarding(
-    backend, auth_credentials, monkeypatch, es, mongo, clickhouse
+    backend, basic_auth_credentials, monkeypatch, es, mongo, clickhouse
 ):
     """Test the post statements API route, given an empty forwarding configuration,
     should not start the forwarding background task.
@@ -487,7 +500,7 @@ def test_api_statements_post_list_without_forwarding(
 
     response = client.post(
         "/xAPI/statements/",
-        headers={"Authorization": f"Basic {auth_credentials}"},
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
         json=statement,
     )
 
@@ -520,7 +533,7 @@ async def test_api_statements_post_list_with_forwarding(
     receiving_backend,
     forwarding_backend,
     monkeypatch,
-    auth_credentials,
+    basic_auth_credentials,
     es,
     es_forwarding,
     mongo,
@@ -594,7 +607,7 @@ async def test_api_statements_post_list_with_forwarding(
             # The statement should be stored on the forwarding client
             response = await forwarding_client.get(
                 "/xAPI/statements/",
-                headers={"Authorization": f"Basic {auth_credentials}"},
+                headers={"Authorization": f"Basic {basic_auth_credentials}"},
             )
             assert response.status_code == 200
             assert_statement_get_responses_are_equivalent(
@@ -605,7 +618,7 @@ async def test_api_statements_post_list_with_forwarding(
     async with AsyncClient() as receiving_client:
         response = await receiving_client.get(
             f"http://{RUNSERVER_TEST_HOST}:{RUNSERVER_TEST_PORT}/xAPI/statements/",
-            headers={"Authorization": f"Basic {auth_credentials}"},
+            headers={"Authorization": f"Basic {basic_auth_credentials}"},
         )
         assert response.status_code == 200
         assert_statement_get_responses_are_equivalent(
@@ -614,3 +627,74 @@ async def test_api_statements_post_list_with_forwarding(
 
     # Stop receiving LRS client
     await lrs_context.__aexit__(None, None, None)
+
+
+@responses.activate
+@pytest.mark.parametrize("auth_method", ["basic", "oidc"])
+@pytest.mark.parametrize(
+    "scopes,is_authorized",
+    [
+        (["all"], True),
+        (["profile/read", "statements/write"], True),
+        (["all/read"], False),
+        (["statements/read/mine"], False),
+        (["profile/write"], False),
+        ([], False),
+    ],
+)
+def test_api_statements_post_scopes(
+    monkeypatch, fs, es, auth_method, scopes, is_authorized
+):
+    """Test that posting statements behaves properly according to user scopes."""
+    # pylint: disable=invalid-name,unused-argument
+    monkeypatch.setattr(
+        "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_SCOPES", True
+    )
+    monkeypatch.setattr("ralph.api.auth.basic.settings.LRS_RESTRICT_BY_SCOPES", True)
+
+    if auth_method == "basic":
+        agent = mock_agent("mbox", 1)
+        credentials = mock_basic_auth_user(fs, scopes=scopes, agent=agent)
+        headers = {"Authorization": f"Basic {credentials}"}
+
+        app.dependency_overrides[get_authenticated_user] = get_basic_auth_user
+        get_basic_auth_user.cache_clear()
+
+    elif auth_method == "oidc":
+        sub = "123|oidc"
+        agent = {"openid": sub}
+        oidc_token = mock_oidc_user(sub=sub, scopes=scopes)
+        headers = {"Authorization": f"Bearer {oidc_token}"}
+
+        monkeypatch.setattr(
+            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_ISSUER_URI",
+            "http://providerHost:8080/auth/realms/real_name",
+        )
+        monkeypatch.setattr(
+            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_AUDIENCE",
+            "http://clientHost:8100",
+        )
+
+        app.dependency_overrides[get_authenticated_user] = get_oidc_user
+
+    statement = mock_statement()
+
+    # NB: scopes are not linked to statements and backends, we therefore test with ES
+    backend_client_class_path = "ralph.api.routers.statements.BACKEND_CLIENT"
+    monkeypatch.setattr(backend_client_class_path, get_es_test_backend())
+
+    response = client.post(
+        "/xAPI/statements/",
+        headers=headers,
+        json=statement,
+    )
+
+    if is_authorized:
+        assert response.status_code == 200
+    else:
+        assert response.status_code == 401
+        assert response.json() == {
+            "detail": 'Access not authorized to scope: "statements/write".'
+        }
+
+    app.dependency_overrides.pop(get_authenticated_user, None)
