@@ -495,8 +495,17 @@ jobs:
           command: |
             git config --global user.email "funmoocbot@users.noreply.github.com"
             git config --global user.name "FUN MOOC Bot"
-            ~/.local/bin/mkdocs gh-deploy
-
+            # Deploy docs with either:
+            # - DOCS_VERSION: 1.1 (for git tag v1.1.2)
+            # - DOCS_ALIAS: latest
+            # or
+            # - DOCS_VERSION: dev (for master branch)
+            # - No DOCS_ALIAS
+            DOCS_VERSION=$([[ -z "$CIRCLE_TAG" ]] && echo $CIRCLE_BRANCH || echo ${CIRCLE_TAG} | sed 's/^v\([0-9]\.[0-9]*\)\..*/\1/')
+            DOCS_ALIAS=$([[ -z "$CIRCLE_TAG" ]] && echo "" || echo "latest")
+            echo "DOCS_VERSION: ${DOCS_VERSION}"
+            echo "DOCS_ALIAS: ${DOCS_ALIAS}"
+            ~/.local/bin/mike deploy --push --update-aliases ${DOCS_VERSION} ${DOCS_ALIAS}
   # Make a new github release
   release:
     docker:
@@ -680,7 +689,7 @@ workflows:
             branches:
               only: master
             tags:
-              only: /.*/
+              only: /^v.*/
 
       # Release
       - release:
