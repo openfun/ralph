@@ -59,6 +59,12 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ]; \
         rm -rf /var/lib/apt/lists/*; \
     fi;
 
+# Install git for documentation deployment
+RUN apt-get update && \
+    apt-get install -y \
+        git && \
+    rm -rf /var/lib/apt/lists/*;
+
 # Uninstall ralph and re-install it in editable mode along with development
 # dependencies
 RUN pip uninstall -y ralph-malph
