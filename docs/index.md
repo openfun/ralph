@@ -43,7 +43,7 @@ Ralph is distributed as a standard python package; it can be installed _via_
     
     - Create a virtual environment:
     ```bash
-    python3.11 -m venv <path-to-virtual-environment>
+    python3.12 -m venv <path-to-virtual-environment>
     ```
 
     - Activate the virtual environment:

@@ -1,5 +1,5 @@
 # -- Base image --
-FROM python:3.11-slim as base
+FROM python:3.12.0-slim as base
 
 # Upgrade pip to its latest release to speed up dependencies installation
 RUN pip install --upgrade pip
