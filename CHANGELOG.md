@@ -20,6 +20,8 @@ and this project adheres to
 
 ### Changed
 
+- Upgrade base python version to 3.12 for the development stack and Docker
+  image
 - Upgrade `cachetools` to `5.3.2`
 - Refactor `database` and `storage` backends under the unified `data` backend
 interface [BC]
