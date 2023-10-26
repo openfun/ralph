@@ -43,3 +43,10 @@ nav:
 plugins:
     - search
     - mkdocstrings
+    - mike:
+        canonical_version: latest
+        version_selector: true
+
+extra:
+    version:
+        provider: mike

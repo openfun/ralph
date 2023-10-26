@@ -670,8 +670,8 @@ workflows:
               only: /^v.*/
 
       # Publish the documentation website to GitHub Pages.
-      # Only do it for master as tagged releases are supposed to tag their own version of the
-      # documentation in the release commit on master before they go out.
+      # Only do it for master and for tagged releases with a tag starting with
+      # the letter v.
       - deploy-docs:
           requires:
             - tray

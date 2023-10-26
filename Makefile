@@ -10,7 +10,14 @@ COMPOSE              = DOCKER_USER=$(DOCKER_USER) docker compose
 COMPOSE_RUN          = $(COMPOSE) run --rm
 COMPOSE_TEST_RUN     = $(COMPOSE_RUN)
 COMPOSE_TEST_RUN_APP = $(COMPOSE_TEST_RUN) app
-MKDOCS               = $(COMPOSE_RUN) --no-deps --publish "8000:8000" app mkdocs
+COMPOSE_RUN_DOCS     = $(COMPOSE_RUN) --no-deps --publish "8000:8000" app
+
+
+# -- Documentation
+DOCS_COMMITTER_NAME  = "FUN MOOC Bot"
+DOCS_COMMITTER_EMAIL = funmoocbot@users.noreply.github.com
+MKDOCS               = $(COMPOSE_RUN_DOCS) mkdocs
+MIKE                 = GIT_COMMITTER_NAME=$(DOCS_COMMITTER_NAME) GIT_COMMITTER_EMAIL=$(DOCS_COMMITTER_EMAIL) $(COMPOSE_RUN_DOCS) mike
 
 # -- Elasticsearch
 ES_PROTOCOL = http
@@ -140,11 +147,14 @@ docs-build: ## build documentation site
 .PHONY: docs-build
 
 docs-deploy: ## deploy documentation site
-	@$(MKDOCS) gh-deploy
+# Using env variables GIT_COMMITTER_NAME and GIT_COMMITTER_EMAIL will work with mike 2.0
+# Until that you need to set local git config user.name and user.email manually
+	@echo "Deploying docs with version dev"
+	@${MIKE} deploy dev
 .PHONY: docs-deploy
 
-docs-serve: ## run mkdocs live server
-	@$(MKDOCS) serve --dev-addr 0.0.0.0:8000
+docs-serve: ## run mike live server
+	@$(MIKE) serve --dev-addr 0.0.0.0:8000
 .PHONY: docs-serve
 
 down: ## stop and remove backend containers
