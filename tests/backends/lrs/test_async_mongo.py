@@ -360,7 +360,7 @@ async def test_backends_lrs_mongo_lrs_backend_query_statements_by_ids_query_fail
 async def test_backends_lrs_mongo_lrs_backend_query_statements_by_ids_two_collections(
     mongo, mongo_forwarding, async_mongo_lrs_backend
 ):
-    """Tests the `AsyncMongoLRSBackend.query_statements_by_ids` method, given a valid
+    """Test the `AsyncMongoLRSBackend.query_statements_by_ids` method, given a valid
     search query, should execute the query only on the specified collection and return
     the expected results.
     """

@@ -102,12 +102,12 @@ class BaseConversionSet(ABC):
     __dest__: BaseModel
 
     def __init__(self) -> None:
-        """Initializes BaseConversionSet."""
+        """Initialize BaseConversionSet."""
         self._conversion_items = self._get_conversion_items()
 
     @abstractmethod
     def _get_conversion_items(self) -> Set[ConversionItem]:
-        """Returns a set of ConversionItems used for conversion."""
+        """Return a set of ConversionItems used for conversion."""
 
     def __iter__(self) -> Iterator[ConversionItem]:  # noqa: D105
         return iter(self._conversion_items)
@@ -172,7 +172,7 @@ class Converter:
         module: str = "ralph.models.edx.converters.xapi",
         **conversion_set_kwargs: Any,
     ) -> None:
-        """Initializes the Converter."""
+        """Initialize the Converter."""
         self.model_selector = model_selector
         self.src_conversion_set = self.get_src_conversion_set(
             import_module(module), **conversion_set_kwargs

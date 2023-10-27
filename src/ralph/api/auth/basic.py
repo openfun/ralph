@@ -114,7 +114,7 @@ def get_basic_auth_user(
     credentials: Optional[HTTPBasicCredentials] = Depends(security),
     security_scopes: SecurityScopes = SecurityScopes([]),
 ) -> AuthenticatedUser:
-    """Checks valid auth parameters.
+    """Check valid auth parameters.
 
     Get the basic auth parameters from the Authorization header, and checks them
     against our own list of hashed credentials.

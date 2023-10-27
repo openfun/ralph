@@ -30,7 +30,7 @@ from tests.fixtures.hypothesis_strategies import custom_given
 def test_models_edx_converters_xapi_video_ui_load_video_to_video_initialized(
     uuid_namespace, event, platform_url
 ):
-    """Tests that converting with `UILoadVideoToVideoInitialized` returns the
+    """Test that converting with `UILoadVideoToVideoInitialized` returns the
     expected xAPI statement.
     """
     event.context.user_id = "1"
@@ -85,7 +85,7 @@ def test_models_edx_converters_xapi_video_ui_load_video_to_video_initialized(
 def test_models_edx_converters_xapi_video_ui_play_video_to_video_played(
     uuid_namespace, event, platform_url
 ):
-    """Tests that converting with `UIPlayVideoToVideoPlayed` returns the expected
+    """Test that converting with `UIPlayVideoToVideoPlayed` returns the expected
     xAPI statement.
     """
     event.context.user_id = "1"
@@ -144,7 +144,7 @@ def test_models_edx_converters_xapi_video_ui_play_video_to_video_played(
 def test_models_edx_converters_xapi_video_ui_pause_video_to_video_paused(
     uuid_namespace, event, platform_url
 ):
-    """Tests that converting with `UIPauseVideoToVideoPaused` returns the expected xAPI
+    """Test that converting with `UIPauseVideoToVideoPaused` returns the expected xAPI
     statement.
     """
     event.context.user_id = "1"
@@ -204,7 +204,7 @@ def test_models_edx_converters_xapi_video_ui_pause_video_to_video_paused(
 def test_models_edx_converters_xapi_video_ui_stop_video_to_video_terminated(
     uuid_namespace, event, platform_url
 ):
-    """Tests that converting with `UIStopVideoToVideoTerminated` returns the expected
+    """Test that converting with `UIStopVideoToVideoTerminated` returns the expected
     xAPI statement.
     """
     event.context.user_id = "1"
@@ -265,7 +265,7 @@ def test_models_edx_converters_xapi_video_ui_stop_video_to_video_terminated(
 def test_models_edx_converters_xapi_video_ui_seek_video_to_video_seeked(
     uuid_namespace, event, platform_url
 ):
-    """Tests that converting with `UISeekVideoToVideoSeeked` returns the expected
+    """Test that converting with `UISeekVideoToVideoSeeked` returns the expected
     xAPI statement.
     """
     event.context.user_id = "1"

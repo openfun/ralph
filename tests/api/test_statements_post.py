@@ -465,7 +465,7 @@ async def test_api_statements_post_with_failure_during_storage(
     # pylint: disable=invalid-name,unused-argument,too-many-arguments
 
     async def write_mock(*args, **kwargs):
-        """Raises an exception. Mocks the database.write method."""
+        """Raise an exception. Mocks the database.write method."""
         raise BackendException()
 
     backend_instance = backend()

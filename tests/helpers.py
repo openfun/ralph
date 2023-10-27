@@ -134,6 +134,7 @@ def mock_statement(
     timestamp: Optional[Union[str, int]] = None,
 ):
     """Generate fake statements with random or provided parameters.
+
     Fields `actor`, `verb`, `object`, `timestamp` accept integer values which
     can be used to create distinct values identifiable by this integer. For each
     variable, using `None` will assign a default value. `timestamp` may be ommited

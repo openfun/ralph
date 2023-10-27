@@ -213,7 +213,7 @@ def test_get_whoami_wrong_password(basic_auth_test_client, fs):
 def test_get_whoami_correct_credentials(basic_auth_test_client, fs):
     """Whoami returns a 200 response when the credentials are correct.
 
-    Returns the username and associated scopes.
+    Return the username and associated scopes.
     """
     credential_bytes = base64.b64encode("ralph:admin".encode("utf-8"))
     credentials = str(credential_bytes, "utf-8")

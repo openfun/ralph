@@ -35,7 +35,7 @@ class GELFParser(BaseParser):
     name = "gelf"
 
     def parse(self, input_file: Union[TextIO, BinaryIO]) -> Generator:
-        """Parses GELF formatted logs (one JSON string event per row).
+        """Parse GELF formatted logs (one JSON string event per row).
 
         Args:
             input_file (file-like): The log file to parse.
@@ -67,7 +67,7 @@ class ElasticSearchParser(BaseParser):
     name = "es"
 
     def parse(self, input_file: Union[TextIO, BinaryIO]) -> Generator:
-        """Parses Elasticsearch JSON documents.
+        """Parse Elasticsearch JSON documents.
 
         Args:
             input_file (file-like): The file containing Elasticsearch JSON documents.

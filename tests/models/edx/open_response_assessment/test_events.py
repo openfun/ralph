@@ -19,7 +19,8 @@ from tests.fixtures.hypothesis_strategies import custom_given
 @custom_given(ORAGetPeerSubmissionEventField)
 def test_models_edx_ora_get_peer_submission_event_field_with_valid_values(field):
     """Test that a valid `ORAGetPeerSubmissionEventField` does not raise a
-    `ValidationError`."""
+    `ValidationError`.
+    """
 
     assert re.match(
         r"^block-v1:.+\+.+\+.+type@openassessment+block@[a-f0-9]{32}$", field.item_id
@@ -31,7 +32,8 @@ def test_models_edx_ora_get_submission_for_staff_grading_event_field_with_valid_
     field,
 ):
     """Test that a valid `ORAGetSubmissionForStaffGradingEventField` does not raise a
-    `ValidationError`."""
+    `ValidationError`.
+    """
 
     assert re.match(
         r"^block-v1:.+\+.+\+.+type@openassessment+block@[a-f0-9]{32}$", field.item_id

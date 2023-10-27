@@ -79,7 +79,7 @@ class InstantiableSettingsItem(BaseModel):
     _class_path: str = None
 
     def get_instance(self, **init_parameters):
-        """Returns an instance of the settings item class using its `_class_path`."""
+        """Return an instance of the settings item class using its `_class_path`."""
         return import_string(self._class_path)(**init_parameters)
 
 
@@ -208,12 +208,12 @@ class Settings(BaseSettings):
 
     @property
     def APP_DIR(self) -> Path:  # pylint: disable=invalid-name
-        """Returns the path to Ralph's configuration directory."""
+        """Return the path to Ralph's configuration directory."""
         return self._CORE.APP_DIR
 
     @property
     def LOCALE_ENCODING(self) -> str:  # pylint: disable=invalid-name
-        """Returns Ralph's default locale encoding."""
+        """Return Ralph's default locale encoding."""
         return self._CORE.LOCALE_ENCODING
 
     @root_validator(allow_reuse=True)

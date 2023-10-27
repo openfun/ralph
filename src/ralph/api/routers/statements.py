@@ -588,5 +588,5 @@ async def post(
 
     logger.info("Indexed %d statements with success", success_count)
 
-    # Returns the list of IDs in the same order they were stored
+    # Return the list of IDs in the same order they were stored
     return list(statements_dict)

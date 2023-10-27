@@ -198,7 +198,7 @@ def _assert_matching_basic_auth_credentials(
 ):
     """Assert that credentials match other arguments.
 
-    args:
+    Args:
         credentials: credentials to match against
         username: username that should match credentials
         scopes: scopes that should match credentials
@@ -236,7 +236,7 @@ def _assert_matching_basic_auth_credentials(
 
 
 def _ifi_type_from_command(ifi_command):
-    """Return the ifi_type associated to the command being passed to cli"""
+    """Return the ifi_type associated to the command being passed to cli."""
     if ifi_command not in ["-M", "-S", "-O", "-A"]:
         raise ValueError('The ifi_command must be one of: "-M", "-S", "-O", "-A"')
 
@@ -246,7 +246,7 @@ def _ifi_type_from_command(ifi_command):
 
 
 def _ifi_value_from_command(ifi_value, ifi_type):
-    """Parse ifi_value returned by cli to generate dict when `ifi_type` is `account`"""
+    """Parse ifi_value returned by cli to generate dict when `ifi_type` is `account`."""
     if ifi_type == "account":
         # Parse arguments from cli
         return {"name": ifi_value.split()[0], "homePage": ifi_value.split()[1]}
@@ -436,7 +436,7 @@ def test_cli_auth_command_when_writing_auth_file_with_incorrect_auth_file(fs):
 
 
 def test_cli_extract_command_with_gelf_parser(gelf_logger):
-    """Test the extract command using the GELF parser."""
+    """Test ralph extract command using the GELF parser."""
     gelf_logger.info('{"username": "foo"}')
 
     runner = CliRunner()
@@ -449,7 +449,7 @@ def test_cli_extract_command_with_gelf_parser(gelf_logger):
 
 
 def test_cli_extract_command_with_es_parser():
-    """Test the extract command using the ElasticSearchParser."""
+    """Test ralph extract command using the ElasticSearchParser."""
     es_output = (
         "\n".join(
             [
@@ -476,7 +476,7 @@ def test_cli_extract_command_with_es_parser():
 
 @custom_given(UIPageClose)
 def test_cli_validate_command_with_edx_format(event):
-    """Test the validate command using the edx format."""
+    """Test ralph validate command using the edx format."""
     event_str = event.json()
     runner = CliRunner()
     result = runner.invoke(cli, ["validate", "-f", "edx"], input=event_str)
@@ -487,7 +487,7 @@ def test_cli_validate_command_with_edx_format(event):
 @custom_given(UIPageClose)
 @pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_cli_convert_command_from_edx_to_xapi_format(valid_uuid, event):
-    """Test the convert command from edx to xapi format."""
+    """Test ralph convert command from edx to xapi format."""
     event_str = event.json()
     runner = CliRunner()
     command = f"-v ERROR convert -f edx -t xapi -u {valid_uuid} -p https://fun-mooc.fr"
@@ -501,8 +501,8 @@ def test_cli_convert_command_from_edx_to_xapi_format(valid_uuid, event):
 
 @pytest.mark.parametrize("invalid_uuid", ["", None, 1, {}])
 def test_cli_convert_command_with_invalid_uuid(invalid_uuid):
-    """Test that the convert command raises an exception when the uuid namespace is
-    invalid.
+    """Test that the ralph convert command raises an exception when the uuid namespace
+    is invalid.
     """
     runner = CliRunner()
     command = f"convert -f edx -t xapi -u '{invalid_uuid}' -p https://fun-mooc.fr"
@@ -531,7 +531,7 @@ def test_cli_verbosity_option_should_impact_logging_behaviour(verbosity):
 
 
 def test_cli_read_command_with_ldp_backend(monkeypatch):
-    """Test the read command using the LDP backend."""
+    """Test ralph read command using the LDP backend."""
     archive_content = {"foo": "bar"}
 
     def mock_read(*_, **__):
@@ -553,7 +553,7 @@ def test_cli_read_command_with_ldp_backend(monkeypatch):
 # pylint: disable=invalid-name
 # pylint: disable=unused-argument
 def test_cli_read_command_with_fs_backend(fs, monkeypatch):
-    """Test the read command using the FS backend."""
+    """Test ralph read command using the FS backend."""
     archive_content = {"foo": "bar"}
 
     def mock_read(*_, **__):
@@ -694,7 +694,7 @@ def test_cli_read_command_with_ws_backend(events, ws):
 
 
 def test_cli_list_command_with_ldp_backend(monkeypatch):
-    """Test the list command using the LDP backend."""
+    """Test ralph list command using the LDP backend."""
     archive_list = [
         "5d5c4c93-04a4-42c5-9860-f51fa4044aa1",
         "997db3eb-b9ca-485d-810f-b530a6cef7c6",
@@ -766,7 +766,7 @@ def test_cli_list_command_with_ldp_backend(monkeypatch):
 # pylint: disable=invalid-name
 # pylint: disable=unused-argument
 def test_cli_list_command_with_fs_backend(fs, monkeypatch):
-    """Test the list command using the LDP backend."""
+    """Test ralph list command using the LDP backend."""
     archive_list = [
         "file1",
         "file2",
@@ -827,7 +827,7 @@ def test_cli_list_command_with_fs_backend(fs, monkeypatch):
 
 # pylint: disable=invalid-name
 def test_cli_write_command_with_fs_backend(fs):
-    """Test the write command using the FS backend."""
+    """Test ralph write command using the FS backend."""
     fs.create_dir(str(settings.APP_DIR))
     fs.create_dir("foo")
 
