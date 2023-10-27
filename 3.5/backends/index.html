@@ -1,0 +1,1362 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A learning events processor to feed your LRS">
+      
+      
+        <meta name="author" content="Open FUN (France Universite Numerique)">
+      
+      
+        <link rel="canonical" href="https://openfun.github.io/ralph/latest/backends/">
+      
+      
+        <link rel="prev" href="../commands/">
+      
+      
+        <link rel="next" href="../models/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.6">
+    
+    
+      
+        <title>Backends - Ralph</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.35e1ed30.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.356b1318.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="indigo">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#backends" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Ralph" class="md-header__button md-logo" aria-label="Ralph" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Ralph
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Backends
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/openfun/ralph/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    openfun/ralph
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Ralph" class="md-nav__button md-logo" aria-label="Ralph" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Ralph
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/openfun/ralph/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    openfun/ralph
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Getting started
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Getting started
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    User guide
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            User guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Commands
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Backends
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Backends
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#key_concepts" class="md-nav__link">
+    Key concepts
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#storage_backends" class="md-nav__link">
+    Storage backends
+  </a>
+  
+    <nav class="md-nav" aria-label="Storage backends">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ovh_-_log_data_platform_ldp" class="md-nav__link">
+    OVH - Log Data Platform (LDP)
+  </a>
+  
+    <nav class="md-nav" aria-label="OVH - Log Data Platform (LDP)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend_parameters" class="md-nav__link">
+    Backend parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openstack_swift" class="md-nav__link">
+    OpenStack Swift
+  </a>
+  
+    <nav class="md-nav" aria-label="OpenStack Swift">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend_parameters_1" class="md-nav__link">
+    Backend parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#amazon_s3" class="md-nav__link">
+    Amazon S3
+  </a>
+  
+    <nav class="md-nav" aria-label="Amazon S3">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend_parameters_2" class="md-nav__link">
+    Backend parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file_system" class="md-nav__link">
+    File system
+  </a>
+  
+    <nav class="md-nav" aria-label="File system">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend_parameters_3" class="md-nav__link">
+    Backend parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stream_backends" class="md-nav__link">
+    Stream backends
+  </a>
+  
+    <nav class="md-nav" aria-label="Stream backends">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#websocket" class="md-nav__link">
+    WebSocket
+  </a>
+  
+    <nav class="md-nav" aria-label="WebSocket">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend_parameters_4" class="md-nav__link">
+    Backend parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#database_backends" class="md-nav__link">
+    Database backends
+  </a>
+  
+    <nav class="md-nav" aria-label="Database backends">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#elasticsearch" class="md-nav__link">
+    Elasticsearch
+  </a>
+  
+    <nav class="md-nav" aria-label="Elasticsearch">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend_parameters_5" class="md-nav__link">
+    Backend parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mongodb" class="md-nav__link">
+    MongoDB
+  </a>
+  
+    <nav class="md-nav" aria-label="MongoDB">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend_parameters_6" class="md-nav__link">
+    Backend parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clickhouse" class="md-nav__link">
+    ClickHouse
+  </a>
+  
+    <nav class="md-nav" aria-label="ClickHouse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend_parameters_7" class="md-nav__link">
+    Backend parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Learning event models
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Learning event models
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Rationale
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/edx/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Open edX events
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/xapi/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    xAPI events
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    API
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Developer guide
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Developer guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contribute/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Contribute
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    About the project
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            About the project
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHANGELOG/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Changelog
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../LICENSE/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    License
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#key_concepts" class="md-nav__link">
+    Key concepts
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#storage_backends" class="md-nav__link">
+    Storage backends
+  </a>
+  
+    <nav class="md-nav" aria-label="Storage backends">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ovh_-_log_data_platform_ldp" class="md-nav__link">
+    OVH - Log Data Platform (LDP)
+  </a>
+  
+    <nav class="md-nav" aria-label="OVH - Log Data Platform (LDP)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend_parameters" class="md-nav__link">
+    Backend parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openstack_swift" class="md-nav__link">
+    OpenStack Swift
+  </a>
+  
+    <nav class="md-nav" aria-label="OpenStack Swift">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend_parameters_1" class="md-nav__link">
+    Backend parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#amazon_s3" class="md-nav__link">
+    Amazon S3
+  </a>
+  
+    <nav class="md-nav" aria-label="Amazon S3">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend_parameters_2" class="md-nav__link">
+    Backend parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file_system" class="md-nav__link">
+    File system
+  </a>
+  
+    <nav class="md-nav" aria-label="File system">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend_parameters_3" class="md-nav__link">
+    Backend parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stream_backends" class="md-nav__link">
+    Stream backends
+  </a>
+  
+    <nav class="md-nav" aria-label="Stream backends">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#websocket" class="md-nav__link">
+    WebSocket
+  </a>
+  
+    <nav class="md-nav" aria-label="WebSocket">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend_parameters_4" class="md-nav__link">
+    Backend parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#database_backends" class="md-nav__link">
+    Database backends
+  </a>
+  
+    <nav class="md-nav" aria-label="Database backends">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#elasticsearch" class="md-nav__link">
+    Elasticsearch
+  </a>
+  
+    <nav class="md-nav" aria-label="Elasticsearch">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend_parameters_5" class="md-nav__link">
+    Backend parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mongodb" class="md-nav__link">
+    MongoDB
+  </a>
+  
+    <nav class="md-nav" aria-label="MongoDB">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend_parameters_6" class="md-nav__link">
+    Backend parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clickhouse" class="md-nav__link">
+    ClickHouse
+  </a>
+  
+    <nav class="md-nav" aria-label="ClickHouse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend_parameters_7" class="md-nav__link">
+    Backend parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="backends">Backends<a class="headerlink" href="#backends" title="Permanent link">&para;</a></h1>
+<p>Ralph supports various storage and database backends that can be accessed to
+read from or write learning events to. Implemented backends are listed below
+along with their configuration parameters. If your favourite backend is missing
+to the list, feel free to submit your implementation or get in touch!</p>
+<h2 id="key_concepts">Key concepts<a class="headerlink" href="#key_concepts" title="Permanent link">&para;</a></h2>
+<p>We distinguish storage from database backends as the semantic and concepts are
+quite different in terms of code, but those two types of backends can be
+considered as &ldquo;backends&rdquo; from a Ralph user perspective as the CLI can use both
+in most of its commands.</p>
+<p>Each backend has its own parameters that are required to use it. Those
+parameters can be set as command line options or environment variables; the
+later is the <strong>recommended solution</strong> for sensible data such as service
+credentials. If we consider the <code>os_username</code> (OpenStack user name) parameter
+of the OpenStack Swift backend, it can be set as a command line option using
+<code>swift</code> as the option prefix (and replacing underscores in its name by dashes):</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>ralph<span class="w"> </span>list<span class="w"> </span>--backend<span class="w"> </span>swift<span class="w"> </span>--swift-os-username<span class="w"> </span>johndoe<span class="w"> </span><span class="c1"># [...] more options</span>
+</code></pre></div>
+<p>Alternatively, this parameter can be set as an environment variable (in upper
+case, prefixed by the program name, <em>e.g.</em> <code>RALPH_</code>):</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">RALPH_BACKENDS__STORAGE__SWIFT__OS_USERNAME</span><span class="o">=</span><span class="s2">&quot;johndoe&quot;</span>
+$<span class="w"> </span>ralph<span class="w"> </span>list<span class="w"> </span>--backend<span class="w"> </span>swift<span class="w"> </span><span class="c1"># [...] more options</span>
+</code></pre></div>
+<p>The general patterns for backend parameters are:</p>
+<ul>
+<li><code>--{{ backend_name }}-{{ parameter | underscore_to_dash }}</code> for command options, and,</li>
+<li><code>RALPH_BACKENDS__{{ backend_type | uppercase }}__{{ backend_name | uppercase }}__{{ parameter | uppercase }}</code> for environment variables, where the <code>backend_type</code> is one of <code>DATABASE</code>, <code>STORAGE</code> and <code>STREAM</code>.</li>
+</ul>
+<h2 id="storage_backends">Storage backends<a class="headerlink" href="#storage_backends" title="Permanent link">&para;</a></h2>
+<h3 id="ovh_-_log_data_platform_ldp">OVH - Log Data Platform (LDP)<a class="headerlink" href="#ovh_-_log_data_platform_ldp" title="Permanent link">&para;</a></h3>
+<p>LDP is a nice service built by OVH on top of Graylog to follow, analyse and
+store your logs. Learning events (<em>aka</em> tracking logs) can be stored in GELF
+format using this backend.</p>
+<blockquote>
+<p>For now the LDP backend is <strong>read-only</strong> as we consider that it is mostly
+used to collect primary logs and not as a Ralph target. Feel free to get in
+touch to prove us wrong, or better: submit your proposal for the <code>write</code>
+method implementation.</p>
+</blockquote>
+<h4 id="backend_parameters">Backend parameters<a class="headerlink" href="#backend_parameters" title="Permanent link">&para;</a></h4>
+<p>To access OVH&rsquo;s LDP API, you need to register Ralph as an authorized
+application and generate an application key, an application secret and a
+consumer key.</p>
+<p>While filling the registration form available at:
+<a href="https://eu.api.ovh.com/createToken/">eu.api.ovh.com/createToken/</a>, be sure to
+give an appropriate validity time span to your token and allow only GET
+requests on the <code>/dbaas/logs/*</code> path.</p>
+<ul>
+<li><code>endpoint</code>: the API endpoint (<em>e.g.</em> <code>ovh-eu</code>)</li>
+<li><code>application_key</code>: use generated application key</li>
+<li><code>application_secret</code>: use generated application secret</li>
+<li><code>consumer_key</code>: use generated consumer key</li>
+</ul>
+<p>The following parameters are required to fetch archives from an LDP account
+stream:</p>
+<ul>
+<li><code>service_name</code>: the LDP account name (<em>e.g.</em> <code>ldp-xx-xxxxx</code>)</li>
+<li><code>stream_id</code>: the identifier of the stream you are querying (<em>e.g.</em> a UUID hex
+  representation: <code>77ec6e4a-ac15-4bcf-8043-7429bf275e49</code>)</li>
+</ul>
+<p>For more information about OVH&rsquo;s API client parameters, please refer to the
+project&rsquo;s documentation:
+<a href="https://github.com/ovh/python-ovh">github.com/ovh/python-ovh</a>.</p>
+<h3 id="openstack_swift">OpenStack Swift<a class="headerlink" href="#openstack_swift" title="Permanent link">&para;</a></h3>
+<p>Swift is the OpenStack object storage service. This storage backend is fully
+supported (read and write operations) to stream and store log archives.</p>
+<h4 id="backend_parameters_1">Backend parameters<a class="headerlink" href="#backend_parameters_1" title="Permanent link">&para;</a></h4>
+<p>Primarily required parameters correspond to a standard authentication using
+OpenStack Keystone service:</p>
+<ul>
+<li><code>os_identity_api_version</code>: keystone API version you will authenticate to (defaults to <code>3</code>)</li>
+<li><code>os_auth_url</code>: the authentication URL (defaults to OVH&rsquo;s Swift <code>https://auth.cloud.ovh.net/</code>)</li>
+<li><code>os_project_domain_name</code>: the project domain name (defaults to <code>Default</code>)</li>
+<li><code>os_user_domain_name</code>: the user domain name (defaults to <code>Default</code>)</li>
+<li><code>os_username</code>: the name of your openstack swift user</li>
+<li><code>os_password</code>: the password of your openstack swift user</li>
+</ul>
+<p>Secondary parameters are required to work with the target container:</p>
+<ul>
+<li><code>os_storage_url</code>: the URL of the target container</li>
+<li><code>os_region_name</code>: the region where your container is</li>
+<li><code>os_tenant_name</code>: the name of the tenant of your container</li>
+<li><code>os_tenant_id</code>: the identifier of the tenant of your container</li>
+</ul>
+<h3 id="amazon_s3">Amazon S3<a class="headerlink" href="#amazon_s3" title="Permanent link">&para;</a></h3>
+<p>S3 is the Amazon Simple Storage Service. This storage backend is fully
+supported (read and write operations) to stream and store log archives.</p>
+<h4 id="backend_parameters_2">Backend parameters<a class="headerlink" href="#backend_parameters_2" title="Permanent link">&para;</a></h4>
+<p>Primarily required parameters correspond to a standard authentication with AWS CLI:</p>
+<ul>
+<li><code>access_key_id</code>: the access key for your AWS account</li>
+<li><code>secret_access_key</code>: the secret key for your AWS account</li>
+<li><code>session_token</code>: the session key for your AWS account (only needed when you are using
+temporary credentials).</li>
+</ul>
+<p>Secondary parameters are required to work with the target bucket:</p>
+<ul>
+<li><code>default_region</code>: the region where your bucket is</li>
+<li><code>bucket_name</code>: the name of your S3 bucket</li>
+</ul>
+<h3 id="file_system">File system<a class="headerlink" href="#file_system" title="Permanent link">&para;</a></h3>
+<p>The file system backend is a dummy template that can be used to develop your
+own backend. It&rsquo;s a &ldquo;dummy&rdquo; backend as it&rsquo;s not required in a UNIX Shell
+context, the <code>ls</code> and <code>cat</code> commands used along with UNIX streams will do a
+better job.</p>
+<h4 id="backend_parameters_3">Backend parameters<a class="headerlink" href="#backend_parameters_3" title="Permanent link">&para;</a></h4>
+<p>The only required parameter is the <code>path</code> we want to list or stream content
+from.</p>
+<h2 id="stream_backends">Stream backends<a class="headerlink" href="#stream_backends" title="Permanent link">&para;</a></h2>
+<h3 id="websocket">WebSocket<a class="headerlink" href="#websocket" title="Permanent link">&para;</a></h3>
+<p>The webSocket backend is <strong>read-only</strong> and can be used to get real-time events.</p>
+<blockquote>
+<p>If you use OVH&rsquo;s Logs Data Platform (LDP), you can retrieve a WebSocket URI to test your
+data stream by following instructions from the
+<a href="https://docs.ovh.com/gb/en/logs-data-platform/ldp-tail/#retrieve-your-websocket-address">official documentation</a>.</p>
+</blockquote>
+<h4 id="backend_parameters_4">Backend parameters<a class="headerlink" href="#backend_parameters_4" title="Permanent link">&para;</a></h4>
+<ul>
+<li><code>ws_uri</code>: the WebSocket uri (<em>e.g.</em> <code>wss://example.com/websocket</code>)</li>
+</ul>
+<h2 id="database_backends">Database backends<a class="headerlink" href="#database_backends" title="Permanent link">&para;</a></h2>
+<h3 id="elasticsearch">Elasticsearch<a class="headerlink" href="#elasticsearch" title="Permanent link">&para;</a></h3>
+<p>Elasticsearch backend is mostly used for indexation purpose (as a datalake) but
+it can also be used to fetch indexed data from it.</p>
+<h4 id="backend_parameters_5">Backend parameters<a class="headerlink" href="#backend_parameters_5" title="Permanent link">&para;</a></h4>
+<p>Elasticsearch backend parameters required to connect to a cluster are:</p>
+<ul>
+<li><code>hosts</code>: a list of cluster hosts to connect to (<em>e.g.</em> <code>["http://elasticsearch-node:9200"]</code>)</li>
+<li><code>index</code>: the elasticsearch index where to get/put documents</li>
+<li><code>client_options</code>: a comma separated key=value list of Elasticsearch client options</li>
+</ul>
+<p>The Elasticsearch client options supported in Ralph are:
+- <code>ca_certs</code>: the path to the CA certificate file.
+- <code>verify_certs</code>: enable or disable the certificate verification. Note that it should be enabled in production. Default to <code>True</code></p>
+<h3 id="mongodb">MongoDB<a class="headerlink" href="#mongodb" title="Permanent link">&para;</a></h3>
+<p>MongoDB backend is mostly used for indexation purpose (as a datalake) but
+it can also be used to fetch collections of documents from it.</p>
+<h4 id="backend_parameters_6">Backend parameters<a class="headerlink" href="#backend_parameters_6" title="Permanent link">&para;</a></h4>
+<p>MongoDB backend parameters required to connect to a cluster are:</p>
+<ul>
+<li><code>connection_uri</code>: the connection URI to connect to (<em>e.g.</em> <code>["mongodb://mongo:27017/"]</code>)</li>
+<li><code>database</code>: the database to connect to</li>
+<li><code>collection</code>: the collection to get/put objects to</li>
+<li><code>client_options</code>: a comma separated key=value list of MongoDB client options</li>
+</ul>
+<p>The MongoDB client options supported in Ralph are:
+- <code>document_class</code>: default class to use for documents returned from queries
+- <code>tz_aware</code>: if True, datetime instances returned as values in a document will be timezone aware (otherwise they will be naive)</p>
+<h3 id="clickhouse">ClickHouse<a class="headerlink" href="#clickhouse" title="Permanent link">&para;</a></h3>
+<p>The ClickHouse backend can be used as a data lake and to fetch collections of
+documents from it.</p>
+<h4 id="backend_parameters_7">Backend parameters<a class="headerlink" href="#backend_parameters_7" title="Permanent link">&para;</a></h4>
+<p>ClickHouse parameters required to connect are:
+- <code>host</code>: the connection hostname to connect to (<em>e.g.</em> <code>"clickhouse.yourhost.com"</code>)
+- <code>port</code>: the port to the ClickHouse HTTPS interface (<em>e.g.</em> <code>8123</code>)
+- <code>database</code>: the name of the database to connect to
+- <code>event_table_name</code>: the name of the table to write statements to
+- <code>client_options</code>: a comma separated key=value list of ClickHouse client options</p>
+<p>Secondary parameters are needed if not using the default ClickHouse user:
+- <code>username</code>: the username to connect as
+- <code>password</code>: the password for the given ClickHouse username</p>
+<p>By default, the following client options are set, if you override the default 
+client options you must also set these:
+- <code>"date_time_input_format": "best_effort"</code> allows RFC date parsing
+- <code>"allow_experimental_object_type": 1</code> allows the JSON data type we use to store statements</p>
+<p>The ClickHouse client options supported in Ralph can be found in these locations:
+- <a href="https://clickhouse.com/docs/en/integrations/language-clients/python/driver-api#settings-argument">Python driver specific</a>
+- <a href="https://clickhouse.com/docs/en/operations/settings/settings/">General ClickHouse client settings</a></p>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      2020-present France Université Numérique
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.aecac24b.min.js"></script>
+      
+    
+  </body>
+</html>
