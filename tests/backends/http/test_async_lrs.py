@@ -798,7 +798,8 @@ async def test_backends_http_lrs_write_with_invalid_parameters(
 @pytest.mark.anyio
 async def test_backends_http_lrs_write_without_target(httpx_mock: HTTPXMock, caplog):
     """Test the LRS backend `write` method without target parameter value writes
-    statements to '/xAPI/statements' default endpoint."""
+    statements to '/xAPI/statements' default endpoint.
+    """
 
     base_url = "http://fake-lrs.com"
 
@@ -872,7 +873,7 @@ async def test_backends_http_lrs_write_backend_exception(
     httpx_mock: HTTPXMock,
     caplog,
 ):
-    """Test the `LRSHTTP.write` method with HTTP error"""
+    """Test the `LRSHTTP.write` method with HTTP error."""
     base_url = "http://fake-lrs.com"
     target = "/xAPI/statements"
 

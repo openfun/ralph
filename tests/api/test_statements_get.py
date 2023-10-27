@@ -70,7 +70,7 @@ def insert_mongo_statements(mongo_client, statements):
 
 
 def insert_clickhouse_statements(statements):
-    """Inserts a bunch of example statements into ClickHouse for testing."""
+    """Insert a bunch of example statements into ClickHouse for testing."""
     settings = ClickHouseDataBackend.settings_class(
         HOST=CLICKHOUSE_TEST_HOST,
         PORT=CLICKHOUSE_TEST_PORT,
@@ -90,7 +90,7 @@ def insert_statements_and_monkeypatch_backend(
     # pylint: disable=invalid-name,unused-argument
 
     def _insert_statements_and_monkeypatch_backend(statements):
-        """Inserts statements once into each backend."""
+        """Insert statements once into each backend."""
         backend_client_class_path = "ralph.api.routers.statements.BACKEND_CLIENT"
         if request.param == "async_es":
             insert_es_statements(es, statements)

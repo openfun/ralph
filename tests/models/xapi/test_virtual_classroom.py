@@ -78,7 +78,8 @@ def test_models_xapi_virtual_classroom_initialized_with_valid_statement(statemen
 @custom_given(VirtualClassroomJoined)
 def test_models_xapi_virtual_classroom_joined_with_valid_statement(statement):
     """Test that a virtual classroom joined statement has the expected
-    `verb`.`id` and `object`.`definition`.`type` property values."""
+    `verb`.`id` and `object`.`definition`.`type` property values.
+    """
     assert statement.verb.id == "http://activitystrea.ms/join"
     assert (
         statement.object.definition.type
@@ -89,7 +90,8 @@ def test_models_xapi_virtual_classroom_joined_with_valid_statement(statement):
 @custom_given(VirtualClassroomLeft)
 def test_models_xapi_virtual_classroom_left_with_valid_statement(statement):
     """Test that a virtual classroom left statement has the expected
-    `verb`.`id` and `object`.`definition`.`type` property values."""
+    `verb`.`id` and `object`.`definition`.`type` property values.
+    """
     assert statement.verb.id == "http://activitystrea.ms/leave"
     assert (
         statement.object.definition.type

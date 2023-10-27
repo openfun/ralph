@@ -174,7 +174,10 @@ def get_es_fixture(host=ES_TEST_HOSTS, index=ES_TEST_INDEX):
 
 @pytest.fixture
 def es():
-    """Yield an Elasticsearch test client. See get_es_fixture above."""
+    """Yield an Elasticsearch test client.
+
+    See get_es_fixture above.
+    """
     # pylint: disable=invalid-name
     for es_client in get_es_fixture():
         yield es_client
@@ -182,7 +185,10 @@ def es():
 
 @pytest.fixture
 def es_forwarding():
-    """Yield a second Elasticsearch test client. See get_es_fixture above."""
+    """Yield a second Elasticsearch test client.
+
+    See get_es_fixture above.
+    """
     for es_client in get_es_fixture(index=ES_TEST_FORWARDING_INDEX):
         yield es_client
 
@@ -268,7 +274,7 @@ def get_mongo_fixture(
     database=MONGO_TEST_DATABASE,
     collection=MONGO_TEST_COLLECTION,
 ):
-    """Create / delete a Mongo test database + collection and yields an
+    """Create / delete a Mongo test database + collection and yield an
     instantiated client.
     """
     client = MongoClient(connection_uri)
@@ -286,7 +292,10 @@ def get_mongo_fixture(
 
 @pytest.fixture
 def mongo():
-    """Yield a Mongo test client. See get_mongo_fixture above."""
+    """Yield a Mongo test client.
+
+    See get_mongo_fixture above.
+    """
     for mongo_client in get_mongo_fixture():
         yield mongo_client
 
@@ -339,7 +348,10 @@ def mongo_lrs_backend():
 
 @pytest.fixture
 def mongo_forwarding():
-    """Yield a second Mongo test client. See get_mongo_fixture above."""
+    """Yield a second Mongo test client.
+
+    See get_mongo_fixture above.
+    """
     for mongo_client in get_mongo_fixture(collection=MONGO_TEST_FORWARDING_COLLECTION):
         yield mongo_client
 
@@ -350,7 +362,7 @@ def get_clickhouse_fixture(
     database=CLICKHOUSE_TEST_DATABASE,
     event_table_name=CLICKHOUSE_TEST_TABLE_NAME,
 ):
-    """Create / delete a ClickHouse test database + table and yields an
+    """Create / delete a ClickHouse test database + table and yield an
     instantiated client.
     """
     client_options = ClickHouseClientOptions(
@@ -396,7 +408,10 @@ def get_clickhouse_fixture(
 
 @pytest.fixture
 def clickhouse():
-    """Yield a ClickHouse test client. See get_clickhouse_fixture above."""
+    """Yield a ClickHouse test client.
+
+    See get_clickhouse_fixture above.
+    """
     for clickhouse_client in get_clickhouse_fixture():
         yield clickhouse_client
 
@@ -455,7 +470,7 @@ def es_data_stream():
 
 @pytest.fixture
 def settings_fs(fs, monkeypatch):
-    """Force Path instantiation with fake FS in Ralph's Settings."""
+    """Force Path instantiation with fake FS in ralph settings."""
     # pylint:disable=invalid-name,unused-argument
 
     monkeypatch.setattr(
@@ -636,7 +651,7 @@ def swift_backend():
 
 @pytest.fixture()
 def moto_fs(fs):
-    """Fix the incompatibility between moto and pyfakefs"""
+    """Fix the incompatibility between moto and pyfakefs."""
     # pylint:disable=invalid-name
 
     for module in [boto3, botocore]:

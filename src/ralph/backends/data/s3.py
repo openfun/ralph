@@ -164,7 +164,7 @@ class S3DataBackend(HistoryMixin, BaseDataBackend):
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
         # pylint: disable=too-many-arguments
-        """Read an object matching the `query` in the `target` bucket and yields it.
+        """Read an object matching the `query` in the `target` bucket and yield it.
 
         Args:
             query: (str or BaseQuery): The ID of the object to read.

@@ -17,13 +17,13 @@ class Validator:
     """Events validator using pydantic models."""
 
     def __init__(self, model_selector: ModelSelector):
-        """Initializes Validator."""
+        """Initialize Validator."""
         self.model_selector = model_selector
 
     def validate(
         self, input_file: TextIO, ignore_errors: bool, fail_on_unknown: bool
     ) -> Generator:
-        """Validates JSON event strings line by line."""
+        """Validate JSON event strings line by line."""
         total = 0
         success = 0
         for event_str in input_file:
@@ -48,7 +48,7 @@ class Validator:
         logger.info("Total events: %d, Invalid events: %d", total, total - success)
 
     def get_first_valid_model(self, event: dict) -> Any:
-        """Returns the first successfully instantiated model for the event.
+        """Return the first successfully instantiated model for the event.
 
         Raises:
             UnknownEventException: When the event does not match any model.

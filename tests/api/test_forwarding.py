@@ -200,7 +200,7 @@ async def test_api_forwarding_forward_xapi_statements_with_unsuccessful_request(
             raise RequestError("Failure during request.")
 
     async def post_fail(*args, **kwargs):  # pylint: disable=unused-argument
-        """Returns a MockUnsuccessfulResponse instance."""
+        """Return a MockUnsuccessfulResponse instance."""
         return MockUnsuccessfulResponse()
 
     monkeypatch.setattr("ralph.api.forwarding.AsyncClient.post", post_fail)

@@ -96,7 +96,7 @@ def custom_builds(
 
 
 def custom_given(*args: Union[st.SearchStrategy, BaseModel], **kwargs):
-    """Wrap the Hypothesis `given` function. Replaces st.builds with custom_builds."""
+    """Wrap the Hypothesis `given` function. Replace st.builds with custom_builds."""
     strategies = []
     for arg in args:
         strategies.append(custom_builds(arg) if is_base_model(arg) else arg)

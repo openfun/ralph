@@ -56,16 +56,16 @@ def test_utils_get_backend_instance(monkeypatch, options, expected):
     """Test get_backend_instance utility should return the expected result."""
 
     class DummyTestBackendSettings(InstantiableSettingsItem):
-        """Represents a dummy backend setting."""
+        """Represent a dummy backend setting."""
 
         FOO: str = "FOO"  # pylint: disable=disallowed-name
 
         def get_instance(self, **init_parameters):  # pylint: disable=no-self-use
-            """Returns the init_parameters."""
+            """Return the init_parameters."""
             return init_parameters
 
     class DummyTestBackend(ABC):
-        """Represents a dummy backend instance."""
+        """Represent a dummy backend instance."""
 
         type = "test"
         name = "dummy"
@@ -77,7 +77,7 @@ def test_utils_get_backend_instance(monkeypatch, options, expected):
             return {}
 
     def mock_import_module(*args, **kwargs):  # pylint: disable=unused-argument
-        """"""
+        """Mock import_module."""
         test_module = ModuleType(name="ralph.backends.test.dummy")
 
         test_module.DummyTestBackendSettings = DummyTestBackendSettings

@@ -67,7 +67,7 @@ class ModelSelector:
     """
 
     def __init__(self, module: str = "ralph.models.edx") -> None:
-        """Instantiates ModelSelector."""
+        """Instantiate ModelSelector."""
         self.model_rules = ModelSelector.build_model_rules(import_module(module))
         self.decision_tree = self.get_decision_tree(self.model_rules)
 

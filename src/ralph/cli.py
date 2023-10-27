@@ -56,7 +56,7 @@ class CommaSeparatedTupleParamType(click.ParamType):
     name = "value1,value2,value3"
 
     def convert(self, value, param, ctx):
-        """Splits the value by comma to return a tuple of values."""
+        """Split the value by comma to return a tuple of values."""
         if isinstance(value, str):
             return tuple(value.split(","))
 
@@ -76,9 +76,9 @@ class CommaSeparatedKeyValueParamType(click.ParamType):
     name = "key=value,key=value"
 
     def convert(self, value, param, ctx):
-        """Splits the values by comma and equal sign.
+        """Split the values by comma and equal sign.
 
-        Returns a dictionary build with key/value pairs.
+        Return a dictionary build with key/value pairs.
         """
         if isinstance(value, dict):
             return value
@@ -116,7 +116,7 @@ class ClientOptionsParamType(CommaSeparatedKeyValueParamType):
     """Comma separated key=value parameter type for client options."""
 
     def __init__(self, client_options_type: Any) -> None:
-        """Instantiates ClientOptionsParamType for a client_options_type.
+        """Instantiate ClientOptionsParamType for a client_options_type.
 
         Args:
             client_options_type (any): Pydantic model used for client options.
@@ -124,9 +124,9 @@ class ClientOptionsParamType(CommaSeparatedKeyValueParamType):
         self.client_options_type = client_options_type
 
     def convert(self, value, param, ctx):
-        """Splits the values by comma and equal sign.
+        """Split the values by comma and equal sign.
 
-        Returns an instance of client_options_type build with key/value pairs.
+        Return an instance of client_options_type build with key/value pairs.
         """
         if isinstance(value, self.client_options_type):
             return value
@@ -138,7 +138,7 @@ class HeadersParametersParamType(CommaSeparatedKeyValueParamType):
     """Comma separated key=value parameter type for headers parameters."""
 
     def __init__(self, headers_parameters_type: Any) -> None:
-        """Instantiates HeadersParametersParamType for a headers_parameters_type.
+        """Instantiate HeadersParametersParamType for a headers_parameters_type.
 
         Args:
             headers_parameters_type (any): Pydantic model used for headers parameters.
@@ -146,9 +146,9 @@ class HeadersParametersParamType(CommaSeparatedKeyValueParamType):
         self.headers_parameters_type = headers_parameters_type
 
     def convert(self, value, param, ctx):
-        """Splits the values by comma and equal sign.
+        """Split the values by comma and equal sign.
 
-        Returns an instance of headers_parameters_type build with key/value pairs.
+        Return an instance of headers_parameters_type build with key/value pairs.
         """
         if isinstance(value, self.headers_parameters_type):
             return value

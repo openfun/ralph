@@ -12,7 +12,7 @@ from ralph.backends.lrs.mongo import MongoLRSBackend
 
 
 def test_api_statements_backend_instance_with_runserver_backend_env(monkeypatch):
-    """Tests that given the RALPH_RUNSERVER_BACKEND environment variable, the backend
+    """Test that given the RALPH_RUNSERVER_BACKEND environment variable, the backend
     instance `BACKEND_CLIENT` should be updated accordingly.
     """
     # Default backend

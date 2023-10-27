@@ -40,7 +40,7 @@ def test_models_xapi_base_statement_with_invalid_null_values(path, value, statem
     XAPI-00001
     An LRS rejects with error code 400 Bad Request any Statement having a property whose
     value is set to "null", an empty object, or has no value, except in an "extensions"
-    property
+    property.
     """
     statement = statement.dict(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), value)
@@ -64,7 +64,7 @@ def test_models_xapi_base_statement_with_valid_null_values(path, value, statemen
     XAPI-00001
     An LRS rejects with error code 400 Bad Request any Statement having a property whose
     value is set to "null", an empty object, or has no value, except in an "extensions"
-    property
+    property.
     """
     statement = statement.dict(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), value)
@@ -108,13 +108,13 @@ def test_models_xapi_base_statement_must_use_actor_verb_and_object(field, statem
 
     XAPI-00003
     An LRS rejects with error code 400 Bad Request a Statement which does not contain an
-    "actor" property
+    "actor" property.
     XAPI-00004
     An LRS rejects with error code 400 Bad Request a Statement which does not contain a
-    "verb" property
+    "verb" property.
     XAPI-00005
     An LRS rejects with error code 400 Bad Request a Statement which does not contain an
-    "object" property
+    "object" property.
     """
     statement = statement.dict(exclude_none=True)
     del statement[field]
@@ -142,7 +142,7 @@ def test_models_xapi_base_statement_with_invalid_data_types(path, value, stateme
 
     XAPI-00006
     An LRS rejects with error code 400 Bad Request a Statement which uses the wrong data
-    type
+    type.
     """
     statement = statement.dict(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), value)
@@ -469,7 +469,7 @@ def test_models_xapi_base_statement_with_invalid_version(value, statement):
     """Test that the statement does not accept an invalid version field.
 
     An LRS MUST reject all Statements with a version specified that does not start with
-    1.0..
+    1.0.
     """
     statement = statement.dict(exclude_none=True)
     set_dict_value_from_path(statement, ["version"], value)
@@ -482,7 +482,7 @@ def test_models_xapi_base_statement_with_valid_version(statement):
     """Test that the statement does accept a valid version field.
 
     Statements returned by an LRS MUST retain the version they are accepted with.
-    If they lack a version, the version MUST be set to 1.0.0
+    If they lack a version, the version MUST be set to 1.0.0.
     """
     statement = statement.dict(exclude_none=True)
     set_dict_value_from_path(statement, ["version"], "1.0.3")

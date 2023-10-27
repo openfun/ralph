@@ -38,7 +38,8 @@ def test_models_edx_peer_instruction_accessed_with_valid_statement(
     statement,
 ):
     """Test that a `ubc.peer_instruction.accessed` statement has the expected
-    `event_type`."""
+    `event_type`.
+    """
     assert statement.event_type == "ubc.peer_instruction.accessed"
     assert statement.name == "ubc.peer_instruction.accessed"
 
@@ -48,7 +49,8 @@ def test_models_edx_peer_instruction_original_submitted_with_valid_statement(
     statement,
 ):
     """Test that a `ubc.peer_instruction.original_submitted` statement has the
-    expected `event_type`."""
+    expected `event_type`.
+    """
     assert statement.event_type == "ubc.peer_instruction.original_submitted"
     assert statement.name == "ubc.peer_instruction.original_submitted"
 
@@ -58,6 +60,7 @@ def test_models_edx_peer_instruction_revised_submitted_with_valid_statement(
     statement,
 ):
     """Test that a `ubc.peer_instruction.revised_submitted` statement has the
-    expected `event_type`."""
+    expected `event_type`.
+    """
     assert statement.event_type == "ubc.peer_instruction.revised_submitted"
     assert statement.name == "ubc.peer_instruction.revised_submitted"

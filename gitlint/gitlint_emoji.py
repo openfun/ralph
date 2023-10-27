@@ -23,7 +23,7 @@ class GitmojiTitle(LineRule):
     target = CommitMessageTitle
 
     def validate(self, title, _commit):
-        """Validates Gitmoji title rule.
+        """Validate Gitmoji title rule.
 
         Downloads the list possible gitmojis from the project's GitHub
         repository and check that title contains one of them.

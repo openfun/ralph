@@ -140,7 +140,7 @@ def test_helpers_mock_statement_no_input():
 
 
 def test_helpers_mock_statement_value_input():
-    """Test that mocked statement have the expected fields with value input."""
+    """Test that mocked statement has the expected fields with value input."""
 
     reference_statement = {
         "id": str(uuid4()),

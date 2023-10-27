@@ -115,7 +115,8 @@ def test_models_xapi_video_paused_with_valid_statement(statement):
 @custom_given(VideoSeeked)
 def test_models_xapi_video_seeked_with_valid_statement(statement):
     """Test that a video seeked statement has the expected `verb`.`id` and
-    `object`.`definition`.`type` property values."""
+    `object`.`definition`.`type` property values.
+    """
 
     assert statement.verb.id == "https://w3id.org/xapi/video/verbs/seeked"
     assert (

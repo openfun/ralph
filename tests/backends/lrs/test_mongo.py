@@ -352,7 +352,7 @@ def test_backends_lrs_mongo_lrs_backend_query_statements_by_ids_with_query_failu
 def test_backends_lrs_mongo_lrs_backend_query_statements_by_ids_with_two_collections(
     mongo, mongo_forwarding, mongo_lrs_backend
 ):
-    """Tests the `MongoLRSBackend.query_statements_by_ids` method, given a valid search
+    """Test the `MongoLRSBackend.query_statements_by_ids` method, given a valid search
     query, should execute the query only on the specified collection and return the
     expected results.
     """

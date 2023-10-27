@@ -113,7 +113,7 @@ def test_converter_convert_dict_event_with_empty_conversion_set(event):
         __dest__ = BaseModel
 
         def _get_conversion_items(self):  # pylint: disable=no-self-use
-            """Returns a set of ConversionItems used for conversion."""
+            """Return a set of ConversionItems used for conversion."""
             return set()
 
     assert not convert_dict_event(event, "", DummyBaseConversionSet()).dict()
@@ -153,7 +153,7 @@ def test_converter_convert_dict_event_with_one_conversion_item(
         __dest__ = DummyBaseModel
 
         def _get_conversion_items(self):  # pylint: disable=no-self-use
-            """Returns a set of ConversionItems used for conversion."""
+            """Return a set of ConversionItems used for conversion."""
             return {ConversionItem("converted", source, transformer)}
 
     converted = convert_dict_event(event, "", DummyBaseConversionSet())
@@ -172,7 +172,7 @@ def test_converter_convert_dict_event_with_one_conversion_item_raising_an_except
         __dest__ = BaseModel
 
         def _get_conversion_items(self):  # pylint: disable=no-self-use
-            """Returns a set of ConversionItems used for conversion."""
+            """Return a set of ConversionItems used for conversion."""
             return {item}
 
     msg = "Failed to get the transformed value for field: None"
@@ -190,7 +190,7 @@ def test_converter_convert_str_event_with_invalid_json_string(invalid_json):
         __dest__ = BaseModel
 
         def _get_conversion_items(self):  # pylint: disable=no-self-use
-            """Returns a set of ConversionItems used for conversion."""
+            """Return a set of ConversionItems used for conversion."""
             return set()
 
     msg = "Failed to parse the event, invalid JSON string"

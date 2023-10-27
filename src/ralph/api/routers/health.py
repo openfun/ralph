@@ -25,7 +25,7 @@ BACKEND_CLIENT: Union[BaseLRSBackend, BaseAsyncLRSBackend] = get_backend_instanc
 async def lbheartbeat() -> None:
     """Load balancer heartbeat.
 
-    Returns a 200 when the server is running.
+    Return a 200 when the server is running.
     """
     return
 
@@ -34,7 +34,7 @@ async def lbheartbeat() -> None:
 async def heartbeat() -> JSONResponse:
     """Application heartbeat.
 
-    Returns a 200 if all checks are successful.
+    Return a 200 if all checks are successful.
     """
     content = {"database": (await await_if_coroutine(BACKEND_CLIENT.status())).value}
     status_code = (

@@ -169,7 +169,7 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend):
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
         # pylint: disable=too-many-arguments
-        """Read objects matching the `query` in the `target` container and yields them.
+        """Read objects matching the `query` in the `target` container and yield them.
 
         Args:
             query: (str or BaseQuery): The query to select objects to read.
