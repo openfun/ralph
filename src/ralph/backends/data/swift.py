@@ -15,6 +15,8 @@ from ralph.backends.data.base import (
     BaseOperationType,
     BaseQuery,
     DataBackendStatus,
+    Listable,
+    Writable,
     enforce_query_checks,
 )
 from ralph.backends.mixins import HistoryMixin
@@ -62,7 +64,7 @@ class SwiftDataBackendSettings(BaseDataBackendSettings):
     LOCALE_ENCODING: str = "utf8"
 
 
-class SwiftDataBackend(HistoryMixin, BaseDataBackend):
+class SwiftDataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
     """SWIFT data backend."""
 
     # pylint: disable=too-many-instance-attributes

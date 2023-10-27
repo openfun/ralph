@@ -28,6 +28,8 @@ from ralph.backends.data.base import (
     BaseOperationType,
     BaseQuery,
     DataBackendStatus,
+    Listable,
+    Writable,
     enforce_query_checks,
 )
 from ralph.conf import BaseSettingsConfig, ClientOptions
@@ -107,7 +109,7 @@ class ClickHouseQuery(BaseClickHouseQuery):
     query_string: Union[Json[BaseClickHouseQuery], None]
 
 
-class ClickHouseDataBackend(BaseDataBackend):
+class ClickHouseDataBackend(BaseDataBackend, Writable, Listable):
     """ClickHouse database backend."""
 
     name = "clickhouse"

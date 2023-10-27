@@ -13,7 +13,7 @@ import pytest
 import requests
 import requests_mock
 
-from ralph.backends.data.base import BaseOperationType, BaseQuery, DataBackendStatus
+from ralph.backends.data.base import BaseQuery, DataBackendStatus
 from ralph.backends.data.ldp import LDPDataBackend
 from ralph.conf import settings
 from ralph.exceptions import BackendException, BackendParameterException
@@ -38,7 +38,6 @@ def test_backends_data_ldp_data_backend_default_instantiation(monkeypatch, fs):
 
     assert LDPDataBackend.name == "ldp"
     assert LDPDataBackend.query_model == BaseQuery
-    assert LDPDataBackend.default_operation_type == BaseOperationType.INDEX
     backend = LDPDataBackend()
     assert isinstance(backend.client, ovh.Client)
     assert backend.service_name is None
@@ -625,14 +624,6 @@ def test_backends_data_ldp_data_backend_read_method_with_query(
     assert json.loads(gzip_decode(result)) == archive_content
 
 
-def test_backends_data_ldp_data_backend_write_method(ldp_backend):
-    """Test the `LDPDataBackend.write` method."""
-    backend = ldp_backend()
-    msg = "LDP data backend is read-only, cannot write to fake"
-    with pytest.raises(NotImplementedError, match=msg):
-        backend.write("truly", "fake", "content")
-
-
 @pytest.mark.parametrize(
     "args,expected",
     [
@@ -700,11 +691,16 @@ def test_backends_data_ldp_data_backend_url_method(monkeypatch, ldp_backend):
     assert backend._url(archive_name) == archive_url
 
 
-def test_backends_data_ldp_data_backend_close_method(ldp_backend):
+def test_backends_data_ldp_data_backend_close_method(ldp_backend, caplog):
     """Test that the `LDPDataBackend.close` method raise an error."""
 
     backend = ldp_backend()
 
-    error = "LDP data backend does not support `close` method"
-    with pytest.raises(NotImplementedError, match=error):
+    with caplog.at_level(logging.INFO):
         backend.close()
+
+    assert (
+        "ralph.backends.data.ldp",
+        logging.INFO,
+        "No open connections to close; skipping",
+    ) in caplog.record_tuples

@@ -25,6 +25,8 @@ from ralph.backends.data.base import (
     BaseOperationType,
     BaseQuery,
     DataBackendStatus,
+    Listable,
+    Writable,
     enforce_query_checks,
 )
 from ralph.backends.mixins import HistoryMixin
@@ -65,7 +67,7 @@ class S3DataBackendSettings(BaseDataBackendSettings):
     LOCALE_ENCODING: str = "utf8"
 
 
-class S3DataBackend(HistoryMixin, BaseDataBackend):
+class S3DataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
     """S3 data backend."""
 
     name = "s3"

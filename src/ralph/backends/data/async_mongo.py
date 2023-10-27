@@ -35,6 +35,7 @@ class AsyncMongoDataBackend(BaseAsyncDataBackend):
     name = "async_mongo"
     query_model = MongoQuery
     settings_class = MongoDataBackendSettings
+    default_operation_type = BaseOperationType.INDEX
 
     def __init__(self, settings: Optional[MongoDataBackendSettings] = None):
         """Instantiate the asynchronous MongoDB client.

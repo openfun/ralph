@@ -30,6 +30,8 @@ from ralph.backends.data.base import (
     BaseOperationType,
     BaseQuery,
     DataBackendStatus,
+    Listable,
+    Writable,
     enforce_query_checks,
 )
 from ralph.conf import BaseSettingsConfig, ClientOptions
@@ -89,7 +91,7 @@ class MongoQuery(BaseMongoQuery):
     query_string: Union[Json[BaseMongoQuery], None]
 
 
-class MongoDataBackend(BaseDataBackend):
+class MongoDataBackend(BaseDataBackend, Writable, Listable):
     """MongoDB data backend."""
 
     name = "mongo"
