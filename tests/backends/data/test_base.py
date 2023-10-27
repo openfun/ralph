@@ -19,7 +19,7 @@ def test_backends_data_base_enforce_query_checks_with_valid_input(value, expecte
     """Test the enforce_query_checks function given valid input."""
 
     class MockBaseDataBackend(BaseDataBackend):
-        """A class mocking the base database class."""
+        """A class mocking the base data backend class."""
 
         def __init__(self, settings=None):
             """Instantiate the Mock data backend."""
@@ -31,12 +31,6 @@ def test_backends_data_base_enforce_query_checks_with_valid_input(value, expecte
             assert query == expected
 
         def status(self):  # pylint: disable=arguments-differ,missing-function-docstring
-            pass
-
-        def list(self):  # pylint: disable=arguments-differ,missing-function-docstring
-            pass
-
-        def write(self):  # pylint: disable=arguments-differ,missing-function-docstring
             pass
 
         def close(self):  # pylint: disable=arguments-differ,missing-function-docstring
@@ -75,12 +69,6 @@ def test_backends_data_base_enforce_query_checks_with_invalid_input(
             return None
 
         def status(self):  # pylint: disable=arguments-differ,missing-function-docstring
-            pass
-
-        def list(self):  # pylint: disable=arguments-differ,missing-function-docstring
-            pass
-
-        def write(self):  # pylint: disable=arguments-differ,missing-function-docstring
             pass
 
         def close(self):  # pylint: disable=arguments-differ,missing-function-docstring

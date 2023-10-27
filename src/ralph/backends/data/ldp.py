@@ -1,7 +1,7 @@
 """OVH's LDP data backend for Ralph."""
 
 import logging
-from typing import Iterable, Iterator, Literal, Optional, Union
+from typing import Iterator, Literal, Optional, Union
 
 import ovh
 import requests
@@ -9,9 +9,9 @@ import requests
 from ralph.backends.data.base import (
     BaseDataBackend,
     BaseDataBackendSettings,
-    BaseOperationType,
     BaseQuery,
     DataBackendStatus,
+    Listable,
     enforce_query_checks,
 )
 from ralph.backends.mixins import HistoryMixin
@@ -57,7 +57,7 @@ class LDPDataBackendSettings(BaseDataBackendSettings):
     SERVICE_NAME: Optional[str] = None
 
 
-class LDPDataBackend(HistoryMixin, BaseDataBackend):
+class LDPDataBackend(HistoryMixin, BaseDataBackend, Listable):
     """OVH LDP (Log Data Platform) data backend."""
 
     name = "ldp"
@@ -214,24 +214,10 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend):
             }
         )
 
-    def write(  # pylint: disable=too-many-arguments
-        self,
-        data: Iterable[Union[bytes, dict]],
-        target: Optional[str] = None,
-        chunk_size: Optional[int] = None,
-        ignore_errors: bool = False,
-        operation_type: Optional[BaseOperationType] = None,
-    ) -> int:
-        """LDP data backend is read-only, calling this method will raise an error."""
-        msg = "LDP data backend is read-only, cannot write to %s"
-        logger.error(msg, target)
-        raise NotImplementedError(msg % target)
-
     def close(self) -> None:
-        """LDP client does not support close, this method is not implemented."""
-        msg = "LDP data backend does not support `close` method"
-        logger.error(msg)
-        raise NotImplementedError(msg)
+        """LDP data backend has no open connections to close. No action."""
+        self._client = None
+        logger.info("No open connections to close; skipping")
 
     def _get_archive_endpoint(self, stream_id: Union[None, str] = None) -> str:
         """Return OVH's archive endpoint."""

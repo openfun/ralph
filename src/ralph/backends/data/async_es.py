@@ -9,6 +9,8 @@ from elasticsearch import ApiError, AsyncElasticsearch, TransportError
 from elasticsearch.helpers import BulkIndexError, async_streaming_bulk
 
 from ralph.backends.data.base import (
+    AsyncListable,
+    AsyncWritable,
     BaseAsyncDataBackend,
     BaseOperationType,
     DataBackendStatus,
@@ -23,12 +25,13 @@ from ralph.utils import parse_bytes_to_dict, read_raw
 logger = logging.getLogger(__name__)
 
 
-class AsyncESDataBackend(BaseAsyncDataBackend):
+class AsyncESDataBackend(BaseAsyncDataBackend, AsyncWritable, AsyncListable):
     """Asynchronous Elasticsearch data backend."""
 
     name = "async_es"
     query_model = ESQuery
     settings_class = ESDataBackendSettings
+    default_operation_type = BaseOperationType.INDEX
 
     def __init__(self, settings: Optional[ESDataBackendSettings] = None):
         """Instantiate the asynchronous Elasticsearch client.

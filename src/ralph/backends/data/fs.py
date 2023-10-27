@@ -16,6 +16,8 @@ from ralph.backends.data.base import (
     BaseOperationType,
     BaseQuery,
     DataBackendStatus,
+    Listable,
+    Writable,
     enforce_query_checks,
 )
 from ralph.backends.mixins import HistoryMixin
@@ -49,7 +51,7 @@ class FSDataBackendSettings(BaseDataBackendSettings):
     LOCALE_ENCODING: str = "utf8"
 
 
-class FSDataBackend(HistoryMixin, BaseDataBackend):
+class FSDataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
     """FileSystem data backend."""
 
     name = "fs"

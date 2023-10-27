@@ -16,6 +16,8 @@ from ralph.backends.data.base import (
     BaseOperationType,
     BaseQuery,
     DataBackendStatus,
+    Listable,
+    Writable,
     enforce_query_checks,
 )
 from ralph.conf import BaseSettingsConfig, ClientOptions, CommaSeparatedTuple
@@ -109,7 +111,7 @@ class ESQuery(BaseQuery):
     track_total_hits: Literal[False] = False
 
 
-class ESDataBackend(BaseDataBackend):
+class ESDataBackend(BaseDataBackend, Writable, Listable):
     """Elasticsearch data backend."""
 
     name = "es"

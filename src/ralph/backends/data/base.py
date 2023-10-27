@@ -79,13 +79,77 @@ def enforce_query_checks(method):
     return wrapper
 
 
+class Writable(ABC):
+    """Data backend interface for backends supporting the write operation."""
+
+    default_operation_type = BaseOperationType.INDEX
+
+    @abstractmethod
+    def write(  # pylint: disable=too-many-arguments
+        self,
+        data: Union[IOBase, Iterable[bytes], Iterable[dict]],
+        target: Optional[str] = None,
+        chunk_size: Optional[int] = None,
+        ignore_errors: bool = False,
+        operation_type: Optional[BaseOperationType] = None,
+    ) -> int:
+        """Write `data` records to the `target` container and return their count.
+
+        Args:
+            data: (Iterable or IOBase): The data to write.
+            target (str or None): The target container name.
+                If `target` is `None`, a default value is used instead.
+            chunk_size (int or None): The number of records or bytes to write in one
+                batch, depending on whether `data` contains dictionaries or bytes.
+                If `chunk_size` is `None`, a default value is used instead.
+            ignore_errors (bool): If `True`, errors during the write operation
+                are ignored and logged. If `False` (default), a `BackendException`
+                is raised if an error occurs.
+            operation_type (BaseOperationType or None): The mode of the write operation.
+                If `operation_type` is `None`, the `default_operation_type` is used
+                instead. See `BaseOperationType`.
+
+        Return:
+            int: The number of written records.
+
+        Raise:
+            BackendException: If a failure during the write operation occurs and
+                `ignore_errors` is set to `False`.
+            BackendParameterException: If a backend argument value is not valid.
+        """
+
+
+class Listable(ABC):
+    """Data backend interface for backends supporting the list operation."""
+
+    @abstractmethod
+    def list(
+        self, target: Optional[str] = None, details: bool = False, new: bool = False
+    ) -> Iterator[Union[str, dict]]:
+        """List containers in the data backend. E.g., collections, files, indexes.
+
+        Args:
+            target (str or None): The target container name.
+                If `target` is `None`, a default value is used instead.
+            details (bool): Get detailed container information instead of just names.
+            new (bool): Given the history, list only not already read containers.
+
+        Yield:
+            str: If `details` is False.
+            dict: If `details` is True.
+
+        Raise:
+            BackendException: If a failure occurs.
+            BackendParameterException: If a backend argument value is not valid.
+        """
+
+
 class BaseDataBackend(ABC):
     """Base data backend interface."""
 
     type = "data"
     name = "base"
     query_model = BaseQuery
-    default_operation_type = BaseOperationType.INDEX
     settings_class = BaseDataBackendSettings
 
     @abstractmethod
@@ -136,27 +200,6 @@ class BaseDataBackend(ABC):
         """
 
     @abstractmethod
-    def list(
-        self, target: Optional[str] = None, details: bool = False, new: bool = False
-    ) -> Iterator[Union[str, dict]]:
-        """List containers in the data backend. E.g., collections, files, indexes.
-
-        Args:
-            target (str or None): The target container name.
-                If `target` is `None`, a default value is used instead.
-            details (bool): Get detailed container information instead of just names.
-            new (bool): Given the history, list only not already read containers.
-
-        Yield:
-            str: If `details` is False.
-            dict: If `details` is True.
-
-        Raise:
-            BackendException: If a failure occurs.
-            BackendParameterException: If a backend argument value is not valid.
-        """
-
-    @abstractmethod
     @enforce_query_checks
     def read(
         self,
@@ -196,7 +239,35 @@ class BaseDataBackend(ABC):
         """
 
     @abstractmethod
-    def write(  # pylint: disable=too-many-arguments
+    def close(self) -> None:
+        """Close the data backend client.
+
+        Raise:
+            BackendException: If a failure occurs during the close operation.
+        """
+
+
+def async_enforce_query_checks(method):
+    """Enforce query argument type checking for methods using it."""
+
+    @functools.wraps(method)
+    async def wrapper(*args, **kwargs):
+        """Wrap method execution."""
+        query = kwargs.pop("query", None)
+        self_ = args[0]
+        async for result in method(*args, query=self_.validate_query(query), **kwargs):
+            yield result
+
+    return wrapper
+
+
+class AsyncWritable(ABC):
+    """Async data backend interface for backends supporting the write operation."""
+
+    default_operation_type = BaseOperationType.INDEX
+
+    @abstractmethod
+    async def write(  # pylint: disable=too-many-arguments
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Optional[str] = None,
@@ -229,27 +300,30 @@ class BaseDataBackend(ABC):
             BackendParameterException: If a backend argument value is not valid.
         """
 
+
+class AsyncListable(ABC):
+    """Async data backend interface for backends supporting the list operation."""
+
     @abstractmethod
-    def close(self) -> None:
-        """Close the data backend client.
+    async def list(
+        self, target: Optional[str] = None, details: bool = False, new: bool = False
+    ) -> Iterator[Union[str, dict]]:
+        """List containers in the data backend. E.g., collections, files, indexes.
+
+        Args:
+            target (str or None): The target container name.
+                If `target` is `None`, a default value is used instead.
+            details (bool): Get detailed container information instead of just names.
+            new (bool): Given the history, list only not already read containers.
+
+        Yield:
+            str: If `details` is False.
+            dict: If `details` is True.
 
         Raise:
-            BackendException: If a failure occurs during the close operation.
+            BackendException: If a failure occurs.
+            BackendParameterException: If a backend argument value is not valid.
         """
-
-
-def async_enforce_query_checks(method):
-    """Enforce query argument type checking for methods using it."""
-
-    @functools.wraps(method)
-    async def wrapper(*args, **kwargs):
-        """Wrap method execution."""
-        query = kwargs.pop("query", None)
-        self_ = args[0]
-        async for result in method(*args, query=self_.validate_query(query), **kwargs):
-            yield result
-
-    return wrapper
 
 
 class BaseAsyncDataBackend(ABC):
@@ -258,7 +332,6 @@ class BaseAsyncDataBackend(ABC):
     type = "data"
     name = "base"
     query_model = BaseQuery
-    default_operation_type = BaseOperationType.INDEX
     settings_class = BaseDataBackendSettings
 
     @abstractmethod
@@ -309,27 +382,6 @@ class BaseAsyncDataBackend(ABC):
         """
 
     @abstractmethod
-    async def list(
-        self, target: Optional[str] = None, details: bool = False, new: bool = False
-    ) -> Iterator[Union[str, dict]]:
-        """List containers in the data backend. E.g., collections, files, indexes.
-
-        Args:
-            target (str or None): The target container name.
-                If `target` is `None`, a default value is used instead.
-            details (bool): Get detailed container information instead of just names.
-            new (bool): Given the history, list only not already read containers.
-
-        Yield:
-            str: If `details` is False.
-            dict: If `details` is True.
-
-        Raise:
-            BackendException: If a failure occurs.
-            BackendParameterException: If a backend argument value is not valid.
-        """
-
-    @abstractmethod
     @async_enforce_query_checks
     async def read(
         self,
@@ -364,40 +416,6 @@ class BaseAsyncDataBackend(ABC):
 
         Raise:
             BackendException: If a failure during the read operation occurs and
-                `ignore_errors` is set to `False`.
-            BackendParameterException: If a backend argument value is not valid.
-        """
-
-    @abstractmethod
-    async def write(  # pylint: disable=too-many-arguments
-        self,
-        data: Union[IOBase, Iterable[bytes], Iterable[dict]],
-        target: Optional[str] = None,
-        chunk_size: Optional[int] = None,
-        ignore_errors: bool = False,
-        operation_type: Optional[BaseOperationType] = None,
-    ) -> int:
-        """Write `data` records to the `target` container and return their count.
-
-        Args:
-            data: (Iterable or IOBase): The data to write.
-            target (str or None): The target container name.
-                If `target` is `None`, a default value is used instead.
-            chunk_size (int or None): The number of records or bytes to write in one
-                batch, depending on whether `data` contains dictionaries or bytes.
-                If `chunk_size` is `None`, a default value is used instead.
-            ignore_errors (bool): If `True`, errors during the write operation
-                are ignored and logged. If `False` (default), a `BackendException`
-                is raised if an error occurs.
-            operation_type (BaseOperationType or None): The mode of the write operation.
-                If `operation_type` is `None`, the `default_operation_type` is used
-                instead. See `BaseOperationType`.
-
-        Return:
-            int: The number of written records.
-
-        Raise:
-            BackendException: If a failure during the write operation occurs and
                 `ignore_errors` is set to `False`.
             BackendParameterException: If a backend argument value is not valid.
         """
