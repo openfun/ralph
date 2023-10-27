@@ -5093,7 +5093,7 @@ contain sensitive data: <code>username</code>, <code>referer</code>, <code>event
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span><span class="s2">&quot;Invalid UUID namespace&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">ConversionItem</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="n">ConversionItem</span><span class="p">(</span>
@@ -5727,7 +5727,7 @@ LMSBaseXapiConverter            (<a class="autorefs autorefs-internal" title="ra
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">LMSBaseXapiConverter</span><span class="p">(</span><span class="n">BaseXapiConverter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Base LMS xAPI Converter.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">ConversionItem</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
         <span class="n">conversion_items</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_conversion_items</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
@@ -5825,7 +5825,7 @@ because the <code>platform_url</code> is present in the edX&rsquo;s event <code>
     <span class="n">__src__</span> <span class="o">=</span> <span class="n">UIPageClose</span>
     <span class="n">__dest__</span> <span class="o">=</span> <span class="n">PageTerminated</span>
 
-    <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">ConversionItem</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
         <span class="n">conversion_items</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_conversion_items</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="n">ConversionItem</span><span class="p">(</span><span class="s2">&quot;object__id&quot;</span><span class="p">,</span> <span class="s2">&quot;page&quot;</span><span class="p">)})</span>
@@ -6112,7 +6112,7 @@ ServerEventToPageViewed            (<a class="autorefs autorefs-internal" title=
     <span class="n">__src__</span> <span class="o">=</span> <span class="n">Server</span>
     <span class="n">__dest__</span> <span class="o">=</span> <span class="n">PageViewed</span>
 
-    <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">ConversionItem</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
         <span class="n">conversion_items</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_conversion_items</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
@@ -6429,7 +6429,7 @@ UILoadVideoToVideoInitialized            (<a class="autorefs autorefs-internal" 
     <span class="n">__src__</span> <span class="o">=</span> <span class="n">UILoadVideo</span>
     <span class="n">__dest__</span> <span class="o">=</span> <span class="n">VideoInitialized</span>
 
-    <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">ConversionItem</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
         <span class="n">conversion_items</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_conversion_items</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
@@ -6693,7 +6693,7 @@ UIPauseVideoToVideoPaused            (<a class="autorefs autorefs-internal" titl
     <span class="n">__src__</span> <span class="o">=</span> <span class="n">UIPauseVideo</span>
     <span class="n">__dest__</span> <span class="o">=</span> <span class="n">VideoPaused</span>
 
-    <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">ConversionItem</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
         <span class="n">conversion_items</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_conversion_items</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
@@ -6965,7 +6965,7 @@ UIPlayVideoToVideoPlayed            (<a class="autorefs autorefs-internal" title
     <span class="n">__src__</span> <span class="o">=</span> <span class="n">UIPlayVideo</span>
     <span class="n">__dest__</span> <span class="o">=</span> <span class="n">VideoPlayed</span>
 
-    <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">ConversionItem</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
         <span class="n">conversion_items</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_conversion_items</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
@@ -7229,7 +7229,7 @@ UISeekVideoToVideoSeeked            (<a class="autorefs autorefs-internal" title
     <span class="n">__src__</span> <span class="o">=</span> <span class="n">UISeekVideo</span>
     <span class="n">__dest__</span> <span class="o">=</span> <span class="n">VideoSeeked</span>
 
-    <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">ConversionItem</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
         <span class="n">conversion_items</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_conversion_items</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
@@ -7501,7 +7501,7 @@ UIStopVideoToVideoTerminated            (<a class="autorefs autorefs-internal" t
     <span class="n">__src__</span> <span class="o">=</span> <span class="n">UIStopVideo</span>
     <span class="n">__dest__</span> <span class="o">=</span> <span class="n">VideoTerminated</span>
 
-    <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">ConversionItem</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
         <span class="n">conversion_items</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_conversion_items</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
@@ -7778,7 +7778,7 @@ VideoBaseXapiConverter            (<a class="autorefs autorefs-internal" title="
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VideoBaseXapiConverter</span><span class="p">(</span><span class="n">BaseXapiConverter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Base Video xAPI Converter.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_conversion_items</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">ConversionItem</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a set of ConversionItems used for conversion.&quot;&quot;&quot;</span>
         <span class="n">conversion_items</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_conversion_items</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">conversion_items</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
@@ -9323,7 +9323,9 @@ sequence.</p>
 
     <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;event&quot;</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">validate_next_jump_event_field</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">validate_next_jump_event_field</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Json</span><span class="p">[</span><span class="n">NavigationalEventField</span><span class="p">],</span> <span class="n">NavigationalEventField</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Json</span><span class="p">[</span><span class="n">NavigationalEventField</span><span class="p">],</span> <span class="n">NavigationalEventField</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check that event.new is equal to event.old + 1.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">new</span> <span class="o">!=</span> <span class="n">value</span><span class="o">.</span><span class="n">old</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;event.new - event.old should be equal to 1&quot;</span><span class="p">)</span>
@@ -9371,7 +9373,9 @@ sequence.</p>
           <summary>Source code in <code>ralph/models/edx/navigational/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;event&quot;</span><span class="p">)</span>
 <span class="nd">@classmethod</span>
-<span class="k">def</span> <span class="nf">validate_next_jump_event_field</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">validate_next_jump_event_field</span><span class="p">(</span>
+    <span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Json</span><span class="p">[</span><span class="n">NavigationalEventField</span><span class="p">],</span> <span class="n">NavigationalEventField</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Json</span><span class="p">[</span><span class="n">NavigationalEventField</span><span class="p">],</span> <span class="n">NavigationalEventField</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check that event.new is equal to event.old + 1.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">new</span> <span class="o">!=</span> <span class="n">value</span><span class="o">.</span><span class="n">old</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;event.new - event.old should be equal to 1&quot;</span><span class="p">)</span>
@@ -9468,7 +9472,9 @@ sequence.</p>
 
     <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;event&quot;</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">validate_prev_jump_event_field</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">validate_prev_jump_event_field</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Json</span><span class="p">[</span><span class="n">NavigationalEventField</span><span class="p">],</span> <span class="n">NavigationalEventField</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Json</span><span class="p">[</span><span class="n">NavigationalEventField</span><span class="p">],</span> <span class="n">NavigationalEventField</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check that event.new is equal to event.old - 1.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">new</span> <span class="o">!=</span> <span class="n">value</span><span class="o">.</span><span class="n">old</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;event.old - event.new should be equal to 1&quot;</span><span class="p">)</span>
@@ -9516,7 +9522,9 @@ sequence.</p>
           <summary>Source code in <code>ralph/models/edx/navigational/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;event&quot;</span><span class="p">)</span>
 <span class="nd">@classmethod</span>
-<span class="k">def</span> <span class="nf">validate_prev_jump_event_field</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">validate_prev_jump_event_field</span><span class="p">(</span>
+    <span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Json</span><span class="p">[</span><span class="n">NavigationalEventField</span><span class="p">],</span> <span class="n">NavigationalEventField</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Json</span><span class="p">[</span><span class="n">NavigationalEventField</span><span class="p">],</span> <span class="n">NavigationalEventField</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check that event.new is equal to event.old - 1.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">new</span> <span class="o">!=</span> <span class="n">value</span><span class="o">.</span><span class="n">old</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;event.old - event.new should be equal to 1&quot;</span><span class="p">)</span>

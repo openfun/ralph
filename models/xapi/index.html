@@ -828,8 +828,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ralph.models.xapi.base.statements.BaseXapiStatement.check_abscence_of_empty_and_invalid_values" class="md-nav__link">
-    check_abscence_of_empty_and_invalid_values()
+  <a href="#ralph.models.xapi.base.statements.BaseXapiStatement.check_absence_of_empty_and_invalid_values" class="md-nav__link">
+    check_absence_of_empty_and_invalid_values()
   </a>
   
 </li>
@@ -3125,8 +3125,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ralph.models.xapi.base.statements.BaseXapiStatement.check_abscence_of_empty_and_invalid_values" class="md-nav__link">
-    check_abscence_of_empty_and_invalid_values()
+  <a href="#ralph.models.xapi.base.statements.BaseXapiStatement.check_absence_of_empty_and_invalid_values" class="md-nav__link">
+    check_absence_of_empty_and_invalid_values()
   </a>
   
 </li>
@@ -5583,8 +5583,8 @@ IRI            (<span title="str">str</span>)
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic custom data type validating RFC 3987 IRIs.&quot;&quot;&quot;</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">__get_validators__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>  <span class="c1"># noqa: D105</span>
-        <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="n">iri</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__get_validators__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">:</span>  <span class="c1"># noqa: D105</span>
+        <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="n">iri</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="s2">&quot;IRI&quot;</span><span class="p">]:</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;Check whether the provided IRI is a valid RFC 3987 IRI.&quot;&quot;&quot;</span>
             <span class="n">parse</span><span class="p">(</span><span class="n">iri</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="s2">&quot;IRI&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">iri</span><span class="p">)</span>
@@ -5639,8 +5639,8 @@ LanguageTag            (<span title="str">str</span>)
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic custom data type validating RFC 5646 Language tags.&quot;&quot;&quot;</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">__get_validators__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>  <span class="c1"># noqa: D105</span>
-        <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="n">tag</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__get_validators__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">:</span>  <span class="c1"># noqa: D105</span>
+        <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="n">tag</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="s2">&quot;LanguageTag&quot;</span><span class="p">]:</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;Check whether the provided tag is a valid RFC 5646 Language tag.&quot;&quot;&quot;</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">tag_is_valid</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Invalid RFC 5646 Language tag&quot;</span><span class="p">)</span>
@@ -5696,8 +5696,8 @@ MailtoEmail            (<span title="str">str</span>)
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic custom data type validating `mailto:email` format.&quot;&quot;&quot;</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">__get_validators__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>  <span class="c1"># noqa: D105</span>
-        <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="n">mailto</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__get_validators__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">:</span>  <span class="c1"># noqa: D105</span>
+        <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="n">mailto</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="s2">&quot;MailtoEmail&quot;</span><span class="p">]:</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;Check whether the provided value follows the `mailto:email` format.&quot;&quot;&quot;</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">mailto</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;mailto:&quot;</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Invalid `mailto:email` value&quot;</span><span class="p">)</span>
@@ -7311,7 +7311,7 @@ BaseXapiResultScore            (<a class="autorefs autorefs-internal" title="ral
 
     <span class="nd">@root_validator</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">check_raw_min_max_relation</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">check_raw_min_max_relation</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check the relationship `min &lt; raw &lt; max`.&quot;&quot;&quot;</span>
         <span class="n">raw_value</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;raw&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">min_value</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -7369,7 +7369,7 @@ BaseXapiResultScore            (<a class="autorefs autorefs-internal" title="ral
           <summary>Source code in <code>ralph/models/xapi/base/results.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@root_validator</span>
 <span class="nd">@classmethod</span>
-<span class="k">def</span> <span class="nf">check_raw_min_max_relation</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">check_raw_min_max_relation</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check the relationship `min &lt; raw &lt; max`.&quot;&quot;&quot;</span>
     <span class="n">raw_value</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;raw&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="n">min_value</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -7560,7 +7560,7 @@ BaseXapiStatement            (<a class="autorefs autorefs-internal" title="ralph
 
     <span class="nd">@root_validator</span><span class="p">(</span><span class="n">pre</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">check_abscence_of_empty_and_invalid_values</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">check_absence_of_empty_and_invalid_values</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check the model for empty and invalid values.</span>
 
 <span class="sd">        Check that the `context` field contains `platform` and `revision` fields</span>
@@ -7570,7 +7570,7 @@ BaseXapiStatement            (<a class="autorefs autorefs-internal" title="ralph
             <span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="p">{}]:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">: invalid empty value&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="n">field</span> <span class="o">!=</span> <span class="s2">&quot;extensions&quot;</span><span class="p">:</span>
-                <span class="bp">cls</span><span class="o">.</span><span class="n">check_abscence_of_empty_and_invalid_values</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">check_absence_of_empty_and_invalid_values</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
         <span class="n">context</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;context&quot;</span><span class="p">,</span> <span class="p">{}))</span>
         <span class="k">if</span> <span class="n">context</span><span class="p">:</span>
@@ -7615,14 +7615,14 @@ BaseXapiStatement            (<a class="autorefs autorefs-internal" title="ralph
 
 
 
-<h5 id="ralph.models.xapi.base.statements.BaseXapiStatement.check_abscence_of_empty_and_invalid_values" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">check_abscence_of_empty_and_invalid_values</span><span class="p">(</span><span class="n">values</span><span class="p">)</span></code>
+<h5 id="ralph.models.xapi.base.statements.BaseXapiStatement.check_absence_of_empty_and_invalid_values" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">check_absence_of_empty_and_invalid_values</span><span class="p">(</span><span class="n">values</span><span class="p">)</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-classmethod"><code>classmethod</code></small>
   </span>
 
-<a href="#ralph.models.xapi.base.statements.BaseXapiStatement.check_abscence_of_empty_and_invalid_values" class="headerlink" title="Permanent link">&para;</a></h5>
+<a href="#ralph.models.xapi.base.statements.BaseXapiStatement.check_absence_of_empty_and_invalid_values" class="headerlink" title="Permanent link">&para;</a></h5>
 
     <div class="doc doc-contents ">
 
@@ -7634,7 +7634,7 @@ only if the <code>object.objectType</code> property is equal to <code>Activity</
           <summary>Source code in <code>ralph/models/xapi/base/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@root_validator</span><span class="p">(</span><span class="n">pre</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="nd">@classmethod</span>
-<span class="k">def</span> <span class="nf">check_abscence_of_empty_and_invalid_values</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">check_absence_of_empty_and_invalid_values</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check the model for empty and invalid values.</span>
 
 <span class="sd">    Check that the `context` field contains `platform` and `revision` fields</span>
@@ -7644,7 +7644,7 @@ only if the <code>object.objectType</code> property is equal to <code>Activity</
         <span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="p">{}]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">: invalid empty value&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="n">field</span> <span class="o">!=</span> <span class="s2">&quot;extensions&quot;</span><span class="p">:</span>
-            <span class="bp">cls</span><span class="o">.</span><span class="n">check_abscence_of_empty_and_invalid_values</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">check_absence_of_empty_and_invalid_values</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
     <span class="n">context</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;context&quot;</span><span class="p">,</span> <span class="p">{}))</span>
     <span class="k">if</span> <span class="n">context</span><span class="p">:</span>
@@ -8024,7 +8024,7 @@ BaseXapiActivityInteractionDefinition            (<a class="autorefs autorefs-in
 
     <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;choices&quot;</span><span class="p">,</span> <span class="s2">&quot;scale&quot;</span><span class="p">,</span> <span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="s2">&quot;steps&quot;</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">check_unique_ids</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">check_unique_ids</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check the uniqueness of interaction components IDs.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">({</span><span class="n">x</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">value</span><span class="p">}):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Duplicate InteractionComponents are not valid&quot;</span><span class="p">)</span>
@@ -8073,7 +8073,7 @@ BaseXapiActivityInteractionDefinition            (<a class="autorefs autorefs-in
           <summary>Source code in <code>ralph/models/xapi/base/unnested_objects.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;choices&quot;</span><span class="p">,</span> <span class="s2">&quot;scale&quot;</span><span class="p">,</span> <span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="s2">&quot;steps&quot;</span><span class="p">)</span>
 <span class="nd">@classmethod</span>
-<span class="k">def</span> <span class="nf">check_unique_ids</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">check_unique_ids</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check the uniqueness of interaction components IDs.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">({</span><span class="n">x</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">value</span><span class="p">}):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Duplicate InteractionComponents are not valid&quot;</span><span class="p">)</span>
@@ -13884,7 +13884,7 @@ LMSContextContextActivities            (<a class="autorefs autorefs-internal" ti
         <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
             <span class="n">LMSProfileActivity</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">LMSProfileActivity</span><span class="p">,</span> <span class="n">BaseXapiActivity</span><span class="p">]]</span>
         <span class="p">],</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">LMSProfileActivity</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">LMSProfileActivity</span><span class="p">,</span> <span class="n">BaseXapiActivity</span><span class="p">]]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check that the category list contains a `LMSProfileActivity`.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">LMSProfileActivity</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">value</span>
@@ -13938,7 +13938,7 @@ LMSContextContextActivities            (<a class="autorefs autorefs-internal" ti
     <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
         <span class="n">LMSProfileActivity</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">LMSProfileActivity</span><span class="p">,</span> <span class="n">BaseXapiActivity</span><span class="p">]]</span>
     <span class="p">],</span>
-<span class="p">):</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">LMSProfileActivity</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">LMSProfileActivity</span><span class="p">,</span> <span class="n">BaseXapiActivity</span><span class="p">]]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check that the category list contains a `LMSProfileActivity`.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">LMSProfileActivity</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">value</span>
@@ -16896,7 +16896,9 @@ VideoContextContextActivities            (<a class="autorefs autorefs-internal" 
         <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
             <span class="n">VideoProfileActivity</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">VideoProfileActivity</span><span class="p">,</span> <span class="n">BaseXapiActivity</span><span class="p">]]</span>
         <span class="p">],</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span>
+        <span class="n">VideoProfileActivity</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">VideoProfileActivity</span><span class="p">,</span> <span class="n">BaseXapiActivity</span><span class="p">]]</span>
+    <span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check that the category list contains a `VideoProfileActivity`.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">VideoProfileActivity</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">value</span>
@@ -16950,7 +16952,9 @@ VideoContextContextActivities            (<a class="autorefs autorefs-internal" 
     <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
         <span class="n">VideoProfileActivity</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">VideoProfileActivity</span><span class="p">,</span> <span class="n">BaseXapiActivity</span><span class="p">]]</span>
     <span class="p">],</span>
-<span class="p">):</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span>
+    <span class="n">VideoProfileActivity</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">VideoProfileActivity</span><span class="p">,</span> <span class="n">BaseXapiActivity</span><span class="p">]]</span>
+<span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check that the category list contains a `VideoProfileActivity`.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">VideoProfileActivity</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">value</span>
@@ -20586,7 +20590,10 @@ VirtualClassroomContextContextActivities            (<a class="autorefs autorefs
             <span class="n">VirtualClassroomProfileActivity</span><span class="p">,</span>
             <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">VirtualClassroomProfileActivity</span><span class="p">,</span> <span class="n">BaseXapiActivity</span><span class="p">]],</span>
         <span class="p">],</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span>
+        <span class="n">VirtualClassroomProfileActivity</span><span class="p">,</span>
+        <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">VirtualClassroomProfileActivity</span><span class="p">,</span> <span class="n">BaseXapiActivity</span><span class="p">]],</span>
+    <span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check that the category list contains a `VirtualClassroomProfileActivity`.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">VirtualClassroomProfileActivity</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">value</span>
@@ -20641,7 +20648,10 @@ VirtualClassroomContextContextActivities            (<a class="autorefs autorefs
         <span class="n">VirtualClassroomProfileActivity</span><span class="p">,</span>
         <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">VirtualClassroomProfileActivity</span><span class="p">,</span> <span class="n">BaseXapiActivity</span><span class="p">]],</span>
     <span class="p">],</span>
-<span class="p">):</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span>
+    <span class="n">VirtualClassroomProfileActivity</span><span class="p">,</span>
+    <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">VirtualClassroomProfileActivity</span><span class="p">,</span> <span class="n">BaseXapiActivity</span><span class="p">]],</span>
+<span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check that the category list contains a `VirtualClassroomProfileActivity`.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">VirtualClassroomProfileActivity</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">value</span>
