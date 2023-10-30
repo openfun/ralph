@@ -8,10 +8,24 @@ from elastic_transport import ApiResponseMeta
 from elasticsearch import ApiError
 from elasticsearch.helpers import bulk
 
+from ralph.backends.lrs.async_es import AsyncESLRSBackend
 from ralph.backends.lrs.base import RalphStatementsQuery
 from ralph.exceptions import BackendException
 
 from tests.fixtures.backends import ES_TEST_FORWARDING_INDEX, ES_TEST_INDEX
+
+
+def test_backends_lrs_async_es_lrs_backend_default_instantiation(monkeypatch, fs):
+    """Test the `ESLRSBackend` default instantiation."""
+    # pylint: disable=invalid-name
+    fs.create_file(".env")
+    monkeypatch.delenv("RALPH_BACKENDS__LRS__ES__DEFAULT_INDEX", raising=False)
+    backend = AsyncESLRSBackend()
+    assert backend.settings.DEFAULT_INDEX == "statements"
+
+    monkeypatch.setenv("RALPH_BACKENDS__LRS__ES__DEFAULT_INDEX", "foo")
+    backend = AsyncESLRSBackend()
+    assert backend.settings.DEFAULT_INDEX == "foo"
 
 
 @pytest.mark.parametrize(

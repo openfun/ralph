@@ -21,6 +21,8 @@ from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import parse_bytes_to_dict
 
 from ..data.base import (
+    AsyncListable,
+    AsyncWritable,
     BaseAsyncDataBackend,
     DataBackendStatus,
     async_enforce_query_checks,
@@ -29,13 +31,12 @@ from ..data.base import (
 logger = logging.getLogger(__name__)
 
 
-class AsyncMongoDataBackend(BaseAsyncDataBackend):
+class AsyncMongoDataBackend(BaseAsyncDataBackend, AsyncWritable, AsyncListable):
     """Async MongoDB data backend."""
 
     name = "async_mongo"
     query_model = MongoQuery
     settings_class = MongoDataBackendSettings
-    default_operation_type = BaseOperationType.INDEX
 
     def __init__(self, settings: Optional[MongoDataBackendSettings] = None):
         """Instantiate the asynchronous MongoDB client.

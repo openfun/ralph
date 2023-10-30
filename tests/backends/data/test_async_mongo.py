@@ -55,6 +55,12 @@ async def test_backends_data_async_mongo_data_backend_default_instantiation(
     assert backend.settings.DEFAULT_CHUNK_SIZE == 500
     assert backend.settings.LOCALE_ENCODING == "utf8"
 
+    # Test overriding default values with environment variables.
+    monkeypatch.setenv("RALPH_BACKENDS__DATA__MONGO__CLIENT_OPTIONS__tz_aware", True)
+    backend = AsyncMongoDataBackend()
+    assert backend.settings.CLIENT_OPTIONS == MongoClientOptions(tz_aware=True)
+    await backend.close()
+
 
 @pytest.mark.anyio
 async def test_backends_data_async_mongo_data_backend_instantiation_with_settings(

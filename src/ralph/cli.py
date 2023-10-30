@@ -7,7 +7,7 @@ import sys
 from inspect import isasyncgen, isclass, iscoroutinefunction
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Any, Optional, Sequence
+from typing import Any, Dict, Optional, Type
 
 import bcrypt
 
@@ -26,11 +26,21 @@ except ModuleNotFoundError:
     # dependencies are not installed.
     pass
 from click_option_group import optgroup
-from pydantic import BaseModel
 
 from ralph import __version__ as ralph_version
-from ralph.backends.conf import backends_settings
-from ralph.backends.data.base import BaseOperationType
+from ralph.backends.data.base import (
+    BaseAsyncDataBackend,
+    BaseDataBackend,
+    BaseOperationType,
+)
+from ralph.backends.http.base import BaseHTTPBackend
+from ralph.backends.loader import (
+    get_cli_backends,
+    get_cli_list_backends,
+    get_cli_write_backends,
+    get_lrs_backends,
+)
+from ralph.backends.stream.base import BaseStreamBackend
 from ralph.conf import ClientOptions, CommaSeparatedTuple, HeadersParameters, settings
 from ralph.exceptions import UnsupportedBackendException
 from ralph.logger import configure_logging
@@ -39,8 +49,8 @@ from ralph.models.selector import ModelSelector
 from ralph.models.validator import Validator
 from ralph.utils import (
     execute_async,
+    get_backend_class,
     get_backend_instance,
-    get_backend_type,
     get_root_logger,
     import_string,
     iter_over_async,
@@ -200,27 +210,22 @@ def cli(verbosity=None):
             handler.setLevel(level)
 
 
-def backends_options(name=None, backend_types: Optional[Sequence[BaseModel]] = None):
+# Once we have a base backend interface we could use Dict[str, Type[BaseBackend]]
+def backends_options(backends: Dict[str, Type], name: Optional[str] = None):
     """Backend-related options decorator for Ralph commands."""
 
     def wrapper(command):
         backend_names = []
-        for backend_name, backend in sorted(
-            [
-                name_backend
-                for backend_type in backend_types
-                for name_backend in backend_type
-            ],
-            key=lambda x: x[0],
-            reverse=True,
-        ):
-            backend_name = backend_name.lower()
+        for backend_name, backend in backends.items():
             backend_names.append(backend_name)
-            for field_name, field in sorted(backend, key=lambda x: x[0], reverse=True):
-                field_type = backend.__fields__[field_name].type_
+            fields = backend.settings_class.__fields__.items()
+            for field_name, field in sorted(fields, key=lambda x: x[0], reverse=True):
+                field_type = field.type_
                 field_name = f"{backend_name}-{field_name.lower()}".replace("_", "-")
                 option = f"--{field_name}"
-                option_kwargs = {}
+                option_kwargs = {"default": None}
+                if field.default:
+                    option_kwargs["type"] = type(field.default)
                 # If the field is a boolean, convert it to a flag option
                 if field_type is bool:
                     option = f"{option}/--no-{field_name}"
@@ -236,9 +241,7 @@ def backends_options(name=None, backend_types: Optional[Sequence[BaseModel]] = N
                 elif field_type is Path:
                     option_kwargs["type"] = click.Path()
 
-                command = optgroup.option(
-                    option.lower(), default=field, **option_kwargs
-                )(command)
+                command = optgroup.option(option.lower(), **option_kwargs)(command)
 
             command = (optgroup.group(f"{backend_name} backend"))(command)
 
@@ -249,9 +252,7 @@ def backends_options(name=None, backend_types: Optional[Sequence[BaseModel]] = N
             required=True,
             help="Backend",
         )(command)
-
-        command = (cli.command(name=name or command.__name__))(command)
-        return command
+        return (cli.command(name=name or command.__name__))(command)
 
     return wrapper
 
@@ -564,15 +565,8 @@ def convert(from_, to_, ignore_errors, fail_on_unknown, **conversion_set_kwargs)
         click.echo(event)
 
 
-read_backend_types = [
-    backends_settings.BACKENDS.DATA,
-    backends_settings.BACKENDS.HTTP,
-    backends_settings.BACKENDS.STREAM,
-]
-
-
 @click.argument("archive", required=False)
-@backends_options(backend_types=read_backend_types)
+@backends_options(get_cli_backends())
 @click.option(
     "-c",
     "--chunk-size",
@@ -625,10 +619,10 @@ def read(
     )
     logger.debug("Backend parameters: %s", options)
 
-    backend_type = get_backend_type(read_backend_types, backend)
-    backend = get_backend_instance(backend_type, backend, options)
+    backend_class = get_backend_class(get_cli_backends(), backend)
+    backend = get_backend_instance(backend_class, options)
 
-    if backend_type == backends_settings.BACKENDS.DATA:
+    if isinstance(backend, (BaseDataBackend, BaseAsyncDataBackend)):
         statements = backend.read(
             query=query,
             target=target,
@@ -641,9 +635,9 @@ def read(
         )
         for statement in statements:
             click.echo(statement)
-    elif backend_type == backends_settings.BACKENDS.STREAM:
+    elif isinstance(backend, BaseStreamBackend):
         backend.stream(sys.stdout.buffer)
-    elif backend_type == backends_settings.BACKENDS.HTTP:
+    elif isinstance(backend, BaseHTTPBackend):
         if query is not None:
             query = backend.query(query=query)
         for statement in backend.read(
@@ -655,20 +649,13 @@ def read(
                     encoding="utf-8",
                 )
             )
-    elif backend_type is None:
+    else:
         msg = "Cannot find an implemented backend type for backend %s"
         logger.error(msg, backend)
         raise UnsupportedBackendException(msg, backend)
 
 
-write_backend_types = [
-    backends_settings.BACKENDS.DATA,
-    backends_settings.BACKENDS.HTTP,
-]
-
-
-# pylint: disable=unnecessary-direct-lambda-call, too-many-arguments
-@backends_options(backend_types=write_backend_types)
+@backends_options(get_cli_write_backends())
 @click.option(
     "-c",
     "--chunk-size",
@@ -725,6 +712,7 @@ def write(
     **options,
 ):
     """Write an archive to a configured backend."""
+    # pylint: disable=too-many-arguments
     logger.info("Writing to target %s for the configured %s backend", target, backend)
 
     logger.debug("Backend parameters: %s", options)
@@ -732,10 +720,10 @@ def write(
     if max_num_simultaneous == 1:
         max_num_simultaneous = None
 
-    backend_type = get_backend_type(write_backend_types, backend)
-    backend = get_backend_instance(backend_type, backend, options)
+    backend_class = get_backend_class(get_cli_write_backends(), backend)
+    backend = get_backend_instance(backend_class, options)
 
-    if backend_type == backends_settings.BACKENDS.DATA:
+    if isinstance(backend, (BaseDataBackend, BaseAsyncDataBackend)):
         writer = (
             execute_async(backend.write)
             if iscoroutinefunction(backend.write)
@@ -750,7 +738,7 @@ def write(
             if force
             else BaseOperationType.INDEX,
         )
-    elif backend_type == backends_settings.BACKENDS.HTTP:
+    elif isinstance(backend, BaseHTTPBackend):
         backend.write(
             target=target,
             data=sys.stdin.buffer,
@@ -759,16 +747,13 @@ def write(
             simultaneous=simultaneous,
             max_num_simultaneous=max_num_simultaneous,
         )
-    elif backend_type is None:
+    else:
         msg = "Cannot find an implemented backend type for backend %s"
         logger.error(msg, backend)
         raise UnsupportedBackendException(msg, backend)
 
 
-list_backend_types = [backends_settings.BACKENDS.DATA]
-
-
-@backends_options(name="list", backend_types=list_backend_types)
+@backends_options(get_cli_list_backends(), name="list")
 @click.option(
     "-t",
     "--target",
@@ -795,8 +780,8 @@ def list_(target, details, new, backend, **options):
     logger.debug("Fetch details: %s", str(details))
     logger.debug("Backend parameters: %s", options)
 
-    backend_type = get_backend_type(list_backend_types, backend)
-    backend = get_backend_instance(backend_type, backend, options)
+    backend_class = get_backend_class(get_cli_list_backends(), backend)
+    backend = get_backend_instance(backend_class, options)
 
     documents = backend.list(target=target, details=details, new=new)
     documents = iter_over_async(documents) if isasyncgen(documents) else documents
@@ -809,10 +794,7 @@ def list_(target, details, new, backend, **options):
         logger.warning("Configured %s backend contains no document", backend.name)
 
 
-runserver_backend_types = [backends_settings.BACKENDS.LRS]
-
-
-@backends_options(name="runserver", backend_types=runserver_backend_types)
+@backends_options(get_lrs_backends(), name="runserver")
 @click.option(
     "-h",
     "--host",
@@ -877,10 +859,10 @@ def runserver(backend: str, host: str, port: int, **options):
                 log_level="debug",
                 reload=True,
             )
-        except NameError as err:  # pylint: disable=redefined-outer-name
+        except NameError as error:
             raise ModuleNotFoundError(
                 "You need to install 'lrs' optional dependencies to use the runserver "
                 "command: pip install ralph-malph[lrs]"
-            ) from err
+            ) from error
 
     logger.info("Shutting down uvicorn server.")

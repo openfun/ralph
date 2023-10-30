@@ -2,20 +2,31 @@
 
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Iterator, List, Optional
+from datetime import datetime
+from typing import Iterator, List, Literal, Optional, Union
+from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, NonNegativeInt
 
 from ralph.backends.data.base import (
     BaseAsyncDataBackend,
     BaseDataBackend,
     BaseDataBackendSettings,
+    BaseQuery,
+    BaseSettingsConfig,
 )
-from ralph.backends.http.async_lrs import LRSStatementsQuery
+from ralph.models.xapi.base.agents import BaseXapiAgent
+from ralph.models.xapi.base.common import IRI
+from ralph.models.xapi.base.groups import BaseXapiGroup
 
 
 class BaseLRSBackendSettings(BaseDataBackendSettings):
     """LRS backend default configuration."""
+
+    class Config(BaseSettingsConfig):
+        """Pydantic Configuration."""
+
+        env_prefix = "RALPH_BACKENDS__LRS__"
 
 
 @dataclass
@@ -25,6 +36,31 @@ class StatementQueryResult:
     statements: List[dict]
     pit_id: Optional[str]
     search_after: Optional[str]
+
+
+class LRSStatementsQuery(BaseQuery):
+    """Pydantic model for LRS query on Statements resource query parameters.
+
+    LRS Specification:
+    https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#213-get-statements
+    """
+
+    # pylint: disable=too-many-instance-attributes
+
+    statement_id: Optional[str] = Field(None, alias="statementId")
+    voided_statement_id: Optional[str] = Field(None, alias="voidedStatementId")
+    agent: Optional[Union[BaseXapiAgent, BaseXapiGroup]]
+    verb: Optional[IRI]
+    activity: Optional[IRI]
+    registration: Optional[UUID]
+    related_activities: Optional[bool] = False
+    related_agents: Optional[bool] = False
+    since: Optional[datetime]
+    until: Optional[datetime]
+    limit: Optional[NonNegativeInt] = 0
+    format: Optional[Literal["ids", "exact", "canonical"]] = "exact"
+    attachments: Optional[bool] = False
+    ascending: Optional[bool] = False
 
 
 class AgentParameters(BaseModel):
@@ -53,7 +89,6 @@ class RalphStatementsQuery(LRSStatementsQuery):
 class BaseLRSBackend(BaseDataBackend):
     """Base LRS backend interface."""
 
-    type = "lrs"
     settings_class = BaseLRSBackendSettings
 
     @abstractmethod
@@ -68,7 +103,6 @@ class BaseLRSBackend(BaseDataBackend):
 class BaseAsyncLRSBackend(BaseAsyncDataBackend):
     """Base async LRS backend interface."""
 
-    type = "lrs"
     settings_class = BaseLRSBackendSettings
 
     @abstractmethod

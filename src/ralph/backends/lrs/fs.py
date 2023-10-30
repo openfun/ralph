@@ -6,7 +6,7 @@ from io import IOBase
 from typing import Iterable, List, Literal, Optional, Union
 from uuid import UUID
 
-from ralph.backends.data.base import BaseOperationType
+from ralph.backends.data.base import BaseOperationType, BaseSettingsConfig
 from ralph.backends.data.fs import FSDataBackend, FSDataBackendSettings
 from ralph.backends.lrs.base import (
     AgentParameters,
@@ -25,6 +25,11 @@ class FSLRSBackendSettings(BaseLRSBackendSettings, FSDataBackendSettings):
     Attributes:
         DEFAULT_LRS_FILE (str): The default LRS filename to store statements.
     """
+
+    class Config(BaseSettingsConfig):
+        """Pydantic Configuration."""
+
+        env_prefix = "RALPH_BACKENDS__LRS__FS__"
 
     DEFAULT_LRS_FILE: str = "fs_lrs.jsonl"
 

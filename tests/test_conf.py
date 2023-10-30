@@ -5,7 +5,7 @@ from importlib import reload
 import pytest
 
 from ralph import conf
-from ralph.backends.conf import BackendSettings
+from ralph.backends.data.es import ESDataBackend
 from ralph.conf import CommaSeparatedTuple, Settings, settings
 from ralph.exceptions import ConfigurationException
 
@@ -49,7 +49,7 @@ def test_conf_comma_separated_list_with_valid_values(value, expected, monkeypatc
     """Test the CommaSeparatedTuple pydantic data type with valid values."""
     assert next(CommaSeparatedTuple.__get_validators__())(value) == expected
     monkeypatch.setenv("RALPH_BACKENDS__DATA__ES__HOSTS", "".join(value))
-    assert BackendSettings().BACKENDS.DATA.ES.HOSTS == expected
+    assert ESDataBackend().settings.HOSTS == expected
 
 
 @pytest.mark.parametrize("value", [{}, None])

@@ -44,6 +44,11 @@ def test_backends_data_ldp_data_backend_default_instantiation(monkeypatch, fs):
     assert backend.stream_id is None
     assert backend.timeout is None
 
+    # Test overriding default values with environment variables.
+    monkeypatch.setenv("RALPH_BACKENDS__DATA__LDP__SERVICE_NAME", "foo")
+    backend = LDPDataBackend()
+    assert backend.service_name == "foo"
+
 
 def test_backends_data_ldp_data_backend_instantiation_with_settings(ldp_backend):
     """Test the `LDPDataBackend` instantiation with settings."""

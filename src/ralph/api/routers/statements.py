@@ -27,9 +27,10 @@ from ralph.api.auth import get_authenticated_user
 from ralph.api.auth.user import AuthenticatedUser
 from ralph.api.forwarding import forward_xapi_statements, get_active_xapi_forwardings
 from ralph.api.models import ErrorDetail, LaxStatement
-from ralph.backends.conf import backends_settings
+from ralph.backends.loader import get_lrs_backends
 from ralph.backends.lrs.base import (
     AgentParameters,
+    BaseAsyncLRSBackend,
     BaseLRSBackend,
     RalphStatementsQuery,
 )
@@ -45,7 +46,7 @@ from ralph.models.xapi.base.agents import (
 from ralph.models.xapi.base.common import IRI
 from ralph.utils import (
     await_if_coroutine,
-    get_backend_instance,
+    get_backend_class,
     now,
     statements_are_equivalent,
 )
@@ -58,10 +59,9 @@ router = APIRouter(
 )
 
 
-BACKEND_CLIENT: BaseLRSBackend = get_backend_instance(
-    backend_type=backends_settings.BACKENDS.LRS,
-    backend_name=settings.RUNSERVER_BACKEND,
-)
+BACKEND_CLIENT: Union[BaseLRSBackend, BaseAsyncLRSBackend] = get_backend_class(
+    backends=get_lrs_backends(), name=settings.RUNSERVER_BACKEND
+)()
 
 POST_PUT_RESPONSES = {
     400: {

@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 class AsyncESLRSBackend(BaseAsyncLRSBackend, AsyncESDataBackend):
     """Asynchronous Elasticsearch LRS backend implementation."""
 
-    settings_class = AsyncESDataBackend.settings_class
+    settings_class = ESLRSBackend.settings_class
 
     async def query_statements(
         self, params: RalphStatementsQuery

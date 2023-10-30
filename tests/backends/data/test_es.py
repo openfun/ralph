@@ -71,6 +71,14 @@ def test_backends_data_es_data_backend_default_instantiation(monkeypatch, fs):
     assert elasticsearch_node.host == "localhost"
     assert elasticsearch_node.port == 9200
 
+    # Test overriding default values with environment variables.
+    monkeypatch.setenv(
+        "RALPH_BACKENDS__DATA__ES__CLIENT_OPTIONS__verify_certs",
+        True,
+    )
+    backend = ESDataBackend()
+    assert backend.settings.CLIENT_OPTIONS == ESClientOptions(verify_certs=True)
+
 
 def test_backends_data_es_data_backend_instantiation_with_settings():
     """Test the `ESDataBackend` instantiation with settings."""

@@ -37,6 +37,11 @@ def test_backends_data_fs_data_backend_default_instantiation(monkeypatch, fs):
     assert backend.default_chunk_size == 4096
     assert backend.locale_encoding == "utf8"
 
+    # Test overriding default values with environment variables.
+    monkeypatch.setenv("RALPH_BACKENDS__DATA__FS__DEFAULT_CHUNK_SIZE", 1)
+    backend = FSDataBackend()
+    assert backend.default_chunk_size == 1
+
 
 def test_backends_data_fs_data_backend_instantiation_with_settings(fs):
     """Test the `FSDataBackend` instantiation with settings."""

@@ -192,7 +192,7 @@ class Settings(BaseSettings):
     RUNSERVER_AUTH_OIDC_AUDIENCE: str = None
     RUNSERVER_AUTH_OIDC_ISSUER_URI: AnyHttpUrl = None
     RUNSERVER_BACKEND: Literal[
-        "async_es", "async_mongo", "clickhouse", "es", "mongo"
+        "async_es", "async_mongo", "clickhouse", "es", "fs", "mongo"
     ] = "es"
     RUNSERVER_HOST: str = "0.0.0.0"  # nosec
     RUNSERVER_MAX_SEARCH_HITS_COUNT: int = 100

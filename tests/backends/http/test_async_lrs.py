@@ -17,10 +17,10 @@ from ralph.backends.http.async_lrs import (
     AsyncLRSHTTPBackend,
     LRSHeaders,
     LRSHTTPBackendSettings,
-    LRSStatementsQuery,
     OperationType,
 )
 from ralph.backends.http.base import HTTPBackendStatus
+from ralph.backends.lrs.base import LRSStatementsQuery
 from ralph.exceptions import BackendException, BackendParameterException
 
 from ...helpers import mock_statement
@@ -61,6 +61,11 @@ def test_backend_http_lrs_default_instantiation(
     assert backend.settings.HEADERS == LRSHeaders()
     assert backend.settings.STATUS_ENDPOINT == "/__heartbeat__"
     assert backend.settings.STATEMENTS_ENDPOINT == "/xAPI/statements"
+
+    # Test overriding default values with environment variables.
+    monkeypatch.setenv("RALPH_BACKENDS__HTTP__LRS__USERNAME", "foo")
+    backend = AsyncLRSHTTPBackend()
+    assert backend.auth == ("foo", "secret")
 
 
 def test_backends_http_lrs_http_instantiation():

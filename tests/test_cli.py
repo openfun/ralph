@@ -11,7 +11,6 @@ from elasticsearch.helpers import bulk, scan
 from hypothesis import settings as hypothesis_settings
 from pydantic import ValidationError
 
-from ralph.backends.conf import backends_settings
 from ralph.backends.data.fs import FSDataBackend
 from ralph.backends.data.ldp import LDPDataBackend
 from ralph.cli import (
@@ -921,50 +920,13 @@ def test_cli_runserver_command_environment_file_generation(monkeypatch):
 
     def mock_uvicorn_run(_, env_file=None, **kwargs):
         """Mock uvicorn.run asserting environment file content."""
+        expected_env_lines = [
+            f"RALPH_RUNSERVER_BACKEND={settings.RUNSERVER_BACKEND}\n",
+            "RALPH_BACKENDS__LRS__ES__DEFAULT_INDEX=foo\n",
+            "RALPH_BACKENDS__LRS__ES__CLIENT_OPTIONS__verify_certs=True\n",
+        ]
         with open(env_file, mode="r", encoding=settings.LOCALE_ENCODING) as file:
-            env_lines = [
-                f"RALPH_RUNSERVER_BACKEND={settings.RUNSERVER_BACKEND}\n",
-                "RALPH_BACKENDS__LRS__ES__DEFAULT_INDEX=foo\n",
-                "RALPH_BACKENDS__LRS__ES__CLIENT_OPTIONS__verify_certs=True\n",
-                "RALPH_BACKENDS__LRS__MONGO__DEFAULT_CHUNK_SIZE="
-                f"{backends_settings.BACKENDS.LRS.MONGO.DEFAULT_CHUNK_SIZE}\n",
-                "RALPH_BACKENDS__LRS__MONGO__DEFAULT_COLLECTION="
-                f"{backends_settings.BACKENDS.LRS.MONGO.DEFAULT_COLLECTION}\n",
-                "RALPH_BACKENDS__LRS__MONGO__DEFAULT_DATABASE="
-                f"{backends_settings.BACKENDS.LRS.MONGO.DEFAULT_DATABASE}\n",
-                "RALPH_BACKENDS__LRS__MONGO__CONNECTION_URI="
-                f"{backends_settings.BACKENDS.LRS.MONGO.CONNECTION_URI}\n",
-                "RALPH_BACKENDS__LRS__FS__DEFAULT_LRS_FILE="
-                f"{backends_settings.BACKENDS.LRS.FS.DEFAULT_LRS_FILE}\n",
-                "RALPH_BACKENDS__LRS__FS__DEFAULT_QUERY_STRING="
-                f"{backends_settings.BACKENDS.LRS.FS.DEFAULT_QUERY_STRING}\n",
-                "RALPH_BACKENDS__LRS__FS__DEFAULT_DIRECTORY_PATH="
-                f"{backends_settings.BACKENDS.LRS.FS.DEFAULT_DIRECTORY_PATH}\n",
-                "RALPH_BACKENDS__LRS__FS__DEFAULT_CHUNK_SIZE="
-                f"{backends_settings.BACKENDS.LRS.FS.DEFAULT_CHUNK_SIZE}\n",
-                "RALPH_BACKENDS__LRS__ES__POINT_IN_TIME_KEEP_ALIVE="
-                f"{backends_settings.BACKENDS.LRS.ES.POINT_IN_TIME_KEEP_ALIVE}\n",
-                "RALPH_BACKENDS__LRS__ES__HOSTS="
-                f"{','.join(backends_settings.BACKENDS.LRS.ES.HOSTS)}\n",
-                "RALPH_BACKENDS__LRS__ES__DEFAULT_CHUNK_SIZE="
-                f"{backends_settings.BACKENDS.LRS.ES.DEFAULT_CHUNK_SIZE}\n",
-                "RALPH_BACKENDS__LRS__ES__ALLOW_YELLOW_STATUS="
-                f"{backends_settings.BACKENDS.LRS.ES.ALLOW_YELLOW_STATUS}\n",
-                "RALPH_BACKENDS__LRS__CLICKHOUSE__IDS_CHUNK_SIZE="
-                f"{backends_settings.BACKENDS.LRS.CLICKHOUSE.IDS_CHUNK_SIZE}\n",
-                "RALPH_BACKENDS__LRS__CLICKHOUSE__DEFAULT_CHUNK_SIZE="
-                f"{backends_settings.BACKENDS.LRS.CLICKHOUSE.DEFAULT_CHUNK_SIZE}\n",
-                "RALPH_BACKENDS__LRS__CLICKHOUSE__EVENT_TABLE_NAME="
-                f"{backends_settings.BACKENDS.LRS.CLICKHOUSE.EVENT_TABLE_NAME}\n",
-                "RALPH_BACKENDS__LRS__CLICKHOUSE__DATABASE="
-                f"{backends_settings.BACKENDS.LRS.CLICKHOUSE.DATABASE}\n",
-                "RALPH_BACKENDS__LRS__CLICKHOUSE__PORT="
-                f"{backends_settings.BACKENDS.LRS.CLICKHOUSE.PORT}\n",
-                "RALPH_BACKENDS__LRS__CLICKHOUSE__HOST="
-                f"{backends_settings.BACKENDS.LRS.CLICKHOUSE.HOST}\n",
-            ]
-            env_lines_created = file.readlines()
-            assert all(line in env_lines_created for line in env_lines)
+            assert file.readlines() == expected_env_lines
 
     monkeypatch.setattr("ralph.cli.uvicorn.run", mock_uvicorn_run)
     runner = CliRunner()
