@@ -3,10 +3,17 @@
 import logging
 from typing import Iterator, List
 
-from ralph.backends.data.es import ESDataBackend, ESQuery, ESQueryPit
+from ralph.backends.data.base import BaseSettingsConfig
+from ralph.backends.data.es import (
+    ESDataBackend,
+    ESDataBackendSettings,
+    ESQuery,
+    ESQueryPit,
+)
 from ralph.backends.lrs.base import (
     AgentParameters,
     BaseLRSBackend,
+    BaseLRSBackendSettings,
     RalphStatementsQuery,
     StatementQueryResult,
 )
@@ -15,10 +22,19 @@ from ralph.exceptions import BackendException, BackendParameterException
 logger = logging.getLogger(__name__)
 
 
+class ESLRSBackendSettings(BaseLRSBackendSettings, ESDataBackendSettings):
+    """Elasticsearch LRS backend default configuration."""
+
+    class Config(BaseSettingsConfig):
+        """Pydantic Configuration."""
+
+        env_prefix = "RALPH_BACKENDS__LRS__ES__"
+
+
 class ESLRSBackend(BaseLRSBackend, ESDataBackend):
     """Elasticsearch LRS backend implementation."""
 
-    settings_class = ESDataBackend.settings_class
+    settings_class = ESLRSBackendSettings
 
     def query_statements(self, params: RalphStatementsQuery) -> StatementQueryResult:
         """Return the statements query payload using xAPI parameters."""

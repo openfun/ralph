@@ -6,10 +6,24 @@ import pytest
 from bson.objectid import ObjectId
 from pymongo import ASCENDING, DESCENDING
 
+from ralph.backends.lrs.async_mongo import AsyncMongoLRSBackend
 from ralph.backends.lrs.base import RalphStatementsQuery
 from ralph.exceptions import BackendException
 
 from tests.fixtures.backends import MONGO_TEST_FORWARDING_COLLECTION
+
+
+def test_backends_lrs_async_mongo_lrs_backend_default_instantiation(monkeypatch, fs):
+    """Test the `AsyncMongoLRSBackend` default instantiation."""
+    # pylint: disable=invalid-name
+    fs.create_file(".env")
+    monkeypatch.delenv("RALPH_BACKENDS__LRS__MONGO__DEFAULT_COLLECTION", raising=False)
+    backend = AsyncMongoLRSBackend()
+    assert backend.settings.DEFAULT_COLLECTION == "marsha"
+
+    monkeypatch.setenv("RALPH_BACKENDS__LRS__MONGO__DEFAULT_COLLECTION", "foo")
+    backend = AsyncMongoLRSBackend()
+    assert backend.settings.DEFAULT_COLLECTION == "foo"
 
 
 @pytest.mark.parametrize(

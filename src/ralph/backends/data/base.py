@@ -147,7 +147,6 @@ class Listable(ABC):
 class BaseDataBackend(ABC):
     """Base data backend interface."""
 
-    type = "data"
     name = "base"
     query_model = BaseQuery
     settings_class = BaseDataBackendSettings
@@ -329,7 +328,6 @@ class AsyncListable(ABC):
 class BaseAsyncDataBackend(ABC):
     """Base async data backend interface."""
 
-    type = "data"
     name = "base"
     query_model = BaseQuery
     settings_class = BaseDataBackendSettings

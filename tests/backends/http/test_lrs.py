@@ -12,9 +12,9 @@ from ralph.backends.http.async_lrs import (
     HTTPBackendStatus,
     LRSHeaders,
     LRSHTTPBackendSettings,
-    LRSStatementsQuery,
 )
 from ralph.backends.http.lrs import LRSHTTPBackend
+from ralph.backends.lrs.base import LRSStatementsQuery
 
 
 @pytest.mark.anyio
@@ -85,6 +85,11 @@ def test_backend_http_lrs_default_instantiation(
     assert backend.settings.HEADERS == LRSHeaders()
     assert backend.settings.STATUS_ENDPOINT == "/__heartbeat__"
     assert backend.settings.STATEMENTS_ENDPOINT == "/xAPI/statements"
+
+    # Test overriding default values with environment variables.
+    monkeypatch.setenv("RALPH_BACKENDS__HTTP__LRS__USERNAME", "foo")
+    backend = LRSHTTPBackend()
+    assert backend.auth == ("foo", "secret")
 
 
 def test_backends_http_lrs_http_instantiation():

@@ -11,6 +11,7 @@ from clickhouse_connect.driver.httpclient import HttpClient
 
 from ralph.backends.data.base import BaseOperationType, DataBackendStatus
 from ralph.backends.data.clickhouse import (
+    ClickHouseClientOptions,
     ClickHouseDataBackend,
     ClickHouseDataBackendSettings,
     ClickHouseQuery,
@@ -48,10 +49,20 @@ def test_backends_data_clickhouse_data_backend_default_instantiation(monkeypatch
     assert ClickHouseDataBackend.default_operation_type == BaseOperationType.CREATE
     assert ClickHouseDataBackend.settings_class == ClickHouseDataBackendSettings
     backend = ClickHouseDataBackend()
+    assert backend.settings.CLIENT_OPTIONS == ClickHouseClientOptions()
     assert backend.event_table_name == "xapi_events_all"
     assert backend.default_chunk_size == 500
     assert backend.locale_encoding == "utf8"
-    backend.close()
+
+    # Test overriding default values with environment variables.
+    monkeypatch.setenv(
+        "RALPH_BACKENDS__DATA__CLICKHOUSE__CLIENT_OPTIONS__date_time_input_format",
+        "no_effort",
+    )
+    backend = ClickHouseDataBackend()
+    assert backend.settings.CLIENT_OPTIONS == ClickHouseClientOptions(
+        date_time_input_format="no_effort"
+    )
 
 
 def test_backends_data_clickhouse_data_backend_instantiation_with_settings():

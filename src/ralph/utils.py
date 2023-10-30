@@ -9,11 +9,11 @@ from functools import reduce
 from importlib import import_module
 from inspect import getmembers, isclass, iscoroutine
 from logging import Logger, getLogger
-from typing import Any, Dict, Iterable, Iterator, List, Optional, Sequence, Union
+from typing import Any, Dict, Iterable, Iterator, List, Optional, Sequence, Type, Union
 
-from pydantic import BaseModel
+from ralph.exceptions import BackendException, UnsupportedBackendException
 
-from ralph.exceptions import BackendException
+logger = logging.getLogger(__name__)
 
 
 def import_subclass(dotted_path: str, parent_class: Any) -> Any:
@@ -56,62 +56,28 @@ def import_string(dotted_path: str) -> Any:
         ) from err
 
 
-def get_backend_type(
-    backend_types: List[BaseModel], backend_name: str
-) -> Union[BaseModel, None]:
-    """Return the backend type from a backend name."""
-    backend_name = backend_name.upper()
-    for backend_type in backend_types:
-        if hasattr(backend_type, backend_name):
-            return backend_type
-    return None
-
-
-def get_backend_class(backend_type: BaseModel, backend_name: str) -> Any:
-    """Return the backend class given the backend type and backend name."""
-    # Get type name from backend_type class name
-    backend_type_name = backend_type.__class__.__name__[
-        : -len("BackendSettings")
-    ].lower()
-    backend_name = backend_name.lower()
-
-    module = import_module(f"ralph.backends.{backend_type_name}.{backend_name}")
-    for _, class_ in getmembers(module, isclass):
-        if (
-            getattr(class_, "type", None) == backend_type_name
-            and getattr(class_, "name", None) == backend_name
-        ):
-            backend_class = class_
-            break
-
+def get_backend_class(backends: Dict[str, Type], name: str) -> Any:
+    """Return the backend class from available backends by its name."""
+    backend_class = backends.get(name)
     if not backend_class:
-        raise BackendException(
-            f'No backend named "{backend_name}" '
-            f'under the backend type "{backend_type_name}"'
-        )
-
+        msg = "'%s' backend not found in available backends: %s"
+        available_backends = ", ".join(backends.keys())
+        logger.error(msg, name, available_backends)
+        raise UnsupportedBackendException(msg % (name, available_backends))
     return backend_class
 
 
-def get_backend_instance(
-    backend_type: BaseModel,
-    backend_name: str,
-    options: Optional[Dict] = None,
-) -> Any:
-    """Return the instantiated backend given the backend type, name and options."""
-    backend_class = get_backend_class(backend_type, backend_name)
-    backend_settings = getattr(backend_type, backend_name.upper())
-
-    if not options:
-        return backend_class(backend_settings)
-
-    prefix = f"{backend_name}_"
+def get_backend_instance(backend_class: Type, options: Dict) -> Any:
+    """Return the instantiated backend given the backend class and options."""
+    prefix = f"{backend_class.name}_"
     # Filter backend-related parameters. Parameter name is supposed to start
     # with the backend name
-    names = filter(lambda key: key.startswith(prefix), options.keys())
-    options = {name.replace(prefix, "").upper(): options[name] for name in names}
-
-    return backend_class(backend_settings.__class__(**options))
+    options = {
+        name.replace(prefix, "").upper(): value
+        for name, value in options.items()
+        if name.startswith(prefix) and value is not None
+    }
+    return backend_class(backend_class.settings_class(**options))
 
 
 def get_root_logger() -> Logger:

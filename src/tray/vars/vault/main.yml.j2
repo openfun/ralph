@@ -1,7 +1,9 @@
 # customer: {{ customer }}
 # env_type: {{ env_type }}
 
-# ES database backend
+# ES data and lrs backends
+# RALPH_BACKENDS__LRS__ES__HOSTS: http://elasticsearch:9200
+# RALPH_BACKENDS__LRS__ES__INDEX: statements
 # RALPH_BACKENDS__DATA__ES__HOSTS: http://elasticsearch:9200
 # RALPH_BACKENDS__DATA__ES__INDEX: statements
 

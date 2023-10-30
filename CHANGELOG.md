@@ -14,6 +14,10 @@ and this project adheres to
 - Implement xAPI LMS Profile statements validation
 - `EdX` to `xAPI` converters for enrollment events
 - Helm: Add variable ``ingress.hosts``
+- Backends: Add `Writable` and `Listable` interfaces to distinguish supported
+  functionalities among `data` backends
+- Backends: Add `get_backends` function to automatically discover backends
+  for CLI and LRS usage
 
 ### Changed
 

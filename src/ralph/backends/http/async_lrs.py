@@ -3,28 +3,23 @@
 import asyncio
 import json
 import logging
-from datetime import datetime
 from itertools import chain
-from typing import Iterable, Iterator, List, Literal, Optional, Union
+from typing import Iterable, Iterator, List, Optional, Union
 from urllib.parse import ParseResult, parse_qs, urljoin, urlparse
-from uuid import UUID
 
 from httpx import AsyncClient, HTTPError, HTTPStatusError, RequestError
 from more_itertools import chunked
-from pydantic import AnyHttpUrl, BaseModel, Field, NonNegativeInt, parse_obj_as
+from pydantic import AnyHttpUrl, BaseModel, Field, parse_obj_as
 from pydantic.types import PositiveInt
 
+from ralph.backends.lrs.base import LRSStatementsQuery
 from ralph.conf import BaseSettingsConfig, HeadersParameters
 from ralph.exceptions import BackendException, BackendParameterException
-from ralph.models.xapi.base.agents import BaseXapiAgent
-from ralph.models.xapi.base.common import IRI
-from ralph.models.xapi.base.groups import BaseXapiGroup
 from ralph.utils import gather_with_limited_concurrency
 
 from .base import (
     BaseHTTPBackend,
     BaseHTTPBackendSettings,
-    BaseQuery,
     HTTPBackendStatus,
     OperationType,
     enforce_query_checks,
@@ -70,31 +65,6 @@ class StatementResponse(BaseModel):
 
     statements: Union[List[dict], dict]
     more: Optional[str]
-
-
-class LRSStatementsQuery(BaseQuery):
-    """Pydantic model for LRS query on Statements resource query parameters.
-
-    LRS Specification:
-    https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#213-get-statements
-    """
-
-    # pylint: disable=too-many-instance-attributes
-
-    statement_id: Optional[str] = Field(None, alias="statementId")
-    voided_statement_id: Optional[str] = Field(None, alias="voidedStatementId")
-    agent: Optional[Union[BaseXapiAgent, BaseXapiGroup]]
-    verb: Optional[IRI]
-    activity: Optional[IRI]
-    registration: Optional[UUID]
-    related_activities: Optional[bool] = False
-    related_agents: Optional[bool] = False
-    since: Optional[datetime]
-    until: Optional[datetime]
-    limit: Optional[NonNegativeInt] = 0
-    format: Optional[Literal["ids", "exact", "canonical"]] = "exact"
-    attachments: Optional[bool] = False
-    ascending: Optional[bool] = False
 
 
 class AsyncLRSHTTPBackend(BaseHTTPBackend):

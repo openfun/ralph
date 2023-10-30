@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 class AsyncMongoLRSBackend(BaseAsyncLRSBackend, AsyncMongoDataBackend):
     """Async MongoDB LRS backend implementation."""
 
-    settings_class = AsyncMongoDataBackend.settings_class
+    settings_class = MongoLRSBackend.settings_class
 
     async def query_statements(
         self, params: RalphStatementsQuery

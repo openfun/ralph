@@ -6,19 +6,18 @@ from typing import Union
 from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse
 
-from ralph.backends.conf import backends_settings
+from ralph.backends.loader import get_lrs_backends
 from ralph.backends.lrs.base import BaseAsyncLRSBackend, BaseLRSBackend
 from ralph.conf import settings
-from ralph.utils import await_if_coroutine, get_backend_instance
+from ralph.utils import await_if_coroutine, get_backend_class
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-BACKEND_CLIENT: Union[BaseLRSBackend, BaseAsyncLRSBackend] = get_backend_instance(
-    backend_type=backends_settings.BACKENDS.LRS,
-    backend_name=settings.RUNSERVER_BACKEND,
-)
+BACKEND_CLIENT: Union[BaseLRSBackend, BaseAsyncLRSBackend] = get_backend_class(
+    backends=get_lrs_backends(), name=settings.RUNSERVER_BACKEND
+)()
 
 
 @router.get("/__lbheartbeat__")

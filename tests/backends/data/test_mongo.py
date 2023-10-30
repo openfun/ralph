@@ -51,6 +51,11 @@ def test_backends_data_mongo_data_backend_default_instantiation(monkeypatch, fs)
     assert backend.settings.CLIENT_OPTIONS == MongoClientOptions()
     assert backend.settings.DEFAULT_CHUNK_SIZE == 500
     assert backend.settings.LOCALE_ENCODING == "utf8"
+
+    # Test overriding default values with environment variables.
+    monkeypatch.setenv("RALPH_BACKENDS__DATA__MONGO__CLIENT_OPTIONS__tz_aware", True)
+    backend = MongoDataBackend()
+    assert backend.settings.CLIENT_OPTIONS == MongoClientOptions(tz_aware=True)
     backend.close()
 
 

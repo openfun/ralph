@@ -8,7 +8,21 @@ import pytest
 from clickhouse_connect.driver.exceptions import ClickHouseError
 
 from ralph.backends.lrs.base import RalphStatementsQuery
+from ralph.backends.lrs.clickhouse import ClickHouseLRSBackend
 from ralph.exceptions import BackendException
+
+
+def test_backends_lrs_clickhouse_lrs_backend_default_instantiation(monkeypatch, fs):
+    """Test the `ClickHouseLRSBackend` default instantiation."""
+    # pylint: disable=invalid-name
+    fs.create_file(".env")
+    monkeypatch.delenv("RALPH_BACKENDS__LRS__CLICKHOUSE__IDS_CHUNK_SIZE", raising=False)
+    backend = ClickHouseLRSBackend()
+    assert backend.settings.IDS_CHUNK_SIZE == 10000
+
+    monkeypatch.setenv("RALPH_BACKENDS__LRS__CLICKHOUSE__IDS_CHUNK_SIZE", 1)
+    backend = ClickHouseLRSBackend()
+    assert backend.settings.IDS_CHUNK_SIZE == 1
 
 
 @pytest.mark.parametrize(

@@ -51,6 +51,11 @@ def test_backends_data_swift_data_backend_default_instantiation(monkeypatch, fs)
     assert backend.options["user_domain_name"] == "Default"
     assert backend.default_container is None
     assert backend.locale_encoding == "utf8"
+
+    # Test overriding default values with environment variables.
+    monkeypatch.setenv("RALPH_BACKENDS__DATA__SWIFT__DEFAULT_CONTAINER", "foo")
+    backend = SwiftDataBackend()
+    assert backend.default_container == "foo"
     backend.close()
 
 

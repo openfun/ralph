@@ -31,7 +31,6 @@ class AsyncESDataBackend(BaseAsyncDataBackend, AsyncWritable, AsyncListable):
     name = "async_es"
     query_model = ESQuery
     settings_class = ESDataBackendSettings
-    default_operation_type = BaseOperationType.INDEX
 
     def __init__(self, settings: Optional[ESDataBackendSettings] = None):
         """Instantiate the asynchronous Elasticsearch client.

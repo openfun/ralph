@@ -41,6 +41,11 @@ def test_backends_data_s3_backend_default_instantiation(
     assert backend.default_chunk_size == 4096
     assert backend.locale_encoding == "utf8"
 
+    # Test overriding default values with environment variables.
+    monkeypatch.setenv("RALPH_BACKENDS__DATA__S3__DEFAULT_CHUNK_SIZE", 1)
+    backend = S3DataBackend()
+    assert backend.default_chunk_size == 1
+
 
 def test_backends_data_s3_data_backend_instantiation_with_settings():
     """Test the `S3DataBackend` instantiation with settings."""

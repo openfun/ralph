@@ -3,6 +3,7 @@
 import logging
 from typing import Generator, Iterator, List
 
+from ralph.backends.data.base import BaseSettingsConfig
 from ralph.backends.data.clickhouse import (
     ClickHouseDataBackend,
     ClickHouseDataBackendSettings,
@@ -22,11 +23,16 @@ logger = logging.getLogger(__name__)
 class ClickHouseLRSBackendSettings(
     BaseLRSBackendSettings, ClickHouseDataBackendSettings
 ):
-    """Represent the ClickHouse data backend default configuration.
+    """ClickHouse LRS backend default configuration.
 
     Attributes:
         IDS_CHUNK_SIZE (int): The chunk size for querying by ids.
     """
+
+    class Config(BaseSettingsConfig):
+        """Pydantic Configuration."""
+
+        env_prefix = "RALPH_BACKENDS__LRS__CLICKHOUSE__"
 
     IDS_CHUNK_SIZE: int = 10000
 

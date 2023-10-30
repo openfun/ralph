@@ -81,7 +81,6 @@ class BaseQuery(BaseModel):
 class BaseHTTPBackend(ABC):
     """Base HTTP backend interface."""
 
-    type = "http"
     name = "base"
     query = BaseQuery
 

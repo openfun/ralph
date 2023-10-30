@@ -3,6 +3,20 @@
 import pytest
 
 from ralph.backends.lrs.base import RalphStatementsQuery
+from ralph.backends.lrs.fs import FSLRSBackend
+
+
+def test_backends_lrs_fs_lrs_backend_default_instantiation(monkeypatch, fs):
+    """Test the `FSLRSBackend` default instantiation."""
+    # pylint: disable=invalid-name
+    fs.create_file(".env")
+    monkeypatch.delenv("RALPH_BACKENDS__LRS__FS__DEFAULT_LRS_FILE", raising=False)
+    backend = FSLRSBackend()
+    assert backend.settings.DEFAULT_LRS_FILE == "fs_lrs.jsonl"
+
+    monkeypatch.setenv("RALPH_BACKENDS__LRS__FS__DEFAULT_LRS_FILE", "foo.txt")
+    backend = FSLRSBackend()
+    assert backend.settings.DEFAULT_LRS_FILE == "foo.txt"
 
 
 @pytest.mark.parametrize(

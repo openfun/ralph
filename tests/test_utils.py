@@ -1,14 +1,12 @@
 """Tests for Ralph utils."""
 
-from abc import ABC
-from types import ModuleType
+import logging
 
 import pytest
 from pydantic import BaseModel
 
 from ralph import utils as ralph_utils
-from ralph.backends.conf import backends_settings
-from ralph.conf import InstantiableSettingsItem
+from ralph.exceptions import UnsupportedBackendException
 
 
 def test_utils_import_string():
@@ -25,79 +23,50 @@ def test_utils_import_string():
     assert http_status.OK == 200
 
 
-def test_utils_get_backend_type():
-    """Test get_backend_type utility."""
-    backend_types = [backend_type[1] for backend_type in backends_settings.BACKENDS]
-    assert (
-        ralph_utils.get_backend_type(backend_types, "es")
-        == backends_settings.BACKENDS.DATA
-    )
-    assert (
-        ralph_utils.get_backend_type(backend_types, "lrs")
-        == backends_settings.BACKENDS.HTTP
-    )
-    assert (
-        ralph_utils.get_backend_type(backend_types, "ws")
-        == backends_settings.BACKENDS.STREAM
-    )
-    assert ralph_utils.get_backend_type(backend_types, "foo") is None
+def test_utils_get_backend_class(caplog):
+    """Test the `get_backend_class` utility should return the expected result."""
+    backends = {"es": type("es_backend", (), {}), "fs": type("fs_backend", (), {})}
+    assert ralph_utils.get_backend_class(backends, "es") == backends["es"]
+    assert ralph_utils.get_backend_class(backends, "fs") == backends["fs"]
+    msg = "'foo' backend not found in available backends: es, fs"
+    with caplog.at_level(logging.ERROR):
+        with pytest.raises(UnsupportedBackendException, match=msg):
+            ralph_utils.get_backend_class(backends, "foo")
+
+    assert ("ralph.utils", logging.ERROR, msg) in caplog.record_tuples
 
 
 @pytest.mark.parametrize(
     "options,expected",
     [
         # Empty options should produce default result.
-        ({}, {}),
+        ({}, {"FOO": "FOO"}),
         # Options not matching the backend name are ignored.
-        ({"foo": "bar", "not_dummy_foo": "baz"}, {}),
+        ({"foo": "bar", "not_dummy_foo": "baz"}, {"FOO": "FOO"}),
+        # Options matching the backend name update the defaults.
+        ({"dummy_foo": "bar"}, {"FOO": "bar"}),
     ],
 )
-def test_utils_get_backend_instance(monkeypatch, options, expected):
-    """Test get_backend_instance utility should return the expected result."""
+def test_utils_get_backend_instance(options, expected):
+    """Test the `get_backend_instance` utility should return the expected result."""
 
-    class DummyTestBackendSettings(InstantiableSettingsItem):
+    class DummyTestBackendSettings(BaseModel):
         """Represent a dummy backend setting."""
 
-        FOO: str = "FOO"  # pylint: disable=disallowed-name
+        FOO: str = "FOO"
 
-        def get_instance(self, **init_parameters):  # pylint: disable=no-self-use
-            """Return the init_parameters."""
-            return init_parameters
-
-    class DummyTestBackend(ABC):
+    class DummyTestBackend:
         """Represent a dummy backend instance."""
 
-        type = "test"
         name = "dummy"
+        settings_class = DummyTestBackendSettings
 
-        def __init__(self, *args, **kargs):  # pylint: disable=unused-argument
-            return
+        def __init__(self, settings):
+            self.settings = settings
 
-        def __call__(self, *args, **kwargs):  # pylint: disable=unused-argument
-            return {}
-
-    def mock_import_module(*args, **kwargs):  # pylint: disable=unused-argument
-        """Mock import_module."""
-        test_module = ModuleType(name="ralph.backends.test.dummy")
-
-        test_module.DummyTestBackendSettings = DummyTestBackendSettings
-        test_module.DummyTestBackend = DummyTestBackend
-
-        return test_module
-
-    class TestBackendSettings(BaseModel):  # DATA-backend-type
-        """A backend type including the DummyTestBackendSettings."""
-
-        DUMMY: DummyTestBackendSettings = (
-            DummyTestBackendSettings()
-        )  # Es-Backend-settings
-
-    monkeypatch.setattr(ralph_utils, "import_module", mock_import_module)
-    backend_instance = ralph_utils.get_backend_instance(
-        TestBackendSettings(), "dummy", options
-    )
-    assert isinstance(backend_instance, DummyTestBackend)
-    assert backend_instance() == expected
+    backend = ralph_utils.get_backend_instance(DummyTestBackend, options)
+    assert isinstance(backend, DummyTestBackend)
+    assert backend.settings.dict() == expected
 
 
 @pytest.mark.parametrize("path,value", [(["foo", "bar"], "bar_value")])
