@@ -1,22 +1,48 @@
-# Ralph
 
-[![Discord](https://img.shields.io/discord/1082704478463082496?label=discord&logo=discord&style=for-the-badge)](https://discord.gg/vYx6YWxJCS)
+<p align="center">
+  <a href="https://openfun.github.io/ralph"><img src="https://raw.githubusercontent.com/openfun/logos/main/ralph/ralph-color-dark.png" alt="Ralph logo" width="400"></a>
+</p>
+
+<p align="center">
+    <em>Ralph, the ultimate Learning Record Store (and more!) for your learning analytics</em>
+</p>
+
+<p align="center">
+<a href="https://circleci.com/gh/openfun/ralph/tree/master">
+    <img src="https://img.shields.io/circleci/build/gh/openfun/ralph/master?label=Tests&logo=circleci" alt="Tests Status">
+</a>
+<a href="https://pypi.org/project/ralph-malph">
+    <img src="https://img.shields.io/pypi/v/ralph-malph?label=PyPI+package" alt="PyPI package version">
+</a>
+<a href="https://pypi.org/project/ralph-malph">
+    <img src="https://img.shields.io/pypi/pyversions/ralph-malph?label=Python" alt="Python versions supported">
+</a>
+<a href="https://hub.docker.com/r/fundocker/ralph/tags">
+    <img src="https://img.shields.io/docker/v/fundocker/ralph/latest?label=Docker+image" alt="Docker image version">
+</a>
+<a href="https://discord.gg/vYx6YWxJCS">
+    <img src="https://img.shields.io/discord/1082704478463082496?label=Discord&logo=discord&style=shield" alt="Discord">
+</a>
+</p>
+
+---
+
+**Documentation**: [https://openfun.github.io/ralph](https://openfun.github.io/ralph)
+
+**Source Code**: [https://github.com/openfun/ralph](https://github.com/openfun/ralph)
+
+---
 
 Ralph is a toolbox for your learning analytics, it can be used as a:
 
+- **[LRS](https://en.wikipedia.org/wiki/Learning_Record_Store)**, a HTTP API server to collect xAPI statements (learning events), following the [ADL LRS standard](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#partthree)
+- **command-line interface** (CLI), to build data pipelines the UNIX-way™️,
 - **library**, to fetch learning events from various backends, (de)serialize or
     convert them from various standard formats such as
     [xAPI](https://adlnet.gov/projects/xapi/), or
-    [openedx](https://docs.openedx.org/en/latest/developers/references/internal_data_formats/tracking_logs/index.html)
-- **command-line interface** (CLI), to build data pipelines the UNIX-way™️,
-- **HTTP API server**, to collect xAPI statements (learning events)
-  following the [ADL LRS
-  standard](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#partthree).
+    [openedx](https://docs.openedx.org/en/latest/developers/references/internal_data_formats/tracking_logs/index) html
 
-## Quick start guide
-
-### Testing the LRS server with Docker compose
-
+## ⚡️ Quick start guide: Run the LRS server
 
 > Preliminary notes:
 >
@@ -46,10 +72,7 @@ Elasticsearch cluster _via_ Docker compose.
 You can check the `elasticsearch` service status using the `status` helper:
 
 ```bash
-$ make status
-
-# This is an alias for:
-$ docker compose ps
+$ make status # This is an alias for: $ docker compose ps
 ```
 
 You may now start the LRS server using:
@@ -106,8 +129,9 @@ $ curl -s \
 > Note that using `jq` is optional in this case, it is used to improve response
 > readability. It is not required to install it to run this snippet.
 
+## ⚡️ Quick start guide: Manipulate data with the CLI
 
-### Testing the CLI (Docker)
+### With the Docker image
 
 Ralph is distributed as a [Docker
 image](https://hub.docker.com/repository/docker/fundocker/ralph). If
@@ -118,7 +142,7 @@ can be pulled from DockerHub:
 $ docker run --pull always --rm fundocker/ralph:latest ralph --help
 ```
 
-### Testing the CLI (Python)
+### With the Python package
 
 Ralph is distributed as a standard python package; it can be installed _via_
 `pip` or any other python package manager (_e.g._ Poetry, Pipenv, etc.):
@@ -154,13 +178,6 @@ $ ralph COMMAND --help
 
 Some major version changes require updating persistence layers. Check out the [migration guide](https://github.com/openfun/ralph/blob/master/UPGRADE.md) for more information.
 
-## Documentation
-
-We try our best to maintain an up-to-date reference documentation for this
-project. If you intend to install, test or contribute to ralph, we invite you
-to read this [documentation](https://openfun.github.io/ralph) and give us
-feedback if some parts are unclear or your use case is not (or poorly) covered.
-
 ## Contributing
 
 This project is intended to be community-driven, so please, do not hesitate to
@@ -171,38 +188,21 @@ We try to raise our code quality standards and expect contributors to follow
 the recommendations from our
 [handbook](https://handbook.openfun.fr).
 
-### Useful commands
+## Useful commands
 
-Bootstrap the project:
-
-```
-$ make bootstrap
-```
-
-Run tests:
-
-```
-$ make test
-```
-
-Run all linters:
-
-```
-$ make lint
-```
-
-If you add new dependencies to the project, you will have to rebuild the Docker
-image (and the development environment):
-
-```
-$ make down && make bootstrap
-```
 
 You can explore all available rules using:
 
 ```
 $ make help
 ```
+but here are some of them:
+
+- Bootstrap the project: `$ make bootstrap`
+- Run tests: `$ make test`
+- Run all linters: `$ make lint`
+- If you add new dependencies to the project, you will have to rebuild the Docker
+image (and the development environment): `$ make down && make bootstrap`
 
 ## License
 
