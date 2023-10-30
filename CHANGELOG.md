@@ -17,6 +17,7 @@ and this project adheres to
 
 ### Changed
 
+- Upgrade `cachetools` to `5.3.2`
 - Refactor `database` and `storage` backends under the unified `data` backend
 interface [BC]
 - Refactor LRS `query_statements` and `query_statements_by_ids` backends
