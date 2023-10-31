@@ -32,7 +32,7 @@ class BaseXapiGroupCommonProperties(BaseModelWithConfig, ABC):
     """
 
     objectType: Literal["Group"]
-    name: Optional[StrictStr]
+    name: Optional[StrictStr] = None
 
 
 class BaseXapiAnonymousGroup(BaseXapiGroupCommonProperties):

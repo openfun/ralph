@@ -1,6 +1,6 @@
 """Configurations for Ralph backends."""
 
-from pydantic import BaseModel, BaseSettings
+from pydantic import BaseModel
 
 from ralph.backends.data.clickhouse import ClickHouseDataBackendSettings
 from ralph.backends.data.es import ESDataBackendSettings
@@ -14,6 +14,7 @@ from ralph.backends.lrs.clickhouse import ClickHouseLRSBackendSettings
 from ralph.backends.lrs.fs import FSLRSBackendSettings
 from ralph.backends.stream.ws import WSStreamBackendSettings
 from ralph.conf import BaseSettingsConfig, core_settings
+from pydantic_settings import BaseSettings
 
 # Active Data backend Settings.
 
@@ -79,6 +80,8 @@ class Backends(BaseModel):
 class BackendSettings(BaseSettings):
     """Pydantic model for Ralph's backends environment & configuration settings."""
 
+    # TODO[pydantic]: The `Config` class inherits from another class, please create the `model_config` manually.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
     class Config(BaseSettingsConfig):
         """Pydantic Configuration."""
 

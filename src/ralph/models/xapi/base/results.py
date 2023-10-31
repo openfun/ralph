@@ -4,10 +4,11 @@ from datetime import timedelta
 from decimal import Decimal
 from typing import Any, Dict, Optional, Union
 
-from pydantic import StrictBool, StrictStr, conint, root_validator
+from pydantic import Field, StrictBool, StrictStr, root_validator
 
 from ..config import BaseModelWithConfig
 from .common import IRI
+from typing_extensions import Annotated
 
 
 class BaseXapiResultScore(BaseModelWithConfig):
@@ -20,10 +21,10 @@ class BaseXapiResultScore(BaseModelWithConfig):
         max (Decimal): Consists of the highest possible score.
     """
 
-    scaled: Optional[conint(ge=-1, le=1)]
-    raw: Optional[Decimal]
-    min: Optional[Decimal]
-    max: Optional[Decimal]
+    scaled: Optional[Annotated[int, Field(ge=-1, le=1)]] = None
+    raw: Optional[Decimal] = None
+    min: Optional[Decimal] = None
+    max: Optional[Decimal] = None
 
     @root_validator
     @classmethod
@@ -58,9 +59,9 @@ class BaseXapiResult(BaseModelWithConfig):
         extensions (dict): Consists of a dictionary of other properties as needed.
     """
 
-    score: Optional[BaseXapiResultScore]
-    success: Optional[StrictBool]
-    completion: Optional[StrictBool]
-    response: Optional[StrictStr]
-    duration: Optional[timedelta]
-    extensions: Optional[Dict[IRI, Union[str, int, bool, list, dict, None]]]
+    score: Optional[BaseXapiResultScore] = None
+    success: Optional[StrictBool] = None
+    completion: Optional[StrictBool] = None
+    response: Optional[StrictStr] = None
+    duration: Optional[timedelta] = None
+    extensions: Optional[Dict[IRI, Union[str, int, bool, list, dict, None]]] = None

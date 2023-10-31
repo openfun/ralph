@@ -3,9 +3,10 @@
 import sys
 from typing import Union
 
-from pydantic import AnyUrl, constr
+from pydantic import StringConstraints, AnyUrl
 
 from .base import BaseEdxModel
+from typing_extensions import Annotated
 
 if sys.version_info >= (3, 8):
     from typing import Literal
@@ -29,4 +30,4 @@ class BaseBrowserModel(BaseEdxModel):
 
     event_source: Literal["browser"]
     page: AnyUrl
-    session: Union[constr(regex=r"^[a-f0-9]{32}$"), Literal[""]]  # noqa: F722
+    session: Union[Annotated[str, StringConstraints(pattern=r"^[a-f0-9]{32}$")], Literal[""]]  # noqa: F722

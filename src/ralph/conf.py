@@ -4,13 +4,14 @@ import io
 import sys
 from enum import Enum
 from pathlib import Path
-from typing import List, Sequence, Union, Tuple
+from typing import Annotated, List, Optional, Sequence, Union, Tuple
 
-from pydantic import AnyHttpUrl, AnyUrl, BaseModel, BaseSettings, Extra, root_validator
+from pydantic import AfterValidator, model_validator, ConfigDict, AnyHttpUrl, AnyUrl, BaseModel
 
 from ralph.exceptions import ConfigurationException
 
 from .utils import import_string
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 if sys.version_info >= (3, 8):
     from typing import Literal
@@ -42,6 +43,8 @@ class BaseSettingsConfig:
 class CoreSettings(BaseSettings):
     """Pydantic model for Ralph's core settings."""
 
+    # TODO[pydantic]: The `Config` class inherits from another class, please create the `model_config` manually.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
     class Config(BaseSettingsConfig):
         """Pydantic Configuration."""
 
@@ -52,29 +55,44 @@ class CoreSettings(BaseSettings):
 core_settings = CoreSettings()
 
 
-class CommaSeparatedTuple(str):
-    """Pydantic field type validating comma separated strings or lists/tuples."""
+# class CommaSeparatedTuple(str):
+#     """Pydantic field type validating comma separated strings or lists/tuples."""
 
-    @classmethod
-    def __get_validators__(cls):  # noqa: D105
-        def validate(value: Union[str, Sequence[str]]) -> Sequence[str]:
-            """Check whether the value is a comma separated string or a list/tuple."""
-            if isinstance(value, (tuple, list)):
-                return tuple(value)
+#     @classmethod
+#     # TODO[pydantic]: We couldn't refactor `__get_validators__`, please create the `__get_pydantic_core_schema__` manually.
+#     # Check https://docs.pydantic.dev/latest/migration/#defining-custom-types for more information.
+#     def __get_validators__(cls):  # noqa: D105
+#         def validate(value: Union[str, Sequence[str]]) -> Sequence[str]:
+#             """Check whether the value is a comma separated string or a list/tuple."""
+#             if isinstance(value, (tuple, list)):
+#                 return tuple(value)
 
-            if isinstance(value, str):
-                return tuple(value.split(","))
+#             if isinstance(value, str):
+#                 return tuple(value.split(","))
 
-            raise TypeError("Invalid comma separated list")
+#             raise TypeError("Invalid comma separated list")
 
-        yield validate
+#         yield validate
+
+def validate_comma_separated_tuple(value: Union[str, Tuple[str, ...]]) -> Tuple[str]:
+    """Checks whether the value is a comma separated string or a tuple."""
+
+    if isinstance(value, tuple):
+        return value
+
+    if isinstance(value, str):
+        return tuple(value.split(","))
+
+    raise TypeError("Invalid comma separated list")
+
+CommaSeparatedTuple = Annotated[Union[str, Tuple[str, ...]], AfterValidator(validate_comma_separated_tuple)]
 
 
 class InstantiableSettingsItem(BaseModel):
     """Pydantic model for a settings configuration item that can be instantiated."""
-
-    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
-        underscore_attrs_are_private = True
+    # TODO[pydantic]: The following keys were removed: `underscore_attrs_are_private`.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
+    model_config = SettingsConfigDict(underscore_attrs_are_private=True)
 
     _class_path: str = None
 
@@ -85,16 +103,12 @@ class InstantiableSettingsItem(BaseModel):
 
 class ClientOptions(BaseModel):
     """Pydantic model for additional client options."""
-
-    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
 
 class HeadersParameters(BaseModel):
     """Pydantic model for headers parameters."""
-
-    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
-        extra = Extra.allow
+    model_config = ConfigDict(extra="allow")
 
 
 # Active parser Settings.
@@ -121,9 +135,7 @@ class ParserSettings(BaseModel):
 
 class XapiForwardingConfigurationSettings(BaseModel):
     """Pydantic model for xAPI forwarding configuration item."""
-
-    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
-        min_anystr_length = 1
+    model_config = ConfigDict(str_min_length=1)
 
     url: AnyUrl
     is_active: bool
@@ -140,32 +152,50 @@ class AuthBackend(Enum):
     OIDC = "OIDC"
 
 
-class AuthBackends(str):
-    """Model representing a list of authentication backends."""
+# class AuthBackends(str):
+#     """Model representing a list of authentication backends."""
 
-    @classmethod
-    def __get_validators__(cls):  # noqa: D105
-        """Checks whether the value is a comma separated string or a tuple representing
-        an AuthBackend."""
+#     @classmethod
+#     # TODO[pydantic]: We couldn't refactor `__get_validators__`, please create the `__get_pydantic_core_schema__` manually.
+#     # Check https://docs.pydantic.dev/latest/migration/#defining-custom-types for more information.
+#     def __get_validators__(cls):  # noqa: D105
+#         """Checks whether the value is a comma separated string or a tuple representing
+#         an AuthBackend."""
 
-        def validate(
-            value: Union[AuthBackend, Tuple[AuthBackend], List[AuthBackend]]
-        ) -> Tuple[AuthBackend]:
-            """Check whether the value is a comma separated string or a list/tuple."""
-            if isinstance(value, (tuple, list)):
-                return tuple(AuthBackend(value))
+#         def validate(
+#             value: Union[AuthBackend, Tuple[AuthBackend], List[AuthBackend]]
+#         ) -> Tuple[AuthBackend]:
+#             """Check whether the value is a comma separated string or a list/tuple."""
+#             if isinstance(value, (tuple, list)):
+#                 return tuple(AuthBackend(value))
 
-            if isinstance(value, str):
-                return tuple(AuthBackend(val) for val in value.split(","))
+#             if isinstance(value, str):
+#                 return tuple(AuthBackend(val) for val in value.split(","))
 
-            raise TypeError("Invalid comma separated list")
+#             raise TypeError("Invalid comma separated list")
 
-        yield validate
+#         yield validate
+
+def validate_auth_backends(
+    value: Union[AuthBackend, Tuple[AuthBackend], List[AuthBackend]]
+) -> Tuple[AuthBackend]:
+    """Check whether the value is a comma separated string or a list/tuple."""
+    if isinstance(value, (tuple, list)):
+        return tuple(AuthBackend(value))
+
+    if isinstance(value, str):
+        return tuple(AuthBackend(val) for val in value.split(","))
+
+    raise TypeError("Invalid comma separated list")
+
+AuthBackends = Annotated[Union[str, Tuple[str, ...], List[str]], AfterValidator(validate_auth_backends)]
 
 
 class Settings(BaseSettings):
     """Pydantic model for Ralph's global environment & configuration settings."""
 
+    # TODO[pydantic]: The `Config` class inherits from another class, please create the `model_config` manually.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
     class Config(BaseSettingsConfig):
         """Pydantic Configuration."""
 
@@ -174,9 +204,9 @@ class Settings(BaseSettings):
 
     _CORE: CoreSettings = core_settings
     AUTH_FILE: Path = _CORE.APP_DIR / "auth.json"
-    AUTH_CACHE_MAX_SIZE = 100
-    AUTH_CACHE_TTL = 3600
-    CONVERTER_EDX_XAPI_UUID_NAMESPACE: str = None
+    AUTH_CACHE_MAX_SIZE: int = 100
+    AUTH_CACHE_TTL: int = 3600
+    CONVERTER_EDX_XAPI_UUID_NAMESPACE: Optional[str] = None
     DEFAULT_BACKEND_CHUNK_SIZE: int = 500
     EXECUTION_ENVIRONMENT: str = "development"
     HISTORY_FILE: Path = _CORE.APP_DIR / "history.json"
@@ -240,7 +270,7 @@ class Settings(BaseSettings):
         """Return Ralph's default locale encoding."""
         return self._CORE.LOCALE_ENCODING
 
-    @root_validator(allow_reuse=True)
+    @model_validator(mode='after')
     @classmethod
     def check_restriction_compatibility(cls, values):
         """Raise an error if scopes are being used without authority restriction."""

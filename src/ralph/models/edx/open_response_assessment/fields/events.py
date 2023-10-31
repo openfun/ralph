@@ -5,9 +5,10 @@ from datetime import datetime
 from typing import Dict, List, Optional, Union
 from uuid import UUID
 
-from pydantic import constr
+from pydantic import StringConstraints
 
 from ralph.models.edx.base import AbstractBaseEventField, BaseModelWithConfig
+from typing_extensions import Annotated
 
 if sys.version_info >= (3, 8):
     from typing import Literal
@@ -29,15 +30,15 @@ class ORAGetPeerSubmissionEventField(AbstractBaseEventField):
             available.
     """
 
-    course_id: constr(max_length=255)
-    item_id: constr(
-        regex=(
+    course_id: Annotated[str, StringConstraints(max_length=255)]
+    item_id: Annotated[str, StringConstraints(
+        pattern=(
             r"^block-v1:.+\+.+\+.+type@openassessment"  # noqa : F722
             r"+block@[a-f0-9]{32}$"  # noqa : F722
         )
-    )
+    )]
     requesting_student_id: str
-    submission_returned_uuid: Union[str, None]
+    submission_returned_uuid: Union[str, None] = None
 
 
 class ORAGetSubmissionForStaffGradingEventField(AbstractBaseEventField):
@@ -57,13 +58,13 @@ class ORAGetSubmissionForStaffGradingEventField(AbstractBaseEventField):
             Currently, set to `full-grade`.
     """
 
-    item_id: constr(
-        regex=(
+    item_id: Annotated[str, StringConstraints(
+        pattern=(
             r"^block-v1:.+\+.+\+.+type@openassessment"  # noqa : F722
             r"+block@[a-f0-9]{32}$"  # noqa : F722
         )
-    )
-    submission_returned_uuid: Union[str, None]
+    )]
+    submission_returned_uuid: Union[str, None] = None
     requesting_staff_id: str
     type: Literal["full-grade"]
 
@@ -93,7 +94,7 @@ class ORAAssessEventPartsField(BaseModelWithConfig):
 
     option: str
     criterion: ORAAssessEventPartsCriterionField
-    feedback: Optional[str]
+    feedback: Optional[str] = None
 
 
 class ORAAssessEventRubricField(BaseModelWithConfig):
@@ -109,7 +110,7 @@ class ORAAssessEventRubricField(BaseModelWithConfig):
             assess the response.
     """
 
-    content_hash: constr(regex=r"^[a-f0-9]{1,40}$")  # noqa: F722
+    content_hash: Annotated[str, StringConstraints(pattern=r"^[a-f0-9]{1,40}$")]  # noqa: F722
 
 
 class ORAAssessEventField(AbstractBaseEventField):
@@ -138,7 +139,7 @@ class ORAAssessEventField(AbstractBaseEventField):
     parts: List[ORAAssessEventPartsField]
     rubric: ORAAssessEventRubricField
     scored_at: datetime
-    scorer_id: constr(max_length=40)
+    scorer_id: Annotated[str, StringConstraints(max_length=40)]
     score_type: Literal["PE", "SE", "ST"]
     submission_uuid: UUID
 
@@ -187,8 +188,8 @@ class ORACreateSubmissionEventAnswerField(BaseModelWithConfig):
     """
 
     parts: List[Dict[Literal["text"], str]]
-    file_keys: Optional[List[str]]
-    files_descriptions: Optional[List[str]]
+    file_keys: Optional[List[str]] = None
+    files_descriptions: Optional[List[str]] = None
 
 
 class ORACreateSubmissionEventField(AbstractBaseEventField):
@@ -223,7 +224,7 @@ class ORASaveSubmissionEventSavedResponseField(BaseModelWithConfig):
     """
 
     text: str
-    file_upload_key: Optional[str]
+    file_upload_key: Optional[str] = None
 
 
 class ORASaveSubmissionEventField(AbstractBaseEventField):
@@ -270,6 +271,6 @@ class ORAUploadFileEventField(BaseModelWithConfig):
         fileType (str): Consists of the MIME type of the uploaded file.
     """
 
-    fileName: constr(max_length=255)
+    fileName: Annotated[str, StringConstraints(max_length=255)]
     fileSize: int
     fileType: str

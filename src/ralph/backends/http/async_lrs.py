@@ -52,6 +52,8 @@ class LRSHTTPBackendSettings(BaseHTTPBackendSettings):
         STATEMENTS_ENDPOINT (str): Default endpoint for LRS statements resource.
     """
 
+    # TODO[pydantic]: The `Config` class inherits from another class, please create the `model_config` manually.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
     class Config(BaseSettingsConfig):
         """Pydantic Configuration."""
 
@@ -69,7 +71,7 @@ class StatementResponse(BaseModel):
     """Pydantic model for `get` statements response."""
 
     statements: Union[List[dict], dict]
-    more: Optional[str]
+    more: Optional[str] = None
 
 
 class LRSStatementsQuery(BaseQuery):
@@ -83,14 +85,14 @@ class LRSStatementsQuery(BaseQuery):
 
     statement_id: Optional[str] = Field(None, alias="statementId")
     voided_statement_id: Optional[str] = Field(None, alias="voidedStatementId")
-    agent: Optional[Union[BaseXapiAgent, BaseXapiGroup]]
-    verb: Optional[IRI]
-    activity: Optional[IRI]
-    registration: Optional[UUID]
+    agent: Optional[Union[BaseXapiAgent, BaseXapiGroup]] = None
+    verb: Optional[IRI] = None
+    activity: Optional[IRI] = None
+    registration: Optional[UUID] = None
     related_activities: Optional[bool] = False
     related_agents: Optional[bool] = False
-    since: Optional[datetime]
-    until: Optional[datetime]
+    since: Optional[datetime] = None
+    until: Optional[datetime] = None
     limit: Optional[NonNegativeInt] = 0
     format: Optional[Literal["ids", "exact", "canonical"]] = "exact"
     attachments: Optional[bool] = False

@@ -34,7 +34,7 @@ class LMSPageObjectDefinitionExtensions(BaseExtensionModelWithConfig):
     """
 
     type: Optional[Literal["course", "course_list", "user_space"]] = Field(
-        alias=ACTIVITY_EXTENSIONS_TYPE
+        None, alias=ACTIVITY_EXTENSIONS_TYPE
     )
 
 

@@ -52,6 +52,8 @@ class ESDataBackendSettings(BaseDataBackendSettings):
             refreshed after the write operation.
     """
 
+    # TODO[pydantic]: The `Config` class inherits from another class, please create the `model_config` manually.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
     class Config(BaseSettingsConfig):
         """Pydantic Configuration."""
 
@@ -76,8 +78,8 @@ class ESQueryPit(BaseModel):
             time alive.
     """
 
-    id: Union[str, None]
-    keep_alive: Union[str, None]
+    id: Union[str, None] = None
+    keep_alive: Union[str, None] = None
 
 
 class ESQuery(BaseQuery):
@@ -103,9 +105,9 @@ class ESQuery(BaseQuery):
 
     query: dict = {"match_all": {}}
     pit: ESQueryPit = ESQueryPit()
-    size: Union[int, None]
+    size: Union[int, None] = None
     sort: Union[str, List[dict]] = "_shard_doc"
-    search_after: Union[list, None]
+    search_after: Union[list, None] = None
     track_total_hits: Literal[False] = False
 
 

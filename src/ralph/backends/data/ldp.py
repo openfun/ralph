@@ -35,6 +35,8 @@ class LDPDataBackendSettings(BaseDataBackendSettings):
         SERVICE_NAME (str): The default LDP account name.
     """
 
+    # TODO[pydantic]: The `Config` class inherits from another class, please create the `model_config` manually.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
     class Config(BaseSettingsConfig):
         """Pydantic Configuration."""
 

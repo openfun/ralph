@@ -20,7 +20,7 @@ from uuid import UUID, uuid4
 
 import clickhouse_connect
 from clickhouse_connect.driver.exceptions import ClickHouseError
-from pydantic import BaseModel, Json, ValidationError, conint
+from pydantic import Field, BaseModel, Json, ValidationError
 
 from ralph.backends.data.base import (
     BaseDataBackend,
@@ -32,6 +32,7 @@ from ralph.backends.data.base import (
 )
 from ralph.conf import BaseSettingsConfig, ClientOptions
 from ralph.exceptions import BackendException, BackendParameterException
+from typing_extensions import Annotated
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +48,7 @@ class ClickHouseClientOptions(ClientOptions):
     """Pydantic model for `clickhouse` client options."""
 
     date_time_input_format: str = "best_effort"
-    allow_experimental_object_type: conint(ge=0, le=1) = 1
+    allow_experimental_object_type: Annotated[int, Field(ge=0, le=1)] = 1
 
 
 class InsertTuple(NamedTuple):
@@ -75,6 +76,8 @@ class ClickHouseDataBackendSettings(BaseDataBackendSettings):
         LOCALE_ENCODING (str): The locale encoding to use when none is provided.
     """
 
+    # TODO[pydantic]: The `Config` class inherits from another class, please create the `model_config` manually.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
     class Config(BaseSettingsConfig):
         """Pydantic Configuration."""
 
@@ -95,10 +98,10 @@ class BaseClickHouseQuery(BaseQuery):
     """Base ClickHouse query model."""
 
     select: Union[str, List[str]] = "event"
-    where: Union[str, List[str], None]
-    parameters: Union[Dict, None]
-    limit: Union[int, None]
-    sort: Union[str, None]
+    where: Union[str, List[str], None] = None
+    parameters: Union[Dict, None] = None
+    limit: Union[int, None] = None
+    sort: Union[str, None] = None
     column_oriented: Union[bool, None] = False
 
 
@@ -106,7 +109,7 @@ class ClickHouseQuery(BaseClickHouseQuery):
     """ClickHouse query model."""
 
     # pylint: disable=unsubscriptable-object
-    query_string: Union[Json[BaseClickHouseQuery], None]
+    query_string: Union[Json[BaseClickHouseQuery], None] = None
 
 
 class ClickHouseDataBackend(BaseDataBackend):

@@ -3,6 +3,7 @@
 import sys
 
 from ...base import AbstractBaseEventField
+from pydantic import ConfigDict
 
 if sys.version_info >= (3, 8):
     from typing import Literal
@@ -19,9 +20,7 @@ class VideoBaseEventField(AbstractBaseEventField):
         id (str): Consists of the additional videos name if given by the
             course creators, or the system-generated hash code otherwise.
     """
-
-    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
-        extra = "allow"
+    model_config = ConfigDict(extra="allow")
 
     code: str
     id: str

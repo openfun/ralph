@@ -34,7 +34,7 @@ class VideoResultExtensions(BaseExtensionModelWithConfig):
     """
 
     time: NonNegativeFloat = Field(alias=RESULT_EXTENSION_TIME)
-    playedSegments: Optional[str] = Field(alias=CONTEXT_EXTENSION_PLAYED_SEGMENTS)
+    playedSegments: Optional[str] = Field(None, alias=CONTEXT_EXTENSION_PLAYED_SEGMENTS)
 
 
 class VideoPausedResultExtensions(VideoResultExtensions):
@@ -44,7 +44,7 @@ class VideoPausedResultExtensions(VideoResultExtensions):
         progress (float): Consists of the ratio of media consumed by the actor.
     """
 
-    progress: Optional[NonNegativeFloat] = Field(alias=RESULT_EXTENSION_PROGRESS)
+    progress: Optional[NonNegativeFloat] = Field(None, alias=RESULT_EXTENSION_PROGRESS)
 
 
 class VideoSeekedResultExtensions(BaseExtensionModelWithConfig):
@@ -132,8 +132,8 @@ class VideoCompletedResult(BaseXapiResult):
     """
 
     extensions: VideoCompletedResultExtensions
-    completion: Optional[Literal[True]]
-    duration: Optional[timedelta]
+    completion: Optional[Literal[True]] = None
+    duration: Optional[timedelta] = None
 
 
 class VideoTerminatedResult(BaseXapiResult):

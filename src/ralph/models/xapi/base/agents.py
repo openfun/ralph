@@ -43,8 +43,8 @@ class BaseXapiAgentCommonProperties(BaseModelWithConfig, ABC):
         name (str): Consists of the full name of the Agent.
     """
 
-    objectType: Optional[Literal["Agent"]]
-    name: Optional[StrictStr]
+    objectType: Optional[Literal["Agent"]] = None
+    name: Optional[StrictStr] = None
 
 
 class BaseXapiAgentWithMbox(BaseXapiAgentCommonProperties, BaseXapiMboxIFI):

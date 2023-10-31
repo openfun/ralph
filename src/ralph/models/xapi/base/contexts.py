@@ -25,10 +25,10 @@ class BaseXapiContextContextActivities(BaseModelWithConfig):
             properties.
     """
 
-    parent: Optional[Union[BaseXapiActivity, List[BaseXapiActivity]]]
-    grouping: Optional[Union[BaseXapiActivity, List[BaseXapiActivity]]]
-    category: Optional[Union[BaseXapiActivity, List[BaseXapiActivity]]]
-    other: Optional[Union[BaseXapiActivity, List[BaseXapiActivity]]]
+    parent: Optional[Union[BaseXapiActivity, List[BaseXapiActivity]]] = None
+    grouping: Optional[Union[BaseXapiActivity, List[BaseXapiActivity]]] = None
+    category: Optional[Union[BaseXapiActivity, List[BaseXapiActivity]]] = None
+    other: Optional[Union[BaseXapiActivity, List[BaseXapiActivity]]] = None
 
 
 class BaseXapiContext(BaseModelWithConfig):
@@ -46,12 +46,12 @@ class BaseXapiContext(BaseModelWithConfig):
         extensions (dict): Consists of a dictionary of other properties as needed.
     """
 
-    registration: Optional[UUID]
-    instructor: Optional[BaseXapiAgent]
-    team: Optional[BaseXapiGroup]
-    contextActivities: Optional[BaseXapiContextContextActivities]
-    revision: Optional[StrictStr]
-    platform: Optional[StrictStr]
-    language: Optional[LanguageTag]
-    statement: Optional[BaseXapiStatementRef]
-    extensions: Optional[Dict[IRI, Union[str, int, bool, list, dict, None]]]
+    registration: Optional[UUID] = None
+    instructor: Optional[BaseXapiAgent] = None
+    team: Optional[BaseXapiGroup] = None
+    contextActivities: Optional[BaseXapiContextContextActivities] = None
+    revision: Optional[StrictStr] = None
+    platform: Optional[StrictStr] = None
+    language: Optional[LanguageTag] = None
+    statement: Optional[BaseXapiStatementRef] = None
+    extensions: Optional[Dict[IRI, Union[str, int, bool, list, dict, None]]] = None

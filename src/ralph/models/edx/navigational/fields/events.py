@@ -1,8 +1,9 @@
 """Navigational event field definition."""
 
-from pydantic import constr
+from pydantic import StringConstraints
 
 from ...base import AbstractBaseEventField
+from typing_extensions import Annotated
 
 
 class NavigationalEventField(AbstractBaseEventField):
@@ -20,11 +21,11 @@ class NavigationalEventField(AbstractBaseEventField):
             being navigated away from.
     """
 
-    id: constr(
-        regex=(
+    id: Annotated[str, StringConstraints(
+        pattern=(
             r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type"  # noqa : F722
             r"@sequential\+block@[a-f0-9]{32}$"  # noqa : F722
         )
-    )
+    )]
     new: int
     old: int

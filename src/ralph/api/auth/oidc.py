@@ -9,7 +9,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, OpenIdConnect
 from jose import ExpiredSignatureError, JWTError, jwt
 from jose.exceptions import JWTClaimsError
-from pydantic import AnyUrl, BaseModel, Extra
+from pydantic import ConfigDict, AnyUrl, BaseModel
 from typing_extensions import Annotated
 
 from ralph.api.auth.user import AuthenticatedUser, UserScopes
@@ -44,13 +44,11 @@ class IDToken(BaseModel):
 
     iss: str
     sub: str
-    aud: Optional[str]
+    aud: Optional[str] = None
     exp: int
     iat: int
-    scope: Optional[str]
-
-    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
-        extra = Extra.ignore
+    scope: Optional[str] = None
+    model_config = ConfigDict(extra="ignore")
 
 
 @lru_cache()

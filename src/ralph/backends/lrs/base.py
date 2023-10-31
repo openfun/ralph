@@ -33,21 +33,21 @@ class AgentParameters(BaseModel):
     NB: Agent refers to the data structure, NOT to the LRS query parameter.
     """
 
-    mbox: Optional[str]
-    mbox_sha1sum: Optional[str]
-    openid: Optional[str]
-    account__name: Optional[str]
-    account__home_page: Optional[str]
+    mbox: Optional[str] = None
+    mbox_sha1sum: Optional[str] = None
+    openid: Optional[str] = None
+    account__name: Optional[str] = None
+    account__home_page: Optional[str] = None
 
 
 class RalphStatementsQuery(LRSStatementsQuery):
     """Represents a dictionary of possible LRS query parameters."""
 
     agent: Optional[AgentParameters] = AgentParameters.construct()
-    search_after: Optional[str]
-    pit_id: Optional[str]
+    search_after: Optional[str] = None
+    pit_id: Optional[str] = None
     authority: Optional[AgentParameters] = AgentParameters.construct()
-    ignore_order: Optional[bool]
+    ignore_order: Optional[bool] = None
 
 
 class BaseLRSBackend(BaseDataBackend):
