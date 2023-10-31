@@ -1,6 +1,7 @@
 """Tests for Ralph cli."""
 import json
 import logging
+from importlib import reload
 from pathlib import Path
 from typing import Union
 
@@ -11,12 +12,14 @@ from elasticsearch.helpers import bulk, scan
 from hypothesis import settings as hypothesis_settings
 from pydantic import ValidationError
 
+from ralph import cli as cli_module
 from ralph.backends.data.fs import FSDataBackend
 from ralph.backends.data.ldp import LDPDataBackend
 from ralph.cli import (
     CommaSeparatedKeyValueParamType,
     CommaSeparatedTupleParamType,
     JSONStringParamType,
+    backends_options,
     cli,
 )
 from ralph.conf import settings
@@ -936,3 +939,29 @@ def test_cli_runserver_command_environment_file_generation(monkeypatch):
         "--es-client-options verify_certs=True".split(),
     )
     assert result.exit_code == 0
+
+
+def test_cli_ralph_cli_lazy_backend_options(monkeypatch):
+    """Test the `RalphCli.lazy_backend_options` function."""
+
+    reload(cli_module)
+    call_counter = {"count": 0}
+
+    def mock_backends_options(backends, name=None):
+        call_counter["count"] += 1
+        return backends_options(backends, name)
+
+    monkeypatch.setattr("ralph.cli.backends_options", mock_backends_options)
+    runner = CliRunner()
+    # Given a command that does not require backend options, the `backend_options`
+    # function should not be called.
+    runner.invoke(cli_module.cli, ["convert --help"])
+    assert not call_counter["count"]
+    # Given a command that requires backend options, the `backend_options` function
+    # should be called once.
+    runner.invoke(cli_module.cli, ["list", "--help"])
+    assert call_counter["count"] == 1
+    # Given a command that requires backend options of multiple commands, the
+    # `backend_options` function should be called once for each command.
+    runner.invoke(cli_module.cli, ["--help"])
+    assert call_counter["count"] == 4  # list + (read, write, runserver)
