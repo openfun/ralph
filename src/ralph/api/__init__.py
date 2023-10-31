@@ -43,6 +43,7 @@ if settings.SENTRY_DSN is not None:
     )
 
 app = FastAPI()
+
 app.include_router(statements.router)
 app.include_router(health.router)
 

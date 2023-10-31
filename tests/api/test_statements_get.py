@@ -9,12 +9,11 @@ import responses
 from elasticsearch.helpers import bulk
 
 from ralph.api import app
-from ralph.api.auth import get_authenticated_user
 from ralph.api.auth.basic import get_basic_auth_user
-from ralph.api.auth.oidc import get_oidc_user
 from ralph.backends.data.base import BaseOperationType
 from ralph.backends.data.clickhouse import ClickHouseDataBackend
 from ralph.backends.data.mongo import MongoDataBackend
+from ralph.conf import AuthBackend
 from ralph.exceptions import BackendException
 
 from tests.fixtures.backends import (
@@ -32,7 +31,7 @@ from tests.fixtures.backends import (
     get_mongo_test_backend,
 )
 
-from ..fixtures.auth import mock_basic_auth_user, mock_oidc_user
+from ..fixtures.auth import AUDIENCE, ISSUER_URI, mock_basic_auth_user, mock_oidc_user
 from ..helpers import mock_activity, mock_agent
 
 
@@ -807,17 +806,38 @@ async def test_api_statements_get_scopes(
     monkeypatch.setattr(
         "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_SCOPES", True
     )
-    monkeypatch.setattr("ralph.api.auth.basic.settings.LRS_RESTRICT_BY_SCOPES", True)
+    monkeypatch.setattr(
+        f"ralph.api.auth.{auth_method}.settings.LRS_RESTRICT_BY_SCOPES", True
+    )
+
+    monkeypatch.setattr(
+        "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_AUTHORITY", True
+    )
+    monkeypatch.setattr(
+        f"ralph.api.auth.{auth_method}.settings.LRS_RESTRICT_BY_AUTHORITY", True
+    )
 
     if auth_method == "basic":
         agent = mock_agent("mbox", 1)
         credentials = mock_basic_auth_user(fs, scopes=scopes, agent=agent)
         headers = {"Authorization": f"Basic {credentials}"}
 
-        app.dependency_overrides[get_authenticated_user] = get_basic_auth_user
         get_basic_auth_user.cache_clear()
 
     elif auth_method == "oidc":
+        monkeypatch.setenv("RUNSERVER_AUTH_BACKENDS", [AuthBackend.OIDC])
+        monkeypatch.setattr(
+            "ralph.api.auth.settings.RUNSERVER_AUTH_BACKENDS", [AuthBackend.OIDC]
+        )
+        monkeypatch.setattr(
+            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_ISSUER_URI",
+            ISSUER_URI,
+        )
+        monkeypatch.setattr(
+            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_AUDIENCE",
+            AUDIENCE,
+        )
+
         sub = "123|oidc"
         iss = "https://iss.example.com"
         agent = {"openid": f"{iss}/{sub}"}
@@ -832,8 +852,6 @@ async def test_api_statements_get_scopes(
             "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_AUDIENCE",
             "http://clientHost:8100",
         )
-
-        app.dependency_overrides[get_authenticated_user] = get_oidc_user
 
     statements = [
         {
@@ -859,7 +877,6 @@ async def test_api_statements_get_scopes(
         "/xAPI/statements/",
         headers=headers,
     )
-
     if is_authorized:
         assert response.status_code == 200
         assert response.json() == {"statements": [statements[1], statements[0]]}
@@ -868,8 +885,6 @@ async def test_api_statements_get_scopes(
         assert response.json() == {
             "detail": 'Access not authorized to scope: "statements/read/mine".'
         }
-
-    app.dependency_overrides.pop(get_authenticated_user, None)
 
 
 @pytest.mark.anyio
@@ -898,6 +913,7 @@ async def test_api_statements_get_scopes_with_authority(
         "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_SCOPES", True
     )
     monkeypatch.setattr("ralph.api.auth.basic.settings.LRS_RESTRICT_BY_SCOPES", True)
+    monkeypatch.setattr("ralph.api.auth.oidc.settings.LRS_RESTRICT_BY_SCOPES", True)
 
     agent = mock_agent("mbox", 1)
     agent_2 = mock_agent("mbox", 2)
@@ -939,5 +955,3 @@ async def test_api_statements_get_scopes_with_authority(
         assert response.json() == {"statements": [statements[1], statements[0]]}
     else:
         assert response.json() == {"statements": [statements[0]]}
-
-    app.dependency_overrides.pop(get_authenticated_user, None)

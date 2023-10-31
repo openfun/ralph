@@ -133,6 +133,36 @@ class XapiForwardingConfigurationSettings(BaseModel):
     timeout: float
 
 
+class AuthBackend(Enum):
+    """Model for valid authentication methods."""
+
+    BASIC = "Basic"
+    OIDC = "OIDC"
+
+
+class AuthBackends(str):
+    """Model representing a list of authentication backends."""
+
+    @classmethod
+    def __get_validators__(cls):  # noqa: D105
+        """Checks whether the value is a comma separated string or a tuple representing
+        an AuthBackend."""
+
+        def validate(
+            value: Union[AuthBackend, Tuple[AuthBackend], List[AuthBackend]]
+        ) -> Tuple[AuthBackend]:
+            """Check whether the value is a comma separated string or a list/tuple."""
+            if isinstance(value, (tuple, list)):
+                return tuple(AuthBackend(value))
+
+            if isinstance(value, str):
+                return tuple(AuthBackend(val) for val in value.split(","))
+
+            raise TypeError("Invalid comma separated list")
+
+        yield validate
+
+
 class Settings(BaseSettings):
     """Pydantic model for Ralph's global environment & configuration settings."""
 
@@ -141,12 +171,6 @@ class Settings(BaseSettings):
 
         env_file = ".env"
         env_file_encoding = core_settings.LOCALE_ENCODING
-
-    class AuthBackends(Enum):
-        """Enum of the authentication backends."""
-
-        BASIC = "basic"
-        OIDC = "oidc"
 
     _CORE: CoreSettings = core_settings
     AUTH_FILE: Path = _CORE.APP_DIR / "auth.json"
@@ -188,7 +212,7 @@ class Settings(BaseSettings):
         },
     }
     PARSERS: ParserSettings = ParserSettings()
-    RUNSERVER_AUTH_BACKEND: AuthBackends = AuthBackends.BASIC
+    RUNSERVER_AUTH_BACKENDS: AuthBackends = AuthBackends([AuthBackend.BASIC])
     RUNSERVER_AUTH_OIDC_AUDIENCE: str = None
     RUNSERVER_AUTH_OIDC_ISSUER_URI: AnyHttpUrl = None
     RUNSERVER_BACKEND: Literal[

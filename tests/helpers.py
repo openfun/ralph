@@ -7,7 +7,10 @@ from datetime import datetime
 from typing import Optional, Union
 from uuid import UUID
 
+from ralph.api.auth import AuthBackend
 from ralph.utils import statements_are_equivalent
+
+from tests.fixtures.auth import AUDIENCE, ISSUER_URI
 
 
 def string_is_date(string: str):
@@ -197,3 +200,23 @@ def mock_statement(
         "object": object,
         "timestamp": timestamp,
     }
+
+
+def configure_env_for_mock_oidc_auth(monkeypatch, runserver_auth_backends=None):
+    """Configure environment variables to simulate OIDC use."""
+
+    if runserver_auth_backends is None:
+        runserver_auth_backends = [AuthBackend.OIDC]
+
+    monkeypatch.setenv("RUNSERVER_AUTH_BACKENDS", runserver_auth_backends)
+    monkeypatch.setattr(
+        "ralph.api.auth.settings.RUNSERVER_AUTH_BACKENDS", runserver_auth_backends
+    )
+    monkeypatch.setattr(
+        "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_ISSUER_URI",
+        ISSUER_URI,
+    )
+    monkeypatch.setattr(
+        "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_AUDIENCE",
+        AUDIENCE,
+    )

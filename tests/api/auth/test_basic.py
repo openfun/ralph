@@ -5,9 +5,10 @@ import json
 
 import bcrypt
 import pytest
-from fastapi.exceptions import HTTPException
-from fastapi.security import HTTPBasicCredentials, SecurityScopes
+from fastapi.security import HTTPBasicCredentials
+from fastapi.testclient import TestClient
 
+from ralph.api import app
 from ralph.api.auth.basic import (
     ServerUsersCredentials,
     UserCredentials,
@@ -15,7 +16,9 @@ from ralph.api.auth.basic import (
     get_stored_credentials,
 )
 from ralph.api.auth.user import AuthenticatedUser, UserScopes
-from ralph.conf import Settings, settings
+from ralph.conf import AuthBackend, Settings, settings
+
+from tests.helpers import configure_env_for_mock_oidc_auth
 
 STORED_CREDENTIALS = json.dumps(
     [
@@ -27,6 +30,9 @@ STORED_CREDENTIALS = json.dumps(
         }
     ]
 )
+
+
+client = TestClient(app)
 
 
 def test_api_auth_basic_model_serveruserscredentials():
@@ -103,12 +109,10 @@ def test_api_auth_basic_caching_credentials(fs):
     credentials = HTTPBasicCredentials(username="ralph", password="admin")
 
     # Call function as in a first request with these credentials
-    get_basic_auth_user(
-        security_scopes=SecurityScopes(["profile/read"]), credentials=credentials
-    )
+    get_basic_auth_user(credentials=credentials)
 
     assert get_basic_auth_user.cache.popitem() == (
-        ("ralph", "admin", "profile/read"),
+        ("ralph", "admin"),
         AuthenticatedUser(
             agent={"mbox": "mailto:ralph@example.com"},
             scopes=UserScopes(["statements/read/mine", "statements/write"]),
@@ -126,8 +130,7 @@ def test_api_auth_basic_with_wrong_password(fs):
     credentials = HTTPBasicCredentials(username="ralph", password="wrong_password")
 
     # Call function as in a first request with these credentials
-    with pytest.raises(HTTPException):
-        get_basic_auth_user(credentials, SecurityScopes(["all"]))
+    assert get_basic_auth_user(credentials) is None
 
 
 def test_api_auth_basic_no_credential_file_found(fs, monkeypatch):
@@ -139,40 +142,39 @@ def test_api_auth_basic_no_credential_file_found(fs, monkeypatch):
 
     credentials = HTTPBasicCredentials(username="ralph", password="admin")
 
-    with pytest.raises(HTTPException):
-        get_basic_auth_user(credentials, SecurityScopes(["all"]))
+    assert get_basic_auth_user(credentials) is None
 
 
-def test_get_whoami_no_credentials(basic_auth_test_client):
+def test_get_whoami_no_credentials():
     """Whoami route returns a 401 error when no credentials are sent."""
-    response = basic_auth_test_client.get("/whoami")
+    response = client.get("/whoami")
     assert response.status_code == 401
-    assert response.headers["www-authenticate"] == "Basic"
-    assert response.json() == {"detail": "Could not validate credentials"}
+    assert response.headers["www-authenticate"] == ",".join(
+        [val.value for val in settings.RUNSERVER_AUTH_BACKENDS]
+    )
+    assert response.json() == {"detail": "Invalid authentication credentials"}
 
 
-def test_get_whoami_credentials_wrong_scheme(basic_auth_test_client):
+def test_get_whoami_credentials_wrong_scheme():
     """Whoami route returns a 401 error when wrong scheme is used for authorization."""
-    response = basic_auth_test_client.get(
-        "/whoami", headers={"Authorization": "Bearer sometoken"}
-    )
+    response = client.get("/whoami", headers={"Authorization": "Bearer sometoken"})
     assert response.status_code == 401
-    assert response.headers["www-authenticate"] == "Basic"
-    assert response.json() == {"detail": "Could not validate credentials"}
-
-
-def test_get_whoami_credentials_encoding_error(basic_auth_test_client):
-    """Whoami route returns a 401 error when the credentials encoding is broken."""
-    response = basic_auth_test_client.get(
-        "/whoami", headers={"Authorization": "Basic not-base64"}
+    assert response.headers["www-authenticate"] == ",".join(
+        [val.value for val in settings.RUNSERVER_AUTH_BACKENDS]
     )
+    assert response.json() == {"detail": "Invalid authentication credentials"}
+
+
+def test_get_whoami_credentials_encoding_error():
+    """Whoami route returns a 401 error when the credentials encoding is broken."""
+    response = client.get("/whoami", headers={"Authorization": "Basic not-base64"})
     assert response.status_code == 401
     assert response.headers["www-authenticate"] == "Basic"
     assert response.json() == {"detail": "Invalid authentication credentials"}
 
 
 # pylint: disable=invalid-name
-def test_get_whoami_username_not_found(basic_auth_test_client, fs):
+def test_get_whoami_username_not_found(fs):
     """Whoami route returns a 401 error when the username cannot be found."""
     credential_bytes = base64.b64encode("john:admin".encode("utf-8"))
     credentials = str(credential_bytes, "utf-8")
@@ -181,17 +183,17 @@ def test_get_whoami_username_not_found(basic_auth_test_client, fs):
     auth_file_path = settings.APP_DIR / "auth.json"
     fs.create_file(auth_file_path, contents=STORED_CREDENTIALS)
 
-    response = basic_auth_test_client.get(
-        "/whoami", headers={"Authorization": f"Basic {credentials}"}
-    )
+    response = client.get("/whoami", headers={"Authorization": f"Basic {credentials}"})
 
     assert response.status_code == 401
-    assert response.headers["www-authenticate"] == "Basic"
+    assert response.headers["www-authenticate"] == ",".join(
+        [val.value for val in settings.RUNSERVER_AUTH_BACKENDS]
+    )
     assert response.json() == {"detail": "Invalid authentication credentials"}
 
 
 # pylint: disable=invalid-name
-def test_get_whoami_wrong_password(basic_auth_test_client, fs):
+def test_get_whoami_wrong_password(fs):
     """Whoami route returns a 401 error when the password is wrong."""
     credential_bytes = base64.b64encode("john:not-admin".encode("utf-8"))
     credentials = str(credential_bytes, "utf-8")
@@ -200,21 +202,24 @@ def test_get_whoami_wrong_password(basic_auth_test_client, fs):
     fs.create_file(auth_file_path, contents=STORED_CREDENTIALS)
     get_basic_auth_user.cache_clear()
 
-    response = basic_auth_test_client.get(
-        "/whoami", headers={"Authorization": f"Basic {credentials}"}
-    )
+    response = client.get("/whoami", headers={"Authorization": f"Basic {credentials}"})
 
     assert response.status_code == 401
-    assert response.headers["www-authenticate"] == "Basic"
     assert response.json() == {"detail": "Invalid authentication credentials"}
 
 
 # pylint: disable=invalid-name
-def test_get_whoami_correct_credentials(basic_auth_test_client, fs):
+@pytest.mark.parametrize(
+    "runserver_auth_backends",
+    [[AuthBackend.BASIC, AuthBackend.OIDC], [AuthBackend.BASIC]],
+)
+def test_get_whoami_correct_credentials(fs, monkeypatch, runserver_auth_backends):
     """Whoami returns a 200 response when the credentials are correct.
 
     Return the username and associated scopes.
     """
+    configure_env_for_mock_oidc_auth(monkeypatch, runserver_auth_backends)
+
     credential_bytes = base64.b64encode("ralph:admin".encode("utf-8"))
     credentials = str(credential_bytes, "utf-8")
 
@@ -222,9 +227,7 @@ def test_get_whoami_correct_credentials(basic_auth_test_client, fs):
     fs.create_file(auth_file_path, contents=STORED_CREDENTIALS)
     get_basic_auth_user.cache_clear()
 
-    response = basic_auth_test_client.get(
-        "/whoami", headers={"Authorization": f"Basic {credentials}"}
-    )
+    response = client.get("/whoami", headers={"Authorization": f"Basic {credentials}"})
 
     assert response.status_code == 200
 

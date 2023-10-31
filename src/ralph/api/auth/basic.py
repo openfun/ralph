@@ -8,8 +8,8 @@ from typing import Any, Iterator, List, Optional
 
 import bcrypt
 from cachetools import TTLCache, cached
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBasic, HTTPBasicCredentials, SecurityScopes
+from fastapi import Depends
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel, root_validator
 from starlette.authentication import AuthenticationError
 
@@ -102,17 +102,15 @@ def get_stored_credentials(auth_file: Path) -> ServerUsersCredentials:
 @cached(
     TTLCache(maxsize=settings.AUTH_CACHE_MAX_SIZE, ttl=settings.AUTH_CACHE_TTL),
     lock=Lock(),
-    key=lambda credentials, security_scopes: (
+    key=lambda credentials: (
         credentials.username,
         credentials.password,
-        security_scopes.scope_str,
     )
     if credentials is not None
     else None,
 )
 def get_basic_auth_user(
     credentials: Optional[HTTPBasicCredentials] = Depends(security),
-    security_scopes: SecurityScopes = SecurityScopes([]),
 ) -> AuthenticatedUser:
     """Check valid auth parameters.
 
@@ -121,18 +119,13 @@ def get_basic_auth_user(
 
     Args:
         credentials (iterator): auth parameters from the Authorization header
-        security_scopes: scopes requested for access
 
     Raises:
         HTTPException
     """
     if not credentials:
-        logger.error("The basic authentication mode requires a Basic Auth header")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Basic"},
-        )
+        logger.info("No credentials were found for Basic auth")
+        return None
 
     try:
         user = next(
@@ -145,15 +138,14 @@ def get_basic_auth_user(
     except StopIteration:
         # next() gets the first item in the enumerable; if there is none, it
         # raises a StopIteration error as it is out of bounds.
-        logger.warning(
+        logger.info(
             "User %s tried to authenticate but this account does not exists",
             credentials.username,
         )
         hashed_password = None
-    except AuthenticationError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail=str(exc)
-        ) from exc
+    except AuthenticationError:
+        logger.info("Error while authenticating using Basic auth")
+        return None
 
     # Check that a password was passed
     if not hashed_password:
@@ -162,11 +154,7 @@ def get_basic_auth_user(
         bcrypt.checkpw(
             credentials.password.encode(settings.LOCALE_ENCODING), UNUSED_PASSWORD
         )
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Basic"},
-        )
+        return None
 
     # Check password validity
     if not bcrypt.checkpw(
@@ -177,21 +165,8 @@ def get_basic_auth_user(
             "Authentication failed for user %s",
             credentials.username,
         )
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Basic"},
-        )
+        return None
 
     user = AuthenticatedUser(scopes=user.scopes, agent=dict(user.agent))
 
-    # Restrict access by scopes
-    if settings.LRS_RESTRICT_BY_SCOPES:
-        for requested_scope in security_scopes.scopes:
-            if not user.scopes.is_authorized(requested_scope):
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail=f'Access not authorized to scope: "{requested_scope}".',
-                    headers={"WWW-Authenticate": "Basic"},
-                )
     return user

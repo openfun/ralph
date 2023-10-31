@@ -9,6 +9,11 @@ from ralph.backends.conf import BackendSettings
 from ralph.conf import CommaSeparatedTuple, Settings, settings
 from ralph.exceptions import ConfigurationException
 
+# import os
+# def test_env_dist(fs, monkeypatch):
+#     fs.create_file(".env", contents=os.read("../.env.dist"))
+#     Settings()
+
 
 def test_conf_settings_field_value_priority(fs, monkeypatch):
     """Test that the Settings object field values are defined in the following

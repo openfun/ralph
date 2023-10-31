@@ -6,7 +6,7 @@ from typing import Dict, Optional
 
 import requests
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OpenIdConnect, SecurityScopes
+from fastapi.security import HTTPBearer, OpenIdConnect
 from jose import ExpiredSignatureError, JWTError, jwt
 from jose.exceptions import JWTClaimsError
 from pydantic import AnyUrl, BaseModel, Extra
@@ -66,7 +66,7 @@ def discover_provider(base_url: AnyUrl) -> Dict:
         )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
+            detail="Could not validate credentials ABU",
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
 
@@ -88,14 +88,13 @@ def get_public_keys(jwks_uri: AnyUrl) -> Dict:
         )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
+            detail="Could not validate credentials ABA",
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
 
 
 def get_oidc_user(
-    auth_header: Annotated[Optional[str], Depends(oauth2_scheme)],
-    security_scopes: SecurityScopes = SecurityScopes([]),
+    auth_header: Annotated[Optional[HTTPBearer], Depends(oauth2_scheme)],
 ) -> AuthenticatedUser:
     """Decode and validate OpenId Connect ID token against issuer in config.
 
@@ -109,17 +108,25 @@ def get_oidc_user(
     Raises:
         HTTPException
     """
+
     if auth_header is None or "Bearer" not in auth_header:
-        logger.error("The OpenID Connect authentication mode requires a Bearer token")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
+        logger.info(
+            "Not using OIDC auth. The OpenID Connect authentication mode requires a "
+            "Bearer token"
         )
+        return None
 
     id_token = auth_header.split(" ")[-1]
-    provider_config = discover_provider(settings.RUNSERVER_AUTH_OIDC_ISSUER_URI)
-    key = get_public_keys(provider_config["jwks_uri"])
+    try:
+        provider_config = discover_provider(settings.RUNSERVER_AUTH_OIDC_ISSUER_URI)
+    except HTTPException:
+        return None
+
+    try:
+        key = get_public_keys(provider_config["jwks_uri"])
+    except HTTPException:
+        return None
+
     algorithms = provider_config["id_token_signing_alg_values_supported"]
     audience = settings.RUNSERVER_AUTH_OIDC_AUDIENCE
     options = {
@@ -137,11 +144,7 @@ def get_oidc_user(
         )
     except (ExpiredSignatureError, JWTError, JWTClaimsError) as exc:
         logger.error("Unable to decode the ID token: %s", exc)
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        ) from exc
+        return None
 
     id_token = IDToken.parse_obj(decoded_token)
 
@@ -149,15 +152,5 @@ def get_oidc_user(
         agent={"openid": f"{id_token.iss}/{id_token.sub}"},
         scopes=UserScopes(id_token.scope.split(" ") if id_token.scope else []),
     )
-
-    # Restrict access by scopes
-    if settings.LRS_RESTRICT_BY_SCOPES:
-        for requested_scope in security_scopes.scopes:
-            if not user.scopes.is_authorized(requested_scope):
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail=f'Access not authorized to scope: "{requested_scope}".',
-                    headers={"WWW-Authenticate": "Basic"},
-                )
 
     return user

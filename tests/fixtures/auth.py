@@ -8,11 +8,9 @@ import bcrypt
 import pytest
 import responses
 from cryptography.hazmat.primitives import serialization
-from fastapi.testclient import TestClient
 from jose import jwt
 from jose.utils import long_to_base64
 
-from ralph.api import app, get_authenticated_user
 from ralph.api.auth.basic import get_stored_credentials
 from ralph.api.auth.oidc import discover_provider, get_public_keys
 from ralph.conf import settings
@@ -102,39 +100,6 @@ def basic_auth_credentials(fs, user_scopes=None, agent=None):
 
     credentials = mock_basic_auth_user(fs, username, password, user_scopes, agent)
     return credentials
-
-
-@pytest.fixture
-def basic_auth_test_client():
-    """Return a TestClient with HTTP basic authentication mode."""
-    # pylint:disable=import-outside-toplevel
-    from ralph.api.auth.basic import (
-        get_basic_auth_user,  # pylint:disable=import-outside-toplevel
-    )
-
-    app.dependency_overrides[get_authenticated_user] = get_basic_auth_user
-
-    with TestClient(app) as test_client:
-        yield test_client
-
-
-@pytest.fixture
-def oidc_auth_test_client(monkeypatch):
-    """Return a TestClient with OpenId Connect authentication mode."""
-    # pylint:disable=import-outside-toplevel
-    monkeypatch.setattr(
-        "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_ISSUER_URI",
-        ISSUER_URI,
-    )
-    monkeypatch.setattr(
-        "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_AUDIENCE",
-        AUDIENCE,
-    )
-    from ralph.api.auth.oidc import get_oidc_user
-
-    app.dependency_overrides[get_authenticated_user] = get_oidc_user
-    with TestClient(app) as test_client:
-        yield test_client
 
 
 def _mock_discovery_response():

@@ -51,6 +51,8 @@ have an authority field matching that of the user
 - Helm: improve volumes and ingress configurations
 - API: Add `RALPH_LRS_RESTRICT_BY_SCOPE` option enabling endpoint access
   control by user scopes
+- API: Variable `RUNSERVER_AUTH_BACKEND` becomes `RUNSERVER_AUTH_BACKENDS`, and
+  multiple authentication methods are supported simultaneously
 
 ### Fixed
 
