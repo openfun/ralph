@@ -8,7 +8,7 @@ from typing import Iterable, Iterator, List, Literal, Optional, Union
 
 from elasticsearch import ApiError, Elasticsearch, TransportError
 from elasticsearch.helpers import BulkIndexError, streaming_bulk
-from pydantic import BaseModel
+from pydantic import BaseModel, Json
 
 from ralph.backends.data.base import (
     BaseDataBackend,
@@ -82,8 +82,8 @@ class ESQueryPit(BaseModel):
     keep_alive: Union[str, None]
 
 
-class ESQuery(BaseQuery):
-    """Elasticsearch query model.
+class BaseESQuery(BaseQuery):
+    """Base Elasticsearch query model.
 
     Attributes:
         query (dict): A search query definition using the Elasticsearch Query DSL.
@@ -109,6 +109,18 @@ class ESQuery(BaseQuery):
     sort: Union[str, List[dict]] = "_shard_doc"
     search_after: Union[list, None]
     track_total_hits: Literal[False] = False
+
+
+class ESQuery(BaseESQuery):
+    """Elasticsearch query model.
+
+    Attributes:
+        query_string (str): Same as in `BaseESQuery`, however also accepts a JSON
+            instance of `BaseESQuery` which, if provided, is used instead.
+    """
+
+    # pylint: disable=unsubscriptable-object
+    query_string: Union[Json[BaseESQuery], str, None]
 
 
 class ESDataBackend(BaseDataBackend, Writable, Listable):
@@ -231,6 +243,9 @@ class ESDataBackend(BaseDataBackend, Writable, Listable):
         chunk_size = chunk_size if chunk_size else self.settings.DEFAULT_CHUNK_SIZE
         if ignore_errors:
             logger.warning("The `ignore_errors` argument is ignored")
+
+        if isinstance(query.query_string, BaseESQuery):
+            query = query.query_string
 
         if not query.pit.keep_alive:
             query.pit.keep_alive = self.settings.POINT_IN_TIME_KEEP_ALIVE

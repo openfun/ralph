@@ -398,6 +398,12 @@ def test_backends_data_es_read_with_query(es, es_backend, caplog):
     assert results[0]["_source"]["id"] == 1
     assert results[1]["_source"]["id"] == 3
 
+    # Find every odd item with a json query string.
+    results = list(backend.read(query=json.dumps(query)))
+    assert len(results) == 2
+    assert results[0]["_source"]["id"] == 1
+    assert results[1]["_source"]["id"] == 3
+
     # Find documents with ID equal to one or five.
     query = "id:(1 OR 5)"
     results = list(backend.read(query=query))

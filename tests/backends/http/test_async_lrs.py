@@ -467,6 +467,14 @@ async def test_backends_http_async_lrs_read_without_pagination(
     assert result == statements_with_query_played_verb["statements"]
     assert len(result) == 2
 
+    # Query as a json string
+    json_query = query.json(by_alias=True, exclude_unset=True)
+    result = await _unpack_async_generator(
+        backend.read(query=json_query, target=target, raw_output=False, greedy=greedy)
+    )
+    assert result == statements_with_query_played_verb["statements"]
+    assert len(result) == 2
+
     # Return an iterable of bytes
     result = await _unpack_async_generator(
         backend.read(query=query, target=target, raw_output=True, greedy=greedy)

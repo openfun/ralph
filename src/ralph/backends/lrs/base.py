@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Iterator, List, Literal, Optional, Union
 from uuid import UUID
 
-from pydantic import BaseModel, Field, NonNegativeInt
+from pydantic import BaseModel, Field, Json, NonNegativeInt
 
 from ralph.backends.data.base import (
     BaseAsyncDataBackend,
@@ -38,8 +38,8 @@ class StatementQueryResult:
     search_after: Optional[str]
 
 
-class LRSStatementsQuery(BaseQuery):
-    """Pydantic model for LRS query on Statements resource query parameters.
+class BaseLRSStatementsQuery(BaseQuery):
+    """Base pydantic model for LRS query on Statements resource query parameters.
 
     LRS Specification:
     https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#213-get-statements
@@ -59,6 +59,13 @@ class LRSStatementsQuery(BaseQuery):
     format: Optional[Literal["ids", "exact", "canonical"]] = "exact"
     attachments: Optional[bool] = False
     ascending: Optional[bool] = False
+
+
+class LRSStatementsQuery(BaseLRSStatementsQuery):
+    """Pydantic model for LRS query on Statements resource query parameters."""
+
+    # pylint: disable=unsubscriptable-object
+    query_string: Union[Json[BaseLRSStatementsQuery], None]
 
 
 class AgentParameters(BaseModel):

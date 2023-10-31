@@ -649,7 +649,7 @@ def test_cli_read_command_with_es_backend_query(es):
         "-b es "
         f"--es-hosts {es_hosts} "
         f"--es-default-index {ES_TEST_INDEX} "
-        f"--query {query_str}"
+        f"{query_str}"
     )
     result = runner.invoke(cli, command.split())
     assert result.exit_code == 0

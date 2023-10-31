@@ -108,8 +108,9 @@ def test_cli_read_command_usage():
 
     assert result.exit_code == 0
     assert (
-        "Usage: ralph read [OPTIONS] [ARCHIVE]\n\n"
-        "  Read an archive or records from a configured backend.\n\n"
+        "Usage: ralph read [OPTIONS] [QUERY]\n\n"
+        "  Read records matching the QUERY (json or string) from a configured backend."
+        "\n\n"
         "Options:\n"
         "  -b, --backend "
         "[async_es|async_lrs|async_mongo|clickhouse|es|fs|ldp|lrs|mongo|s3|swift|ws]\n"
@@ -210,10 +211,6 @@ def test_cli_read_command_usage():
         "  -c, --chunk-size INTEGER        Get events by chunks of size #\n"
         "  -t, --target TEXT               Endpoint from which to read events (e.g.\n"
         "                                  `/statements`)\n"
-        '  -q, --query \'{"KEY": "VALUE", "KEY": "VALUE"}\'\n'
-        "                                  Query object as a JSON string (database and"
-        "\n"
-        "                                  HTTP backends ONLY)\n"
         "  -i, --ignore_errors BOOLEAN     Ignore errors during the encoding operation."
         "\n"
         "                                  [default: False]\n"

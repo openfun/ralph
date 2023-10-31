@@ -12,7 +12,7 @@ from more_itertools import chunked
 from pydantic import AnyHttpUrl, BaseModel, Field, parse_obj_as
 from pydantic.types import PositiveInt
 
-from ralph.backends.lrs.base import LRSStatementsQuery
+from ralph.backends.lrs.base import BaseLRSStatementsQuery, LRSStatementsQuery
 from ralph.conf import BaseSettingsConfig, HeadersParameters
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import gather_with_limited_concurrency
@@ -158,14 +158,14 @@ class AsyncLRSHTTPBackend(BaseHTTPBackend):
         if not target:
             target = self.settings.STATEMENTS_ENDPOINT
 
-        if query and query.limit:
+        if query.limit:
             logger.warning(
                 "The limit query parameter value is overwritten by the chunk_size "
                 "parameter value."
             )
 
-        if query is None:
-            query = LRSStatementsQuery()
+        if isinstance(query.query_string, BaseLRSStatementsQuery):
+            query = query.query_string
 
         query.limit = chunk_size
 
