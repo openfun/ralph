@@ -7,7 +7,7 @@ import sys
 from inspect import isasyncgen, isclass, iscoroutinefunction
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Any, Dict, Optional, Type
+from typing import Any, Callable, Dict, Optional, Type, Union
 
 import bcrypt
 
@@ -184,7 +184,53 @@ class JSONStringParamType(click.ParamType):
         return options
 
 
-@click.group(name="ralph")
+class RalphCLI(click.Group):
+    """Ralph CLI entrypoint."""
+
+    lazy_commands: Dict[str, Callable] = {}
+
+    @classmethod
+    def lazy_backends_options(
+        cls, get_backends: Callable, name: Optional[str] = None
+    ) -> Callable:
+        """Lazy backend-related options decorator for Ralph commands."""
+
+        def wrapper(command):
+            command_name = name or command.__name__
+            cls.lazy_commands[command_name] = lambda: backends_options(
+                get_backends(), command_name
+            )(command)
+            return command
+
+        return wrapper
+
+    def invoke(self, ctx: click.Context):
+        """Configure logging before click calls `list_commands` or `get_command`."""
+        configure_logging()
+        verbosity = ctx.params.get("verbosity")
+        if verbosity is not None:
+            level = getattr(logging, verbosity)
+            get_root_logger().setLevel(level)
+            for handler in get_root_logger().handlers:
+                handler.setLevel(level)
+        return super().invoke(ctx)
+
+    def list_commands(self, ctx):
+        """Register all lazy commands before calling `list_commands`."""
+        for command in self.lazy_commands.values():
+            command()
+        self.lazy_commands = {}
+        return super().list_commands(ctx)
+
+    def get_command(self, ctx, cmd_name) -> Union[click.Command, None]:
+        """Register lazy command (if it is requested) before calling `get_command`."""
+        if cmd_name in self.lazy_commands:
+            self.lazy_commands[cmd_name]()
+            del self.lazy_commands[cmd_name]
+        return super().get_command(ctx, cmd_name)
+
+
+@click.group(name="ralph", cls=RalphCLI)
 @click.option(
     "-v",
     "--verbosity",
@@ -194,7 +240,7 @@ class JSONStringParamType(click.ParamType):
     help="Either CRITICAL, ERROR, WARNING, INFO (default) or DEBUG",
 )
 @click.version_option(version=ralph_version)
-def cli(verbosity=None):
+def cli(verbosity=None):  # pylint: disable=unused-argument
     """The cli is a stream-based tool to play with your logs.
 
     It offers functionalities to:
@@ -202,12 +248,6 @@ def cli(verbosity=None):
     - Read and write learning data to various databases or servers
     - Manage an instance of a Ralph LRS server
     """
-    configure_logging()
-    if verbosity is not None:
-        level = getattr(logging, verbosity, None)
-        get_root_logger().setLevel(level)
-        for handler in get_root_logger().handlers:
-            handler.setLevel(level)
 
 
 # Once we have a base backend interface we could use Dict[str, Type[BaseBackend]]
@@ -252,7 +292,7 @@ def backends_options(backends: Dict[str, Type], name: Optional[str] = None):
             required=True,
             help="Backend",
         )(command)
-        return (cli.command(name=name or command.__name__))(command)
+        return cli.command(name=name or command.__name__)(command)
 
     return wrapper
 
@@ -565,8 +605,8 @@ def convert(from_, to_, ignore_errors, fail_on_unknown, **conversion_set_kwargs)
         click.echo(event)
 
 
+@RalphCLI.lazy_backends_options(get_cli_backends)
 @click.argument("archive", required=False)
-@backends_options(get_cli_backends())
 @click.option(
     "-c",
     "--chunk-size",
@@ -655,7 +695,7 @@ def read(
         raise UnsupportedBackendException(msg, backend)
 
 
-@backends_options(get_cli_write_backends())
+@RalphCLI.lazy_backends_options(get_cli_write_backends)
 @click.option(
     "-c",
     "--chunk-size",
@@ -753,7 +793,7 @@ def write(
         raise UnsupportedBackendException(msg, backend)
 
 
-@backends_options(get_cli_list_backends(), name="list")
+@RalphCLI.lazy_backends_options(get_cli_list_backends, name="list")
 @click.option(
     "-t",
     "--target",
@@ -794,7 +834,7 @@ def list_(target, details, new, backend, **options):
         logger.warning("Configured %s backend contains no document", backend.name)
 
 
-@backends_options(get_lrs_backends(), name="runserver")
+@RalphCLI.lazy_backends_options(get_lrs_backends, name="runserver")
 @click.option(
     "-h",
     "--host",
