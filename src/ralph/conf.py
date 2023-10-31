@@ -4,7 +4,7 @@ import io
 import sys
 from enum import Enum
 from pathlib import Path
-from typing import List, Sequence, Union
+from typing import List, Sequence, Union, Tuple
 
 from pydantic import AnyHttpUrl, AnyUrl, BaseModel, BaseSettings, Extra, root_validator
 
