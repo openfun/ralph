@@ -38,7 +38,7 @@ Ralph is a toolbox for your learning analytics, it can be used as a:
 - **[LRS](https://en.wikipedia.org/wiki/Learning_Record_Store)**, a HTTP API server to collect xAPI statements (learning events), following the [ADL LRS standard](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#partthree)
 - **command-line interface** (CLI), to build data pipelines the UNIX-way™️,
 - **library**, to fetch learning events from various backends, (de)serialize or
-    convert them from various standard formats such as
+    convert them from and to various standard formats such as
     [xAPI](https://adlnet.gov/projects/xapi/), or
     [openedx](https://docs.openedx.org/en/latest/developers/references/internal_data_formats/tracking_logs/index) html
 
@@ -61,8 +61,8 @@ Ralph is a toolbox for your learning analytics, it can be used as a:
 To bootstrap a test environment on your machine, clone this project first and
 run the `bootstrap` Makefile target:
 
-```
-$ make bootstrap
+```bash
+make bootstrap
 ```
 
 This command will create required `.env` file (you may want to edit it for your
@@ -72,21 +72,21 @@ Elasticsearch cluster _via_ Docker compose.
 You can check the `elasticsearch` service status using the `status` helper:
 
 ```bash
-$ make status # This is an alias for: $ docker compose ps
+make status # This is an alias for: docker compose ps
 ```
 
 You may now start the LRS server using:
 
-```
-$ make run
+```bash
+make run
 ```
 
 The server should be up and running at
 [http://localhost:8100](http://localhost:8100). You can check its status using
 the heartbeat probe:
 
-```
-$ curl http://localhost:8100/__heartbeat__
+```bash
+curl http://localhost:8100/__heartbeat__
 ```
 
 The expected answer should be:
@@ -98,13 +98,13 @@ The expected answer should be:
 If the database status is satisfying, you are now ready to send xAPI statements
 to the LRS:
 
-```
-$ curl -sL https://github.com/openfun/potsie/raw/main/fixtures/elasticsearch/lrs.json.gz | \
-  gunzip | \
-  head -n 100 | \
-  sed "s/@timestamp/timestamp/g" | \
-  jq -s . | \
-  curl -Lk \
+```bash
+curl -sL https://github.com/openfun/potsie/raw/main/fixtures/elasticsearch/lrs.json.gz | \
+gunzip | \
+head -n 100 | \
+sed "s/@timestamp/timestamp/g" | \
+jq -s . | \
+curl -Lk \
     --user ralph:secret \
     -X POST \
     -H "Content-Type: application/json" \
@@ -118,12 +118,12 @@ using `curl`.
 You can get them back from the LRS using `curl` to query the
 `/xAPI/statements/` endpoint:
 
-```
-$ curl -s \
+```bash
+curl -s \
     --user ralph:secret \
     -H "Content-Type: application/json" \
     http://localhost:8100/xAPI/statements/ \ |
-  jq
+jq
 ```
 
 > Note that using `jq` is optional in this case, it is used to improve response
@@ -138,8 +138,8 @@ image](https://hub.docker.com/repository/docker/fundocker/ralph). If
 [Docker](https://docs.docker.com/get-docker/) is installed on your machine, it
 can be pulled from DockerHub:
 
-```
-$ docker run --pull always --rm fundocker/ralph:latest ralph --help
+```bash
+docker run --pull always --rm fundocker/ralph:latest ralph --help
 ```
 
 ### With the Python package
@@ -147,28 +147,28 @@ $ docker run --pull always --rm fundocker/ralph:latest ralph --help
 Ralph is distributed as a standard python package; it can be installed _via_
 `pip` or any other python package manager (_e.g._ Poetry, Pipenv, etc.):
 
-```sh
+```bash
 # Install the full package
-$ pip install \
+pip install \
     ralph-malph[backend-es,backend-ldp,backend-mongo,backend-swift,backend-ws,cli,lrs]
 
 # Install only the core package (library usage without backends, CLI and LRS)
-$ pip install ralph-malph
+pip install ralph-malph
 ```
 
 If you installed the full package (including the CLI, LRS and supported
 backends), the `ralph` command should be available in your `PATH`. Try to
 invoke the program usage thanks to the `--help` flag:
 
-```
-$ ralph --help
+```bash
+ralph --help
 ```
 
 You should see a list of available commands and global flags for `ralph`. Note
 that each command has its own usage that can be invoked _via_:
 
-```
-$ ralph COMMAND --help
+```bash
+ralph COMMAND --help
 ```
 
 > You should substitute `COMMAND` by the target command, _e.g._ `list`, to see
@@ -193,16 +193,16 @@ the recommendations from our
 
 You can explore all available rules using:
 
-```
-$ make help
+```bash
+make help
 ```
 but here are some of them:
 
-- Bootstrap the project: `$ make bootstrap`
-- Run tests: `$ make test`
-- Run all linters: `$ make lint`
+- Bootstrap the project: `make bootstrap`
+- Run tests: `make test`
+- Run all linters: `make lint`
 - If you add new dependencies to the project, you will have to rebuild the Docker
-image (and the development environment): `$ make down && make bootstrap`
+image (and the development environment): `make down && make bootstrap`
 
 ## License
 

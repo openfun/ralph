@@ -9,38 +9,56 @@ repo_url: https://github.com/openfun/ralph/
 copyright: 2020-present France Université Numérique
 
 theme:
+    custom_dir: docs/theme
     name: material
     palette:
-        primary: deep purple
-        
+        primary: pink
+    favicon: img/favicon.png
+    logo: img/ralph-white.png
+    features:
+    - content.tabs.link
+    - content.code.annotate
+    - content.code.copy
+    - navigation.tabs
+
 markdown_extensions:
+    - admonition
     - attr_list
     - mkdocs_click
     - smarty
     - toc:
         permalink: True
         separator: "_"
-    - pymdownx.highlight
+    - pymdownx.highlight:
+        anchor_linenums: true
+        line_spans: __span
+        pygments_lang_class: true
+    - pymdownx.inlinehilite
+    - pymdownx.snippets
     - pymdownx.superfences
+    - pymdownx.details
+    - pymdownx.tabbed:
+        alternate_style: true
 
 nav:
-    - 'Getting started':
-        - index.md
-    - 'User guide':
-        - 'Commands': commands.md
-        - 'Backends': backends.md
-        - 'Learning event models':
-            - 'Rationale': models/index.md
-            - 'Open edX events': models/edx.md
-            - 'xAPI events': models/xapi.md
-        - 'API': api.md
-    - 'Developer guide':
-        - 'Contribute': contribute.md
+    - 'Ralph': index.md
+    - 'Features':
+        - 'LRS HTTP server': api/index.md
+        - 'Backends for data storage': backends/index.md
+        - 'Learning statements models': models/index.md
+    - 'Tutorials':
+        - 'Development - Contributing': tutorials/development_contributing.md
+        - 'Use Ralph as a CLI': tutorials/cli.md
+        - 'Use Ralph as a library': tutorials/library.md
+    - 'Contributing': contribute.md
+    - 'Migration': UPGRADE.md
     - 'About the project':
         - 'Changelog': CHANGELOG.md
         - 'License': LICENSE.md
 
 plugins:
+    - neoteroi.mkdocsoad:
+        use_pymdownx: true
     - search
     - mkdocstrings
     - mike:
@@ -50,3 +68,6 @@ plugins:
 extra:
     version:
         provider: mike
+
+extra_css:
+    - css/neoteroi-mkdocs.css

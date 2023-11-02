@@ -1,118 +1,119 @@
-# Introduction
+<p align="center">
+  <a href="https://openfun.github.io/ralph"><img src="https://raw.githubusercontent.com/openfun/logos/main/ralph/ralph-color-dark.png" alt="Ralph logo" width="400"></a>
+</p>
+
+<p align="center">
+    <em>⚙️ The ultimate toolbox for your learning analytics (expect some xAPI ❤️) </em>
+</p>
+
+<p align="center">
+<a href="https://circleci.com/gh/openfun/ralph/tree/master">
+    <img src="https://img.shields.io/circleci/build/gh/openfun/ralph/master?label=Tests&logo=circleci" alt="CircleCI tests">
+</a>
+<a href="https://pypi.org/project/ralph-malph">
+    <img src="https://img.shields.io/pypi/v/ralph-malph?label=PyPi+package" alt="PyPi version">
+</a>
+<a href="https://pypi.org/project/ralph-malph">
+    <img src="https://img.shields.io/pypi/pyversions/ralph-malph?label=Python" alt="Python versions">
+</a>
+<a href="https://hub.docker.com/r/fundocker/ralph/tags">
+    <img src="https://img.shields.io/docker/v/fundocker/ralph/latest?label=Docker+image" alt="Docker image version">
+</a>
+</p>
 
 Ralph is a toolbox for your learning analytics, it can be used as a:
 
-- **library**, to read learning events from various backends, (de)serialize or
-  convert them from various standard formats such as
-  [xAPI](https://adlnet.gov/projects/xapi/),
+- **[LRS](https://en.wikipedia.org/wiki/Learning_Record_Store)**, a HTTP API server to collect xAPI statements (learning events), following the [ADL LRS standard](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#partthree)
 - **command-line interface** (CLI), to build data pipelines the UNIX-way™️,
-- **HTTP API server**, to collect xAPI statements (learning events)
-  following the [ADL LRS
-  standard](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#partthree).
+- **library**, to fetch learning events from various backends, (de)serialize or
+    convert them from and to various standard formats such as
+    [xAPI](https://adlnet.gov/projects/xapi/), or
+    [openedx](https://docs.openedx.org/en/latest/developers/references/internal_data_formats/tracking_logs/index.html)
 
-## Supported backends
+## Installation
 
-As a library or a CLI, you will be able to read and write from/to the following
-backends:
+### Install from PyPI
 
-- [Elasticsearch](https://www.elastic.co/elasticsearch/)
-- [MongoDB](https://www.mongodb.com/)
-- [OpenStack Swift](https://wiki.openstack.org/wiki/Swift)
-- [AWS S3](https://aws.amazon.com/s3/)
-- [OVH Logs Data Platform](https://docs.ovh.com/gb/en/logs-data-platform/)\*
-- [WebSocket](https://en.wikipedia.org/wiki/WebSocket)
-- File system
+Ralph is distributed as a standard python package; it can be installed _via_
+`pip` or any other python package manager (_e.g._ Poetry, Pipenv, etc.):
 
-\* _read-only backend_
+???+ tip "Use a virtual environment for installation"
 
-The LRS server currently supports the following backends to store learning
-traces in xAPI format:
+    To maintain a clean and controlled environment when installing `ralph-malph`, consider using a [virtual environment](https://docs.python.org/3/library/venv.html).
+    
+    - Create a virtual environment:
+    ```bash
+    python3.11 -m venv <path-to-virtual-environment>
+    ```
 
-- Elasticsearch
-- MongoDB
+    - Activate the virtual environment:
+    ```bash
+    source venv/bin/activate
+    ```
 
-## CLI key concepts
+If you only need to integrate [learning statement models](./models/index.md) feature in your project, you don't need to
+install the `backends`, `cli` or `lrs` extra dependencies, the **core library** is what you need:
 
-At first, Ralph has been designed as a CLI to batch process your logs using
-base commands and UNIX standard streams (`stdin`, `stdout`) to connect them in
-a pipeline. A base example pipeline may be:
-
-```sh
-$ ralph read --backend swift my_archive.gzip | \
-    gunzip | \
-    ralph write --backend es
+```bash
+pip install ralph-malph
 ```
 
-In this small pipeline, we stream `my_archive.gzip` content from a Swift
-container to the standard output (using the `read` command), uncompress the
-content (using the `gunzip` command), and bulk insert logs in an ElasticSearch
-index (using the `write` command).
+If you want to use the [Ralph LRS server](./api/index.md), add the `lrs` flavour in your installation. 
+You also have to choose the type of backend you will use for LRS data storage (`backend-clickhouse`,`backend-es`,`backend-mongo`).
 
-As UNIX is beautiful, Ralph offers many powerful possibilities by combining its
-commands with other standard commands or command line tools.
+- Install the **core package** with the LRS and the Elasticsearch backend. For example:
 
-## Quick start guide
-
-Ralph is distributed as a [python
-package](https://pypi.org/project/ralph-malph/) and a [Docker
-image](https://hub.docker.com/repository/docker/fundocker/ralph).
-
-> If you choose to install `ralph` in your native environment (without using
-> Docker), please make sure that **Python 3.11** is installed (and your default
-> python distribution).
-
-Ralph package can be installed from PyPI using the `pip` tool:
-
-```sh
-# Create a new virtualenv (optional)
-$ python3.11 -m venv venv
-$ source venv/bin/activate
-
-# Install the full package (in a virtualenv)
-(venv) $ pip install \
-    ralph-malph[backend-es,backend-ldp,backend-lrs,backend-mongo,backend-swift,backend-ws,cli,lrs]
-
-# Install only the core package with the Elasticsearch backend and the LRS (in
-# a virtualenv)
-(venv) $ pip install ralph-malph[backend-es,lrs]
-
-# Test the ralph command (it should be in your PATH)
-(venv) $ ralph --help
+```bash
+pip install ralph-malph[backend-es,lrs]
 ```
 
-If you only need to integrate `ralph` models in your project, you don't need to
-install the `backends`, `cli` or `lrs` extra dependencies, the core package is
-what you need:
+- Add the `cli` flavour if you want to use the LRS on the command line: 
 
-```sh
-# Install the core library (in a virtualenv)
-(venv) $ pip install ralph-malph
+```bash
+pip install ralph-malph[backend-es,lrs,cli]
 ```
 
-Alternatively, Docker users can pull the latest `ralph` image and start playing
-with it:
+- If you have various uses for Ralph's features or would like to discover all the existing functionnalities, it is recommended to install the **full package**: 
 
-```sh
-# Pull latest docker image and get usage
-$ docker run --rm -i fundocker/ralph:latest ralph --help
-
-# Pro tip: define an alias to ease your life
-$ alias ralph="docker run --rm -i fundocker/ralph:latest ralph"
+```bash
+pip install ralph-malph[backend-clickhouse,backend-es,backend-ldp,backend-lrs,backend-mongo,backend-s3,backend-swift,backend-ws,cli,lrs]
 ```
 
-Now that `ralph` can be run from your system, we invite you to explore
-[available commands](./commands.md).
+### Install from DockerHub
 
-## Contributing
+Ralph is distributed as a [Docker
+image](https://hub.docker.com/repository/docker/fundocker/ralph). If
+[Docker](https://docs.docker.com/get-docker/) is installed on your machine, it
+can be pulled from DockerHub:
 
-This project is intended to be community-driven, so please, do not hesitate to
-get in touch if you have any questions related to our implementation or design
-decisions.
+``` bash
+docker run --rm -i fundocker/ralph:latest ralph --help
+```
 
-We try to raise our code quality standards and expect contributors to follow
-the recommendations from our
-[handbook](https://handbook.openfun.fr).
+???+ tip "Use a `ralph` alias in your local environment"
+
+    Simplify your workflow by creating an alias for easy access to Ralph commands:
+
+    ```bash
+    alias ralph="docker run --rm -i fundocker/ralph:latest ralph"
+    ```
+
+## [WIP] Start using Ralph
+
+
+## Contributing to Ralph
+
+If you're interested in contributing to Ralph, whether it's by reporting issues, suggesting improvements, or submitting code changes, please head over to our dedicated [Contributing to Ralph](./contribute.md) page. 
+There, you'll find detailed guidelines and instructions on how to take part in the project.
+
+We look forward to your contributions and appreciate your commitment to making Ralph a more valuable tool for everyone.
+
+## Contributors
+
+<a href="https://github.com/openfun/ralph/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=openfun/ralph" />
+</a>
 
 ## License
 
-This work is released under the MIT License (see [LICENSE](./LICENSE)).
+This work is released under the MIT License (see [LICENSE](./LICENSE.md)).

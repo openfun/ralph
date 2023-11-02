@@ -240,7 +240,7 @@ run-clickhouse: ## start clickhouse backend
 	@$(COMPOSE_RUN) dockerize -wait tcp://clickhouse:9000 -timeout 60s
 .PHONY: run-clickhouse
 
-run-databases: ## alias for running database services
+run-databases: ## alias for running databases services
 run-databases: \
 	run-es \
 	run-mongo \

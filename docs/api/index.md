@@ -1,4 +1,4 @@
-# API Server
+# LRS HTTP server
 
 Ralph comes with an API server that aims to implement the Learning Record Store
 (LRS) specification (still a work in progress).
@@ -7,7 +7,7 @@ Ralph comes with an API server that aims to implement the Learning Record Store
 
 The API server supports the following authentication methods:
 
-- Http Basic Authentication (default method)
+- HTTP Basic Authentication (default method)
 - OpenID Connect authentication on top of OAuth2.0
 
 ### HTTP Basic Authentication
@@ -17,11 +17,11 @@ The default method for securing Ralph API server is with HTTP basic authenticati
 The API server can be started up with the following command:
 
 ```bash
-$ ralph runserver --backend es
+ralph runserver --backend es
 ```
 
-The `--backend` (or `-b`) option specifies which database backend to use for LRS data storage and retrieval. See Ralph's [backends
-documentation](./backends.md) for more details.
+The `--backend` (or `-b`) option specifies which database backend to use for LRS data storage and retrieval. 
+See Ralph's [backends documentation](../backends/index.md) for more details.
 
 However, before you can start your API server and make requests against it, you need to set up your credentials.
 
@@ -66,7 +66,7 @@ access, and an `agent` object used to represent the user in the LRS. The
 To create a new user credentials, Ralph's CLI provides a dedicated command:
 
 ```bash
-$ ralph auth \
+ralph auth \
     --username janedoe \
     --password supersecret \
     --scope janedoe_scope \
@@ -91,7 +91,7 @@ The first request that can be answered by the ralph API server is a `whoami` req
 Use curl to get `http://localhost:8100/whoami`:
 
 ```bash
-$ curl http://localhost:8100/whoami
+curl http://localhost:8100/whoami
 < HTTP/1.1 401 Unauthorized
 < {"error":"Not authenticated"}
 ```
@@ -99,7 +99,7 @@ $ curl http://localhost:8100/whoami
 Send your username and password to the API server through HTTP Basic Auth:
 
 ```bash
-$ curl --user john.doe@example.com:PASSWORD http://localhost:8100/whoami
+curl --user john.doe@example.com:PASSWORD http://localhost:8100/whoami
 < HTTP/1.1 200 OK
 < {"scopes":["example_scope"], "agent": {"mbox": "mailto:john.doe@example.com"}}
 ```
@@ -113,7 +113,9 @@ To enable OIDC auth, you should modify the `RALPH_RUNSERVER_AUTH_BACKENDS` envir
 ```bash
 RALPH_RUNSERVER_AUTH_BACKENDS=basic,oidc
 ```
+
 and you should define the `RALPH_RUNSERVER_AUTH_OIDC_ISSUER_URI` environment variable with your identity provider's Issuer Identifier URI as follows:
+
 ```bash
 RALPH_RUNSERVER_AUTH_OIDC_ISSUER_URI=http://{provider_host}:{provider_port}/auth/realms/{realm_name}
 ```
@@ -135,11 +137,13 @@ The first request that can be answered by the ralph API server is a `whoami` req
 Use curl to get `http://localhost:8100/whoami`:
 
 ```bash
-$ curl http://localhost:8100/whoami
+curl http://localhost:8100/whoami
 < HTTP/1.1 401 Unauthorized
 < {"detail":"Could not validate credentials"}
 ```
+
 With the Keycloak instance running, use curl to get access token from Keycloak:
+
 ```bash
 curl --request POST 'http://localhost:8080/auth/realms/fun-mooc/protocol/openid-connect/token' \
 --header 'Content-Type: application/x-www-form-urlencoded' \
@@ -168,7 +172,7 @@ which outputs (tokens truncated for example purpose):
 Send the access token to the API server as a Bearer header:
 
 ```bash
-$ curl http://localhost:8100/whoami --header "Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJSTWlLM"
+curl http://localhost:8100/whoami --header "Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJSTWlLM"
 < HTTP/1.1 200 OK
 < {"username":"ralph_admin","scopes":["all"]}
 ```
@@ -181,7 +185,7 @@ By default, all authenticated users have full read and write access to the serve
 
 In Ralph LRS, all incoming statements are assigned an `authority` (or ownership) derived from the user that makes the call. You may restrict read access to users "own" statements (thus enabling multitenancy) by setting the following environment variable: 
 
-```
+```bash
 RALPH_LRS_RESTRICT_BY_AUTHORITY = True # Default: False
 ```
 
@@ -194,7 +198,7 @@ NB: If not using "scopes", or for users with limited "scopes", using this option
 In Ralph, users are assigned scopes which may be used to restrict endpoint access or 
 functionalities. You may enable this option by setting the following environment variable:
 
-```
+```bash
 RALPH_LRS_RESTRICT_BY_SCOPES = True # Default: False
 ```
 
@@ -283,6 +287,7 @@ RALPH_SENTRY_LRS_TRACES_SAMPLE_RATE=0.3
 > Note that a sampling rate of `1.0` means 100% of transactions are sent to sentry and `0.1` only 10%.
 
 If you want to lower noisy transactions (_e.g._ in a Kubernetes cluster), you can disable health checks related ones:
+
 ```bash
 RALPH_SENTRY_IGNORE_HEALTH_CHECKS=True
 ```
@@ -291,15 +296,22 @@ RALPH_SENTRY_IGNORE_HEALTH_CHECKS=True
 
 #### HTTP Basic auth caching 
 
-HTTP basic auth implementation uses the secure and standard bcrypt algorithm to hash/salt passwords before storing them.
+HTTP Basic auth implementation uses the secure and standard bcrypt algorithm to hash/salt passwords before storing them.
 This implementation comes with a performance cost.
-To speed up requests, credentials are stored in an LRU cache with a Time To Live.
+To speed up requests, credentials are stored in an LRU cache with a `Time To Live`.
 To configure this cache, you can define the following environment variables:
+
 - the maximum number of entries in the cache. Select a value greater than the maximum number of individual user credentials, for better performance. Defaults to 100. 
-```
+
+```bash
 RALPH_AUTH_CACHE_MAX_SIZE=100
 ```
-- the Time To Live of the cache entries in seconds. Defaults to 3600s.
-```
+- the `Time To Live` of the cache entries in seconds. Defaults to 3600s.
+
+```bash
 RALPH_AUTH_CACHE_TTL=3600
 ```
+
+## API documentation
+
+[OAD(./docs/api/openapi.json)]
