@@ -65,7 +65,6 @@ def test_backends_data_clickhouse_data_backend_instantiation_with_settings():
         PASSWORD="",
         CLIENT_OPTIONS={
             "date_time_input_format": "test_format",
-            "allow_experimental_object_type": 0,
         },
         DEFAULT_CHUNK_SIZE=1000,
         LOCALE_ENCODING="utf-16",
@@ -159,31 +158,37 @@ def test_backends_data_clickhouse_data_backend_read_method_with_a_custom_query(
     backend.write(statements)
 
     # Test filtering
-    query = ClickHouseQuery(where="event.bool = 1")
+    query = ClickHouseQuery(where="JSONExtractBool(event, 'bool') = 1")
     results = list(backend.read(query=query, chunk_size=None))
     assert len(results) == 2
     assert results[0]["event"] == statements[0]
     assert results[1]["event"] == statements[2]
 
     # Test select fields
-    query = ClickHouseQuery(select=["event_id", "event.bool"])
+    query = ClickHouseQuery(
+        select=["event_id", "JSONExtractBool(event, 'bool') as bool"]
+    )
     results = list(backend.read(query=query))
+
     assert len(results) == 3
     assert len(results[0]) == 2
     assert results[0]["event_id"] == documents[0][0]
-    assert results[0]["event.bool"] == statements[0]["bool"]
+    assert results[0]["bool"] == statements[0]["bool"]
     assert results[1]["event_id"] == documents[1][0]
-    assert results[1]["event.bool"] == statements[1]["bool"]
+    assert results[1]["bool"] == statements[1]["bool"]
     assert results[2]["event_id"] == documents[2][0]
-    assert results[2]["event.bool"] == statements[2]["bool"]
+    assert results[2]["bool"] == statements[2]["bool"]
 
     # Test both
-    query = ClickHouseQuery(where="event.bool = 0", select=["event_id", "event.bool"])
+    query = ClickHouseQuery(
+        where="JSONExtractBool(event, 'bool') = 0",
+        select=["event_id", "JSONExtractBool(event, 'bool') as bool"],
+    )
     results = list(backend.read(query=query))
     assert len(results) == 1
     assert len(results[0]) == 2
     assert results[0]["event_id"] == documents[1][0]
-    assert results[0]["event.bool"] == statements[1]["bool"]
+    assert results[0]["bool"] == statements[1]["bool"]
 
     # Test sort
     query = ClickHouseQuery(sort="emission_time DESCENDING")
@@ -201,7 +206,7 @@ def test_backends_data_clickhouse_data_backend_read_method_with_a_custom_query(
 
     # Test parameters
     query = ClickHouseQuery(
-        where="event.bool = {event_bool:Bool}",
+        where="JSONExtractBool(event, 'bool') = {event_bool:Bool}",
         parameters={"event_bool": 0, "format": "exact"},
     )
     results = list(backend.read(query=query))
@@ -217,15 +222,15 @@ def test_backends_data_clickhouse_data_backend_read_method_with_failures(
     backend = clickhouse_backend()
 
     statement = {"id": str(uuid.uuid4()), "timestamp": str(datetime.utcnow())}
-    document = {"event": statement}
+    document = {"event": json.dumps(statement)}
     backend.write([statement])
 
     # JSON encoding error
-    def mock_read_raw(*args, **kwargs):
-        """Mock the `ClickHouseDataBackend._read_raw` method."""
+    def mock_read_json(*args, **kwargs):
+        """Mock the `ClickHouseDataBackend._read_json` method."""
         raise TypeError("Error")
 
-    monkeypatch.setattr(backend, "_read_raw", mock_read_raw)
+    monkeypatch.setattr(backend, "_read_json", mock_read_json)
 
     msg = f"Failed to encode document {document}: Error"
 
@@ -235,7 +240,7 @@ def test_backends_data_clickhouse_data_backend_read_method_with_failures(
             BackendException,
             match=msg,
         ):
-            list(backend.read(raw_output=True, ignore_errors=False))
+            list(backend.read(raw_output=False, ignore_errors=False))
 
     assert (
         "ralph.backends.data.clickhouse",
@@ -247,7 +252,7 @@ def test_backends_data_clickhouse_data_backend_read_method_with_failures(
 
     # Ignoring errors
     with caplog.at_level(logging.WARNING):
-        list(backend.read(raw_output=True, ignore_errors=True))
+        list(backend.read(raw_output=False, ignore_errors=True))
 
     assert (
         "ralph.backends.data.clickhouse",
@@ -474,16 +479,20 @@ def test_backends_data_clickhouse_data_backend_write_method(
     result = clickhouse.query(sql).result_set
     assert result[0][0] == 2
 
-    sql = f"""SELECT * FROM {CLICKHOUSE_TEST_TABLE_NAME} ORDER BY event.timestamp"""
+    sql = f"""
+        SELECT *
+        FROM {CLICKHOUSE_TEST_TABLE_NAME}
+        ORDER BY JSONExtractString(event, 'timestamp')
+    """
     result = list(clickhouse.query(sql).named_results())
 
     assert result[0]["event_id"] == native_statements[0]["id"]
     assert result[0]["emission_time"] == native_statements[0]["timestamp"]
-    assert result[0]["event"] == statements[0]
+    assert json.loads(result[0]["event"]) == statements[0]
 
     assert result[1]["event_id"] == native_statements[1]["id"]
     assert result[1]["emission_time"] == native_statements[1]["timestamp"]
-    assert result[1]["event"] == statements[1]
+    assert json.loads(result[1]["event"]) == statements[1]
     backend.close()
 
 
@@ -517,16 +526,20 @@ def test_backends_data_clickhouse_data_backend_write_method_bytes(
     result = clickhouse.query(sql).result_set
     assert result[0][0] == 2
 
-    sql = f"""SELECT * FROM {CLICKHOUSE_TEST_TABLE_NAME} ORDER BY event.timestamp"""
+    sql = f"""
+        SELECT *
+        FROM {CLICKHOUSE_TEST_TABLE_NAME}
+        ORDER BY JSONExtractString(event, 'timestamp')
+    """
     result = list(clickhouse.query(sql).named_results())
 
     assert result[0]["event_id"] == native_statements[0]["id"]
     assert result[0]["emission_time"] == native_statements[0]["timestamp"]
-    assert result[0]["event"] == statements[0]
+    assert json.loads(result[0]["event"]) == statements[0]
 
     assert result[1]["event_id"] == native_statements[1]["id"]
     assert result[1]["emission_time"] == native_statements[1]["timestamp"]
-    assert result[1]["event"] == statements[1]
+    assert json.loads(result[1]["event"]) == statements[1]
     backend.close()
 
 
@@ -633,16 +646,20 @@ def test_backends_data_clickhouse_data_backend_write_method_with_custom_chunk_si
     result = clickhouse.query(sql).result_set
     assert result[0][0] == 2
 
-    sql = f"""SELECT * FROM {CLICKHOUSE_TEST_TABLE_NAME} ORDER BY event.timestamp"""
+    sql = f"""
+        SELECT *
+        FROM {CLICKHOUSE_TEST_TABLE_NAME}
+        ORDER BY JSONExtractString(event, 'timestamp')
+    """
     result = list(clickhouse.query(sql).named_results())
 
     assert result[0]["event_id"] == native_statements[0]["id"]
     assert result[0]["emission_time"] == native_statements[0]["timestamp"]
-    assert result[0]["event"] == statements[0]
+    assert json.loads(result[0]["event"]) == statements[0]
 
     assert result[1]["event_id"] == native_statements[1]["id"]
     assert result[1]["emission_time"] == native_statements[1]["timestamp"]
-    assert result[1]["event"] == statements[1]
+    assert json.loads(result[1]["event"]) == statements[1]
     backend.close()
 
 

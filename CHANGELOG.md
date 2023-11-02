@@ -51,6 +51,8 @@ have an authority field matching that of the user
 - Helm: improve volumes and ingress configurations
 - API: Add `RALPH_LRS_RESTRICT_BY_SCOPE` option enabling endpoint access
   control by user scopes
+- Backends: Replace reference to a JSON column in ClickHouse with 
+  function calls on the String column [BC]
 
 ### Fixed
 

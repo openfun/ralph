@@ -51,11 +51,13 @@ class ClickHouseLRSBackend(BaseLRSBackend, ClickHouseDataBackend):
         ch_params.pop("authority", None)
 
         if params.verb:
-            where.append("event.verb.id = {verb:String}")
+            where.append("JSONExtractString(event, 'verb', 'id') = {verb:String}")
 
         if params.activity:
-            where.append("event.object.objectType = 'Activity'")
-            where.append("event.object.id = {activity:String}")
+            where.append(
+                "JSONExtractString(event, 'object', 'objectType') = 'Activity'"
+            )
+            where.append("JSONExtractString(event, 'object', 'id') = {activity:String}")
 
         if params.since:
             where.append("emission_time > {since:DateTime64(6)}")
@@ -152,33 +154,42 @@ class ClickHouseLRSBackend(BaseLRSBackend, ClickHouseDataBackend):
         """Add filters relative to agents to `where`."""
         if not agent_params:
             return
+
         if not isinstance(agent_params, dict):
             agent_params = agent_params.dict()
+
         if agent_params.get("mbox"):
             ch_params[f"{target_field}__mbox"] = agent_params.get("mbox")
-            where.append(f"event.{target_field}.mbox = {{{target_field}__mbox:String}}")
+            where.append(
+                f"JSONExtractString(event, '{target_field}', 'mbox') = "
+                f"{{{target_field}__mbox:String}}"
+            )
         elif agent_params.get("mbox_sha1sum"):
             ch_params[f"{target_field}__mbox_sha1sum"] = agent_params.get(
                 "mbox_sha1sum"
             )
             where.append(
-                f"event.{target_field}.mbox_sha1sum = {{{target_field}__mbox_sha1sum:String}}"  # noqa: E501 # pylint: disable=line-too-long
+                f"JSONExtractString(event, '{target_field}', 'mbox_sha1sum') = "
+                f"{{{target_field}__mbox_sha1sum:String}}"
             )
         elif agent_params.get("openid"):
             ch_params[f"{target_field}__openid"] = agent_params.get("openid")
             where.append(
-                f"event.{target_field}.openid = {{{target_field}__openid:String}}"
+                f"JSONExtractString(event, '{target_field}', 'openid') = "
+                f"{{{target_field}__openid:String}}"
             )
         elif agent_params.get("account__name"):
             ch_params[f"{target_field}__account__name"] = agent_params.get(
                 "account__name"
             )
             where.append(
-                f"event.{target_field}.account.name = {{{target_field}__account__name:String}}"  # noqa: E501 # pylint: disable=line-too-long
+                f"JSONExtractString(event, '{target_field}', 'account', 'name') = "
+                f"{{{target_field}__account__name:String}}"
             )
             ch_params[f"{target_field}__account__home_page"] = agent_params.get(
                 "account__home_page"
             )
             where.append(
-                f"event.{target_field}.account.homePage = {{{target_field}__account__home_page:String}}"  # noqa: E501 # pylint: disable=line-too-long
+                f"JSONExtractString(event, '{target_field}', 'account', 'homePage') = "
+                f"{{{target_field}__account__home_page:String}}"
             )

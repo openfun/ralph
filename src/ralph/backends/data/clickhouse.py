@@ -20,7 +20,7 @@ from uuid import UUID, uuid4
 
 import clickhouse_connect
 from clickhouse_connect.driver.exceptions import ClickHouseError
-from pydantic import BaseModel, Json, ValidationError, conint
+from pydantic import BaseModel, Json, ValidationError
 
 from ralph.backends.data.base import (
     BaseDataBackend,
@@ -47,7 +47,6 @@ class ClickHouseClientOptions(ClientOptions):
     """Pydantic model for `clickhouse` client options."""
 
     date_time_input_format: str = "best_effort"
-    allow_experimental_object_type: conint(ge=0, le=1) = 1
 
 
 class InsertTuple(NamedTuple):
@@ -55,8 +54,7 @@ class InsertTuple(NamedTuple):
 
     event_id: UUID
     emission_time: datetime
-    event: dict
-    event_str: str
+    event: str
 
 
 class ClickHouseDataBackendSettings(BaseDataBackendSettings):
@@ -262,7 +260,7 @@ class ClickHouseDataBackend(BaseDataBackend):
         if query.limit:
             sql += f"\nLIMIT {query.limit}"
 
-        reader = self._read_raw if raw_output else lambda _: _
+        reader = self._read_raw if raw_output else self._read_json
 
         logger.debug(
             "Start reading the %s table of the %s database (chunk size: %d)",
@@ -423,7 +421,6 @@ class ClickHouseDataBackend(BaseDataBackend):
             insert_tuple = InsertTuple(
                 insert.event_id,
                 insert.emission_time,
-                statement,
                 json.dumps(statement),
             )
 
@@ -445,12 +442,7 @@ class ClickHouseDataBackend(BaseDataBackend):
             self.client.insert(
                 event_table_name,
                 batch,
-                column_names=[
-                    "event_id",
-                    "emission_time",
-                    "event",
-                    "event_str",
-                ],
+                column_names=["event_id", "emission_time", "event"],
                 # Allow ClickHouse to buffer the insert, and wait for the
                 # buffer to flush. Should be configurable, but I think these are
                 # reasonable defaults.
@@ -488,6 +480,19 @@ class ClickHouseDataBackend(BaseDataBackend):
                 logger.error("Raised error: %s, for document %s", error, raw_document)
                 raise error
 
+    @staticmethod
+    def _read_json(document: Dict[str, Any]) -> Dict[str, Any]:
+        """Read the `documents` row and yield for the event JSON."""
+        if "event" in document:
+            document["event"] = json.loads(document["event"])
+
+        return document
+
     def _read_raw(self, document: Dict[str, Any]) -> bytes:
         """Read the `documents` Iterable and yield bytes."""
+        # We want to return a JSON structure of the whole row, so if the event string
+        # is in there we first need to serialize it so that we can deserialize the
+        # whole thing.
+        document = self._read_json(document)
+
         return json.dumps(document).encode(self.locale_encoding)

@@ -50,13 +50,13 @@ from ralph.exceptions import BackendException
                 "sort": "emission_time DESCENDING, event_id DESCENDING",
             },
         ),
-        # # 2. Query by statementId and agent with mbox IFI.
+        # 2. Query by statementId and agent with mbox IFI.
         (
             {"statementId": "test_id", "agent": {"mbox": "mailto:foo@bar.baz"}},
             {
                 "where": [
                     "event_id = {statementId:UUID}",
-                    "event.actor.mbox = {actor__mbox:String}",
+                    "JSONExtractString(event, 'actor', 'mbox') = {actor__mbox:String}",
                 ],
                 "params": {
                     "actor__mbox": "mailto:foo@bar.baz",
@@ -82,7 +82,8 @@ from ralph.exceptions import BackendException
             {
                 "where": [
                     "event_id = {statementId:UUID}",
-                    "event.actor.mbox_sha1sum = {actor__mbox_sha1sum:String}",
+                    "JSONExtractString(event, 'actor', 'mbox_sha1sum') = {"
+                    "actor__mbox_sha1sum:String}",
                 ],
                 "params": {
                     "actor__mbox_sha1sum": "a7a5b7462b862c8c8767d43d43e865ffff754a64",
@@ -108,7 +109,8 @@ from ralph.exceptions import BackendException
             {
                 "where": [
                     "event_id = {statementId:UUID}",
-                    "event.actor.openid = {actor__openid:String}",
+                    "JSONExtractString(event, 'actor', 'openid') = {"
+                    "actor__openid:String}",
                 ],
                 "params": {
                     "actor__openid": "http://toby.openid.example.org/",
@@ -138,8 +140,10 @@ from ralph.exceptions import BackendException
             {
                 "where": [
                     "event_id = {statementId:UUID}",
-                    "event.actor.account.name = {actor__account__name:String}",
-                    "event.actor.account.homePage = {actor__account__home_page:String}",
+                    "JSONExtractString(event, 'actor', 'account', 'name') = {"
+                    "actor__account__name:String}",
+                    "JSONExtractString(event, 'actor', 'account', 'homePage') = {"
+                    "actor__account__home_page:String}",
                 ],
                 "params": {
                     "actor__account__name": "13936749",
@@ -166,9 +170,9 @@ from ralph.exceptions import BackendException
             },
             {
                 "where": [
-                    "event.verb.id = {verb:String}",
-                    "event.object.objectType = 'Activity'",
-                    "event.object.id = {activity:String}",
+                    "JSONExtractString(event, 'verb', 'id') = {verb:String}",
+                    "JSONExtractString(event, 'object', 'objectType') = 'Activity'",
+                    "JSONExtractString(event, 'object', 'id') = {activity:String}",
                 ],
                 "params": {
                     "ascending": False,
