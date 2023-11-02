@@ -207,7 +207,6 @@ By default, the following client options are set, if you override the default
 client options you must also set these:
 
 - `"date_time_input_format": "best_effort"` allows RFC date parsing
-- `"allow_experimental_object_type": 1` allows the JSON data type we use to store statements
 
 The ClickHouse client options supported in Ralph can be found in these locations:
 - [Python driver specific](https://clickhouse.com/docs/en/integrations/language-clients/python/driver-api#settings-argument)

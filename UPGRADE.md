@@ -80,3 +80,22 @@ CLI syntax has been changed from `fetch` & `push` to `read` & `write` affecting 
 $ sed -i 's/"fetch"/"read"/g' { my_history_file_path }
 $ sed -i 's/"push"/"write"/g' { my_history_file_path }
 ```
+
+#### Upgrade ClickHouse schema
+
+If you are using the ClickHouse backend, schema changes have been made
+to drop the existing JSON column in favor of the String version of the 
+same data. See [this issue](https://github.com/openfun/ralph/issues/482) 
+for details. 
+
+Ralph does not manage the ClickHouse schema, so if you have existing 
+data you will need to manually alter it as an admin user. Note: this 
+will rewrite the statements table, which may take a long time if you
+have many rows. The command to run is:
+
+```sql
+-- If RALPH_BACKENDS__DATA__CLICKHOUSE__DATABASE is 'xapi'
+-- and RALPH_BACKENDS__DATA__CLICKHOUSE__EVENT_TABLE_NAME is 'test'
+
+ALTER TABLE xapi.test DROP COLUMN event, RENAME COLUMN event_str to event;
+```

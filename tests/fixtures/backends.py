@@ -367,7 +367,6 @@ def get_clickhouse_fixture(
     """
     client_options = ClickHouseClientOptions(
         date_time_input_format="best_effort",  # Allows RFC dates
-        allow_experimental_object_type=1,  # Allows JSON data type
     ).dict()
 
     client = clickhouse_connect.get_client(
@@ -391,11 +390,10 @@ def get_clickhouse_fixture(
     client.command(sql)
 
     sql = f"""
-        CREATE TABLE IF NOT EXISTS {event_table_name} (
+        CREATE TABLE {event_table_name} (
         event_id UUID NOT NULL,
         emission_time DateTime64(6) NOT NULL,
-        event JSON NOT NULL,
-        event_str String NOT NULL
+        event String NOT NULL
         )
         ENGINE MergeTree ORDER BY (emission_time, event_id)
         PRIMARY KEY (emission_time, event_id)
@@ -546,7 +544,6 @@ def clickhouse_backend():
             PASSWORD="",
             CLIENT_OPTIONS={
                 "date_time_input_format": "best_effort",
-                "allow_experimental_object_type": 1,
             },
             DEFAULT_CHUNK_SIZE=500,
             LOCALE_ENCODING="utf8",
@@ -572,7 +569,6 @@ def clickhouse_lrs_backend():
             PASSWORD="",
             CLIENT_OPTIONS={
                 "date_time_input_format": "best_effort",
-                "allow_experimental_object_type": 1,
             },
             DEFAULT_CHUNK_SIZE=500,
             LOCALE_ENCODING="utf8",
