@@ -9,8 +9,9 @@ All default values are in `values.yaml`.
 ## Review manifest
 
 To generate and review your manifest, under `./src/helm` run the following command:
-```
-$ helm template .
+
+```bash
+helm template .
 ```
 
 ## Deploy chart
@@ -32,8 +33,8 @@ This chart use the file `vaul.yaml` to set the mandatory secrets for the applica
 
 Under `./src/helm`
 
-```
-$ helm upgrade --install RELEASE_NAME ralph/. --values ralph/dev-values.yaml
+```bash
+helm upgrade --install RELEASE_NAME ralph/. --values ralph/dev-values.yaml
 ```
 
 Tips:

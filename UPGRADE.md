@@ -76,9 +76,10 @@ For example here is a valid `auth.json` file:
 CLI syntax has been changed from `fetch` & `push` to `read` & `write` affecting the command history. You must replace the command history after updating:
 - locate your history file path, which is in `{ RALPH_APP_DIR }/history.json` (defaults to `.ralph/history.json`)
 - run the commands below to update history
-```
-$ sed -i 's/"fetch"/"read"/g' { my_history_file_path }
-$ sed -i 's/"push"/"write"/g' { my_history_file_path }
+
+```bash
+sed -i 's/"fetch"/"read"/g' { my_history_file_path }
+sed -i 's/"push"/"write"/g' { my_history_file_path }
 ```
 
 #### Upgrade ClickHouse schema
