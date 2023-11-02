@@ -499,7 +499,7 @@ jobs:
             # - DOCS_VERSION: 1.1 (for git tag v1.1.2)
             # - DOCS_ALIAS: latest
             # or
-            # - DOCS_VERSION: dev (for master branch)
+            # - DOCS_VERSION: master (for master branch)
             # - No DOCS_ALIAS
             DOCS_VERSION=$([[ -z "$CIRCLE_TAG" ]] && echo $CIRCLE_BRANCH || echo ${CIRCLE_TAG} | sed 's/^v\([0-9]\.[0-9]*\)\..*/\1/')
             DOCS_ALIAS=$([[ -z "$CIRCLE_TAG" ]] && echo "" || echo "latest")
