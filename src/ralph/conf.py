@@ -6,7 +6,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Annotated, List, Optional, Sequence, Union, Tuple
 
-from pydantic import AfterValidator, model_validator, ConfigDict, AnyHttpUrl, AnyUrl, BaseModel
+from pydantic import AfterValidator, model_validator, ConfigDict, AnyHttpUrl, AnyUrl, BaseModel, parse_obj_as
 
 from ralph.exceptions import ConfigurationException
 
@@ -242,7 +242,7 @@ class Settings(BaseSettings):
         },
     }
     PARSERS: ParserSettings = ParserSettings()
-    RUNSERVER_AUTH_BACKENDS: AuthBackends = AuthBackends([AuthBackend.BASIC])
+    RUNSERVER_AUTH_BACKENDS: AuthBackends = parse_obj_as(AuthBackends, 'Basic')
     RUNSERVER_AUTH_OIDC_AUDIENCE: str = None
     RUNSERVER_AUTH_OIDC_ISSUER_URI: AnyHttpUrl = None
     RUNSERVER_BACKEND: Literal[
@@ -255,7 +255,7 @@ class Settings(BaseSettings):
     LRS_RESTRICT_BY_AUTHORITY: bool = False
     LRS_RESTRICT_BY_SCOPES: bool = False
     SENTRY_CLI_TRACES_SAMPLE_RATE: float = 1.0
-    SENTRY_DSN: str = None
+    SENTRY_DSN: Optional[str] = None
     SENTRY_IGNORE_HEALTH_CHECKS: bool = False
     SENTRY_LRS_TRACES_SAMPLE_RATE: float = 1.0
     XAPI_FORWARDINGS: List[XapiForwardingConfigurationSettings] = []
@@ -274,9 +274,7 @@ class Settings(BaseSettings):
     @classmethod
     def check_restriction_compatibility(cls, values):
         """Raise an error if scopes are being used without authority restriction."""
-        if values.get("LRS_RESTRICT_BY_SCOPES") and not values.get(
-            "LRS_RESTRICT_BY_AUTHORITY"
-        ):
+        if values.LRS_RESTRICT_BY_SCOPES and not values.LRS_RESTRICT_BY_AUTHORITY:
             raise ConfigurationException(
                 "LRS_RESTRICT_BY_AUTHORITY must be set to True if using "
                 "LRS_RESTRICT_BY_SCOPES=True"

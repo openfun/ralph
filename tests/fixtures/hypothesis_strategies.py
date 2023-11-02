@@ -83,7 +83,7 @@ def custom_builds(
         arg = kwargs.get(name, None)
         if arg is False:
             continue
-        is_required = field.required or (arg is not None and _overwrite_default)
+        is_required = field.is_required or (arg is not None and _overwrite_default)
         required_optional = required if is_required or arg is not None else optional
         field_strategy = get_strategy_from(field.outer_type_) if arg is None else arg
         required_optional[field.alias] = field_strategy

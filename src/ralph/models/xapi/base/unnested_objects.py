@@ -1,10 +1,10 @@
 """Base xAPI `Object` definitions (1)."""
 
 import sys
-from typing import Any, Dict, List, Optional, Union
+from typing import Annotated, Any, Dict, List, Optional, Union
 from uuid import UUID
 
-from pydantic import AnyUrl, StrictStr, constr, validator
+from pydantic import AnyUrl, StrictStr, StringConstraints, validator
 
 from ..config import BaseModelWithConfig
 from .common import IRI, LanguageMap
@@ -26,11 +26,11 @@ class BaseXapiActivityDefinition(BaseModelWithConfig):
         extensions (dict): Consists of a dictionary of other properties as needed.
     """
 
-    name: Optional[LanguageMap]
-    description: Optional[LanguageMap]
-    type: Optional[IRI]
-    moreInfo: Optional[AnyUrl]
-    extensions: Optional[Dict[IRI, Union[str, int, bool, list, dict, None]]]
+    name: Optional[LanguageMap] = None
+    description: Optional[LanguageMap] = None
+    type: Optional[IRI] = None
+    moreInfo: Optional[AnyUrl] = None
+    extensions: Optional[Dict[IRI, Union[str, int, bool, list, dict, None]]] = None
 
 
 class BaseXapiInteractionComponent(BaseModelWithConfig):
@@ -41,7 +41,7 @@ class BaseXapiInteractionComponent(BaseModelWithConfig):
         description (LanguageMap): Consists of the description of the interaction.
     """
 
-    id: constr(regex=r"^[^\s]+$")  # noqa:F722
+    id: Annotated[str, StringConstraints(pattern=r"^[^\s]+$")]  # #noqa:F722
     description: Optional[LanguageMap]
 
 

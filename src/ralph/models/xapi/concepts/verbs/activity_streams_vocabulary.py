@@ -21,7 +21,7 @@ class JoinVerb(BaseXapiVerb):
     """
 
     id: Literal["http://activitystrea.ms/join"] = "http://activitystrea.ms/join"
-    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["joined"]]]
+    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["joined"]]] = None
 
 
 class LeaveVerb(BaseXapiVerb):
@@ -33,4 +33,4 @@ class LeaveVerb(BaseXapiVerb):
     """
 
     id: Literal["http://activitystrea.ms/leave"] = "http://activitystrea.ms/leave"
-    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["left"]]]
+    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["left"]]] = None

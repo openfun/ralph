@@ -23,4 +23,4 @@ class PostedVerb(BaseXapiVerb):
     id: Literal[
         "https://w3id.org/xapi/acrossx/verbs/posted"
     ] = "https://w3id.org/xapi/acrossx/verbs/posted"
-    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["posted"]]]
+    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["posted"]]] = None
