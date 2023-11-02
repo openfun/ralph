@@ -24,11 +24,14 @@ class TextbookInteractionBaseEventField(AbstractBaseEventField):
     """
 
     page: int
-    chapter: Annotated[str, StringConstraints(
-        pattern=(
-            r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"  # noqa
-        )
-    )]
+    chapter: Annotated[
+        str,
+        StringConstraints(
+            pattern=(
+                r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"  # noqa
+            )
+        ),
+    ]
 
 
 class TextbookPdfThumbnailsToggledEventField(TextbookInteractionBaseEventField):
@@ -74,11 +77,14 @@ class TextbookPdfChapterNavigatedEventField(AbstractBaseEventField):
     """
 
     name: Literal["textbook.pdf.chapter.navigated"]
-    chapter: Annotated[str, StringConstraints(
-        pattern=(
-            r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"  # noqa
-        )
-    )]
+    chapter: Annotated[
+        str,
+        StringConstraints(
+            pattern=(
+                r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"  # noqa
+            )
+        ),
+    ]
     chapter_title: str
 
 
@@ -263,11 +269,14 @@ class BookEventField(AbstractBaseEventField):
             clicked or `nextpage` value when the previous page button is clicked.
     """
 
-    chapter: Annotated[str, StringConstraints(
-        pattern=(
-            r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"  # noqa
-        )
-    )]
+    chapter: Annotated[
+        str,
+        StringConstraints(
+            pattern=(
+                r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"  # noqa
+            )
+        ),
+    ]
     name: Union[
         Literal["textbook.pdf.page.loaded"], Literal["textbook.pdf.page.navigatednext"]
     ]

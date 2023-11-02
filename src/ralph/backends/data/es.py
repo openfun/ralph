@@ -9,6 +9,7 @@ from typing import Iterable, Iterator, List, Literal, Optional, Union
 from elasticsearch import ApiError, Elasticsearch, TransportError
 from elasticsearch.helpers import BulkIndexError, streaming_bulk
 from pydantic import BaseModel
+from pydantic_settings import SettingsConfigDict
 
 from ralph.backends.data.base import (
     BaseDataBackend,
@@ -18,7 +19,7 @@ from ralph.backends.data.base import (
     DataBackendStatus,
     enforce_query_checks,
 )
-from ralph.conf import BaseSettingsConfig, ClientOptions, CommaSeparatedTuple
+from ralph.conf import BASE_SETTINGS_CONFIG, ClientOptions, CommaSeparatedTuple
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import parse_bytes_to_dict, read_raw
 
@@ -54,10 +55,14 @@ class ESDataBackendSettings(BaseDataBackendSettings):
 
     # TODO[pydantic]: The `Config` class inherits from another class, please create the `model_config` manually.
     # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
-    class Config(BaseSettingsConfig):
-        """Pydantic Configuration."""
+    # class Config(BaseSettingsConfig):
+    #     """Pydantic Configuration."""
 
-        env_prefix = "RALPH_BACKENDS__DATA__ES__"
+    #     env_prefix = "RALPH_BACKENDS__DATA__ES__"
+
+    model_config = BASE_SETTINGS_CONFIG | SettingsConfigDict(
+        env_prefix="RALPH_BACKENDS__DATA__ES__"
+    )
 
     ALLOW_YELLOW_STATUS: bool = False
     CLIENT_OPTIONS: ESClientOptions = ESClientOptions()
@@ -66,7 +71,7 @@ class ESDataBackendSettings(BaseDataBackendSettings):
     HOSTS: CommaSeparatedTuple = ("http://localhost:9200",)
     LOCALE_ENCODING: str = "utf8"
     POINT_IN_TIME_KEEP_ALIVE: str = "1m"
-    REFRESH_AFTER_WRITE: Union[Literal["false", "true", "wait_for"], bool, str, None]
+    REFRESH_AFTER_WRITE: Union[Literal["false", "true", "wait_for"], bool, str, None] = False # TODO: check that this is the good default
 
 
 class ESQueryPit(BaseModel):

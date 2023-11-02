@@ -4,7 +4,8 @@ from datetime import datetime
 from typing import Any, List, Optional, Union
 from uuid import UUID
 
-from pydantic import model_validator, StringConstraints
+from pydantic import StringConstraints, model_validator
+from typing_extensions import Annotated
 
 from ..config import BaseModelWithConfig
 from .agents import BaseXapiAgent
@@ -14,7 +15,6 @@ from .groups import BaseXapiGroup
 from .objects import BaseXapiObject
 from .results import BaseXapiResult
 from .verbs import BaseXapiVerb
-from typing_extensions import Annotated
 
 
 class BaseXapiStatement(BaseModelWithConfig):
@@ -43,7 +43,9 @@ class BaseXapiStatement(BaseModelWithConfig):
     timestamp: Optional[datetime] = None
     stored: Optional[datetime] = None
     authority: Optional[Union[BaseXapiAgent, BaseXapiGroup]] = None
-    version: Annotated[str, StringConstraints(pattern=r"^1\.0\.[0-9]+$")] = "1.0.0"  # noqa:F722
+    version: Annotated[
+        str, StringConstraints(pattern=r"^1\.0\.[0-9]+$")
+    ] = "1.0.0"  # noqa:F722
     attachments: Optional[List[BaseXapiAttachment]] = None
 
     @model_validator(mode="before")

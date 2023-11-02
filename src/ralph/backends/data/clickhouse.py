@@ -20,7 +20,9 @@ from uuid import UUID, uuid4
 
 import clickhouse_connect
 from clickhouse_connect.driver.exceptions import ClickHouseError
-from pydantic import Field, BaseModel, Json, ValidationError
+from pydantic import BaseModel, Field, Json, ValidationError
+from pydantic_settings import SettingsConfigDict
+from typing_extensions import Annotated
 
 from ralph.backends.data.base import (
     BaseDataBackend,
@@ -30,9 +32,8 @@ from ralph.backends.data.base import (
     DataBackendStatus,
     enforce_query_checks,
 )
-from ralph.conf import BaseSettingsConfig, ClientOptions
+from ralph.conf import BASE_SETTINGS_CONFIG, ClientOptions
 from ralph.exceptions import BackendException, BackendParameterException
-from typing_extensions import Annotated
 
 logger = logging.getLogger(__name__)
 
@@ -78,17 +79,20 @@ class ClickHouseDataBackendSettings(BaseDataBackendSettings):
 
     # TODO[pydantic]: The `Config` class inherits from another class, please create the `model_config` manually.
     # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
-    class Config(BaseSettingsConfig):
-        """Pydantic Configuration."""
+    # class Config(BaseSettingsConfig):
+    #     """Pydantic Configuration."""
 
-        env_prefix = "RALPH_BACKENDS__DATA__CLICKHOUSE__"
+    #     env_prefix = "RALPH_BACKENDS__DATA__CLICKHOUSE__"
+    model_config = BASE_SETTINGS_CONFIG | SettingsConfigDict(
+        env_prefix="RALPH_BACKENDS__DATA__CLICKHOUSE__"
+    )
 
     HOST: str = "localhost"
     PORT: int = 8123
     DATABASE: str = "xapi"
     EVENT_TABLE_NAME: str = "xapi_events_all"
-    USERNAME: str = None
-    PASSWORD: str = None
+    USERNAME: Optional[str] = None
+    PASSWORD: Optional[str] = None
     CLIENT_OPTIONS: ClickHouseClientOptions = ClickHouseClientOptions()
     DEFAULT_CHUNK_SIZE: int = 500
     LOCALE_ENCODING: str = "utf8"

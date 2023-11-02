@@ -9,7 +9,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, OpenIdConnect
 from jose import ExpiredSignatureError, JWTError, jwt
 from jose.exceptions import JWTClaimsError
-from pydantic import ConfigDict, AnyUrl, BaseModel
+from pydantic import AnyUrl, BaseModel, ConfigDict
 from typing_extensions import Annotated
 
 from ralph.api.auth.user import AuthenticatedUser, UserScopes

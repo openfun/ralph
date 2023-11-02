@@ -6,7 +6,7 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from typing import Dict, Optional, Union
 
-from pydantic import StringConstraints, ConfigDict, AnyHttpUrl, BaseModel
+from pydantic import AnyHttpUrl, BaseModel, ConfigDict, StringConstraints
 from typing_extensions import Annotated
 
 if sys.version_info >= (3, 8):
@@ -17,6 +17,7 @@ else:
 
 class BaseModelWithConfig(BaseModel):
     """Pydantic model for base configuration shared among all models."""
+
     model_config = ConfigDict(extra="forbid")
 
 
@@ -28,12 +29,17 @@ class ContextModuleField(BaseModelWithConfig):
         display_name (str): Consists of a short description or title of the component.
     """
 
-    usage_key: Annotated[str, StringConstraints(pattern=r"^block-v1:.+\+.+\+.+type@.+@[a-f0-9]{32}$")]  # noqa:F722
+    usage_key: Annotated[
+        str, StringConstraints(pattern=r"^block-v1:.+\+.+\+.+type@.+@[a-f0-9]{32}$")
+    ]  # noqa:F722
     display_name: str
     original_usage_key: Optional[
-        Annotated[str, StringConstraints(
-            pattern=r"^block-v1:.+\+.+\+.+type@problem\+block@[a-f0-9]{32}$"  # noqa:F722
-        )]
+        Annotated[
+            str,
+            StringConstraints(
+                pattern=r"^block-v1:.+\+.+\+.+type@problem\+block@[a-f0-9]{32}$"  # noqa:F722
+            ),
+        ]
     ] = None
     original_usage_version: Optional[str] = None
 
@@ -80,7 +86,9 @@ class BaseContextField(BaseModelWithConfig):
                 `request.META['PATH_INFO']`
     """
 
-    course_id: Annotated[str, StringConstraints(pattern=r"^$|^course-v1:.+\+.+\+.+$")]  # noqa:F722
+    course_id: Annotated[
+        str, StringConstraints(pattern=r"^$|^course-v1:.+\+.+\+.+$")
+    ]  # noqa:F722
     course_user_tags: Optional[Dict[str, str]] = None
     module: Optional[ContextModuleField] = None
     org_id: str
@@ -150,7 +158,9 @@ class BaseEdxModel(BaseModelWithConfig):
                 In JSON the value is `null` instead of `None`.
     """
 
-    username: Union[Annotated[str, StringConstraints(min_length=2, max_length=30)], Literal[""]]
+    username: Union[
+        Annotated[str, StringConstraints(min_length=2, max_length=30)], Literal[""]
+    ]
     ip: Union[IPv4Address, Literal[""]]
     agent: str
     host: str

@@ -1,10 +1,10 @@
 """Base xAPI `Inverse Functional Identifier` definitions."""
 
-from pydantic import StringConstraints, AnyUrl, StrictStr
+from pydantic import AnyUrl, StrictStr, StringConstraints
+from typing_extensions import Annotated
 
 from ..config import BaseModelWithConfig
 from .common import IRI, MailtoEmail
-from typing_extensions import Annotated
 
 
 class BaseXapiAccount(BaseModelWithConfig):
@@ -36,7 +36,9 @@ class BaseXapiMboxSha1SumIFI(BaseModelWithConfig):
         mbox_sha1sum (str): Consists of the SHA1 hash of the Agent's email address.
     """
 
-    mbox_sha1sum: Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{40}$")]  # noqa:F722
+    mbox_sha1sum: Annotated[
+        str, StringConstraints(pattern=r"^[0-9a-f]{40}$")
+    ]  # noqa:F722
 
 
 class BaseXapiOpenIdIFI(BaseModelWithConfig):

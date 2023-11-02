@@ -6,7 +6,7 @@ validation.
 from typing import Optional, Union
 from uuid import UUID
 
-from pydantic import ConfigDict, AnyUrl, BaseModel
+from pydantic import AnyUrl, BaseModel, ConfigDict
 
 from ..models.xapi.base.agents import BaseXapiAgent
 from ..models.xapi.base.groups import BaseXapiGroup
@@ -28,6 +28,7 @@ class BaseModelWithLaxConfig(BaseModel):
     Common base lax model to perform light input validation as
     we receive statements through the API.
     """
+
     model_config = ConfigDict(extra="allow")
 
 

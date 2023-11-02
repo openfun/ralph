@@ -6,9 +6,9 @@ from typing import Dict, List, Optional, Union
 from uuid import UUID
 
 from pydantic import StringConstraints
+from typing_extensions import Annotated
 
 from ralph.models.edx.base import AbstractBaseEventField, BaseModelWithConfig
-from typing_extensions import Annotated
 
 if sys.version_info >= (3, 8):
     from typing import Literal
@@ -31,12 +31,15 @@ class ORAGetPeerSubmissionEventField(AbstractBaseEventField):
     """
 
     course_id: Annotated[str, StringConstraints(max_length=255)]
-    item_id: Annotated[str, StringConstraints(
-        pattern=(
-            r"^block-v1:.+\+.+\+.+type@openassessment"  # noqa : F722
-            r"+block@[a-f0-9]{32}$"  # noqa : F722
-        )
-    )]
+    item_id: Annotated[
+        str,
+        StringConstraints(
+            pattern=(
+                r"^block-v1:.+\+.+\+.+type@openassessment"  # noqa : F722
+                r"+block@[a-f0-9]{32}$"  # noqa : F722
+            )
+        ),
+    ]
     requesting_student_id: str
     submission_returned_uuid: Union[str, None] = None
 
@@ -58,12 +61,15 @@ class ORAGetSubmissionForStaffGradingEventField(AbstractBaseEventField):
             Currently, set to `full-grade`.
     """
 
-    item_id: Annotated[str, StringConstraints(
-        pattern=(
-            r"^block-v1:.+\+.+\+.+type@openassessment"  # noqa : F722
-            r"+block@[a-f0-9]{32}$"  # noqa : F722
-        )
-    )]
+    item_id: Annotated[
+        str,
+        StringConstraints(
+            pattern=(
+                r"^block-v1:.+\+.+\+.+type@openassessment"  # noqa : F722
+                r"+block@[a-f0-9]{32}$"  # noqa : F722
+            )
+        ),
+    ]
     submission_returned_uuid: Union[str, None] = None
     requesting_staff_id: str
     type: Literal["full-grade"]
@@ -110,7 +116,9 @@ class ORAAssessEventRubricField(BaseModelWithConfig):
             assess the response.
     """
 
-    content_hash: Annotated[str, StringConstraints(pattern=r"^[a-f0-9]{1,40}$")]  # noqa: F722
+    content_hash: Annotated[
+        str, StringConstraints(pattern=r"^[a-f0-9]{1,40}$")
+    ]  # noqa: F722
 
 
 class ORAAssessEventField(AbstractBaseEventField):

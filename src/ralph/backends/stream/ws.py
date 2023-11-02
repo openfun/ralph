@@ -5,8 +5,9 @@ import logging
 from typing import BinaryIO, Optional
 
 import websockets
+from pydantic_settings import SettingsConfigDict
 
-from ralph.conf import BaseSettingsConfig
+from ralph.conf import BASE_SETTINGS_CONFIG
 
 from .base import BaseStreamBackend, BaseStreamBackendSettings
 
@@ -22,10 +23,11 @@ class WSStreamBackendSettings(BaseStreamBackendSettings):
 
     # TODO[pydantic]: The `Config` class inherits from another class, please create the `model_config` manually.
     # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
-    class Config(BaseSettingsConfig):
-        """Pydantic Configuration."""
+    # class Config(BaseSettingsConfig):
+    #     """Pydantic Configuration."""
 
-        env_prefix = "RALPH_BACKENDS__STREAM__WS__"
+    #     env_prefix = "RALPH_BACKENDS__STREAM__WS__"
+    model_config = BASE_SETTINGS_CONFIG
 
     URI: Optional[str] = None
 

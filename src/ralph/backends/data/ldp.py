@@ -5,6 +5,7 @@ from typing import Iterable, Iterator, Literal, Optional, Union
 
 import ovh
 import requests
+from pydantic_settings import SettingsConfigDict
 
 from ralph.backends.data.base import (
     BaseDataBackend,
@@ -15,7 +16,7 @@ from ralph.backends.data.base import (
     enforce_query_checks,
 )
 from ralph.backends.mixins import HistoryMixin
-from ralph.conf import BaseSettingsConfig
+from ralph.conf import BASE_SETTINGS_CONFIG
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import now
 
@@ -37,10 +38,14 @@ class LDPDataBackendSettings(BaseDataBackendSettings):
 
     # TODO[pydantic]: The `Config` class inherits from another class, please create the `model_config` manually.
     # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
-    class Config(BaseSettingsConfig):
-        """Pydantic Configuration."""
+    # class Config(BaseSettingsConfig):
+    #     """Pydantic Configuration."""
 
-        env_prefix = "RALPH_BACKENDS__DATA__LDP__"
+    #     env_prefix = "RALPH_BACKENDS__DATA__LDP__"
+
+    model_config = BASE_SETTINGS_CONFIG | SettingsConfigDict(
+        env_prefix="RALPH_BACKENDS__DATA__LDP__"
+    )
 
     APPLICATION_KEY: Optional[str] = None
     APPLICATION_SECRET: Optional[str] = None

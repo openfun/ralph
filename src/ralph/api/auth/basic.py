@@ -10,7 +10,7 @@ import bcrypt
 from cachetools import TTLCache, cached
 from fastapi import Depends
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from pydantic import BaseModel, root_validator
+from pydantic import BaseModel, RootModel, model_validator
 from starlette.authentication import AuthenticationError
 
 from ralph.api.auth.user import AuthenticatedUser
@@ -40,7 +40,7 @@ class UserCredentials(AuthenticatedUser):
     username: str
 
 
-class ServerUsersCredentials(BaseModel):
+class ServerUsersCredentials(RootModel[List[UserCredentials]]):
     """Custom root pydantic model.
 
     Describe expected list of all server users credentials as stored in
@@ -50,8 +50,6 @@ class ServerUsersCredentials(BaseModel):
         __root__ (List): Custom root consisting of the
                         list of all server users credentials.
     """
-
-    __root__: List[UserCredentials]
 
     def __add__(self, other) -> Any:  # noqa: D105
         return ServerUsersCredentials.parse_obj(self.__root__ + other.__root__)
@@ -65,7 +63,7 @@ class ServerUsersCredentials(BaseModel):
     def __iter__(self) -> Iterator[UserCredentials]:  # noqa: D105
         return iter(self.__root__)
 
-    @root_validator
+    @model_validator(mode="after")
     @classmethod
     def ensure_unique_username(cls, values: Any) -> Any:
         """Every username should be unique among registered users."""

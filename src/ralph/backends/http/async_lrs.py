@@ -13,8 +13,9 @@ from httpx import AsyncClient, HTTPError, HTTPStatusError, RequestError
 from more_itertools import chunked
 from pydantic import AnyHttpUrl, BaseModel, Field, NonNegativeInt, parse_obj_as
 from pydantic.types import PositiveInt
+from pydantic_settings import SettingsConfigDict
 
-from ralph.conf import BaseSettingsConfig, HeadersParameters
+from ralph.conf import BASE_SETTINGS_CONFIG, HeadersParameters
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.models.xapi.base.agents import BaseXapiAgent
 from ralph.models.xapi.base.common import IRI
@@ -54,10 +55,14 @@ class LRSHTTPBackendSettings(BaseHTTPBackendSettings):
 
     # TODO[pydantic]: The `Config` class inherits from another class, please create the `model_config` manually.
     # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
-    class Config(BaseSettingsConfig):
-        """Pydantic Configuration."""
+    # class Config(BaseSettingsConfig):
+    #     """Pydantic Configuration."""
 
-        env_prefix = "RALPH_BACKENDS__HTTP__LRS__"
+    #     env_prefix = "RALPH_BACKENDS__HTTP__LRS__"
+
+    model_config = BASE_SETTINGS_CONFIG | SettingsConfigDict(
+        env_prefix="RALPH_BACKENDS__HTTP__LRS__"
+    )
 
     BASE_URL: AnyHttpUrl = Field("http://0.0.0.0:8100")
     USERNAME: str = "ralph"

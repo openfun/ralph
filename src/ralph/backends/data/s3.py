@@ -17,6 +17,7 @@ from botocore.exceptions import (
     ResponseStreamingError,
 )
 from botocore.response import StreamingBody
+from pydantic_settings import SettingsConfigDict
 from requests_toolbelt import StreamingIterator
 
 from ralph.backends.data.base import (
@@ -28,7 +29,7 @@ from ralph.backends.data.base import (
     enforce_query_checks,
 )
 from ralph.backends.mixins import HistoryMixin
-from ralph.conf import BaseSettingsConfig
+from ralph.conf import BASE_SETTINGS_CONFIG
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import now
 
@@ -52,17 +53,21 @@ class S3DataBackendSettings(BaseDataBackendSettings):
 
     # TODO[pydantic]: The `Config` class inherits from another class, please create the `model_config` manually.
     # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
-    class Config(BaseSettingsConfig):
-        """Pydantic Configuration."""
+    # class Config(BaseSettingsConfig):
+    #     """Pydantic Configuration."""
 
-        env_prefix = "RALPH_BACKENDS__DATA__S3__"
+    #     env_prefix = "RALPH_BACKENDS__DATA__S3__"
 
-    ACCESS_KEY_ID: str = None
-    SECRET_ACCESS_KEY: str = None
-    SESSION_TOKEN: str = None
-    ENDPOINT_URL: str = None
-    DEFAULT_REGION: str = None
-    DEFAULT_BUCKET_NAME: str = None
+    model_config = BASE_SETTINGS_CONFIG | SettingsConfigDict(
+        env_prefix="RALPH_BACKENDS__DATA__S3__"
+    )
+
+    ACCESS_KEY_ID: Optional[str] = None
+    SECRET_ACCESS_KEY: Optional[str] = None
+    SESSION_TOKEN: Optional[str] = None
+    ENDPOINT_URL: Optional[str] = None
+    DEFAULT_REGION: Optional[str] = None
+    DEFAULT_BUCKET_NAME: Optional[str] = None
     DEFAULT_CHUNK_SIZE: int = 4096
     LOCALE_ENCODING: str = "utf8"
 

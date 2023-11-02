@@ -8,10 +8,10 @@ from io import IOBase
 from typing import Iterable, Iterator, Optional, Union
 
 from pydantic import BaseModel, ValidationError
-
-from ralph.conf import BaseSettingsConfig, core_settings
-from ralph.exceptions import BackendParameterException
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from ralph.conf import BASE_SETTINGS_CONFIG, core_settings
+from ralph.exceptions import BackendParameterException
 
 logger = logging.getLogger(__name__)
 
@@ -21,17 +21,29 @@ class BaseDataBackendSettings(BaseSettings):
 
     # TODO[pydantic]: The `Config` class inherits from another class, please create the `model_config` manually.
     # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
-    class Config(BaseSettingsConfig):
-        """Pydantic Configuration."""
+    # class Config(BaseSettingsConfig):
+    #     """Pydantic Configuration."""
 
-        env_prefix = "RALPH_BACKENDS__DATA__"
-        env_file = ".env"
-        env_file_encoding = core_settings.LOCALE_ENCODING
+    #     env_prefix = "RALPH_BACKENDS__DATA__"
+    #     env_file = ".env"
+    #     env_file_encoding = core_settings.LOCALE_ENCODING
+
+    model_config = BASE_SETTINGS_CONFIG | SettingsConfigDict(
+        env_prefix="RALPH_BACKENDS__DATA__",
+        env_file=".env",
+        env_file_encoding=core_settings.LOCALE_ENCODING,
+    )
 
 
 class BaseQuery(BaseModel):
     """Base query model."""
-    model_config = SettingsConfigDict(env_prefix="RALPH_BACKENDS__DATA__", env_file=".env", env_file_encoding=core_settings.LOCALE_ENCODING, extra="forbid")
+
+    model_config = SettingsConfigDict(
+        env_prefix="RALPH_BACKENDS__DATA__",
+        env_file=".env",
+        env_file_encoding=core_settings.LOCALE_ENCODING,
+        extra="forbid",
+    )
 
     query_string: Union[str, None] = None
 

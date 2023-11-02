@@ -85,7 +85,9 @@ def custom_builds(
             continue
         is_required = field.is_required or (arg is not None and _overwrite_default)
         required_optional = required if is_required or arg is not None else optional
-        field_strategy = get_strategy_from(field.outer_type_) if arg is None else arg
+        field_strategy = (
+            get_strategy_from(field.annotation) if arg is None else arg
+        )  # TODO: validate this change is not failing silently
         required_optional[field.alias] = field_strategy
     if not required:
         # To avoid generating empty values

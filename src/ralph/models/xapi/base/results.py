@@ -5,10 +5,10 @@ from decimal import Decimal
 from typing import Any, Dict, Optional, Union
 
 from pydantic import Field, StrictBool, StrictStr, model_validator
+from typing_extensions import Annotated
 
 from ..config import BaseModelWithConfig
 from .common import IRI
-from typing_extensions import Annotated
 
 
 class BaseXapiResultScore(BaseModelWithConfig):
@@ -26,7 +26,7 @@ class BaseXapiResultScore(BaseModelWithConfig):
     min: Optional[Decimal] = None
     max: Optional[Decimal] = None
 
-    @model_validator(mode='after') # TODO: needs review
+    @model_validator(mode="after")  # TODO: needs review
     @classmethod
     def check_raw_min_max_relation(cls, values: Any) -> Any:
         """Check the relationship `min < raw < max`."""

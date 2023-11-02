@@ -37,7 +37,9 @@ class DownloadedVerb(BaseXapiVerb):
     id: Literal[
         "http://id.tincanapi.com/verb/downloaded"
     ] = "http://id.tincanapi.com/verb/downloaded"
-    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["downloaded"]]] = None # TODO: remove literal for LANG_EN_US_DISPLAY ?
+    display: Optional[
+        Dict[Literal[LANG_EN_US_DISPLAY], Literal["downloaded"]]
+    ] = None  # TODO: remove literal for LANG_EN_US_DISPLAY ?
 
 
 class UnregisteredVerb(BaseXapiVerb):

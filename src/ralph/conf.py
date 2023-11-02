@@ -4,14 +4,22 @@ import io
 import sys
 from enum import Enum
 from pathlib import Path
-from typing import Annotated, List, Optional, Sequence, Union, Tuple
+from typing import Annotated, List, Optional, Sequence, Tuple, Union
 
-from pydantic import AfterValidator, model_validator, ConfigDict, AnyHttpUrl, AnyUrl, BaseModel, parse_obj_as
+from pydantic import (
+    AfterValidator,
+    AnyHttpUrl,
+    AnyUrl,
+    BaseModel,
+    ConfigDict,
+    model_validator,
+    parse_obj_as,
+)
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from ralph.exceptions import ConfigurationException
 
 from .utils import import_string
-from pydantic_settings import BaseSettings, SettingsConfigDict
 
 if sys.version_info >= (3, 8):
     from typing import Literal
@@ -31,13 +39,17 @@ except ImportError:
 MODEL_PATH_SEPARATOR = "__"
 
 
-class BaseSettingsConfig:
-    """Pydantic model for BaseSettings Configuration."""
+# class BaseSettingsConfig:
+#     """Pydantic model for BaseSettings Configuration."""
 
-    case_sensitive = True
-    env_nested_delimiter = "__"
-    env_prefix = "RALPH_"
-    extra = "ignore"
+#     case_sensitive = True
+#     env_nested_delimiter = "__"
+#     env_prefix = "RALPH_"
+#     extra = "ignore"
+
+BASE_SETTINGS_CONFIG = SettingsConfigDict(
+    case_sensitive=True, env_nested_delimiter="__", env_prefix="RALPH_", extra="ignore"
+)
 
 
 class CoreSettings(BaseSettings):
@@ -45,8 +57,9 @@ class CoreSettings(BaseSettings):
 
     # TODO[pydantic]: The `Config` class inherits from another class, please create the `model_config` manually.
     # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
-    class Config(BaseSettingsConfig):
-        """Pydantic Configuration."""
+    # class Config(BaseSettingsConfig):
+    #     """Pydantic Configuration."""
+    model_config = BASE_SETTINGS_CONFIG
 
     APP_DIR: Path = get_app_dir("ralph")
     LOCALE_ENCODING: str = getattr(io, "LOCALE_ENCODING", "utf8")
@@ -74,6 +87,7 @@ core_settings = CoreSettings()
 
 #         yield validate
 
+
 def validate_comma_separated_tuple(value: Union[str, Tuple[str, ...]]) -> Tuple[str]:
     """Checks whether the value is a comma separated string or a tuple."""
 
@@ -85,16 +99,20 @@ def validate_comma_separated_tuple(value: Union[str, Tuple[str, ...]]) -> Tuple[
 
     raise TypeError("Invalid comma separated list")
 
-CommaSeparatedTuple = Annotated[Union[str, Tuple[str, ...]], AfterValidator(validate_comma_separated_tuple)]
+
+CommaSeparatedTuple = Annotated[
+    Union[str, Tuple[str, ...]], AfterValidator(validate_comma_separated_tuple)
+]
 
 
 class InstantiableSettingsItem(BaseModel):
     """Pydantic model for a settings configuration item that can be instantiated."""
+
     # TODO[pydantic]: The following keys were removed: `underscore_attrs_are_private`.
     # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
     model_config = SettingsConfigDict(underscore_attrs_are_private=True)
 
-    _class_path: str = None
+    _class_path: Optional[str] = None
 
     def get_instance(self, **init_parameters):
         """Return an instance of the settings item class using its `_class_path`."""
@@ -103,11 +121,13 @@ class InstantiableSettingsItem(BaseModel):
 
 class ClientOptions(BaseModel):
     """Pydantic model for additional client options."""
+
     model_config = ConfigDict(extra="forbid")
 
 
 class HeadersParameters(BaseModel):
     """Pydantic model for headers parameters."""
+
     model_config = ConfigDict(extra="allow")
 
 
@@ -135,6 +155,7 @@ class ParserSettings(BaseModel):
 
 class XapiForwardingConfigurationSettings(BaseModel):
     """Pydantic model for xAPI forwarding configuration item."""
+
     model_config = ConfigDict(str_min_length=1)
 
     url: AnyUrl
@@ -176,6 +197,7 @@ class AuthBackend(Enum):
 
 #         yield validate
 
+
 def validate_auth_backends(
     value: Union[AuthBackend, Tuple[AuthBackend], List[AuthBackend]]
 ) -> Tuple[AuthBackend]:
@@ -188,7 +210,10 @@ def validate_auth_backends(
 
     raise TypeError("Invalid comma separated list")
 
-AuthBackends = Annotated[Union[str, Tuple[str, ...], List[str]], AfterValidator(validate_auth_backends)]
+
+AuthBackends = Annotated[
+    Union[str, Tuple[str, ...], List[str]], AfterValidator(validate_auth_backends)
+]
 
 
 class Settings(BaseSettings):
@@ -196,11 +221,15 @@ class Settings(BaseSettings):
 
     # TODO[pydantic]: The `Config` class inherits from another class, please create the `model_config` manually.
     # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
-    class Config(BaseSettingsConfig):
-        """Pydantic Configuration."""
+    # class Config(BaseSettingsConfig):
+    #     """Pydantic Configuration."""
 
-        env_file = ".env"
-        env_file_encoding = core_settings.LOCALE_ENCODING
+    #     env_file = ".env"
+    #     env_file_encoding = core_settings.LOCALE_ENCODING
+
+    model_config = BASE_SETTINGS_CONFIG | SettingsConfigDict(
+        env_file=".env", env_file_encoding=core_settings.LOCALE_ENCODING
+    )
 
     _CORE: CoreSettings = core_settings
     AUTH_FILE: Path = _CORE.APP_DIR / "auth.json"
@@ -242,7 +271,7 @@ class Settings(BaseSettings):
         },
     }
     PARSERS: ParserSettings = ParserSettings()
-    RUNSERVER_AUTH_BACKENDS: AuthBackends = parse_obj_as(AuthBackends, 'Basic')
+    RUNSERVER_AUTH_BACKENDS: AuthBackends = parse_obj_as(AuthBackends, "Basic")
     RUNSERVER_AUTH_OIDC_AUDIENCE: str = None
     RUNSERVER_AUTH_OIDC_ISSUER_URI: AnyHttpUrl = None
     RUNSERVER_BACKEND: Literal[
@@ -270,7 +299,7 @@ class Settings(BaseSettings):
         """Return Ralph's default locale encoding."""
         return self._CORE.LOCALE_ENCODING
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     @classmethod
     def check_restriction_compatibility(cls, values):
         """Raise an error if scopes are being used without authority restriction."""

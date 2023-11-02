@@ -3,7 +3,7 @@
 import sys
 from typing import Union
 
-from pydantic import field_validator, Json
+from pydantic import Json, field_validator
 
 from ralph.models.selector import selector
 

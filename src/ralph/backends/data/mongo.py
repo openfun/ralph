@@ -13,7 +13,8 @@ from uuid import uuid4
 from bson.errors import BSONError
 from bson.objectid import ObjectId
 from dateutil.parser import isoparse
-from pydantic import StringConstraints, Json, MongoDsn
+from pydantic import Json, MongoDsn, StringConstraints
+from pydantic_settings import SettingsConfigDict
 from pymongo import MongoClient, ReplaceOne
 from pymongo.collection import Collection
 from pymongo.errors import (
@@ -23,6 +24,7 @@ from pymongo.errors import (
     InvalidOperation,
     PyMongoError,
 )
+from typing_extensions import Annotated
 
 from ralph.backends.data.base import (
     BaseDataBackend,
@@ -32,10 +34,9 @@ from ralph.backends.data.base import (
     DataBackendStatus,
     enforce_query_checks,
 )
-from ralph.conf import BaseSettingsConfig, ClientOptions
+from ralph.conf import BASE_SETTINGS_CONFIG, ClientOptions
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import parse_bytes_to_dict, read_raw
-from typing_extensions import Annotated
 
 logger = logging.getLogger(__name__)
 
@@ -61,16 +62,27 @@ class MongoDataBackendSettings(BaseDataBackendSettings):
 
     # TODO[pydantic]: The `Config` class inherits from another class, please create the `model_config` manually.
     # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
-    class Config(BaseSettingsConfig):
-        """Pydantic Configuration."""
+    # class Config(BaseSettingsConfig):
+    #     """Pydantic Configuration."""
 
-        env_prefix = "RALPH_BACKENDS__DATA__MONGO__"
+    #     env_prefix = "RALPH_BACKENDS__DATA__MONGO__"
 
-    CONNECTION_URI: MongoDsn = MongoDsn("mongodb://localhost:27017/", scheme="mongodb")
-    DEFAULT_DATABASE: Annotated[str, StringConstraints(pattern=r"^[^\s.$/\\\"\x00]+$")] = "statements"  # noqa : F722
-    DEFAULT_COLLECTION: Annotated[str, StringConstraints(
-        pattern=r"^(?!.*\.\.)[^.$\x00]+(?:\.[^.$\x00]+)*$"  # noqa : F722
-    )] = "marsha"
+    model_config = BASE_SETTINGS_CONFIG | SettingsConfigDict(
+        env_prefix="RALPH_BACKENDS__DATA__MONGO__"
+    )
+
+    CONNECTION_URI: MongoDsn = MongoDsn("mongodb://localhost:27017/")
+    #CONNECTION_URI: MongoDsn = MongoDsn("mongodb://localhost:27017/", scheme="mongodb") # TODO: check why we remove scheme
+    DEFAULT_DATABASE: Annotated[
+        str, StringConstraints(pattern=r"^[^\s.$/\\\"\x00]+$")
+    ] = "statements"  # noqa : F722
+    DEFAULT_COLLECTION: str = "marsha"
+    # DEFAULT_COLLECTION: Annotated[ # TODO: Uncomment after pydantic 2.5 https://github.com/pydantic/pydantic/issues/7058
+    #     str,
+    #     StringConstraints(
+    #         pattern=r"^(?!.*\.\.)[^.$\x00]+(?:\.[^.$\x00]+)*$"  # noqa : F722
+    #     ),
+    # ] = "marsha"
     CLIENT_OPTIONS: MongoClientOptions = MongoClientOptions()
     DEFAULT_CHUNK_SIZE: int = 500
     LOCALE_ENCODING: str = "utf8"

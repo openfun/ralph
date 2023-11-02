@@ -7,6 +7,7 @@ from io import IOBase
 from typing import Iterable, Iterator, Optional, Union
 from uuid import uuid4
 
+from pydantic_settings import SettingsConfigDict
 from swiftclient.service import ClientException, Connection
 
 from ralph.backends.data.base import (
@@ -18,7 +19,7 @@ from ralph.backends.data.base import (
     enforce_query_checks,
 )
 from ralph.backends.mixins import HistoryMixin
-from ralph.conf import BaseSettingsConfig
+from ralph.conf import BASE_SETTINGS_CONFIG
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import now
 
@@ -45,22 +46,26 @@ class SwiftDataBackendSettings(BaseDataBackendSettings):
 
     # TODO[pydantic]: The `Config` class inherits from another class, please create the `model_config` manually.
     # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
-    class Config(BaseSettingsConfig):
-        """Pydantic Configuration."""
+    # class Config(BaseSettingsConfig):
+    #     """Pydantic Configuration."""
 
-        env_prefix = "RALPH_BACKENDS__DATA__SWIFT__"
+    #     env_prefix = "RALPH_BACKENDS__DATA__SWIFT__"
+
+    model_config = BASE_SETTINGS_CONFIG | SettingsConfigDict(
+        env_prefix="RALPH_BACKENDS__DATA__SWIFT__"
+    )
 
     AUTH_URL: str = "https://auth.cloud.ovh.net/"
-    USERNAME: str = None
-    PASSWORD: str = None
+    USERNAME: Optional[str] = None
+    PASSWORD: Optional[str] = None
     IDENTITY_API_VERSION: str = "3"
-    TENANT_ID: str = None
-    TENANT_NAME: str = None
+    TENANT_ID: Optional[str] = None
+    TENANT_NAME: Optional[str] = None
     PROJECT_DOMAIN_NAME: str = "Default"
-    REGION_NAME: str = None
-    OBJECT_STORAGE_URL: str = None
+    REGION_NAME: Optional[str] = None
+    OBJECT_STORAGE_URL: Optional[str] = None
     USER_DOMAIN_NAME: str = "Default"
-    DEFAULT_CONTAINER: str = None
+    DEFAULT_CONTAINER: Optional[str] = None
     LOCALE_ENCODING: str = "utf8"
 
 

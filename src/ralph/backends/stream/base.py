@@ -3,8 +3,9 @@
 from abc import ABC, abstractmethod
 from typing import BinaryIO
 
-from ralph.conf import BaseSettingsConfig, core_settings
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from ralph.conf import BASE_SETTINGS_CONFIG, core_settings
 
 
 class BaseStreamBackendSettings(BaseSettings):
@@ -12,12 +13,18 @@ class BaseStreamBackendSettings(BaseSettings):
 
     # TODO[pydantic]: The `Config` class inherits from another class, please create the `model_config` manually.
     # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
-    class Config(BaseSettingsConfig):
-        """Pydantic Configuration."""
+    # class Config(BaseSettingsConfig):
+    #     """Pydantic Configuration."""
 
-        env_prefix = "RALPH_BACKENDS__STREAM__"
-        env_file = ".env"
-        env_file_encoding = core_settings.LOCALE_ENCODING
+    #     env_prefix = "RALPH_BACKENDS__STREAM__"
+    #     env_file = ".env"
+    #     env_file_encoding = core_settings.LOCALE_ENCODING
+
+    model_config = BASE_SETTINGS_CONFIG | SettingsConfigDict(
+        env_prefix="RALPH_BACKENDS__STREAM__",
+        env_file=".env",
+        env_file_encoding=core_settings.LOCALE_ENCODING,
+    )
 
 
 class BaseStreamBackend(ABC):

@@ -2,7 +2,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Union
+from typing import Optional, Union
 
 import pytest
 from click.exceptions import BadParameter
@@ -170,7 +170,7 @@ def _gen_cli_auth_args(
     scopes: list,
     ifi_command: str,
     ifi_value: Union[str, dict],
-    agent_name: str = None,
+    agent_name: Optional[str] = None,
     write: bool = False,
 ):
     """Generate arguments for cli to create user."""
@@ -193,8 +193,8 @@ def _assert_matching_basic_auth_credentials(
     scopes: list,
     ifi_type: str,
     ifi_value: Union[str, dict],
-    agent_name: str = None,
-    hash_: str = None,
+    agent_name: Optional[str] = None,
+    hash_: Optional[str] = None,
 ):
     """Assert that credentials match other arguments.
 
