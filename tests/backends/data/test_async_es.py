@@ -443,11 +443,25 @@ async def test_backends_data_async_es_read_with_query(es, async_es_backend, capl
     assert results[0]["_source"]["id"] == 1
     assert results[1]["_source"]["id"] == 3
 
+    # Find every odd item with a json query string.
+    query = json.dumps(query)
+    results = [statement async for statement in backend.read(query=query)]
+    assert len(results) == 2
+    assert results[0]["_source"]["id"] == 1
+    assert results[1]["_source"]["id"] == 3
+
     # Find documents with ID equal to one or five.
     query = "id:(1 OR 5)"
-    results = [statement async for statement in backend.read(query=query)]
+    with caplog.at_level(logging.INFO):
+        results = [statement async for statement in backend.read(query=query)]
+
     assert len(results) == 1
     assert results[0]["_source"]["id"] == 1
+    assert (
+        "ralph.backends.data.async_es",
+        logging.INFO,
+        "Fallback to Lucene Query as the query is not a BaseESQuery: id:(1 OR 5)",
+    ) in caplog.record_tuples
 
     # Check query argument type
     with pytest.raises(

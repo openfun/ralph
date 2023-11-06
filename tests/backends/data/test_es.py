@@ -406,9 +406,16 @@ def test_backends_data_es_read_with_query(es, es_backend, caplog):
 
     # Find documents with ID equal to one or five.
     query = "id:(1 OR 5)"
-    results = list(backend.read(query=query))
+    with caplog.at_level(logging.INFO):
+        results = list(backend.read(query=query))
+
     assert len(results) == 1
     assert results[0]["_source"]["id"] == 1
+    assert (
+        "ralph.backends.data.es",
+        logging.INFO,
+        "Fallback to Lucene Query as the query is not a BaseESQuery: id:(1 OR 5)",
+    ) in caplog.record_tuples
 
     # Check query argument type
     with pytest.raises(

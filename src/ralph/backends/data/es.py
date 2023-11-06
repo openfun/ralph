@@ -219,6 +219,7 @@ class ESDataBackend(BaseDataBackend, Writable, Listable):
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
+        # pylint: disable=too-many-arguments,too-many-branches
         """Read documents matching the query in the target index and yield them.
 
         Args:
@@ -246,6 +247,11 @@ class ESDataBackend(BaseDataBackend, Writable, Listable):
 
         if isinstance(query.query_string, BaseESQuery):
             query = query.query_string
+        elif isinstance(query.query_string, str):
+            logger.info(
+                "Fallback to Lucene Query as the query is not a BaseESQuery: %s",
+                query.query_string,
+            )
 
         if not query.pit.keep_alive:
             query.pit.keep_alive = self.settings.POINT_IN_TIME_KEEP_ALIVE

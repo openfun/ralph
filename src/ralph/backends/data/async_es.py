@@ -16,7 +16,12 @@ from ralph.backends.data.base import (
     DataBackendStatus,
     async_enforce_query_checks,
 )
-from ralph.backends.data.es import ESDataBackend, ESDataBackendSettings, ESQuery
+from ralph.backends.data.es import (
+    BaseESQuery,
+    ESDataBackend,
+    ESDataBackendSettings,
+    ESQuery,
+)
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import parse_bytes_to_dict, read_raw
 
@@ -119,6 +124,7 @@ class AsyncESDataBackend(BaseAsyncDataBackend, AsyncWritable, AsyncListable):
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
+        # pylint: disable=too-many-arguments,too-many-branches
         """Read documents matching the query in the target index and yield them.
 
         Args:
@@ -143,6 +149,14 @@ class AsyncESDataBackend(BaseAsyncDataBackend, AsyncWritable, AsyncListable):
         chunk_size = chunk_size if chunk_size else self.settings.DEFAULT_CHUNK_SIZE
         if ignore_errors:
             logger.warning("The `ignore_errors` argument is ignored")
+
+        if isinstance(query.query_string, BaseESQuery):
+            query = query.query_string
+        elif isinstance(query.query_string, str):
+            logger.info(
+                "Fallback to Lucene Query as the query is not a BaseESQuery: %s",
+                query.query_string,
+            )
 
         if not query.pit.keep_alive:
             query.pit.keep_alive = self.settings.POINT_IN_TIME_KEEP_ALIVE
