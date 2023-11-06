@@ -29,10 +29,10 @@ methods under the unified `lrs` backend interface [BC]
 - `GET /statements` now has "mine" option which matches statements that
 have an authority field matching that of the user
 - CLI: change `push` to `write` and `fetch` to `read` [BC]
-- Upgrade `fastapi` to `0.104.0`
+- Upgrade `fastapi` to `0.104.1`
 - Upgrade `more-itertools` to `10.1.0`
-- Upgrade `sentry_sdk` to `1.32.0`
-- Upgrade `uvicorn` to `0.23.2`
+- Upgrade `sentry_sdk` to `1.34.0`
+- Upgrade `uvicorn` to `0.24.0`
 - API: Invalid parameters now return 400 status code
 - API: Forwarding PUT now uses PUT (instead of POST)
 - Models: The xAPI `context.contextActivities.category` field is now mandatory
