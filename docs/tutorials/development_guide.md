@@ -17,7 +17,7 @@ You should know that we would be glad to help you contribute to Ralph! Here's ou
 
 
 !!! info
-    In this tutorial, and even more generally in others tutorials, we tend to use Elasticsearch backend. Note that you can do the same with [another LRS backend](../backends) implemented in Ralph.
+    In this tutorial, and even more generally in others tutorials, we tend to use Elasticsearch backend. Note that you can do the same with [another LRS backend](../features/backends.md) implemented in Ralph.
 
 To start playing with `ralph`, you should first `bootstrap` using:
 
@@ -27,7 +27,7 @@ make bootstrap
 
 
 When bootstrapping the project for the first time, the `env.dist` template file is copied to the `.env` file.
-You may want to edit the generated `.env` file to set up available backend parameters that will be injected into the running container as environment variables to configure Ralph (see [backends documentation](../backends/index.md)):
+You may want to edit the generated `.env` file to set up available backend parameters that will be injected into the running container as environment variables to configure Ralph (see [backends documentation](../features/backends.md)):
 
 ```bash
 # Elasticsearch backend
@@ -213,7 +213,7 @@ LRS_AUTH:
       - "all"
 ```
 
-The password hash has been generated using `bcrypt` as explained in the [API user guide](../api/index.md#creating-a-credentials-file).
+The password hash has been generated using `bcrypt` as explained in the [LRS user guide](./lrs/authentication/basic.md#creating_user_credentials).
 
 And finally (re-)encrypt Ralph's vault:
 
@@ -279,25 +279,22 @@ curl -sLk \
       -o jsonpath='{.spec.rules[0].host}')/whoami"
 ```
 
-And why not send test statements from Potsie's repository:
+Let's also send some test statements:
 
 ```bash
-curl -sL \
-  https://github.com/openfun/potsie/raw/main/fixtures/elasticsearch/lrs.json.gz | \
-gunzip | \
+gunzip -c data/statements.json.gz | \
 head -n 100 | \
 jq -s . | \
-sed "s/@timestamp/timestamp/g" | \
 curl -sLk \
   --user foo:bar \
   -X POST \
   -H "Content-Type: application/json" \
+  -d @- \
   "https://$(\
       kubectl -n development-ralph \
       get \
       ingress/ralph-app-current \
-      -o jsonpath='{.spec.rules[0].host}')/xAPI/statements/" \
-  -d @-
+      -o jsonpath='{.spec.rules[0].host}')/xAPI/statements/"
 ```
 
 !!! tip "Install `jq`"

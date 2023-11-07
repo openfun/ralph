@@ -16,9 +16,10 @@ theme:
     favicon: img/favicon.png
     logo: img/ralph-white.png
     features:
-    - content.tabs.link
     - content.code.annotate
     - content.code.copy
+    - content.tabs.link
+    - navigation.indexes 
     - navigation.tabs
 
 markdown_extensions:
@@ -41,20 +42,32 @@ markdown_extensions:
         alternate_style: true
 
 nav:
-    - 'Ralph': index.md
-    - 'Features':
-        - 'LRS HTTP server': api/index.md
-        - 'Backends for data storage': backends/index.md
-        - 'Learning statements models': models/index.md
-    - 'Tutorials':
-        - 'Development Guide': tutorials/development_guide.md
-        - 'Use Ralph as a CLI': tutorials/cli.md
-        - 'Use Ralph as a library': tutorials/library.md
-    - 'Contributing': contribute.md
-    - 'Migration': UPGRADE.md
-    - 'About the project':
-        - 'Changelog': CHANGELOG.md
-        - 'License': LICENSE.md
+    - Ralph: index.md
+    - Features:
+        - LRS HTTP server: features/api.md
+        - Backends for data storage: features/backends.md
+        - Learning statements models: features/models.md
+    - Tutorials:
+        - Ralph CLI Guide: tutorials/cli.md
+        - Ralph LRS Guide: 
+            - tutorials/lrs/index.md
+            - tutorials/lrs/first-steps.md
+            - Authentication:
+                - tutorials/lrs/authentication/index.md
+                - tutorials/lrs/authentication/basic.md
+                - tutorials/lrs/authentication/oidc.md
+            - tutorials/lrs/backends.md
+            - tutorials/lrs/multitenancy.md
+            - Additional configurations:
+                - tutorials/lrs/forwarding.md
+                - tutorials/lrs/sentry.md
+        - Ralph Library Guide: tutorials/library.md
+        - Development Guide: tutorials/development_guide.md
+    - Contributing: contribute.md
+    - Migration: UPGRADE.md
+    - About the project:
+        - Changelog: CHANGELOG.md
+        - License: LICENSE.md
 
 plugins:
     - neoteroi.mkdocsoad:
