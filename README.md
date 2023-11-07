@@ -99,8 +99,7 @@ If the database status is satisfying, you are now ready to send xAPI statements
 to the LRS:
 
 ```bash
-curl -sL https://github.com/openfun/potsie/raw/main/fixtures/elasticsearch/lrs.json.gz | \
-gunzip | \
+gunzip -c data/statements.json.gz | \
 head -n 100 | \
 sed "s/@timestamp/timestamp/g" | \
 jq -s . | \
@@ -108,7 +107,8 @@ curl -Lk \
     --user ralph:secret \
     -X POST \
     -H "Content-Type: application/json" \
-    http://localhost:8100/xAPI/statements/ -d @-
+    -d @- \
+    http://localhost:8100/xAPI/statements/
 ```
 
 The command above fetches one hundred (100) example xAPI statements from our

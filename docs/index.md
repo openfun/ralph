@@ -85,14 +85,14 @@ Ralph is distributed as a standard python package; it can be installed _via_
     source venv/bin/activate
     ```
 
-If you want to generate xAPI statements from your application and only need to integrate [learning statement models](./models/index.md) in your project, you don't need to
+If you want to generate xAPI statements from your application and only need to integrate [learning statement models](./features/models.md) in your project, you don't need to
 install the `backends`, `cli` or `lrs` extra dependencies, the **core library** is what you need:
 
 ```bash
 pip install ralph-malph
 ```
 
-If you want to use the [Ralph LRS server](./api/index.md), add the `lrs` flavour in your installation. 
+If you want to use the [Ralph LRS server](./features/api.md), add the `lrs` flavour in your installation. 
 You also have to choose the type of backend you will use for LRS data storage (`backend-clickhouse`,`backend-es`,`backend-mongo`).
 
 - Install the **core package** with the LRS and the Elasticsearch backend. For example:
