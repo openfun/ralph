@@ -4,7 +4,7 @@ import sys
 from typing import Annotated, Any, Dict, List, Optional, Union
 from uuid import UUID
 
-from pydantic import AnyUrl, StrictStr, StringConstraints, validator
+from pydantic import AnyUrl, StrictStr, StringConstraints, field_validator
 
 from ..config import BaseModelWithConfig
 from .common import IRI, LanguageMap
@@ -79,7 +79,7 @@ class BaseXapiActivityInteractionDefinition(BaseXapiActivityDefinition):
     target: Optional[List[BaseXapiInteractionComponent]]
     steps: Optional[List[BaseXapiInteractionComponent]]
 
-    @validator("choices", "scale", "source", "target", "steps")
+    @field_validator("choices", "scale", "source", "target", "steps")
     @classmethod
     def check_unique_ids(cls, value: Any) -> None:
         """Check the uniqueness of interaction components IDs."""

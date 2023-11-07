@@ -79,7 +79,7 @@ def custom_builds(
             break
     optional = {}
     required = {}
-    for name, field in klass.__fields__.items():
+    for name, field in klass.model_fields.items():
         arg = kwargs.get(name, None)
         if arg is False:
             continue

@@ -269,7 +269,7 @@ def test_backends_database_clickhouse_query_statements_query(
 
     backend = clickhouse_lrs_backend()
     monkeypatch.setattr(backend, "read", mock_read)
-    backend.query_statements(RalphStatementsQuery.construct(**params))
+    backend.query_statements(RalphStatementsQuery.model_construct(**params))
     backend.close()
 
 
@@ -301,7 +301,7 @@ def test_backends_lrs_clickhouse_lrs_backend_query_statements(
 
     # Check the expected search query results.
     result = backend.query_statements(
-        RalphStatementsQuery.construct(statementId=test_id, limit=10)
+        RalphStatementsQuery.model_construct(statementId=test_id, limit=10)
     )
     assert result.statements == statements
     backend.close()
@@ -331,7 +331,7 @@ def test_backends_lrs_clickhouse_lrs_backend__find(clickhouse, clickhouse_lrs_ba
     assert success == 1
 
     # Check the expected search query results.
-    result = backend.query_statements(RalphStatementsQuery.construct())
+    result = backend.query_statements(RalphStatementsQuery.model_construct())
     assert result.statements == statements
     backend.close()
 
@@ -387,7 +387,7 @@ def test_backends_lrs_clickhouse_lrs_backend_query_statements_client_failure(
 
     msg = "Failed to read documents: Query error"
     with pytest.raises(BackendException, match=msg):
-        next(backend.query_statements(RalphStatementsQuery.construct()))
+        next(backend.query_statements(RalphStatementsQuery.model_construct()))
 
     assert (
         "ralph.backends.lrs.clickhouse",

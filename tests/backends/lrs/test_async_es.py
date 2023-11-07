@@ -271,7 +271,7 @@ async def test_backends_lrs_async_es_lrs_backend_query_statements_query(
 
     backend = async_es_lrs_backend()
     monkeypatch.setattr(backend, "read", mock_read)
-    result = await backend.query_statements(RalphStatementsQuery.construct(**params))
+    result = await backend.query_statements(RalphStatementsQuery.model_construct(**params))
     assert result.statements == [{}]
     assert result.pit_id == "foo_pit_id"
     assert result.search_after == "bar_search_after|baz_search_after"
@@ -294,7 +294,7 @@ async def test_backends_lrs_async_es_lrs_backend_query_statements(
     assert await backend.write(documents) == 1
 
     # Check the expected search query results.
-    result = await backend.query_statements(RalphStatementsQuery.construct(limit=10))
+    result = await backend.query_statements(RalphStatementsQuery.model_construct(limit=10))
     assert result.statements == documents
     assert re.match(r"[0-9]+\|0", result.search_after)
 
@@ -321,7 +321,7 @@ async def test_backends_lrs_async_es_lrs_backend_query_statements_pit_query_fail
     msg = "Query error"
     with pytest.raises(BackendException, match=msg):
         with caplog.at_level(logging.ERROR):
-            await backend.query_statements(RalphStatementsQuery.construct())
+            await backend.query_statements(RalphStatementsQuery.model_construct())
 
     await backend.close()
 
@@ -354,7 +354,7 @@ async def test_backends_lrs_es_lrs_backend_query_statements_by_ids_search_query_
             _ = [
                 statement
                 async for statement in backend.query_statements_by_ids(
-                    RalphStatementsQuery.construct()
+                    RalphStatementsQuery.model_construct()
                 )
             ]
 

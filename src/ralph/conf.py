@@ -108,9 +108,7 @@ CommaSeparatedTuple = Annotated[
 class InstantiableSettingsItem(BaseModel):
     """Pydantic model for a settings configuration item that can be instantiated."""
 
-    # TODO[pydantic]: The following keys were removed: `underscore_attrs_are_private`.
-    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
-    model_config = SettingsConfigDict(underscore_attrs_are_private=True)
+    model_config = SettingsConfigDict()
 
     _class_path: Optional[str] = None
 

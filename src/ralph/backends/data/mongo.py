@@ -72,7 +72,7 @@ class MongoDataBackendSettings(BaseDataBackendSettings):
     )
 
     CONNECTION_URI: MongoDsn = MongoDsn("mongodb://localhost:27017/")
-    #CONNECTION_URI: MongoDsn = MongoDsn("mongodb://localhost:27017/", scheme="mongodb") # TODO: check why we remove scheme
+    # CONNECTION_URI: MongoDsn = MongoDsn("mongodb://localhost:27017/", scheme="mongodb") # TODO: check why we remove scheme
     DEFAULT_DATABASE: Annotated[
         str, StringConstraints(pattern=r"^[^\s.$/\\\"\x00]+$")
     ] = "statements"  # noqa : F722

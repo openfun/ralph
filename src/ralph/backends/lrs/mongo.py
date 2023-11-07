@@ -96,7 +96,7 @@ class MongoLRSBackend(BaseLRSBackend, MongoDataBackend):
         ]
 
         # Note: `params` fields are validated thus we skip MongoQuery validation.
-        return MongoQuery.construct(
+        return MongoQuery.model_construct(
             filter=mongo_query_filters, limit=params.limit, sort=mongo_query_sort
         )
 

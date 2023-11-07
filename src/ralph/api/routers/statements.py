@@ -119,7 +119,7 @@ def _parse_agent_parameters(agent_obj: dict) -> AgentParameters:
         agent_query_params["account__home_page"] = agent.account.homePage
 
     # Overwrite `agent` field
-    return AgentParameters.construct(**agent_query_params)
+    return AgentParameters.model_construct(**agent_query_params)
 
 
 def strict_query_params(request: Request) -> None:
@@ -357,7 +357,7 @@ async def get(
     try:
         query_result = await await_if_coroutine(
             BACKEND_CLIENT.query_statements(
-                RalphStatementsQuery.construct(**{**query_params, "limit": limit})
+                RalphStatementsQuery.model_construct(**{**query_params, "limit": limit})
             )
         )
     except BackendException as error:

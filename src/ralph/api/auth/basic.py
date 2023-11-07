@@ -50,24 +50,25 @@ class ServerUsersCredentials(RootModel[List[UserCredentials]]):
         __root__ (List): Custom root consisting of the
                         list of all server users credentials.
     """
-
-    def __add__(self, other) -> Any:  # noqa: D105
-        return ServerUsersCredentials.parse_obj(self.__root__ + other.__root__)
+    root: List[UserCredentials]
+    
+    def __add__(self, other):  # noqa: D105
+        return ServerUsersCredentials.parse_obj(self.root + other.root)
 
     def __getitem__(self, item: int) -> UserCredentials:  # noqa: D105
-        return self.__root__[item]
+        return self.root[item]
 
     def __len__(self) -> int:  # noqa: D105
-        return len(self.__root__)
+        return len(self.root)
 
     def __iter__(self) -> Iterator[UserCredentials]:  # noqa: D105
-        return iter(self.__root__)
+        return iter(self.root)
 
-    @model_validator(mode="after")
+    @model_validator(mode="before")
     @classmethod
     def ensure_unique_username(cls, values: Any) -> Any:
         """Every username should be unique among registered users."""
-        usernames = [entry.username for entry in values.get("__root__")]
+        usernames = [entry.username for entry in values]
         if len(usernames) != len(set(usernames)):
             raise ValueError(
                 "You cannot create multiple credentials with the same username"

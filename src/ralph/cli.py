@@ -205,7 +205,7 @@ def backends_options(name=None, backend_types: Optional[Sequence[BaseModel]] = N
 
     def wrapper(command):
         backend_names = []
-        for backend_name, backend in sorted(
+        for backend_name, backend in sorted( # e.g: "ASYNC_ES", ESDataBackendSettings()
             [
                 name_backend
                 for backend_type in backend_types
@@ -217,7 +217,7 @@ def backends_options(name=None, backend_types: Optional[Sequence[BaseModel]] = N
             backend_name = backend_name.lower()
             backend_names.append(backend_name)
             for field_name, field in sorted(backend, key=lambda x: x[0], reverse=True):
-                field_type = backend.__fields__[field_name].type_
+                field_type = type(backend.model_fields[field_name])#.annotation.__origin__ 
                 field_name = f"{backend_name}-{field_name.lower()}".replace("_", "-")
                 option = f"--{field_name}"
                 option_kwargs = {}
@@ -365,9 +365,11 @@ def auth(
     # Import required Pydantic models dynamically so that we don't create a
     # direct dependency between the CLI and the LRS
     # pylint: disable=invalid-name
+    logger.warning('ok aaa')
     ServerUsersCredentials = import_string(
         "ralph.api.auth.basic.ServerUsersCredentials"
     )
+    logger.warning('ok bbb')
     UserCredentialsBasicAuth = import_string("ralph.api.auth.basic.UserCredentials")
 
     # NB: renaming classes below for clarity
@@ -381,12 +383,14 @@ def auth(
         "ralph.models.xapi.base.agents.BaseXapiAgentWithAccount"
     )
 
+    logger.warning('ok ccc')
     if agent_ifi_mbox:
         if agent_ifi_mbox[:7] != "mailto:":
             raise click.UsageError(
                 'Mbox field must start with "mailto:" (e.g.: "mailto:foo@bar.com")'
             )
         agent = AgentMbox(mbox=agent_ifi_mbox, name=agent_name, objectType="Agent")
+        logger.warning('ok ddd')
     if agent_ifi_mbox_sha1sum:
         agent = AgentMboxSha1sum(
             mbox_sha1sum=agent_ifi_mbox_sha1sum, name=agent_name, objectType="Agent"
@@ -408,6 +412,7 @@ def auth(
         scopes=scope,
         agent=agent,
     )
+    logger.warning('ok eee')
 
     if write_to_disk:
         logger.info("Will append new credentials to: %s", settings.AUTH_FILE)
@@ -419,23 +424,39 @@ def auth(
         auth_file.parent.mkdir(parents=True, exist_ok=True)
         auth_file.touch()
 
-        users = ServerUsersCredentials.parse_obj([])
+        logger.warning('ok fff')
+        users = ServerUsersCredentials.model_validate([])
+        logger.warning('ok fffgloser')
+
+        logger.warning(auth_file)
         # Parse credentials file if not empty
         if auth_file.stat().st_size:
-            users = ServerUsersCredentials.parse_file(auth_file)
-        users += ServerUsersCredentials.parse_obj(
+            with open(auth_file, encoding=settings.LOCALE_ENCODING) as f:
+                users = ServerUsersCredentials.model_validate_json(json.load(f))
+
+        logger.warning('ok fffa')
+        logger.warning(type(ServerUsersCredentials.model_validate(
+            [
+                credentials,
+            ]
+        )))
+
+        users += ServerUsersCredentials.model_validate(
             [
                 credentials,
             ]
         )
-        auth_file.write_text(users.json(indent=2), encoding=settings.LOCALE_ENCODING)
+        
+        logger.warning('ok fffb')
+
+        auth_file.write_text(users.model_dump_json(indent=2), encoding=settings.LOCALE_ENCODING)
         logger.info("User %s has been added to: %s", username, settings.AUTH_FILE)
     else:
         click.echo(
             (
                 f"Copy/paste the following credentials to your LRS authentication "
                 f"file located in: {settings.AUTH_FILE}\n"
-                f"{credentials.json(indent=2)}"
+                f"{credentials.model_dump_json(indent=2)}"
             )
         )
 

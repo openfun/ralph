@@ -3,6 +3,7 @@
 import copy
 import json
 import logging
+from typing import Annotated
 
 import pytest
 from hypothesis import HealthCheck, settings
@@ -205,7 +206,7 @@ def test_models_validator_validate_typing_cleanup(event):
 
 @pytest.mark.parametrize(
     "event, models, expected",
-    [({"foo": 1}, [Server, create_model("A", foo=1)], create_model("A", foo=1))],
+    [({"foo": 1}, [Server, create_model("A", foo=(int, 1))], create_model("A", foo=(int, 1)))],
 )
 def test_models_validator_get_first_valid_model_with_match(event, models, expected):
     """Test that the `get_first_valid_model` method returns the expected model."""

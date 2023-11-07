@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import List, Optional, Union
 from uuid import UUID
 
-from pydantic import Field, validator
+from pydantic import Field, field_validator
 
 from ..base.contexts import BaseXapiContext, BaseXapiContextContextActivities
 from ..base.unnested_objects import BaseXapiActivity
@@ -45,7 +45,7 @@ class VirtualClassroomContextContextActivities(BaseXapiContextContextActivities)
         List[Union[VirtualClassroomProfileActivity, BaseXapiActivity]],
     ]
 
-    @validator("category")
+    @field_validator("category")
     @classmethod
     def check_presence_of_profile_activity_category(
         cls,

@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import List, Optional, Union
 from uuid import UUID
 
-from pydantic import Field, NonNegativeFloat, PositiveInt, condecimal, validator
+from pydantic import Field, NonNegativeFloat, PositiveInt, condecimal, field_validator
 
 from ..base.contexts import BaseXapiContext, BaseXapiContextContextActivities
 from ..base.unnested_objects import BaseXapiActivity
@@ -49,7 +49,7 @@ class LMSContextContextActivities(BaseXapiContextContextActivities):
         LMSProfileActivity, List[Union[LMSProfileActivity, BaseXapiActivity]]
     ]
 
-    @validator("category")
+    @field_validator("category")
     @classmethod
     def check_presence_of_profile_activity_category(
         cls,

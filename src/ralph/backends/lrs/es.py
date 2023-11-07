@@ -72,7 +72,7 @@ class ESLRSBackend(BaseLRSBackend, ESDataBackend):
             es_query_filters += [{"range": {"timestamp": {"lte": params.until}}}]
 
         es_query = {
-            "pit": ESQueryPit.construct(id=params.pit_id),
+            "pit": ESQueryPit.model_construct(id=params.pit_id),
             "size": params.limit,
             "sort": [{"timestamp": {"order": "asc" if params.ascending else "desc"}}],
         }
@@ -86,7 +86,7 @@ class ESLRSBackend(BaseLRSBackend, ESDataBackend):
             es_query["search_after"] = params.search_after.split("|")
 
         # Note: `params` fields are validated thus we skip their validation in ESQuery.
-        return ESQuery.construct(**es_query)
+        return ESQuery.model_construct(**es_query)
 
     @staticmethod
     def _add_agent_filters(

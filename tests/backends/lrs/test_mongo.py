@@ -238,7 +238,7 @@ def test_backends_lrs_mongo_lrs_backend_query_statements_query(
 
     backend = mongo_lrs_backend()
     monkeypatch.setattr(backend, "read", mock_read)
-    result = backend.query_statements(RalphStatementsQuery.construct(**params))
+    result = backend.query_statements(RalphStatementsQuery.model_construct(**params))
     assert result.statements == [{}]
     assert not result.pit_id
     assert result.search_after == "search_after_id"
@@ -267,9 +267,9 @@ def test_backends_lrs_mongo_lrs_backend_query_statements_with_success(
     ]
     assert backend.write(documents) == 2
 
-    statement_parameters = RalphStatementsQuery.construct(
+    statement_parameters = RalphStatementsQuery.model_construct(
         statementId="62b9ce922c26b46b68ffc68f",
-        agent=AgentParameters.construct(
+        agent=AgentParameters.model_construct(
             account__name="test_name",
             account__home_page="http://example.com",
         ),
@@ -309,7 +309,7 @@ def test_backends_lrs_mongo_lrs_backend_query_statements_with_query_failure(
 
     with caplog.at_level(logging.ERROR):
         with pytest.raises(BackendException, match=msg):
-            backend.query_statements(RalphStatementsQuery.construct())
+            backend.query_statements(RalphStatementsQuery.model_construct())
 
     assert (
         "ralph.backends.lrs.mongo",
@@ -339,7 +339,7 @@ def test_backends_lrs_mongo_lrs_backend_query_statements_by_ids_with_query_failu
 
     with caplog.at_level(logging.ERROR):
         with pytest.raises(BackendException, match=msg):
-            list(backend.query_statements_by_ids(RalphStatementsQuery.construct()))
+            list(backend.query_statements_by_ids(RalphStatementsQuery.model_construct()))
 
     assert (
         "ralph.backends.lrs.mongo",

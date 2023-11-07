@@ -71,7 +71,9 @@ class ESDataBackendSettings(BaseDataBackendSettings):
     HOSTS: CommaSeparatedTuple = ("http://localhost:9200",)
     LOCALE_ENCODING: str = "utf8"
     POINT_IN_TIME_KEEP_ALIVE: str = "1m"
-    REFRESH_AFTER_WRITE: Union[Literal["false", "true", "wait_for"], bool, str, None] = False # TODO: check that this is the good default
+    REFRESH_AFTER_WRITE: Union[
+        Literal["false", "true", "wait_for"], bool, str, None
+    ] = False  # TODO: check that this is the good default
 
 
 class ESQueryPit(BaseModel):
