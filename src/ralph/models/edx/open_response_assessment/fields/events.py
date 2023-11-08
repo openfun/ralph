@@ -55,7 +55,7 @@ class ORAGetSubmissionForStaffGradingEventField(AbstractBaseEventField):
             of the course team member who is retrieved the response for grading.
         type (str): Consists of the type of staff grading that is being performed.
             Currently, set to `full-grade`.
-    """
+    """  # noqa: D205
 
     item_id: constr(
         regex=(
@@ -166,7 +166,7 @@ class ORASubmitFeedbackOnAssessmentsEventField(AbstractBaseEventField):
         options (list): Consists of the label of each checkbox option that the learner
             selected to evaluate the assessment process.
         submission_uuid (str): Consists of the unique identifier for the feedback.
-    """
+    """  # noqa: D205
 
     feedback_text: str
     options: List[str]
@@ -184,7 +184,7 @@ class ORACreateSubmissionEventAnswerField(BaseModelWithConfig):
             answer.
         files_description (list): Consists of a list of file descriptions if files are
             given for answer.
-    """
+    """  # noqa: D205
 
     parts: List[Dict[Literal["text"], str]]
     file_keys: Optional[List[str]]
@@ -231,7 +231,7 @@ class ORASaveSubmissionEventField(AbstractBaseEventField):
 
     Attributes:
         saved_response (str): Consists of a JSON string of the users saved responses.
-            Note:
+            Note::
                 Responses have a length limit of 100000 in the front-end but not in the
                 back-end. Events are truncated at `TRACK_MAX_EVENT` which is 50000 by
                 default. Also, the `eventtracking.backends.logger.LoggerBackend`
@@ -254,7 +254,7 @@ class ORAStudentTrainingAssessExampleEventField(AbstractBaseEventField):
         options_selected (dict): Consists of a set of name/value pairs that identify
             the option that the learner selected for each criterion in the rubric.
         submission_uuid (str): Consists of the unique identifier of the response.
-    """
+    """  # noqa: D205
 
     corrections: Dict[str, str]
     options_selected: Dict[str, str]

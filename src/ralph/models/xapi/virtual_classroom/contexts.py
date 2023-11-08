@@ -179,7 +179,7 @@ class VirtualClassroomStartedPollContextActivities(
 
     Attributes:
         parent (list): see VirtualClassroomActivity.
-    """
+    """  # noqa: D205
 
     parent: Union[VirtualClassroomActivity, List[VirtualClassroomActivity]]
 
@@ -209,7 +209,7 @@ class VirtualClassroomAnsweredPollContextActivities(
 
     Attributes:
         parent (list): see VirtualClassroomActivity.
-    """
+    """  # noqa: D205
 
     parent: Union[VirtualClassroomActivity, List[VirtualClassroomActivity]]
 
@@ -238,7 +238,7 @@ class VirtualClassroomPostedPublicMessageContextActivities(
 
     Attributes:
         parent (list): see VirtualClassroomActivity.
-    """
+    """  # noqa: D205
 
     parent: Union[VirtualClassroomActivity, List[VirtualClassroomActivity]]
 

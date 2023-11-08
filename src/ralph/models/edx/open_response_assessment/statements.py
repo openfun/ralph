@@ -62,7 +62,7 @@ class ORAGetSubmissionForStaffGrading(BaseServerModel):
         event_type (str): Consists of the value
             `openassessmentblock.get_submission_for_staff_grading`.
         page (str): Consists of the value `x_module`.
-    """
+    """  # noqa: D205
 
     __selector__ = selector(
         event_source="server",
@@ -149,7 +149,7 @@ class ORASubmitFeedbackOnAssessments(BaseServerModel):
         event_type (str): Consists of the value
             `openassessmentblock.submit_feedback_on_assessments`.
         page (str): Consists of the value `x_module`.
-    """
+    """  # noqa: D205
 
     __selector__ = selector(
         event_source="server",

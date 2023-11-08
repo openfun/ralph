@@ -68,7 +68,7 @@ class ConversionItem:
         object.__setattr__(self, "dest", tuple(dest.split(MODEL_PATH_SEPARATOR)))
         src = tuple(src.split(MODEL_PATH_SEPARATOR)) if src else None
         object.__setattr__(self, "src", src)
-        transformers = tuple([transformers]) if callable(transformers) else transformers
+        transformers = (transformers,) if callable(transformers) else transformers
         object.__setattr__(self, "transformers", transformers)
         object.__setattr__(self, "raw_input", raw_input)
 
