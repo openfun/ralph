@@ -45,9 +45,7 @@ class UIBook(BaseBrowserModel):
 
     __selector__ = selector(event_source="browser", event_type="book")
 
-    event: Union[
-        Json[BookEventField], BookEventField  # pylint: disable=unsubscriptable-object
-    ]
+    event: Union[Json[BookEventField], BookEventField]
     event_type: Literal["book"]
     name: Literal["book"]
 
@@ -69,9 +67,7 @@ class UITextbookPdfThumbnailsToggled(BaseBrowserModel):
     )
 
     event: Union[
-        Json[  # pylint: disable=unsubscriptable-object
-            TextbookPdfThumbnailsToggledEventField
-        ],
+        Json[TextbookPdfThumbnailsToggledEventField],
         TextbookPdfThumbnailsToggledEventField,
     ]
     event_type: Literal["textbook.pdf.thumbnails.toggled"]
@@ -95,9 +91,7 @@ class UITextbookPdfThumbnailNavigated(BaseBrowserModel):
     )
 
     event: Union[
-        Json[  # pylint: disable=unsubscriptable-object
-            TextbookPdfThumbnailNavigatedEventField
-        ],
+        Json[TextbookPdfThumbnailNavigatedEventField],
         TextbookPdfThumbnailNavigatedEventField,
     ]
     event_type: Literal["textbook.pdf.thumbnail.navigated"]
@@ -121,9 +115,7 @@ class UITextbookPdfOutlineToggled(BaseBrowserModel):
     )
 
     event: Union[
-        Json[  # pylint: disable=unsubscriptable-object
-            TextbookPdfOutlineToggledEventField
-        ],
+        Json[TextbookPdfOutlineToggledEventField],
         TextbookPdfOutlineToggledEventField,
     ]
     event_type: Literal["textbook.pdf.outline.toggled"]
@@ -147,9 +139,7 @@ class UITextbookPdfChapterNavigated(BaseBrowserModel):
     )
 
     event: Union[
-        Json[  # pylint: disable=unsubscriptable-object
-            TextbookPdfChapterNavigatedEventField
-        ],
+        Json[TextbookPdfChapterNavigatedEventField],
         TextbookPdfChapterNavigatedEventField,
     ]
     event_type: Literal["textbook.pdf.chapter.navigated"]
@@ -172,9 +162,7 @@ class UITextbookPdfPageNavigated(BaseBrowserModel):
     )
 
     event: Union[
-        Json[  # pylint: disable=unsubscriptable-object
-            TextbookPdfPageNavigatedEventField
-        ],
+        Json[TextbookPdfPageNavigatedEventField],
         TextbookPdfPageNavigatedEventField,
     ]
     event_type: Literal["textbook.pdf.page.navigated"]
@@ -198,9 +186,7 @@ class UITextbookPdfZoomButtonsChanged(BaseBrowserModel):
     )
 
     event: Union[
-        Json[  # pylint: disable=unsubscriptable-object
-            TextbookPdfZoomButtonsChangedEventField
-        ],
+        Json[TextbookPdfZoomButtonsChangedEventField],
         TextbookPdfZoomButtonsChangedEventField,
     ]
     event_type: Literal["textbook.pdf.zoom.buttons.changed"]
@@ -223,9 +209,7 @@ class UITextbookPdfZoomMenuChanged(BaseBrowserModel):
     )
 
     event: Union[
-        Json[  # pylint: disable=unsubscriptable-object
-            TextbookPdfZoomMenuChangedEventField
-        ],
+        Json[TextbookPdfZoomMenuChangedEventField],
         TextbookPdfZoomMenuChangedEventField,
     ]
     event_type: Literal["textbook.pdf.zoom.menu.changed"]
@@ -249,9 +233,7 @@ class UITextbookPdfDisplayScaled(BaseBrowserModel):
     )
 
     event: Union[
-        Json[  # pylint: disable=unsubscriptable-object
-            TextbookPdfDisplayScaledEventField
-        ],
+        Json[TextbookPdfDisplayScaledEventField],
         TextbookPdfDisplayScaledEventField,
     ]
     event_type: Literal["textbook.pdf.display.scaled"]
@@ -275,9 +257,7 @@ class UITextbookPdfPageScrolled(BaseBrowserModel):
     )
 
     event: Union[
-        Json[  # pylint: disable=unsubscriptable-object
-            TextbookPdfPageScrolledEventField
-        ],
+        Json[TextbookPdfPageScrolledEventField],
         TextbookPdfPageScrolledEventField,
     ]
     event_type: Literal["textbook.pdf.page.scrolled"]
@@ -300,9 +280,7 @@ class UITextbookPdfSearchExecuted(BaseBrowserModel):
     )
 
     event: Union[
-        Json[  # pylint: disable=unsubscriptable-object
-            TextbookPdfSearchExecutedEventField
-        ],
+        Json[TextbookPdfSearchExecutedEventField],
         TextbookPdfSearchExecutedEventField,
     ]
     event_type: Literal["textbook.pdf.search.executed"]
@@ -326,9 +304,7 @@ class UITextbookPdfSearchNavigatedNext(BaseBrowserModel):
     )
 
     event: Union[
-        Json[  # pylint: disable=unsubscriptable-object
-            TextbookPdfSearchNavigatedNextEventField
-        ],
+        Json[TextbookPdfSearchNavigatedNextEventField],
         TextbookPdfSearchNavigatedNextEventField,
     ]
     event_type: Literal["textbook.pdf.search.navigatednext"]
@@ -352,9 +328,7 @@ class UITextbookPdfSearchHighlightToggled(BaseBrowserModel):
     )
 
     event: Union[
-        Json[  # pylint: disable=unsubscriptable-object
-            TextbookPdfSearchHighlightToggledEventField
-        ],
+        Json[TextbookPdfSearchHighlightToggledEventField],
         TextbookPdfSearchHighlightToggledEventField,
     ]
     event_type: Literal["textbook.pdf.search.highlight.toggled"]
@@ -379,9 +353,7 @@ class UITextbookPdfSearchCaseSensitivityToggled(BaseBrowserModel):
     )
 
     event: Union[
-        Json[  # pylint: disable=unsubscriptable-object
-            TextbookPdfSearchCaseSensitivityToggledEventField
-        ],
+        Json[TextbookPdfSearchCaseSensitivityToggledEventField],
         TextbookPdfSearchCaseSensitivityToggledEventField,
     ]
     event_type: Literal["textbook.pdf.searchcasesensitivity.toggled"]

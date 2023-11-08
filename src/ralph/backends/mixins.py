@@ -30,7 +30,6 @@ class HistoryMixin:
                 self._history = []
         return self._history
 
-    # pylint: disable=no-self-use
     def write_history(self, history):
         """Write given history as a JSON file."""
         logger.debug("Writing history file: %s", str(settings.HISTORY_FILE))

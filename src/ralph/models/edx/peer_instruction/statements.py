@@ -54,7 +54,7 @@ class PeerInstructionOriginalSubmitted(BaseServerModel):
     )
 
     event: Union[
-        Json[PeerInstructionEventField],  # pylint: disable=unsubscriptable-object
+        Json[PeerInstructionEventField],
         PeerInstructionEventField,
     ]
     event_type: Literal["ubc.peer_instruction.original_submitted"]
@@ -80,7 +80,7 @@ class PeerInstructionRevisedSubmitted(BaseServerModel):
     )
 
     event: Union[
-        Json[PeerInstructionEventField],  # pylint: disable=unsubscriptable-object
+        Json[PeerInstructionEventField],
         PeerInstructionEventField,
     ]
     event_type: Literal["ubc.peer_instruction.revised_submitted"]

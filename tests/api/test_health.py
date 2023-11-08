@@ -47,7 +47,6 @@ async def test_api_health_lbheartbeat(client, backend, monkeypatch):
     ],
 )
 async def test_api_health_heartbeat(client, backend, monkeypatch, clickhouse):
-    # pylint: disable=unused-argument
     """Test the heartbeat healthcheck."""
     monkeypatch.setattr(health, "BACKEND_CLIENT", backend())
 

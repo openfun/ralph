@@ -1,4 +1,4 @@
-"""Tests for Ralph fs data backend"""  # pylint: disable = too-many-lines
+"""Tests for Ralph fs data backend"""
 import json
 import logging
 import os
@@ -16,7 +16,7 @@ from ralph.utils import now
 
 def test_backends_data_fs_data_backend_default_instantiation(monkeypatch, fs):
     """Test the `FSDataBackend` default instantiation."""
-    # pylint: disable=invalid-name
+
     fs.create_file(".env")
     backend_settings_names = [
         "DEFAULT_CHUNK_SIZE",
@@ -45,7 +45,7 @@ def test_backends_data_fs_data_backend_default_instantiation(monkeypatch, fs):
 
 def test_backends_data_fs_data_backend_instantiation_with_settings(fs):
     """Test the `FSDataBackend` instantiation with settings."""
-    # pylint: disable=invalid-name,unused-argument
+
     deep_path = "deep/directories/path"
     assert not os.path.exists(deep_path)
     settings = FSDataBackend.settings_class(
@@ -64,7 +64,7 @@ def test_backends_data_fs_data_backend_instantiation_with_settings(fs):
 
     try:
         FSDataBackend(settings)
-    except Exception as err:  # pylint:disable=broad-except
+    except Exception as err:  # noqa: BLE001
         pytest.fail(f"Two FSDataBackends should not raise exceptions: {err}")
 
 
@@ -116,7 +116,7 @@ def test_backends_data_fs_data_backend_list_method_with_invalid_target(
     """Test the `FSDataBackend.list` method given an invalid `target` argument should
     raise a `BackendParameterException`.
     """
-    # pylint: disable=invalid-name
+
     for file in files:
         fs.create_file(file)
 
@@ -148,7 +148,7 @@ def test_backends_data_fs_data_backend_list_method_without_history(
     files, target, expected, fs_backend, fs
 ):
     """Test the `FSDataBackend.list` method without history."""
-    # pylint: disable=invalid-name
+
     for file in files:
         fs.create_file(file)
 
@@ -181,7 +181,7 @@ def test_backends_data_fs_data_backend_list_method_with_details(
     files, target, expected, fs_backend, fs
 ):
     """Test the `FSDataBackend.list` method with `details` set to `True`."""
-    # pylint: disable=invalid-name,too-many-arguments
+
     for file in files:
         fs.create_file(file)
         os.utime(file, (1, 1))
@@ -197,7 +197,6 @@ def test_backends_data_fs_data_backend_list_method_with_details(
 
 def test_backends_data_fs_data_backend_list_method_with_history(fs_backend, fs):
     """Test the `FSDataBackend.list` method with history."""
-    # pylint: disable=invalid-name
 
     # Create 3 files in the default directory.
     fs.create_file("foo/file_1")
@@ -275,7 +274,6 @@ def test_backends_data_fs_data_backend_list_method_with_history_and_details(
     fs_backend, fs
 ):
     """Test the `FSDataBackend.list` method with an history and detailed output."""
-    # pylint: disable=invalid-name
 
     # Create 3 files in the default directory.
     fs.create_file("foo/file_1")
@@ -367,7 +365,6 @@ def test_backends_data_fs_data_backend_read_method_with_raw_ouput(
     fs_backend, fs, monkeypatch
 ):
     """Test the `FSDataBackend.read` method with `raw_output` set to `True`."""
-    # pylint: disable=invalid-name
 
     # Create files in absolute path directory.
     absolute_path = "/tmp/test_fs/"
@@ -482,7 +479,6 @@ def test_backends_data_fs_data_backend_read_method_without_raw_output(
     fs_backend, fs, monkeypatch
 ):
     """Test the `FSDataBackend.read` method with `raw_output` set to `False`."""
-    # pylint: disable=invalid-name
 
     # File contents.
     valid_dictionary = {"foo": "bar"}
@@ -566,7 +562,6 @@ def test_backends_data_fs_data_backend_read_method_with_ignore_errors(fs_backend
     """Test the `FSDataBackend.read` method with `ignore_errors` set to `True`, given
     a file containing invalid JSON lines, should skip the invalid lines.
     """
-    # pylint: disable=invalid-name
 
     # File contents.
     valid_dictionary = {"foo": "bar"}
@@ -611,7 +606,6 @@ def test_backends_data_fs_data_backend_read_method_without_ignore_errors(
     """Test the `FSDataBackend.read` method with `ignore_errors` set to `False`, given
     a file containing invalid JSON lines, should raise a `BackendException`.
     """
-    # pylint: disable=invalid-name
 
     # File contents.
     valid_dictionary = {"foo": "bar"}
@@ -691,7 +685,6 @@ def test_backends_data_fs_data_backend_read_method_without_ignore_errors(
 
 def test_backends_data_fs_data_backend_read_method_with_query(fs_backend, fs):
     """Test the `FSDataBackend.read` method, given a query argument."""
-    # pylint: disable=invalid-name
 
     # File contents.
     valid_dictionary = {"foo": "bar"}
@@ -751,7 +744,6 @@ def test_backends_data_fs_data_backend_write_method_with_file_exists_error(
     existing file and a `CREATE` or `INDEX` `operation_type`, should raise a
     `BackendException`.
     """
-    # pylint: disable=invalid-name
 
     # Create files in default directory.
     fs.create_file("foo/foo.txt", contents="content")
@@ -775,7 +767,7 @@ def test_backends_data_fs_data_backend_write_method_with_delete_operation(
     """Test the `FSDataBackend.write` method, given a `DELETE` `operation_type`, should
     raise a `BackendParameterException`.
     """
-    # pylint: disable=invalid-name
+
     backend = fs_backend()
 
     msg = "Delete operation_type is not allowed."
@@ -792,7 +784,6 @@ def test_backends_data_fs_data_backend_write_method_with_update_operation(
     """Test the `FSDataBackend.write` method, given an `UPDATE` `operation_type`,
     should overwrite the target file content with the provided data.
     """
-    # pylint: disable=invalid-name
 
     # Create files in default directory.
     fs.create_file("foo/foo.txt", contents="content")
@@ -900,7 +891,6 @@ def test_backends_data_fs_data_backend_write_method_with_append_operation(
     """Test the `FSDataBackend.write` method, given an `APPEND` `operation_type`,
     should append the provided data to the end of the target file.
     """
-    # pylint: disable=invalid-name
 
     # Create files in default directory.
     fs.create_file("foo/foo.txt", contents="foo")
@@ -963,7 +953,6 @@ def test_backends_data_fs_data_backend_write_method_without_target(
     """Test the `FSDataBackend.write` method, given no `target` argument,
     should create a new random file and write the provided data into it.
     """
-    # pylint: disable=invalid-name
 
     # Freeze the ralph.utils.now() value.
     frozen_now = now()

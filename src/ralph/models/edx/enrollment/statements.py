@@ -37,7 +37,7 @@ class EdxCourseEnrollmentActivated(BaseServerModel):
     )
 
     event: Union[
-        Json[EnrollmentEventField],  # pylint: disable=unsubscriptable-object
+        Json[EnrollmentEventField],
         EnrollmentEventField,
     ]
     event_type: Literal["edx.course.enrollment.activated"]
@@ -60,7 +60,7 @@ class EdxCourseEnrollmentDeactivated(BaseServerModel):
     )
 
     event: Union[
-        Json[EnrollmentEventField],  # pylint: disable=unsubscriptable-object
+        Json[EnrollmentEventField],
         EnrollmentEventField,
     ]
     event_type: Literal["edx.course.enrollment.deactivated"]
@@ -84,7 +84,7 @@ class EdxCourseEnrollmentModeChanged(BaseServerModel):
     )
 
     event: Union[
-        Json[EnrollmentEventField],  # pylint: disable=unsubscriptable-object
+        Json[EnrollmentEventField],
         EnrollmentEventField,
     ]
     event_type: Literal["edx.course.enrollment.mode_changed"]

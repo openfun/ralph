@@ -42,7 +42,7 @@ class BaseXapiStatement(BaseModelWithConfig):
     timestamp: Optional[datetime]
     stored: Optional[datetime]
     authority: Optional[Union[BaseXapiAgent, BaseXapiGroup]]
-    version: constr(regex=r"^1\.0\.[0-9]+$") = "1.0.0"  # noqa:F722
+    version: constr(regex=r"^1\.0\.[0-9]+$") = "1.0.0"
     attachments: Optional[List[BaseXapiAttachment]]
 
     @root_validator(pre=True)

@@ -45,8 +45,6 @@ class WSStreamBackend(BaseStreamBackend):
 
     def stream(self, target: BinaryIO) -> None:
         """Stream websocket content to target."""
-        # pylint: disable=no-member
-
         logger.debug("Streaming from websocket uri: %s", self.settings.URI)
 
         async def _stream() -> None:

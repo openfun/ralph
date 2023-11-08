@@ -146,7 +146,6 @@ def mock_statement(
         object: object of the statement
         timestamp: timestamp of the statement. Use `""` to omit timestamp
     """
-    # pylint: disable=redefined-builtin
 
     # Id
     if id_ is None:

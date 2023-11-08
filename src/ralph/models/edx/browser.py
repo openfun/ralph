@@ -29,4 +29,4 @@ class BaseBrowserModel(BaseEdxModel):
 
     event_source: Literal["browser"]
     page: AnyUrl
-    session: Union[constr(regex=r"^[a-f0-9]{32}$"), Literal[""]]  # noqa: F722
+    session: Union[constr(regex=r"^[a-f0-9]{32}$"), Literal[""]]

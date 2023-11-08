@@ -21,10 +21,10 @@ def test_backends_http_base_abstract_interface_with_implemented_abstract_method(
         ) -> Iterator[Union[str, dict]]:
             """Fake the list method."""
 
-        async def read(self):  # pylint: disable=arguments-differ
+        async def read(self):
             """Fake the read method."""
 
-        async def write(self):  # pylint: disable=arguments-differ
+        async def write(self):
             """Fake the write method."""
 
     GoodStorage()

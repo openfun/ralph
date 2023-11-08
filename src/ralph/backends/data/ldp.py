@@ -147,7 +147,7 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend, Listable):
             yield self._details(target, archive)
 
     @enforce_query_checks
-    def read(
+    def read(  # noqa: PLR0913
         self,
         *,
         query: Optional[Union[str, BaseQuery]] = None,
@@ -156,7 +156,6 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend, Listable):
         raw_output: bool = True,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
-        # pylint: disable=too-many-arguments
         """Read an archive matching the query in the target stream_id and yield it.
 
         Args:

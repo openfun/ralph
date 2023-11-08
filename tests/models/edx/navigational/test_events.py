@@ -51,12 +51,10 @@ def test_fields_edx_navigational_events_event_field_with_valid_content(field):
             "block-v1:orgX=CS111=20_T1+type@sequential"
             "+block@d0d4a647742943e3951b45d9db8a0ea13"
         ),
-    ],  # pylint: disable=invalid-name
+    ],
 )
 @custom_given(NavigationalEventField)
-def test_fields_edx_navigational_events_event_field_with_invalid_content(
-    id, field  # pylint: disable=redefined-builtin, invalid-name
-):
+def test_fields_edx_navigational_events_event_field_with_invalid_content(id, field):
     """Test that an invalid `NavigationalEventField` raises a `ValidationError`."""
 
     invalid_field = json.loads(field.json())

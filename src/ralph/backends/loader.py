@@ -60,7 +60,7 @@ def get_backends(packages: Tuple[str], base_backends: Tuple[Type]) -> Dict[str, 
     for module in modules:
         try:
             backend_module = import_module(module)
-        except Exception as error:  # pylint:disable=broad-except
+        except Exception as error:  # noqa: BLE001
             logger.debug("Failed to import %s module: %s", module, error)
             continue
         for _, class_ in getmembers(backend_module, isclass):

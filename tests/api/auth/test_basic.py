@@ -171,7 +171,6 @@ def test_get_whoami_credentials_encoding_error(basic_auth_test_client):
     assert response.json() == {"detail": "Invalid authentication credentials"}
 
 
-# pylint: disable=invalid-name
 def test_get_whoami_username_not_found(basic_auth_test_client, fs):
     """Whoami route returns a 401 error when the username cannot be found."""
     credential_bytes = base64.b64encode("john:admin".encode("utf-8"))
@@ -190,7 +189,6 @@ def test_get_whoami_username_not_found(basic_auth_test_client, fs):
     assert response.json() == {"detail": "Invalid authentication credentials"}
 
 
-# pylint: disable=invalid-name
 def test_get_whoami_wrong_password(basic_auth_test_client, fs):
     """Whoami route returns a 401 error when the password is wrong."""
     credential_bytes = base64.b64encode("john:not-admin".encode("utf-8"))
@@ -209,7 +207,6 @@ def test_get_whoami_wrong_password(basic_auth_test_client, fs):
     assert response.json() == {"detail": "Invalid authentication credentials"}
 
 
-# pylint: disable=invalid-name
 def test_get_whoami_correct_credentials(basic_auth_test_client, fs):
     """Whoami returns a 200 response when the credentials are correct.
 

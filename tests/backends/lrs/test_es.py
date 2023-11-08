@@ -296,7 +296,7 @@ def test_backends_lrs_es_lrs_backend_query_statements(es, es_lrs_backend):
     """Test the `ESLRSBackend.query_statements` method, given a query,
     should return matching statements.
     """
-    # pylint: disable=invalid-name,unused-argument
+
     # Instantiate ESLRSBackend.
     backend = es_lrs_backend()
     # Insert documents.
@@ -317,7 +317,6 @@ def test_backends_lrs_es_lrs_backend_query_statements_with_search_query_failure(
     """Test the `ESLRSBackend.query_statements`, given a search query failure, should
     raise a `BackendException` and log the error.
     """
-    # pylint: disable=invalid-name,unused-argument
 
     def mock_read(**_):
         """Mock the Elasticsearch.read method."""
@@ -346,7 +345,6 @@ def test_backends_lrs_es_lrs_backend_query_statements_by_ids_with_search_query_f
     """Test the `ESLRSBackend.query_statements_by_ids` method, given a search query
     failure, should raise a `BackendException` and log the error.
     """
-    # pylint: disable=invalid-name,unused-argument
 
     def mock_search(**_):
         """Mock the Elasticsearch.search method."""
@@ -376,7 +374,6 @@ def test_backends_lrs_es_lrs_backend_query_statements_by_ids_with_multiple_index
     query, should execute the query only on the specified index and return the
     expected results.
     """
-    # pylint: disable=invalid-name
 
     # Insert documents.
     index_1_document = {"_index": ES_TEST_INDEX, "_id": "1", "_source": {"id": "1"}}

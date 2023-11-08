@@ -112,7 +112,7 @@ def test_converter_convert_dict_event_with_empty_conversion_set(event):
 
         __dest__ = BaseModel
 
-        def _get_conversion_items(self):  # pylint: disable=no-self-use
+        def _get_conversion_items(self):
             """Return a set of ConversionItems used for conversion."""
             return set()
 
@@ -152,7 +152,7 @@ def test_converter_convert_dict_event_with_one_conversion_item(
 
         __dest__ = DummyBaseModel
 
-        def _get_conversion_items(self):  # pylint: disable=no-self-use
+        def _get_conversion_items(self):
             """Return a set of ConversionItems used for conversion."""
             return {ConversionItem("converted", source, transformer)}
 
@@ -171,7 +171,7 @@ def test_converter_convert_dict_event_with_one_conversion_item_raising_an_except
 
         __dest__ = BaseModel
 
-        def _get_conversion_items(self):  # pylint: disable=no-self-use
+        def _get_conversion_items(self):
             """Return a set of ConversionItems used for conversion."""
             return {item}
 
@@ -189,7 +189,7 @@ def test_converter_convert_str_event_with_invalid_json_string(invalid_json):
 
         __dest__ = BaseModel
 
-        def _get_conversion_items(self):  # pylint: disable=no-self-use
+        def _get_conversion_items(self):
             """Return a set of ConversionItems used for conversion."""
             return set()
 
@@ -289,7 +289,6 @@ def test_converter_convert_with_an_unknown_event_raises_an_exception(
             list(result)
 
 
-# pylint: disable=line-too-long
 @pytest.mark.parametrize(
     "event",
     [json.dumps({"event_source": "browser", "event_type": "page_close"})],

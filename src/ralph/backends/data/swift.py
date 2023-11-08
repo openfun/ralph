@@ -67,8 +67,6 @@ class SwiftDataBackendSettings(BaseDataBackendSettings):
 class SwiftDataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
     """SWIFT data backend."""
 
-    # pylint: disable=too-many-instance-attributes
-
     name = "swift"
     default_operation_type = BaseOperationType.CREATE
     settings_class = SwiftDataBackendSettings
@@ -161,7 +159,7 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
             yield self._details(target, obj) if details else obj
 
     @enforce_query_checks
-    def read(
+    def read(  # noqa: PLR0913
         self,
         *,
         query: Optional[Union[str, BaseQuery]] = None,
@@ -170,7 +168,6 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
-        # pylint: disable=too-many-arguments
         """Read objects matching the `query` in the `target` container and yield them.
 
         Args:
@@ -240,11 +237,11 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
             }
         )
 
-    def write(  # pylint: disable=too-many-arguments, disable=too-many-branches
+    def write(  # noqa: PLR0912, PLR0913
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Optional[str] = None,
-        chunk_size: Optional[int] = None,
+        chunk_size: Optional[int] = None,  # noqa: ARG002
         ignore_errors: bool = False,
         operation_type: Optional[BaseOperationType] = None,
     ) -> int:

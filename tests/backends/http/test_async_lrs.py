@@ -25,8 +25,6 @@ from ralph.exceptions import BackendException, BackendParameterException
 
 from ...helpers import mock_statement
 
-# pylint: disable=too-many-lines
-
 
 async def _unpack_async_generator(async_gen):
     """Unpack content of async generator into list."""
@@ -36,9 +34,7 @@ async def _unpack_async_generator(async_gen):
     return result
 
 
-def test_backend_http_lrs_default_instantiation(
-    monkeypatch, fs
-):  # pylint:disable = invalid-name
+def test_backend_http_lrs_default_instantiation(monkeypatch, fs):
     """Test the `LRSHTTPBackend` default instantiation."""
     fs.create_file(".env")
     backend_settings_names = [
@@ -926,11 +922,10 @@ async def test_backends_http_lrs_read_concurrency(
     NB: Maximal gains are (num_pages-1)*fetch_time; when batch_processing_time >
     fetch_time
     """
-    # pylint: disable=too-many-locals
 
     async def _simulate_network_latency(request: httpx.Request, response):
         """Return requested statements after an async sleep time."""
-        # pylint: disable=unused-argument
+
         await asyncio.sleep(network_latency_time)
         return httpx.Response(status_code=200, json=response)
 
@@ -1030,7 +1025,6 @@ async def test_backends_http_lrs_write_concurrency(
 
     # Mock HTTPX POST
     async def simulate_network_latency(request: httpx.Request):
-        # pylint: disable=unused-argument
         await asyncio.sleep(0.5)
         return httpx.Response(
             status_code=200,

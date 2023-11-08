@@ -31,7 +31,6 @@ class UIPageClose(BaseBrowserModel):
 
     __selector__ = selector(event_source="browser", event_type="page_close")
 
-    # pylint: disable=unsubscriptable-object
     event: Literal["{}"]
     event_type: Literal["page_close"]
     name: Literal["page_close"]
@@ -50,7 +49,6 @@ class UISeqGoto(BaseBrowserModel):
 
     __selector__ = selector(event_source="browser", event_type="seq_goto")
 
-    # pylint: disable=unsubscriptable-object
     event: Union[Json[NavigationalEventField], NavigationalEventField]
     event_type: Literal["seq_goto"]
     name: Literal["seq_goto"]
@@ -70,7 +68,6 @@ class UISeqNext(BaseBrowserModel):
 
     __selector__ = selector(event_source="browser", event_type="seq_next")
 
-    # pylint: disable=unsubscriptable-object
     event: Union[Json[NavigationalEventField], NavigationalEventField]
     event_type: Literal["seq_next"]
     name: Literal["seq_next"]
@@ -102,7 +99,6 @@ class UISeqPrev(BaseBrowserModel):
 
     __selector__ = selector(event_source="browser", event_type="seq_prev")
 
-    # pylint: disable=unsubscriptable-object
     event: Union[Json[NavigationalEventField], NavigationalEventField]
     event_type: Literal["seq_prev"]
     name: Literal["seq_prev"]

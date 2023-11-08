@@ -28,8 +28,7 @@ async def test_backend_http_lrs_in_async_setting(monkeypatch, method):
 
         async def response_mock(*args, **kwargs):
             """Mock a read function."""
-            # pylint: disable=invalid-name
-            # pylint: disable=unused-argument
+
             for statement in read_mock_response:
                 yield statement
 
@@ -60,9 +59,7 @@ async def test_backend_http_lrs_in_async_setting(monkeypatch, method):
 
 
 @pytest.mark.anyio
-def test_backend_http_lrs_default_instantiation(
-    monkeypatch, fs
-):  # pylint:disable = invalid-name
+def test_backend_http_lrs_default_instantiation(monkeypatch, fs):
     """Test the `LRSHTTPBackend` default instantiation."""
     fs.create_file(".env")
     backend_settings_names = [
@@ -150,8 +147,6 @@ def test_backends_http_lrs_inheritence(monkeypatch):
 
     async def read_mock(*args, **kwargs):
         """Mock a read function."""
-        # pylint: disable=invalid-name
-        # pylint: disable=unused-argument
 
         # For simplicity, check that parameters are passed in function
         assert kwargs["chunk_size"] == read_chunk_size

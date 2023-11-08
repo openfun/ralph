@@ -141,7 +141,7 @@ def strict_query_params(request: Request) -> None:
 
 @router.get("")
 @router.get("/")
-async def get(
+async def get(  # noqa: PLR0913
     request: Request,
     current_user: Annotated[
         AuthenticatedUser,
@@ -224,7 +224,7 @@ async def get(
             "0 indicates return the maximum the server will allow"
         ),
     ),
-    format: Optional[Literal["ids", "exact", "canonical"]] = Query(
+    format: Optional[Literal["ids", "exact", "canonical"]] = Query(  # noqa: ARG001
         "exact",
         description=(
             "**Not implemented** "
@@ -242,7 +242,7 @@ async def get(
             'as in "exact" mode.'
         ),
     ),
-    attachments: Optional[bool] = Query(
+    attachments: Optional[bool] = Query(  # noqa: ARG001
         False,
         description=(
             "**Not implemented** "
@@ -252,7 +252,7 @@ async def get(
             "does not send attachment data."
         ),
     ),
-    ascending: Optional[bool] = Query(
+    ascending: Optional[bool] = Query(  # noqa: ARG001
         False, description='If "true", return results in ascending order of stored time'
     ),
     mine: Optional[bool] = Query(
@@ -265,14 +265,14 @@ async def get(
     ###
     # Private use query string parameters
     ###
-    search_after: Optional[str] = Query(
+    search_after: Optional[str] = Query(  # noqa: ARG001
         None,
         description=(
             "Sorting data to allow pagination through large number of search results. "
             "NB: for internal use, not part of the LRS specification."
         ),
     ),
-    pit_id: Optional[str] = Query(
+    pit_id: Optional[str] = Query(  # noqa: ARG001
         None,
         description=(
             "Point-in-time ID to ensure consistency of search requests through "
@@ -287,9 +287,6 @@ async def get(
     LRS Specification:
     https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#213-get-statements
     """
-    # pylint: disable=unused-argument,redefined-builtin,too-many-arguments
-    # pylint: disable=too-many-locals
-
     # Make sure the limit does not go above max from settings
     limit = min(limit, settings.RUNSERVER_MAX_SEARCH_HITS_COUNT)
 
@@ -402,7 +399,6 @@ async def get(
 
 @router.put("/", responses=POST_PUT_RESPONSES, status_code=status.HTTP_204_NO_CONTENT)
 @router.put("", responses=POST_PUT_RESPONSES, status_code=status.HTTP_204_NO_CONTENT)
-# pylint: disable=unused-argument, too-many-branches
 async def put(
     current_user: Annotated[
         AuthenticatedUser,
@@ -484,8 +480,7 @@ async def put(
 
 @router.post("/", responses=POST_PUT_RESPONSES)
 @router.post("", responses=POST_PUT_RESPONSES)
-# pylint: disable = too-many-branches
-async def post(
+async def post(  # noqa: PLR0912
     current_user: Annotated[
         AuthenticatedUser,
         Security(get_authenticated_user, scopes=["statements/write"]),

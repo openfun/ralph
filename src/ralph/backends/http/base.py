@@ -125,7 +125,7 @@ class BaseHTTPBackend(ABC):
 
     @abstractmethod
     @enforce_query_checks
-    async def read(  # pylint: disable=too-many-arguments
+    async def read(  # noqa: PLR0913
         self,
         query: Optional[Union[str, BaseQuery]] = None,
         target: Optional[str] = None,
@@ -138,7 +138,7 @@ class BaseHTTPBackend(ABC):
         """Yield records read from the HTTP response results."""
 
     @abstractmethod
-    async def write(  # pylint: disable=too-many-arguments
+    async def write(  # noqa: PLR0913
         self,
         data: Union[List[bytes], List[dict]],
         target: Optional[str] = None,

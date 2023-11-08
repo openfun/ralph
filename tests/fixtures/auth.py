@@ -78,7 +78,6 @@ def mock_basic_auth_user(
     return credentials
 
 
-# pylint: disable=invalid-name
 @pytest.fixture
 def basic_auth_credentials(fs, user_scopes=None, agent=None):
     """Set up the credentials file for request authentication.
@@ -107,9 +106,9 @@ def basic_auth_credentials(fs, user_scopes=None, agent=None):
 @pytest.fixture
 def basic_auth_test_client():
     """Return a TestClient with HTTP basic authentication mode."""
-    # pylint:disable=import-outside-toplevel
+
     from ralph.api.auth.basic import (
-        get_basic_auth_user,  # pylint:disable=import-outside-toplevel
+        get_basic_auth_user,
     )
 
     app.dependency_overrides[get_authenticated_user] = get_basic_auth_user
@@ -121,7 +120,7 @@ def basic_auth_test_client():
 @pytest.fixture
 def oidc_auth_test_client(monkeypatch):
     """Return a TestClient with OpenId Connect authentication mode."""
-    # pylint:disable=import-outside-toplevel
+
     monkeypatch.setattr(
         "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_ISSUER_URI",
         ISSUER_URI,

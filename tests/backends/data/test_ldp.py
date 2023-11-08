@@ -22,7 +22,7 @@ from ralph.utils import now
 
 def test_backends_data_ldp_data_backend_default_instantiation(monkeypatch, fs):
     """Test the `LDPDataBackend` default instantiation."""
-    # pylint: disable=invalid-name
+
     fs.create_file(".env")
     backend_settings_names = [
         "APPLICATION_KEY",
@@ -59,7 +59,7 @@ def test_backends_data_ldp_data_backend_instantiation_with_settings(ldp_backend)
 
     try:
         ldp_backend(service_name="bar")
-    except Exception as err:  # pylint:disable=broad-except
+    except Exception as err:  # noqa: BLE001
         pytest.fail(f"LDPDataBackend should not raise exceptions: {err}")
 
 
@@ -231,7 +231,6 @@ def test_backends_data_ldp_data_backend_list_method_with_history(
     target, expected_stream_id, ldp_backend, monkeypatch, settings_fs
 ):
     """Test the `LDPDataBackend.list` method with history."""
-    # pylint: disable=unused-argument
 
     def mock_get(url):
         """Mock the OVH client get request."""
@@ -311,7 +310,7 @@ def test_backends_data_ldp_data_backend_list_method_with_history_and_details(
     target, expected_stream_id, ldp_backend, monkeypatch, settings_fs
 ):
     """Test the `LDPDataBackend.list` method with a history and detailed output."""
-    # pylint: disable=unused-argument
+
     details_responses = [
         {
             "archiveId": "archive_1",
@@ -441,7 +440,7 @@ def test_backends_data_ldp_data_backend_read_method_without_raw_ouput(
 
     def mock_get(url):
         """Mock the OVH client get request."""
-        # pylint: disable=unused-argument
+
         return {"filename": "archive_name", "size": 10}
 
     backend = ldp_backend()
@@ -469,7 +468,7 @@ def test_backends_data_ldp_data_backend_read_method_without_ignore_errors(
 
     def mock_get(url):
         """Mock the OVH client get request."""
-        # pylint: disable=unused-argument
+
         return {"filename": "archive_name", "size": 10}
 
     backend = ldp_backend()
@@ -510,7 +509,6 @@ def test_backends_data_ldp_data_backend_read_method_with_failure(
 
     def mock_ovh_post(url):
         """Mock the OVH Client post request."""
-        # pylint: disable=unused-argument
 
         return {
             "expirationDate": "2020-10-13T12:59:37.326131+00:00",
@@ -535,12 +533,11 @@ def test_backends_data_ldp_data_backend_read_method_with_failure(
 
         def raise_for_status(self):
             """Raise an `HttpError`."""
-            # pylint: disable=no-self-use
+
             raise requests.HTTPError("Failure during request")
 
     def mock_requests_get(url, stream=True, timeout=None):
         """Mock the request get method."""
-        # pylint: disable=unused-argument
 
         return MockUnsuccessfulResponse()
 
@@ -561,7 +558,6 @@ def test_backends_data_ldp_data_backend_read_method_with_query(
     ldp_backend, monkeypatch, fs
 ):
     """Test the `LDPDataBackend.read` method, given a query argument."""
-    # pylint: disable=invalid-name
 
     # Create fake archive to stream.
     archive_content = {"foo": "bar"}
@@ -569,7 +565,6 @@ def test_backends_data_ldp_data_backend_read_method_with_query(
 
     def mock_ovh_post(url):
         """Mock the OVH Client post request."""
-        # pylint: disable=unused-argument
 
         return {
             "expirationDate": "2020-10-13T12:59:37.326131+00:00",
@@ -585,7 +580,6 @@ def test_backends_data_ldp_data_backend_read_method_with_query(
 
     def mock_ovh_get(url):
         """Mock the OVH client get request."""
-        # pylint: disable=unused-argument
 
         return {
             "archiveId": "5d5c4c93-04a4-42c5-9860-f51fa4044aa1",
@@ -642,7 +636,7 @@ def test_backends_data_ldp_data_backend_get_archive_endpoint_method_with_valid_i
     """Test the `LDPDataBackend.get_archive_endpoint` method, given valid input, should
     return the expected url.
     """
-    # pylint: disable=protected-access
+
     assert ldp_backend()._get_archive_endpoint(*args) == expected
 
 
@@ -655,7 +649,7 @@ def test_backends_data_ldp_data_backend_get_archive_endpoint_method_with_invalid
     """Test the `LDPDataBackend.get_archive_endpoint` method, given invalid input
     parameters, should raise a BackendParameterException.
     """
-    # pylint: disable=protected-access
+
     with pytest.raises(
         BackendParameterException,
         match="LDPDataBackend requires to set both service_name and stream_id",
@@ -675,7 +669,7 @@ def test_backends_data_ldp_data_backend_get_archive_endpoint_method_with_invalid
 
 def test_backends_data_ldp_data_backend_url_method(monkeypatch, ldp_backend):
     """Test the `LDPDataBackend.url` method."""
-    # pylint: disable=protected-access
+
     archive_name = "5d49d1b3-a3eb-498c-9039-6a482166f888"
     archive_url = (
         "https://storage.gra.cloud.ovh.net/v1/"

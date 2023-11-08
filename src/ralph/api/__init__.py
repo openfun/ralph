@@ -20,9 +20,7 @@ def get_health_check_routes() -> List:
     return [route.path for route in health.router.routes]
 
 
-def filter_transactions(
-    event: Dict, hint  # pylint: disable=unused-argument
-) -> Union[Dict, None]:
+def filter_transactions(event: Dict, hint) -> Union[Dict, None]:  # noqa: ARG001
     """Filter transactions for Sentry."""
     url = urlparse(event["request"]["url"])
 

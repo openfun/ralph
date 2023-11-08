@@ -17,7 +17,7 @@ def test_models_edx_converters_xapi_base_xapi_converter_successful_initializatio
     class DummyBaseXapiConverter(BaseXapiConverter):
         """Dummy implementation of abstract BaseXapiConverter."""
 
-        def _get_conversion_items(self):  # pylint: disable=no-self-use
+        def _get_conversion_items(self):
             """Return a set of ConversionItems used for conversion."""
             return set()
 
@@ -32,7 +32,7 @@ def test_models_edx_converters_xapi_base_xapi_converter_unsuccessful_initializat
     class DummyBaseXapiConverter(BaseXapiConverter):
         """Dummy implementation of abstract BaseXapiConverter."""
 
-        def _get_conversion_items(self):  # pylint: disable=no-self-use
+        def _get_conversion_items(self):
             """Return a set of ConversionItems used for conversion."""
             return set()
 

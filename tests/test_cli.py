@@ -165,8 +165,7 @@ def test_cli_help_option():
     ) in result.output
 
 
-# pylint: disable=too-many-arguments
-def _gen_cli_auth_args(
+def _gen_cli_auth_args(  # noqa: PLR0913
     username: str,
     password: str,
     scopes: list,
@@ -188,8 +187,7 @@ def _gen_cli_auth_args(
     return cli_args
 
 
-# pylint: disable=too-many-arguments
-def _assert_matching_basic_auth_credentials(
+def _assert_matching_basic_auth_credentials(  # noqa: PLR0913
     credentials: dict,
     username: str,
     scopes: list,
@@ -306,7 +304,6 @@ def test_cli_auth_command_without_writing_auth_file(scopes, ifi_command, ifi_val
     )
 
 
-# pylint: disable=invalid-name,unused-argument
 @pytest.mark.parametrize(
     "ifi_command_1, ifi_value_1, ifi_command_2, ifi_value_2",
     [
@@ -336,7 +333,6 @@ def test_cli_auth_command_without_writing_auth_file(scopes, ifi_command, ifi_val
         ),  # account ifi
     ],
 )
-# pylint: disable=too-many-locals
 def test_cli_auth_command_when_writing_auth_file(
     fs, ifi_command_1, ifi_value_1, ifi_command_2, ifi_value_2
 ):
@@ -411,7 +407,6 @@ def test_cli_auth_command_when_writing_auth_file(
     )
 
 
-# pylint: disable=invalid-name
 def test_cli_auth_command_when_writing_auth_file_with_incorrect_auth_file(fs):
     """Test ralph auth command when credentials are written in the authentication
     file with a badly formatted original authentication file.
@@ -538,7 +533,6 @@ def test_cli_read_command_with_ldp_backend(monkeypatch):
 
     def mock_read(*_, **__):
         """Always return the same archive."""
-        # pylint: disable=unused-argument
 
         yield bytes(json.dumps(archive_content), encoding="utf-8")
 
@@ -552,8 +546,6 @@ def test_cli_read_command_with_ldp_backend(monkeypatch):
     assert '{"foo": "bar"}' in result.output
 
 
-# pylint: disable=invalid-name
-# pylint: disable=unused-argument
 def test_cli_read_command_with_fs_backend(fs, monkeypatch):
     """Test ralph read command using the FS backend."""
     archive_content = {"foo": "bar"}
@@ -574,7 +566,6 @@ def test_cli_read_command_with_fs_backend(fs, monkeypatch):
 
 def test_cli_read_command_with_es_backend(es):
     """Test ralph read command using the es backend."""
-    # pylint: disable=invalid-name
 
     # Insert documents
     bulk(
@@ -619,7 +610,6 @@ def test_cli_read_command_with_es_backend(es):
 
 def test_cli_read_command_client_options_with_es_backend(es):
     """Test ralph read command with multiple client options using the es backend."""
-    # pylint: disable=invalid-name
 
     runner = CliRunner()
     es_client_options = "ca_certs=/path/,verify_certs=True"
@@ -631,7 +621,6 @@ def test_cli_read_command_client_options_with_es_backend(es):
 
 def test_cli_read_command_with_es_backend_query(es):
     """Test ralph read command using the es backend and a query."""
-    # pylint: disable=invalid-name
 
     # Insert documents
     bulk(
@@ -726,7 +715,6 @@ def test_cli_list_command_with_ldp_backend(monkeypatch):
 
     def mock_list(this, target=None, details=False, new=False):
         """Mock LDP backend list method."""
-        # pylint: disable=unused-argument
 
         response = archive_list
         if details:
@@ -765,8 +753,6 @@ def test_cli_list_command_with_ldp_backend(monkeypatch):
     assert "Configured ldp backend contains no document" in result.output
 
 
-# pylint: disable=invalid-name
-# pylint: disable=unused-argument
 def test_cli_list_command_with_fs_backend(fs, monkeypatch):
     """Test ralph list command using the LDP backend."""
     archive_list = [
@@ -788,7 +774,6 @@ def test_cli_list_command_with_fs_backend(fs, monkeypatch):
 
     def mock_list(this, target=None, details=False, new=False):
         """Mock LDP backend list method."""
-        # pylint: disable=unused-argument
 
         response = archive_list
         if details:
@@ -827,7 +812,6 @@ def test_cli_list_command_with_fs_backend(fs, monkeypatch):
     assert "Configured fs backend contains no document" in result.output
 
 
-# pylint: disable=invalid-name
 def test_cli_write_command_with_fs_backend(fs):
     """Test ralph write command using the FS backend."""
     fs.create_dir(str(settings.APP_DIR))
@@ -878,7 +862,6 @@ def test_cli_write_command_with_fs_backend(fs):
 
 def test_cli_write_command_with_es_backend(es):
     """Test ralph write command using the es backend."""
-    # pylint: disable=invalid-name
 
     # Documents
     records = [{"id": idx} for idx in range(10)]

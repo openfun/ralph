@@ -107,7 +107,6 @@ def test_models_validator_validate_with_an_unknown_event_raises_an_exception(
             list(result)
 
 
-# pylint: disable=line-too-long
 def test_models_validator_validate_with_an_invalid_page_close_event_writes_an_error_message(  # noqa
     caplog,
 ):
@@ -210,7 +209,7 @@ def test_models_validator_validate_typing_cleanup(event):
 def test_models_validator_get_first_valid_model_with_match(event, models, expected):
     """Test that the `get_first_valid_model` method returns the expected model."""
 
-    def dummy_get_models(event: dict):  # pylint: disable=unused-argument
+    def dummy_get_models(event: dict):
         return models
 
     validator = Validator(ModelSelector(module="os"))
@@ -227,7 +226,7 @@ def test_models_validator_get_first_valid_model_without_match(event, models, err
     matches the given event.
     """
 
-    def dummy_get_models(event: dict):  # pylint: disable=unused-argument
+    def dummy_get_models(event: dict):
         return models
 
     validator = Validator(ModelSelector(module="os"))

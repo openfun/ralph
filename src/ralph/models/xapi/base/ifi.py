@@ -35,7 +35,7 @@ class BaseXapiMboxSha1SumIFI(BaseModelWithConfig):
         mbox_sha1sum (str): Consists of the SHA1 hash of the Agent's email address.
     """
 
-    mbox_sha1sum: constr(regex=r"^[0-9a-f]{40}$")  # noqa:F722
+    mbox_sha1sum: constr(regex=r"^[0-9a-f]{40}$")
 
 
 class BaseXapiOpenIdIFI(BaseModelWithConfig):

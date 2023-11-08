@@ -1,4 +1,4 @@
-"""Tests for Ralph's async mongo data backend."""  # pylint: disable = too-many-lines
+"""Tests for Ralph's async mongo data backend."""
 
 import json
 import logging
@@ -29,7 +29,7 @@ async def test_backends_data_async_mongo_data_backend_default_instantiation(
     monkeypatch, fs
 ):
     """Test the `AsyncMongoDataBackend` default instantiation."""
-    # pylint: disable=invalid-name
+
     fs.create_file(".env")
     backend_settings_names = [
         "CONNECTION_URI",
@@ -148,7 +148,7 @@ async def test_backends_data_async_mongo_data_backend_status_with_error_status(
     # Given a MongoDB serverStatus query returning an ok status different from 1,
     # the `status` method should return `DataBackendStatus.ERROR`.
 
-    class MockAsyncIOMotorClientAdmin:  # pylint: disable = function-redefined
+    class MockAsyncIOMotorClientAdmin:
         """Mock the `AsyncIOMotorClient.admin` property."""
 
         @staticmethod
@@ -156,7 +156,7 @@ async def test_backends_data_async_mongo_data_backend_status_with_error_status(
             """Mock the `command` method always raising a `ConnectionFailure`."""
             return {"ok": 0}
 
-    class MockAsyncIOMotorClient:  # pylint: disable = function-redefined
+    class MockAsyncIOMotorClient:
         """Mock the `motor.motor_asyncio.AsyncIOMotorClient`."""
 
         admin = MockAsyncIOMotorClientAdmin
@@ -185,7 +185,7 @@ async def test_backends_data_async_mongo_data_backend_status_with_ok_status(
         """Mock the `AsyncIOMotorClient.admin` property."""
 
         @staticmethod
-        async def command(command: str):  # pylint: disable = unused-argument
+        async def command(command: str):
             """Mock the `command` method always ensuring the server is up."""
             return {"ok": 1.0}
 
@@ -258,7 +258,6 @@ async def test_backends_data_async_mongo_data_backend_list_method_without_histor
     mongo, async_mongo_backend, monkeypatch
 ):
     """Test the `AsyncMongoDataBackend.list` method without history."""
-    # pylint: disable=unused-argument
 
     backend = async_mongo_backend()
 
@@ -292,7 +291,7 @@ async def test_backends_data_async_mongo_data_backend_list_method_without_histor
 
 @pytest.mark.anyio
 async def test_backends_data_async_mongo_data_backend_list_method_with_history(
-    mongo, async_mongo_backend, caplog  # pylint: disable=unused-argument
+    mongo, async_mongo_backend, caplog
 ):
     """Test the `AsyncMongoDataBackend.list` method given `new` argument set to
     `True`, should log a warning message.
@@ -318,7 +317,7 @@ async def test_backends_data_async_mongo_data_backend_read_method_with_raw_outpu
     async_mongo_backend,
 ):
     """Test the `AsyncMongoDataBackend.read` method with `raw_output` set to `True`."""
-    # pylint: disable=unused-argument
+
     backend = async_mongo_backend()
     documents = [
         {"_id": ObjectId("64945e53a4ee2699573e0d6f"), "id": "foo"},
@@ -356,7 +355,7 @@ async def test_backends_data_async_mongo_data_backend_read_method_without_raw_ou
     """Test the `AsyncMongoDataBackend.read` method with `raw_output` set to
     `False`.
     """
-    # pylint: disable=unused-argument
+
     backend = async_mongo_backend()
     documents = [
         {"_id": ObjectId("64945e53a4ee2699573e0d6f"), "id": "foo"},
@@ -452,7 +451,7 @@ async def test_backends_data_async_mongo_data_backend_read_method_with_ignore_er
     given a collection containing unparsable documents, should skip the invalid
     documents.
     """
-    # pylint: disable=unused-argument
+
     backend = async_mongo_backend()
     documents = [
         {"_id": ObjectId("64945e53a4ee2699573e0d6f"), "id": "foo"},
@@ -494,7 +493,7 @@ async def test_backends_data_async_mongo_data_backend_read_method_without_ignore
     given a collection containing unparsable documents, should raise a
     `BackendException`.
     """
-    # pylint: disable=unused-argument
+
     backend = async_mongo_backend()
     documents = [
         {"_id": ObjectId("64945e53a4ee2699573e0d6f"), "id": "foo"},
@@ -563,7 +562,7 @@ async def test_backends_data_async_mongo_data_backend_read_method_with_query(
     query, mongo, async_mongo_backend
 ):
     """Test the `AsyncMongoDataBackend.read` method given a query argument."""
-    # pylint: disable=unused-argument
+
     # Create records
     backend = async_mongo_backend()
     documents = [
@@ -594,7 +593,7 @@ async def test_backends_data_async_mongo_data_backend_write_method_with_target(
     """Test the `AsyncMongoDataBackend.write` method, given a valid `target` argument,
     should write documents to the target collection.
     """
-    # pylint: disable=unused-argument
+
     backend = async_mongo_backend()
     timestamp = {"timestamp": "2022-06-27T15:36:50"}
     documents = [{"id": "foo", **timestamp}, {"id": "bar", **timestamp}]
@@ -624,7 +623,7 @@ async def test_backends_data_async_mongo_data_backend_write_method_without_targe
     """Test the `AsyncMongoDataBackend.write` method, given a no `target` argument,
     should write documents to the default collection.
     """
-    # pylint: disable=unused-argument
+
     backend = async_mongo_backend()
     timestamp = {"timestamp": "2022-06-27T15:36:50"}
     documents = [{"id": "foo", **timestamp}, {"id": "bar", **timestamp}]
@@ -640,7 +639,6 @@ async def test_backends_data_async_mongo_data_backend_write_method_without_targe
     }
 
 
-# pylint: disable=line-too-long
 @pytest.mark.anyio
 async def test_backends_data_async_mongo_data_backend_write_method_with_duplicated_key_error(  # noqa: E501
     mongo, async_mongo_backend
@@ -649,7 +647,7 @@ async def test_backends_data_async_mongo_data_backend_write_method_with_duplicat
     ids, should write the documents until it encounters a duplicated id and then raise
     a `BackendException`.
     """
-    # pylint: disable=unused-argument
+
     backend = async_mongo_backend()
     # Identical statement IDs produce the same ObjectIds, leading to a
     # duplicated key write error while trying to bulk import this batch.
@@ -687,7 +685,6 @@ async def test_backends_data_async_mongo_data_backend_write_method_with_duplicat
     ]
 
 
-# pylint: disable=line-too-long
 @pytest.mark.anyio
 async def test_backends_data_async_mongo_data_backend_write_method_with_delete_operation(  # noqa: E501
     mongo, async_mongo_backend
@@ -695,7 +692,7 @@ async def test_backends_data_async_mongo_data_backend_write_method_with_delete_o
     """Test the `AsyncMongoDataBackend.write` method, given a `DELETE` `operation_type`,
     should delete the provided documents from the MongoDB collection.
     """
-    # pylint: disable=unused-argument
+
     backend = async_mongo_backend()
     timestamp = {"timestamp": "2022-06-27T15:36:50"}
     documents = [
@@ -721,7 +718,6 @@ async def test_backends_data_async_mongo_data_backend_write_method_with_delete_o
     assert not [statement async for statement in backend.read()]
 
 
-# pylint: disable=line-too-long
 @pytest.mark.anyio
 async def test_backends_data_async_mongo_data_backend_write_method_with_delete_operation_failure(  # noqa: E501
     mongo, async_mongo_backend, caplog
@@ -729,7 +725,7 @@ async def test_backends_data_async_mongo_data_backend_write_method_with_delete_o
     """Test the `AsyncMongoDataBackend.write` method with the `DELETE` `operation_type`,
     given an AsyncIOMotorClient failure, should raise a `BackendException`.
     """
-    # pylint: disable=unused-argument
+
     backend = async_mongo_backend()
     msg = (
         "Failed to delete document chunk: cannot encode object: <class 'object'>, "
@@ -757,7 +753,6 @@ async def test_backends_data_async_mongo_data_backend_write_method_with_delete_o
     ) in caplog.record_tuples
 
 
-# pylint: disable=line-too-long
 @pytest.mark.anyio
 async def test_backends_data_async_mongo_data_backend_write_method_with_update_operation(  # noqa: E501
     mongo, async_mongo_backend
@@ -765,7 +760,7 @@ async def test_backends_data_async_mongo_data_backend_write_method_with_update_o
     """Test the `AsyncMongoDataBackend.write` method, given an `UPDATE`
     `operation_type`, should update the provided documents from the MongoDB collection.
     """
-    # pylint: disable=unused-argument
+
     backend = async_mongo_backend()
     timestamp = {"timestamp": "2022-06-27T15:36:50"}
     documents = [{"id": "foo", **timestamp}, {"id": "bar", **timestamp}]
@@ -798,7 +793,6 @@ async def test_backends_data_async_mongo_data_backend_write_method_with_update_o
     }
 
 
-# pylint: disable=line-too-long
 @pytest.mark.anyio
 async def test_backends_data_async_mongo_data_backend_write_method_with_update_operation_failure(  # noqa: E501
     mongo, async_mongo_backend
@@ -806,7 +800,7 @@ async def test_backends_data_async_mongo_data_backend_write_method_with_update_o
     """Test the `AsyncMongoDataBackend.write` method with the `UPDATE` `operation_type`,
     given an AsyncIOMotorClient failure, should raise a `BackendException`.
     """
-    # pylint: disable=unused-argument
+
     backend = async_mongo_backend()
     schema = {
         "$jsonSchema": {
@@ -856,7 +850,6 @@ async def test_backends_data_async_mongo_data_backend_write_method_with_update_o
         )
 
 
-# pylint: disable=line-too-long
 @pytest.mark.anyio
 async def test_backends_data_async_mongo_data_backend_write_method_with_append_operation(  # noqa: E501
     async_mongo_backend, caplog
@@ -884,7 +877,7 @@ async def test_backends_data_async_mongo_data_backend_write_method_with_create_o
     """Test the `AsyncMongoDataBackend.write` method, given an `CREATE`
     `operation_type`, should insert the provided documents to the MongoDB collection.
     """
-    # pylint: disable=unused-argument
+
     backend = async_mongo_backend()
     documents = [
         {"timestamp": "2022-06-27T15:36:50"},
@@ -896,7 +889,6 @@ async def test_backends_data_async_mongo_data_backend_write_method_with_create_o
     assert results[1]["_source"]["timestamp"] == documents[1]["timestamp"]
 
 
-# pylint: disable=line-too-long
 @pytest.mark.parametrize(
     "document,error",
     [
@@ -915,7 +907,7 @@ async def test_backends_data_async_mongo_data_backend_write_method_with_invalid_
     """Test the `AsyncMongoDataBackend.write` method, given invalid documents, should
     raise a `BackendException`.
     """
-    # pylint: disable=unused-argument
+
     backend = async_mongo_backend()
     with pytest.raises(BackendException, match=error):
         await backend.write([document])
@@ -936,7 +928,6 @@ async def test_backends_data_async_mongo_data_backend_write_method_with_invalid_
     ) in caplog.record_tuples
 
 
-# pylint: disable=line-too-long
 @pytest.mark.anyio
 async def test_backends_data_async_mongo_data_backend_write_method_with_unparsable_documents(  # noqa: E501
     async_mongo_backend, caplog
@@ -984,7 +975,6 @@ async def test_backends_data_async_mongo_data_backend_write_method_with_no_data(
     ) in caplog.record_tuples
 
 
-# pylint: disable=line-too-long
 @pytest.mark.anyio
 async def test_backends_data_async_mongo_data_backend_write_method_with_custom_chunk_size(  # noqa: E501
     mongo, async_mongo_backend, caplog
@@ -992,7 +982,7 @@ async def test_backends_data_async_mongo_data_backend_write_method_with_custom_c
     """Test the `AsyncMongoDataBackend.write` method, given a custom chunk_size, should
     insert the provided documents to target collection by batches of size `chunk_size`.
     """
-    # pylint: disable=unused-argument
+
     backend = async_mongo_backend()
     timestamp = {"timestamp": "2022-06-27T15:36:50"}
     new_timestamp = {"timestamp": "2023-06-27T15:36:50"}

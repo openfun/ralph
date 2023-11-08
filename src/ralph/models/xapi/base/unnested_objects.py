@@ -41,7 +41,7 @@ class BaseXapiInteractionComponent(BaseModelWithConfig):
         description (LanguageMap): Consists of the description of the interaction.
     """
 
-    id: constr(regex=r"^[^\s]+$")  # noqa:F722
+    id: constr(regex=r"^[^\s]+$")
     description: Optional[LanguageMap]
 
 

@@ -31,7 +31,7 @@ class Rule:
     """Rule used for selection."""
 
     field: LazyModelField
-    value: Union[LazyModelField, Any]  # pylint: disable=unsubscriptable-object
+    value: Union[LazyModelField, Any]
 
     def check(self, event: Dict) -> bool:
         """Check if event matches the rule.

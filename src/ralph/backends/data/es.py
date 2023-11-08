@@ -101,7 +101,7 @@ class ESQuery(BaseQuery):
             matching the set of sort values in `search_after`. Used for pagination.
         track_total_hits (bool): Number of hits matching the query to count accurately.
             Not used. Always set to `False`.
-    """  # pylint: disable=line-too-long # noqa: E501
+    """
 
     query: dict = {"match_all": {}}
     pit: ESQueryPit = ESQueryPit()
@@ -198,7 +198,7 @@ class ESDataBackend(BaseDataBackend, Writable, Listable):
             yield index
 
     @enforce_query_checks
-    def read(
+    def read(  # noqa: PLR0912, PLR0913
         self,
         *,
         query: Optional[Union[str, ESQuery]] = None,
@@ -207,7 +207,6 @@ class ESDataBackend(BaseDataBackend, Writable, Listable):
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
-        # pylint: disable=too-many-arguments
         """Read documents matching the query in the target index and yield them.
 
         Args:
@@ -276,7 +275,7 @@ class ESDataBackend(BaseDataBackend, Writable, Listable):
             for document in documents:
                 yield document
 
-    def write(  # pylint: disable=too-many-arguments
+    def write(  # noqa: PLR0913
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Optional[str] = None,

@@ -49,7 +49,7 @@ class IDToken(BaseModel):
     iat: int
     scope: Optional[str]
 
-    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
+    class Config:  # noqa: D106
         extra = Extra.ignore
 
 

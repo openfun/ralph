@@ -26,7 +26,7 @@ from tests.fixtures.backends import (
 
 def test_backends_data_mongo_data_backend_default_instantiation(monkeypatch, fs):
     """Test the `MongoDataBackend` default instantiation."""
-    # pylint: disable=invalid-name
+
     fs.create_file(".env")
     backend_settings_names = [
         "CONNECTION_URI",
@@ -79,7 +79,7 @@ def test_backends_data_mongo_data_backend_instantiation_with_settings():
 
     try:
         MongoDataBackend(settings)
-    except Exception as err:  # pylint:disable=broad-except
+    except Exception as err:  # noqa: BLE001
         pytest.fail(f"Two MongoDataBackends should not raise exceptions: {err}")
     backend.close()
 
@@ -219,7 +219,7 @@ def test_backends_data_mongo_data_backend_list_method_without_history(
     mongo, mongo_backend
 ):
     """Test the `MongoDataBackend.list` method without history."""
-    # pylint: disable=unused-argument
+
     backend = mongo_backend()
     assert list(backend.list()) == [MONGO_TEST_COLLECTION]
     assert list(backend.list(MONGO_TEST_DATABASE)) == [MONGO_TEST_COLLECTION]
@@ -256,7 +256,7 @@ def test_backends_data_mongo_data_backend_read_method_with_raw_output(
     mongo, mongo_backend
 ):
     """Test the `MongoDataBackend.read` method with `raw_output` set to `True`."""
-    # pylint: disable=unused-argument
+
     backend = mongo_backend()
     documents = [
         {"_id": ObjectId("64945e53a4ee2699573e0d6f"), "id": "foo"},
@@ -281,7 +281,7 @@ def test_backends_data_mongo_data_backend_read_method_without_raw_output(
     mongo, mongo_backend
 ):
     """Test the `MongoDataBackend.read` method with `raw_output` set to `False`."""
-    # pylint: disable=unused-argument
+
     backend = mongo_backend()
     documents = [
         {"_id": ObjectId("64945e53a4ee2699573e0d6f"), "id": "foo"},
@@ -360,7 +360,7 @@ def test_backends_data_mongo_data_backend_read_method_with_ignore_errors(
     """Test the `MongoDataBackend.read` method with `ignore_errors` set to `True`, given
     a collection containing unparsable documents, should skip the invalid documents.
     """
-    # pylint: disable=unused-argument
+
     backend = mongo_backend()
     documents = [
         {"_id": ObjectId("64945e53a4ee2699573e0d6f"), "id": "foo"},
@@ -396,7 +396,7 @@ def test_backends_data_mongo_data_backend_read_method_without_ignore_errors(
     given a collection containing unparsable documents, should raise a
     `BackendException`.
     """
-    # pylint: disable=unused-argument
+
     backend = mongo_backend()
     documents = [
         {"_id": ObjectId("64945e53a4ee2699573e0d6f"), "id": "foo"},
@@ -456,7 +456,7 @@ def test_backends_data_mongo_data_backend_read_method_with_query(
     query, mongo, mongo_backend
 ):
     """Test the `MongoDataBackend.read` method given a query argument."""
-    # pylint: disable=unused-argument
+
     # Create records
     backend = mongo_backend()
     documents = [
@@ -481,7 +481,7 @@ def test_backends_data_mongo_data_backend_write_method_with_target(
     """Test the `MongoDataBackend.write` method, given a valid `target` argument, should
     write documents to the target collection.
     """
-    # pylint: disable=unused-argument
+
     backend = mongo_backend()
     timestamp = {"timestamp": "2022-06-27T15:36:50"}
     documents = [{"id": "foo", **timestamp}, {"id": "bar", **timestamp}]
@@ -508,7 +508,7 @@ def test_backends_data_mongo_data_backend_write_method_without_target(
     """Test the `MongoDataBackend.write` method, given a no `target` argument, should
     write documents to the default collection.
     """
-    # pylint: disable=unused-argument
+
     backend = mongo_backend()
     timestamp = {"timestamp": "2022-06-27T15:36:50"}
     documents = [{"id": "foo", **timestamp}, {"id": "bar", **timestamp}]
@@ -532,7 +532,7 @@ def test_backends_data_mongo_data_backend_write_method_with_duplicated_key_error
     should write the documents until it encounters a duplicated id and then raise a
     `BackendException`.
     """
-    # pylint: disable=unused-argument
+
     backend = mongo_backend()
     # Identical statement IDs produce the same ObjectIds, leading to a
     # duplicated key write error while trying to bulk import this batch.
@@ -585,7 +585,7 @@ def test_backends_data_mongo_data_backend_write_method_with_delete_operation(
     """Test the `MongoDataBackend.write` method, given a `DELETE` `operation_type`,
     should delete the provided documents from the MongoDB collection.
     """
-    # pylint: disable=unused-argument
+
     backend = mongo_backend()
     timestamp = {"timestamp": "2022-06-27T15:36:50"}
     documents = [
@@ -613,7 +613,7 @@ def test_backends_data_mongo_data_backend_write_method_with_delete_operation_fai
     """Test the `MongoDataBackend.write` method with the `DELETE` `operation_type`,
     given a MongoClient failure, should raise a `BackendException`.
     """
-    # pylint: disable=unused-argument
+
     backend = mongo_backend()
     msg = (
         "Failed to delete document chunk: cannot encode object: <class 'object'>, "
@@ -647,7 +647,7 @@ def test_backends_data_mongo_data_backend_write_method_with_update_operation(
     """Test the `MongoDataBackend.write` method, given an `UPDATE` `operation_type`,
     should update the provided documents from the MongoDB collection.
     """
-    # pylint: disable=unused-argument
+
     backend = mongo_backend()
     timestamp = {"timestamp": "2022-06-27T15:36:50"}
     documents = [{"id": "foo", **timestamp}, {"id": "bar", **timestamp}]
@@ -684,7 +684,7 @@ def test_backends_data_mongo_data_backend_write_method_with_update_operation_fai
     """Test the `MongoDataBackend.write` method with the `UPDATE` `operation_type`,
     given a MongoClient failure, should raise a `BackendException`.
     """
-    # pylint: disable=unused-argument
+
     backend = mongo_backend()
     schema = {
         "$jsonSchema": {
@@ -758,7 +758,7 @@ def test_backends_data_mongo_data_backend_write_method_with_create_operation(
     """Test the `MongoDataBackend.write` method, given an `CREATE` `operation_type`,
     should insert the provided documents to the MongoDB collection.
     """
-    # pylint: disable=unused-argument
+
     backend = mongo_backend()
     documents = [
         {"timestamp": "2022-06-27T15:36:50"},
@@ -788,7 +788,7 @@ def test_backends_data_mongo_data_backend_write_method_with_invalid_documents(
     """Test the `MongoDataBackend.write` method, given invalid documents, should raise a
     `BackendException`.
     """
-    # pylint: disable=unused-argument
+
     backend = mongo_backend()
     with caplog.at_level(logging.ERROR):
         with pytest.raises(BackendException, match=error):
@@ -852,7 +852,7 @@ def test_backends_data_mongo_data_backend_write_method_with_custom_chunk_size(
     """Test the `MongoDataBackend.write` method, given a custom chunk_size, should
     insert the provided documents to target collection by batches of size `chunk_size`.
     """
-    # pylint: disable=unused-argument
+
     backend = mongo_backend()
     timestamp = {"timestamp": "2022-06-27T15:36:50"}
     new_timestamp = {"timestamp": "2023-06-27T15:36:50"}

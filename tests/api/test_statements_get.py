@@ -87,7 +87,6 @@ def insert_statements_and_monkeypatch_backend(
     request, es, mongo, clickhouse, monkeypatch
 ):
     """(Security) Return a function that inserts statements into each backend."""
-    # pylint: disable=invalid-name,unused-argument
 
     def _insert_statements_and_monkeypatch_backend(statements):
         """Insert statements once into each backend."""
@@ -137,7 +136,6 @@ async def test_api_statements_get_mine(
     """(Security) Test that the get statements API route, given a "mine=True"
     query parameter returns a list of statements filtered by authority.
     """
-    # pylint: disable=redefined-outer-name,invalid-name
 
     # Create two distinct agents
     if ifi == "account_same_home_page":
@@ -250,7 +248,6 @@ async def test_api_statements_get(
     client, insert_statements_and_monkeypatch_backend, basic_auth_credentials
 ):
     """Test the get statements API route without any filters set up."""
-    # pylint: disable=redefined-outer-name
 
     statements = [
         {
@@ -281,7 +278,6 @@ async def test_api_statements_get_ascending(
     """Test the get statements API route, given an "ascending" query parameter, should
     return statements in ascending order by their timestamp.
     """
-    # pylint: disable=redefined-outer-name
 
     statements = [
         {
@@ -311,7 +307,6 @@ async def test_api_statements_get_by_statement_id(
     """Test the get statements API route, given a "statementId" query parameter, should
     return a list of statements matching the given statementId.
     """
-    # pylint: disable=redefined-outer-name
 
     statements = [
         {
@@ -351,7 +346,6 @@ async def test_api_statements_get_by_agent(
     """Test the get statements API route, given an "agent" query parameter, should
     return a list of statements filtered by the given agent.
     """
-    # pylint: disable=redefined-outer-name
 
     # Create two distinct agents
     if ifi == "account_same_home_page":
@@ -396,7 +390,6 @@ async def test_api_statements_get_by_verb(
     """Test the get statements API route, given a "verb" query parameter, should
     return a list of statements filtered by the given verb id.
     """
-    # pylint: disable=redefined-outer-name
 
     statements = [
         {
@@ -428,7 +421,6 @@ async def test_api_statements_get_by_activity(
     """Test the get statements API route, given an "activity" query parameter, should
     return a list of statements filtered by the given activity id.
     """
-    # pylint: disable=redefined-outer-name
 
     activity_0 = mock_activity(0)
     activity_1 = mock_activity(1)
@@ -472,7 +464,6 @@ async def test_api_statements_get_since_timestamp(
     """Test the get statements API route, given a "since" query parameter, should
     return a list of statements filtered by the given timestamp.
     """
-    # pylint: disable=redefined-outer-name
 
     statements = [
         {
@@ -503,7 +494,6 @@ async def test_api_statements_get_until_timestamp(
     """Test the get statements API route, given an "until" query parameter,
     should return a list of statements filtered by the given timestamp.
     """
-    # pylint: disable=redefined-outer-name
 
     statements = [
         {
@@ -538,7 +528,6 @@ async def test_api_statements_get_with_pagination(
     can fit on the first page, should return a list of statements non-exceeding the page
     limit and include a "more" property with a link to get the next page of results.
     """
-    # pylint: disable=redefined-outer-name
 
     monkeypatch.setattr(
         "ralph.api.routers.statements.settings.RUNSERVER_MAX_SEARCH_HITS_COUNT", 2
@@ -614,7 +603,6 @@ async def test_api_statements_get_with_pagination_and_query(
     of statements non-exceeding the page limit and include a "more" property with
     a link to get the next page of results.
     """
-    # pylint: disable=redefined-outer-name
 
     monkeypatch.setattr(
         "ralph.api.routers.statements.settings.RUNSERVER_MAX_SEARCH_HITS_COUNT", 2
@@ -678,7 +666,6 @@ async def test_api_statements_get_with_no_matching_statement(
     """Test the get statements API route, given a query yielding no matching statement,
     should return an empty list.
     """
-    # pylint: disable=redefined-outer-name
 
     statements = [
         {
@@ -708,7 +695,6 @@ async def test_api_statements_get_with_database_query_failure(
     """Test the get statements API route, given a query raising a BackendException,
     should return an error response with HTTP code 500.
     """
-    # pylint: disable=redefined-outer-name
 
     def mock_query_statements(*_):
         """Mocks the BACKEND_CLIENT.query_statements method."""
@@ -798,11 +784,10 @@ async def test_api_statements_get_invalid_query_parameters(
         ([], False),
     ],
 )
-async def test_api_statements_get_scopes(
+async def test_api_statements_get_scopes(  # noqa: PLR0913
     client, monkeypatch, fs, es, auth_method, scopes, is_authorized
 ):
     """Test that getting statements behaves properly according to user scopes."""
-    # pylint: disable=invalid-name,too-many-locals,too-many-arguments
 
     monkeypatch.setattr(
         "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_SCOPES", True
@@ -882,7 +867,7 @@ async def test_api_statements_get_scopes(
         (["statements/read/mine"], False),
     ],
 )
-async def test_api_statements_get_scopes_with_authority(
+async def test_api_statements_get_scopes_with_authority(  # noqa: PLR0913
     client, monkeypatch, fs, es, scopes, read_all_access
 ):
     """Test that restricting by scope and by authority behaves properly.
@@ -890,7 +875,7 @@ async def test_api_statements_get_scopes_with_authority(
     `statements/read/mine` scope but should not be restricted when the user
     has wider scopes.
     """
-    # pylint: disable=invalid-name,too-many-arguments
+
     monkeypatch.setattr(
         "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_AUTHORITY", True
     )

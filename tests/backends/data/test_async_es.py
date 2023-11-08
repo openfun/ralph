@@ -35,7 +35,7 @@ async def test_backends_data_async_es_data_backend_default_instantiation(
     monkeypatch, fs
 ):
     """Test the `AsyncESDataBackend` default instantiation."""
-    # pylint: disable=invalid-name
+
     fs.create_file(".env")
     backend_settings_names = [
         "ALLOW_YELLOW_STATUS",
@@ -115,7 +115,7 @@ async def test_backends_data_async_es_data_backend_instantiation_with_settings()
 
     try:
         AsyncESDataBackend(settings)
-    except Exception as err:  # pylint:disable=broad-except
+    except Exception as err:  # noqa: BLE001
         pytest.fail(f"Two AsyncESDataBackends should not raise exceptions: {err}")
 
 
@@ -281,7 +281,7 @@ async def test_backends_data_async_es_data_backend_list_method_with_history(
     """
     backend = async_es_backend()
 
-    async def mock_get(*args, **kwargs):  # pylint: disable=unused-argument
+    async def mock_get(*args, **kwargs):
         return {}
 
     monkeypatch.setattr(backend.client.indices, "get", mock_get)
@@ -306,13 +306,12 @@ async def test_backends_data_async_es_data_backend_list_method_with_history(
     ],
 )
 @pytest.mark.anyio
-async def test_backends_data_async_es_data_backend_read_method_with_failure(
+async def test_backends_data_async_es_data_backend_read_method_with_failure(  # noqa: PLR0913
     exception, error, es, async_es_backend, caplog, monkeypatch
 ):
     """Test the `AsyncESDataBackend.read` method, given a request failure, should
     raise a `BackendException`.
     """
-    # pylint: disable=invalid-name,unused-argument,too-many-arguments
 
     def mock_async_es_search_open_pit(**kwargs):
         """Mock the AsyncES.client.search and open_point_in_time methods always raising
@@ -365,10 +364,10 @@ async def test_backends_data_async_es_data_backend_read_method_with_ignore_error
     """Test the `AsyncESDataBackend.read` method, given `ignore_errors` set to `True`,
     should log a warning message.
     """
-    # pylint: disable=invalid-name, unused-argument
+
     backend = async_es_backend()
 
-    async def mock_async_es_search(**kwargs):  # pylint: disable=unused-argument
+    async def mock_async_es_search(**kwargs):
         return {"hits": {"hits": []}}
 
     monkeypatch.setattr(backend.client, "search", mock_async_es_search)
@@ -389,7 +388,7 @@ async def test_backends_data_async_es_data_backend_read_method_with_raw_ouput(
     es, async_es_backend
 ):
     """Test the `AsyncESDataBackend.read` method with `raw_output` set to `True`."""
-    # pylint: disable=invalid-name,unused-argument
+
     backend = async_es_backend()
     documents = [{"id": idx, "timestamp": now()} for idx in range(10)]
     assert await backend.write(documents) == 10
@@ -406,7 +405,7 @@ async def test_backends_data_async_es_data_backend_read_method_without_raw_ouput
     es, async_es_backend
 ):
     """Test the `AsyncESDataBackend.read` method with `raw_output` set to `False`."""
-    # pylint: disable=invalid-name,unused-argument
+
     backend = async_es_backend()
     documents = [{"id": idx, "timestamp": now()} for idx in range(10)]
     assert await backend.write(documents) == 10
@@ -423,7 +422,7 @@ async def test_backends_data_async_es_data_backend_read_method_with_query(
     es, async_es_backend, caplog
 ):
     """Test the `AsyncESDataBackend.read` method with a query."""
-    # pylint: disable=invalid-name,unused-argument
+
     backend = async_es_backend()
     documents = [{"id": idx, "timestamp": now(), "modulo": idx % 2} for idx in range(5)]
     assert await backend.write(documents) == 5
@@ -491,7 +490,6 @@ async def test_backends_data_async_es_data_backend_write_method_with_create_oper
     """Test the `AsyncESDataBackend.write` method, given an `CREATE` `operation_type`,
     should insert the target documents with the provided data.
     """
-    # pylint: disable=invalid-name,unused-argument
 
     backend = async_es_backend()
     assert len([statement async for statement in backend.read()]) == 0
@@ -544,7 +542,6 @@ async def test_backends_data_async_es_data_backend_write_method_with_delete_oper
     """Test the `AsyncESDataBackend.write` method, given a `DELETE` `operation_type`,
     should remove the target documents.
     """
-    # pylint: disable=invalid-name,unused-argument
 
     backend = async_es_backend()
     data = [{"id": idx, "value": str(idx)} for idx in range(10)]
@@ -574,7 +571,6 @@ async def test_backends_data_async_es_data_backend_write_method_with_update_oper
     """Test the `AsyncESDataBackend.write` method, given an `UPDATE`
     `operation_type`, should overwrite the target documents with the provided data.
     """
-    # pylint: disable=invalid-name,unused-argument
 
     backend = async_es_backend()
     data = BytesIO(
@@ -643,7 +639,6 @@ async def test_backends_data_async_es_data_backend_write_method_with_target(
     """Test the `AsyncESDataBackend.write` method, given a target index, should insert
     documents to the corresponding index.
     """
-    # pylint: disable=invalid-name,unused-argument
 
     backend = async_es_backend()
 
@@ -692,7 +687,6 @@ async def test_backends_data_async_es_data_backend_write_method_without_ignore_e
     """Test the `AsyncESDataBackend.write` method with `ignore_errors` set to `False`,
     given badly formatted data, should raise a `BackendException`.
     """
-    # pylint: disable=invalid-name,unused-argument
 
     data = [{"id": idx, "count": random.randint(0, 100)} for idx in range(10)]
     # Patch a record with a non-expected type for the count field (should be
@@ -764,7 +758,6 @@ async def test_backends_data_async_es_data_backend_write_method_with_ignore_erro
     """Test the `AsyncESDataBackend.write` method with `ignore_errors` set to `True`,
     given badly formatted data, should should skip the invalid data.
     """
-    # pylint: disable=invalid-name,unused-argument
 
     msg = (
         "Failed to decode JSON: Expecting value: line 1 column 1 (char 0), "
@@ -815,7 +808,6 @@ async def test_backends_data_async_es_data_backend_write_method_with_datastream(
     es_data_stream, async_es_backend
 ):
     """Test the `AsyncESDataBackend.write` method using a configured data stream."""
-    # pylint: disable=invalid-name,unused-argument
 
     data = [{"id": idx, "@timestamp": datetime.now().isoformat()} for idx in range(10)]
     backend = async_es_backend()
@@ -857,7 +849,7 @@ async def test_backends_data_es_data_backend_close_method(async_es_backend, capl
     # No client instantiated
     backend = async_es_backend()
     await backend.close()
-    backend._client = None  # pylint: disable=protected-access
+    backend._client = None
     with caplog.at_level(logging.WARNING):
         await backend.close()
 

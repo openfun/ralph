@@ -22,8 +22,8 @@ class NavigationalEventField(AbstractBaseEventField):
 
     id: constr(
         regex=(
-            r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type"  # noqa : F722
-            r"@sequential\+block@[a-f0-9]{32}$"  # noqa : F722
+            r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type"
+            r"@sequential\+block@[a-f0-9]{32}$"
         )
     )
     new: int

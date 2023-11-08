@@ -73,7 +73,7 @@ class CommaSeparatedTuple(str):
 class InstantiableSettingsItem(BaseModel):
     """Pydantic model for a settings configuration item that can be instantiated."""
 
-    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
+    class Config:  # noqa: D106
         underscore_attrs_are_private = True
 
     _class_path: str = None
@@ -86,14 +86,14 @@ class InstantiableSettingsItem(BaseModel):
 class ClientOptions(BaseModel):
     """Pydantic model for additional client options."""
 
-    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
+    class Config:  # noqa: D106
         extra = Extra.forbid
 
 
 class HeadersParameters(BaseModel):
     """Pydantic model for headers parameters."""
 
-    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
+    class Config:  # noqa: D106
         extra = Extra.allow
 
 
@@ -122,7 +122,7 @@ class ParserSettings(BaseModel):
 class XapiForwardingConfigurationSettings(BaseModel):
     """Pydantic model for xAPI forwarding configuration item."""
 
-    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
+    class Config:  # noqa: D106
         min_anystr_length = 1
 
     url: AnyUrl
@@ -194,7 +194,7 @@ class Settings(BaseSettings):
     RUNSERVER_BACKEND: Literal[
         "async_es", "async_mongo", "clickhouse", "es", "fs", "mongo"
     ] = "es"
-    RUNSERVER_HOST: str = "0.0.0.0"  # nosec
+    RUNSERVER_HOST: str = "0.0.0.0"  # noqa: S104
     RUNSERVER_MAX_SEARCH_HITS_COUNT: int = 100
     RUNSERVER_POINT_IN_TIME_KEEP_ALIVE: str = "1m"
     RUNSERVER_PORT: int = 8100
@@ -207,12 +207,12 @@ class Settings(BaseSettings):
     XAPI_FORWARDINGS: List[XapiForwardingConfigurationSettings] = []
 
     @property
-    def APP_DIR(self) -> Path:  # pylint: disable=invalid-name
+    def APP_DIR(self) -> Path:
         """Return the path to Ralph's configuration directory."""
         return self._CORE.APP_DIR
 
     @property
-    def LOCALE_ENCODING(self) -> str:  # pylint: disable=invalid-name
+    def LOCALE_ENCODING(self) -> str:
         """Return Ralph's default locale encoding."""
         return self._CORE.LOCALE_ENCODING
 

@@ -270,7 +270,6 @@ def test_backends_database_clickhouse_query_statements_query(
     """Test the ClickHouse backend query_statements method, given a search query
     failure, should raise a BackendException and log the error.
     """
-    # pylint: disable=unused-argument
 
     def mock_read(query, target, ignore_errors):
         """Mock the `ClickHouseDataBackend.read` method."""
@@ -297,7 +296,7 @@ def test_backends_lrs_clickhouse_lrs_backend_query_statements(
     """Test the `ClickHouseLRSBackend.query_statements` method, given a query,
     should return matching statements.
     """
-    # pylint: disable=unused-argument, invalid-name
+
     backend = clickhouse_lrs_backend()
 
     # Insert documents
@@ -329,7 +328,7 @@ def test_backends_lrs_clickhouse_lrs_backend__find(clickhouse, clickhouse_lrs_ba
     """Test the `ClickHouseLRSBackend._find` method, given a query,
     should return matching statements.
     """
-    # pylint: disable=unused-argument, invalid-name
+
     backend = clickhouse_lrs_backend()
 
     # Insert documents
@@ -360,7 +359,7 @@ def test_backends_lrs_clickhouse_lrs_backend_query_statements_by_ids(
     """Test the `ClickHouseLRSBackend.query_statements_by_ids` method, given
     a list of ids, should return matching statements.
     """
-    # pylint: disable=unused-argument
+
     backend = clickhouse_lrs_backend()
 
     # Insert documents
@@ -392,7 +391,6 @@ def test_backends_lrs_clickhouse_lrs_backend_query_statements_client_failure(
     """Test the `ClickHouseLRSBackend.query_statements`, given a client query
     failure, should raise a `BackendException` and log the error.
     """
-    # pylint: disable=invalid-name,unused-argument
 
     def mock_query(*args, **kwargs):
         """Mock the clickhouse_connect.client.search method."""
@@ -421,7 +419,6 @@ def test_backends_lrs_clickhouse_lrs_backend_query_statements_by_ids_client_fail
     """Test the `ClickHouseLRSBackend.query_statements_by_ids`, given a client
     query failure, should raise a `BackendException` and log the error.
     """
-    # pylint: disable=invalid-name,unused-argument
 
     def mock_query(*args, **kwargs):
         """Mock the clickhouse_connect.client.search method."""

@@ -12,7 +12,7 @@ from tests.fixtures.backends import WS_TEST_HOST, WS_TEST_PORT
 
 def test_backends_stream_ws_stream_default_instantiation(monkeypatch, fs):
     """Test the `WSStreamBackend` instantiation."""
-    # pylint: disable=invalid-name,unused-argument
+
     fs.create_file(".env")
     backend_settings_names = ["URI"]
     for name in backend_settings_names:
@@ -30,7 +30,7 @@ def test_backends_stream_ws_stream_default_instantiation(monkeypatch, fs):
 
 def test_backends_stream_ws_stream_stream(ws, monkeypatch, events):
     """Test the `WSStreamBackend` stream method."""
-    # pylint: disable=invalid-name,unused-argument
+
     settings = WSStreamBackendSettings(URI=f"ws://{WS_TEST_HOST}:{WS_TEST_PORT}")
 
     backend = WSStreamBackend(settings)
@@ -55,7 +55,7 @@ def test_backends_stream_ws_stream_stream(ws, monkeypatch, events):
 
 def test_backends_stream_ws_stream_stream_when_server_stops(ws, monkeypatch, events):
     """Test the WSStreamBackend stream method when the websocket server stops."""
-    # pylint: disable=invalid-name,unused-argument
+
     settings = WSStreamBackendSettings(URI=f"ws://{WS_TEST_HOST}:{WS_TEST_PORT}")
     backend = WSStreamBackend(settings)
 

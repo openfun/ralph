@@ -268,7 +268,7 @@ async def test_backends_lrs_async_mongo_lrs_backend_query_statements_with_succes
     """Test the `AsyncMongoLRSBackend.query_statements` method, given a valid search
     query, should return the expected statements.
     """
-    # pylint: disable=unused-argument
+
     backend = async_mongo_lrs_backend()
 
     # Insert documents
@@ -312,7 +312,6 @@ async def test_backends_lrs_async_mongo_lrs_backend_query_statements_with_query_
     """Test the `AsyncMongoLRSBackend.query_statements` method, given a search query
     failure, should raise a BackendException and log the error.
     """
-    # pylint: disable=unused-argument
 
     msg = "Failed to execute MongoDB query: Something is wrong"
 
@@ -342,7 +341,6 @@ async def test_backends_lrs_mongo_lrs_backend_query_statements_by_ids_query_fail
     """Test the `AsyncMongoLRSBackend.query_statements_by_ids` method, given a search
     query failure, should raise a BackendException and log the error.
     """
-    # pylint: disable=unused-argument
 
     msg = "Failed to execute MongoDB query: Something is wrong"
 
@@ -378,7 +376,6 @@ async def test_backends_lrs_mongo_lrs_backend_query_statements_by_ids_two_collec
     search query, should execute the query only on the specified collection and return
     the expected results.
     """
-    # pylint: disable=unused-argument
 
     # Instantiate Mongo Databases
     backend_1 = async_mongo_lrs_backend()

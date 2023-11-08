@@ -160,7 +160,6 @@ class VideoEnableClosedCaptioningContextExtensions(VideoContextExtensions):
 
 
 class VideoVolumeChangeInteractionContextExtensions(VideoContextExtensions):
-    # noqa: D205, D415
     """Pydantic model for video volume change interaction `context`.`extensions`
     property.
 
@@ -172,7 +171,6 @@ class VideoVolumeChangeInteractionContextExtensions(VideoContextExtensions):
 
 
 class VideoScreenChangeInteractionContextExtensions(VideoContextExtensions):
-    # noqa: D205, D415
     """Pydantic model for video screen change interaction `context`.`extensions`
     property.
 

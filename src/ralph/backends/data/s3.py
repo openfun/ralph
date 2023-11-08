@@ -156,7 +156,7 @@ class S3DataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
             raise BackendException(msg % (target, error_msg)) from err
 
     @enforce_query_checks
-    def read(
+    def read(  # noqa: PLR0913
         self,
         *,
         query: Optional[Union[str, BaseQuery]] = None,
@@ -165,7 +165,6 @@ class S3DataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
-        # pylint: disable=too-many-arguments
         """Read an object matching the `query` in the `target` bucket and yield it.
 
         Args:
@@ -229,7 +228,7 @@ class S3DataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
             }
         )
 
-    def write(  # pylint: disable=too-many-arguments
+    def write(  # noqa: PLR0913
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Optional[str] = None,
