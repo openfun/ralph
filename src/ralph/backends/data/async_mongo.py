@@ -35,7 +35,7 @@ class AsyncMongoDataBackend(BaseAsyncDataBackend, AsyncWritable, AsyncListable):
     """Async MongoDB data backend."""
 
     name = "async_mongo"
-    query_model = MongoQuery
+    query_class = MongoQuery
     settings_class = MongoDataBackendSettings
 
     def __init__(self, settings: Optional[MongoDataBackendSettings] = None):

@@ -148,7 +148,7 @@ class BaseDataBackend(ABC):
     """Base data backend interface."""
 
     name = "base"
-    query_model = BaseQuery
+    query_class = BaseQuery
     settings_class = BaseDataBackendSettings
 
     @abstractmethod
@@ -165,26 +165,26 @@ class BaseDataBackend(ABC):
     ) -> BaseQuery:
         """Validate and transform the query."""
         if query is None:
-            query = self.query_model()
+            query = self.query_class()
 
         if isinstance(query, str):
-            query = self.query_model(query_string=query)
+            query = self.query_class(query_string=query)
 
         if isinstance(query, dict):
             try:
-                query = self.query_model(**query)
+                query = self.query_class(**query)
             except ValidationError as error:
                 msg = "The 'query' argument is expected to be a %s instance. %s"
                 errors = error.errors()
-                logger.error(msg, self.query_model.__name__, errors)
+                logger.error(msg, self.query_class.__name__, errors)
                 raise BackendParameterException(
-                    msg % (self.query_model.__name__, errors)
+                    msg % (self.query_class.__name__, errors)
                 ) from error
 
-        if not isinstance(query, self.query_model):
+        if not isinstance(query, self.query_class):
             msg = "The 'query' argument is expected to be a %s instance."
-            logger.error(msg, self.query_model.__name__)
-            raise BackendParameterException(msg % (self.query_model.__name__,))
+            logger.error(msg, self.query_class.__name__)
+            raise BackendParameterException(msg % (self.query_class.__name__,))
 
         logger.debug("Query: %s", str(query))
 
@@ -328,7 +328,7 @@ class BaseAsyncDataBackend(ABC):
     """Base async data backend interface."""
 
     name = "base"
-    query_model = BaseQuery
+    query_class = BaseQuery
     settings_class = BaseDataBackendSettings
 
     @abstractmethod
@@ -345,26 +345,26 @@ class BaseAsyncDataBackend(ABC):
     ) -> BaseQuery:
         """Validate and transform the query."""
         if query is None:
-            query = self.query_model()
+            query = self.query_class()
 
         if isinstance(query, str):
-            query = self.query_model(query_string=query)
+            query = self.query_class(query_string=query)
 
         if isinstance(query, dict):
             try:
-                query = self.query_model(**query)
+                query = self.query_class(**query)
             except ValidationError as error:
                 msg = "The 'query' argument is expected to be a %s instance. %s"
                 errors = error.errors()
-                logger.error(msg, self.query_model.__name__, errors)
+                logger.error(msg, self.query_class.__name__, errors)
                 raise BackendParameterException(
-                    msg % (self.query_model.__name__, errors)
+                    msg % (self.query_class.__name__, errors)
                 ) from error
 
-        if not isinstance(query, self.query_model):
+        if not isinstance(query, self.query_class):
             msg = "The 'query' argument is expected to be a %s instance."
-            logger.error(msg, self.query_model.__name__)
-            raise BackendParameterException(msg % (self.query_model.__name__,))
+            logger.error(msg, self.query_class.__name__)
+            raise BackendParameterException(msg % (self.query_class.__name__,))
 
         logger.debug("Query: %s", str(query))
 

@@ -43,7 +43,7 @@ async def test_backends_data_async_mongo_data_backend_default_instantiation(
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__MONGO__{name}", raising=False)
 
     assert AsyncMongoDataBackend.name == "async_mongo"
-    assert AsyncMongoDataBackend.query_model == MongoQuery
+    assert AsyncMongoDataBackend.query_class == MongoQuery
     assert AsyncMongoDataBackend.default_operation_type == BaseOperationType.INDEX
     assert AsyncMongoDataBackend.settings_class == MongoDataBackendSettings
     backend = AsyncMongoDataBackend()

@@ -27,7 +27,7 @@ class AsyncESDataBackend(BaseAsyncDataBackend, AsyncWritable, AsyncListable):
     """Asynchronous Elasticsearch data backend."""
 
     name = "async_es"
-    query_model = ESQuery
+    query_class = ESQuery
     settings_class = ESDataBackendSettings
 
     def __init__(self, settings: Optional[ESDataBackendSettings] = None):
