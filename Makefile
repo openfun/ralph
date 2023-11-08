@@ -72,7 +72,7 @@ bin/init-cluster:
 		-u $(RALPH_LRS_AUTH_USER_NAME) \
 		-p $(RALPH_LRS_AUTH_USER_PWD) \
 		-s $(RALPH_LRS_AUTH_USER_SCOPE) \
-		-M $(RALPH_LRS_AUTH_USER_AGENT_MBOX)
+		-M $(RALPH_LRS_AUTH_USER_AGENT_MBOX) \
 		-w
 
 
