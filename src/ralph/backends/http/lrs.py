@@ -30,8 +30,6 @@ def _ensure_running_loop_uniqueness(func):
 class LRSHTTPBackend(AsyncLRSHTTPBackend):
     """LRS HTTP backend."""
 
-    # pylint: disable=invalid-overridden-method
-
     name = "lrs"
 
     @_ensure_running_loop_uniqueness

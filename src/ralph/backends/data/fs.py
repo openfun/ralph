@@ -144,7 +144,7 @@ class FSDataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
             }
 
     @enforce_query_checks
-    def read(
+    def read(  # noqa: PLR0913
         self,
         *,
         query: Optional[Union[str, BaseQuery]] = None,
@@ -153,7 +153,6 @@ class FSDataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
-        # pylint: disable=too-many-arguments
         """Read files matching the query in the target folder and yield them.
 
         Args:
@@ -217,12 +216,12 @@ class FSDataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
                 }
             )
 
-    def write(  # pylint: disable=too-many-arguments
+    def write(  # noqa: PLR0913
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Optional[str] = None,
-        chunk_size: Optional[int] = None,
-        ignore_errors: bool = False,
+        chunk_size: Optional[int] = None,  # noqa: ARG002
+        ignore_errors: bool = False,  # noqa: ARG002
         operation_type: Optional[BaseOperationType] = None,
     ) -> int:
         """Write data records to the target file and return their count.

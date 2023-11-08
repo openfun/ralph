@@ -70,7 +70,6 @@ def test_models_edx_problem_hint_feedback_displayed_event_field_with_valid_field
     assert field.trigger_type in ("single", "compound")
 
 
-# pylint: disable=line-too-long
 @pytest.mark.parametrize(
     "question_type",
     [
@@ -95,7 +94,6 @@ def test_models_edx_problem_hint_feedback_displayed_event_field_with_invalid_que
         EdxProblemHintFeedbackDisplayedEventField(**invalid_field)
 
 
-# pylint: disable=line-too-long
 @pytest.mark.parametrize("trigger_type", ["jingle", "compund"])
 @custom_given(EdxProblemHintFeedbackDisplayedEventField)
 def test_models_edx_problem_hint_feedback_displayed_event_field_with_invalid_trigger_type_value(  # noqa

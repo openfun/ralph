@@ -300,7 +300,7 @@ async def test_backends_lrs_async_es_lrs_backend_query_statements(
     """Test the `AsyncESLRSBackend.query_statements` method, given a query,
     should return matching statements.
     """
-    # pylint: disable=invalid-name, unused-argument
+
     # Instantiate AsyncESLRSBackend.
     backend = async_es_lrs_backend()
     # Insert documents.
@@ -322,7 +322,6 @@ async def test_backends_lrs_async_es_lrs_backend_query_statements_pit_query_fail
     """Test the `AsyncESLRSBackend.query_statements` method, given a point in time
     query failure, should raise a `BackendException` and log the error.
     """
-    # pylint: disable=invalid-name,unused-argument
 
     async def mock_read(**_):
         """Mock the Elasticsearch.read method."""
@@ -353,7 +352,6 @@ async def test_backends_lrs_es_lrs_backend_query_statements_by_ids_search_query_
     """Test the `AsyncESLRSBackend.query_statements_by_ids` method, given a search
     query failure, should raise a `BackendException` and log the error.
     """
-    # pylint: disable=invalid-name,unused-argument
 
     def mock_search(**_):
         """Mock the Elasticsearch.search method."""
@@ -389,7 +387,6 @@ async def test_backends_lrs_async_es_lrs_backend_query_statements_by_ids_many_in
     search query, should execute the query uniquely on the specified index and return
     the expected results.
     """
-    # pylint: disable=invalid-name
 
     # Insert documents.
     index_1_document = {"_index": ES_TEST_INDEX, "_id": "1", "_source": {"id": "1"}}

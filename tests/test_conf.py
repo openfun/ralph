@@ -19,7 +19,6 @@ def test_conf_settings_field_value_priority(fs, monkeypatch):
         3. Dotenv variables (.env)
         4. Default values.
     """
-    # pylint: disable=invalid-name
 
     # 4. Using default value.
     assert str(Settings().AUTH_FILE) == str(settings.APP_DIR / "auth.json")

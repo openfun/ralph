@@ -32,7 +32,6 @@ def test_models_edx_converters_xapi_server_server_event_to_page_viewed_constant_
     assert xapi_event1.id == xapi_event2.id
 
 
-# pylint: disable=line-too-long
 @custom_given(Server, provisional.urls())
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_models_edx_converters_xapi_server_server_event_to_page_viewed(
@@ -68,11 +67,10 @@ def test_models_edx_converters_xapi_server_server_event_to_page_viewed(
     }
 
 
-# pylint: disable=line-too-long
 @settings(deadline=None)
 @custom_given(Server, provisional.urls())
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
-def test_models_edx_converters_xapi_server_server_event_to_page_viewed_with_anonymous_user(  # noqa: E501, pylint:disable=line-too-long
+def test_models_edx_converters_xapi_server_server_event_to_page_viewed_with_anonymous_user(  # noqa: E501
     uuid_namespace, event, platform_url
 ):
     """Test that anonymous usernames are replaced with `anonymous`."""

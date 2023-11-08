@@ -240,7 +240,7 @@ class RalphCLI(click.Group):
     help="Either CRITICAL, ERROR, WARNING, INFO (default) or DEBUG",
 )
 @click.version_option(version=ralph_version)
-def cli(verbosity=None):  # pylint: disable=unused-argument
+def cli(verbosity=None):  # noqa: ARG001
     """The cli is a stream-based tool to play with your logs.
 
     It offers functionalities to:
@@ -261,7 +261,9 @@ def backends_options(backends: Dict[str, Type], name: Optional[str] = None):
             fields = backend.settings_class.__fields__.items()
             for field_name, field in sorted(fields, key=lambda x: x[0], reverse=True):
                 field_type = field.type_
-                field_name = f"{backend_name}-{field_name.lower()}".replace("_", "-")
+                field_name = (  # noqa: PLW2901
+                    f"{backend_name}-{field_name.lower()}".replace("_", "-")
+                )
                 option = f"--{field_name}"
                 option_kwargs = {"default": None}
                 if field.default:
@@ -367,8 +369,7 @@ def backends_options(backends: Dict[str, Type], name: Optional[str] = None):
     default=False,
     help="Write new credentials to the LRS authentication file.",
 )
-# pylint: disable=too-many-arguments, too-many-locals
-def auth(
+def auth(  # noqa: PLR0913
     username,
     password,
     scope,
@@ -405,7 +406,7 @@ def auth(
 
     # Import required Pydantic models dynamically so that we don't create a
     # direct dependency between the CLI and the LRS
-    # pylint: disable=invalid-name
+
     ServerUsersCredentials = import_string(
         "ralph.api.auth.basic.ServerUsersCredentials"
     )
@@ -636,7 +637,7 @@ def convert(from_, to_, ignore_errors, fail_on_unknown, **conversion_set_kwargs)
     default=False,
     help="Ignore errors during the encoding operation.",
 )
-def read(
+def read(  # noqa: PLR0913
     backend,
     archive,
     chunk_size,
@@ -644,7 +645,7 @@ def read(
     query,
     ignore_errors,
     **options,
-):  # pylint: disable=too-many-arguments
+):
     """Read an archive or records from a configured backend."""
     logger.info(
         (
@@ -741,7 +742,7 @@ def read(
     default=None,
     help="The target container to write into",
 )
-def write(
+def write(  # noqa: PLR0913
     backend,
     chunk_size,
     force,
@@ -874,14 +875,16 @@ def runserver(backend: str, host: str, port: int, **options):
             if value is None:
                 continue
             backend_name, field_name = key.split(sep="_", maxsplit=1)
-            key = f"RALPH_BACKENDS__LRS__{backend_name}__{field_name}".upper()
+            key = (  # noqa: PLW2901
+                f"RALPH_BACKENDS__LRS__{backend_name}__{field_name}".upper()
+            )
             if isinstance(value, tuple):
-                value = ",".join(value)
+                value = ",".join(value)  # noqa: PLW2901
             if issubclass(type(value), ClientOptions):
                 for key_dict, value_dict in value.dict().items():
                     if value_dict is None:
                         continue
-                    key_dict = f"{key}__{key_dict}"
+                    key_dict = f"{key}__{key_dict}"  # noqa: PLW2901
                     logger.debug(
                         "Setting environment variable %s to '%s'", key_dict, value_dict
                     )

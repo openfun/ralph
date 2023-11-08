@@ -14,9 +14,7 @@ from ralph.backends.data.s3 import S3DataBackend, S3DataBackendSettings
 from ralph.exceptions import BackendException, BackendParameterException
 
 
-def test_backends_data_s3_backend_default_instantiation(
-    monkeypatch, fs
-):  # pylint: disable=invalid-name
+def test_backends_data_s3_backend_default_instantiation(monkeypatch, fs):
     """Test the `S3DataBackend` default instantiation."""
     fs.create_file(".env")
     backend_settings_names = [
@@ -66,7 +64,7 @@ def test_backends_data_s3_data_backend_instantiation_with_settings():
 
     try:
         S3DataBackend(settings_)
-    except Exception as err:  # pylint:disable=broad-except
+    except Exception as err:  # noqa: BLE001
         pytest.fail(f"S3DataBackend should not raise exceptions: {err}")
 
 
@@ -92,7 +90,7 @@ def test_backends_data_s3_data_backend_status_method(s3_backend):
 @mock_s3
 def test_backends_data_s3_data_backend_list_should_yield_archive_names(
     s3_backend,
-):  # pylint: disable=invalid-name
+):
     """Test that given `S3DataBackend.list` method successfully connects to the S3
     data, the S3 backend list method should yield the archives.
     """
@@ -139,7 +137,7 @@ def test_backends_data_s3_data_backend_list_should_yield_archive_names(
         response_list = backend.list()
         response_list_new = backend.list(new=True)
         response_list_details = backend.list(details=True)
-    except Exception:  # pylint:disable=broad-except
+    except Exception:  # noqa: BLE001
         pytest.fail("S3 backend should not raise exception on successful list")
 
     assert list(response_list) == [x["name"] for x in listing]
@@ -151,7 +149,7 @@ def test_backends_data_s3_data_backend_list_should_yield_archive_names(
 @mock_s3
 def test_backends_data_s3_list_on_empty_bucket_should_do_nothing(
     s3_backend,
-):  # pylint: disable=invalid-name
+):
     """Test that given `S3DataBackend.list` method successfully connects to the S3
     data, the S3 backend list method on an empty bucket should do nothing.
     """
@@ -168,7 +166,7 @@ def test_backends_data_s3_list_on_empty_bucket_should_do_nothing(
     backend.clean_history(lambda *_: True)
     try:
         response_list = backend.list()
-    except Exception:  # pylint:disable=broad-except
+    except Exception:  # noqa: BLE001
         pytest.fail("S3 backend should not raise exception on successful list")
 
     assert list(response_list) == [x["name"] for x in listing]
@@ -178,7 +176,7 @@ def test_backends_data_s3_list_on_empty_bucket_should_do_nothing(
 @mock_s3
 def test_backends_data_s3_list_with_failed_connection_should_log_the_error(
     s3_backend, caplog
-):  # pylint: disable=invalid-name
+):
     """Test that given `S3DataBackend.list` method fails to retrieve the list of
     archives, the S3 backend list method should log the error and raise a
     BackendException.
@@ -225,7 +223,7 @@ def test_backends_data_s3_list_with_failed_connection_should_log_the_error(
 def test_backends_data_s3_read_with_valid_name_should_write_to_history(
     s3_backend,
     monkeypatch,
-):  # pylint: disable=invalid-name
+):
     """Test that given `S3DataBackend.list` method successfully retrieves from the
     S3 data the object with the provided name (the object exists),
     the S3 backend read method should write the entry to the history.
@@ -294,7 +292,7 @@ def test_backends_data_s3_read_with_valid_name_should_write_to_history(
 @mock_s3
 def test_backends_data_s3_read_with_invalid_output_should_log_the_error(
     s3_backend, caplog
-):  # pylint: disable=invalid-name
+):
     """Test that given `S3DataBackend.read` method fails to serialize the object, the
     S3 backend read method should log the error, not write to history and raise a
     BackendException.
@@ -331,7 +329,7 @@ def test_backends_data_s3_read_with_invalid_output_should_log_the_error(
 @mock_s3
 def test_backends_data_s3_read_with_invalid_name_should_log_the_error(
     s3_backend, caplog
-):  # pylint: disable=invalid-name
+):
     """Test that given `S3DataBackend.read` method fails to retrieve from the S3
     data the object with the provided name (the object does not exists on S3),
     the S3 backend read method should log the error, not write to history and raise a
@@ -367,9 +365,7 @@ def test_backends_data_s3_read_with_invalid_name_should_log_the_error(
 
 
 @mock_s3
-def test_backends_data_s3_read_with_wrong_name_should_log_the_error(
-    s3_backend, caplog
-):  # pylint: disable=invalid-name
+def test_backends_data_s3_read_with_wrong_name_should_log_the_error(s3_backend, caplog):
     """Test that given `S3DataBackend.read` method fails to retrieve from the S3
     data the object with the provided name (the object does not exists on S3),
     the S3 backend read method should log the error, not write to history and raise a
@@ -408,7 +404,7 @@ def test_backends_data_s3_read_with_wrong_name_should_log_the_error(
 @mock_s3
 def test_backends_data_s3_read_with_iter_error_should_log_the_error(
     s3_backend, caplog, monkeypatch
-):  # pylint: disable=invalid-name
+):
     """Test that given `S3DataBackend.read` method fails to iterate through the result
     from the S3 data the object, the S3 backend read method should log the error,
     not write to history and raise a BackendException.
@@ -455,7 +451,7 @@ def test_backends_data_s3_read_with_iter_error_should_log_the_error(
 @mock_s3
 def test_backends_data_s3_write_method_with_parameter_error(
     operation_type, s3_backend, caplog
-):  # pylint: disable=invalid-name
+):
     """Test the `S3DataBackend.write` method, given a target matching an
     existing object and a `CREATE` or `INDEX` `operation_type`, should raise a
     `FileExistsError`.
@@ -505,7 +501,7 @@ def test_backends_data_s3_data_backend_write_method_with_append_or_delete_operat
     """Test the `S3DataBackend.write` method, given an `APPEND`
     `operation_type`, should raise a `BackendParameterException`.
     """
-    # pylint: disable=invalid-name
+
     backend = s3_backend()
     with pytest.raises(
         BackendParameterException,
@@ -522,7 +518,7 @@ def test_backends_data_s3_data_backend_write_method_with_append_or_delete_operat
 @mock_s3
 def test_backends_data_s3_write_method_with_create_index_operation(
     operation_type, s3_backend, monkeypatch, caplog
-):  # pylint: disable=invalid-name
+):
     """Test the `S3DataBackend.write` method, given a target matching an
     existing object and a `CREATE` or `INDEX` `operation_type`, should add
     an entry to the History.
@@ -626,7 +622,7 @@ def test_backends_data_s3_write_method_with_create_index_operation(
 @mock_s3
 def test_backends_data_s3_write_method_with_no_data_should_skip(
     s3_backend,
-):  # pylint: disable=invalid-name
+):
     """Test the `S3DataBackend.write` method, given no data to write,
     should skip and return 0.
     """
@@ -651,7 +647,7 @@ def test_backends_data_s3_write_method_with_no_data_should_skip(
 @mock_s3
 def test_backends_data_s3_write_method_with_failure_should_log_the_error(
     s3_backend,
-):  # pylint: disable=invalid-name
+):
     """Test the `S3DataBackend.write` method, given a connection failure,
     should raise a `BackendException`.
     """
@@ -703,7 +699,7 @@ def test_backends_data_s3_data_backend_close_method(s3_backend, caplog):
 
     # No client instantiated
     backend = s3_backend()
-    backend._client = None  # pylint: disable=protected-access
+    backend._client = None
     with caplog.at_level(logging.WARNING):
         backend.close()
 

@@ -66,9 +66,9 @@ class MongoDataBackendSettings(BaseDataBackendSettings):
         env_prefix = "RALPH_BACKENDS__DATA__MONGO__"
 
     CONNECTION_URI: MongoDsn = MongoDsn("mongodb://localhost:27017/", scheme="mongodb")
-    DEFAULT_DATABASE: constr(regex=r"^[^\s.$/\\\"\x00]+$") = "statements"  # noqa : F722
+    DEFAULT_DATABASE: constr(regex=r"^[^\s.$/\\\"\x00]+$") = "statements"
     DEFAULT_COLLECTION: constr(
-        regex=r"^(?!.*\.\.)[^.$\x00]+(?:\.[^.$\x00]+)*$"  # noqa : F722
+        regex=r"^(?!.*\.\.)[^.$\x00]+(?:\.[^.$\x00]+)*$"
     ) = "marsha"
     CLIENT_OPTIONS: MongoClientOptions = MongoClientOptions()
     DEFAULT_CHUNK_SIZE: int = 500
@@ -87,7 +87,6 @@ class BaseMongoQuery(BaseQuery):
 class MongoQuery(BaseMongoQuery):
     """MongoDB query model."""
 
-    # pylint: disable=unsubscriptable-object
     query_string: Union[Json[BaseMongoQuery], None]
 
 
@@ -127,7 +126,10 @@ class MongoDataBackend(BaseDataBackend, Writable, Listable):
 
         # Check MongoDB server status.
         try:
-            if self.client.admin.command("serverStatus").get("ok") != 1.0:
+            if (
+                self.client.admin.command("serverStatus").get("ok")
+                != 1.0  # noqa: PLR2004
+            ):
                 logger.error("MongoDB `serverStatus` command did not return 1.0")
                 return DataBackendStatus.ERROR
         except PyMongoError as error:
@@ -173,7 +175,7 @@ class MongoDataBackend(BaseDataBackend, Writable, Listable):
             raise BackendException(msg % error) from error
 
     @enforce_query_checks
-    def read(
+    def read(  # noqa: PLR0913
         self,
         *,
         query: Optional[Union[str, MongoQuery]] = None,
@@ -182,7 +184,6 @@ class MongoDataBackend(BaseDataBackend, Writable, Listable):
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
-        # pylint: disable=too-many-arguments
         """Read documents matching the `query` from `target` collection and yield them.
 
         Args:
@@ -230,7 +231,7 @@ class MongoDataBackend(BaseDataBackend, Writable, Listable):
             logger.error(msg, error)
             raise BackendException(msg % error) from error
 
-    def write(  # pylint: disable=too-many-arguments
+    def write(  # noqa: PLR0913
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Optional[str] = None,

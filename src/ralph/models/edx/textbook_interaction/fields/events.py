@@ -13,7 +13,6 @@ else:
     from typing_extensions import Literal
 
 
-# pylint: disable=line-too-long
 class TextbookInteractionBaseEventField(AbstractBaseEventField):
     """Pydantic model for textbook interaction core `event` field.
 
@@ -25,9 +24,7 @@ class TextbookInteractionBaseEventField(AbstractBaseEventField):
 
     page: int
     chapter: constr(
-        regex=(
-            r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"  # noqa
-        )
+        regex=(r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$")
     )
 
 
@@ -63,7 +60,6 @@ class TextbookPdfOutlineToggledEventField(TextbookInteractionBaseEventField):
     name: Literal["textbook.pdf.outline.toggled"]
 
 
-# pylint: disable=line-too-long
 class TextbookPdfChapterNavigatedEventField(AbstractBaseEventField):
     """Pydantic model for `textbook.pdf.chapter.navigated`.`event` field.
 
@@ -75,9 +71,7 @@ class TextbookPdfChapterNavigatedEventField(AbstractBaseEventField):
 
     name: Literal["textbook.pdf.chapter.navigated"]
     chapter: constr(
-        regex=(
-            r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"  # noqa
-        )
+        regex=(r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$")
     )
     chapter_title: str
 
@@ -245,7 +239,6 @@ class TextbookPdfSearchCaseSensitivityToggledEventField(
     status: str
 
 
-# pylint: disable=line-too-long
 class BookEventField(AbstractBaseEventField):
     """Pydantic model for `book`.`event` field.
 
@@ -264,9 +257,7 @@ class BookEventField(AbstractBaseEventField):
     """
 
     chapter: constr(
-        regex=(
-            r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"  # noqa
-        )
+        regex=(r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$")
     )
     name: Union[
         Literal["textbook.pdf.page.loaded"], Literal["textbook.pdf.page.navigatednext"]

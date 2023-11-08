@@ -20,7 +20,6 @@ from ralph.backends.data.es import ESDataBackend, ESDataBackendSettings, ESQuery
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import parse_bytes_to_dict, read_raw
 
-# pylint: disable=duplicate-code
 logger = logging.getLogger(__name__)
 
 
@@ -111,7 +110,7 @@ class AsyncESDataBackend(BaseAsyncDataBackend, AsyncWritable, AsyncListable):
             yield index
 
     @async_enforce_query_checks
-    async def read(
+    async def read(  # noqa: PLR0912, PLR0913
         self,
         *,
         query: Optional[Union[str, ESQuery]] = None,
@@ -120,7 +119,6 @@ class AsyncESDataBackend(BaseAsyncDataBackend, AsyncWritable, AsyncListable):
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
-        # pylint: disable=too-many-arguments
         """Read documents matching the query in the target index and yield them.
 
         Args:
@@ -191,7 +189,7 @@ class AsyncESDataBackend(BaseAsyncDataBackend, AsyncWritable, AsyncListable):
             for document in documents:
                 yield document
 
-    async def write(  # pylint: disable=too-many-arguments
+    async def write(  # noqa: PLR0913
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Union[None, str] = None,

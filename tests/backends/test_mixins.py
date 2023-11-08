@@ -10,7 +10,6 @@ from ralph.conf import Settings, settings
 
 def test_backends_mixins_history_mixin_empty_history(settings_fs):
     """Test the history method of the HistoryMixin when history is empty."""
-    # pylint: disable=protected-access,unused-argument
 
     history = HistoryMixin()
 
@@ -35,7 +34,6 @@ def test_backends_mixins_history_mixin_empty_history(settings_fs):
 
 def test_backends_mixins_history_mixin_with_history(fs, settings_fs):
     """Test the history method of the HistoryMixin when history is filled."""
-    # pylint: disable=invalid-name,unused-argument
 
     history = HistoryMixin()
 
@@ -48,7 +46,6 @@ def test_backends_mixins_history_mixin_with_history(fs, settings_fs):
 
 def test_backends_mixins_history_mixin_write_history(fs, settings_fs):
     """Test the write_history method of the HistoryMixin."""
-    # pylint: disable=invalid-name, protected-access, unused-argument
 
     # Force Path instantiation with fake FS
     history_file_path = Path(settings.APP_DIR / "history.json")
@@ -78,7 +75,6 @@ def test_backends_mixins_history_mixin_write_history(fs, settings_fs):
 
 def test_backends_mixins_history_mixin_clean_history(fs, settings_fs):
     """Test the clean_history method of the HistoryMixin."""
-    # pylint: disable=invalid-name,unused-argument
 
     history = HistoryMixin()
 
@@ -102,7 +98,6 @@ def test_backends_mixins_history_mixin_clean_history(fs, settings_fs):
 
 def test_backends_mixins_history_mixin_append_to_history(fs):
     """Test the append_to_history method of the HistoryMixin."""
-    # pylint: disable=invalid-name, protected-access
 
     history = HistoryMixin()
 

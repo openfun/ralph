@@ -105,7 +105,6 @@ class BaseClickHouseQuery(BaseQuery):
 class ClickHouseQuery(BaseClickHouseQuery):
     """ClickHouse query model."""
 
-    # pylint: disable=unsubscriptable-object
     query_string: Union[Json[BaseClickHouseQuery], None]
 
 
@@ -166,7 +165,10 @@ class ClickHouseDataBackend(BaseDataBackend, Writable, Listable):
         return DataBackendStatus.OK
 
     def list(
-        self, target: Optional[str] = None, details: bool = False, new: bool = False
+        self,
+        target: Optional[str] = None,
+        details: bool = False,
+        new: bool = False,  # noqa: ARG002
     ) -> Iterator[Union[str, dict]]:
         """List tables for a given database.
 
@@ -198,7 +200,7 @@ class ClickHouseDataBackend(BaseDataBackend, Writable, Listable):
                 yield str(table.get("name"))
 
     @enforce_query_checks
-    def read(
+    def read(  # noqa: PLR0912, PLR0913
         self,
         *,
         query: Optional[Union[str, ClickHouseQuery]] = None,
@@ -207,7 +209,6 @@ class ClickHouseDataBackend(BaseDataBackend, Writable, Listable):
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
-        # pylint: disable=too-many-arguments
         """Read documents matching the query in the target table and yield them.
 
         Args:
@@ -243,7 +244,7 @@ class ClickHouseDataBackend(BaseDataBackend, Writable, Listable):
         if isinstance(query.select, str):
             query.select = [query.select]
         select = ",".join(query.select)
-        sql = f"SELECT {select} FROM {target}"  # nosec
+        sql = f"SELECT {select} FROM {target}"  # noqa: S608
 
         if query.where:
             if isinstance(query.where, str):
@@ -292,7 +293,7 @@ class ClickHouseDataBackend(BaseDataBackend, Writable, Listable):
             logger.error(msg, error)
             raise BackendException(msg % error) from error
 
-    def write(  # pylint: disable=too-many-arguments
+    def write(  # noqa: PLR0913
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Optional[str] = None,

@@ -85,7 +85,7 @@ class Writable(ABC):
     default_operation_type = BaseOperationType.INDEX
 
     @abstractmethod
-    def write(  # pylint: disable=too-many-arguments
+    def write(  # noqa: PLR0913
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Optional[str] = None,
@@ -200,7 +200,7 @@ class BaseDataBackend(ABC):
 
     @abstractmethod
     @enforce_query_checks
-    def read(
+    def read(  # noqa: PLR0913
         self,
         *,
         query: Optional[Union[str, BaseQuery]] = None,
@@ -209,7 +209,6 @@ class BaseDataBackend(ABC):
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
-        # pylint: disable=too-many-arguments
         """Read records matching the `query` in the `target` container and yield them.
 
         Args:
@@ -266,7 +265,7 @@ class AsyncWritable(ABC):
     default_operation_type = BaseOperationType.INDEX
 
     @abstractmethod
-    async def write(  # pylint: disable=too-many-arguments
+    async def write(  # noqa: PLR0913
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Optional[str] = None,
@@ -381,7 +380,7 @@ class BaseAsyncDataBackend(ABC):
 
     @abstractmethod
     @async_enforce_query_checks
-    async def read(
+    async def read(  # noqa: PLR0913
         self,
         *,
         query: Optional[Union[str, BaseQuery]] = None,
@@ -390,7 +389,6 @@ class BaseAsyncDataBackend(ABC):
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
-        # pylint: disable=too-many-arguments
         """Read records matching the `query` in the `target` container and yield them.
 
         Args:

@@ -66,7 +66,9 @@ class AsyncMongoDataBackend(BaseAsyncDataBackend, AsyncWritable, AsyncListable):
 
         # Check MongoDB server status.
         try:
-            if (await self.client.admin.command("serverStatus")).get("ok") != 1.0:
+            if (await self.client.admin.command("serverStatus")).get(
+                "ok"
+            ) != 1.0:  # noqa: PLR2004
                 logger.error("MongoDB `serverStatus` command did not return 1.0")
                 return DataBackendStatus.ERROR
         except PyMongoError as error:
@@ -117,7 +119,7 @@ class AsyncMongoDataBackend(BaseAsyncDataBackend, AsyncWritable, AsyncListable):
             raise BackendException(msg % error) from error
 
     @async_enforce_query_checks
-    async def read(
+    async def read(  # noqa: PLR0913
         self,
         *,
         query: Optional[Union[str, MongoQuery]] = None,
@@ -126,7 +128,6 @@ class AsyncMongoDataBackend(BaseAsyncDataBackend, AsyncWritable, AsyncListable):
         raw_output: bool = False,
         ignore_errors: bool = False,
     ) -> Iterator[Union[bytes, dict]]:
-        # pylint: disable=too-many-arguments
         """Read documents matching the `query` from `target` collection and yield them.
 
         Args:
@@ -178,7 +179,7 @@ class AsyncMongoDataBackend(BaseAsyncDataBackend, AsyncWritable, AsyncListable):
             logger.error(msg, error)
             raise BackendException(msg % error) from error
 
-    async def write(  # pylint: disable=too-many-arguments
+    async def write(  # noqa: PLR0913
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Optional[str] = None,

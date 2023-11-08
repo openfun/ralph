@@ -186,7 +186,6 @@ def test_models_edx_ui_textbook_pdf_search_highlight_toggled_with_valid_statemen
     assert statement.name == "textbook.pdf.search.highlight.toggled"
 
 
-# pylint: disable=line-too-long
 @custom_given(UITextbookPdfSearchCaseSensitivityToggled)
 def test_models_edx_ui_textbook_pdf_search_case_sensitivity_toggled_with_valid_statement(  # noqa
     statement,

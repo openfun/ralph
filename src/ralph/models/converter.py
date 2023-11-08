@@ -86,7 +86,7 @@ class ConversionItem:
         try:
             for transformer in self.transformers:
                 data = transformer(data)
-        except Exception as err:
+        except Exception as err:  # noqa: BLE001
             msg = f"Failed to get the transformed value for field: {self.src}"
             raise ConversionException(msg) from err
         return data

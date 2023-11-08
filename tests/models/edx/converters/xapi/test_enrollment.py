@@ -21,7 +21,7 @@ from tests.fixtures.hypothesis_strategies import custom_given
 
 @custom_given(EdxCourseEnrollmentActivated, provisional.urls())
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
-def test_models_edx_converters_xapi_enrollment_edx_course_enrollment_activated_to_lms_registered_course(  # noqa: E501, pylint:disable=line-too-long
+def test_models_edx_converters_xapi_enrollment_edx_course_enrollment_activated_to_lms_registered_course(  # noqa: E501
     uuid_namespace, event, platform_url
 ):
     """Test that converting with `EdxCourseEnrollmentActivatedToLMSRegisteredCourse`
@@ -68,7 +68,7 @@ def test_models_edx_converters_xapi_enrollment_edx_course_enrollment_activated_t
 
 @custom_given(EdxCourseEnrollmentDeactivated, provisional.urls())
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
-def test_models_edx_converters_xapi_enrollment_edx_course_enrollment_deactivated_to_lms_unregistered_course(  # noqa: E501, pylint:disable=line-too-long
+def test_models_edx_converters_xapi_enrollment_edx_course_enrollment_deactivated_to_lms_unregistered_course(  # noqa: E501
     uuid_namespace, event, platform_url
 ):
     """Test that converting with

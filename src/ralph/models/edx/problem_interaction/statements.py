@@ -198,7 +198,7 @@ class UIProblemReset(BaseBrowserModel):
 
     event: Union[
         str,
-        Json[UIProblemResetEventField],  # pylint: disable=unsubscriptable-object
+        Json[UIProblemResetEventField],
         UIProblemResetEventField,
     ]
     event_type: Literal["problem_reset"]
@@ -238,7 +238,7 @@ class UIProblemShow(BaseBrowserModel):
     __selector__ = selector(event_source="browser", event_type="problem_show")
 
     event: Union[
-        Json[UIProblemShowEventField],  # pylint: disable=unsubscriptable-object
+        Json[UIProblemShowEventField],
         UIProblemShowEventField,
     ]
     event_type: Literal["problem_show"]

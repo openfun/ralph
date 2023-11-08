@@ -173,7 +173,6 @@ class VirtualClassroomTerminatedContext(VirtualClassroomContext):
 class VirtualClassroomStartedPollContextActivities(
     VirtualClassroomContextContextActivities
 ):
-    # noqa: D205, D415
     """Pydantic model for virtual classroom started poll `context`.`contextActivities`
     property.
 
@@ -203,7 +202,6 @@ class VirtualClassroomStartedPollContext(VirtualClassroomContext):
 class VirtualClassroomAnsweredPollContextActivities(
     VirtualClassroomContextContextActivities
 ):
-    # noqa: D205, D415
     """Pydantic model for virtual classroom answered poll `context`.`contextActivities`
     property.
 
@@ -232,7 +230,6 @@ class VirtualClassroomAnsweredPollContext(VirtualClassroomContext):
 class VirtualClassroomPostedPublicMessageContextActivities(
     VirtualClassroomContextContextActivities
 ):
-    # noqa: D205, D415
     """Pydantic model for virtual classroom posted public message
     `context`.`contextActivities` property.
 

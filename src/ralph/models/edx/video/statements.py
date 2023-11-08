@@ -40,7 +40,7 @@ class UILoadVideo(BaseBrowserModel):
     __selector__ = selector(event_source="browser", event_type="load_video")
 
     event: Union[
-        Json[VideoBaseEventField],  # pylint: disable=unsubscriptable-object
+        Json[VideoBaseEventField],
         VideoBaseEventField,
     ]
     event_type: Literal["load_video"]
@@ -62,7 +62,7 @@ class UIPlayVideo(BaseBrowserModel):
     __selector__ = selector(event_source="browser", event_type="play_video")
 
     event: Union[
-        Json[PlayVideoEventField],  # pylint: disable=unsubscriptable-object
+        Json[PlayVideoEventField],
         PlayVideoEventField,
     ]
     event_type: Literal["play_video"]
@@ -84,7 +84,7 @@ class UIPauseVideo(BaseBrowserModel):
     __selector__ = selector(event_source="browser", event_type="pause_video")
 
     event: Union[
-        Json[PauseVideoEventField],  # pylint: disable=unsubscriptable-object
+        Json[PauseVideoEventField],
         PauseVideoEventField,
     ]
     event_type: Literal["pause_video"]
@@ -107,7 +107,7 @@ class UISeekVideo(BaseBrowserModel):
     __selector__ = selector(event_source="browser", event_type="seek_video")
 
     event: Union[
-        Json[SeekVideoEventField],  # pylint: disable=unsubscriptable-object
+        Json[SeekVideoEventField],
         SeekVideoEventField,
     ]
     event_type: Literal["seek_video"]
@@ -129,7 +129,7 @@ class UIStopVideo(BaseBrowserModel):
     __selector__ = selector(event_source="browser", event_type="stop_video")
 
     event: Union[
-        Json[StopVideoEventField],  # pylint: disable=unsubscriptable-object
+        Json[StopVideoEventField],
         StopVideoEventField,
     ]
     event_type: Literal["stop_video"]
@@ -152,7 +152,7 @@ class UIHideTranscript(BaseBrowserModel):
     __selector__ = selector(event_source="browser", event_type="hide_transcript")
 
     event: Union[
-        Json[VideoHideTranscriptEventField],  # pylint: disable=unsubscriptable-object
+        Json[VideoHideTranscriptEventField],
         VideoHideTranscriptEventField,
     ]
     event_type: Literal["hide_transcript"]
@@ -175,7 +175,7 @@ class UIShowTranscript(BaseBrowserModel):
     __selector__ = selector(event_source="browser", event_type="show_transcript")
 
     event: Union[
-        Json[VideoShowTranscriptEventField],  # pylint: disable=unsubscriptable-object
+        Json[VideoShowTranscriptEventField],
         VideoShowTranscriptEventField,
     ]
     event_type: Literal["show_transcript"]
@@ -196,7 +196,7 @@ class UISpeedChangeVideo(BaseBrowserModel):
     __selector__ = selector(event_source="browser", event_type="speed_change_video")
 
     event: Union[
-        Json[SpeedChangeVideoEventField],  # pylint: disable=unsubscriptable-object
+        Json[SpeedChangeVideoEventField],
         SpeedChangeVideoEventField,
     ]
     event_type: Literal["speed_change_video"]
@@ -217,7 +217,7 @@ class UIVideoHideCCMenu(BaseBrowserModel):
     __selector__ = selector(event_source="browser", event_type="video_hide_cc_menu")
 
     event: Union[
-        Json[VideoBaseEventField],  # pylint: disable=unsubscriptable-object
+        Json[VideoBaseEventField],
         VideoBaseEventField,
     ]
     event_type: Literal["video_hide_cc_menu"]
@@ -240,7 +240,7 @@ class UIVideoShowCCMenu(BaseBrowserModel):
     __selector__ = selector(event_source="browser", event_type="video_show_cc_menu")
 
     event: Union[
-        Json[VideoBaseEventField],  # pylint: disable=unsubscriptable-object
+        Json[VideoBaseEventField],
         VideoBaseEventField,
     ]
     event_type: Literal["video_show_cc_menu"]

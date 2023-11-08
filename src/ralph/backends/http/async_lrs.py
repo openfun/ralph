@@ -75,9 +75,7 @@ class AsyncLRSHTTPBackend(BaseHTTPBackend):
     default_operation_type = OperationType.CREATE
     settings_class = LRSHTTPBackendSettings
 
-    def __init__(  # pylint: disable=too-many-arguments
-        self, settings: Optional[LRSHTTPBackendSettings] = None
-    ):
+    def __init__(self, settings: Optional[LRSHTTPBackendSettings] = None):
         """Instantiate the LRS HTTP (basic auth) backend client.
 
         Args:
@@ -109,7 +107,10 @@ class AsyncLRSHTTPBackend(BaseHTTPBackend):
         return HTTPBackendStatus.OK
 
     async def list(
-        self, target: Optional[str] = None, details: bool = False, new: bool = False
+        self,
+        target: Optional[str] = None,
+        details: bool = False,  # noqa: ARG002
+        new: bool = False,  # noqa: ARG002
     ) -> Iterator[Union[str, dict]]:
         """Raise error for unsupported `list` method."""
         msg = "LRS HTTP backend does not support `list` method, cannot list from %s"
@@ -118,13 +119,13 @@ class AsyncLRSHTTPBackend(BaseHTTPBackend):
         raise NotImplementedError(msg % target)
 
     @enforce_query_checks
-    async def read(  # pylint: disable=too-many-arguments
+    async def read(  # noqa: PLR0913
         self,
         query: Optional[Union[str, LRSStatementsQuery]] = None,
         target: Optional[str] = None,
         chunk_size: Optional[PositiveInt] = 500,
         raw_output: bool = False,
-        ignore_errors: bool = False,
+        ignore_errors: bool = False,  # noqa: ARG002
         greedy: bool = True,
         max_statements: Optional[PositiveInt] = None,
     ) -> Iterator[Union[bytes, dict]]:
@@ -203,7 +204,7 @@ class AsyncLRSHTTPBackend(BaseHTTPBackend):
             logger.error("%s. %s", msg, error)
             raise BackendException(msg, *error.args) from error
 
-    async def write(  # pylint: disable=too-many-arguments
+    async def write(  # noqa: PLR0913
         self,
         data: Union[Iterable[bytes], Iterable[dict]],
         target: Optional[str] = None,

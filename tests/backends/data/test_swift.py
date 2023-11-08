@@ -19,7 +19,7 @@ from ralph.utils import now
 
 def test_backends_data_swift_data_backend_default_instantiation(monkeypatch, fs):
     """Test the `SwiftDataBackend` default instantiation."""
-    # pylint: disable=invalid-name
+
     fs.create_file(".env")
     backend_settings_names = [
         "AUTH_URL",
@@ -61,7 +61,7 @@ def test_backends_data_swift_data_backend_default_instantiation(monkeypatch, fs)
 
 def test_backends_data_swift_data_backend_instantiation_with_settings(fs):
     """Test the `SwiftDataBackend` instantiation with settings."""
-    # pylint: disable=invalid-name
+
     fs.create_file(".env")
     settings_ = SwiftDataBackend.settings_class(
         AUTH_URL="https://toto.net/",
@@ -89,7 +89,7 @@ def test_backends_data_swift_data_backend_instantiation_with_settings(fs):
 
     try:
         SwiftDataBackend(settings_)
-    except Exception as err:  # pylint:disable=broad-except
+    except Exception as err:  # noqa: BLE001
         pytest.fail(f"Two SwiftDataBackends should not raise exceptions: {err}")
     backend.close()
 
@@ -105,7 +105,6 @@ def test_backends_data_swift_data_backend_status_method_with_error_status(
     )
 
     def mock_failed_head_account(*args, **kwargs):
-        # pylint:disable=unused-argument
         raise ClientException(error)
 
     backend = swift_backend()
@@ -129,7 +128,7 @@ def test_backends_data_swift_data_backend_status_method_with_ok_status(
     permissions, should return `DataBackendStatus.OK`.
     """
 
-    def mock_successful_head_account(*args, **kwargs):  # pylint:disable=unused-argument
+    def mock_successful_head_account(*args, **kwargs):
         return 1
 
     backend = swift_backend()
@@ -146,7 +145,7 @@ def test_backends_data_swift_data_backend_status_method_with_ok_status(
 
 def test_backends_data_swift_data_backend_list_method(
     swift_backend, monkeypatch, fs, settings_fs
-):  # pylint:disable=invalid-name,unused-argument
+):
     """Test that the `SwiftDataBackend.list` method argument should list
     the default container.
     """
@@ -181,10 +180,10 @@ def test_backends_data_swift_data_backend_list_method(
         },
     ]
 
-    def mock_get_container(*args, **kwargs):  # pylint:disable=unused-argument
+    def mock_get_container(*args, **kwargs):
         return (None, [x["name"] for x in listing])
 
-    def mock_head_object(container, obj):  # pylint:disable=unused-argument
+    def mock_head_object(container, obj):
         resp = next((x for x in listing if x["name"] == obj), None)
         return {
             "Last-Modified": resp["lastModified"],
@@ -204,7 +203,7 @@ def test_backends_data_swift_data_backend_list_method(
 
 def test_backends_data_swift_data_backend_list_with_failed_details(
     swift_backend, monkeypatch, fs, caplog, settings_fs
-):  # pylint:disable=invalid-name,unused-argument,too-many-arguments
+):
     """Test that the `SwiftDataBackend.list` method with a failed connection
     when retrieving details, should log the error and raise a BackendException.
     """
@@ -219,10 +218,10 @@ def test_backends_data_swift_data_backend_list_with_failed_details(
         },
     ]
 
-    def mock_get_container(*args, **kwargs):  # pylint:disable=unused-argument
+    def mock_get_container(*args, **kwargs):
         return (None, [x["name"] for x in listing])
 
-    def mock_head_object(*args, **kwargs):  # pylint:disable=unused-argument
+    def mock_head_object(*args, **kwargs):
         raise ClientException(error)
 
     backend = swift_backend()
@@ -243,13 +242,13 @@ def test_backends_data_swift_data_backend_list_with_failed_details(
 
 def test_backends_data_swift_data_backend_list_with_failed_connection(
     swift_backend, monkeypatch, fs, caplog, settings_fs
-):  # pylint:disable=invalid-name,unused-argument,too-many-arguments
+):
     """Test that the `SwiftDataBackend.list` method with a failed connection
     should log the error and raise a BackendException.
     """
     error = "Container not found"
 
-    def mock_get_container(*args, **kwargs):  # pylint:disable=unused-argument
+    def mock_get_container(*args, **kwargs):
         raise ClientException(error)
 
     backend = swift_backend()
@@ -272,7 +271,7 @@ def test_backends_data_swift_data_backend_list_with_failed_connection(
 
 def test_backends_data_swift_data_backend_read_method_with_raw_output(
     swift_backend, monkeypatch, fs, settings_fs
-):  # pylint:disable=invalid-name, unused-argument
+):
     """Test the `SwiftDataBackend.read` method with `raw_output` set to `True`."""
 
     # Object contents.
@@ -283,7 +282,7 @@ def test_backends_data_swift_data_backend_read_method_with_raw_output(
 
     backend = swift_backend()
 
-    def mock_get_object(*args, **kwargs):  # pylint:disable=unused-argument
+    def mock_get_object(*args, **kwargs):
         resp_headers = {"Content-Length": 14}
         return (resp_headers, BytesIO(content))
 
@@ -333,7 +332,7 @@ def test_backends_data_swift_data_backend_read_method_with_raw_output(
 
 def test_backends_data_swift_data_backend_read_method_without_raw_output(
     swift_backend, monkeypatch, fs, settings_fs
-):  # pylint:disable=invalid-name, unused-argument
+):
     """Test the `SwiftDataBackend.read` method with `raw_output` set to `False`."""
 
     # Object contents.
@@ -345,7 +344,7 @@ def test_backends_data_swift_data_backend_read_method_without_raw_output(
 
     backend = swift_backend()
 
-    def mock_get_object(*args, **kwargs):  # pylint:disable=unused-argument
+    def mock_get_object(*args, **kwargs):
         resp_headers = {"Content-Length": 14}
         return (resp_headers, BytesIO(content_bytes))
 
@@ -388,7 +387,6 @@ def test_backends_data_swift_data_backend_read_method_with_ignore_errors(
     """Test the `SwiftDataBackend.read` method with `ignore_errors` set to `True`,
     given an archive containing invalid JSON lines, should skip the invalid lines.
     """
-    # pylint: disable=invalid-name, unused-argument
 
     # File contents.
     valid_dictionary = {"foo": "bar"}
@@ -405,7 +403,7 @@ def test_backends_data_swift_data_backend_read_method_with_ignore_errors(
 
     backend = swift_backend()
 
-    def mock_get_object_1(*args, **kwargs):  # pylint:disable=unused-argument
+    def mock_get_object_1(*args, **kwargs):
         resp_headers = {"Content-Length": 14}
         return (resp_headers, BytesIO(valid_invalid_json))
 
@@ -416,7 +414,7 @@ def test_backends_data_swift_data_backend_read_method_with_ignore_errors(
     assert isinstance(result, Iterable)
     assert list(result) == [valid_dictionary, valid_dictionary]
 
-    def mock_get_object_2(*args, **kwargs):  # pylint:disable=unused-argument
+    def mock_get_object_2(*args, **kwargs):
         resp_headers = {"Content-Length": 14}
         return (resp_headers, BytesIO(invalid_valid_json))
 
@@ -435,7 +433,6 @@ def test_backends_data_swift_data_backend_read_method_without_ignore_errors(
     """Test the `SwiftDataBackend.read` method with `ignore_errors` set to `False`,
     given a file containing invalid JSON lines, should raise a `BackendException`.
     """
-    # pylint: disable=invalid-name, unused-argument
 
     # File contents.
     valid_dictionary = {"foo": "bar"}
@@ -452,7 +449,7 @@ def test_backends_data_swift_data_backend_read_method_without_ignore_errors(
 
     backend = swift_backend()
 
-    def mock_get_object_1(*args, **kwargs):  # pylint:disable=unused-argument
+    def mock_get_object_1(*args, **kwargs):
         resp_headers = {"Content-Length": 14}
         return (resp_headers, BytesIO(valid_invalid_json))
 
@@ -471,7 +468,7 @@ def test_backends_data_swift_data_backend_read_method_without_ignore_errors(
     # added to the history.
     assert not backend.history
 
-    def mock_get_object_2(*args, **kwargs):  # pylint:disable=unused-argument
+    def mock_get_object_2(*args, **kwargs):
         resp_headers = {"Content-Length": 14}
         return (resp_headers, BytesIO(invalid_valid_json))
 
@@ -494,7 +491,7 @@ def test_backends_data_swift_data_backend_read_method_with_failed_connection(
 
     error = "Failed to get object."
 
-    def mock_failed_get_object(*args, **kwargs):  # pylint:disable=unused-argument
+    def mock_failed_get_object(*args, **kwargs):
         raise ClientException(error)
 
     backend = swift_backend()
@@ -520,10 +517,10 @@ def test_backends_data_swift_data_backend_write_method_with_file_exists_error(
     existing file and a `CREATE` or `INDEX` `operation_type`, should raise a
     `BackendException`.
     """
-    # pylint: disable=invalid-name, unused-argument
+
     listing = [{"name": "2020-04-29.gz"}, {"name": "object.gz"}]
 
-    def mock_get_container(*args, **kwargs):  # pylint:disable=unused-argument
+    def mock_get_container(*args, **kwargs):
         return (None, [x["name"] for x in listing])
 
     backend = swift_backend()
@@ -549,20 +546,19 @@ def test_backends_data_swift_data_backend_write_method_with_failed_connection(
 ):
     """Test the `SwiftDataBackend.write` method, given a failed connection, should
     raise a `BackendException`."""
-    # pylint: disable=invalid-name, unused-argument
 
     backend = swift_backend()
 
     error = "Client Exception error."
     msg = f"Failed to write to object object.gz: {error}"
 
-    def mock_get_container(*args, **kwargs):  # pylint:disable=unused-argument
+    def mock_get_container(*args, **kwargs):
         return (None, [])
 
-    def mock_put_object(*args, **kwargs):  # pylint:disable=unused-argument
+    def mock_put_object(*args, **kwargs):
         return 1
 
-    def mock_head_object(*args, **kwargs):  # pylint:disable=unused-argument
+    def mock_head_object(*args, **kwargs):
         raise ClientException(error)
 
     monkeypatch.setattr(backend.connection, "get_container", mock_get_container)
@@ -586,7 +582,6 @@ def test_backends_data_swift_data_backend_write_method_with_failed_connection(
     ],
 )
 def test_backends_data_swift_data_backend_write_method_with_invalid_operation(
-    # pylint: disable=line-too-long
     operation_type,
     swift_backend,
     fs,
@@ -594,7 +589,6 @@ def test_backends_data_swift_data_backend_write_method_with_invalid_operation(
 ):
     """Test the `SwiftDataBackend.write` method, given an unsupported `operation_type`,
     should raise a `BackendParameterException`."""
-    # pylint: disable=invalid-name, unused-argument
 
     backend = swift_backend()
 
@@ -613,7 +607,6 @@ def test_backends_data_swift_data_backend_write_method_without_target(
     """Test the `SwiftDataBackend.write` method, given no target, should write
     to the default container to a random object with the provided data.
     """
-    # pylint: disable=invalid-name, unused-argument
 
     # Freeze the ralph.utils.now() value.
     frozen_now = now()
@@ -633,13 +626,13 @@ def test_backends_data_swift_data_backend_write_method_without_target(
 
     listing = [{"name": "2020-04-29.gz"}, {"name": "object.gz"}]
 
-    def mock_get_container(*args, **kwargs):  # pylint:disable=unused-argument
+    def mock_get_container(*args, **kwargs):
         return (None, [x["name"] for x in listing])
 
-    def mock_put_object(*args, **kwargs):  # pylint:disable=unused-argument
+    def mock_put_object(*args, **kwargs):
         return 1
 
-    def mock_head_object(*args, **kwargs):  # pylint:disable=unused-argument
+    def mock_head_object(*args, **kwargs):
         return {"Content-Length": 3}
 
     expected_filename = f"{frozen_now}-{frozen_uuid4}"
@@ -692,7 +685,7 @@ def test_backends_data_swift_data_backend_close_method(swift_backend, caplog):
 
     # No client instantiated
     backend = swift_backend()
-    backend._connection = None  # pylint: disable=protected-access
+    backend._connection = None
     with caplog.at_level(logging.WARNING):
         backend.close()
 

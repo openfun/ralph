@@ -66,11 +66,10 @@ async def test_api_statements_put_invalid_parameters(client, basic_auth_credenti
     ],
 )
 @pytest.mark.anyio
-async def test_api_statements_put_single_statement_directly(
+async def test_api_statements_put_single_statement_directly(  # noqa: PLR0913
     client, backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
     """Test the put statements API route with one statement."""
-    # pylint: disable=invalid-name,unused-argument,too-many-arguments
 
     monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
     statement = mock_statement()
@@ -100,7 +99,6 @@ async def test_api_statements_put_enriching_without_existing_values(
     client, monkeypatch, basic_auth_credentials, es
 ):
     """Test that statements are properly enriched when statement provides no values."""
-    # pylint: disable=invalid-name,unused-argument
 
     monkeypatch.setattr(
         "ralph.api.routers.statements.BACKEND_CLIENT", get_es_test_backend()
@@ -149,11 +147,10 @@ async def test_api_statements_put_enriching_without_existing_values(
         ("authority", {"mbox": "mailto:test_ralph@example.com"}, 204),
     ],
 )
-async def test_api_statements_put_enriching_with_existing_values(
+async def test_api_statements_put_enriching_with_existing_values(  # noqa: PLR0913
     client, field, value, status, monkeypatch, basic_auth_credentials, es
 ):
     """Test that statements are properly enriched when values are provided."""
-    # pylint: disable=invalid-name,unused-argument, too-many-arguments
 
     monkeypatch.setattr(
         "ralph.api.routers.statements.BACKEND_CLIENT", get_es_test_backend()
@@ -200,10 +197,9 @@ async def test_api_statements_put_enriching_with_existing_values(
         get_mongo_test_backend,
     ],
 )
-async def test_api_statements_put_single_statement_no_trailing_slash(
+async def test_api_statements_put_single_statement_no_trailing_slash(  # noqa: PLR0913
     client, backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
-    # pylint: disable=invalid-name,unused-argument,too-many-arguments
     """Test that the statements endpoint also works without the trailing slash."""
 
     monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
@@ -229,10 +225,9 @@ async def test_api_statements_put_single_statement_no_trailing_slash(
         get_mongo_test_backend,
     ],
 )
-async def test_api_statements_put_id_mismatch(
+async def test_api_statements_put_id_mismatch(  # noqa: PLR0913
     client, backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
-    # pylint: disable=invalid-name,unused-argument,too-many-arguments
     """Test the put statements API route when the statementId doesn't match."""
     monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
     statement = mock_statement(id_=str(uuid4()))
@@ -261,10 +256,9 @@ async def test_api_statements_put_id_mismatch(
         get_mongo_test_backend,
     ],
 )
-async def test_api_statements_put_list_of_one(
+async def test_api_statements_put_list_of_one(  # noqa: PLR0913
     client, backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
-    # pylint: disable=invalid-name,unused-argument,too-many-arguments
     """Test that we fail on PUTs with a list, even if it's one statement."""
     monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
     statement = mock_statement()
@@ -289,10 +283,9 @@ async def test_api_statements_put_list_of_one(
         get_mongo_test_backend,
     ],
 )
-async def test_api_statements_put_duplicate_of_existing_statement(
+async def test_api_statements_put_duplicate_of_existing_statement(  # noqa: PLR0913
     client, backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
-    # pylint: disable=invalid-name,unused-argument,too-many-arguments
     """Test the put statements API route, given a statement that already exist in the
     database (has the same ID), should fail.
     """
@@ -343,11 +336,10 @@ async def test_api_statements_put_duplicate_of_existing_statement(
         get_mongo_test_backend,
     ],
 )
-async def test_api_statements_put_with_failure_during_storage(
+async def test_api_statements_put_with_failure_during_storage(  # noqa: PLR0913
     client, backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
     """Test the put statements API route with a failure happening during storage."""
-    # pylint: disable=invalid-name,unused-argument,too-many-arguments
 
     def write_mock(*args, **kwargs):
         """Raise an exception. Mocks the database.write method."""
@@ -379,11 +371,10 @@ async def test_api_statements_put_with_failure_during_storage(
         get_mongo_test_backend,
     ],
 )
-async def test_api_statements_put_with_a_failure_during_id_query(
+async def test_api_statements_put_with_a_failure_during_id_query(  # noqa: PLR0913
     client, backend, monkeypatch, basic_auth_credentials, es, mongo, clickhouse
 ):
     """Test the put statements API route with a failure during query execution."""
-    # pylint: disable=invalid-name,unused-argument,too-many-arguments
 
     def query_statements_by_ids_mock(*args, **kwargs):
         """Raise an exception. Mock the database.query_statements_by_ids method."""
@@ -417,10 +408,9 @@ async def test_api_statements_put_with_a_failure_during_id_query(
         get_mongo_test_backend,
     ],
 )
-async def test_api_statements_put_without_forwarding(
+async def test_api_statements_put_without_forwarding(  # noqa: PLR0913
     client, backend, basic_auth_credentials, monkeypatch, es, mongo, clickhouse
 ):
-    # pylint: disable=invalid-name,unused-argument,too-many-arguments
     """Test the put statements API route, given an empty forwarding configuration,
     should not start the forwarding background task.
     """
@@ -476,7 +466,7 @@ async def test_api_statements_put_without_forwarding(
         ),
     ],
 )
-async def test_api_statements_put_with_forwarding(
+async def test_api_statements_put_with_forwarding(  # noqa: PLR0913
     receiving_backend,
     forwarding_backend,
     monkeypatch,
@@ -492,7 +482,6 @@ async def test_api_statements_put_with_forwarding(
     xAPI statement it should store and forward it to the receiving instance which in
     turn should store it too.
     """
-    # pylint: disable=invalid-name,unused-argument,too-many-arguments,too-many-locals
 
     statement = mock_statement()
 
@@ -508,7 +497,7 @@ async def test_api_statements_put_with_forwarding(
         )
         lrs_context = lrs(app)
         # Start receiving LRS client
-        await lrs_context.__aenter__()  # pylint: disable=unnecessary-dunder-call
+        await lrs_context.__aenter__()
 
     # Set-up forwarding client.
     with monkeypatch.context() as forwarding_patch:
@@ -593,11 +582,11 @@ async def test_api_statements_put_with_forwarding(
         ([], False),
     ],
 )
-async def test_api_statements_put_scopes(
+async def test_api_statements_put_scopes(  # noqa: PLR0913
     client, monkeypatch, fs, es, auth_method, scopes, is_authorized
 ):
     """Test that putting statements behaves properly according to user scopes."""
-    # pylint: disable=invalid-name,unused-argument,duplicate-code,too-many-arguments
+
     monkeypatch.setattr(
         "ralph.api.routers.statements.settings.LRS_RESTRICT_BY_SCOPES", True
     )

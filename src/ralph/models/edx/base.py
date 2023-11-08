@@ -17,7 +17,7 @@ else:
 class BaseModelWithConfig(BaseModel):
     """Pydantic model for base configuration shared among all models."""
 
-    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
+    class Config:  # noqa: D106
         extra = "forbid"
 
 
@@ -29,12 +29,10 @@ class ContextModuleField(BaseModelWithConfig):
         display_name (str): Consists of a short description or title of the component.
     """
 
-    usage_key: constr(regex=r"^block-v1:.+\+.+\+.+type@.+@[a-f0-9]{32}$")  # noqa:F722
+    usage_key: constr(regex=r"^block-v1:.+\+.+\+.+type@.+@[a-f0-9]{32}$")
     display_name: str
     original_usage_key: Optional[
-        constr(
-            regex=r"^block-v1:.+\+.+\+.+type@problem\+block@[a-f0-9]{32}$"  # noqa:F722
-        )
+        constr(regex=r"^block-v1:.+\+.+\+.+type@problem\+block@[a-f0-9]{32}$")
     ]
     original_usage_version: Optional[str]
 
@@ -81,7 +79,7 @@ class BaseContextField(BaseModelWithConfig):
                 `request.META['PATH_INFO']`
     """
 
-    course_id: constr(regex=r"^$|^course-v1:.+\+.+\+.+$")  # noqa:F722
+    course_id: constr(regex=r"^$|^course-v1:.+\+.+\+.+$")
     course_user_tags: Optional[Dict[str, str]]
     module: Optional[ContextModuleField]
     org_id: str

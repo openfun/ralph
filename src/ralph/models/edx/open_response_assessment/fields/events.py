@@ -31,17 +31,13 @@ class ORAGetPeerSubmissionEventField(AbstractBaseEventField):
 
     course_id: constr(max_length=255)
     item_id: constr(
-        regex=(
-            r"^block-v1:.+\+.+\+.+type@openassessment"  # noqa : F722
-            r"+block@[a-f0-9]{32}$"  # noqa : F722
-        )
+        regex=(r"^block-v1:.+\+.+\+.+type@openassessment+block@[a-f0-9]{32}$")
     )
     requesting_student_id: str
     submission_returned_uuid: Union[str, None]
 
 
 class ORAGetSubmissionForStaffGradingEventField(AbstractBaseEventField):
-    # noqa: D205, D415
     """Pydantic model for `openassessmentblock.get_submission_for_staff_grading`.
     `event` field.
 
@@ -58,10 +54,7 @@ class ORAGetSubmissionForStaffGradingEventField(AbstractBaseEventField):
     """  # noqa: D205
 
     item_id: constr(
-        regex=(
-            r"^block-v1:.+\+.+\+.+type@openassessment"  # noqa : F722
-            r"+block@[a-f0-9]{32}$"  # noqa : F722
-        )
+        regex=(r"^block-v1:.+\+.+\+.+type@openassessment+block@[a-f0-9]{32}$")
     )
     submission_returned_uuid: Union[str, None]
     requesting_staff_id: str
@@ -109,7 +102,7 @@ class ORAAssessEventRubricField(BaseModelWithConfig):
             assess the response.
     """
 
-    content_hash: constr(regex=r"^[a-f0-9]{1,40}$")  # noqa: F722
+    content_hash: constr(regex=r"^[a-f0-9]{1,40}$")
 
 
 class ORAAssessEventField(AbstractBaseEventField):
@@ -156,7 +149,6 @@ class ORAStaffAssessEventField(ORAAssessEventField):
 
 
 class ORASubmitFeedbackOnAssessmentsEventField(AbstractBaseEventField):
-    # noqa: D205, D415
     """Pydantic model for `openassessmentblock.submit_feedback_on_assessments`.
     `event` field.
 
@@ -174,7 +166,6 @@ class ORASubmitFeedbackOnAssessmentsEventField(AbstractBaseEventField):
 
 
 class ORACreateSubmissionEventAnswerField(BaseModelWithConfig):
-    # noqa: D205, D415
     """Pydantic model for `openassessmentblock.create_submission`.`event`.`answer`
     field.
 
@@ -238,12 +229,10 @@ class ORASaveSubmissionEventField(AbstractBaseEventField):
                 silently drops events when they exceed `TRACK_MAX_EVENT`.
     """
 
-    # pylint: disable=unsubscriptable-object
     saved_response: ORASaveSubmissionEventSavedResponseField
 
 
 class ORAStudentTrainingAssessExampleEventField(AbstractBaseEventField):
-    # noqa: D205, D415
     """Pydantic model for `openassessment.student_training_assess_example`.`event`
     field.
 

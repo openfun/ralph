@@ -39,7 +39,7 @@ class FSLRSBackend(BaseLRSBackend, FSDataBackend):
 
     settings_class = FSLRSBackendSettings
 
-    def write(  # pylint: disable=too-many-arguments
+    def write(  # noqa: PLR0913
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Union[None, str] = None,

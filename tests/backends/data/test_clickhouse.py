@@ -27,7 +27,6 @@ from tests.fixtures.backends import (
 
 
 def test_backends_data_clickhouse_data_backend_default_instantiation(monkeypatch, fs):
-    # pylint: disable=invalid-name
     """Test the `ClickHouseDataBackend` default instantiation."""
     fs.create_file(".env")
     backend_settings_names = [
@@ -93,7 +92,6 @@ def test_backends_data_clickhouse_data_backend_status(
     clickhouse, clickhouse_backend, monkeypatch
 ):
     """Test the `ClickHouseDataBackend.status` method."""
-    # pylint: disable=unused-argument
 
     backend = clickhouse_backend()
 
@@ -112,7 +110,7 @@ def test_backends_data_clickhouse_data_backend_read_method_with_raw_output(
     clickhouse, clickhouse_backend
 ):
     """Test the `ClickHouseDataBackend.read` method."""
-    # pylint: disable=unused-argument, protected-access
+
     # Create records
     date_1 = (datetime.now() - timedelta(seconds=3)).isoformat()
     date_2 = (datetime.now() - timedelta(seconds=2)).isoformat()
@@ -146,7 +144,6 @@ def test_backends_data_clickhouse_data_backend_read_method_with_raw_output(
     backend.close()
 
 
-# pylint: disable=unused-argument
 def test_backends_data_clickhouse_data_backend_read_method_with_a_custom_query(
     clickhouse, clickhouse_backend
 ):
@@ -162,9 +159,7 @@ def test_backends_data_clickhouse_data_backend_read_method_with_a_custom_query(
     ]
 
     backend = clickhouse_backend()
-    documents = list(
-        backend._to_insert_tuples(statements)  # pylint: disable=protected-access
-    )
+    documents = list(backend._to_insert_tuples(statements))
 
     backend.write(statements)
 
@@ -228,7 +223,7 @@ def test_backends_data_clickhouse_data_backend_read_method_with_a_custom_query(
 
 def test_backends_data_clickhouse_data_backend_read_method_with_failures(
     monkeypatch, caplog, clickhouse, clickhouse_backend
-):  # pylint: disable=unused-argument
+):
     """Test the `ClickHouseDataBackend.read` method with failures."""
     backend = clickhouse_backend()
 
@@ -316,7 +311,7 @@ def test_backends_data_clickhouse_data_backend_list_method_with_failure(
     monkeypatch, caplog, clickhouse, clickhouse_backend
 ):
     """Test the `ClickHouseDataBackend.list` method with a failure."""
-    # pylint: disable=unused-argument
+
     backend = clickhouse_backend()
 
     def mock_query(*_, **__):
@@ -345,7 +340,7 @@ def test_backends_data_clickhouse_data_backend_write_method_with_invalid_timesta
     clickhouse, clickhouse_backend
 ):
     """Test the `ClickHouseDataBackend.write` method with an invalid timestamp."""
-    # pylint: disable=unused-argument
+
     valid_timestamp = (datetime.now() - timedelta(seconds=3)).isoformat()
     invalid_timestamp = "This is not a valid timestamp!"
     invalid_statement = {
@@ -422,7 +417,7 @@ def test_backends_data_clickhouse_data_backend_write_method_with_duplicated_key(
     """Test the `ClickHouseDataBackend.write` method with duplicated key
     conflict.
     """
-    # pylint: disable=unused-argument
+
     backend = clickhouse_backend()
 
     timestamp = {"timestamp": "2022-06-27T15:36:50"}
@@ -447,7 +442,7 @@ def test_backends_data_clickhouse_data_backend_write_method_chunks_on_error(
     """Test the `ClickHouseDataBackend.write` method imports partial chunks
     while raising BulkWriteError and ignoring errors.
     """
-    # pylint: disable=unused-argument
+
     backend = clickhouse_backend()
 
     # Identical statement ID produces the same ObjectId, leading to a
@@ -702,7 +697,7 @@ def test_backends_data_clickhouse_data_backend_close_method(clickhouse_backend, 
 
     # No client instantiated
     backend = clickhouse_backend()
-    backend._client = None  # pylint: disable=protected-access
+    backend._client = None
     with caplog.at_level(logging.WARNING):
         backend.close()
 

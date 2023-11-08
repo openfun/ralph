@@ -11,7 +11,6 @@ from ralph.conf import settings
 from ralph.parsers import GELFParser
 
 
-# pylint: disable=invalid-name
 def test_parsers_gelfparser_parse_empty_file():
     """Test the GELFParser parsing with an empty file."""
     parser = GELFParser()
@@ -39,7 +38,6 @@ def test_parsers_gelfparser_parse_raw_file(gelf_logger):
     assert events[1] == '{"username": ""}'
 
 
-# pylint: disable=invalid-name,unused-argument
 def test_parsers_gelfparser_parse_gzipped_file(fs, gelf_logger):
     """Test the GELFParser parsing using a gzipped GELF file."""
     gelf_logger.info('{"username": "foo"}')

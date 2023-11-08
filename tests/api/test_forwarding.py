@@ -24,7 +24,7 @@ def test_api_forwarding_with_valid_configuration(monkeypatch, forwarding_setting
     """
     monkeypatch.delenv("RALPH_XAPI_FORWARDINGS", raising=False)
     settings = Settings()
-    # pylint: disable=use-implicit-booleaness-not-comparison
+
     assert settings.XAPI_FORWARDINGS == []
 
     monkeypatch.setenv("RALPH_XAPI_FORWARDINGS", f"[{forwarding_settings.json()}]")
@@ -61,7 +61,6 @@ def test_api_forwarding_get_active_xapi_forwardings_with_empty_forwardings(
     monkeypatch.setattr("ralph.api.forwarding.settings", Settings())
     get_active_xapi_forwardings.cache_clear()
     with caplog.at_level(logging.INFO):
-        # pylint: disable=use-implicit-booleaness-not-comparison
         assert get_active_xapi_forwardings() == []
 
     assert caplog.record_tuples[0][2] == expected_log
@@ -71,7 +70,6 @@ def test_api_forwarding_get_active_xapi_forwardings_with_empty_forwardings(
     monkeypatch.setattr("ralph.api.forwarding.settings", Settings())
     get_active_xapi_forwardings.cache_clear()
     with caplog.at_level(logging.INFO):
-        # pylint: disable=use-implicit-booleaness-not-comparison
         assert get_active_xapi_forwardings() == []
 
     assert caplog.record_tuples[0][2] == expected_log
@@ -98,7 +96,6 @@ def test_api_forwarding_get_active_xapi_forwardings_with_inactive_forwardings(
     get_active_xapi_forwardings.cache_clear()
     caplog.clear()
     with caplog.at_level(logging.INFO):
-        # pylint: disable=use-implicit-booleaness-not-comparison
         assert get_active_xapi_forwardings() == []
 
     msg = (
@@ -152,7 +149,7 @@ async def test_api_forwarding_forward_xapi_statements_with_successful_request(
         def raise_for_status():
             """Does not raise any exceptions."""
 
-    async def post_success(*args, **kwargs):  # pylint: disable=unused-argument
+    async def post_success(*args, **kwargs):
         """Return a MockSuccessfulResponse instance."""
         return MockSuccessfulResponse()
 
@@ -199,7 +196,7 @@ async def test_api_forwarding_forward_xapi_statements_with_unsuccessful_request(
             """Dummy raise_for_status method that is always raising an exception."""
             raise RequestError("Failure during request.")
 
-    async def post_fail(*args, **kwargs):  # pylint: disable=unused-argument
+    async def post_fail(*args, **kwargs):
         """Return a MockUnsuccessfulResponse instance."""
         return MockUnsuccessfulResponse()
 

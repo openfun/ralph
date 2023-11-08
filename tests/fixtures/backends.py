@@ -178,7 +178,7 @@ def es():
 
     See get_es_fixture above.
     """
-    # pylint: disable=invalid-name
+
     for es_client in get_es_fixture():
         yield es_client
 
@@ -196,7 +196,7 @@ def es_forwarding():
 @pytest.fixture
 def fs_backend(fs, settings_fs):
     """Return the `get_fs_data_backend` function."""
-    # pylint: disable=invalid-name,redefined-outer-name,unused-argument
+
     fs.create_dir("foo")
 
     def get_fs_data_backend(path: str = "foo"):
@@ -215,7 +215,7 @@ def fs_backend(fs, settings_fs):
 @pytest.fixture
 def fs_lrs_backend(fs, settings_fs):
     """Return the `get_fs_data_backend` function."""
-    # pylint: disable=invalid-name,redefined-outer-name,unused-argument
+
     fs.create_dir("foo")
 
     def get_fs_lrs_backend(path: str = "foo"):
@@ -469,7 +469,6 @@ def es_data_stream():
 @pytest.fixture
 def settings_fs(fs, monkeypatch):
     """Force Path instantiation with fake FS in ralph settings."""
-    # pylint:disable=invalid-name,unused-argument
 
     monkeypatch.setattr(
         "ralph.backends.mixins.settings",
@@ -480,7 +479,6 @@ def settings_fs(fs, monkeypatch):
 @pytest.fixture
 def ldp_backend(settings_fs):
     """Return the `get_ldp_data_backend` function."""
-    # pylint: disable=invalid-name,redefined-outer-name,unused-argument
 
     def get_ldp_data_backend(service_name: str = "foo", stream_id: str = "bar"):
         """Return an instance of LDPDataBackend."""
@@ -501,7 +499,6 @@ def ldp_backend(settings_fs):
 @pytest.fixture
 def async_es_backend():
     """Return the `get_async_es_data_backend` function."""
-    # pylint: disable=invalid-name,redefined-outer-name,unused-argument
 
     def get_async_es_data_backend():
         """Return an instance of AsyncESDataBackend."""
@@ -531,7 +528,6 @@ def async_es_lrs_backend():
 @pytest.fixture
 def clickhouse_backend():
     """Return the `get_clickhouse_data_backend` function."""
-    # pylint: disable=invalid-name,redefined-outer-name
 
     def get_clickhouse_data_backend():
         """Return an instance of ClickHouseDataBackend."""
@@ -556,7 +552,6 @@ def clickhouse_backend():
 @pytest.fixture
 def clickhouse_lrs_backend():
     """Return the `get_clickhouse_lrs_backend` function."""
-    # pylint: disable=invalid-name,redefined-outer-name
 
     def get_clickhouse_lrs_backend():
         """Return an instance of ClickHouseLRSBackend."""
@@ -648,7 +643,6 @@ def swift_backend():
 @pytest.fixture()
 def moto_fs(fs):
     """Fix the incompatibility between moto and pyfakefs."""
-    # pylint:disable=invalid-name
 
     for module in [boto3, botocore]:
         module_dir = Path(module.__file__).parent
@@ -685,19 +679,17 @@ def events():
 @pytest.fixture
 def ws(events):
     """Return a websocket server instance."""
-    # pylint: disable=invalid-name,redefined-outer-name
+
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
 
     async def forward(websocket, path):
         """Stupid test server that sends events."""
-        # pylint: disable=unused-argument
 
         for event in events:
             await websocket.send(json.dumps(event))
             time.sleep(random.randrange(0, 500) / 10000.0)
 
-    # pylint: disable=no-member
     server = websockets.serve(forward, "0.0.0.0", WS_TEST_PORT)
     asyncio.get_event_loop().run_until_complete(server)
     yield server
@@ -711,7 +703,6 @@ def ws(events):
 @pytest.fixture
 def lrs():
     """Return a context manager that runs ralph's lrs server."""
-    # pylint: disable=invalid-name,redefined-outer-name
 
     @asynccontextmanager
     async def runserver(app, host=RUNSERVER_TEST_HOST, port=RUNSERVER_TEST_PORT):

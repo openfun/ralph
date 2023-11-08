@@ -33,7 +33,7 @@ from tests.fixtures.backends import (
 
 def test_backends_data_es_data_backend_default_instantiation(monkeypatch, fs):
     """Test the `ESDataBackend` default instantiation."""
-    # pylint: disable=invalid-name
+
     fs.create_file(".env")
     backend_settings_names = [
         "ALLOW_YELLOW_STATUS",
@@ -112,7 +112,7 @@ def test_backends_data_es_data_backend_instantiation_with_settings():
 
     try:
         ESDataBackend(settings)
-    except Exception as err:  # pylint:disable=broad-except
+    except Exception as err:  # noqa: BLE001
         pytest.fail(f"Two ESDataBackends should not raise exceptions: {err}")
 
     backend.close()
@@ -274,13 +274,12 @@ def test_backends_data_es_data_backend_list_method_with_history(
         (ESConnectionError(""), "Connection error"),
     ],
 )
-def test_backends_data_es_data_backend_read_method_with_failure(
+def test_backends_data_es_data_backend_read_method_with_failure(  # noqa: PLR0913
     exception, error, es, es_backend, caplog, monkeypatch
 ):
     """Test the `ESDataBackend.read` method, given a request failure, should raise a
     `BackendException`.
     """
-    # pylint: disable=invalid-name,unused-argument,too-many-arguments
 
     def mock_es_search_open_pit(**kwargs):
         """Mock the ES.client.search and open_point_in_time methods always raising an
@@ -328,7 +327,7 @@ def test_backends_data_es_data_backend_read_method_with_ignore_errors(
     """Test the `ESDataBackend.read` method, given `ignore_errors` set to `True`,
     should log a warning message.
     """
-    # pylint: disable=invalid-name,unused-argument
+
     backend = es_backend()
     monkeypatch.setattr(backend.client, "search", lambda **_: {"hits": {"hits": []}})
     with caplog.at_level(logging.WARNING):
@@ -345,7 +344,7 @@ def test_backends_data_es_data_backend_read_method_with_ignore_errors(
 
 def test_backends_data_es_data_backend_read_method_with_raw_ouput(es, es_backend):
     """Test the `ESDataBackend.read` method with `raw_output` set to `True`."""
-    # pylint: disable=invalid-name,unused-argument
+
     backend = es_backend()
     documents = [{"id": idx, "timestamp": now()} for idx in range(10)]
     assert backend.write(documents) == 10
@@ -359,7 +358,7 @@ def test_backends_data_es_data_backend_read_method_with_raw_ouput(es, es_backend
 
 def test_backends_data_es_data_backend_read_method_without_raw_ouput(es, es_backend):
     """Test the `ESDataBackend.read` method with `raw_output` set to `False`."""
-    # pylint: disable=invalid-name,unused-argument
+
     backend = es_backend()
     documents = [{"id": idx, "timestamp": now()} for idx in range(10)]
     assert backend.write(documents) == 10
@@ -373,7 +372,7 @@ def test_backends_data_es_data_backend_read_method_without_raw_ouput(es, es_back
 
 def test_backends_data_es_data_backend_read_method_with_query(es, es_backend, caplog):
     """Test the `ESDataBackend.read` method with a query."""
-    # pylint: disable=invalid-name,unused-argument
+
     backend = es_backend()
     documents = [{"id": idx, "timestamp": now(), "modulo": idx % 2} for idx in range(5)]
     assert backend.write(documents) == 5
@@ -438,7 +437,6 @@ def test_backends_data_es_data_backend_write_method_with_create_operation(
     """Test the `ESDataBackend.write` method, given an `CREATE` `operation_type`,
     should insert the target documents with the provided data.
     """
-    # pylint: disable=invalid-name,unused-argument
 
     backend = es_backend()
     assert len(list(backend.read())) == 0
@@ -488,7 +486,6 @@ def test_backends_data_es_data_backend_write_method_with_delete_operation(
     """Test the `ESDataBackend.write` method, given a `DELETE` `operation_type`, should
     remove the target documents.
     """
-    # pylint: disable=invalid-name,unused-argument
 
     backend = es_backend()
     data = [{"id": idx, "value": str(idx)} for idx in range(10)]
@@ -515,7 +512,6 @@ def test_backends_data_es_data_backend_write_method_with_update_operation(
     """Test the `ESDataBackend.write` method, given an `UPDATE` `operation_type`, should
     overwrite the target documents with the provided data.
     """
-    # pylint: disable=invalid-name,unused-argument
 
     backend = es_backend()
     data = BytesIO(
@@ -579,7 +575,6 @@ def test_backends_data_es_data_backend_write_method_with_target(es, es_backend):
     """Test the `ESDataBackend.write` method, given a target index, should insert
     documents to the corresponding index.
     """
-    # pylint: disable=invalid-name,unused-argument
 
     backend = es_backend()
 
@@ -616,7 +611,6 @@ def test_backends_data_es_data_backend_write_method_without_ignore_errors(
     """Test the `ESDataBackend.write` method with `ignore_errors` set to `False`, given
     badly formatted data, should raise a `BackendException`.
     """
-    # pylint: disable=invalid-name,unused-argument
 
     data = [{"id": idx, "count": random.randint(0, 100)} for idx in range(10)]
     # Patch a record with a non-expected type for the count field (should be
@@ -685,7 +679,6 @@ def test_backends_data_es_data_backend_write_method_with_ignore_errors(es, es_ba
     """Test the `ESDataBackend.write` method with `ignore_errors` set to `True`, given
     badly formatted data, should should skip the invalid data.
     """
-    # pylint: disable=invalid-name,unused-argument
 
     records = [{"id": idx, "count": random.randint(0, 100)} for idx in range(10)]
     # Patch a record with a non-expected type for the count field (should be
@@ -724,7 +717,6 @@ def test_backends_data_es_data_backend_write_method_with_datastream(
     es_data_stream, es_backend
 ):
     """Test the `ESDataBackend.write` method using a configured data stream."""
-    # pylint: disable=invalid-name,unused-argument
 
     data = [{"id": idx, "@timestamp": datetime.now().isoformat()} for idx in range(10)]
     backend = es_backend()
@@ -769,7 +761,7 @@ def test_backends_data_es_data_backend_close_method(es_backend, caplog):
 
     # No client instantiated
     backend = es_backend()
-    backend._client = None  # pylint: disable=protected-access
+    backend._client = None
     with caplog.at_level(logging.WARNING):
         backend.close()
 
