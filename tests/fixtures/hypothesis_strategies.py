@@ -56,6 +56,46 @@ def get_strategy_from(annotation):
         return st.none()
     return st.from_type(annotation)
 
+# def OLD_custom_builds(
+#     klass: BaseModel, _overwrite_default=True, **kwargs: Union[st.SearchStrategy, bool]
+# ):
+#     """Return a fixed_dictionaries Hypothesis strategy for pydantic models.
+
+#     Args:
+#         klass (BaseModel): The pydantic model for which to generate a strategy.
+#         _overwrite_default (bool): By default, fields overwritten by kwargs become
+#             required. If _overwrite_default is set to False, we keep the original field
+#             requirement (either required or optional).
+#         **kwargs (SearchStrategy or bool): If kwargs contain search strategies, they
+#             overwrite the default strategy for the given key.
+#             If kwargs contains booleans, they set whether the given key should be
+#             present (True) or omitted (False) in the generated model.
+#     """
+
+#     for special_class, special_kwargs in OVERWRITTEN_STRATEGIES.items():
+#         if issubclass(klass, special_class):
+#             kwargs = dict(special_kwargs, **kwargs)
+#             break
+#     optional = {}
+#     required = {}
+#     for name, field in klass.model_fields.items():
+#         arg = kwargs.get(name, None)
+#         if arg is False:
+#             continue
+#         is_required = field.is_required or (arg is not None and _overwrite_default)
+#         required_optional = required if is_required or arg is not None else optional
+#         #field_strategy = (
+#         #    get_strategy_from(field.annotation) if arg is None else arg
+#         #)  # TODO: validate this change is not failing silently
+#         field_strategy = get_strategy_from(field.outer_type_) if arg is None else arg
+#         required_optional[field.alias] = field_strategy
+#     if not required:
+#         # To avoid generating empty values
+#         key, value = random.choice(list(optional.items()))
+#         required[key] = value
+#         del optional[key]
+#     return st.fixed_dictionaries(required, optional=optional).map(klass.parse_obj)
+
 
 def custom_builds(
     klass: BaseModel, _overwrite_default=True, **kwargs: Union[st.SearchStrategy, bool]
@@ -84,20 +124,33 @@ def custom_builds(
         if arg is False:
             continue
         is_required = field.is_required or (arg is not None and _overwrite_default)
-        required_optional = required if is_required or arg is not None else optional
+        
         field_strategy = (
             get_strategy_from(field.annotation) if arg is None else arg
         )  # TODO: validate this change is not failing silently
-        required_optional[field.alias] = field_strategy
+        #field_strategy = get_strategy_from(field.outer_type_) if arg is None else arg
+        if is_required or arg is not None:
+            required[field.alias] = field_strategy
+        else:
+            optional[field.alias] = field_strategy
     if not required:
         # To avoid generating empty values
         key, value = random.choice(list(optional.items()))
         required[key] = value
         del optional[key]
+    print("Imblue dabedi")
+    print(required)
+    print(optional)
     return st.fixed_dictionaries(required, optional=optional).map(klass.parse_obj)
 
+# def OLD_custom_given(*args: Union[st.SearchStrategy, BaseModel], **kwargs):
+#     """Wrap the Hypothesis `given` function. Replace st.builds with custom_builds."""
+#     strategies = []
+#     for arg in args:
+#         strategies.append(custom_builds(arg) if is_base_model(arg) else arg)
+#     return given(*strategies, **kwargs)
 
-def custom_given(*args: Union[st.SearchStrategy, BaseModel], **kwargs):
+def custom_given(*args: BaseModel, **kwargs):
     """Wrap the Hypothesis `given` function. Replace st.builds with custom_builds."""
     strategies = []
     for arg in args:

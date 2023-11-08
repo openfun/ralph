@@ -432,7 +432,7 @@ def auth(
         # Parse credentials file if not empty
         if auth_file.stat().st_size:
             with open(auth_file, encoding=settings.LOCALE_ENCODING) as f:
-                users = ServerUsersCredentials.model_validate_json(json.load(f))
+                users = ServerUsersCredentials.model_validate_json(f.read())
 
         logger.warning('ok fffa')
         logger.warning(type(ServerUsersCredentials.model_validate(

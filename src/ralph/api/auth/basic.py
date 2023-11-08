@@ -64,10 +64,12 @@ class ServerUsersCredentials(RootModel[List[UserCredentials]]):
     def __iter__(self) -> Iterator[UserCredentials]:  # noqa: D105
         return iter(self.root)
 
-    @model_validator(mode="before")
+    @model_validator(mode="after")
     @classmethod
     def ensure_unique_username(cls, values: Any) -> Any:
         """Every username should be unique among registered users."""
+        logger.warning("azerty")
+        logger.error(values)
         usernames = [entry.username for entry in values]
         if len(usernames) != len(set(usernames)):
             raise ValueError(
