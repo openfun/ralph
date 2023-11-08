@@ -11,9 +11,8 @@ from pathlib import Path
 
 import pytest
 from elastic_transport import ApiResponseMeta
-from elasticsearch import ApiError
+from elasticsearch import ApiError, Elasticsearch
 from elasticsearch import ConnectionError as ESConnectionError
-from elasticsearch import Elasticsearch
 
 from ralph.backends.data.base import BaseOperationType, DataBackendStatus
 from ralph.backends.data.es import (
@@ -548,9 +547,9 @@ def test_backends_data_es_data_backend_write_method_with_update_operation(
     hits = list(backend.read())
     assert len(hits) == 10
     assert sorted([hit["_source"]["id"] for hit in hits]) == list(range(10))
-    assert sorted([hit["_source"]["value"] for hit in hits]) == list(
-        map(lambda x: str(x + 10), range(10))
-    )
+    assert sorted([hit["_source"]["value"] for hit in hits]) == [
+        str(x + 10) for x in range(10)
+    ]
 
     backend.close()
 

@@ -508,7 +508,7 @@ async def post(
 
     # Enrich statements before forwarding
     statements_dict = {}
-    for statement in map(lambda x: x.dict(exclude_unset=True), statements):
+    for statement in (x.dict(exclude_unset=True) for x in statements):
         _enrich_statement_with_id(statement)
         # Requests with duplicate statement IDs are considered invalid
         if statement["id"] in statements_dict:

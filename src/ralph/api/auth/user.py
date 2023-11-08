@@ -1,6 +1,5 @@
 """Authenticated user for the Ralph API."""
 
-from functools import lru_cache
 from typing import Dict, FrozenSet, Literal
 
 from pydantic import BaseModel
@@ -22,7 +21,6 @@ Scope = Literal[
 class UserScopes(FrozenSet[Scope]):
     """Scopes available to users."""
 
-    @lru_cache(maxsize=1024)
     def is_authorized(self, requested_scope: Scope):
         """Check if the requested scope can be accessed based on user scopes."""
         expanded_scopes = {

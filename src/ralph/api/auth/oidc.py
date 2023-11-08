@@ -102,6 +102,7 @@ def get_oidc_user(
     Args:
         auth_header (str): Authentication header containing the Base64 encoded
             OIDC Token. This is invoked behind the scenes by Depends.
+        security_scopes (SecurityScopes): Scopes required to access the endpoint.
 
     Return:
         AuthenticatedUser (AuthenticatedUser)

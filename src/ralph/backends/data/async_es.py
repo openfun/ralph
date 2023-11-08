@@ -21,7 +21,6 @@ from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import parse_bytes_to_dict, read_raw
 
 # pylint: disable=duplicate-code
-
 logger = logging.getLogger(__name__)
 
 

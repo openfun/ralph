@@ -607,9 +607,9 @@ async def test_backends_data_async_es_data_backend_write_method_with_update_oper
     hits = [statement async for statement in backend.read()]
     assert len(hits) == 10
     assert sorted([hit["_source"]["id"] for hit in hits]) == list(range(10))
-    assert sorted([hit["_source"]["value"] for hit in hits]) == list(
-        map(lambda x: str(x + 10), range(10))
-    )
+    assert sorted([hit["_source"]["value"] for hit in hits]) == [
+        str(x + 10) for x in range(10)
+    ]
 
     await backend.close()
 

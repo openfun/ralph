@@ -166,7 +166,7 @@ class VideoVolumeChangeInteractionContextExtensions(VideoContextExtensions):
 
     Attributes:
         volume (int): Consists of the volume of the video.
-    """
+    """  # noqa: D205
 
     volume: int = Field(alias=CONTEXT_EXTENSION_VOLUME)
 
@@ -181,7 +181,7 @@ class VideoScreenChangeInteractionContextExtensions(VideoContextExtensions):
         screenSize (str): Expresses the total available screen size for Video playback.
         videoPlaybackSize (str): Consists of the size in Width x Height of the video as
             viewed by the user.
-    """
+    """  # noqa: D205
 
     fullScreen: bool = Field(alias=CONTEXT_EXTENSION_FULL_SCREEN)
     screenSize: str = Field(alias=CONTEXT_EXTENSION_SCREEN_SIZE)
