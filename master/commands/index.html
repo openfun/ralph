@@ -958,7 +958,7 @@
     --async-es-refresh-after-write TEXT
   async_mongo backend: 
     --async-mongo-client-options KEY=VALUE,KEY=VALUE
-    --async-mongo-connection-uri TEXT
+    --async-mongo-connection-uri MONGODSN
     --async-mongo-default-chunk-size INTEGER
     --async-mongo-default-collection TEXT
     --async-mongo-default-database TEXT
@@ -997,7 +997,7 @@
     --ldp-service-name TEXT
   mongo backend: 
     --mongo-client-options KEY=VALUE,KEY=VALUE
-    --mongo-connection-uri TEXT
+    --mongo-connection-uri MONGODSN
     --mongo-default-chunk-size INTEGER
     --mongo-default-collection TEXT
     --mongo-default-database TEXT
@@ -1035,7 +1035,7 @@
 <div class="highlight"><pre><span></span><code>ralph read [OPTIONS] [ARCHIVE]
 </code></pre></div>
 <p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  -b, --backend [async_es|async_mongo|clickhouse|es|fs|ldp|lrs|mongo|s3|swift|ws]
+<div class="highlight"><pre><span></span><code>  -b, --backend [async_es|async_lrs|async_mongo|clickhouse|es|fs|ldp|lrs|mongo|s3|swift|ws]
                                   Backend  [required]
   async_es backend: 
     --async-es-allow-yellow-status / --no-async-es-allow-yellow-status
@@ -1046,9 +1046,16 @@
     --async-es-locale-encoding TEXT
     --async-es-point-in-time-keep-alive TEXT
     --async-es-refresh-after-write TEXT
+  async_lrs backend: 
+    --async-lrs-base-url TEXT
+    --async-lrs-headers KEY=VALUE,KEY=VALUE
+    --async-lrs-password TEXT
+    --async-lrs-statements-endpoint TEXT
+    --async-lrs-status-endpoint TEXT
+    --async-lrs-username TEXT
   async_mongo backend: 
     --async-mongo-client-options KEY=VALUE,KEY=VALUE
-    --async-mongo-connection-uri TEXT
+    --async-mongo-connection-uri MONGODSN
     --async-mongo-default-chunk-size INTEGER
     --async-mongo-default-collection TEXT
     --async-mongo-default-database TEXT
@@ -1094,7 +1101,7 @@
     --lrs-username TEXT
   mongo backend: 
     --mongo-client-options KEY=VALUE,KEY=VALUE
-    --mongo-connection-uri TEXT
+    --mongo-connection-uri MONGODSN
     --mongo-default-chunk-size INTEGER
     --mongo-default-collection TEXT
     --mongo-default-database TEXT
@@ -1153,7 +1160,7 @@
     --async-es-refresh-after-write TEXT
   async_mongo backend: 
     --async-mongo-client-options KEY=VALUE,KEY=VALUE
-    --async-mongo-connection-uri TEXT
+    --async-mongo-connection-uri MONGODSN
     --async-mongo-default-chunk-size INTEGER
     --async-mongo-default-collection TEXT
     --async-mongo-default-database TEXT
@@ -1186,7 +1193,7 @@
     --fs-locale-encoding TEXT
   mongo backend: 
     --mongo-client-options KEY=VALUE,KEY=VALUE
-    --mongo-connection-uri TEXT
+    --mongo-connection-uri MONGODSN
     --mongo-default-chunk-size INTEGER
     --mongo-default-collection TEXT
     --mongo-default-database TEXT
@@ -1212,7 +1219,7 @@
 <div class="highlight"><pre><span></span><code>ralph write [OPTIONS]
 </code></pre></div>
 <p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  -b, --backend [async_es|async_mongo|clickhouse|es|fs|ldp|lrs|mongo|s3|swift]
+<div class="highlight"><pre><span></span><code>  -b, --backend [async_es|async_lrs|async_mongo|clickhouse|es|fs|lrs|mongo|s3|swift]
                                   Backend  [required]
   async_es backend: 
     --async-es-allow-yellow-status / --no-async-es-allow-yellow-status
@@ -1223,9 +1230,16 @@
     --async-es-locale-encoding TEXT
     --async-es-point-in-time-keep-alive TEXT
     --async-es-refresh-after-write TEXT
+  async_lrs backend: 
+    --async-lrs-base-url TEXT
+    --async-lrs-headers KEY=VALUE,KEY=VALUE
+    --async-lrs-password TEXT
+    --async-lrs-statements-endpoint TEXT
+    --async-lrs-status-endpoint TEXT
+    --async-lrs-username TEXT
   async_mongo backend: 
     --async-mongo-client-options KEY=VALUE,KEY=VALUE
-    --async-mongo-connection-uri TEXT
+    --async-mongo-connection-uri MONGODSN
     --async-mongo-default-chunk-size INTEGER
     --async-mongo-default-collection TEXT
     --async-mongo-default-database TEXT
@@ -1254,14 +1268,6 @@
     --fs-default-directory-path PATH
     --fs-default-query-string TEXT
     --fs-locale-encoding TEXT
-  ldp backend: 
-    --ldp-application-key TEXT
-    --ldp-application-secret TEXT
-    --ldp-consumer-key TEXT
-    --ldp-default-stream-id TEXT
-    --ldp-endpoint TEXT
-    --ldp-request-timeout TEXT
-    --ldp-service-name TEXT
   lrs backend: 
     --lrs-base-url TEXT
     --lrs-headers KEY=VALUE,KEY=VALUE
@@ -1271,7 +1277,7 @@
     --lrs-username TEXT
   mongo backend: 
     --mongo-client-options KEY=VALUE,KEY=VALUE
-    --mongo-connection-uri TEXT
+    --mongo-connection-uri MONGODSN
     --mongo-default-chunk-size INTEGER
     --mongo-default-collection TEXT
     --mongo-default-database TEXT
