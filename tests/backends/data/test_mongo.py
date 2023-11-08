@@ -40,7 +40,7 @@ def test_backends_data_mongo_data_backend_default_instantiation(monkeypatch, fs)
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__MONGO__{name}", raising=False)
 
     assert MongoDataBackend.name == "mongo"
-    assert MongoDataBackend.query_model == MongoQuery
+    assert MongoDataBackend.query_class == MongoQuery
     assert MongoDataBackend.default_operation_type == BaseOperationType.INDEX
     assert MongoDataBackend.settings_class == MongoDataBackendSettings
     backend = MongoDataBackend()

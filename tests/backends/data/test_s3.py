@@ -31,7 +31,7 @@ def test_backends_data_s3_backend_default_instantiation(monkeypatch, fs):
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__S3__{name}", raising=False)
 
     assert S3DataBackend.name == "s3"
-    assert S3DataBackend.query_model == BaseQuery
+    assert S3DataBackend.query_class == BaseQuery
     assert S3DataBackend.default_operation_type == BaseOperationType.CREATE
     assert S3DataBackend.settings_class == S3DataBackendSettings
     backend = S3DataBackend()

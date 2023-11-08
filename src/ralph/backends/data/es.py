@@ -115,7 +115,7 @@ class ESDataBackend(BaseDataBackend, Writable, Listable):
     """Elasticsearch data backend."""
 
     name = "es"
-    query_model = ESQuery
+    query_class = ESQuery
     settings_class = ESDataBackendSettings
 
     def __init__(self, settings: Optional[ESDataBackendSettings] = None):

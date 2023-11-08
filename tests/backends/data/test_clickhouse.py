@@ -44,7 +44,7 @@ def test_backends_data_clickhouse_data_backend_default_instantiation(monkeypatch
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__CLICKHOUSE__{name}", raising=False)
 
     assert ClickHouseDataBackend.name == "clickhouse"
-    assert ClickHouseDataBackend.query_model == ClickHouseQuery
+    assert ClickHouseDataBackend.query_class == ClickHouseQuery
     assert ClickHouseDataBackend.default_operation_type == BaseOperationType.CREATE
     assert ClickHouseDataBackend.settings_class == ClickHouseDataBackendSettings
     backend = ClickHouseDataBackend()

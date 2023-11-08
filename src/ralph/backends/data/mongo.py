@@ -94,7 +94,7 @@ class MongoDataBackend(BaseDataBackend, Writable, Listable):
     """MongoDB data backend."""
 
     name = "mongo"
-    query_model = MongoQuery
+    query_class = MongoQuery
     settings_class = MongoDataBackendSettings
 
     def __init__(self, settings: Optional[MongoDataBackendSettings] = None):

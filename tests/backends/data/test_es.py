@@ -51,7 +51,7 @@ def test_backends_data_es_data_backend_default_instantiation(monkeypatch, fs):
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__ES__{name}", raising=False)
 
     assert ESDataBackend.name == "es"
-    assert ESDataBackend.query_model == ESQuery
+    assert ESDataBackend.query_class == ESQuery
     assert ESDataBackend.default_operation_type == BaseOperationType.INDEX
     assert ESDataBackend.settings_class == ESDataBackendSettings
     backend = ESDataBackend()

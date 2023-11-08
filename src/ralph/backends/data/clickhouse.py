@@ -112,7 +112,7 @@ class ClickHouseDataBackend(BaseDataBackend, Writable, Listable):
     """ClickHouse database backend."""
 
     name = "clickhouse"
-    query_model = ClickHouseQuery
+    query_class = ClickHouseQuery
     default_operation_type = BaseOperationType.CREATE
     settings_class = ClickHouseDataBackendSettings
 

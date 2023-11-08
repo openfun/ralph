@@ -53,7 +53,7 @@ async def test_backends_data_async_es_data_backend_default_instantiation(
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__ES__{name}", raising=False)
 
     assert AsyncESDataBackend.name == "async_es"
-    assert AsyncESDataBackend.query_model == ESQuery
+    assert AsyncESDataBackend.query_class == ESQuery
     assert AsyncESDataBackend.default_operation_type == BaseOperationType.INDEX
     assert AsyncESDataBackend.settings_class == ESDataBackendSettings
     backend = AsyncESDataBackend()
