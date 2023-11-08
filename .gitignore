@@ -48,7 +48,6 @@ venv.bak/
 
 # Test & lint
 .coverage
-.pylint.d
 .pytest_cache
 
 # Documentation site

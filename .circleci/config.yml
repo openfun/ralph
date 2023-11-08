@@ -177,23 +177,11 @@ jobs:
           keys:
             - v1-dependencies-python:3.11-{{ .Revision }}
       - run:
-          name: Lint code with flake8
-          command: ~/.local/bin/flake8
-      - run:
-          name: Lint code with isort
-          command: ~/.local/bin/isort --recursive --check-only .
-      - run:
           name: Lint code with black
           command: ~/.local/bin/black src/ralph tests --check
       - run:
-          name: Lint code with pylint
-          command: ~/.local/bin/pylint src/ralph tests
-      - run:
-          name: Lint code with bandit
-          command: ~/.local/bin/bandit -qr src/ralph
-      - run:
-          name: Lint code with pydocstyle
-          command: ~/.local/bin/pydocstyle
+          name: Lint code with Ruff check
+          command: ~/.local/bin/ruff check .
 
   test:
     parameters:

@@ -192,51 +192,31 @@ k3d-stop: ## stop local k8s cluster
 		k3d cluster stop "$(K3D_CLUSTER_NAME)"
 .PHONY: k3d-stop
 
-# Nota bene: Black should come after isort just in case they don't agree...
 lint: ## lint back-end python sources
 lint: \
-  lint-isort \
-  lint-black \
-  lint-flake8 \
-  lint-pylint \
-  lint-bandit \
-  lint-pydocstyle
+	lint-black \
+	lint-ruff
 .PHONY: lint
+
+lint-mypy: ## lint back-end python sources with mypy
+	@echo 'lint:mypy started…'
+	@$(COMPOSE_TEST_RUN_APP) mypy
+.PHONY: lint-mypy
 
 lint-black: ## lint back-end python sources with black
 	@echo 'lint:black started…'
 	@$(COMPOSE_TEST_RUN_APP) black src/ralph tests
 .PHONY: lint-black
 
-lint-flake8: ## lint back-end python sources with flake8
-	@echo 'lint:flake8 started…'
-	@$(COMPOSE_TEST_RUN_APP) flake8
-.PHONY: lint-flake8
+lint-ruff: ## lint python sources with ruff
+	@echo 'lint:ruff started…'
+	@$(COMPOSE_TEST_RUN_APP) ruff check .
+.PHONY: lint-ruff
 
-lint-isort: ## automatically re-arrange python imports in back-end code base
-	@echo 'lint:isort started…'
-	@$(COMPOSE_TEST_RUN_APP) isort --atomic .
-.PHONY: lint-isort
-
-lint-pylint: ## lint back-end python sources with pylint
-	@echo 'lint:pylint started…'
-	@$(COMPOSE_TEST_RUN_APP) pylint src/ralph tests
-.PHONY: lint-pylint
-
-lint-bandit: ## lint back-end python sources with bandit
-	@echo 'lint:bandit started…'
-	@$(COMPOSE_TEST_RUN_APP) bandit -qr src/ralph
-.PHONY: lint-bandit
-
-lint-pydocstyle: ## lint Python docstrings with pydocstyle
-	@echo 'lint:pydocstyle started…'
-	@$(COMPOSE_TEST_RUN_APP) pydocstyle
-.PHONY: lint-pydocstyle
-
-lint-mypy: ## lint back-end python sources with mypy
-	@echo 'lint:mypy started…'
-	@$(COMPOSE_TEST_RUN_APP) mypy
-.PHONY: lint-mypy
+lint-ruff-fix: ## lint python sources with ruff with fix option
+	@echo 'lint:ruff-fix started…'
+	@$(COMPOSE_TEST_RUN_APP) ruff check . --fix
+.PHONY: lint-ruff-fix
 
 logs: ## display app logs (follow mode)
 	@$(COMPOSE) logs -f app

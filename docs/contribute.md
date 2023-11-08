@@ -38,8 +38,11 @@ To lint your code, either use the `lint` meta target or one of the linting tools
 # Run all linters
 $ make lint
 
-# Run pylint
-$ make lint-pylint
+# Run ruff linter
+$ make lint-ruff
+
+# Run ruff linter and resolve fixable errors
+$ make lint-ruff-fix
 
 # List available linters
 $ make help | grep lint-

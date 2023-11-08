@@ -11,8 +11,6 @@ services:
     image: "${RALPH_IMAGE_NAME:-ralph}:${RALPH_IMAGE_TAG:-development}"
     env_file:
       - .env
-    environment:
-      PYLINTHOME: /app/.pylint.d
     ports:
       - "${RALPH_RUNSERVER_PORT:-8100}:${RALPH_RUNSERVER_PORT:-8100}"
     command:
