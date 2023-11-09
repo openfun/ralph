@@ -9,16 +9,14 @@ from ralph.backends.lrs.base import (
     RalphStatementsQuery,
     StatementQueryResult,
 )
-from ralph.backends.lrs.es import ESLRSBackend
+from ralph.backends.lrs.es import ESLRSBackend, ESLRSBackendSettings
 from ralph.exceptions import BackendException, BackendParameterException
 
 logger = logging.getLogger(__name__)
 
 
-class AsyncESLRSBackend(BaseAsyncLRSBackend, AsyncESDataBackend):
+class AsyncESLRSBackend(BaseAsyncLRSBackend[ESLRSBackendSettings], AsyncESDataBackend):
     """Asynchronous Elasticsearch LRS backend implementation."""
-
-    settings_class = ESLRSBackend.settings_class
 
     async def query_statements(
         self, params: RalphStatementsQuery

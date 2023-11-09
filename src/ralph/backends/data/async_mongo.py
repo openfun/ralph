@@ -4,7 +4,7 @@ import json
 import logging
 from io import IOBase
 from itertools import chain
-from typing import Any, Dict, Iterable, Iterator, Optional, Union
+from typing import Any, Dict, Iterable, Iterator, Optional, TypeVar, Union
 
 from bson.errors import BSONError
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -29,22 +29,25 @@ from ..data.base import (
 )
 
 logger = logging.getLogger(__name__)
+Settings = TypeVar("Settings", bound=MongoDataBackendSettings)
 
 
-class AsyncMongoDataBackend(BaseAsyncDataBackend, AsyncWritable, AsyncListable):
+class AsyncMongoDataBackend(
+    BaseAsyncDataBackend[Settings, MongoQuery],
+    AsyncWritable,
+    AsyncListable,
+):
     """Async MongoDB data backend."""
 
     name = "async_mongo"
-    query_class = MongoQuery
-    settings_class = MongoDataBackendSettings
 
-    def __init__(self, settings: Optional[MongoDataBackendSettings] = None):
+    def __init__(self, settings: Optional[Settings] = None):
         """Instantiate the asynchronous MongoDB client.
 
         Args:
             settings (MongoDataBackendSettings or None): The data backend settings.
         """
-        self.settings = settings if settings else self.settings_class()
+        super().__init__(settings)
         self.client = AsyncIOMotorClient(
             self.settings.CONNECTION_URI, **self.settings.CLIENT_OPTIONS.dict()
         )

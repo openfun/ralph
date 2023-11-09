@@ -4,7 +4,7 @@ import logging
 from io import IOBase
 from itertools import chain
 from pathlib import Path
-from typing import Iterable, Iterator, List, Literal, Optional, Union
+from typing import Iterable, Iterator, List, Literal, Optional, TypeVar, Union
 
 from elasticsearch import ApiError, Elasticsearch, TransportError
 from elasticsearch.helpers import BulkIndexError, streaming_bulk
@@ -111,21 +111,22 @@ class ESQuery(BaseQuery):
     track_total_hits: Literal[False] = False
 
 
-class ESDataBackend(BaseDataBackend, Writable, Listable):
+Settings = TypeVar("Settings", bound=ESDataBackendSettings)
+
+
+class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
     """Elasticsearch data backend."""
 
     name = "es"
-    query_class = ESQuery
-    settings_class = ESDataBackendSettings
 
-    def __init__(self, settings: Optional[ESDataBackendSettings] = None):
+    def __init__(self, settings: Optional[Settings] = None):
         """Instantiate the Elasticsearch data backend.
 
         Args:
-            settings (ESDataBackendSettings or None): The data backend settings.
+            settings (Settings or None): The data backend settings.
                 If `settings` is `None`, a default settings instance is used instead.
         """
-        self.settings = settings if settings else self.settings_class()
+        super().__init__(settings)
         self._client = None
 
     @property

@@ -3,7 +3,6 @@
 import logging
 from typing import Generator, Iterator, List
 
-from ralph.backends.data.base import BaseSettingsConfig
 from ralph.backends.data.clickhouse import (
     ClickHouseDataBackend,
     ClickHouseDataBackendSettings,
@@ -15,6 +14,7 @@ from ralph.backends.lrs.base import (
     RalphStatementsQuery,
     StatementQueryResult,
 )
+from ralph.conf import BaseSettingsConfig
 from ralph.exceptions import BackendException, BackendParameterException
 
 logger = logging.getLogger(__name__)
@@ -37,10 +37,10 @@ class ClickHouseLRSBackendSettings(
     IDS_CHUNK_SIZE: int = 10000
 
 
-class ClickHouseLRSBackend(BaseLRSBackend, ClickHouseDataBackend):
+class ClickHouseLRSBackend(
+    BaseLRSBackend[ClickHouseLRSBackendSettings], ClickHouseDataBackend
+):
     """ClickHouse LRS backend implementation."""
-
-    settings_class = ClickHouseLRSBackendSettings
 
     def query_statements(self, params: RalphStatementsQuery) -> StatementQueryResult:
         """Return the statements query payload using xAPI parameters."""

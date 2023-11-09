@@ -64,17 +64,20 @@ class SwiftDataBackendSettings(BaseDataBackendSettings):
     LOCALE_ENCODING: str = "utf8"
 
 
-class SwiftDataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
+class SwiftDataBackend(
+    BaseDataBackend[SwiftDataBackendSettings, BaseQuery],
+    HistoryMixin,
+    Writable,
+    Listable,
+):
     """SWIFT data backend."""
 
     name = "swift"
     default_operation_type = BaseOperationType.CREATE
-    settings_class = SwiftDataBackendSettings
 
     def __init__(self, settings: Optional[SwiftDataBackendSettings] = None):
         """Prepares the options for the SwiftService."""
-        self.settings = settings if settings else self.settings_class()
-
+        super().__init__(settings)
         self.default_container = self.settings.DEFAULT_CONTAINER
         self.locale_encoding = self.settings.LOCALE_ENCODING
         self._connection = None

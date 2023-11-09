@@ -3,7 +3,7 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Iterator, List, Literal, Optional, Union
+from typing import Any, Iterator, List, Literal, Optional, TypeVar, Union
 from uuid import UUID
 
 from pydantic import BaseModel, Field, NonNegativeInt
@@ -13,8 +13,8 @@ from ralph.backends.data.base import (
     BaseDataBackend,
     BaseDataBackendSettings,
     BaseQuery,
-    BaseSettingsConfig,
 )
+from ralph.conf import BaseSettingsConfig
 from ralph.models.xapi.base.agents import BaseXapiAgent
 from ralph.models.xapi.base.common import IRI
 from ralph.models.xapi.base.groups import BaseXapiGroup
@@ -84,10 +84,11 @@ class RalphStatementsQuery(LRSStatementsQuery):
     ignore_order: Optional[bool]
 
 
-class BaseLRSBackend(BaseDataBackend):
-    """Base LRS backend interface."""
+Settings = TypeVar("Settings", bound=BaseLRSBackendSettings)
 
-    settings_class = BaseLRSBackendSettings
+
+class BaseLRSBackend(BaseDataBackend[Settings, Any]):
+    """Base LRS backend interface."""
 
     @abstractmethod
     def query_statements(self, params: RalphStatementsQuery) -> StatementQueryResult:
@@ -98,10 +99,8 @@ class BaseLRSBackend(BaseDataBackend):
         """Yield statements with matching ids from the backend."""
 
 
-class BaseAsyncLRSBackend(BaseAsyncDataBackend):
+class BaseAsyncLRSBackend(BaseAsyncDataBackend[Settings, Any]):
     """Base async LRS backend interface."""
-
-    settings_class = BaseLRSBackendSettings
 
     @abstractmethod
     async def query_statements(

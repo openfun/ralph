@@ -7,7 +7,7 @@ import logging
 import struct
 from io import IOBase
 from itertools import chain
-from typing import Generator, Iterable, Iterator, List, Optional, Tuple, Union
+from typing import Generator, Iterable, Iterator, List, Optional, Tuple, TypeVar, Union
 from uuid import uuid4
 
 from bson.errors import BSONError
@@ -90,21 +90,22 @@ class MongoQuery(BaseMongoQuery):
     query_string: Union[Json[BaseMongoQuery], None]
 
 
-class MongoDataBackend(BaseDataBackend, Writable, Listable):
+Settings = TypeVar("Settings", bound=MongoDataBackendSettings)
+
+
+class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable):
     """MongoDB data backend."""
 
     name = "mongo"
-    query_class = MongoQuery
-    settings_class = MongoDataBackendSettings
 
-    def __init__(self, settings: Optional[MongoDataBackendSettings] = None):
+    def __init__(self, settings: Optional[Settings] = None):
         """Instantiate the MongoDB client.
 
         Args:
             settings (MongoDataBackendSettings or None): The data backend settings.
                 If `settings` is `None`, a default settings instance is used instead.
         """
-        self.settings = settings if settings else self.settings_class()
+        super().__init__(settings)
         self.client = MongoClient(
             self.settings.CONNECTION_URI, **self.settings.CLIENT_OPTIONS.dict()
         )

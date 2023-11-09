@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from io import IOBase
 from itertools import chain
 from pathlib import Path
-from typing import IO, Iterable, Iterator, Optional, Union
+from typing import IO, Iterable, Iterator, Optional, TypeVar, Union
 from uuid import uuid4
 
 from ralph.backends.data.base import (
@@ -51,20 +51,28 @@ class FSDataBackendSettings(BaseDataBackendSettings):
     LOCALE_ENCODING: str = "utf8"
 
 
-class FSDataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
+Settings = TypeVar("Settings", bound=FSDataBackendSettings)
+
+
+class FSDataBackend(
+    BaseDataBackend[Settings, BaseQuery],
+    Writable,
+    Listable,
+    HistoryMixin,
+):
     """FileSystem data backend."""
 
     name = "fs"
     default_operation_type = BaseOperationType.CREATE
-    settings_class = FSDataBackendSettings
 
-    def __init__(self, settings: Optional[FSDataBackendSettings] = None):
+    def __init__(self, settings: Optional[Settings] = None):
         """Create the default target directory if it does not exist.
 
         Args:
             settings (FSDataBackendSettings or None): The data backend settings.
                 If `settings` is `None`, a default settings instance is used instead.
         """
+        super().__init__(settings)
         self.settings = settings if settings else self.settings_class()
         self.default_chunk_size = self.settings.DEFAULT_CHUNK_SIZE
         self.default_directory = self.settings.DEFAULT_DIRECTORY_PATH

@@ -3,7 +3,7 @@
 import logging
 from io import IOBase
 from itertools import chain
-from typing import Iterable, Iterator, Optional, Union
+from typing import Iterable, Iterator, Optional, TypeVar, Union
 
 from elasticsearch import ApiError, AsyncElasticsearch, TransportError
 from elasticsearch.helpers import BulkIndexError, async_streaming_bulk
@@ -21,23 +21,24 @@ from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import parse_bytes_to_dict, read_raw
 
 logger = logging.getLogger(__name__)
+Settings = TypeVar("Settings", bound=ESDataBackendSettings)
 
 
-class AsyncESDataBackend(BaseAsyncDataBackend, AsyncWritable, AsyncListable):
+class AsyncESDataBackend(
+    BaseAsyncDataBackend[Settings, ESQuery], AsyncWritable, AsyncListable
+):
     """Asynchronous Elasticsearch data backend."""
 
     name = "async_es"
-    query_class = ESQuery
-    settings_class = ESDataBackendSettings
 
-    def __init__(self, settings: Optional[ESDataBackendSettings] = None):
+    def __init__(self, settings: Optional[Settings] = None):
         """Instantiate the asynchronous Elasticsearch client.
 
         Args:
             settings (ESDataBackendSettings or None): The data backend settings.
                 If `settings` is `None`, a default settings instance is used instead.
         """
-        self.settings = settings if settings else self.settings_class()
+        super().__init__(settings)
         self._client = None
 
     @property

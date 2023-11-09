@@ -6,7 +6,7 @@ from io import IOBase
 from typing import Iterable, List, Literal, Optional, Union
 from uuid import UUID
 
-from ralph.backends.data.base import BaseOperationType, BaseSettingsConfig
+from ralph.backends.data.base import BaseOperationType
 from ralph.backends.data.fs import FSDataBackend, FSDataBackendSettings
 from ralph.backends.lrs.base import (
     AgentParameters,
@@ -15,6 +15,7 @@ from ralph.backends.lrs.base import (
     RalphStatementsQuery,
     StatementQueryResult,
 )
+from ralph.conf import BaseSettingsConfig
 
 logger = logging.getLogger(__name__)
 
@@ -34,10 +35,8 @@ class FSLRSBackendSettings(BaseLRSBackendSettings, FSDataBackendSettings):
     DEFAULT_LRS_FILE: str = "fs_lrs.jsonl"
 
 
-class FSLRSBackend(BaseLRSBackend, FSDataBackend):
+class FSLRSBackend(BaseLRSBackend[FSLRSBackendSettings], FSDataBackend):
     """FileSystem LRS Backend."""
-
-    settings_class = FSLRSBackendSettings
 
     def write(  # noqa: PLR0913
         self,

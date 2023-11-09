@@ -14,6 +14,7 @@ from typing import (
     List,
     NamedTuple,
     Optional,
+    TypeVar,
     Union,
 )
 from uuid import UUID, uuid4
@@ -108,22 +109,27 @@ class ClickHouseQuery(BaseClickHouseQuery):
     query_string: Union[Json[BaseClickHouseQuery], None]
 
 
-class ClickHouseDataBackend(BaseDataBackend, Writable, Listable):
+Settings = TypeVar("Settings", bound=ClickHouseDataBackendSettings)
+
+
+class ClickHouseDataBackend(
+    BaseDataBackend[Settings, ClickHouseQuery],
+    Writable,
+    Listable,
+):
     """ClickHouse database backend."""
 
     name = "clickhouse"
-    query_class = ClickHouseQuery
     default_operation_type = BaseOperationType.CREATE
-    settings_class = ClickHouseDataBackendSettings
 
-    def __init__(self, settings: Optional[ClickHouseDataBackendSettings] = None):
+    def __init__(self, settings: Optional[Settings] = None):
         """Instantiate the ClickHouse configuration.
 
         Args:
             settings (ClickHouseDataBackendSettings or None): The ClickHouse
                 data backend settings.
         """
-        self.settings = settings if settings else self.settings_class()
+        super().__init__(settings)
         self.database = self.settings.DATABASE
         self.event_table_name = self.settings.EVENT_TABLE_NAME
         self.default_chunk_size = self.settings.DEFAULT_CHUNK_SIZE
