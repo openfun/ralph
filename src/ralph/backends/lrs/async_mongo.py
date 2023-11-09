@@ -10,16 +10,16 @@ from ralph.backends.lrs.base import (
     RalphStatementsQuery,
     StatementQueryResult,
 )
-from ralph.backends.lrs.mongo import MongoLRSBackend
+from ralph.backends.lrs.mongo import MongoLRSBackend, MongoLRSBackendSettings
 from ralph.exceptions import BackendException, BackendParameterException
 
 logger = logging.getLogger(__name__)
 
 
-class AsyncMongoLRSBackend(BaseAsyncLRSBackend, AsyncMongoDataBackend):
+class AsyncMongoLRSBackend(
+    BaseAsyncLRSBackend[MongoLRSBackendSettings], AsyncMongoDataBackend
+):
     """Async MongoDB LRS backend implementation."""
-
-    settings_class = MongoLRSBackend.settings_class
 
     async def query_statements(
         self, params: RalphStatementsQuery

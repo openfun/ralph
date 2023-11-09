@@ -1,9 +1,16 @@
 """Tests for the base data backend"""
 import logging
+from typing import Any
 
 import pytest
 
-from ralph.backends.data.base import BaseDataBackend, BaseQuery, enforce_query_checks
+from ralph.backends.data.base import (
+    BaseDataBackend,
+    BaseDataBackendSettings,
+    BaseQuery,
+    enforce_query_checks,
+    get_backend_generic_argument,
+)
 from ralph.exceptions import BackendParameterException
 
 
@@ -20,9 +27,6 @@ def test_backends_data_base_enforce_query_checks_with_valid_input(value, expecte
 
     class MockBaseDataBackend(BaseDataBackend):
         """A class mocking the base data backend class."""
-
-        def __init__(self, settings=None):
-            """Instantiate the Mock data backend."""
 
         @enforce_query_checks
         def read(self, query=None):
@@ -59,9 +63,6 @@ def test_backends_data_base_enforce_query_checks_with_invalid_input(
     class MockBaseDataBackend(BaseDataBackend):
         """A class mocking the base database class."""
 
-        def __init__(self, settings=None):
-            """Instantiate the Mock data backend."""
-
         @enforce_query_checks
         def read(self, query=None):
             """Mock the base database read method."""
@@ -80,3 +81,32 @@ def test_backends_data_base_enforce_query_checks_with_invalid_input(
 
     error = error.replace("\\", "")
     assert ("ralph.backends.data.base", logging.ERROR, error) in caplog.record_tuples
+
+
+def test_backends_data_base_get_backend_generic_argument():
+    """Test the get_backend_generic_argument function."""
+
+    assert get_backend_generic_argument(BaseDataBackendSettings, 0) is None
+    assert get_backend_generic_argument(BaseDataBackend, -2) is None
+    assert get_backend_generic_argument(BaseDataBackend, -1) is BaseQuery
+    assert get_backend_generic_argument(BaseDataBackend, 0) is BaseDataBackendSettings
+    assert get_backend_generic_argument(BaseDataBackend, 1) is BaseQuery
+    assert get_backend_generic_argument(BaseDataBackend, 2) is None
+
+    class DummySettings(BaseDataBackendSettings):
+        """Dummy Settings."""
+
+    class DummyQuery(BaseQuery):
+        """Dummy Query."""
+
+    class DummyBackend(BaseDataBackend[DummySettings, DummyQuery]):
+        """Dummy Backend."""
+
+    assert get_backend_generic_argument(DummyBackend, 0) is DummySettings
+    assert get_backend_generic_argument(DummyBackend, 1) is DummyQuery
+
+    class DummyAnyBackend(BaseDataBackend[DummySettings, Any]):
+        """Dummy Any Backend."""
+
+    assert get_backend_generic_argument(DummyAnyBackend, 0) is DummySettings
+    assert get_backend_generic_argument(DummyAnyBackend, 1) is None

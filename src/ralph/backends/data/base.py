@@ -5,7 +5,7 @@ import logging
 from abc import ABC, abstractmethod
 from enum import Enum, unique
 from io import IOBase
-from typing import Iterable, Iterator, Optional, Union
+from typing import Any, Generic, Iterable, Iterator, Optional, Type, TypeVar, Union
 
 from pydantic import BaseModel, BaseSettings, ValidationError
 
@@ -34,7 +34,7 @@ class BaseQuery(BaseModel):
 
         extra = "forbid"
 
-    query_string: Union[str, None]
+    query_string: Union[str, None] = None
 
 
 @unique
@@ -144,25 +144,65 @@ class Listable(ABC):
         """
 
 
-class BaseDataBackend(ABC):
+def get_backend_generic_argument(backend_class: Type, position: int) -> Optional[Type]:
+    """Return the generic argument of `backend_class` at specified `position`."""
+    if not hasattr(backend_class, "__orig_bases__"):
+        return None
+
+    bases = backend_class.__orig_bases__[0]
+    if not hasattr(bases, "__args__") or len(bases.__args__) < abs(position) + 1:
+        return None
+
+    argument = bases.__args__[position]
+    if argument is Any:
+        return None
+
+    if isinstance(argument, TypeVar):
+        return argument.__bound__
+
+    return argument
+
+
+def set_backend_settings_class(backend_class: Type):
+    """Set `settings_class` attribute with `Config.env_prefix` for `backend_class`."""
+    settings_class = get_backend_generic_argument(backend_class, 0)
+    if settings_class:
+        backend_class.settings_class = settings_class
+
+
+def set_backend_query_class(backend_class: Type):
+    """Set `query_class` attribute for `backend_class`."""
+    query_class = get_backend_generic_argument(backend_class, 1)
+    if query_class:
+        backend_class.query_class = query_class
+
+
+Settings = TypeVar("Settings", bound=BaseDataBackendSettings)
+Query = TypeVar("Query", bound=BaseQuery)
+
+
+class BaseDataBackend(Generic[Settings, Query], ABC):
     """Base data backend interface."""
 
     name = "base"
-    query_class = BaseQuery
-    settings_class = BaseDataBackendSettings
+    query_class: Type[Query]
+    settings_class: Type[Settings]
 
-    @abstractmethod
-    def __init__(self, settings: Optional[BaseDataBackendSettings] = None):
+    def __init_subclass__(cls, **kwargs):  # noqa: D105
+        super().__init_subclass__(**kwargs)
+        set_backend_settings_class(cls)
+        set_backend_query_class(cls)
+
+    def __init__(self, settings: Optional[Settings] = None):
         """Instantiate the data backend.
 
         Args:
-            settings (BaseDataBackendSettings or None): The data backend settings.
+            settings (Settings or None): The data backend settings.
                 If `settings` is `None`, a default settings instance is used instead.
         """
+        self.settings: Settings = settings if settings else self.settings_class()
 
-    def validate_query(
-        self, query: Union[str, dict, BaseQuery, None] = None
-    ) -> BaseQuery:
+    def validate_query(self, query: Union[str, dict, Query, None] = None) -> Query:
         """Validate and transform the query."""
         if query is None:
             query = self.query_class()
@@ -203,7 +243,7 @@ class BaseDataBackend(ABC):
     def read(  # noqa: PLR0913
         self,
         *,
-        query: Optional[Union[str, BaseQuery]] = None,
+        query: Optional[Union[str, Query]] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
@@ -212,7 +252,7 @@ class BaseDataBackend(ABC):
         """Read records matching the `query` in the `target` container and yield them.
 
         Args:
-            query: (str or BaseQuery): The query to select records to read.
+            query: (str or Query): The query to select records to read.
             target (str or None): The target container name.
                 If `target` is `None`, a default value is used instead.
             chunk_size (int or None): The number of records or bytes to read in one
@@ -324,21 +364,26 @@ class AsyncListable(ABC):
         """
 
 
-class BaseAsyncDataBackend(ABC):
+class BaseAsyncDataBackend(Generic[Settings, Query], ABC):
     """Base async data backend interface."""
 
     name = "base"
-    query_class = BaseQuery
-    settings_class = BaseDataBackendSettings
+    query_class: Type[Query]
+    settings_class: Type[Settings]
 
-    @abstractmethod
-    def __init__(self, settings: Optional[BaseDataBackendSettings] = None):
+    def __init_subclass__(cls, **kwargs):  # noqa: D105
+        super().__init_subclass__(**kwargs)
+        set_backend_settings_class(cls)
+        set_backend_query_class(cls)
+
+    def __init__(self, settings: Optional[Settings] = None):
         """Instantiate the data backend.
 
         Args:
-            settings (BaseDataBackendSettings or None): The backend settings.
+            settings (Settings or None): The backend settings.
                 If `settings` is `None`, a default settings instance is used instead.
         """
+        self.settings: Settings = settings if settings else self.settings_class()
 
     def validate_query(
         self, query: Union[str, dict, BaseQuery, None] = None
@@ -383,7 +428,7 @@ class BaseAsyncDataBackend(ABC):
     async def read(  # noqa: PLR0913
         self,
         *,
-        query: Optional[Union[str, BaseQuery]] = None,
+        query: Optional[Union[str, Query]] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
@@ -392,7 +437,7 @@ class BaseAsyncDataBackend(ABC):
         """Read records matching the `query` in the `target` container and yield them.
 
         Args:
-            query: (str or BaseQuery): The query to select records to read.
+            query: (str or Query): The query to select records to read.
             target (str or None): The target container name.
                 If `target` is `None`, a default value is used instead.
             chunk_size (int or None): The number of records or bytes to read in one

@@ -6,7 +6,6 @@ from typing import Iterator, List
 from bson.objectid import ObjectId
 from pymongo import ASCENDING, DESCENDING
 
-from ralph.backends.data.base import BaseSettingsConfig
 from ralph.backends.data.mongo import (
     MongoDataBackend,
     MongoDataBackendSettings,
@@ -19,6 +18,7 @@ from ralph.backends.lrs.base import (
     RalphStatementsQuery,
     StatementQueryResult,
 )
+from ralph.conf import BaseSettingsConfig
 from ralph.exceptions import BackendException, BackendParameterException
 
 logger = logging.getLogger(__name__)
@@ -33,10 +33,8 @@ class MongoLRSBackendSettings(BaseLRSBackendSettings, MongoDataBackendSettings):
         env_prefix = "RALPH_BACKENDS__LRS__MONGO__"
 
 
-class MongoLRSBackend(BaseLRSBackend, MongoDataBackend):
+class MongoLRSBackend(BaseLRSBackend[MongoLRSBackendSettings], MongoDataBackend):
     """MongoDB LRS backend."""
-
-    settings_class = MongoLRSBackendSettings
 
     def query_statements(self, params: RalphStatementsQuery) -> StatementQueryResult:
         """Return the results of a statements query using xAPI parameters."""

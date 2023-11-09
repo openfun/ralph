@@ -67,17 +67,17 @@ class S3DataBackendSettings(BaseDataBackendSettings):
     LOCALE_ENCODING: str = "utf8"
 
 
-class S3DataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
+class S3DataBackend(
+    BaseDataBackend[S3DataBackendSettings, BaseQuery], Writable, Listable, HistoryMixin
+):
     """S3 data backend."""
 
     name = "s3"
     default_operation_type = BaseOperationType.CREATE
-    settings_class = S3DataBackendSettings
 
     def __init__(self, settings: Optional[S3DataBackendSettings] = None):
         """Instantiate the AWS S3 client."""
-        self.settings = settings if settings else self.settings_class()
-
+        super().__init__(settings)
         self.default_bucket_name = self.settings.DEFAULT_BUCKET_NAME
         self.default_chunk_size = self.settings.DEFAULT_CHUNK_SIZE
         self.locale_encoding = self.settings.LOCALE_ENCODING
