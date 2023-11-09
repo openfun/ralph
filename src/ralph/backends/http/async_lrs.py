@@ -12,7 +12,7 @@ from more_itertools import chunked
 from pydantic import AnyHttpUrl, BaseModel, Field, parse_obj_as
 from pydantic.types import PositiveInt
 
-from ralph.backends.lrs.base import BaseLRSStatementsQuery, LRSStatementsQuery
+from ralph.backends.lrs.base import LRSStatementsQuery
 from ralph.conf import BaseSettingsConfig, HeadersParameters
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import gather_with_limited_concurrency
@@ -22,7 +22,6 @@ from .base import (
     BaseHTTPBackendSettings,
     HTTPBackendStatus,
     OperationType,
-    enforce_query_checks,
 )
 
 logger = logging.getLogger(__name__)
@@ -118,10 +117,9 @@ class AsyncLRSHTTPBackend(BaseHTTPBackend):
         logger.error(msg, target)
         raise NotImplementedError(msg % target)
 
-    @enforce_query_checks
     async def read(  # noqa: PLR0913
         self,
-        query: Optional[Union[str, LRSStatementsQuery]] = None,
+        query: Optional[LRSStatementsQuery] = None,
         target: Optional[str] = None,
         chunk_size: Optional[PositiveInt] = 500,
         raw_output: bool = False,
@@ -136,7 +134,7 @@ class AsyncLRSHTTPBackend(BaseHTTPBackend):
         been limited.
 
         Args:
-            query (str, LRSStatementsQuery):  The query to select records to read.
+            query (LRSStatementsQuery):  The query to select records to read.
             target (str): Endpoint from which to read data (e.g. `/statements`).
                 If target is `None`, `/xAPI/statements` default endpoint is used.
             chunk_size (int or None): The number of records or bytes to read in one
@@ -158,14 +156,14 @@ class AsyncLRSHTTPBackend(BaseHTTPBackend):
         if not target:
             target = self.settings.STATEMENTS_ENDPOINT
 
+        if query is None:
+            query = LRSStatementsQuery()
+
         if query.limit:
             logger.warning(
                 "The limit query parameter value is overwritten by the chunk_size "
                 "parameter value."
             )
-
-        if isinstance(query.query_string, BaseLRSStatementsQuery):
-            query = query.query_string
 
         query.limit = chunk_size
 

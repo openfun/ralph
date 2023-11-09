@@ -537,28 +537,8 @@ async def test_backends_data_async_mongo_read_without_ignore_errors(
     ) in caplog.record_tuples
 
 
-@pytest.mark.parametrize(
-    "query",
-    [
-        '{"filter": {"id": {"$eq": "bar"}}, "projection": {"id": 1}}',
-        {"filter": {"id": {"$eq": "bar"}}, "projection": {"id": 1}},
-        MongoQuery(
-            query_string='{"filter": {"id": {"$eq": "bar"}}, "projection": {"id": 1}}'
-        ),
-        # Given both `query_string` and other query arguments, only the `query_string`
-        # should be applied.
-        MongoQuery(
-            query_string='{"filter": {"id": {"$eq": "bar"}}, "projection": {"id": 1}}',
-            filter={"id": {"$eq": "foo"}},
-            projection={"id": 0},
-        ),
-        MongoQuery(filter={"id": {"$eq": "bar"}}, projection={"id": 1}),
-    ],
-)
 @pytest.mark.anyio
-async def test_backends_data_async_mongo_read_with_query(
-    query, mongo, async_mongo_backend
-):
+async def test_backends_data_async_mongo_read_with_query(mongo, async_mongo_backend):
     """Test the `AsyncMongoDataBackend.read` method given a query argument."""
 
     # Create records
@@ -573,6 +553,8 @@ async def test_backends_data_async_mongo_read_with_query(
         {"_id": "64945e530468d817b1f756db", "id": "bar"},
     ]
     await backend.collection.insert_many(documents)
+
+    query = MongoQuery(filter={"id": {"$eq": "bar"}}, projection={"id": 1})
 
     assert [statement async for statement in backend.read(query=query)] == expected
     assert [

@@ -418,25 +418,7 @@ def test_backends_data_mongo_read_without_ignore_errors(mongo, mongo_backend, ca
     backend.close()
 
 
-@pytest.mark.parametrize(
-    "query",
-    [
-        '{"filter": {"id": {"$eq": "bar"}}, "projection": {"id": 1}}',
-        {"filter": {"id": {"$eq": "bar"}}, "projection": {"id": 1}},
-        MongoQuery(
-            query_string='{"filter": {"id": {"$eq": "bar"}}, "projection": {"id": 1}}'
-        ),
-        # Given both `query_string` and other query arguments, only the `query_string`
-        # should be applied.
-        MongoQuery(
-            query_string='{"filter": {"id": {"$eq": "bar"}}, "projection": {"id": 1}}',
-            filter={"id": {"$eq": "foo"}},
-            projection={"id": 0},
-        ),
-        MongoQuery(filter={"id": {"$eq": "bar"}}, projection={"id": 1}),
-    ],
-)
-def test_backends_data_mongo_read_with_query(query, mongo, mongo_backend):
+def test_backends_data_mongo_read_with_query(mongo, mongo_backend):
     """Test the `MongoDataBackend.read` method given a query argument."""
 
     # Create records
@@ -451,6 +433,8 @@ def test_backends_data_mongo_read_with_query(query, mongo, mongo_backend):
         {"_id": "64945e530468d817b1f756db", "id": "bar"},
     ]
     backend.collection.insert_many(documents)
+
+    query = MongoQuery(filter={"id": {"$eq": "bar"}}, projection={"id": 1})
     assert list(backend.read(query=query)) == expected
     assert list(backend.read(query=query, chunk_size=1)) == expected
     assert list(backend.read(query=query, chunk_size=1000)) == expected

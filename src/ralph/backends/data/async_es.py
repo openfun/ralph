@@ -14,10 +14,8 @@ from ralph.backends.data.base import (
     BaseAsyncDataBackend,
     BaseOperationType,
     DataBackendStatus,
-    async_enforce_query_checks,
 )
 from ralph.backends.data.es import (
-    BaseESQuery,
     ESDataBackend,
     ESDataBackendSettings,
     ESQuery,
@@ -114,11 +112,10 @@ class AsyncESDataBackend(BaseAsyncDataBackend, AsyncWritable, AsyncListable):
         for index in indices:
             yield index
 
-    @async_enforce_query_checks
-    async def read(  # noqa: PLR0912, PLR0913
+    async def read(  # noqa: PLR0912,PLR0913
         self,
         *,
-        query: Optional[Union[str, ESQuery]] = None,
+        query: Optional[ESQuery] = None,
         target: Optional[str] = None,
         chunk_size: Union[None, int] = None,
         raw_output: bool = False,
@@ -128,7 +125,7 @@ class AsyncESDataBackend(BaseAsyncDataBackend, AsyncWritable, AsyncListable):
         """Read documents matching the query in the target index and yield them.
 
         Args:
-            query (str or ESQuery): A query in the Lucene query string syntax or a
+            query (ESQuery): A query in the Lucene query string syntax or a
                 dictionary defining a search definition using the Elasticsearch Query
                 DSL. The Lucene query overrides the query DSL if present. See ESQuery.
             target (str or None): The target Elasticsearch index name to query.
@@ -150,13 +147,8 @@ class AsyncESDataBackend(BaseAsyncDataBackend, AsyncWritable, AsyncListable):
         if ignore_errors:
             logger.warning("The `ignore_errors` argument is ignored")
 
-        if isinstance(query.query_string, BaseESQuery):
-            query = query.query_string
-        elif isinstance(query.query_string, str):
-            logger.info(
-                "Fallback to Lucene Query as the query is not a BaseESQuery: %s",
-                query.query_string,
-            )
+        if query is None:
+            query = self.query_class()
 
         if not query.pit.keep_alive:
             query.pit.keep_alive = self.settings.POINT_IN_TIME_KEEP_ALIVE
@@ -173,9 +165,7 @@ class AsyncESDataBackend(BaseAsyncDataBackend, AsyncWritable, AsyncListable):
                 raise BackendException(msg % error) from error
 
         limit = query.size
-        kwargs = query.dict(exclude={"query_string", "size"})
-        if query.query_string:
-            kwargs["q"] = query.query_string
+        kwargs = query.dict(exclude={"size"})
 
         count = chunk_size
         # The first condition is set to comprise either limit as None

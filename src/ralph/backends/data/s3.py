@@ -23,11 +23,9 @@ from ralph.backends.data.base import (
     BaseDataBackend,
     BaseDataBackendSettings,
     BaseOperationType,
-    BaseQuery,
     DataBackendStatus,
     Listable,
     Writable,
-    enforce_query_checks,
 )
 from ralph.backends.mixins import HistoryMixin
 from ralph.conf import BaseSettingsConfig
@@ -155,11 +153,10 @@ class S3DataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
             logger.error(msg, target, error_msg)
             raise BackendException(msg % (target, error_msg)) from err
 
-    @enforce_query_checks
     def read(  # noqa: PLR0913
         self,
         *,
-        query: Optional[Union[str, BaseQuery]] = None,
+        query: Optional[str] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
@@ -168,7 +165,7 @@ class S3DataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
         """Read an object matching the `query` in the `target` bucket and yield it.
 
         Args:
-            query: (str or BaseQuery): The ID of the object to read.
+            query: (str): The ID of the object to read.
             target (str or None): The target bucket containing the objects.
                 If target is `None`, the `default_bucket` is used instead.
             chunk_size (int or None): The chunk size when reading objects by batch.
@@ -187,7 +184,7 @@ class S3DataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
             BackendParameterException: If a backend argument value is not valid and
                 `ignore_errors` is set to `False`.
         """
-        if query.query_string is None:
+        if query is None:
             msg = "Invalid query. The query should be a valid object name."
             logger.error(msg)
             raise BackendParameterException(msg)
@@ -199,13 +196,13 @@ class S3DataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
             target = self.default_bucket_name
 
         try:
-            response = self.client.get_object(Bucket=target, Key=query.query_string)
+            response = self.client.get_object(Bucket=target, Key=query)
         except (ClientError, EndpointConnectionError) as err:
             error_msg = err.response["Error"]["Message"]
             msg = "Failed to download %s: %s"
-            logger.error(msg, query.query_string, error_msg)
+            logger.error(msg, query, error_msg)
             if not ignore_errors:
-                raise BackendException(msg % (query.query_string, error_msg)) from err
+                raise BackendException(msg % (query, error_msg)) from err
 
         reader = self._read_raw if raw_output else self._read_dict
         try:
@@ -213,16 +210,16 @@ class S3DataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
                 yield chunk
         except (ReadTimeoutError, ResponseStreamingError) as err:
             msg = "Failed to read chunk from object %s"
-            logger.error(msg, query.query_string)
+            logger.error(msg, query)
             if not ignore_errors:
-                raise BackendException(msg % (query.query_string)) from err
+                raise BackendException(msg % (query)) from err
 
         # Archive fetched, add a new entry to the history.
         self.append_to_history(
             {
                 "backend": self.name,
                 "action": "read",
-                "id": target + "/" + query.query_string,
+                "id": target + "/" + query,
                 "size": response["ContentLength"],
                 "timestamp": now(),
             }

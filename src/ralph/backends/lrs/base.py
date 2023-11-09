@@ -6,13 +6,12 @@ from datetime import datetime
 from typing import Iterator, List, Literal, Optional, Union
 from uuid import UUID
 
-from pydantic import BaseModel, Field, Json, NonNegativeInt
+from pydantic import BaseModel, Field, NonNegativeInt
 
 from ralph.backends.data.base import (
     BaseAsyncDataBackend,
     BaseDataBackend,
     BaseDataBackendSettings,
-    BaseQuery,
     BaseSettingsConfig,
 )
 from ralph.models.xapi.base.agents import BaseXapiAgent
@@ -38,7 +37,7 @@ class StatementQueryResult:
     search_after: Optional[str]
 
 
-class BaseLRSStatementsQuery(BaseQuery):
+class LRSStatementsQuery(BaseModel):
     """Base pydantic model for LRS query on Statements resource query parameters.
 
     LRS Specification:
@@ -59,13 +58,6 @@ class BaseLRSStatementsQuery(BaseQuery):
     format: Optional[Literal["ids", "exact", "canonical"]] = "exact"
     attachments: Optional[bool] = False
     ascending: Optional[bool] = False
-
-
-class LRSStatementsQuery(BaseLRSStatementsQuery):
-    """Pydantic model for LRS query on Statements resource query parameters."""
-
-    # pylint: disable=unsubscriptable-object
-    query_string: Union[Json[BaseLRSStatementsQuery], None]
 
 
 class AgentParameters(BaseModel):

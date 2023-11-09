@@ -54,6 +54,7 @@ from ralph.utils import (
     get_root_logger,
     import_string,
     iter_over_async,
+    parse_custom_query,
 )
 
 # cli module logger
@@ -630,14 +631,14 @@ def convert(from_, to_, ignore_errors, fail_on_unknown, **conversion_set_kwargs)
     default=False,
     help="Ignore errors during the encoding operation.",
 )
-def read(  # noqa: PLR0913
+def read(
     backend,
     chunk_size,
     target,
     query,
     ignore_errors,
     **options,
-):  # pylint: disable=too-many-arguments
+):
     """Read records matching the QUERY (json or string) from a configured backend."""
     logger.info(
         (
@@ -655,6 +656,8 @@ def read(  # noqa: PLR0913
     backend = get_backend_instance(backend_class, options)
 
     if isinstance(backend, (BaseDataBackend, BaseAsyncDataBackend)):
+        if query:
+            query = parse_custom_query(backend, query)
         statements = backend.read(
             query=query,
             target=target,

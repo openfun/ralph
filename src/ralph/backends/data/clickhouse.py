@@ -20,17 +20,15 @@ from uuid import UUID, uuid4
 
 import clickhouse_connect
 from clickhouse_connect.driver.exceptions import ClickHouseError
-from pydantic import BaseModel, Json, ValidationError
+from pydantic import BaseModel, ValidationError
 
 from ralph.backends.data.base import (
     BaseDataBackend,
     BaseDataBackendSettings,
     BaseOperationType,
-    BaseQuery,
     DataBackendStatus,
     Listable,
     Writable,
-    enforce_query_checks,
 )
 from ralph.conf import BaseSettingsConfig, ClientOptions
 from ralph.exceptions import BackendException, BackendParameterException
@@ -91,8 +89,17 @@ class ClickHouseDataBackendSettings(BaseDataBackendSettings):
     LOCALE_ENCODING: str = "utf8"
 
 
-class BaseClickHouseQuery(BaseQuery):
-    """Base ClickHouse query model."""
+class ClickHouseQuery(BaseModel):
+    """Base ClickHouse query model.
+
+    Attributes:
+        select:
+        where:
+        parameters:
+        limit:
+        sort:
+        column_oriented:
+    """
 
     select: Union[str, List[str]] = "event"
     where: Union[str, List[str], None]
@@ -100,12 +107,6 @@ class BaseClickHouseQuery(BaseQuery):
     limit: Union[int, None]
     sort: Union[str, None]
     column_oriented: Union[bool, None] = False
-
-
-class ClickHouseQuery(BaseClickHouseQuery):
-    """ClickHouse query model."""
-
-    query_string: Union[Json[BaseClickHouseQuery], None]
 
 
 class ClickHouseDataBackend(BaseDataBackend, Writable, Listable):
@@ -199,11 +200,10 @@ class ClickHouseDataBackend(BaseDataBackend, Writable, Listable):
             else:
                 yield str(table.get("name"))
 
-    @enforce_query_checks
     def read(  # noqa: PLR0912, PLR0913
         self,
         *,
-        query: Optional[Union[str, ClickHouseQuery]] = None,
+        query: Optional[ClickHouseQuery] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
@@ -212,7 +212,7 @@ class ClickHouseDataBackend(BaseDataBackend, Writable, Listable):
         """Read documents matching the query in the target table and yield them.
 
         Args:
-            query (str or ClickHouseQuery): The query to use when fetching documents.
+            query (ClickHouseQuery): The query to use when fetching documents.
             target (str or None): The target table name to query.
                 If target is `None`, the `event_table_name` is used instead.
             chunk_size (int or None): The chunk size when reading documents by batches.
@@ -235,11 +235,8 @@ class ClickHouseDataBackend(BaseDataBackend, Writable, Listable):
         if chunk_size is None:
             chunk_size = self.default_chunk_size
 
-        query = (
-            BaseClickHouseQuery(query.query_string)
-            if query.query_string
-            else query.copy(exclude={"query_string"})
-        )
+        if query is None:
+            query = self.query_class()
 
         if isinstance(query.select, str):
             query.select = [query.select]

@@ -14,11 +14,9 @@ from ralph.backends.data.base import (
     BaseDataBackend,
     BaseDataBackendSettings,
     BaseOperationType,
-    BaseQuery,
     DataBackendStatus,
     Listable,
     Writable,
-    enforce_query_checks,
 )
 from ralph.backends.mixins import HistoryMixin
 from ralph.conf import BaseSettingsConfig
@@ -143,11 +141,10 @@ class FSDataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
                 "modified_at": modified_at.isoformat(),
             }
 
-    @enforce_query_checks
     def read(  # noqa: PLR0913
         self,
         *,
-        query: Optional[Union[str, BaseQuery]] = None,
+        query: Optional[str] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
@@ -156,7 +153,7 @@ class FSDataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
         """Read files matching the query in the target folder and yield them.
 
         Args:
-            query: (str or BaseQuery): The relative pattern for the files to read.
+            query (str): The relative pattern for the files to read.
             target (str or None): The target directory path containing the files.
                 If target is `None`, the `default_directory_path` is used instead.
                 If target is a relative path, it is considered to be relative to the
@@ -176,8 +173,8 @@ class FSDataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
             BackendException: If a failure during the read operation occurs and
                 `ignore_errors` is set to `False`.
         """
-        if not query.query_string:
-            query.query_string = self.default_query_string
+        if not query:
+            query = self.default_query_string
 
         if not chunk_size:
             chunk_size = self.default_chunk_size
@@ -185,12 +182,10 @@ class FSDataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
         target = Path(target) if target else self.default_directory
         if not target.is_absolute() and target != self.default_directory:
             target = self.default_directory / target
-        paths = list(
-            filter(lambda path: path.is_file(), target.glob(query.query_string))
-        )
+        paths = list(filter(lambda path: path.is_file(), target.glob(query)))
 
         if not paths:
-            logger.info("No file found for query: %s", target / query.query_string)
+            logger.info("No file found for query: %s", target / query)
             return
 
         logger.debug("Reading matching files: %s", paths)

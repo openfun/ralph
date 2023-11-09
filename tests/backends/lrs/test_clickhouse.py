@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 import pytest
 from clickhouse_connect.driver.exceptions import ClickHouseError
 
+from ralph.backends.data.clickhouse import ClickHouseQuery
 from ralph.backends.lrs.base import RalphStatementsQuery
 from ralph.backends.lrs.clickhouse import ClickHouseLRSBackend
 from ralph.exceptions import BackendException
@@ -259,7 +260,7 @@ def test_backends_lrs_clickhouse_default_instantiation(monkeypatch, fs):
         ),
     ],
 )
-def test_backends_database_clickhouse_query_statements_query(
+def test_backends_lrs_clickhouse_query_statements_query(
     params,
     expected_params,
     monkeypatch,
@@ -273,13 +274,13 @@ def test_backends_database_clickhouse_query_statements_query(
     def mock_read(query, target, ignore_errors):
         """Mock the `ClickHouseDataBackend.read` method."""
 
-        assert query == {
-            "select": ["event_id", "emission_time", "event"],
-            "where": expected_params["where"],
-            "parameters": expected_params["params"],
-            "limit": expected_params["limit"],
-            "sort": expected_params["sort"],
-        }
+        assert query == ClickHouseQuery(
+            select=["event_id", "emission_time", "event"],
+            where=expected_params["where"],
+            parameters=expected_params["params"],
+            limit=expected_params["limit"],
+            sort=expected_params["sort"],
+        )
 
         return {}
 

@@ -8,17 +8,15 @@ from typing import Iterable, Iterator, List, Literal, Optional, Union
 
 from elasticsearch import ApiError, Elasticsearch, TransportError
 from elasticsearch.helpers import BulkIndexError, streaming_bulk
-from pydantic import BaseModel, Json
+from pydantic import BaseModel
 
 from ralph.backends.data.base import (
     BaseDataBackend,
     BaseDataBackendSettings,
     BaseOperationType,
-    BaseQuery,
     DataBackendStatus,
     Listable,
     Writable,
-    enforce_query_checks,
 )
 from ralph.conf import BaseSettingsConfig, ClientOptions, CommaSeparatedTuple
 from ralph.exceptions import BackendException, BackendParameterException
@@ -82,16 +80,13 @@ class ESQueryPit(BaseModel):
     keep_alive: Union[str, None]
 
 
-class BaseESQuery(BaseQuery):
-    """Base Elasticsearch query model.
+class ESQuery(BaseModel):
+    """Elasticsearch query model.
 
     Attributes:
         query (dict): A search query definition using the Elasticsearch Query DSL.
             See Elasticsearch search reference for query DSL syntax:
             https://www.elastic.co/guide/en/elasticsearch/reference/8.9/search-search.html#request-body-search-query
-        query_string (str): The Elastisearch query in the Lucene query string syntax.
-            See Elasticsearch search reference for Lucene query syntax:
-            https://www.elastic.co/guide/en/elasticsearch/reference/8.9/search-search.html#search-api-query-params-q
         pit (dict): Limit the search to a point in time (PIT). See ESQueryPit.
         size (int): The maximum number of documents to yield.
         sort (str or list): Specify how to sort search results. Set to `_doc` or
@@ -109,18 +104,6 @@ class BaseESQuery(BaseQuery):
     sort: Union[str, List[dict]] = "_shard_doc"
     search_after: Union[list, None]
     track_total_hits: Literal[False] = False
-
-
-class ESQuery(BaseESQuery):
-    """Elasticsearch query model.
-
-    Attributes:
-        query_string (str): Same as in `BaseESQuery`, however also accepts a JSON
-            instance of `BaseESQuery` which, if provided, is used instead.
-    """
-
-    # pylint: disable=unsubscriptable-object
-    query_string: Union[Json[BaseESQuery], str, None]
 
 
 class ESDataBackend(BaseDataBackend, Writable, Listable):
@@ -209,11 +192,10 @@ class ESDataBackend(BaseDataBackend, Writable, Listable):
         for index in indices:
             yield index
 
-    @enforce_query_checks
     def read(  # noqa: PLR0912, PLR0913
         self,
         *,
-        query: Optional[Union[str, ESQuery]] = None,
+        query: Optional[ESQuery] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
@@ -223,7 +205,7 @@ class ESDataBackend(BaseDataBackend, Writable, Listable):
         """Read documents matching the query in the target index and yield them.
 
         Args:
-            query (str or ESQuery): A query in the Lucene query string syntax or a
+            query (ESQuery): A query in the Lucene query string syntax or a
                 dictionary defining a search definition using the Elasticsearch Query
                 DSL. The Lucene query overrides the query DSL if present. See ESQuery.
             target (str or None): The target Elasticsearch index name to query.
@@ -245,13 +227,8 @@ class ESDataBackend(BaseDataBackend, Writable, Listable):
         if ignore_errors:
             logger.warning("The `ignore_errors` argument is ignored")
 
-        if isinstance(query.query_string, BaseESQuery):
-            query = query.query_string
-        elif isinstance(query.query_string, str):
-            logger.info(
-                "Fallback to Lucene Query as the query is not a BaseESQuery: %s",
-                query.query_string,
-            )
+        if query is None:
+            query = self.query_class()
 
         if not query.pit.keep_alive:
             query.pit.keep_alive = self.settings.POINT_IN_TIME_KEEP_ALIVE
@@ -266,9 +243,7 @@ class ESDataBackend(BaseDataBackend, Writable, Listable):
                 raise BackendException(msg % error) from error
 
         limit = query.size
-        kwargs = query.dict(exclude={"query_string", "size"})
-        if query.query_string:
-            kwargs["q"] = query.query_string
+        kwargs = query.dict(exclude={"size"})
 
         count = chunk_size
         # The first condition is set to comprise either limit as None

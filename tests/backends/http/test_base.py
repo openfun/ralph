@@ -2,7 +2,7 @@
 
 from typing import Iterator, Union
 
-from ralph.backends.http.base import BaseHTTPBackend, BaseQuery
+from ralph.backends.http.base import BaseHTTPBackend
 
 
 def test_backends_http_base_abstract_interface_with_implemented_abstract_method():
@@ -30,4 +30,4 @@ def test_backends_http_base_abstract_interface_with_implemented_abstract_method(
     GoodStorage()
 
     assert GoodStorage.name == "good"
-    assert GoodStorage.query == BaseQuery
+    assert GoodStorage.query is None

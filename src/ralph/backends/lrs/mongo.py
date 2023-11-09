@@ -60,7 +60,9 @@ class MongoLRSBackend(BaseLRSBackend, MongoDataBackend):
     def query_statements_by_ids(self, ids: List[str]) -> Iterator[dict]:
         """Yield statements with matching ids from the backend."""
         try:
-            mongo_response = self.read(query={"filter": {"_source.id": {"$in": ids}}})
+            mongo_response = self.read(
+                query=MongoQuery(filter={"_source.id": {"$in": ids}})
+            )
             yield from (document["_source"] for document in mongo_response)
         except (BackendException, BackendParameterException) as error:
             logger.error("Failed to read from MongoDB")

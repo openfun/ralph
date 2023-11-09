@@ -11,6 +11,8 @@ from inspect import getmembers, isclass, iscoroutine
 from logging import Logger, getLogger
 from typing import Any, Dict, Iterable, Iterator, List, Optional, Sequence, Type, Union
 
+from pydantic import BaseModel, ValidationError
+
 from ralph.exceptions import BackendException, UnsupportedBackendException
 
 logger = logging.getLogger(__name__)
@@ -78,6 +80,19 @@ def get_backend_instance(backend_class: Type, options: Dict) -> Any:
         if name.startswith(prefix) and value is not None
     }
     return backend_class(backend_class.settings_class(**options))
+
+
+def parse_custom_query(backend: Any, query: str) -> Union[BaseModel, str]:
+    """Parse a query string to a Pydantic instance for backend with custom queries."""
+    if backend.query_class is not None:
+        try:
+            query = backend.query_class.parse_raw(query)
+        except (TypeError, ValidationError) as err:
+            msg = "Failed to parse query string. The query should be a Json string"
+            logger.error(msg, backend)
+            raise BackendException from err
+
+    return query
 
 
 def get_root_logger() -> Logger:

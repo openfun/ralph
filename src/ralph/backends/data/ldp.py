@@ -9,10 +9,8 @@ import requests
 from ralph.backends.data.base import (
     BaseDataBackend,
     BaseDataBackendSettings,
-    BaseQuery,
     DataBackendStatus,
     Listable,
-    enforce_query_checks,
 )
 from ralph.backends.mixins import HistoryMixin
 from ralph.conf import BaseSettingsConfig
@@ -146,11 +144,10 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend, Listable):
         for archive in archives:
             yield self._details(target, archive)
 
-    @enforce_query_checks
     def read(  # noqa: PLR0913
         self,
         *,
-        query: Optional[Union[str, BaseQuery]] = None,
+        query: Optional[str] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = 4096,
         raw_output: bool = True,
@@ -159,7 +156,7 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend, Listable):
         """Read an archive matching the query in the target stream_id and yield it.
 
         Args:
-            query (str or BaseQuery): The ID of the archive to read.
+            query (str): The ID of the archive to read.
             target (str or None): The target stream_id containing the archives.
                 If target is `None`, the `DEFAULT_STREAM_ID` is used instead.
             chunk_size (int or None): The chunk size when reading archives by batch.
@@ -173,7 +170,7 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend, Listable):
             BackendException: If a failure during the read operation occurs.
             BackendParameterException: If the `query` argument is not an archive name.
         """
-        if query.query_string is None:
+        if query is None:
             msg = "Invalid query. The query should be a valid archive name"
             raise BackendParameterException(msg)
 
@@ -181,10 +178,10 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend, Listable):
             logger.warning("The `raw_output` and `ignore_errors` arguments are ignored")
 
         target = target if target else self.stream_id
-        logger.debug("Getting archive: %s from stream: %s", query.query_string, target)
+        logger.debug("Getting archive: %s from stream: %s", query, target)
 
         # Stream response (archive content)
-        url = self._url(query.query_string)
+        url = self._url(query)
         try:
             with requests.get(url, stream=True, timeout=self.timeout) as result:
                 result.raise_for_status()
@@ -192,11 +189,11 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend, Listable):
                     yield chunk
         except requests.exceptions.HTTPError as error:
             msg = "Failed to read archive %s: %s"
-            logger.error(msg, query.query_string, error)
-            raise BackendException(msg % (query.query_string, error)) from error
+            logger.error(msg, query, error)
+            raise BackendException(msg % (query, error)) from error
 
         # Get detailed information about the archive to fetch
-        details = self._details(target, query.query_string)
+        details = self._details(target, query)
         # Archive is supposed to have been fully read, add a new entry to
         # the history.
         self.append_to_history(
@@ -206,7 +203,7 @@ class LDPDataBackend(HistoryMixin, BaseDataBackend, Listable):
                 # WARNING: previously only the filename was used as the ID
                 # By changing this and prepending the `target` stream_id previously
                 # fetched archives will not be marked as read anymore.
-                "id": f"{target}/{query.query_string}",
+                "id": f"{target}/{query}",
                 "filename": details.get("filename"),
                 "size": details.get("size"),
                 "timestamp": now(),

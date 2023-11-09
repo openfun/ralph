@@ -5,6 +5,7 @@ import logging
 from typing import Iterator, List
 
 from ralph.backends.data.async_mongo import AsyncMongoDataBackend
+from ralph.backends.data.mongo import MongoQuery
 from ralph.backends.lrs.base import (
     BaseAsyncLRSBackend,
     RalphStatementsQuery,
@@ -49,7 +50,7 @@ class AsyncMongoLRSBackend(BaseAsyncLRSBackend, AsyncMongoDataBackend):
         """Yield statements with matching ids from the backend."""
         try:
             async for document in self.read(
-                query={"filter": {"_source.id": {"$in": ids}}}
+                query=MongoQuery(filter={"_source.id": {"$in": ids}})
             ):
                 yield document["_source"]
         except (BackendException, BackendParameterException) as error:

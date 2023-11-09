@@ -13,7 +13,7 @@ from uuid import uuid4
 from bson.errors import BSONError
 from bson.objectid import ObjectId
 from dateutil.parser import isoparse
-from pydantic import Json, MongoDsn, constr
+from pydantic import BaseModel, MongoDsn, constr
 from pymongo import MongoClient, ReplaceOne
 from pymongo.collection import Collection
 from pymongo.errors import (
@@ -28,11 +28,9 @@ from ralph.backends.data.base import (
     BaseDataBackend,
     BaseDataBackendSettings,
     BaseOperationType,
-    BaseQuery,
     DataBackendStatus,
     Listable,
     Writable,
-    enforce_query_checks,
 )
 from ralph.conf import BaseSettingsConfig, ClientOptions
 from ralph.exceptions import BackendException, BackendParameterException
@@ -75,19 +73,13 @@ class MongoDataBackendSettings(BaseDataBackendSettings):
     LOCALE_ENCODING: str = "utf8"
 
 
-class BaseMongoQuery(BaseQuery):
+class MongoQuery(BaseModel):
     """Base MongoDB query model."""
 
     filter: Union[dict, None]
     limit: Union[int, None]
     projection: Union[dict, None]
     sort: Union[List[Tuple], None]
-
-
-class MongoQuery(BaseMongoQuery):
-    """MongoDB query model."""
-
-    query_string: Union[Json[BaseMongoQuery], None]
 
 
 class MongoDataBackend(BaseDataBackend, Writable, Listable):
@@ -174,11 +166,10 @@ class MongoDataBackend(BaseDataBackend, Writable, Listable):
             logger.error(msg, error)
             raise BackendException(msg % error) from error
 
-    @enforce_query_checks
     def read(  # noqa: PLR0913
         self,
         *,
-        query: Optional[Union[str, MongoQuery]] = None,
+        query: Optional[MongoQuery] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
@@ -187,7 +178,7 @@ class MongoDataBackend(BaseDataBackend, Writable, Listable):
         """Read documents matching the `query` from `target` collection and yield them.
 
         Args:
-            query (str or MongoQuery): The MongoDB query to use when reading documents.
+            query (MongoQuery): The MongoDB query to use when reading documents.
             target (str or None): The MongoDB collection name to query.
                 If target is `None`, the `DEFAULT_COLLECTION` is used instead.
             chunk_size (int or None): The chunk size when reading archives by batch.
@@ -206,9 +197,8 @@ class MongoDataBackend(BaseDataBackend, Writable, Listable):
         if not chunk_size:
             chunk_size = self.settings.DEFAULT_CHUNK_SIZE
 
-        query = (query.query_string if query.query_string else query).dict(
-            exclude={"query_string"}, exclude_unset=True
-        )
+        if query is None:
+            query = self.query_class()
 
         try:
             collection = self.database[target] if target else self.collection
@@ -218,7 +208,9 @@ class MongoDataBackend(BaseDataBackend, Writable, Listable):
             raise BackendParameterException(msg % (target, error)) from error
 
         try:
-            documents = collection.find(batch_size=chunk_size, **query)
+            documents = collection.find(
+                batch_size=chunk_size, **query.dict(exclude_none=True)
+            )
             documents = (d.update({"_id": str(d.get("_id"))}) or d for d in documents)
             if raw_output:
                 documents = read_raw(

@@ -4,6 +4,7 @@ import logging
 from typing import Iterator, List
 
 from ralph.backends.data.async_es import AsyncESDataBackend
+from ralph.backends.data.es import ESQuery
 from ralph.backends.lrs.base import (
     BaseAsyncLRSBackend,
     RalphStatementsQuery,
@@ -43,7 +44,9 @@ class AsyncESLRSBackend(BaseAsyncLRSBackend, AsyncESDataBackend):
     async def query_statements_by_ids(self, ids: List[str]) -> Iterator[dict]:
         """Yield statements with matching ids from the backend."""
         try:
-            async for document in self.read(query={"query": {"terms": {"_id": ids}}}):
+            async for document in self.read(
+                query=ESQuery(query={"terms": {"_id": ids}})
+            ):
                 yield document["_source"]
         except (BackendException, BackendParameterException) as error:
             logger.error("Failed to read from Elasticsearch")

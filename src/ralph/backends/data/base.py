@@ -1,16 +1,14 @@
 """Base data backend for Ralph."""
 
-import functools
 import logging
 from abc import ABC, abstractmethod
 from enum import Enum, unique
 from io import IOBase
 from typing import Iterable, Iterator, Optional, Union
 
-from pydantic import BaseModel, BaseSettings, ValidationError
+from pydantic import BaseSettings
 
 from ralph.conf import BaseSettingsConfig, core_settings
-from ralph.exceptions import BackendParameterException
 
 logger = logging.getLogger(__name__)
 
@@ -24,17 +22,6 @@ class BaseDataBackendSettings(BaseSettings):
         env_prefix = "RALPH_BACKENDS__DATA__"
         env_file = ".env"
         env_file_encoding = core_settings.LOCALE_ENCODING
-
-
-class BaseQuery(BaseModel):
-    """Base query model."""
-
-    class Config:
-        """Base query model configuration."""
-
-        extra = "forbid"
-
-    query_string: Union[str, None]
 
 
 @unique
@@ -63,20 +50,6 @@ class DataBackendStatus(Enum):
     OK = "ok"
     AWAY = "away"
     ERROR = "error"
-
-
-def enforce_query_checks(method):
-    """Enforce query argument type checking for methods using it."""
-
-    @functools.wraps(method)
-    def wrapper(*args, **kwargs):
-        """Wrap method execution."""
-        query = kwargs.pop("query", None)
-        self_ = args[0]
-
-        return method(*args, query=self_.validate_query(query), **kwargs)
-
-    return wrapper
 
 
 class Writable(ABC):
@@ -148,7 +121,7 @@ class BaseDataBackend(ABC):
     """Base data backend interface."""
 
     name = "base"
-    query_class = BaseQuery
+    query_class = None
     settings_class = BaseDataBackendSettings
 
     @abstractmethod
@@ -160,36 +133,6 @@ class BaseDataBackend(ABC):
                 If `settings` is `None`, a default settings instance is used instead.
         """
 
-    def validate_query(
-        self, query: Union[str, dict, BaseQuery, None] = None
-    ) -> BaseQuery:
-        """Validate and transform the query."""
-        if query is None:
-            query = self.query_class()
-
-        if isinstance(query, str):
-            query = self.query_class(query_string=query)
-
-        if isinstance(query, dict):
-            try:
-                query = self.query_class(**query)
-            except ValidationError as error:
-                msg = "The 'query' argument is expected to be a %s instance. %s"
-                errors = error.errors()
-                logger.error(msg, self.query_class.__name__, errors)
-                raise BackendParameterException(
-                    msg % (self.query_class.__name__, errors)
-                ) from error
-
-        if not isinstance(query, self.query_class):
-            msg = "The 'query' argument is expected to be a %s instance."
-            logger.error(msg, self.query_class.__name__)
-            raise BackendParameterException(msg % (self.query_class.__name__,))
-
-        logger.debug("Query: %s", str(query))
-
-        return query
-
     @abstractmethod
     def status(self) -> DataBackendStatus:
         """Implement data backend checks (e.g. connection, cluster status).
@@ -199,11 +142,10 @@ class BaseDataBackend(ABC):
         """
 
     @abstractmethod
-    @enforce_query_checks
     def read(  # noqa: PLR0913
         self,
         *,
-        query: Optional[Union[str, BaseQuery]] = None,
+        query: Optional[str] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
@@ -212,7 +154,7 @@ class BaseDataBackend(ABC):
         """Read records matching the `query` in the `target` container and yield them.
 
         Args:
-            query: (str or BaseQuery): The query to select records to read.
+            query: (str): The query to select records to read.
             target (str or None): The target container name.
                 If `target` is `None`, a default value is used instead.
             chunk_size (int or None): The number of records or bytes to read in one
@@ -243,20 +185,6 @@ class BaseDataBackend(ABC):
         Raise:
             BackendException: If a failure occurs during the close operation.
         """
-
-
-def async_enforce_query_checks(method):
-    """Enforce query argument type checking for methods using it."""
-
-    @functools.wraps(method)
-    async def wrapper(*args, **kwargs):
-        """Wrap method execution."""
-        query = kwargs.pop("query", None)
-        self_ = args[0]
-        async for result in method(*args, query=self_.validate_query(query), **kwargs):
-            yield result
-
-    return wrapper
 
 
 class AsyncWritable(ABC):
@@ -328,7 +256,7 @@ class BaseAsyncDataBackend(ABC):
     """Base async data backend interface."""
 
     name = "base"
-    query_class = BaseQuery
+    query_class = None
     settings_class = BaseDataBackendSettings
 
     @abstractmethod
@@ -340,36 +268,6 @@ class BaseAsyncDataBackend(ABC):
                 If `settings` is `None`, a default settings instance is used instead.
         """
 
-    def validate_query(
-        self, query: Union[str, dict, BaseQuery, None] = None
-    ) -> BaseQuery:
-        """Validate and transform the query."""
-        if query is None:
-            query = self.query_class()
-
-        if isinstance(query, str):
-            query = self.query_class(query_string=query)
-
-        if isinstance(query, dict):
-            try:
-                query = self.query_class(**query)
-            except ValidationError as error:
-                msg = "The 'query' argument is expected to be a %s instance. %s"
-                errors = error.errors()
-                logger.error(msg, self.query_class.__name__, errors)
-                raise BackendParameterException(
-                    msg % (self.query_class.__name__, errors)
-                ) from error
-
-        if not isinstance(query, self.query_class):
-            msg = "The 'query' argument is expected to be a %s instance."
-            logger.error(msg, self.query_class.__name__)
-            raise BackendParameterException(msg % (self.query_class.__name__,))
-
-        logger.debug("Query: %s", str(query))
-
-        return query
-
     @abstractmethod
     async def status(self) -> DataBackendStatus:
         """Implement data backend checks (e.g. connection, cluster status).
@@ -379,11 +277,10 @@ class BaseAsyncDataBackend(ABC):
         """
 
     @abstractmethod
-    @async_enforce_query_checks
     async def read(  # noqa: PLR0913
         self,
         *,
-        query: Optional[Union[str, BaseQuery]] = None,
+        query: Optional[str] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
@@ -392,7 +289,7 @@ class BaseAsyncDataBackend(ABC):
         """Read records matching the `query` in the `target` container and yield them.
 
         Args:
-            query: (str or BaseQuery): The query to select records to read.
+            query: (str): The query to select records to read.
             target (str or None): The target container name.
                 If `target` is `None`, a default value is used instead.
             chunk_size (int or None): The number of records or bytes to read in one

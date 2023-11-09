@@ -13,11 +13,9 @@ from ralph.backends.data.base import (
     BaseDataBackend,
     BaseDataBackendSettings,
     BaseOperationType,
-    BaseQuery,
     DataBackendStatus,
     Listable,
     Writable,
-    enforce_query_checks,
 )
 from ralph.backends.mixins import HistoryMixin
 from ralph.conf import BaseSettingsConfig
@@ -158,11 +156,10 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
                 continue
             yield self._details(target, obj) if details else obj
 
-    @enforce_query_checks
     def read(  # noqa: PLR0913
         self,
         *,
-        query: Optional[Union[str, BaseQuery]] = None,
+        query: Optional[str] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = 500,
         raw_output: bool = False,
@@ -171,7 +168,7 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
         """Read objects matching the `query` in the `target` container and yield them.
 
         Args:
-            query: (str or BaseQuery): The query to select objects to read.
+            query (str): The query to select objects to read.
             target (str or None): The target container name.
                 If `target` is `None`, a default value is used instead.
             chunk_size (int or None): The number of records or bytes to read in one
@@ -194,7 +191,7 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
                 `ignore_errors` is set to `False`.
             BackendParameterException: If a backend argument value is not valid.
         """
-        if query.query_string is None:
+        if query is None:
             msg = "Invalid query. The query should be a valid archive name."
             logger.error(msg)
             if not ignore_errors:
@@ -203,23 +200,23 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
         target = target if target else self.default_container
 
         logger.info(
-            "Getting object from container: %s (query_string: %s)",
+            "Getting object from container: %s (query: %s)",
             target,
-            query.query_string,
+            query,
         )
 
         try:
             resp_headers, content = self.connection.get_object(
                 container=target,
-                obj=query.query_string,
+                obj=query,
                 resp_chunk_size=chunk_size,
             )
         except ClientException as err:
             msg = "Failed to read %s: %s"
             error = err.msg
-            logger.error(msg, query.query_string, error)
+            logger.error(msg, query, error)
             if not ignore_errors:
-                raise BackendException(msg % (query.query_string, error)) from err
+                raise BackendException(msg % (query, error)) from err
 
         reader = self._read_raw if raw_output else self._read_dict
 
@@ -231,7 +228,7 @@ class SwiftDataBackend(HistoryMixin, BaseDataBackend, Writable, Listable):
             {
                 "backend": self.name,
                 "action": "read",
-                "id": f"{target}/{query.query_string}",
+                "id": f"{target}/{query}",
                 "size": resp_headers["Content-Length"],
                 "timestamp": now(),
             }

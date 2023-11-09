@@ -25,7 +25,6 @@ from ..data.base import (
     AsyncWritable,
     BaseAsyncDataBackend,
     DataBackendStatus,
-    async_enforce_query_checks,
 )
 
 logger = logging.getLogger(__name__)
@@ -118,11 +117,10 @@ class AsyncMongoDataBackend(BaseAsyncDataBackend, AsyncWritable, AsyncListable):
             logger.error(msg, error)
             raise BackendException(msg % error) from error
 
-    @async_enforce_query_checks
     async def read(  # noqa: PLR0913
         self,
         *,
-        query: Optional[Union[str, MongoQuery]] = None,
+        query: Optional[MongoQuery] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
@@ -131,7 +129,7 @@ class AsyncMongoDataBackend(BaseAsyncDataBackend, AsyncWritable, AsyncListable):
         """Read documents matching the `query` from `target` collection and yield them.
 
         Args:
-            query (str or MongoQuery): The MongoDB query to use when fetching documents.
+            query (MongoQuery): The MongoDB query to use when fetching documents.
             target (str or None): The MongoDB collection name to query.
                 If target is `None`, the `DEFAULT_COLLECTION` is used instead.
             chunk_size (int or None): The chunk size when reading documents by batches.
@@ -150,9 +148,9 @@ class AsyncMongoDataBackend(BaseAsyncDataBackend, AsyncWritable, AsyncListable):
         if not chunk_size:
             chunk_size = self.settings.DEFAULT_CHUNK_SIZE
 
-        query = (query.query_string if query.query_string else query).dict(
-            exclude={"query_string"}, exclude_unset=True
-        )
+        if query is None:
+            query = self.query_class()
+
         try:
             collection = self.database[target] if target else self.collection
         except InvalidName as error:
@@ -162,7 +160,9 @@ class AsyncMongoDataBackend(BaseAsyncDataBackend, AsyncWritable, AsyncListable):
 
         reader = self._read_raw if raw_output else lambda _: _
         try:
-            async for document in collection.find(batch_size=chunk_size, **query):
+            async for document in collection.find(
+                batch_size=chunk_size, **query.dict(exclude_none=True)
+            ):
                 document.update({"_id": str(document.get("_id"))})
                 try:
                     yield reader(document)

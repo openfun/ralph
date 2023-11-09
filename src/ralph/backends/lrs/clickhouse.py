@@ -7,6 +7,7 @@ from ralph.backends.data.base import BaseSettingsConfig
 from ralph.backends.data.clickhouse import (
     ClickHouseDataBackend,
     ClickHouseDataBackendSettings,
+    ClickHouseQuery,
 )
 from ralph.backends.lrs.base import (
     AgentParameters,
@@ -88,13 +89,13 @@ class ClickHouseLRSBackend(BaseLRSBackend, ClickHouseDataBackend):
         sort_order = "ASCENDING" if params.ascending else "DESCENDING"
         order_by = f"emission_time {sort_order}, event_id {sort_order}"
 
-        query = {
-            "select": ["event_id", "emission_time", "event"],
-            "where": where,
-            "parameters": ch_params,
-            "limit": params.limit,
-            "sort": order_by,
-        }
+        query = ClickHouseQuery(
+            select=["event_id", "emission_time", "event"],
+            where=where,
+            parameters=ch_params,
+            limit=params.limit,
+            sort=order_by,
+        )
         try:
             clickhouse_response = list(
                 self.read(
@@ -130,15 +131,15 @@ class ClickHouseLRSBackend(BaseLRSBackend, ClickHouseDataBackend):
             for i in range(0, len(ids), chunk_size):
                 yield ids[i : i + chunk_size]
 
-        query = {
-            "select": "event",
-            "where": "event_id IN ({ids:Array(String)})",
-            "parameters": {"ids": ["1"]},
-            "column_oriented": True,
-        }
+        query = ClickHouseQuery(
+            select="event",
+            where="event_id IN ({ids:Array(String)})",
+            parameters={"ids": ["1"]},
+            column_oriented=True,
+        )
         try:
             for chunk_ids in chunk_id_list():
-                query["parameters"]["ids"] = chunk_ids
+                query.parameters = {"ids": chunk_ids}
                 ch_response = self.read(
                     query=query,
                     target=self.event_table_name,

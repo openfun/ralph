@@ -673,6 +673,24 @@ def test_cli_read_command_with_es_backend_query(es):
 
     assert expected == result.output
 
+    # Test with an invalid json query string
+    invalid_query_str = "wrong_query_string"
+
+    command = (
+        "-v ERROR "
+        "read "
+        "-b es "
+        f"--es-hosts {es_hosts} "
+        f"--es-default-index {ES_TEST_INDEX} "
+        f"{invalid_query_str}"
+    )
+    result = runner.invoke(cli, command.split())
+    assert result.exit_code > 0
+    assert isinstance(result.exception, TypeError)
+    assert (
+        str(result.exception) == "not all arguments converted during string formatting"
+    )
+
 
 def test_cli_read_command_with_ws_backend(events, ws):
     """Test ralph read command using the ws backend."""

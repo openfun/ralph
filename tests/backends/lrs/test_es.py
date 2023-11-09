@@ -36,7 +36,6 @@ def test_backends_lrs_es_default_instantiation(monkeypatch, fs):
             {
                 "pit": {"id": None, "keep_alive": None},
                 "query": {"match_all": {}},
-                "query_string": None,
                 "search_after": None,
                 "size": 0,
                 "sort": [{"timestamp": {"order": "desc"}}],
@@ -49,7 +48,6 @@ def test_backends_lrs_es_default_instantiation(monkeypatch, fs):
             {
                 "pit": {"id": None, "keep_alive": None},
                 "query": {"bool": {"filter": [{"term": {"_id": "statementId"}}]}},
-                "query_string": None,
                 "search_after": None,
                 "size": 0,
                 "sort": [{"timestamp": {"order": "desc"}}],
@@ -69,7 +67,6 @@ def test_backends_lrs_es_default_instantiation(monkeypatch, fs):
                         ]
                     }
                 },
-                "query_string": None,
                 "search_after": None,
                 "size": 0,
                 "sort": [{"timestamp": {"order": "desc"}}],
@@ -98,7 +95,6 @@ def test_backends_lrs_es_default_instantiation(monkeypatch, fs):
                         ]
                     }
                 },
-                "query_string": None,
                 "search_after": None,
                 "size": 0,
                 "sort": [{"timestamp": {"order": "desc"}}],
@@ -127,7 +123,6 @@ def test_backends_lrs_es_default_instantiation(monkeypatch, fs):
                         ]
                     }
                 },
-                "query_string": None,
                 "search_after": None,
                 "size": 0,
                 "sort": [{"timestamp": {"order": "desc"}}],
@@ -160,7 +155,6 @@ def test_backends_lrs_es_default_instantiation(monkeypatch, fs):
                         ]
                     }
                 },
-                "query_string": None,
                 "search_after": None,
                 "size": 0,
                 "sort": [{"timestamp": {"order": "desc"}}],
@@ -196,7 +190,6 @@ def test_backends_lrs_es_default_instantiation(monkeypatch, fs):
                         ]
                     }
                 },
-                "query_string": None,
                 "search_after": None,
                 "size": 0,
                 "sort": [{"timestamp": {"order": "desc"}}],
@@ -231,7 +224,6 @@ def test_backends_lrs_es_default_instantiation(monkeypatch, fs):
                         ]
                     }
                 },
-                "query_string": None,
                 "search_after": None,
                 "size": 0,
                 "sort": [{"timestamp": {"order": "desc"}}],
@@ -244,7 +236,6 @@ def test_backends_lrs_es_default_instantiation(monkeypatch, fs):
             {
                 "pit": {"id": "46ToAwMDaWR5BXV1a", "keep_alive": None},
                 "query": {"match_all": {}},
-                "query_string": None,
                 "search_after": ["1686557542970", "0"],
                 "size": 0,
                 "sort": [{"timestamp": {"order": "desc"}}],
@@ -257,7 +248,6 @@ def test_backends_lrs_es_default_instantiation(monkeypatch, fs):
             {
                 "pit": {"id": None, "keep_alive": None},
                 "query": {"match_all": {}},
-                "query_string": None,
                 "search_after": None,
                 "size": 0,
                 "sort": "_shard_doc",

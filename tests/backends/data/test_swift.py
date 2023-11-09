@@ -10,7 +10,7 @@ from uuid import uuid4
 import pytest
 from swiftclient.service import ClientException
 
-from ralph.backends.data.base import BaseOperationType, BaseQuery, DataBackendStatus
+from ralph.backends.data.base import BaseOperationType, DataBackendStatus
 from ralph.backends.data.swift import SwiftDataBackend, SwiftDataBackendSettings
 from ralph.conf import settings
 from ralph.exceptions import BackendException, BackendParameterException
@@ -39,7 +39,7 @@ def test_backends_data_swift_default_instantiation(monkeypatch, fs):
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__SWIFT__{name}", raising=False)
 
     assert SwiftDataBackend.name == "swift"
-    assert SwiftDataBackend.query_class == BaseQuery
+    assert SwiftDataBackend.query_class is None
     assert SwiftDataBackend.default_operation_type == BaseOperationType.CREATE
     assert SwiftDataBackend.settings_class == SwiftDataBackendSettings
     backend = SwiftDataBackend()
