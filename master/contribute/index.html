@@ -908,8 +908,11 @@ have no effect while running Ralph.</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Run all linters</span>
 $<span class="w"> </span>make<span class="w"> </span>lint
 
-<span class="c1"># Run pylint</span>
-$<span class="w"> </span>make<span class="w"> </span>lint-pylint
+<span class="c1"># Run ruff linter</span>
+$<span class="w"> </span>make<span class="w"> </span>lint-ruff
+
+<span class="c1"># Run ruff linter and resolve fixable errors</span>
+$<span class="w"> </span>make<span class="w"> </span>lint-ruff-fix
 
 <span class="c1"># List available linters</span>
 $<span class="w"> </span>make<span class="w"> </span><span class="nb">help</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>lint-

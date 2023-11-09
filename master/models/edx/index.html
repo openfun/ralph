@@ -4318,13 +4318,13 @@ BaseContextField            (<a class="autorefs autorefs-internal" title="ralph.
         <td><code>course_user_tags</code></td>
         <td><code>Dict of str</code></td>
         <td><p>Content from <code>user_api_usercoursetag</code> table.
-Retrieved with:
+Retrieved with::
     <code>dict(
         UserCourseTag.objects.filter(
             user=request.user.pk, course_id=course_key
         ).values_list('key', 'value')
     )</code>
-Note:
+Note::
     Is only present when a course page is requested.
     Is an empty dictionary when the user is not logged in or not found in
     the <code>user_api_usercoursetag</code> table.</p></td>
@@ -4333,9 +4333,9 @@ Note:
         <td><code>user_id</code></td>
         <td><code>int or str or None</code></td>
         <td><p>Consists of the ID of the authenticated user.
-Retrieved with:
+Retrieved with::
     <code>request.user.pk</code> querying the <code>auth_user</code> table.
-Note:
+Note::
     Is an integer when the user is found in the <code>auth_user</code> table.
     Is an empty string when an exception is raised while retrieving the ID.
     Is <code>None</code> when the user is not logged in.</p></td>
@@ -4344,22 +4344,22 @@ Note:
         <td><code>org_id</code></td>
         <td><code>str</code></td>
         <td><p>Consists of the organization name that lists the course.
-Retrieved with:
+Retrieved with::
     <code>course_id.org</code> where <code>course_id</code> is an
     <code>opaque_keys.edx.locator.CourseLocator</code> which is created using the URL
     of the requested page.
-Note:
+Note::
     Is an empty string when the requested page is not a course page.</p></td>
       </tr>
       <tr>
         <td><code>course_id</code></td>
         <td><code>str</code></td>
         <td><p>Consists of the unique identifier for the visited course page.
-Retrieved with:
+Retrieved with::
     <code>course_id.to_deprecated_string()</code> where <code>course_id</code> is an
     <code>opaque_keys.edx.locator.CourseLocator</code> which is created using the URL
     of the requested page.
-Note:
+Note::
     Is an empty string when the requested page is not a course page.</p></td>
       </tr>
       <tr>
@@ -4367,7 +4367,7 @@ Note:
         <td><code>Path</code></td>
         <td><p>Consist of the relative URL (without the hostname) of the
 requested page.
-Retrieved with:
+Retrieved with::
     <code>request.META['PATH_INFO']</code></p></td>
       </tr>
   </tbody>
@@ -4379,44 +4379,44 @@ Retrieved with:
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        course_user_tags (Dict of str): Content from `user_api_usercoursetag` table.</span>
-<span class="sd">            Retrieved with:</span>
+<span class="sd">            Retrieved with::</span>
 <span class="sd">                `dict(</span>
 <span class="sd">                    UserCourseTag.objects.filter(</span>
 <span class="sd">                        user=request.user.pk, course_id=course_key</span>
 <span class="sd">                    ).values_list(&#39;key&#39;, &#39;value&#39;)</span>
 <span class="sd">                )`</span>
-<span class="sd">            Note:</span>
+<span class="sd">            Note::</span>
 <span class="sd">                Is only present when a course page is requested.</span>
 <span class="sd">                Is an empty dictionary when the user is not logged in or not found in</span>
 <span class="sd">                the `user_api_usercoursetag` table.</span>
 <span class="sd">        user_id (int or str or None): Consists of the ID of the authenticated user.</span>
-<span class="sd">            Retrieved with:</span>
+<span class="sd">            Retrieved with::</span>
 <span class="sd">                `request.user.pk` querying the `auth_user` table.</span>
-<span class="sd">            Note:</span>
+<span class="sd">            Note::</span>
 <span class="sd">                Is an integer when the user is found in the `auth_user` table.</span>
 <span class="sd">                Is an empty string when an exception is raised while retrieving the ID.</span>
 <span class="sd">                Is `None` when the user is not logged in.</span>
 <span class="sd">        org_id (str): Consists of the organization name that lists the course.</span>
-<span class="sd">            Retrieved with:</span>
+<span class="sd">            Retrieved with::</span>
 <span class="sd">                `course_id.org` where `course_id` is an</span>
 <span class="sd">                `opaque_keys.edx.locator.CourseLocator` which is created using the URL</span>
 <span class="sd">                of the requested page.</span>
-<span class="sd">            Note:</span>
+<span class="sd">            Note::</span>
 <span class="sd">                Is an empty string when the requested page is not a course page.</span>
 <span class="sd">        course_id (str): Consists of the unique identifier for the visited course page.</span>
-<span class="sd">            Retrieved with:</span>
+<span class="sd">            Retrieved with::</span>
 <span class="sd">                `course_id.to_deprecated_string()` where `course_id` is an</span>
 <span class="sd">                `opaque_keys.edx.locator.CourseLocator` which is created using the URL</span>
 <span class="sd">                of the requested page.</span>
-<span class="sd">            Note:</span>
+<span class="sd">            Note::</span>
 <span class="sd">                Is an empty string when the requested page is not a course page.</span>
 <span class="sd">        path (Path): Consist of the relative URL (without the hostname) of the</span>
 <span class="sd">            requested page.</span>
-<span class="sd">            Retrieved with:</span>
+<span class="sd">            Retrieved with::</span>
 <span class="sd">                `request.META[&#39;PATH_INFO&#39;]`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">course_id</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^$|^course-v1:.+\+.+\+.+$&quot;</span><span class="p">)</span>  <span class="c1"># noqa:F722</span>
+    <span class="n">course_id</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^$|^course-v1:.+\+.+\+.+$&quot;</span><span class="p">)</span>
     <span class="n">course_user_tags</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>
     <span class="n">module</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ContextModuleField</span><span class="p">]</span>
     <span class="n">org_id</span><span class="p">:</span> <span class="nb">str</span>
@@ -4490,9 +4490,9 @@ BaseEdxModel            (<a class="autorefs autorefs-internal" title="ralph.mode
         <td><code>username</code></td>
         <td><code>str</code></td>
         <td><p>Consists of the unique username identifying the logged-in user.
-Retrieved with:
+Retrieved with::
     <code>request.user.username</code> querying the <code>auth_user</code> table.
-Note:
+Note::
     Is an empty string when the user is not logged in.
     If an exception is raised when retrieving the username from the table
     then the value is <code>anonymous</code>.
@@ -4503,18 +4503,18 @@ Note:
         <td><code>ip</code></td>
         <td><code>IPv4Address or str</code></td>
         <td><p>Consists of the public IPv4 address of the user.
-Retrieved with:
+Retrieved with::
     <code>get_ip(request)</code> cf. https://github.com/un33k/django-ipware/tree/1.1.0
-Note:
+Note::
     Can be an empty string if the IP address is not found.</p></td>
       </tr>
       <tr>
         <td><code>agent</code></td>
         <td><code>str</code></td>
         <td><p>Consists of the <code>User-Agent</code> HTTP request header.
-Retrieved with:
+Retrieved with::
     <code>request.META[HTTP_USER_AGENT]</code>
-Note:
+Note::
     Can be an empty string if the header is not present in the request.
     Contains information about:
         Browser name and version
@@ -4525,16 +4525,16 @@ Note:
         <td><code>host</code></td>
         <td><code>str</code></td>
         <td><p>Consists of the hostname of the server.
-Retrieved with:
+Retrieved with::
     <code>request.META[SERVER_NAME]</code></p></td>
       </tr>
       <tr>
         <td><code>referer</code></td>
         <td><code>Path</code></td>
         <td><p>Consists of the <code>Referer</code> HTTP request header.
-Retrieved with:
+Retrieved with::
     <code>request.META[HTTP_REFERER]</code>
-Note:
+Note::
     Can be an empty string if the header is not present in the request.
     Contains the referring URL (previous URL visited by the user).</p></td>
       </tr>
@@ -4542,9 +4542,9 @@ Note:
         <td><code>accept_language</code></td>
         <td><code>str</code></td>
         <td><p>Consists of the <code>Accept-Language</code> HTTP request header.
-Retrieved with:
+Retrieved with::
     <code>request.META[HTTP_ACCEPT_LANGUAGE]</code>
-Note:
+Note::
     Can be an empty string if the header is not present in the request.
     Contains the default language settings of the user.</p></td>
       </tr>
@@ -4558,14 +4558,14 @@ Note:
         <td><code>datetime</code></td>
         <td><p>Consists of the UTC time in ISO format at which the event was
 emitted.
-Retrieved with:
+Retrieved with::
     <code>datetime.datetime.utcnow()</code></p></td>
       </tr>
       <tr>
         <td><code>page</code></td>
         <td><code>None</code></td>
         <td><p>Consists of the value <code>None</code>
-Note:
+Note::
     In JSON the value is <code>null</code> instead of <code>None</code>.</p></td>
       </tr>
   </tbody>
@@ -4579,50 +4579,50 @@ Note:
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        username (str): Consists of the unique username identifying the logged-in user.</span>
-<span class="sd">            Retrieved with:</span>
+<span class="sd">            Retrieved with::</span>
 <span class="sd">                `request.user.username` querying the `auth_user` table.</span>
-<span class="sd">            Note:</span>
+<span class="sd">            Note::</span>
 <span class="sd">                Is an empty string when the user is not logged in.</span>
 <span class="sd">                If an exception is raised when retrieving the username from the table</span>
 <span class="sd">                then the value is `anonymous`.</span>
 <span class="sd">                Usernames are made of 2-30 ASCII letters / numbers / underscores (_) /</span>
 <span class="sd">                hyphens (-)</span>
 <span class="sd">        ip (IPv4Address or str): Consists of the public IPv4 address of the user.</span>
-<span class="sd">            Retrieved with:</span>
+<span class="sd">            Retrieved with::</span>
 <span class="sd">                `get_ip(request)` cf. https://github.com/un33k/django-ipware/tree/1.1.0</span>
-<span class="sd">            Note:</span>
+<span class="sd">            Note::</span>
 <span class="sd">                Can be an empty string if the IP address is not found.</span>
 <span class="sd">        agent (str): Consists of the `User-Agent` HTTP request header.</span>
-<span class="sd">            Retrieved with:</span>
+<span class="sd">            Retrieved with::</span>
 <span class="sd">                `request.META[HTTP_USER_AGENT]`</span>
-<span class="sd">            Note:</span>
+<span class="sd">            Note::</span>
 <span class="sd">                Can be an empty string if the header is not present in the request.</span>
 <span class="sd">                Contains information about:</span>
 <span class="sd">                    Browser name and version</span>
 <span class="sd">                    Operating system name and version</span>
 <span class="sd">                    Default language</span>
 <span class="sd">        host (str): Consists of the hostname of the server.</span>
-<span class="sd">            Retrieved with:</span>
+<span class="sd">            Retrieved with::</span>
 <span class="sd">                `request.META[SERVER_NAME]`</span>
 <span class="sd">        referer (Path): Consists of the `Referer` HTTP request header.</span>
-<span class="sd">            Retrieved with:</span>
+<span class="sd">            Retrieved with::</span>
 <span class="sd">                `request.META[HTTP_REFERER]`</span>
-<span class="sd">            Note:</span>
+<span class="sd">            Note::</span>
 <span class="sd">                Can be an empty string if the header is not present in the request.</span>
 <span class="sd">                Contains the referring URL (previous URL visited by the user).</span>
 <span class="sd">        accept_language (str): Consists of the `Accept-Language` HTTP request header.</span>
-<span class="sd">            Retrieved with:</span>
+<span class="sd">            Retrieved with::</span>
 <span class="sd">                `request.META[HTTP_ACCEPT_LANGUAGE]`</span>
-<span class="sd">            Note:</span>
+<span class="sd">            Note::</span>
 <span class="sd">                Can be an empty string if the header is not present in the request.</span>
 <span class="sd">                Contains the default language settings of the user.</span>
 <span class="sd">        context (BaseContextField): see BaseContextField.</span>
 <span class="sd">        time (datetime): Consists of the UTC time in ISO format at which the event was</span>
 <span class="sd">            emitted.</span>
-<span class="sd">            Retrieved with:</span>
+<span class="sd">            Retrieved with::</span>
 <span class="sd">                `datetime.datetime.utcnow()`</span>
 <span class="sd">        page (None): Consists of the value `None`</span>
-<span class="sd">            Note:</span>
+<span class="sd">            Note::</span>
 <span class="sd">                In JSON the value is `null` instead of `None`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -4696,7 +4696,7 @@ BaseModelWithConfig            (<span title="pydantic.main.BaseModel">BaseModel<
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BaseModelWithConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for base configuration shared among all models.&quot;&quot;&quot;</span>
 
-    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>  <span class="c1"># pylint: disable=missing-class-docstring # noqa: D106</span>
+    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>  <span class="c1"># noqa: D106</span>
         <span class="n">extra</span> <span class="o">=</span> <span class="s2">&quot;forbid&quot;</span>
 </code></pre></div>
         </details>
@@ -4778,12 +4778,10 @@ ContextModuleField            (<a class="autorefs autorefs-internal" title="ralp
 <span class="sd">        display_name (str): Consists of a short description or title of the component.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">usage_key</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^block-v1:.+\+.+\+.+type@.+@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span><span class="p">)</span>  <span class="c1"># noqa:F722</span>
+    <span class="n">usage_key</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^block-v1:.+\+.+\+.+type@.+@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span><span class="p">)</span>
     <span class="n">display_name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">original_usage_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
-        <span class="n">constr</span><span class="p">(</span>
-            <span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^block-v1:.+\+.+\+.+type@problem\+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span>  <span class="c1"># noqa:F722</span>
-        <span class="p">)</span>
+        <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^block-v1:.+\+.+\+.+type@problem\+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span><span class="p">)</span>
     <span class="p">]</span>
     <span class="n">original_usage_version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 </code></pre></div>
@@ -4923,7 +4921,7 @@ string.</p></td>
 
     <span class="n">event_source</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;browser&quot;</span><span class="p">]</span>
     <span class="n">page</span><span class="p">:</span> <span class="n">AnyUrl</span>
-    <span class="n">session</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span><span class="p">),</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]]</span>  <span class="c1"># noqa: F722</span>
+    <span class="n">session</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span><span class="p">),</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]]</span>
 </code></pre></div>
         </details>
 
@@ -5413,7 +5411,7 @@ __src__            (<a class="autorefs autorefs-internal" title="ralph.models.ed
     <span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">EnrollmentEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">EnrollmentEventField</span><span class="p">],</span>
         <span class="n">EnrollmentEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;edx.course.enrollment.activated&quot;</span><span class="p">]</span>
@@ -5661,7 +5659,7 @@ __src__            (<a class="autorefs autorefs-internal" title="ralph.models.ed
     <span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">EnrollmentEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">EnrollmentEventField</span><span class="p">],</span>
         <span class="n">EnrollmentEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;edx.course.enrollment.deactivated&quot;</span><span class="p">]</span>
@@ -6003,7 +6001,6 @@ is called).</p>
 
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span><span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;page_close&quot;</span><span class="p">)</span>
 
-    <span class="c1"># pylint: disable=unsubscriptable-object</span>
     <span class="n">event</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;page_close&quot;</span><span class="p">]</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;page_close&quot;</span><span class="p">]</span>
@@ -6326,7 +6323,6 @@ Note:
         <span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;server&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="n">LazyModelField</span><span class="p">(</span><span class="s2">&quot;context__path&quot;</span><span class="p">)</span>
     <span class="p">)</span>
 
-    <span class="c1"># pylint: disable=unsubscriptable-object</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Path</span>
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Json</span><span class="p">[</span><span class="n">ServerEventField</span><span class="p">],</span> <span class="n">ServerEventField</span><span class="p">]</span>
 </code></pre></div>
@@ -6624,7 +6620,7 @@ play.</p>
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span><span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;load_video&quot;</span><span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">VideoBaseEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">VideoBaseEventField</span><span class="p">],</span>
         <span class="n">VideoBaseEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;load_video&quot;</span><span class="p">]</span>
@@ -6896,7 +6892,7 @@ control.</p>
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span><span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;pause_video&quot;</span><span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">PauseVideoEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">PauseVideoEventField</span><span class="p">],</span>
         <span class="n">PauseVideoEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;pause_video&quot;</span><span class="p">]</span>
@@ -7160,7 +7156,7 @@ control.</p>
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span><span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;play_video&quot;</span><span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">PlayVideoEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">PlayVideoEventField</span><span class="p">],</span>
         <span class="n">PlayVideoEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;play_video&quot;</span><span class="p">]</span>
@@ -7432,7 +7428,7 @@ to a different point in the video file.</p>
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span><span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;seek_video&quot;</span><span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">SeekVideoEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">SeekVideoEventField</span><span class="p">],</span>
         <span class="n">SeekVideoEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;seek_video&quot;</span><span class="p">]</span>
@@ -7712,7 +7708,7 @@ file and play automatically stops.</p>
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span><span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;stop_video&quot;</span><span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">StopVideoEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">StopVideoEventField</span><span class="p">],</span>
         <span class="n">StopVideoEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;stop_video&quot;</span><span class="p">]</span>
@@ -8348,7 +8344,7 @@ EdxCourseEnrollmentActivated            (<a class="autorefs autorefs-internal" t
     <span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">EnrollmentEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">EnrollmentEventField</span><span class="p">],</span>
         <span class="n">EnrollmentEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;edx.course.enrollment.activated&quot;</span><span class="p">]</span>
@@ -8450,7 +8446,7 @@ EdxCourseEnrollmentDeactivated            (<a class="autorefs autorefs-internal"
     <span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">EnrollmentEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">EnrollmentEventField</span><span class="p">],</span>
         <span class="n">EnrollmentEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;edx.course.enrollment.deactivated&quot;</span><span class="p">]</span>
@@ -8554,7 +8550,7 @@ student_courseenrollment.mode to a different mode is complete.</p>
     <span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">EnrollmentEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">EnrollmentEventField</span><span class="p">],</span>
         <span class="n">EnrollmentEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;edx.course.enrollment.mode_changed&quot;</span><span class="p">]</span>
@@ -8973,8 +8969,8 @@ being navigated away from.</p></td>
 
     <span class="nb">id</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span>
         <span class="n">regex</span><span class="o">=</span><span class="p">(</span>
-            <span class="sa">r</span><span class="s2">&quot;^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type&quot;</span>  <span class="c1"># noqa : F722</span>
-            <span class="sa">r</span><span class="s2">&quot;@sequential\+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span>  <span class="c1"># noqa : F722</span>
+            <span class="sa">r</span><span class="s2">&quot;^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type&quot;</span>
+            <span class="sa">r</span><span class="s2">&quot;@sequential\+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span>
         <span class="p">)</span>
     <span class="p">)</span>
     <span class="n">new</span><span class="p">:</span> <span class="nb">int</span>
@@ -9122,7 +9118,6 @@ is called).</p>
 
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span><span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;page_close&quot;</span><span class="p">)</span>
 
-    <span class="c1"># pylint: disable=unsubscriptable-object</span>
     <span class="n">event</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;page_close&quot;</span><span class="p">]</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;page_close&quot;</span><span class="p">]</span>
@@ -9220,7 +9215,6 @@ UISeqGoto            (<a class="autorefs autorefs-internal" title="ralph.models.
 
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span><span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;seq_goto&quot;</span><span class="p">)</span>
 
-    <span class="c1"># pylint: disable=unsubscriptable-object</span>
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Json</span><span class="p">[</span><span class="n">NavigationalEventField</span><span class="p">],</span> <span class="n">NavigationalEventField</span><span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;seq_goto&quot;</span><span class="p">]</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;seq_goto&quot;</span><span class="p">]</span>
@@ -9320,7 +9314,6 @@ sequence.</p>
 
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span><span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;seq_next&quot;</span><span class="p">)</span>
 
-    <span class="c1"># pylint: disable=unsubscriptable-object</span>
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Json</span><span class="p">[</span><span class="n">NavigationalEventField</span><span class="p">],</span> <span class="n">NavigationalEventField</span><span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;seq_next&quot;</span><span class="p">]</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;seq_next&quot;</span><span class="p">]</span>
@@ -9469,7 +9462,6 @@ sequence.</p>
 
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span><span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;seq_prev&quot;</span><span class="p">)</span>
 
-    <span class="c1"># pylint: disable=unsubscriptable-object</span>
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Json</span><span class="p">[</span><span class="n">NavigationalEventField</span><span class="p">],</span> <span class="n">NavigationalEventField</span><span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;seq_prev&quot;</span><span class="p">]</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;seq_prev&quot;</span><span class="p">]</span>
@@ -10033,7 +10025,7 @@ assess the response.</p></td>
 <span class="sd">            assess the response.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">content_hash</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[a-f0-9]{1,40}$&quot;</span><span class="p">)</span>  <span class="c1"># noqa: F722</span>
+    <span class="n">content_hash</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[a-f0-9]{1,40}$&quot;</span><span class="p">)</span>
 </code></pre></div>
         </details>
 
@@ -10115,7 +10107,6 @@ given for answer.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/open_response_assessment/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ORACreateSubmissionEventAnswerField</span><span class="p">(</span><span class="n">BaseModelWithConfig</span><span class="p">):</span>
-    <span class="c1"># noqa: D205, D415</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for `openassessmentblock.create_submission`.`event`.`answer`</span>
 <span class="sd">    field.</span>
 
@@ -10125,7 +10116,7 @@ given for answer.</p></td>
 <span class="sd">            answer.</span>
 <span class="sd">        files_description (list): Consists of a list of file descriptions if files are</span>
 <span class="sd">            given for answer.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: D205</span>
 
     <span class="n">parts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]</span>
     <span class="n">file_keys</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
@@ -10347,10 +10338,7 @@ available.</p></td>
 
     <span class="n">course_id</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span>
     <span class="n">item_id</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span>
-        <span class="n">regex</span><span class="o">=</span><span class="p">(</span>
-            <span class="sa">r</span><span class="s2">&quot;^block-v1:.+\+.+\+.+type@openassessment&quot;</span>  <span class="c1"># noqa : F722</span>
-            <span class="sa">r</span><span class="s2">&quot;+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span>  <span class="c1"># noqa : F722</span>
-        <span class="p">)</span>
+        <span class="n">regex</span><span class="o">=</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^block-v1:.+\+.+\+.+type@openassessment+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span><span class="p">)</span>
     <span class="p">)</span>
     <span class="n">requesting_student_id</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">submission_returned_uuid</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
@@ -10446,7 +10434,6 @@ Currently, set to <code>full-grade</code>.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/open_response_assessment/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ORAGetSubmissionForStaffGradingEventField</span><span class="p">(</span><span class="n">AbstractBaseEventField</span><span class="p">):</span>
-    <span class="c1"># noqa: D205, D415</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for `openassessmentblock.get_submission_for_staff_grading`.</span>
 <span class="sd">    `event` field.</span>
 
@@ -10460,13 +10447,10 @@ Currently, set to <code>full-grade</code>.</p></td>
 <span class="sd">            of the course team member who is retrieved the response for grading.</span>
 <span class="sd">        type (str): Consists of the type of staff grading that is being performed.</span>
 <span class="sd">            Currently, set to `full-grade`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: D205</span>
 
     <span class="n">item_id</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span>
-        <span class="n">regex</span><span class="o">=</span><span class="p">(</span>
-            <span class="sa">r</span><span class="s2">&quot;^block-v1:.+\+.+\+.+type@openassessment&quot;</span>  <span class="c1"># noqa : F722</span>
-            <span class="sa">r</span><span class="s2">&quot;+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span>  <span class="c1"># noqa : F722</span>
-        <span class="p">)</span>
+        <span class="n">regex</span><span class="o">=</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^block-v1:.+\+.+\+.+type@openassessment+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span><span class="p">)</span>
     <span class="p">)</span>
     <span class="n">submission_returned_uuid</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
     <span class="n">requesting_staff_id</span><span class="p">:</span> <span class="nb">str</span>
@@ -10536,7 +10520,7 @@ ORASaveSubmissionEventField            (<a class="autorefs autorefs-internal" ti
         <td><code>saved_response</code></td>
         <td><code>str</code></td>
         <td><p>Consists of a JSON string of the users saved responses.
-Note:
+Note::
     Responses have a length limit of 100000 in the front-end but not in the
     back-end. Events are truncated at <code>TRACK_MAX_EVENT</code> which is 50000 by
     default. Also, the <code>eventtracking.backends.logger.LoggerBackend</code>
@@ -10551,14 +10535,13 @@ Note:
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        saved_response (str): Consists of a JSON string of the users saved responses.</span>
-<span class="sd">            Note:</span>
+<span class="sd">            Note::</span>
 <span class="sd">                Responses have a length limit of 100000 in the front-end but not in the</span>
 <span class="sd">                back-end. Events are truncated at `TRACK_MAX_EVENT` which is 50000 by</span>
 <span class="sd">                default. Also, the `eventtracking.backends.logger.LoggerBackend`</span>
 <span class="sd">                silently drops events when they exceed `TRACK_MAX_EVENT`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="c1"># pylint: disable=unsubscriptable-object</span>
     <span class="n">saved_response</span><span class="p">:</span> <span class="n">ORASaveSubmissionEventSavedResponseField</span>
 </code></pre></div>
         </details>
@@ -10808,7 +10791,6 @@ the option that the learner selected for each criterion in the rubric.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/open_response_assessment/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ORAStudentTrainingAssessExampleEventField</span><span class="p">(</span><span class="n">AbstractBaseEventField</span><span class="p">):</span>
-    <span class="c1"># noqa: D205, D415</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for `openassessment.student_training_assess_example`.`event`</span>
 <span class="sd">    field.</span>
 
@@ -10819,7 +10801,7 @@ the option that the learner selected for each criterion in the rubric.</p></td>
 <span class="sd">        options_selected (dict): Consists of a set of name/value pairs that identify</span>
 <span class="sd">            the option that the learner selected for each criterion in the rubric.</span>
 <span class="sd">        submission_uuid (str): Consists of the unique identifier of the response.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: D205</span>
 
     <span class="n">corrections</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
     <span class="n">options_selected</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
@@ -10907,7 +10889,6 @@ selected to evaluate the assessment process.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/open_response_assessment/fields/events.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ORASubmitFeedbackOnAssessmentsEventField</span><span class="p">(</span><span class="n">AbstractBaseEventField</span><span class="p">):</span>
-    <span class="c1"># noqa: D205, D415</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for `openassessmentblock.submit_feedback_on_assessments`.</span>
 <span class="sd">    `event` field.</span>
 
@@ -10917,7 +10898,7 @@ selected to evaluate the assessment process.</p></td>
 <span class="sd">        options (list): Consists of the label of each checkbox option that the learner</span>
 <span class="sd">            selected to evaluate the assessment process.</span>
 <span class="sd">        submission_uuid (str): Consists of the unique identifier for the feedback.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: D205</span>
 
     <span class="n">feedback_text</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">options</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
@@ -11345,7 +11326,6 @@ response for grading.</p>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/open_response_assessment/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ORAGetSubmissionForStaffGrading</span><span class="p">(</span><span class="n">BaseServerModel</span><span class="p">):</span>
-    <span class="c1"># noqa: D205, D415</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for `openassessmentblock.get_submission_for_staff_grading`</span>
 <span class="sd">    statement.</span>
 
@@ -11357,7 +11337,7 @@ response for grading.</p>
 <span class="sd">        event_type (str): Consists of the value</span>
 <span class="sd">            `openassessmentblock.get_submission_for_staff_grading`.</span>
 <span class="sd">        page (str): Consists of the value `x_module`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: D205</span>
 
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span>
         <span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;server&quot;</span><span class="p">,</span>
@@ -11954,7 +11934,6 @@ other feedback about the assessment process.</p>
         <details class="quote">
           <summary>Source code in <code>ralph/models/edx/open_response_assessment/statements.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ORASubmitFeedbackOnAssessments</span><span class="p">(</span><span class="n">BaseServerModel</span><span class="p">):</span>
-    <span class="c1"># noqa: D205, D415</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for `openassessmentblock.submit_feedback_on_assessments`</span>
 <span class="sd">    statement.</span>
 
@@ -11966,7 +11945,7 @@ other feedback about the assessment process.</p>
 <span class="sd">        event_type (str): Consists of the value</span>
 <span class="sd">            `openassessmentblock.submit_feedback_on_assessments`.</span>
 <span class="sd">        page (str): Consists of the value `x_module`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: D205</span>
 
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span>
         <span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;server&quot;</span><span class="p">,</span>
@@ -12073,7 +12052,6 @@ ORAUploadFile            (<a class="autorefs autorefs-internal" title="ralph.mod
         <span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;openassessment.upload_file&quot;</span>
     <span class="p">)</span>
 
-    <span class="c1"># pylint: disable=unsubscriptable-object</span>
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Json</span><span class="p">[</span><span class="n">ORAUploadFileEventField</span><span class="p">],</span> <span class="n">ORAUploadFileEventField</span><span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;openassessment.upload_file&quot;</span><span class="p">]</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;openassessment.upload_file&quot;</span><span class="p">]</span>
@@ -12522,7 +12500,7 @@ for why that selection was made.</p>
     <span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">PeerInstructionEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">PeerInstructionEventField</span><span class="p">],</span>
         <span class="n">PeerInstructionEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;ubc.peer_instruction.original_submitted&quot;</span><span class="p">]</span>
@@ -12630,7 +12608,7 @@ why that selection was made.</p>
     <span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">PeerInstructionEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">PeerInstructionEventField</span><span class="p">],</span>
         <span class="n">PeerInstructionEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;ubc.peer_instruction.revised_submitted&quot;</span><span class="p">]</span>
@@ -13260,23 +13238,23 @@ the problem.</p></td>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">answers</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span>
-        <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[a-f0-9]</span><span class="si">{32}</span><span class="s2">_[0-9]_[0-9]$&quot;</span><span class="p">),</span>  <span class="c1"># noqa : F722</span>
+        <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[a-f0-9]</span><span class="si">{32}</span><span class="s2">_[0-9]_[0-9]$&quot;</span><span class="p">),</span>
         <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">],</span>
     <span class="p">]</span>
     <span class="n">attempts</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">correct_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span>
-        <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[a-f0-9]</span><span class="si">{32}</span><span class="s2">_[0-9]_[0-9]$&quot;</span><span class="p">),</span>  <span class="c1"># noqa : F722</span>
+        <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[a-f0-9]</span><span class="si">{32}</span><span class="s2">_[0-9]_[0-9]$&quot;</span><span class="p">),</span>
         <span class="n">CorrectMap</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">grade</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">max_grade</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">problem_id</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span>
-        <span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+&quot;</span>  <span class="c1"># noqa : F722</span>
-        <span class="sa">r</span><span class="s2">&quot;type@problem\+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span>  <span class="c1"># noqa : F722</span>
+        <span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+&quot;</span>
+        <span class="sa">r</span><span class="s2">&quot;type@problem\+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span>
     <span class="p">)</span>
     <span class="n">state</span><span class="p">:</span> <span class="n">State</span>
     <span class="n">submission</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span>
-        <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[a-f0-9]</span><span class="si">{32}</span><span class="s2">_[0-9]_[0-9]$&quot;</span><span class="p">),</span>  <span class="c1"># noqa : F722</span>
+        <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[a-f0-9]</span><span class="si">{32}</span><span class="s2">_[0-9]_[0-9]$&quot;</span><span class="p">),</span>
         <span class="n">SubmissionAnswerField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">success</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;correct&quot;</span><span class="p">],</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;incorrect&quot;</span><span class="p">]]</span>
@@ -13383,13 +13361,13 @@ identifier for each problem.</p></td>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">answers</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span>
-        <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[a-f0-9]</span><span class="si">{32}</span><span class="s2">_[0-9]_[0-9]$&quot;</span><span class="p">),</span>  <span class="c1"># noqa : F722</span>
+        <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[a-f0-9]</span><span class="si">{32}</span><span class="s2">_[0-9]_[0-9]$&quot;</span><span class="p">),</span>
         <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">],</span>
     <span class="p">]</span>
     <span class="n">failure</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;closed&quot;</span><span class="p">],</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;unreset&quot;</span><span class="p">]]</span>
     <span class="n">problem_id</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span>
-        <span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+&quot;</span>  <span class="c1"># noqa : F722</span>
-        <span class="sa">r</span><span class="s2">&quot;type@problem\+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span>  <span class="c1"># noqa : F722</span>
+        <span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+&quot;</span>
+        <span class="sa">r</span><span class="s2">&quot;type@problem\+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span>
     <span class="p">)</span>
     <span class="n">state</span><span class="p">:</span> <span class="n">State</span>
 </code></pre></div>
@@ -13518,8 +13496,8 @@ ProblemRescoreEventField            (<a class="autorefs autorefs-internal" title
     <span class="n">orig_score</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">orig_total</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">problem_id</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span>
-        <span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+&quot;</span>  <span class="c1"># noqa : F722</span>
-        <span class="sa">r</span><span class="s2">&quot;type@problem\+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span>  <span class="c1"># noqa : F722</span>
+        <span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+&quot;</span>
+        <span class="sa">r</span><span class="s2">&quot;type@problem\+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span>
     <span class="p">)</span>
     <span class="n">state</span><span class="p">:</span> <span class="n">State</span>
     <span class="n">success</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;correct&quot;</span><span class="p">],</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;incorrect&quot;</span><span class="p">]]</span>
@@ -13619,8 +13597,8 @@ ProblemRescoreFailEventField            (<a class="autorefs autorefs-internal" t
 
     <span class="n">failure</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;closed&quot;</span><span class="p">],</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;unreset&quot;</span><span class="p">]]</span>
     <span class="n">problem_id</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span>
-        <span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+&quot;</span>  <span class="c1"># noqa : F722</span>
-        <span class="sa">r</span><span class="s2">&quot;type@problem\+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span>  <span class="c1"># noqa : F722</span>
+        <span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+&quot;</span>
+        <span class="sa">r</span><span class="s2">&quot;type@problem\+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span>
     <span class="p">)</span>
     <span class="n">state</span><span class="p">:</span> <span class="n">State</span>
 </code></pre></div>
@@ -13799,8 +13777,8 @@ ResetProblemEventField            (<a class="autorefs autorefs-internal" title="
     <span class="n">new_state</span><span class="p">:</span> <span class="n">State</span>
     <span class="n">old_state</span><span class="p">:</span> <span class="n">State</span>
     <span class="n">problem_id</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span>
-        <span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+&quot;</span>  <span class="c1"># noqa : F722</span>
-        <span class="sa">r</span><span class="s2">&quot;type@problem\+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span>  <span class="c1"># noqa : F722</span>
+        <span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+&quot;</span>
+        <span class="sa">r</span><span class="s2">&quot;type@problem\+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span>
     <span class="p">)</span>
 </code></pre></div>
         </details>
@@ -13893,8 +13871,8 @@ ResetProblemFailEventField            (<a class="autorefs autorefs-internal" tit
     <span class="n">failure</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;closed&quot;</span><span class="p">],</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;not_done&quot;</span><span class="p">]]</span>
     <span class="n">old_state</span><span class="p">:</span> <span class="n">State</span>
     <span class="n">problem_id</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span>
-        <span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+&quot;</span>  <span class="c1"># noqa : F722</span>
-        <span class="sa">r</span><span class="s2">&quot;type@problem\+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span>  <span class="c1"># noqa : F722</span>
+        <span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+&quot;</span>
+        <span class="sa">r</span><span class="s2">&quot;type@problem\+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span>
     <span class="p">)</span>
 </code></pre></div>
         </details>
@@ -13995,8 +13973,8 @@ the answer strings if multiple choices are allowed.</p></td>
     <span class="n">answers</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]]</span>
     <span class="n">failure</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;closed&quot;</span><span class="p">],</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;done&quot;</span><span class="p">]]</span>
     <span class="n">problem_id</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span>
-        <span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+&quot;</span>  <span class="c1"># noqa : F722</span>
-        <span class="sa">r</span><span class="s2">&quot;type@problem\+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span>  <span class="c1"># noqa : F722</span>
+        <span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+&quot;</span>
+        <span class="sa">r</span><span class="s2">&quot;type@problem\+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span>
     <span class="p">)</span>
     <span class="n">state</span><span class="p">:</span> <span class="n">State</span>
 </code></pre></div>
@@ -14092,8 +14070,8 @@ the answer strings if multiple choices are allowed.</p></td>
 
     <span class="n">answers</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]]</span>
     <span class="n">problem_id</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span>
-        <span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+&quot;</span>  <span class="c1"># noqa : F722</span>
-        <span class="sa">r</span><span class="s2">&quot;type@problem\+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span>  <span class="c1"># noqa : F722</span>
+        <span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+&quot;</span>
+        <span class="sa">r</span><span class="s2">&quot;type@problem\+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span>
     <span class="p">)</span>
     <span class="n">state</span><span class="p">:</span> <span class="n">State</span>
 </code></pre></div>
@@ -14173,8 +14151,8 @@ ShowAnswerEventField            (<a class="autorefs autorefs-internal" title="ra
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">problem_id</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span>
-        <span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+&quot;</span>  <span class="c1"># noqa : F722</span>
-        <span class="sa">r</span><span class="s2">&quot;type@problem\+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span>  <span class="c1"># noqa : F722</span>
+        <span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+&quot;</span>
+        <span class="sa">r</span><span class="s2">&quot;type@problem\+block@[a-f0-9]</span><span class="si">{32}</span><span class="s2">$&quot;</span>
     <span class="p">)</span>
 </code></pre></div>
         </details>
@@ -14275,7 +14253,7 @@ State            (<a class="autorefs autorefs-internal" title="ralph.models.edx.
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">correct_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span>
-        <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[a-f0-9]</span><span class="si">{32}</span><span class="s2">_[0-9]_[0-9]$&quot;</span><span class="p">),</span>  <span class="c1"># noqa : F722</span>
+        <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[a-f0-9]</span><span class="si">{32}</span><span class="s2">_[0-9]_[0-9]$&quot;</span><span class="p">),</span>
         <span class="n">CorrectMap</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">done</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span>
@@ -15962,7 +15940,7 @@ the problem answer.</p>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
         <span class="nb">str</span><span class="p">,</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">UIProblemResetEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">UIProblemResetEventField</span><span class="p">],</span>
         <span class="n">UIProblemResetEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;problem_reset&quot;</span><span class="p">]</span>
@@ -16161,7 +16139,7 @@ show the problem answer.</p>
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span><span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;problem_show&quot;</span><span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">UIProblemShowEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">UIProblemShowEventField</span><span class="p">],</span>
         <span class="n">UIProblemShowEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;problem_show&quot;</span><span class="p">]</span>
@@ -16392,7 +16370,6 @@ Note:
         <span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;server&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="n">LazyModelField</span><span class="p">(</span><span class="s2">&quot;context__path&quot;</span><span class="p">)</span>
     <span class="p">)</span>
 
-    <span class="c1"># pylint: disable=unsubscriptable-object</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Path</span>
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Json</span><span class="p">[</span><span class="n">ServerEventField</span><span class="p">],</span> <span class="n">ServerEventField</span><span class="p">]</span>
 </code></pre></div>
@@ -16661,9 +16638,7 @@ clicked or <code>nextpage</code> value when the previous page button is clicked.
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">chapter</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span>
-        <span class="n">regex</span><span class="o">=</span><span class="p">(</span>
-            <span class="sa">r</span><span class="s2">&quot;^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$&quot;</span>  <span class="c1"># noqa</span>
-        <span class="p">)</span>
+        <span class="n">regex</span><span class="o">=</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$&quot;</span><span class="p">)</span>
     <span class="p">)</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
         <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;textbook.pdf.page.loaded&quot;</span><span class="p">],</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;textbook.pdf.page.navigatednext&quot;</span><span class="p">]</span>
@@ -16761,9 +16736,7 @@ It begins with the <code>block_id</code> value and ends with the <code>.pdf</cod
 
     <span class="n">page</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">chapter</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span>
-        <span class="n">regex</span><span class="o">=</span><span class="p">(</span>
-            <span class="sa">r</span><span class="s2">&quot;^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$&quot;</span>  <span class="c1"># noqa</span>
-        <span class="p">)</span>
+        <span class="n">regex</span><span class="o">=</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$&quot;</span><span class="p">)</span>
     <span class="p">)</span>
 </code></pre></div>
         </details>
@@ -16850,9 +16823,7 @@ It begins with the <code>block_id</code> value and ends with the <code>.pdf</cod
 
     <span class="n">name</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;textbook.pdf.chapter.navigated&quot;</span><span class="p">]</span>
     <span class="n">chapter</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span>
-        <span class="n">regex</span><span class="o">=</span><span class="p">(</span>
-            <span class="sa">r</span><span class="s2">&quot;^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$&quot;</span>  <span class="c1"># noqa</span>
-        <span class="p">)</span>
+        <span class="n">regex</span><span class="o">=</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$&quot;</span><span class="p">)</span>
     <span class="p">)</span>
     <span class="n">chapter_title</span><span class="p">:</span> <span class="nb">str</span>
 </code></pre></div>
@@ -18118,9 +18089,7 @@ PNG Viewer.</p>
 
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span><span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;book&quot;</span><span class="p">)</span>
 
-    <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">BookEventField</span><span class="p">],</span> <span class="n">BookEventField</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
-    <span class="p">]</span>
+    <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Json</span><span class="p">[</span><span class="n">BookEventField</span><span class="p">],</span> <span class="n">BookEventField</span><span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;book&quot;</span><span class="p">]</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;book&quot;</span><span class="p">]</span>
 </code></pre></div>
@@ -18222,9 +18191,7 @@ navigate to a chapter.</p>
     <span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
-            <span class="n">TextbookPdfChapterNavigatedEventField</span>
-        <span class="p">],</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">TextbookPdfChapterNavigatedEventField</span><span class="p">],</span>
         <span class="n">TextbookPdfChapterNavigatedEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;textbook.pdf.chapter.navigated&quot;</span><span class="p">]</span>
@@ -18328,9 +18295,7 @@ first page is shown.</p>
     <span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
-            <span class="n">TextbookPdfDisplayScaledEventField</span>
-        <span class="p">],</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">TextbookPdfDisplayScaledEventField</span><span class="p">],</span>
         <span class="n">TextbookPdfDisplayScaledEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;textbook.pdf.display.scaled&quot;</span><span class="p">]</span>
@@ -18434,9 +18399,7 @@ hide a list of the book’s chapters.</p>
     <span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
-            <span class="n">TextbookPdfOutlineToggledEventField</span>
-        <span class="p">],</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">TextbookPdfOutlineToggledEventField</span><span class="p">],</span>
         <span class="n">TextbookPdfOutlineToggledEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;textbook.pdf.outline.toggled&quot;</span><span class="p">]</span>
@@ -18538,9 +18501,7 @@ UITextbookPdfPageNavigated            (<a class="autorefs autorefs-internal" tit
     <span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
-            <span class="n">TextbookPdfPageNavigatedEventField</span>
-        <span class="p">],</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">TextbookPdfPageNavigatedEventField</span><span class="p">],</span>
         <span class="n">TextbookPdfPageNavigatedEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;textbook.pdf.page.navigated&quot;</span><span class="p">]</span>
@@ -18644,9 +18605,7 @@ and the transition takes less than 50 milliseconds.</p>
     <span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
-            <span class="n">TextbookPdfPageScrolledEventField</span>
-        <span class="p">],</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">TextbookPdfPageScrolledEventField</span><span class="p">],</span>
         <span class="n">TextbookPdfPageScrolledEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;textbook.pdf.page.scrolled&quot;</span><span class="p">]</span>
@@ -18752,9 +18711,7 @@ UITextbookPdfSearchCaseSensitivityToggled            (<a class="autorefs autoref
     <span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
-            <span class="n">TextbookPdfSearchCaseSensitivityToggledEventField</span>
-        <span class="p">],</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">TextbookPdfSearchCaseSensitivityToggledEventField</span><span class="p">],</span>
         <span class="n">TextbookPdfSearchCaseSensitivityToggledEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;textbook.pdf.searchcasesensitivity.toggled&quot;</span><span class="p">]</span>
@@ -18856,9 +18813,7 @@ UITextbookPdfSearchExecuted            (<a class="autorefs autorefs-internal" ti
     <span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
-            <span class="n">TextbookPdfSearchExecutedEventField</span>
-        <span class="p">],</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">TextbookPdfSearchExecutedEventField</span><span class="p">],</span>
         <span class="n">TextbookPdfSearchExecutedEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;textbook.pdf.search.executed&quot;</span><span class="p">]</span>
@@ -18962,9 +18917,7 @@ UITextbookPdfSearchHighlightToggled            (<a class="autorefs autorefs-inte
     <span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
-            <span class="n">TextbookPdfSearchHighlightToggledEventField</span>
-        <span class="p">],</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">TextbookPdfSearchHighlightToggledEventField</span><span class="p">],</span>
         <span class="n">TextbookPdfSearchHighlightToggledEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;textbook.pdf.search.highlight.toggled&quot;</span><span class="p">]</span>
@@ -19068,9 +19021,7 @@ UITextbookPdfSearchNavigatedNext            (<a class="autorefs autorefs-interna
     <span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
-            <span class="n">TextbookPdfSearchNavigatedNextEventField</span>
-        <span class="p">],</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">TextbookPdfSearchNavigatedNextEventField</span><span class="p">],</span>
         <span class="n">TextbookPdfSearchNavigatedNextEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;textbook.pdf.search.navigatednext&quot;</span><span class="p">]</span>
@@ -19174,9 +19125,7 @@ navigate to a page.</p>
     <span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
-            <span class="n">TextbookPdfThumbnailNavigatedEventField</span>
-        <span class="p">],</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">TextbookPdfThumbnailNavigatedEventField</span><span class="p">],</span>
         <span class="n">TextbookPdfThumbnailNavigatedEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;textbook.pdf.thumbnail.navigated&quot;</span><span class="p">]</span>
@@ -19280,9 +19229,7 @@ page thumbnails.</p>
     <span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
-            <span class="n">TextbookPdfThumbnailsToggledEventField</span>
-        <span class="p">],</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">TextbookPdfThumbnailsToggledEventField</span><span class="p">],</span>
         <span class="n">TextbookPdfThumbnailsToggledEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;textbook.pdf.thumbnails.toggled&quot;</span><span class="p">]</span>
@@ -19386,9 +19333,7 @@ or <kbd>Zoom Out</kbd> icon.</p>
     <span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
-            <span class="n">TextbookPdfZoomButtonsChangedEventField</span>
-        <span class="p">],</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">TextbookPdfZoomButtonsChangedEventField</span><span class="p">],</span>
         <span class="n">TextbookPdfZoomButtonsChangedEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;textbook.pdf.zoom.buttons.changed&quot;</span><span class="p">]</span>
@@ -19490,9 +19435,7 @@ UITextbookPdfZoomMenuChanged            (<a class="autorefs autorefs-internal" t
     <span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
-            <span class="n">TextbookPdfZoomMenuChangedEventField</span>
-        <span class="p">],</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">TextbookPdfZoomMenuChangedEventField</span><span class="p">],</span>
         <span class="n">TextbookPdfZoomMenuChangedEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;textbook.pdf.zoom.menu.changed&quot;</span><span class="p">]</span>
@@ -20099,7 +20042,7 @@ course creators, or the system-generated hash code otherwise.</p></td>
 <span class="sd">            course creators, or the system-generated hash code otherwise.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>  <span class="c1"># pylint: disable=missing-class-docstring # noqa: D106</span>
+    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>  <span class="c1"># noqa: D106</span>
         <span class="n">extra</span> <span class="o">=</span> <span class="s2">&quot;allow&quot;</span>
 
     <span class="n">code</span><span class="p">:</span> <span class="nb">str</span>
@@ -20402,7 +20345,7 @@ display of the video transcript.</p>
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span><span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;hide_transcript&quot;</span><span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">VideoHideTranscriptEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">VideoHideTranscriptEventField</span><span class="p">],</span>
         <span class="n">VideoHideTranscriptEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;hide_transcript&quot;</span><span class="p">]</span>
@@ -20504,7 +20447,7 @@ play.</p>
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span><span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;load_video&quot;</span><span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">VideoBaseEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">VideoBaseEventField</span><span class="p">],</span>
         <span class="n">VideoBaseEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;load_video&quot;</span><span class="p">]</span>
@@ -20606,7 +20549,7 @@ control.</p>
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span><span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;pause_video&quot;</span><span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">PauseVideoEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">PauseVideoEventField</span><span class="p">],</span>
         <span class="n">PauseVideoEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;pause_video&quot;</span><span class="p">]</span>
@@ -20708,7 +20651,7 @@ control.</p>
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span><span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;play_video&quot;</span><span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">PlayVideoEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">PlayVideoEventField</span><span class="p">],</span>
         <span class="n">PlayVideoEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;play_video&quot;</span><span class="p">]</span>
@@ -20812,7 +20755,7 @@ to a different point in the video file.</p>
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span><span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;seek_video&quot;</span><span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">SeekVideoEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">SeekVideoEventField</span><span class="p">],</span>
         <span class="n">SeekVideoEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;seek_video&quot;</span><span class="p">]</span>
@@ -20916,7 +20859,7 @@ video transcript.</p>
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span><span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;show_transcript&quot;</span><span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">VideoShowTranscriptEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">VideoShowTranscriptEventField</span><span class="p">],</span>
         <span class="n">VideoShowTranscriptEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;show_transcript&quot;</span><span class="p">]</span>
@@ -21012,7 +20955,7 @@ the video.</p>
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span><span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;speed_change_video&quot;</span><span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">SpeedChangeVideoEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">SpeedChangeVideoEventField</span><span class="p">],</span>
         <span class="n">SpeedChangeVideoEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;speed_change_video&quot;</span><span class="p">]</span>
@@ -21114,7 +21057,7 @@ file and play automatically stops.</p>
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span><span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;stop_video&quot;</span><span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">StopVideoEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">StopVideoEventField</span><span class="p">],</span>
         <span class="n">StopVideoEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;stop_video&quot;</span><span class="p">]</span>
@@ -21210,7 +21153,7 @@ for a video that has transcripts in multiple languages</p>
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span><span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;video_hide_cc_menu&quot;</span><span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">VideoBaseEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">VideoBaseEventField</span><span class="p">],</span>
         <span class="n">VideoBaseEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;video_hide_cc_menu&quot;</span><span class="p">]</span>
@@ -21309,7 +21252,7 @@ transcripts in multiple languages.</p>
     <span class="n">__selector__</span> <span class="o">=</span> <span class="n">selector</span><span class="p">(</span><span class="n">event_source</span><span class="o">=</span><span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;video_show_cc_menu&quot;</span><span class="p">)</span>
 
     <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Json</span><span class="p">[</span><span class="n">VideoBaseEventField</span><span class="p">],</span>  <span class="c1"># pylint: disable=unsubscriptable-object</span>
+        <span class="n">Json</span><span class="p">[</span><span class="n">VideoBaseEventField</span><span class="p">],</span>
         <span class="n">VideoBaseEventField</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;video_show_cc_menu&quot;</span><span class="p">]</span>

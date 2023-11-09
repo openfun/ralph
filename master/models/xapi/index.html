@@ -6841,7 +6841,7 @@ BaseXapiMboxSha1SumIFI            (<a class="autorefs autorefs-internal" title="
 <span class="sd">        mbox_sha1sum (str): Consists of the SHA1 hash of the Agent&#39;s email address.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">mbox_sha1sum</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[0-9a-f]</span><span class="si">{40}</span><span class="s2">$&quot;</span><span class="p">)</span>  <span class="c1"># noqa:F722</span>
+    <span class="n">mbox_sha1sum</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[0-9a-f]</span><span class="si">{40}</span><span class="s2">$&quot;</span><span class="p">)</span>
 </code></pre></div>
         </details>
 
@@ -7559,7 +7559,7 @@ BaseXapiStatement            (<a class="autorefs autorefs-internal" title="ralph
     <span class="n">timestamp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span>
     <span class="n">stored</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span>
     <span class="n">authority</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">BaseXapiAgent</span><span class="p">,</span> <span class="n">BaseXapiGroup</span><span class="p">]]</span>
-    <span class="n">version</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^1\.0\.[0-9]+$&quot;</span><span class="p">)</span> <span class="o">=</span> <span class="s2">&quot;1.0.0&quot;</span>  <span class="c1"># noqa:F722</span>
+    <span class="n">version</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^1\.0\.[0-9]+$&quot;</span><span class="p">)</span> <span class="o">=</span> <span class="s2">&quot;1.0.0&quot;</span>
     <span class="n">attachments</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">BaseXapiAttachment</span><span class="p">]]</span>
 
     <span class="nd">@root_validator</span><span class="p">(</span><span class="n">pre</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -8151,7 +8151,7 @@ BaseXapiInteractionComponent            (<a class="autorefs autorefs-internal" t
 <span class="sd">        description (LanguageMap): Consists of the description of the interaction.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="nb">id</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[^\s]+$&quot;</span><span class="p">)</span>  <span class="c1"># noqa:F722</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="n">constr</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[^\s]+$&quot;</span><span class="p">)</span>
     <span class="n">description</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">LanguageMap</span><span class="p">]</span>
 </code></pre></div>
         </details>
@@ -13407,7 +13407,7 @@ BaseExtensionModelWithConfig            (<span title="pydantic.main.BaseModel">B
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BaseExtensionModelWithConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for extension configuration shared among all models.&quot;&quot;&quot;</span>
 
-    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>  <span class="c1"># pylint: disable=missing-class-docstring # noqa: D106</span>
+    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>  <span class="c1"># noqa: D106</span>
         <span class="n">extra</span> <span class="o">=</span> <span class="n">Extra</span><span class="o">.</span><span class="n">allow</span>
         <span class="n">min_anystr_length</span> <span class="o">=</span> <span class="mi">0</span>
 </code></pre></div>
@@ -13463,7 +13463,7 @@ BaseModelWithConfig            (<span title="pydantic.main.BaseModel">BaseModel<
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BaseModelWithConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for base configuration shared among all models.&quot;&quot;&quot;</span>
 
-    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>  <span class="c1"># pylint: disable=missing-class-docstring # noqa: D106</span>
+    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>  <span class="c1"># noqa: D106</span>
         <span class="n">extra</span> <span class="o">=</span> <span class="n">Extra</span><span class="o">.</span><span class="n">forbid</span>
         <span class="n">min_anystr_length</span> <span class="o">=</span> <span class="mi">1</span>
 </code></pre></div>
@@ -17798,7 +17798,6 @@ viewed by the user.</p></td>
         <details class="quote">
           <summary>Source code in <code>ralph/models/xapi/video/contexts.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VideoScreenChangeInteractionContextExtensions</span><span class="p">(</span><span class="n">VideoContextExtensions</span><span class="p">):</span>
-    <span class="c1"># noqa: D205, D415</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for video screen change interaction `context`.`extensions`</span>
 <span class="sd">    property.</span>
 
@@ -17807,7 +17806,7 @@ viewed by the user.</p></td>
 <span class="sd">        screenSize (str): Expresses the total available screen size for Video playback.</span>
 <span class="sd">        videoPlaybackSize (str): Consists of the size in Width x Height of the video as</span>
 <span class="sd">            viewed by the user.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: D205</span>
 
     <span class="n">fullScreen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">alias</span><span class="o">=</span><span class="n">CONTEXT_EXTENSION_FULL_SCREEN</span><span class="p">)</span>
     <span class="n">screenSize</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">alias</span><span class="o">=</span><span class="n">CONTEXT_EXTENSION_SCREEN_SIZE</span><span class="p">)</span>
@@ -18105,13 +18104,12 @@ property.</p>
         <details class="quote">
           <summary>Source code in <code>ralph/models/xapi/video/contexts.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VideoVolumeChangeInteractionContextExtensions</span><span class="p">(</span><span class="n">VideoContextExtensions</span><span class="p">):</span>
-    <span class="c1"># noqa: D205, D415</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for video volume change interaction `context`.`extensions`</span>
 <span class="sd">    property.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        volume (int): Consists of the volume of the video.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: D205</span>
 
     <span class="n">volume</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">alias</span><span class="o">=</span><span class="n">CONTEXT_EXTENSION_VOLUME</span><span class="p">)</span>
 </code></pre></div>
@@ -20417,13 +20415,12 @@ property.</p>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VirtualClassroomAnsweredPollContextActivities</span><span class="p">(</span>
     <span class="n">VirtualClassroomContextContextActivities</span>
 <span class="p">):</span>
-    <span class="c1"># noqa: D205, D415</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for virtual classroom answered poll `context`.`contextActivities`</span>
 <span class="sd">    property.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        parent (list): see VirtualClassroomActivity.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: D205</span>
 
     <span class="n">parent</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">VirtualClassroomActivity</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">VirtualClassroomActivity</span><span class="p">]]</span>
 </code></pre></div>
@@ -21191,13 +21188,12 @@ VirtualClassroomPostedPublicMessageContextActivities            (<a class="autor
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VirtualClassroomPostedPublicMessageContextActivities</span><span class="p">(</span>
     <span class="n">VirtualClassroomContextContextActivities</span>
 <span class="p">):</span>
-    <span class="c1"># noqa: D205, D415</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for virtual classroom posted public message</span>
 <span class="sd">    `context`.`contextActivities` property.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        parent (list): see VirtualClassroomActivity.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: D205</span>
 
     <span class="n">parent</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">VirtualClassroomActivity</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">VirtualClassroomActivity</span><span class="p">]]</span>
 </code></pre></div>
@@ -21429,13 +21425,12 @@ property.</p>
           <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VirtualClassroomStartedPollContextActivities</span><span class="p">(</span>
     <span class="n">VirtualClassroomContextContextActivities</span>
 <span class="p">):</span>
-    <span class="c1"># noqa: D205, D415</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pydantic model for virtual classroom started poll `context`.`contextActivities`</span>
 <span class="sd">    property.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        parent (list): see VirtualClassroomActivity.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: D205</span>
 
     <span class="n">parent</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">VirtualClassroomActivity</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">VirtualClassroomActivity</span><span class="p">]]</span>
 </code></pre></div>
