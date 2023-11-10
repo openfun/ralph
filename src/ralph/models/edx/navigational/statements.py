@@ -77,7 +77,6 @@ class UISeqNext(BaseBrowserModel):
 
     @field_validator("event")
     @classmethod
-    @classmethod
     def validate_next_jump_event_field(
         cls, value: Union[Json[NavigationalEventField], NavigationalEventField]
     ) -> Union[Json[NavigationalEventField], NavigationalEventField]:
@@ -109,7 +108,6 @@ class UISeqPrev(BaseBrowserModel):
     name: Literal["seq_prev"]
 
     @field_validator("event")
-    @classmethod
     @classmethod
     def validate_prev_jump_event_field(
         cls, value: Union[Json[NavigationalEventField], NavigationalEventField]

@@ -42,7 +42,7 @@ class CorrectMap(BaseModelWithConfig):
         queuestate (json): see QueueStateField.
     """
 
-    answervariable: Union[Literal[None], None, str] = None
+    answervariable: Union[Literal[None], None, str] # = None
     correctness: Union[Literal["correct"], Literal["incorrect"]]
     hint: Optional[str] = None
     hintmode: Optional[Union[Literal["on_request"], Literal["always"]]] = None
