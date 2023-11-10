@@ -14,7 +14,7 @@ from ralph.backends.data.s3 import S3DataBackend, S3DataBackendSettings
 from ralph.exceptions import BackendException, BackendParameterException
 
 
-def test_backends_data_s3_backend_default_instantiation(monkeypatch, fs):
+def test_backends_data_s3_default_instantiation(monkeypatch, fs):
     """Test the `S3DataBackend` default instantiation."""
     fs.create_file(".env")
     backend_settings_names = [
@@ -45,7 +45,7 @@ def test_backends_data_s3_backend_default_instantiation(monkeypatch, fs):
     assert backend.default_chunk_size == 1
 
 
-def test_backends_data_s3_data_backend_instantiation_with_settings():
+def test_backends_data_s3_instantiation_with_settings():
     """Test the `S3DataBackend` instantiation with settings."""
     settings_ = S3DataBackend.settings_class(
         ACCESS_KEY_ID="access_key",
@@ -69,7 +69,7 @@ def test_backends_data_s3_data_backend_instantiation_with_settings():
 
 
 @mock_s3
-def test_backends_data_s3_data_backend_status_method(s3_backend):
+def test_backends_data_s3_status(s3_backend):
     """Test the `S3DataBackend.status` method."""
 
     # Regions outside of us-east-1 require the appropriate LocationConstraint
@@ -88,7 +88,7 @@ def test_backends_data_s3_data_backend_status_method(s3_backend):
 
 
 @mock_s3
-def test_backends_data_s3_data_backend_list_should_yield_archive_names(
+def test_backends_data_s3_list_should_yield_archive_names(
     s3_backend,
 ):
     """Test that given `S3DataBackend.list` method successfully connects to the S3
@@ -449,7 +449,7 @@ def test_backends_data_s3_read_with_iter_error_should_log_the_error(
     [None, BaseOperationType.CREATE, BaseOperationType.INDEX],
 )
 @mock_s3
-def test_backends_data_s3_write_method_with_parameter_error(
+def test_backends_data_s3_write_with_parameter_error(
     operation_type, s3_backend, caplog
 ):
     """Test the `S3DataBackend.write` method, given a target matching an
@@ -495,7 +495,7 @@ def test_backends_data_s3_write_method_with_parameter_error(
     "operation_type",
     [BaseOperationType.APPEND, BaseOperationType.DELETE],
 )
-def test_backends_data_s3_data_backend_write_method_with_append_or_delete_operation(
+def test_backends_data_s3_write_with_append_or_delete_operation(
     s3_backend, operation_type
 ):
     """Test the `S3DataBackend.write` method, given an `APPEND`
@@ -516,7 +516,7 @@ def test_backends_data_s3_data_backend_write_method_with_append_or_delete_operat
     [BaseOperationType.CREATE, BaseOperationType.INDEX],
 )
 @mock_s3
-def test_backends_data_s3_write_method_with_create_index_operation(
+def test_backends_data_s3_write_with_create_index_operation(
     operation_type, s3_backend, monkeypatch, caplog
 ):
     """Test the `S3DataBackend.write` method, given a target matching an
@@ -620,7 +620,7 @@ def test_backends_data_s3_write_method_with_create_index_operation(
 
 
 @mock_s3
-def test_backends_data_s3_write_method_with_no_data_should_skip(
+def test_backends_data_s3_write_with_no_data_should_skip(
     s3_backend,
 ):
     """Test the `S3DataBackend.write` method, given no data to write,
@@ -645,7 +645,7 @@ def test_backends_data_s3_write_method_with_no_data_should_skip(
 
 
 @mock_s3
-def test_backends_data_s3_write_method_with_failure_should_log_the_error(
+def test_backends_data_s3_write_with_failure_should_log_the_error(
     s3_backend,
 ):
     """Test the `S3DataBackend.write` method, given a connection failure,
@@ -676,9 +676,7 @@ def test_backends_data_s3_write_method_with_failure_should_log_the_error(
     backend.close()
 
 
-def test_backends_data_s3_data_backend_close_method_with_failure(
-    s3_backend, monkeypatch
-):
+def test_backends_data_s3_close_with_failure(s3_backend, monkeypatch):
     """Test the `S3DataBackend.close` method."""
 
     backend = s3_backend()
@@ -694,7 +692,7 @@ def test_backends_data_s3_data_backend_close_method_with_failure(
 
 
 @mock_s3
-def test_backends_data_s3_data_backend_close_method(s3_backend, caplog):
+def test_backends_data_s3_close(s3_backend, caplog):
     """Test the `S3DataBackend.close` method."""
 
     # No client instantiated

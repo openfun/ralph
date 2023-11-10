@@ -6,7 +6,7 @@ from ralph.backends.lrs.base import RalphStatementsQuery
 from ralph.backends.lrs.fs import FSLRSBackend
 
 
-def test_backends_lrs_fs_lrs_backend_default_instantiation(monkeypatch, fs):
+def test_backends_lrs_fs_default_instantiation(monkeypatch, fs):
     """Test the `FSLRSBackend` default instantiation."""
     fs.create_file(".env")
     monkeypatch.delenv("RALPH_BACKENDS__LRS__FS__DEFAULT_LRS_FILE", raising=False)
@@ -153,7 +153,7 @@ def test_backends_lrs_fs_lrs_backend_default_instantiation(monkeypatch, fs):
         ),
     ],
 )
-def test_backends_lrs_fs_lrs_backend_query_statements_query(
+def test_backends_lrs_fs_query_statements_query(
     params, expected_statement_ids, fs_lrs_backend
 ):
     """Test the `FSLRSBackend.query_statements` method, given valid statement
@@ -278,7 +278,7 @@ def test_backends_lrs_fs_lrs_backend_query_statements_query(
     assert ids == expected_statement_ids
 
 
-def test_backends_lrs_fs_lrs_backend_query_statements_by_ids(fs_lrs_backend):
+def test_backends_lrs_fs_query_statements_by_ids(fs_lrs_backend):
     """Test the `FSLRSBackend.query_statements_by_ids` method, given a valid search
     query, should return the expected results.
     """

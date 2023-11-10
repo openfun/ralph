@@ -31,9 +31,7 @@ from tests.fixtures.backends import (
 
 
 @pytest.mark.anyio
-async def test_backends_data_async_es_data_backend_default_instantiation(
-    monkeypatch, fs
-):
+async def test_backends_data_async_es_default_instantiation(monkeypatch, fs):
     """Test the `AsyncESDataBackend` default instantiation."""
 
     fs.create_file(".env")
@@ -82,7 +80,7 @@ async def test_backends_data_async_es_data_backend_default_instantiation(
 
 
 @pytest.mark.anyio
-async def test_backends_data_async_es_data_backend_instantiation_with_settings():
+async def test_backends_data_async_es_instantiation_with_settings():
     """Test the `AsyncESDataBackend` instantiation with settings."""
     # Not testing `ca_certs` and `verify_certs` as elasticsearch aiohttp
     # node transport checks that file exists
@@ -120,9 +118,7 @@ async def test_backends_data_async_es_data_backend_instantiation_with_settings()
 
 
 @pytest.mark.anyio
-async def test_backends_data_async_es_data_backend_status_method(
-    monkeypatch, async_es_backend, caplog
-):
+async def test_backends_data_async_es_status(monkeypatch, async_es_backend, caplog):
     """Test the `AsyncESDataBackend.status` method."""
 
     async def mock_info():
@@ -196,7 +192,7 @@ async def test_backends_data_async_es_data_backend_status_method(
     ],
 )
 @pytest.mark.anyio
-async def test_backends_data_async_es_data_backend_list_method_with_failure(
+async def test_backends_data_async_es_list_with_failure(
     exception, error, caplog, monkeypatch, async_es_backend
 ):
     """Test the `AsyncESDataBackend.list` method given a failed Elasticsearch connection
@@ -225,7 +221,7 @@ async def test_backends_data_async_es_data_backend_list_method_with_failure(
 
 
 @pytest.mark.anyio
-async def test_backends_data_async_es_data_backend_list_method_without_history(
+async def test_backends_data_async_es_list_without_history(
     async_es_backend, monkeypatch
 ):
     """Test the `AsyncESDataBackend.list` method without history."""
@@ -247,33 +243,7 @@ async def test_backends_data_async_es_data_backend_list_method_without_history(
 
 
 @pytest.mark.anyio
-async def test_backends_data_async_es_data_backend_list_method_with_details(
-    async_es_backend, monkeypatch
-):
-    """Test the `AsyncESDataBackend.list` method with `details` set to `True`."""
-    indices = {"index_1": {"info_1": "foo"}, "index_2": {"info_2": "baz"}}
-
-    async def mock_get(index):
-        """Mocks the AsyncES.client.indices.get method returning a dictionary."""
-        assert index == "target_index*"
-        return indices
-
-    backend = async_es_backend()
-    monkeypatch.setattr(backend.client.indices, "get", mock_get)
-    result = [
-        statement async for statement in backend.list("target_index*", details=True)
-    ]
-    assert isinstance(result, Iterable)
-    assert list(result) == [
-        {"index_1": {"info_1": "foo"}},
-        {"index_2": {"info_2": "baz"}},
-    ]
-
-    await backend.close()
-
-
-@pytest.mark.anyio
-async def test_backends_data_async_es_data_backend_list_method_with_history(
+async def test_backends_data_async_es_list_with_history(
     async_es_backend, caplog, monkeypatch
 ):
     """Test the `AsyncESDataBackend.list` method given `new` argument set to True,
@@ -298,6 +268,30 @@ async def test_backends_data_async_es_data_backend_list_method_with_history(
     await backend.close()
 
 
+@pytest.mark.anyio
+async def test_backends_data_async_es_list_with_details(async_es_backend, monkeypatch):
+    """Test the `AsyncESDataBackend.list` method with `details` set to `True`."""
+    indices = {"index_1": {"info_1": "foo"}, "index_2": {"info_2": "baz"}}
+
+    async def mock_get(index):
+        """Mocks the AsyncES.client.indices.get method returning a dictionary."""
+        assert index == "target_index*"
+        return indices
+
+    backend = async_es_backend()
+    monkeypatch.setattr(backend.client.indices, "get", mock_get)
+    result = [
+        statement async for statement in backend.list("target_index*", details=True)
+    ]
+    assert isinstance(result, Iterable)
+    assert list(result) == [
+        {"index_1": {"info_1": "foo"}},
+        {"index_2": {"info_2": "baz"}},
+    ]
+
+    await backend.close()
+
+
 @pytest.mark.parametrize(
     "exception, error",
     [
@@ -306,7 +300,7 @@ async def test_backends_data_async_es_data_backend_list_method_with_history(
     ],
 )
 @pytest.mark.anyio
-async def test_backends_data_async_es_data_backend_read_method_with_failure(  # noqa: PLR0913
+async def test_backends_data_async_es_read_with_failure(  # noqa: PLR0913
     exception, error, es, async_es_backend, caplog, monkeypatch
 ):
     """Test the `AsyncESDataBackend.read` method, given a request failure, should
@@ -358,7 +352,7 @@ async def test_backends_data_async_es_data_backend_read_method_with_failure(  # 
 
 
 @pytest.mark.anyio
-async def test_backends_data_async_es_data_backend_read_method_with_ignore_errors(
+async def test_backends_data_async_es_read_with_ignore_errors(
     es, async_es_backend, monkeypatch, caplog
 ):
     """Test the `AsyncESDataBackend.read` method, given `ignore_errors` set to `True`,
@@ -384,9 +378,7 @@ async def test_backends_data_async_es_data_backend_read_method_with_ignore_error
 
 
 @pytest.mark.anyio
-async def test_backends_data_async_es_data_backend_read_method_with_raw_ouput(
-    es, async_es_backend
-):
+async def test_backends_data_async_es_read_with_raw_ouput(es, async_es_backend):
     """Test the `AsyncESDataBackend.read` method with `raw_output` set to `True`."""
 
     backend = async_es_backend()
@@ -401,9 +393,7 @@ async def test_backends_data_async_es_data_backend_read_method_with_raw_ouput(
 
 
 @pytest.mark.anyio
-async def test_backends_data_async_es_data_backend_read_method_without_raw_ouput(
-    es, async_es_backend
-):
+async def test_backends_data_async_es_read_without_raw_ouput(es, async_es_backend):
     """Test the `AsyncESDataBackend.read` method with `raw_output` set to `False`."""
 
     backend = async_es_backend()
@@ -418,9 +408,7 @@ async def test_backends_data_async_es_data_backend_read_method_without_raw_ouput
 
 
 @pytest.mark.anyio
-async def test_backends_data_async_es_data_backend_read_method_with_query(
-    es, async_es_backend, caplog
-):
+async def test_backends_data_async_es_read_with_query(es, async_es_backend, caplog):
     """Test the `AsyncESDataBackend.read` method with a query."""
 
     backend = async_es_backend()
@@ -484,7 +472,7 @@ async def test_backends_data_async_es_data_backend_read_method_with_query(
 
 
 @pytest.mark.anyio
-async def test_backends_data_async_es_data_backend_write_method_with_create_operation(
+async def test_backends_data_async_es_write_with_create_operation(
     es, async_es_backend, caplog
 ):
     """Test the `AsyncESDataBackend.write` method, given an `CREATE` `operation_type`,
@@ -535,7 +523,7 @@ async def test_backends_data_async_es_data_backend_write_method_with_create_oper
 
 
 @pytest.mark.anyio
-async def test_backends_data_async_es_data_backend_write_method_with_delete_operation(
+async def test_backends_data_async_es_write_with_delete_operation(
     es,
     async_es_backend,
 ):
@@ -564,7 +552,7 @@ async def test_backends_data_async_es_data_backend_write_method_with_delete_oper
 
 
 @pytest.mark.anyio
-async def test_backends_data_async_es_data_backend_write_method_with_update_operation(
+async def test_backends_data_async_es_write_with_update_operation(
     es,
     async_es_backend,
 ):
@@ -611,7 +599,7 @@ async def test_backends_data_async_es_data_backend_write_method_with_update_oper
 
 
 @pytest.mark.anyio
-async def test_backends_data_async_es_data_backend_write_method_with_append_operation(
+async def test_backends_data_async_es_write_with_append_operation(
     async_es_backend, caplog
 ):
     """Test the `AsyncESDataBackend.write` method, given an `APPEND` `operation_type`,
@@ -633,9 +621,7 @@ async def test_backends_data_async_es_data_backend_write_method_with_append_oper
 
 
 @pytest.mark.anyio
-async def test_backends_data_async_es_data_backend_write_method_with_target(
-    es, async_es_backend
-):
+async def test_backends_data_async_es_write_with_target(es, async_es_backend):
     """Test the `AsyncESDataBackend.write` method, given a target index, should insert
     documents to the corresponding index.
     """
@@ -681,7 +667,7 @@ async def test_backends_data_async_es_data_backend_write_method_with_target(
 
 
 @pytest.mark.anyio
-async def test_backends_data_async_es_data_backend_write_method_without_ignore_errors(
+async def test_backends_data_async_es_write_without_ignore_errors(
     es, async_es_backend, caplog
 ):
     """Test the `AsyncESDataBackend.write` method with `ignore_errors` set to `False`,
@@ -752,7 +738,7 @@ async def test_backends_data_async_es_data_backend_write_method_without_ignore_e
 
 
 @pytest.mark.anyio
-async def test_backends_data_async_es_data_backend_write_method_with_ignore_errors(
+async def test_backends_data_async_es_write_with_ignore_errors(
     es, async_es_backend, caplog
 ):
     """Test the `AsyncESDataBackend.write` method with `ignore_errors` set to `True`,
@@ -804,7 +790,7 @@ async def test_backends_data_async_es_data_backend_write_method_with_ignore_erro
 
 
 @pytest.mark.anyio
-async def test_backends_data_async_es_data_backend_write_method_with_datastream(
+async def test_backends_data_async_es_write_with_datastream(
     es_data_stream, async_es_backend
 ):
     """Test the `AsyncESDataBackend.write` method using a configured data stream."""
@@ -825,9 +811,7 @@ async def test_backends_data_async_es_data_backend_write_method_with_datastream(
 
 
 @pytest.mark.anyio
-async def test_backends_data_es_data_backend_close_method_with_failure(
-    async_es_backend, monkeypatch
-):
+async def test_backends_data_es_close_with_failure(async_es_backend, monkeypatch):
     """Test the `AsyncESDataBackend.close` method."""
 
     backend = async_es_backend()
@@ -843,7 +827,7 @@ async def test_backends_data_es_data_backend_close_method_with_failure(
 
 
 @pytest.mark.anyio
-async def test_backends_data_es_data_backend_close_method(async_es_backend, caplog):
+async def test_backends_data_es_close(async_es_backend, caplog):
     """Test the `AsyncESDataBackend.close` method."""
 
     # No client instantiated

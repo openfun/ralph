@@ -19,7 +19,7 @@ from ralph.backends.lrs.base import LRSStatementsQuery
 
 @pytest.mark.anyio
 @pytest.mark.parametrize("method", ["status", "list", "write", "read"])
-async def test_backend_http_lrs_in_async_setting(monkeypatch, method):
+async def test_backends_http_lrs_in_async_setting(monkeypatch, method):
     """Test that backend returns the proper error when run in async function."""
 
     # Define mock responses
@@ -59,7 +59,7 @@ async def test_backend_http_lrs_in_async_setting(monkeypatch, method):
 
 
 @pytest.mark.anyio
-def test_backend_http_lrs_default_instantiation(monkeypatch, fs):
+def test_backends_http_lrs_default_instantiation(monkeypatch, fs):
     """Test the `LRSHTTPBackend` default instantiation."""
     fs.create_file(".env")
     backend_settings_names = [
@@ -89,7 +89,7 @@ def test_backend_http_lrs_default_instantiation(monkeypatch, fs):
     assert backend.auth == ("foo", "secret")
 
 
-def test_backends_http_lrs_http_instantiation():
+def test_backends_http_lrs_instantiation_with_settings():
     """Test the LRS backend default instantiation."""
 
     headers = LRSHeaders(

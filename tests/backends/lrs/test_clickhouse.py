@@ -12,7 +12,7 @@ from ralph.backends.lrs.clickhouse import ClickHouseLRSBackend
 from ralph.exceptions import BackendException
 
 
-def test_backends_lrs_clickhouse_lrs_backend_default_instantiation(monkeypatch, fs):
+def test_backends_lrs_clickhouse_default_instantiation(monkeypatch, fs):
     """Test the `ClickHouseLRSBackend` default instantiation."""
     fs.create_file(".env")
     monkeypatch.delenv("RALPH_BACKENDS__LRS__CLICKHOUSE__IDS_CHUNK_SIZE", raising=False)
@@ -289,9 +289,7 @@ def test_backends_database_clickhouse_query_statements_query(
     backend.close()
 
 
-def test_backends_lrs_clickhouse_lrs_backend_query_statements(
-    clickhouse, clickhouse_lrs_backend
-):
+def test_backends_lrs_clickhouse_query_statements(clickhouse, clickhouse_lrs_backend):
     """Test the `ClickHouseLRSBackend.query_statements` method, given a query,
     should return matching statements.
     """
@@ -323,7 +321,7 @@ def test_backends_lrs_clickhouse_lrs_backend_query_statements(
     backend.close()
 
 
-def test_backends_lrs_clickhouse_lrs_backend__find(clickhouse, clickhouse_lrs_backend):
+def test_backends_lrs_clickhouse__find(clickhouse, clickhouse_lrs_backend):
     """Test the `ClickHouseLRSBackend._find` method, given a query,
     should return matching statements.
     """
@@ -352,7 +350,7 @@ def test_backends_lrs_clickhouse_lrs_backend__find(clickhouse, clickhouse_lrs_ba
     backend.close()
 
 
-def test_backends_lrs_clickhouse_lrs_backend_query_statements_by_ids(
+def test_backends_lrs_clickhouse_query_statements_by_ids(
     clickhouse, clickhouse_lrs_backend
 ):
     """Test the `ClickHouseLRSBackend.query_statements_by_ids` method, given
@@ -384,7 +382,7 @@ def test_backends_lrs_clickhouse_lrs_backend_query_statements_by_ids(
     backend.close()
 
 
-def test_backends_lrs_clickhouse_lrs_backend_query_statements_client_failure(
+def test_backends_lrs_clickhouse_query_statements_client_failure(
     clickhouse, clickhouse_lrs_backend, monkeypatch, caplog
 ):
     """Test the `ClickHouseLRSBackend.query_statements`, given a client query
@@ -412,7 +410,7 @@ def test_backends_lrs_clickhouse_lrs_backend_query_statements_client_failure(
     backend.close()
 
 
-def test_backends_lrs_clickhouse_lrs_backend_query_statements_by_ids_client_failure(
+def test_backends_lrs_clickhouse_query_statements_by_ids_client_failure(
     clickhouse, clickhouse_lrs_backend, monkeypatch, caplog
 ):
     """Test the `ClickHouseLRSBackend.query_statements_by_ids`, given a client

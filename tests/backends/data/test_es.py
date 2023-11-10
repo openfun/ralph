@@ -31,7 +31,7 @@ from tests.fixtures.backends import (
 )
 
 
-def test_backends_data_es_data_backend_default_instantiation(monkeypatch, fs):
+def test_backends_data_es_default_instantiation(monkeypatch, fs):
     """Test the `ESDataBackend` default instantiation."""
 
     fs.create_file(".env")
@@ -79,7 +79,7 @@ def test_backends_data_es_data_backend_default_instantiation(monkeypatch, fs):
     assert backend.settings.CLIENT_OPTIONS == ESClientOptions(verify_certs=True)
 
 
-def test_backends_data_es_data_backend_instantiation_with_settings():
+def test_backends_data_es_instantiation_with_settings():
     """Test the `ESDataBackend` instantiation with settings."""
     settings = ESDataBackendSettings(
         ALLOW_YELLOW_STATUS=True,
@@ -118,7 +118,7 @@ def test_backends_data_es_data_backend_instantiation_with_settings():
     backend.close()
 
 
-def test_backends_data_es_data_backend_status_method(monkeypatch, es_backend, caplog):
+def test_backends_data_es_status(monkeypatch, es_backend, caplog):
     """Test the `ESDataBackend.status` method."""
     backend = es_backend()
     with monkeypatch.context() as elasticsearch_patch:
@@ -176,7 +176,7 @@ def test_backends_data_es_data_backend_status_method(monkeypatch, es_backend, ca
         (ESConnectionError(""), "Connection error"),
     ],
 )
-def test_backends_data_es_data_backend_list_method_with_failure(
+def test_backends_data_es_list_with_failure(
     exception, error, caplog, monkeypatch, es_backend
 ):
     """Test the `ESDataBackend.list` method given an failed Elasticsearch connection
@@ -203,9 +203,7 @@ def test_backends_data_es_data_backend_list_method_with_failure(
     backend.close()
 
 
-def test_backends_data_es_data_backend_list_method_without_history(
-    es_backend, monkeypatch
-):
+def test_backends_data_es_list_without_history(es_backend, monkeypatch):
     """Test the `ESDataBackend.list` method without history."""
 
     indices = {"index_1": {"info_1": "foo"}, "index_2": {"info_2": "baz"}}
@@ -224,9 +222,7 @@ def test_backends_data_es_data_backend_list_method_without_history(
     backend.close()
 
 
-def test_backends_data_es_data_backend_list_method_with_details(
-    es_backend, monkeypatch
-):
+def test_backends_data_es_list_with_details(es_backend, monkeypatch):
     """Test the `ESDataBackend.list` method with `details` set to `True`."""
     indices = {"index_1": {"info_1": "foo"}, "index_2": {"info_2": "baz"}}
 
@@ -247,9 +243,7 @@ def test_backends_data_es_data_backend_list_method_with_details(
     backend.close()
 
 
-def test_backends_data_es_data_backend_list_method_with_history(
-    es_backend, caplog, monkeypatch
-):
+def test_backends_data_es_list_with_history(es_backend, caplog, monkeypatch):
     """Test the `ESDataBackend.list` method given `new` argument set to True, should log
     a warning message.
     """
@@ -274,7 +268,7 @@ def test_backends_data_es_data_backend_list_method_with_history(
         (ESConnectionError(""), "Connection error"),
     ],
 )
-def test_backends_data_es_data_backend_read_method_with_failure(  # noqa: PLR0913
+def test_backends_data_es_read_with_failure(  # noqa: PLR0913
     exception, error, es, es_backend, caplog, monkeypatch
 ):
     """Test the `ESDataBackend.read` method, given a request failure, should raise a
@@ -321,9 +315,7 @@ def test_backends_data_es_data_backend_read_method_with_failure(  # noqa: PLR091
     backend.close()
 
 
-def test_backends_data_es_data_backend_read_method_with_ignore_errors(
-    es, es_backend, monkeypatch, caplog
-):
+def test_backends_data_es_read_with_ignore_errors(es, es_backend, monkeypatch, caplog):
     """Test the `ESDataBackend.read` method, given `ignore_errors` set to `True`,
     should log a warning message.
     """
@@ -342,7 +334,7 @@ def test_backends_data_es_data_backend_read_method_with_ignore_errors(
     backend.close()
 
 
-def test_backends_data_es_data_backend_read_method_with_raw_ouput(es, es_backend):
+def test_backends_data_es_read_with_raw_ouput(es, es_backend):
     """Test the `ESDataBackend.read` method with `raw_output` set to `True`."""
 
     backend = es_backend()
@@ -356,7 +348,7 @@ def test_backends_data_es_data_backend_read_method_with_raw_ouput(es, es_backend
     backend.close()
 
 
-def test_backends_data_es_data_backend_read_method_without_raw_ouput(es, es_backend):
+def test_backends_data_es_read_without_raw_ouput(es, es_backend):
     """Test the `ESDataBackend.read` method with `raw_output` set to `False`."""
 
     backend = es_backend()
@@ -370,7 +362,7 @@ def test_backends_data_es_data_backend_read_method_without_raw_ouput(es, es_back
     backend.close()
 
 
-def test_backends_data_es_data_backend_read_method_with_query(es, es_backend, caplog):
+def test_backends_data_es_read_with_query(es, es_backend, caplog):
     """Test the `ESDataBackend.read` method with a query."""
 
     backend = es_backend()
@@ -431,9 +423,7 @@ def test_backends_data_es_data_backend_read_method_with_query(es, es_backend, ca
     backend.close()
 
 
-def test_backends_data_es_data_backend_write_method_with_create_operation(
-    es, es_backend, caplog
-):
+def test_backends_data_es_write_with_create_operation(es, es_backend, caplog):
     """Test the `ESDataBackend.write` method, given an `CREATE` `operation_type`,
     should insert the target documents with the provided data.
     """
@@ -479,7 +469,7 @@ def test_backends_data_es_data_backend_write_method_with_create_operation(
     backend.close()
 
 
-def test_backends_data_es_data_backend_write_method_with_delete_operation(
+def test_backends_data_es_write_with_delete_operation(
     es,
     es_backend,
 ):
@@ -505,7 +495,7 @@ def test_backends_data_es_data_backend_write_method_with_delete_operation(
     backend.close()
 
 
-def test_backends_data_es_data_backend_write_method_with_update_operation(
+def test_backends_data_es_write_with_update_operation(
     es,
     es_backend,
 ):
@@ -550,9 +540,7 @@ def test_backends_data_es_data_backend_write_method_with_update_operation(
     backend.close()
 
 
-def test_backends_data_es_data_backend_write_method_with_append_operation(
-    es_backend, caplog
-):
+def test_backends_data_es_write_with_append_operation(es_backend, caplog):
     """Test the `ESDataBackend.write` method, given an `APPEND` `operation_type`,
     should raise a `BackendParameterException`.
     """
@@ -571,7 +559,7 @@ def test_backends_data_es_data_backend_write_method_with_append_operation(
     backend.close()
 
 
-def test_backends_data_es_data_backend_write_method_with_target(es, es_backend):
+def test_backends_data_es_write_with_target(es, es_backend):
     """Test the `ESDataBackend.write` method, given a target index, should insert
     documents to the corresponding index.
     """
@@ -605,9 +593,7 @@ def test_backends_data_es_data_backend_write_method_with_target(es, es_backend):
     backend.close()
 
 
-def test_backends_data_es_data_backend_write_method_without_ignore_errors(
-    es, es_backend, caplog
-):
+def test_backends_data_es_write_without_ignore_errors(es, es_backend, caplog):
     """Test the `ESDataBackend.write` method with `ignore_errors` set to `False`, given
     badly formatted data, should raise a `BackendException`.
     """
@@ -675,7 +661,7 @@ def test_backends_data_es_data_backend_write_method_without_ignore_errors(
     backend.close()
 
 
-def test_backends_data_es_data_backend_write_method_with_ignore_errors(es, es_backend):
+def test_backends_data_es_write_with_ignore_errors(es, es_backend):
     """Test the `ESDataBackend.write` method with `ignore_errors` set to `True`, given
     badly formatted data, should should skip the invalid data.
     """
@@ -713,9 +699,7 @@ def test_backends_data_es_data_backend_write_method_with_ignore_errors(es, es_ba
     backend.close()
 
 
-def test_backends_data_es_data_backend_write_method_with_datastream(
-    es_data_stream, es_backend
-):
+def test_backends_data_es_write_with_datastream(es_data_stream, es_backend):
     """Test the `ESDataBackend.write` method using a configured data stream."""
 
     data = [{"id": idx, "@timestamp": datetime.now().isoformat()} for idx in range(10)]
@@ -732,9 +716,7 @@ def test_backends_data_es_data_backend_write_method_with_datastream(
     backend.close()
 
 
-def test_backends_data_es_data_backend_close_method_with_failure(
-    es_backend, monkeypatch
-):
+def test_backends_data_es_close_with_failure(es_backend, monkeypatch):
     """Test the `ESDataBackend.close` method."""
 
     backend = es_backend()
@@ -749,7 +731,7 @@ def test_backends_data_es_data_backend_close_method_with_failure(
         backend.close()
 
 
-def test_backends_data_es_data_backend_close_method(es_backend, caplog):
+def test_backends_data_es_close(es_backend, caplog):
     """Test the `ESDataBackend.close` method."""
 
     backend = es_backend()
