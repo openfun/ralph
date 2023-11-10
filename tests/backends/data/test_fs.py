@@ -14,7 +14,7 @@ from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import now
 
 
-def test_backends_data_fs_data_backend_default_instantiation(monkeypatch, fs):
+def test_backends_data_fs_default_instantiation(monkeypatch, fs):
     """Test the `FSDataBackend` default instantiation."""
 
     fs.create_file(".env")
@@ -43,7 +43,7 @@ def test_backends_data_fs_data_backend_default_instantiation(monkeypatch, fs):
     assert backend.default_chunk_size == 1
 
 
-def test_backends_data_fs_data_backend_instantiation_with_settings(fs):
+def test_backends_data_fs_instantiation_with_settings(fs):
     """Test the `FSDataBackend` instantiation with settings."""
 
     deep_path = "deep/directories/path"
@@ -72,9 +72,7 @@ def test_backends_data_fs_data_backend_instantiation_with_settings(fs):
     "mode",
     [0o007, 0o100, 0o200, 0o300, 0o400, 0o500, 0o600],
 )
-def test_backends_data_fs_data_backend_status_method_with_error_status(
-    mode, fs_backend, caplog
-):
+def test_backends_data_fs_status_with_error_status(mode, fs_backend, caplog):
     """Test the `FSDataBackend.status` method, given a directory with wrong
     permissions, should return `DataBackendStatus.ERROR`.
     """
@@ -91,7 +89,7 @@ def test_backends_data_fs_data_backend_status_method_with_error_status(
 
 
 @pytest.mark.parametrize("mode", [0o700])
-def test_backends_data_fs_data_backend_status_method_with_ok_status(mode, fs_backend):
+def test_backends_data_fs_status_with_ok_status(mode, fs_backend):
     """Test the `FSDataBackend.status` method, given a directory with right
     permissions, should return `DataBackendStatus.OK`.
     """
@@ -110,7 +108,7 @@ def test_backends_data_fs_data_backend_status_method_with_ok_status(mode, fs_bac
         (["foo/file_1"], "bar", "Invalid target argument', 'No such file or directory"),
     ],
 )
-def test_backends_data_fs_data_backend_list_method_with_invalid_target(
+def test_backends_data_fs_list_with_invalid_target(
     files, target, error, fs_backend, fs
 ):
     """Test the `FSDataBackend.list` method given an invalid `target` argument should
@@ -144,9 +142,7 @@ def test_backends_data_fs_data_backend_list_method_with_invalid_target(
         (["bar/file_1", "bar/file_2"], "/bar", ["/bar/file_1", "/bar/file_2"]),
     ],
 )
-def test_backends_data_fs_data_backend_list_method_without_history(
-    files, target, expected, fs_backend, fs
-):
+def test_backends_data_fs_list_without_history(files, target, expected, fs_backend, fs):
     """Test the `FSDataBackend.list` method without history."""
 
     for file in files:
@@ -177,9 +173,7 @@ def test_backends_data_fs_data_backend_list_method_without_history(
         (["bar/file_1", "bar/file_2"], "/bar", ["/bar/file_1", "/bar/file_2"]),
     ],
 )
-def test_backends_data_fs_data_backend_list_method_with_details(
-    files, target, expected, fs_backend, fs
-):
+def test_backends_data_fs_list_with_details(files, target, expected, fs_backend, fs):
     """Test the `FSDataBackend.list` method with `details` set to `True`."""
 
     for file in files:
@@ -195,7 +189,7 @@ def test_backends_data_fs_data_backend_list_method_with_details(
     ]
 
 
-def test_backends_data_fs_data_backend_list_method_with_history(fs_backend, fs):
+def test_backends_data_fs_list_with_history(fs_backend, fs):
     """Test the `FSDataBackend.list` method with history."""
 
     # Create 3 files in the default directory.
@@ -270,9 +264,7 @@ def test_backends_data_fs_data_backend_list_method_with_history(fs_backend, fs):
     assert sorted(result) == expected
 
 
-def test_backends_data_fs_data_backend_list_method_with_history_and_details(
-    fs_backend, fs
-):
+def test_backends_data_fs_list_with_history_and_details(fs_backend, fs):
     """Test the `FSDataBackend.list` method with an history and detailed output."""
 
     # Create 3 files in the default directory.
@@ -361,9 +353,7 @@ def test_backends_data_fs_data_backend_list_method_with_history_and_details(
     assert sorted(result, key=itemgetter("path")) == expected
 
 
-def test_backends_data_fs_data_backend_read_method_with_raw_ouput(
-    fs_backend, fs, monkeypatch
-):
+def test_backends_data_fs_read_with_raw_ouput(fs_backend, fs, monkeypatch):
     """Test the `FSDataBackend.read` method with `raw_output` set to `True`."""
 
     # Create files in absolute path directory.
@@ -475,9 +465,7 @@ def test_backends_data_fs_data_backend_read_method_with_raw_ouput(
     ]
 
 
-def test_backends_data_fs_data_backend_read_method_without_raw_output(
-    fs_backend, fs, monkeypatch
-):
+def test_backends_data_fs_read_without_raw_output(fs_backend, fs, monkeypatch):
     """Test the `FSDataBackend.read` method with `raw_output` set to `False`."""
 
     # File contents.
@@ -558,7 +546,7 @@ def test_backends_data_fs_data_backend_read_method_without_raw_output(
     ]
 
 
-def test_backends_data_fs_data_backend_read_method_with_ignore_errors(fs_backend, fs):
+def test_backends_data_fs_read_with_ignore_errors(fs_backend, fs):
     """Test the `FSDataBackend.read` method with `ignore_errors` set to `True`, given
     a file containing invalid JSON lines, should skip the invalid lines.
     """
@@ -600,9 +588,7 @@ def test_backends_data_fs_data_backend_read_method_with_ignore_errors(fs_backend
     assert list(result) == [valid_dictionary]
 
 
-def test_backends_data_fs_data_backend_read_method_without_ignore_errors(
-    fs_backend, fs, monkeypatch
-):
+def test_backends_data_fs_read_without_ignore_errors(fs_backend, fs, monkeypatch):
     """Test the `FSDataBackend.read` method with `ignore_errors` set to `False`, given
     a file containing invalid JSON lines, should raise a `BackendException`.
     """
@@ -683,7 +669,7 @@ def test_backends_data_fs_data_backend_read_method_without_ignore_errors(
     assert len(backend.history) == 1
 
 
-def test_backends_data_fs_data_backend_read_method_with_query(fs_backend, fs):
+def test_backends_data_fs_read_with_query(fs_backend, fs):
     """Test the `FSDataBackend.read` method, given a query argument."""
 
     # File contents.
@@ -737,9 +723,7 @@ def test_backends_data_fs_data_backend_read_method_with_query(fs_backend, fs):
 @pytest.mark.parametrize(
     "operation_type", [None, BaseOperationType.CREATE, BaseOperationType.INDEX]
 )
-def test_backends_data_fs_data_backend_write_method_with_file_exists_error(
-    operation_type, fs_backend, fs
-):
+def test_backends_data_fs_write_with_file_exists_error(operation_type, fs_backend, fs):
     """Test the `FSDataBackend.write` method, given a target matching an
     existing file and a `CREATE` or `INDEX` `operation_type`, should raise a
     `BackendException`.
@@ -761,7 +745,7 @@ def test_backends_data_fs_data_backend_write_method_with_file_exists_error(
     assert not sorted(backend.history, key=itemgetter("id"))
 
 
-def test_backends_data_fs_data_backend_write_method_with_delete_operation(
+def test_backends_data_fs_write_with_delete_operation(
     fs_backend,
 ):
     """Test the `FSDataBackend.write` method, given a `DELETE` `operation_type`, should
@@ -778,9 +762,7 @@ def test_backends_data_fs_data_backend_write_method_with_delete_operation(
     assert not sorted(backend.history, key=itemgetter("id"))
 
 
-def test_backends_data_fs_data_backend_write_method_with_update_operation(
-    fs_backend, fs, monkeypatch
-):
+def test_backends_data_fs_write_with_update_operation(fs_backend, fs, monkeypatch):
     """Test the `FSDataBackend.write` method, given an `UPDATE` `operation_type`,
     should overwrite the target file content with the provided data.
     """
@@ -885,7 +867,7 @@ def test_backends_data_fs_data_backend_write_method_with_update_operation(
         ),
     ],
 )
-def test_backends_data_fs_data_backend_write_method_with_append_operation(
+def test_backends_data_fs_write_with_append_operation(
     data, expected, fs_backend, fs, monkeypatch
 ):
     """Test the `FSDataBackend.write` method, given an `APPEND` `operation_type`,
@@ -937,7 +919,7 @@ def test_backends_data_fs_data_backend_write_method_with_append_operation(
     ]
 
 
-def test_backends_data_fs_data_backend_write_method_with_no_data(fs_backend, caplog):
+def test_backends_data_fs_write_with_no_data(fs_backend, caplog):
     """Test the `FSDataBackend.write` method, given no data, should return 0."""
     backend = fs_backend()
     with caplog.at_level(logging.INFO):
@@ -947,9 +929,7 @@ def test_backends_data_fs_data_backend_write_method_with_no_data(fs_backend, cap
     assert ("ralph.backends.data.fs", logging.INFO, msg) in caplog.record_tuples
 
 
-def test_backends_data_fs_data_backend_write_method_without_target(
-    fs_backend, monkeypatch
-):
+def test_backends_data_fs_write_without_target(fs_backend, monkeypatch):
     """Test the `FSDataBackend.write` method, given no `target` argument,
     should create a new random file and write the provided data into it.
     """
@@ -992,7 +972,7 @@ def test_backends_data_fs_data_backend_write_method_without_target(
     ]
 
 
-def test_backends_data_fs_data_backend_close_method(fs_backend):
+def test_backends_data_fs_close(fs_backend):
     """Test that the `FSDataBackend.close` method raise an error."""
 
     backend = fs_backend()

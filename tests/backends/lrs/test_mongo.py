@@ -13,7 +13,7 @@ from ralph.exceptions import BackendException
 from tests.fixtures.backends import MONGO_TEST_FORWARDING_COLLECTION
 
 
-def test_backends_lrs_mongo_lrs_backend_default_instantiation(monkeypatch, fs):
+def test_backends_lrs_mongo_default_instantiation(monkeypatch, fs):
     """Test the `MongoLRSBackend` default instantiation."""
     fs.create_file(".env")
     monkeypatch.delenv("RALPH_BACKENDS__LRS__MONGO__DEFAULT_COLLECTION", raising=False)
@@ -236,7 +236,7 @@ def test_backends_lrs_mongo_lrs_backend_default_instantiation(monkeypatch, fs):
         ),
     ],
 )
-def test_backends_lrs_mongo_lrs_backend_query_statements_query(
+def test_backends_lrs_mongo_query_statements_query(
     params, expected_query, mongo_lrs_backend, monkeypatch
 ):
     """Test the `MongoLRSBackend.query_statements` method, given valid statement
@@ -258,9 +258,7 @@ def test_backends_lrs_mongo_lrs_backend_query_statements_query(
     backend.close()
 
 
-def test_backends_lrs_mongo_lrs_backend_query_statements_with_success(
-    mongo, mongo_lrs_backend
-):
+def test_backends_lrs_mongo_query_statements_with_success(mongo, mongo_lrs_backend):
     """Test the `MongoLRSBackend.query_statements` method, given a valid search query,
     should return the expected statements.
     """
@@ -302,7 +300,7 @@ def test_backends_lrs_mongo_lrs_backend_query_statements_with_success(
     backend.close()
 
 
-def test_backends_lrs_mongo_lrs_backend_query_statements_with_query_failure(
+def test_backends_lrs_mongo_query_statements_with_query_failure(
     mongo_lrs_backend, monkeypatch, caplog
 ):
     """Test the `MongoLRSBackend.query_statements` method, given a search query failure,
@@ -331,7 +329,7 @@ def test_backends_lrs_mongo_lrs_backend_query_statements_with_query_failure(
     backend.close()
 
 
-def test_backends_lrs_mongo_lrs_backend_query_statements_by_ids_with_query_failure(
+def test_backends_lrs_mongo_query_statements_by_ids_with_query_failure(
     mongo_lrs_backend, monkeypatch, caplog
 ):
     """Test the `MongoLRSBackend.query_statements_by_ids` method, given a search query
@@ -360,7 +358,7 @@ def test_backends_lrs_mongo_lrs_backend_query_statements_by_ids_with_query_failu
     backend.close()
 
 
-def test_backends_lrs_mongo_lrs_backend_query_statements_by_ids_with_two_collections(
+def test_backends_lrs_mongo_query_statements_by_ids_with_two_collections(
     mongo, mongo_forwarding, mongo_lrs_backend
 ):
     """Test the `MongoLRSBackend.query_statements_by_ids` method, given a valid search

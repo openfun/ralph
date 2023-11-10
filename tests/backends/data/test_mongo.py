@@ -24,7 +24,7 @@ from tests.fixtures.backends import (
 )
 
 
-def test_backends_data_mongo_data_backend_default_instantiation(monkeypatch, fs):
+def test_backends_data_mongo_default_instantiation(monkeypatch, fs):
     """Test the `MongoDataBackend` default instantiation."""
 
     fs.create_file(".env")
@@ -59,7 +59,7 @@ def test_backends_data_mongo_data_backend_default_instantiation(monkeypatch, fs)
     backend.close()
 
 
-def test_backends_data_mongo_data_backend_instantiation_with_settings():
+def test_backends_data_mongo_instantiation_with_settings():
     """Test the `MongoDataBackend` instantiation with settings."""
     settings = MongoDataBackend.settings_class(
         CONNECTION_URI=MONGO_TEST_CONNECTION_URI,
@@ -84,7 +84,7 @@ def test_backends_data_mongo_data_backend_instantiation_with_settings():
     backend.close()
 
 
-def test_backends_data_mongo_data_backend_status_with_connection_failure(
+def test_backends_data_mongo_status_with_connection_failure(
     mongo_backend, monkeypatch, caplog
 ):
     """Test the `MongoDataBackend.status` method, given a connection failure, should
@@ -117,7 +117,7 @@ def test_backends_data_mongo_data_backend_status_with_connection_failure(
     ) in caplog.record_tuples
 
 
-def test_backends_data_mongo_data_backend_status_with_error_status(
+def test_backends_data_mongo_status_with_error_status(
     mongo_backend, monkeypatch, caplog
 ):
     """Test the `MongoDataBackend.status` method, given a failed serverStatus command,
@@ -164,7 +164,7 @@ def test_backends_data_mongo_data_backend_status_with_error_status(
     ) in caplog.record_tuples
 
 
-def test_backends_data_mongo_data_backend_status_with_ok_status(mongo_backend):
+def test_backends_data_mongo_status_with_ok_status(mongo_backend):
     """Test the `MongoDataBackend.status` method, given a successful connection and
     serverStatus command, should return `DataBackendStatus.OK`.
     """
@@ -174,7 +174,7 @@ def test_backends_data_mongo_data_backend_status_with_ok_status(mongo_backend):
 
 
 @pytest.mark.parametrize("invalid_character", [" ", ".", "/", '"'])
-def test_backends_data_mongo_data_backend_list_method_with_invalid_target(
+def test_backends_data_mongo_list_with_invalid_target(
     invalid_character, mongo_backend, caplog
 ):
     """Test the `MongoDataBackend.list` method given an invalid `target` argument,
@@ -193,9 +193,7 @@ def test_backends_data_mongo_data_backend_list_method_with_invalid_target(
     backend.close()
 
 
-def test_backends_data_mongo_data_backend_list_method_with_failure(
-    mongo_backend, monkeypatch, caplog
-):
+def test_backends_data_mongo_list_with_failure(mongo_backend, monkeypatch, caplog):
     """Test the `MongoDataBackend.list` method given a failure while retrieving MongoDB
     collections, should raise a `BackendException`.
     """
@@ -215,9 +213,7 @@ def test_backends_data_mongo_data_backend_list_method_with_failure(
     backend.close()
 
 
-def test_backends_data_mongo_data_backend_list_method_without_history(
-    mongo, mongo_backend
-):
+def test_backends_data_mongo_list_without_history(mongo, mongo_backend):
     """Test the `MongoDataBackend.list` method without history."""
 
     backend = mongo_backend()
@@ -234,9 +230,7 @@ def test_backends_data_mongo_data_backend_list_method_without_history(
     backend.close()
 
 
-def test_backends_data_mongo_data_backend_list_method_with_history(
-    mongo_backend, caplog
-):
+def test_backends_data_mongo_list_with_history(mongo_backend, caplog):
     """Test the `MongoDataBackend.list` method given `new` argument set to `True`,
     should log a warning message.
     """
@@ -252,9 +246,7 @@ def test_backends_data_mongo_data_backend_list_method_with_history(
     backend.close()
 
 
-def test_backends_data_mongo_data_backend_read_method_with_raw_output(
-    mongo, mongo_backend
-):
+def test_backends_data_mongo_read_with_raw_output(mongo, mongo_backend):
     """Test the `MongoDataBackend.read` method with `raw_output` set to `True`."""
 
     backend = mongo_backend()
@@ -277,9 +269,7 @@ def test_backends_data_mongo_data_backend_read_method_with_raw_output(
     backend.close()
 
 
-def test_backends_data_mongo_data_backend_read_method_without_raw_output(
-    mongo, mongo_backend
-):
+def test_backends_data_mongo_read_without_raw_output(mongo, mongo_backend):
     """Test the `MongoDataBackend.read` method with `raw_output` set to `False`."""
 
     backend = mongo_backend()
@@ -311,7 +301,7 @@ def test_backends_data_mongo_data_backend_read_method_without_raw_output(
         ("foo..bar", "cannot be empty"),
     ],
 )
-def test_backends_data_mongo_data_backend_read_method_with_invalid_target(
+def test_backends_data_mongo_read_with_invalid_target(
     invalid_target, error, mongo_backend, caplog
 ):
     """Test the `MongoDataBackend.read` method given an invalid `target` argument,
@@ -330,9 +320,7 @@ def test_backends_data_mongo_data_backend_read_method_with_invalid_target(
     backend.close()
 
 
-def test_backends_data_mongo_data_backend_read_method_with_failure(
-    mongo_backend, monkeypatch, caplog
-):
+def test_backends_data_mongo_read_with_failure(mongo_backend, monkeypatch, caplog):
     """Test the `MongoDataBackend.read` method given a MongoClient failure,
     should raise a `BackendException`.
     """
@@ -354,9 +342,7 @@ def test_backends_data_mongo_data_backend_read_method_with_failure(
     backend.close()
 
 
-def test_backends_data_mongo_data_backend_read_method_with_ignore_errors(
-    mongo, mongo_backend, caplog
-):
+def test_backends_data_mongo_read_with_ignore_errors(mongo, mongo_backend, caplog):
     """Test the `MongoDataBackend.read` method with `ignore_errors` set to `True`, given
     a collection containing unparsable documents, should skip the invalid documents.
     """
@@ -389,9 +375,7 @@ def test_backends_data_mongo_data_backend_read_method_with_ignore_errors(
     backend.close()
 
 
-def test_backends_data_mongo_data_backend_read_method_without_ignore_errors(
-    mongo, mongo_backend, caplog
-):
+def test_backends_data_mongo_read_without_ignore_errors(mongo, mongo_backend, caplog):
     """Test the `MongoDataBackend.read` method with `ignore_errors` set to `False`,
     given a collection containing unparsable documents, should raise a
     `BackendException`.
@@ -452,9 +436,7 @@ def test_backends_data_mongo_data_backend_read_method_without_ignore_errors(
         MongoQuery(filter={"id": {"$eq": "bar"}}, projection={"id": 1}),
     ],
 )
-def test_backends_data_mongo_data_backend_read_method_with_query(
-    query, mongo, mongo_backend
-):
+def test_backends_data_mongo_read_with_query(query, mongo, mongo_backend):
     """Test the `MongoDataBackend.read` method given a query argument."""
 
     # Create records
@@ -475,9 +457,7 @@ def test_backends_data_mongo_data_backend_read_method_with_query(
     backend.close()
 
 
-def test_backends_data_mongo_data_backend_write_method_with_target(
-    mongo, mongo_backend
-):
+def test_backends_data_mongo_write_with_target(mongo, mongo_backend):
     """Test the `MongoDataBackend.write` method, given a valid `target` argument, should
     write documents to the target collection.
     """
@@ -502,9 +482,7 @@ def test_backends_data_mongo_data_backend_write_method_with_target(
     backend.close()
 
 
-def test_backends_data_mongo_data_backend_write_method_without_target(
-    mongo, mongo_backend
-):
+def test_backends_data_mongo_write_without_target(mongo, mongo_backend):
     """Test the `MongoDataBackend.write` method, given a no `target` argument, should
     write documents to the default collection.
     """
@@ -525,7 +503,7 @@ def test_backends_data_mongo_data_backend_write_method_without_target(
     backend.close()
 
 
-def test_backends_data_mongo_data_backend_write_method_with_duplicated_key_error(
+def test_backends_data_mongo_write_with_duplicated_key_error(
     mongo, mongo_backend, caplog
 ):
     """Test the `MongoDataBackend.write` method, given documents with duplicated ids,
@@ -579,9 +557,7 @@ def test_backends_data_mongo_data_backend_write_method_with_duplicated_key_error
     backend.close()
 
 
-def test_backends_data_mongo_data_backend_write_method_with_delete_operation(
-    mongo, mongo_backend
-):
+def test_backends_data_mongo_write_with_delete_operation(mongo, mongo_backend):
     """Test the `MongoDataBackend.write` method, given a `DELETE` `operation_type`,
     should delete the provided documents from the MongoDB collection.
     """
@@ -607,7 +583,7 @@ def test_backends_data_mongo_data_backend_write_method_with_delete_operation(
     backend.close()
 
 
-def test_backends_data_mongo_data_backend_write_method_with_delete_operation_failure(
+def test_backends_data_mongo_write_with_delete_operation_failure(
     mongo, mongo_backend, caplog
 ):
     """Test the `MongoDataBackend.write` method with the `DELETE` `operation_type`,
@@ -641,9 +617,7 @@ def test_backends_data_mongo_data_backend_write_method_with_delete_operation_fai
     backend.close()
 
 
-def test_backends_data_mongo_data_backend_write_method_with_update_operation(
-    mongo, mongo_backend
-):
+def test_backends_data_mongo_write_with_update_operation(mongo, mongo_backend):
     """Test the `MongoDataBackend.write` method, given an `UPDATE` `operation_type`,
     should update the provided documents from the MongoDB collection.
     """
@@ -678,7 +652,7 @@ def test_backends_data_mongo_data_backend_write_method_with_update_operation(
     backend.close()
 
 
-def test_backends_data_mongo_data_backend_write_method_with_update_operation_failure(
+def test_backends_data_mongo_write_with_update_operation_failure(
     mongo, mongo_backend, caplog
 ):
     """Test the `MongoDataBackend.write` method with the `UPDATE` `operation_type`,
@@ -736,9 +710,7 @@ def test_backends_data_mongo_data_backend_write_method_with_update_operation_fai
     backend.close()
 
 
-def test_backends_data_mongo_data_backend_write_method_with_append_operation(
-    mongo_backend, caplog
-):
+def test_backends_data_mongo_write_with_append_operation(mongo_backend, caplog):
     """Test the `MongoDataBackend.write` method, given an `APPEND` `operation_type`,
     should raise a `BackendParameterException`.
     """
@@ -752,9 +724,7 @@ def test_backends_data_mongo_data_backend_write_method_with_append_operation(
     backend.close()
 
 
-def test_backends_data_mongo_data_backend_write_method_with_create_operation(
-    mongo, mongo_backend
-):
+def test_backends_data_mongo_write_with_create_operation(mongo, mongo_backend):
     """Test the `MongoDataBackend.write` method, given an `CREATE` `operation_type`,
     should insert the provided documents to the MongoDB collection.
     """
@@ -782,7 +752,7 @@ def test_backends_data_mongo_data_backend_write_method_with_create_operation(
         ),
     ],
 )
-def test_backends_data_mongo_data_backend_write_method_with_invalid_documents(
+def test_backends_data_mongo_write_with_invalid_documents(
     document, error, mongo, mongo_backend, caplog
 ):
     """Test the `MongoDataBackend.write` method, given invalid documents, should raise a
@@ -808,9 +778,7 @@ def test_backends_data_mongo_data_backend_write_method_with_invalid_documents(
     backend.close()
 
 
-def test_backends_data_mongo_data_backend_write_method_with_unparsable_documents(
-    mongo_backend, caplog
-):
+def test_backends_data_mongo_write_with_unparsable_documents(mongo_backend, caplog):
     """Test the `MongoDataBackend.write` method, given unparsable raw documents, should
     raise a `BackendException`.
     """
@@ -833,9 +801,7 @@ def test_backends_data_mongo_data_backend_write_method_with_unparsable_documents
     backend.close()
 
 
-def test_backends_data_mongo_data_backend_write_method_with_no_data(
-    mongo_backend, caplog
-):
+def test_backends_data_mongo_write_with_no_data(mongo_backend, caplog):
     """Test the `MongoDataBackend.write` method, given no documents, should return 0."""
     backend = mongo_backend()
     with caplog.at_level(logging.INFO):
@@ -846,9 +812,7 @@ def test_backends_data_mongo_data_backend_write_method_with_no_data(
     backend.close()
 
 
-def test_backends_data_mongo_data_backend_write_method_with_custom_chunk_size(
-    mongo, mongo_backend
-):
+def test_backends_data_mongo_write_with_custom_chunk_size(mongo, mongo_backend):
     """Test the `MongoDataBackend.write` method, given a custom chunk_size, should
     insert the provided documents to target collection by batches of size `chunk_size`.
     """
@@ -904,9 +868,7 @@ def test_backends_data_mongo_data_backend_write_method_with_custom_chunk_size(
     backend.close()
 
 
-def test_backends_data_mongo_data_backend_close_method_with_failure(
-    mongo_backend, monkeypatch
-):
+def test_backends_data_mongo_close_with_failure(mongo_backend, monkeypatch):
     """Test the `MongoDataBackend.close` method."""
 
     backend = mongo_backend()
@@ -921,7 +883,7 @@ def test_backends_data_mongo_data_backend_close_method_with_failure(
         backend.close()
 
 
-def test_backends_data_mongo_data_backend_close_method(mongo_backend):
+def test_backends_data_mongo_close(mongo_backend):
     """Test the `MongoDataBackend.close` method."""
 
     backend = mongo_backend()

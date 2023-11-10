@@ -26,7 +26,7 @@ from tests.fixtures.backends import (
 )
 
 
-def test_backends_data_clickhouse_data_backend_default_instantiation(monkeypatch, fs):
+def test_backends_data_clickhouse_default_instantiation(monkeypatch, fs):
     """Test the `ClickHouseDataBackend` default instantiation."""
     fs.create_file(".env")
     backend_settings_names = [
@@ -64,7 +64,7 @@ def test_backends_data_clickhouse_data_backend_default_instantiation(monkeypatch
     )
 
 
-def test_backends_data_clickhouse_data_backend_instantiation_with_settings():
+def test_backends_data_clickhouse_instantiation_with_settings():
     """Test the `ClickHouseDataBackend` instantiation."""
     settings = ClickHouseDataBackendSettings(
         HOST=CLICKHOUSE_TEST_HOST,
@@ -88,9 +88,7 @@ def test_backends_data_clickhouse_data_backend_instantiation_with_settings():
     backend.close()
 
 
-def test_backends_data_clickhouse_data_backend_status(
-    clickhouse, clickhouse_backend, monkeypatch
-):
+def test_backends_data_clickhouse_status(clickhouse, clickhouse_backend, monkeypatch):
     """Test the `ClickHouseDataBackend.status` method."""
 
     backend = clickhouse_backend()
@@ -106,9 +104,7 @@ def test_backends_data_clickhouse_data_backend_status(
     backend.close()
 
 
-def test_backends_data_clickhouse_data_backend_read_method_with_raw_output(
-    clickhouse, clickhouse_backend
-):
+def test_backends_data_clickhouse_read_with_raw_output(clickhouse, clickhouse_backend):
     """Test the `ClickHouseDataBackend.read` method."""
 
     # Create records
@@ -144,7 +140,7 @@ def test_backends_data_clickhouse_data_backend_read_method_with_raw_output(
     backend.close()
 
 
-def test_backends_data_clickhouse_data_backend_read_method_with_a_custom_query(
+def test_backends_data_clickhouse_read_with_a_custom_query(
     clickhouse, clickhouse_backend
 ):
     """Test the `ClickHouseDataBackend.read` method with a custom query."""
@@ -221,7 +217,7 @@ def test_backends_data_clickhouse_data_backend_read_method_with_a_custom_query(
     backend.close()
 
 
-def test_backends_data_clickhouse_data_backend_read_method_with_failures(
+def test_backends_data_clickhouse_read_with_failures(
     monkeypatch, caplog, clickhouse, clickhouse_backend
 ):
     """Test the `ClickHouseDataBackend.read` method with failures."""
@@ -295,9 +291,7 @@ def test_backends_data_clickhouse_data_backend_read_method_with_failures(
     backend.close()
 
 
-def test_backends_data_clickhouse_data_backend_list_method(
-    clickhouse, clickhouse_backend
-):
+def test_backends_data_clickhouse_list(clickhouse, clickhouse_backend):
     """Test the `ClickHouseDataBackend.list` method."""
 
     backend = clickhouse_backend()
@@ -307,7 +301,7 @@ def test_backends_data_clickhouse_data_backend_list_method(
     backend.close()
 
 
-def test_backends_data_clickhouse_data_backend_list_method_with_failure(
+def test_backends_data_clickhouse_list_with_failure(
     monkeypatch, caplog, clickhouse, clickhouse_backend
 ):
     """Test the `ClickHouseDataBackend.list` method with a failure."""
@@ -336,7 +330,7 @@ def test_backends_data_clickhouse_data_backend_list_method_with_failure(
     backend.close()
 
 
-def test_backends_data_clickhouse_data_backend_write_method_with_invalid_timestamp(
+def test_backends_data_clickhouse_write_with_invalid_timestamp(
     clickhouse, clickhouse_backend
 ):
     """Test the `ClickHouseDataBackend.write` method with an invalid timestamp."""
@@ -365,9 +359,7 @@ def test_backends_data_clickhouse_data_backend_write_method_with_invalid_timesta
     backend.close()
 
 
-def test_backends_data_clickhouse_data_backend_write_method_no_timestamp(
-    caplog, clickhouse_backend
-):
+def test_backends_data_clickhouse_write_no_timestamp(caplog, clickhouse_backend):
     """Test the `ClickHouseDataBackend.write` method when a statement has no
     timestamp.
     """
@@ -411,7 +403,7 @@ def test_backends_data_clickhouse_data_backend_write_method_no_timestamp(
     backend.close()
 
 
-def test_backends_data_clickhouse_data_backend_write_method_with_duplicated_key(
+def test_backends_data_clickhouse_write_with_duplicated_key(
     clickhouse, clickhouse_backend
 ):
     """Test the `ClickHouseDataBackend.write` method with duplicated key
@@ -436,9 +428,7 @@ def test_backends_data_clickhouse_data_backend_write_method_with_duplicated_key(
     backend.close()
 
 
-def test_backends_data_clickhouse_data_backend_write_method_chunks_on_error(
-    clickhouse, clickhouse_backend
-):
+def test_backends_data_clickhouse_write_chunks_on_error(clickhouse, clickhouse_backend):
     """Test the `ClickHouseDataBackend.write` method imports partial chunks
     while raising BulkWriteError and ignoring errors.
     """
@@ -460,9 +450,7 @@ def test_backends_data_clickhouse_data_backend_write_method_chunks_on_error(
     backend.close()
 
 
-def test_backends_data_clickhouse_data_backend_write_method(
-    clickhouse, clickhouse_backend
-):
+def test_backends_data_clickhouse_write(clickhouse, clickhouse_backend):
     """Test the `ClickHouseDataBackend.write` method."""
 
     sql = f"""SELECT count(*) FROM {CLICKHOUSE_TEST_TABLE_NAME}"""
@@ -502,9 +490,7 @@ def test_backends_data_clickhouse_data_backend_write_method(
     backend.close()
 
 
-def test_backends_data_clickhouse_data_backend_write_method_bytes(
-    clickhouse, clickhouse_backend
-):
+def test_backends_data_clickhouse_write_bytes(clickhouse, clickhouse_backend):
     """Test the `ClickHouseDataBackend.write` method."""
 
     sql = f"""SELECT count(*) FROM {CLICKHOUSE_TEST_TABLE_NAME}"""
@@ -549,9 +535,7 @@ def test_backends_data_clickhouse_data_backend_write_method_bytes(
     backend.close()
 
 
-def test_backends_data_clickhouse_data_backend_write_method_bytes_failed(
-    clickhouse, clickhouse_backend
-):
+def test_backends_data_clickhouse_write_bytes_failed(clickhouse, clickhouse_backend):
     """Test the `ClickHouseDataBackend.write` method."""
 
     sql = f"""SELECT count(*) FROM {CLICKHOUSE_TEST_TABLE_NAME}"""
@@ -581,9 +565,7 @@ def test_backends_data_clickhouse_data_backend_write_method_bytes_failed(
     backend.close()
 
 
-def test_backends_data_clickhouse_data_backend_write_method_empty(
-    clickhouse, clickhouse_backend
-):
+def test_backends_data_clickhouse_write_empty(clickhouse, clickhouse_backend):
     """Test the `ClickHouseDataBackend.write` method."""
 
     sql = f"""SELECT count(*) FROM {CLICKHOUSE_TEST_TABLE_NAME}"""
@@ -600,7 +582,7 @@ def test_backends_data_clickhouse_data_backend_write_method_empty(
     backend.close()
 
 
-def test_backends_data_clickhouse_data_backend_write_method_wrong_operation_type(
+def test_backends_data_clickhouse_write_wrong_operation_type(
     clickhouse, clickhouse_backend
 ):
     """Test the `ClickHouseDataBackend.write` method."""
@@ -627,7 +609,7 @@ def test_backends_data_clickhouse_data_backend_write_method_wrong_operation_type
     backend.close()
 
 
-def test_backends_data_clickhouse_data_backend_write_method_with_custom_chunk_size(
+def test_backends_data_clickhouse_write_with_custom_chunk_size(
     clickhouse, clickhouse_backend
 ):
     """Test the `ClickHouseDataBackend.write` method with a custom chunk_size."""
@@ -669,9 +651,7 @@ def test_backends_data_clickhouse_data_backend_write_method_with_custom_chunk_si
     backend.close()
 
 
-def test_backends_data_clickhouse_data_backend_close_method_with_failure(
-    clickhouse_backend, monkeypatch
-):
+def test_backends_data_clickhouse_close_with_failure(clickhouse_backend, monkeypatch):
     """Test the `ClickHouseDataBackend.close` method with failure."""
 
     backend = clickhouse_backend()
@@ -686,7 +666,7 @@ def test_backends_data_clickhouse_data_backend_close_method_with_failure(
         backend.close()
 
 
-def test_backends_data_clickhouse_data_backend_close_method(clickhouse_backend, caplog):
+def test_backends_data_clickhouse_close(clickhouse_backend, caplog):
     """Test the `ClickHouseDataBackend.close` method."""
 
     backend = clickhouse_backend()

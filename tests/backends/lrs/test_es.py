@@ -15,7 +15,7 @@ from ralph.exceptions import BackendException
 from tests.fixtures.backends import ES_TEST_FORWARDING_INDEX, ES_TEST_INDEX
 
 
-def test_backends_lrs_es_lrs_backend_default_instantiation(monkeypatch, fs):
+def test_backends_lrs_es_default_instantiation(monkeypatch, fs):
     """Test the `ESLRSBackend` default instantiation."""
     fs.create_file(".env")
     monkeypatch.delenv("RALPH_BACKENDS__LRS__ES__DEFAULT_INDEX", raising=False)
@@ -266,7 +266,7 @@ def test_backends_lrs_es_lrs_backend_default_instantiation(monkeypatch, fs):
         ),
     ],
 )
-def test_backends_lrs_es_lrs_backend_query_statements_query(
+def test_backends_lrs_es_query_statements_query(
     params, expected_query, es_lrs_backend, monkeypatch
 ):
     """Test the `ESLRSBackend.query_statements` method, given valid statement
@@ -291,7 +291,7 @@ def test_backends_lrs_es_lrs_backend_query_statements_query(
     backend.close()
 
 
-def test_backends_lrs_es_lrs_backend_query_statements(es, es_lrs_backend):
+def test_backends_lrs_es_query_statements(es, es_lrs_backend):
     """Test the `ESLRSBackend.query_statements` method, given a query,
     should return matching statements.
     """
@@ -310,7 +310,7 @@ def test_backends_lrs_es_lrs_backend_query_statements(es, es_lrs_backend):
     backend.close()
 
 
-def test_backends_lrs_es_lrs_backend_query_statements_with_search_query_failure(
+def test_backends_lrs_es_query_statements_with_search_query_failure(
     es, es_lrs_backend, monkeypatch, caplog
 ):
     """Test the `ESLRSBackend.query_statements`, given a search query failure, should
@@ -338,7 +338,7 @@ def test_backends_lrs_es_lrs_backend_query_statements_with_search_query_failure(
     backend.close()
 
 
-def test_backends_lrs_es_lrs_backend_query_statements_by_ids_with_search_query_failure(
+def test_backends_lrs_es_query_statements_by_ids_with_search_query_failure(
     es, es_lrs_backend, monkeypatch, caplog
 ):
     """Test the `ESLRSBackend.query_statements_by_ids` method, given a search query
@@ -366,7 +366,7 @@ def test_backends_lrs_es_lrs_backend_query_statements_by_ids_with_search_query_f
     backend.close()
 
 
-def test_backends_lrs_es_lrs_backend_query_statements_by_ids_with_multiple_indexes(
+def test_backends_lrs_es_query_statements_by_ids_with_multiple_indexes(
     es, es_forwarding, es_lrs_backend
 ):
     """Test the `ESLRSBackend.query_statements_by_ids` method, given a valid search

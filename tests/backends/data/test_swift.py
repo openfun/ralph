@@ -17,7 +17,7 @@ from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import now
 
 
-def test_backends_data_swift_data_backend_default_instantiation(monkeypatch, fs):
+def test_backends_data_swift_default_instantiation(monkeypatch, fs):
     """Test the `SwiftDataBackend` default instantiation."""
 
     fs.create_file(".env")
@@ -59,7 +59,7 @@ def test_backends_data_swift_data_backend_default_instantiation(monkeypatch, fs)
     backend.close()
 
 
-def test_backends_data_swift_data_backend_instantiation_with_settings(fs):
+def test_backends_data_swift_instantiation_with_settings(fs):
     """Test the `SwiftDataBackend` instantiation with settings."""
 
     fs.create_file(".env")
@@ -94,7 +94,7 @@ def test_backends_data_swift_data_backend_instantiation_with_settings(fs):
     backend.close()
 
 
-def test_backends_data_swift_data_backend_status_method_with_error_status(
+def test_backends_data_swift_status_with_error_status(
     monkeypatch, swift_backend, caplog
 ):
     """Test the `SwiftDataBackend.status` method, given a failed connection,
@@ -121,9 +121,7 @@ def test_backends_data_swift_data_backend_status_method_with_error_status(
     backend.close()
 
 
-def test_backends_data_swift_data_backend_status_method_with_ok_status(
-    monkeypatch, swift_backend, caplog
-):
+def test_backends_data_swift_status_with_ok_status(monkeypatch, swift_backend, caplog):
     """Test the `SwiftDataBackend.status` method, given a directory with wrong
     permissions, should return `DataBackendStatus.OK`.
     """
@@ -143,9 +141,7 @@ def test_backends_data_swift_data_backend_status_method_with_ok_status(
     backend.close()
 
 
-def test_backends_data_swift_data_backend_list_method(
-    swift_backend, monkeypatch, fs, settings_fs
-):
+def test_backends_data_swift_list(swift_backend, monkeypatch, fs, settings_fs):
     """Test that the `SwiftDataBackend.list` method argument should list
     the default container.
     """
@@ -201,7 +197,7 @@ def test_backends_data_swift_data_backend_list_method(
     backend.close()
 
 
-def test_backends_data_swift_data_backend_list_with_failed_details(
+def test_backends_data_swift_list_with_failed_details(
     swift_backend, monkeypatch, fs, caplog, settings_fs
 ):
     """Test that the `SwiftDataBackend.list` method with a failed connection
@@ -240,7 +236,7 @@ def test_backends_data_swift_data_backend_list_with_failed_details(
     backend.close()
 
 
-def test_backends_data_swift_data_backend_list_with_failed_connection(
+def test_backends_data_swift_list_with_failed_connection(
     swift_backend, monkeypatch, fs, caplog, settings_fs
 ):
     """Test that the `SwiftDataBackend.list` method with a failed connection
@@ -269,7 +265,7 @@ def test_backends_data_swift_data_backend_list_with_failed_connection(
     backend.close()
 
 
-def test_backends_data_swift_data_backend_read_method_with_raw_output(
+def test_backends_data_swift_read_with_raw_output(
     swift_backend, monkeypatch, fs, settings_fs
 ):
     """Test the `SwiftDataBackend.read` method with `raw_output` set to `True`."""
@@ -330,7 +326,7 @@ def test_backends_data_swift_data_backend_read_method_with_raw_output(
     backend.close()
 
 
-def test_backends_data_swift_data_backend_read_method_without_raw_output(
+def test_backends_data_swift_read_without_raw_output(
     swift_backend, monkeypatch, fs, settings_fs
 ):
     """Test the `SwiftDataBackend.read` method with `raw_output` set to `False`."""
@@ -369,7 +365,7 @@ def test_backends_data_swift_data_backend_read_method_without_raw_output(
     backend.close()
 
 
-def test_backends_data_swift_data_backend_read_method_with_invalid_query(swift_backend):
+def test_backends_data_swift_read_with_invalid_query(swift_backend):
     """Test the `SwiftDataBackend.read` method given an invalid `query` argument should
     raise a `BackendParameterException`.
     """
@@ -381,7 +377,7 @@ def test_backends_data_swift_data_backend_read_method_with_invalid_query(swift_b
     backend.close()
 
 
-def test_backends_data_swift_data_backend_read_method_with_ignore_errors(
+def test_backends_data_swift_read_with_ignore_errors(
     monkeypatch, swift_backend, fs, settings_fs
 ):
     """Test the `SwiftDataBackend.read` method with `ignore_errors` set to `True`,
@@ -427,7 +423,7 @@ def test_backends_data_swift_data_backend_read_method_with_ignore_errors(
     backend.close()
 
 
-def test_backends_data_swift_data_backend_read_method_without_ignore_errors(
+def test_backends_data_swift_read_without_ignore_errors(
     monkeypatch, swift_backend, fs, settings_fs
 ):
     """Test the `SwiftDataBackend.read` method with `ignore_errors` set to `False`,
@@ -483,7 +479,7 @@ def test_backends_data_swift_data_backend_read_method_without_ignore_errors(
     backend.close()
 
 
-def test_backends_data_swift_data_backend_read_method_with_failed_connection(
+def test_backends_data_swift_read_with_failed_connection(
     caplog, monkeypatch, swift_backend
 ):
     """Test the `SwiftDataBackend.read` method, given a `ClientException` raised by
@@ -510,7 +506,7 @@ def test_backends_data_swift_data_backend_read_method_with_failed_connection(
 @pytest.mark.parametrize(
     "operation_type", [None, BaseOperationType.CREATE, BaseOperationType.INDEX]
 )
-def test_backends_data_swift_data_backend_write_method_with_file_exists_error(
+def test_backends_data_swift_write_with_file_exists_error(
     operation_type, swift_backend, monkeypatch, fs, settings_fs
 ):
     """Test the `SwiftDataBackend.write` method, given a target matching an
@@ -541,7 +537,7 @@ def test_backends_data_swift_data_backend_write_method_with_file_exists_error(
     backend.close()
 
 
-def test_backends_data_swift_data_backend_write_method_with_failed_connection(
+def test_backends_data_swift_write_with_failed_connection(
     monkeypatch, swift_backend, fs, settings_fs
 ):
     """Test the `SwiftDataBackend.write` method, given a failed connection, should
@@ -581,7 +577,7 @@ def test_backends_data_swift_data_backend_write_method_with_failed_connection(
         BaseOperationType.UPDATE,
     ],
 )
-def test_backends_data_swift_data_backend_write_method_with_invalid_operation(
+def test_backends_data_swift_write_with_invalid_operation(
     operation_type,
     swift_backend,
     fs,
@@ -601,7 +597,7 @@ def test_backends_data_swift_data_backend_write_method_with_invalid_operation(
     backend.close()
 
 
-def test_backends_data_swift_data_backend_write_method_without_target(
+def test_backends_data_swift_write_without_target(
     swift_backend, monkeypatch, fs, settings_fs
 ):
     """Test the `SwiftDataBackend.write` method, given no target, should write
@@ -657,9 +653,7 @@ def test_backends_data_swift_data_backend_write_method_without_target(
     backend.close()
 
 
-def test_backends_data_swift_data_backend_close_method_with_failure(
-    swift_backend, monkeypatch
-):
+def test_backends_data_swift_close_with_failure(swift_backend, monkeypatch):
     """Test the `SwiftDataBackend.close` method."""
 
     backend = swift_backend()
@@ -674,7 +668,7 @@ def test_backends_data_swift_data_backend_close_method_with_failure(
         backend.close()
 
 
-def test_backends_data_swift_data_backend_close_method(swift_backend, caplog):
+def test_backends_data_swift_close(swift_backend, caplog):
     """Test the `SwiftDataBackend.close` method."""
 
     backend = swift_backend()

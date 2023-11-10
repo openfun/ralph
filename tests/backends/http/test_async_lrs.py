@@ -34,7 +34,7 @@ async def _unpack_async_generator(async_gen):
     return result
 
 
-def test_backend_http_lrs_default_instantiation(monkeypatch, fs):
+def test_backends_http_async_lrs_default_instantiation(monkeypatch, fs):
     """Test the `LRSHTTPBackend` default instantiation."""
     fs.create_file(".env")
     backend_settings_names = [
@@ -64,7 +64,7 @@ def test_backend_http_lrs_default_instantiation(monkeypatch, fs):
     assert backend.auth == ("foo", "secret")
 
 
-def test_backends_http_lrs_http_instantiation():
+def test_backends_http_async_lrs_instantiation():
     """Test the LRS backend default instantiation."""
 
     headers = LRSHeaders(
@@ -92,7 +92,7 @@ def test_backends_http_lrs_http_instantiation():
 
 
 @pytest.mark.anyio
-async def test_backends_http_lrs_status_with_successful_request(
+async def test_backends_http_async_lrs_status_with_successful_request(
     httpx_mock: HTTPXMock,
 ):
     """Test the LRS backend status method returns `OK` when the request is
@@ -119,7 +119,7 @@ async def test_backends_http_lrs_status_with_successful_request(
 
 
 @pytest.mark.anyio
-async def test_backends_http_lrs_status_with_request_error(
+async def test_backends_http_async_lrs_status_with_request_error(
     httpx_mock: HTTPXMock, caplog
 ):
     """Test the LRS backend status method returns `AWAY` when a `RequestError`
@@ -151,7 +151,7 @@ async def test_backends_http_lrs_status_with_request_error(
 
 
 @pytest.mark.anyio
-async def test_backends_http_lrs_status_with_http_status_error(
+async def test_backends_http_async_lrs_status_with_http_status_error(
     httpx_mock: HTTPXMock, caplog
 ):
     """Test the LRS backend status method returns `ERROR` when an `HTTPStatusError`
@@ -185,7 +185,7 @@ async def test_backends_http_lrs_status_with_http_status_error(
 
 
 @pytest.mark.anyio
-async def test_backends_http_lrs_list(caplog):
+async def test_backends_http_async_lrs_list(caplog):
     """Test the LRS backend `list` method raises a `NotImplementedError`."""
 
     base_url = "http://fake-lrs.com"
@@ -218,7 +218,7 @@ async def test_backends_http_lrs_list(caplog):
 
 @pytest.mark.parametrize("max_statements", [None, 2, 4, 8])
 @pytest.mark.anyio
-async def test_backends_http_lrs_read_max_statements(
+async def test_backends_http_async_lrs_read_max_statements(
     httpx_mock: HTTPXMock, max_statements: int
 ):
     """Test the LRS backend `read` method `max_statements` property."""
@@ -291,7 +291,7 @@ async def test_backends_http_lrs_read_max_statements(
 
 @pytest.mark.parametrize("greedy", [False, True])
 @pytest.mark.anyio
-async def test_backends_http_lrs_read_without_target(
+async def test_backends_http_async_lrs_read_without_target(
     httpx_mock: HTTPXMock, greedy: bool
 ):
     """Test that the LRS backend `read` method without target parameter value fetches
@@ -333,7 +333,7 @@ async def test_backends_http_lrs_read_without_target(
 
 @pytest.mark.anyio
 @pytest.mark.parametrize("greedy", [False, True])
-async def test_backends_http_lrs_read_backend_error(
+async def test_backends_http_async_lrs_read_backend_error(
     httpx_mock: HTTPXMock, caplog, greedy: bool
 ):
     """Test the LRS backend `read` method raises a `BackendException` when the server
@@ -380,7 +380,7 @@ async def test_backends_http_lrs_read_backend_error(
 
 @pytest.mark.anyio
 @pytest.mark.parametrize("greedy", [False, True])
-async def test_backends_http_lrs_read_without_pagination(
+async def test_backends_http_async_lrs_read_without_pagination(
     httpx_mock: HTTPXMock, greedy: bool
 ):
     """Test the LRS backend `read` method when the request on the target endpoint
@@ -479,7 +479,7 @@ async def test_backends_http_lrs_read_without_pagination(
 
 
 @pytest.mark.anyio
-async def test_backends_http_lrs_read_with_pagination(httpx_mock: HTTPXMock):
+async def test_backends_http_async_lrs_read_with_pagination(httpx_mock: HTTPXMock):
     """Test the LRS backend `read` method when the request on the target endpoint
     returns statements with pagination."""
 
@@ -641,7 +641,7 @@ async def test_backends_http_lrs_read_with_pagination(httpx_mock: HTTPXMock):
         (2, True, None),
     ],
 )
-async def test_backends_http_lrs_write_without_operation(
+async def test_backends_http_async_lrs_write_without_operation(
     httpx_mock: HTTPXMock, caplog, chunk_size, simultaneous, max_num_simultaneous
 ):
     """Test the LRS backend `write` method, given no operation_type should POST to
@@ -689,7 +689,7 @@ async def test_backends_http_lrs_write_without_operation(
 
 
 @pytest.mark.anyio
-async def test_backends_http_lrs_write_without_data(caplog):
+async def test_backends_http_async_lrs_write_without_data(caplog):
     """Test the LRS backend `write` method returns null when no data to write
     in the target endpoint are given.
     """
@@ -725,7 +725,7 @@ async def test_backends_http_lrs_write_without_data(caplog):
     ],
 )
 @pytest.mark.anyio
-async def test_backends_http_lrs_write_with_unsupported_operation(
+async def test_backends_http_async_lrs_write_with_unsupported_operation(
     operation_type, caplog, error_msg
 ):
     """Test the LRS backend `write` method, given an unsupported` `operation_type`,
@@ -763,7 +763,7 @@ async def test_backends_http_lrs_write_with_unsupported_operation(
     ],
 )
 @pytest.mark.anyio
-async def test_backends_http_lrs_write_with_invalid_parameters(
+async def test_backends_https_async_lrs_write_with_invalid_parameters(
     caplog, simultaneous, max_num_simultaneous, error_msg
 ):
     """Test the LRS backend `write` method, given invalid_parameters
@@ -797,7 +797,9 @@ async def test_backends_http_lrs_write_with_invalid_parameters(
 
 
 @pytest.mark.anyio
-async def test_backends_http_lrs_write_without_target(httpx_mock: HTTPXMock, caplog):
+async def test_backends_https_async_lrs_write_without_target(
+    httpx_mock: HTTPXMock, caplog
+):
     """Test the LRS backend `write` method without target parameter value writes
     statements to '/xAPI/statements' default endpoint.
     """
@@ -834,7 +836,7 @@ async def test_backends_http_lrs_write_without_target(httpx_mock: HTTPXMock, cap
 
 
 @pytest.mark.anyio
-async def test_backends_http_lrs_write_with_create_or_index_operation(
+async def test_backends_https_async_lrs_write_with_create_or_index_operation(
     httpx_mock: HTTPXMock, caplog
 ):
     """Test the `LRSHTTP.write` method with `CREATE` or `INDEX` operation_type writes
@@ -870,7 +872,7 @@ async def test_backends_http_lrs_write_with_create_or_index_operation(
 
 
 @pytest.mark.anyio
-async def test_backends_http_lrs_write_backend_exception(
+async def test_backends_https_async_lrs_write_backend_exception(
     httpx_mock: HTTPXMock,
     caplog,
 ):
@@ -909,7 +911,7 @@ async def test_backends_http_lrs_write_backend_exception(
 @pytest.mark.parametrize(
     "num_pages,chunk_size,network_latency_time", [(3, 3, 0.2), (10, 3, 0.2)]
 )
-async def test_backends_http_lrs_read_concurrency(
+async def test_backends_https_async_lrs_read_concurrency(
     httpx_mock: HTTPXMock, num_pages, chunk_size, network_latency_time
 ):
     """Test concurrency performances in `read`, for development use.
@@ -1004,7 +1006,7 @@ async def test_backends_http_lrs_read_concurrency(
 
 @pytest.mark.skip(reason="Timing based tests are too unstable to run in CI")
 @pytest.mark.anyio
-async def test_backends_http_lrs_write_concurrency(
+async def test_backends_https_async_lrs_write_concurrency(
     httpx_mock: HTTPXMock,
 ):
     """Test concurrency performances in `write`, for development use."""

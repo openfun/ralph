@@ -13,7 +13,7 @@ from ralph.exceptions import BackendException
 from tests.fixtures.backends import MONGO_TEST_FORWARDING_COLLECTION
 
 
-def test_backends_lrs_async_mongo_lrs_backend_default_instantiation(monkeypatch, fs):
+def test_backends_lrs_async_mongo_default_instantiation(monkeypatch, fs):
     """Test the `AsyncMongoLRSBackend` default instantiation."""
     fs.create_file(".env")
     monkeypatch.delenv("RALPH_BACKENDS__LRS__MONGO__DEFAULT_COLLECTION", raising=False)
@@ -237,7 +237,7 @@ def test_backends_lrs_async_mongo_lrs_backend_default_instantiation(monkeypatch,
     ],
 )
 @pytest.mark.anyio
-async def test_backends_lrs_async_mongo_lrs_backend_query_statements_query(
+async def test_backends_lrs_async_mongo_query_statements_query(
     params, expected_query, async_mongo_lrs_backend, monkeypatch
 ):
     """Test the `AsyncMongoLRSBackend.query_statements` method, given valid statement
@@ -261,7 +261,7 @@ async def test_backends_lrs_async_mongo_lrs_backend_query_statements_query(
 
 
 @pytest.mark.anyio
-async def test_backends_lrs_async_mongo_lrs_backend_query_statements_with_success(
+async def test_backends_lrs_async_mongo_query_statements_with_success(
     mongo, async_mongo_lrs_backend
 ):
     """Test the `AsyncMongoLRSBackend.query_statements` method, given a valid search
@@ -305,7 +305,7 @@ async def test_backends_lrs_async_mongo_lrs_backend_query_statements_with_succes
 
 
 @pytest.mark.anyio
-async def test_backends_lrs_async_mongo_lrs_backend_query_statements_with_query_failure(
+async def test_backends_lrs_async_mongo_query_statements_with_query_failure(
     async_mongo_lrs_backend, monkeypatch, caplog
 ):
     """Test the `AsyncMongoLRSBackend.query_statements` method, given a search query
@@ -334,7 +334,7 @@ async def test_backends_lrs_async_mongo_lrs_backend_query_statements_with_query_
 
 
 @pytest.mark.anyio
-async def test_backends_lrs_mongo_lrs_backend_query_statements_by_ids_query_failure(
+async def test_backends_lrs_mongo_query_statements_by_ids_query_failure(
     async_mongo_lrs_backend, monkeypatch, caplog
 ):
     """Test the `AsyncMongoLRSBackend.query_statements_by_ids` method, given a search
@@ -368,7 +368,7 @@ async def test_backends_lrs_mongo_lrs_backend_query_statements_by_ids_query_fail
 
 
 @pytest.mark.anyio
-async def test_backends_lrs_mongo_lrs_backend_query_statements_by_ids_two_collections(
+async def test_backends_lrs_mongo_query_statements_by_ids_two_collections(
     mongo, mongo_forwarding, async_mongo_lrs_backend
 ):
     """Test the `AsyncMongoLRSBackend.query_statements_by_ids` method, given a valid

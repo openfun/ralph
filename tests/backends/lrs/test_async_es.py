@@ -15,7 +15,7 @@ from ralph.exceptions import BackendException
 from tests.fixtures.backends import ES_TEST_FORWARDING_INDEX, ES_TEST_INDEX
 
 
-def test_backends_lrs_async_es_lrs_backend_default_instantiation(monkeypatch, fs):
+def test_backends_lrs_async_es_default_instantiation(monkeypatch, fs):
     """Test the `ESLRSBackend` default instantiation."""
     fs.create_file(".env")
     monkeypatch.delenv("RALPH_BACKENDS__LRS__ES__DEFAULT_INDEX", raising=False)
@@ -267,7 +267,7 @@ def test_backends_lrs_async_es_lrs_backend_default_instantiation(monkeypatch, fs
     ],
 )
 @pytest.mark.anyio
-async def test_backends_lrs_async_es_lrs_backend_query_statements_query(
+async def test_backends_lrs_async_es_query_statements_query(
     params, expected_query, async_es_lrs_backend, monkeypatch
 ):
     """Test the `AsyncESLRSBackend.query_statements` method, given valid statement
@@ -293,9 +293,7 @@ async def test_backends_lrs_async_es_lrs_backend_query_statements_query(
 
 
 @pytest.mark.anyio
-async def test_backends_lrs_async_es_lrs_backend_query_statements(
-    es, async_es_lrs_backend
-):
+async def test_backends_lrs_async_es_query_statements(es, async_es_lrs_backend):
     """Test the `AsyncESLRSBackend.query_statements` method, given a query,
     should return matching statements.
     """
@@ -315,7 +313,7 @@ async def test_backends_lrs_async_es_lrs_backend_query_statements(
 
 
 @pytest.mark.anyio
-async def test_backends_lrs_async_es_lrs_backend_query_statements_pit_query_failure(
+async def test_backends_lrs_async_es_query_statements_pit_query_failure(
     es, async_es_lrs_backend, monkeypatch, caplog
 ):
     """Test the `AsyncESLRSBackend.query_statements` method, given a point in time
@@ -345,7 +343,7 @@ async def test_backends_lrs_async_es_lrs_backend_query_statements_pit_query_fail
 
 
 @pytest.mark.anyio
-async def test_backends_lrs_es_lrs_backend_query_statements_by_ids_search_query_failure(
+async def test_backends_lrs_es_query_statements_by_ids_search_query_failure(
     es, async_es_lrs_backend, monkeypatch, caplog
 ):
     """Test the `AsyncESLRSBackend.query_statements_by_ids` method, given a search
@@ -379,7 +377,7 @@ async def test_backends_lrs_es_lrs_backend_query_statements_by_ids_search_query_
 
 
 @pytest.mark.anyio
-async def test_backends_lrs_async_es_lrs_backend_query_statements_by_ids_many_indexes(
+async def test_backends_lrs_async_es_query_statements_by_ids_many_indexes(
     es, es_forwarding, async_es_lrs_backend
 ):
     """Test the `AsyncESLRSBackend.query_statements_by_ids` method, given a valid

@@ -10,7 +10,7 @@ from ralph.backends.stream.ws import WSStreamBackend, WSStreamBackendSettings
 from tests.fixtures.backends import WS_TEST_HOST, WS_TEST_PORT
 
 
-def test_backends_stream_ws_stream_default_instantiation(monkeypatch, fs):
+def test_backends_stream_ws_default_instantiation(monkeypatch, fs):
     """Test the `WSStreamBackend` instantiation."""
 
     fs.create_file(".env")
@@ -28,7 +28,7 @@ def test_backends_stream_ws_stream_default_instantiation(monkeypatch, fs):
     assert backend.settings.URI == uri
 
 
-def test_backends_stream_ws_stream_stream(ws, monkeypatch, events):
+def test_backends_stream_ws_stream(ws, monkeypatch, events):
     """Test the `WSStreamBackend` stream method."""
 
     settings = WSStreamBackendSettings(URI=f"ws://{WS_TEST_HOST}:{WS_TEST_PORT}")
@@ -53,7 +53,7 @@ def test_backends_stream_ws_stream_stream(ws, monkeypatch, events):
     assert streamed_events == events
 
 
-def test_backends_stream_ws_stream_stream_when_server_stops(ws, monkeypatch, events):
+def test_backends_stream_ws_stream_when_server_stops(ws, monkeypatch, events):
     """Test the WSStreamBackend stream method when the websocket server stops."""
 
     settings = WSStreamBackendSettings(URI=f"ws://{WS_TEST_HOST}:{WS_TEST_PORT}")

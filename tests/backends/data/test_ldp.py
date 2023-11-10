@@ -20,7 +20,7 @@ from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import now
 
 
-def test_backends_data_ldp_data_backend_default_instantiation(monkeypatch, fs):
+def test_backends_data_ldp_default_instantiation(monkeypatch, fs):
     """Test the `LDPDataBackend` default instantiation."""
 
     fs.create_file(".env")
@@ -50,7 +50,7 @@ def test_backends_data_ldp_data_backend_default_instantiation(monkeypatch, fs):
     assert backend.service_name == "foo"
 
 
-def test_backends_data_ldp_data_backend_instantiation_with_settings(ldp_backend):
+def test_backends_data_ldp_instantiation_with_settings(ldp_backend):
     """Test the `LDPDataBackend` instantiation with settings."""
     backend = ldp_backend()
     assert isinstance(backend.client, ovh.Client)
@@ -67,7 +67,7 @@ def test_backends_data_ldp_data_backend_instantiation_with_settings(ldp_backend)
     "exception_class",
     [ovh.exceptions.HTTPError, ovh.exceptions.InvalidResponse],
 )
-def test_backends_data_ldp_data_backend_status_method_with_error_status(
+def test_backends_data_ldp_status_with_error_status(
     exception_class, ldp_backend, monkeypatch
 ):
     """Test the `LDPDataBackend.status` method, given a failed request to OVH's archive
@@ -89,9 +89,7 @@ def test_backends_data_ldp_data_backend_status_method_with_error_status(
     assert backend.status() == DataBackendStatus.ERROR
 
 
-def test_backends_data_ldp_data_backend_status_method_with_ok_status(
-    ldp_backend, monkeypatch
-):
+def test_backends_data_ldp_status_with_ok_status(ldp_backend, monkeypatch):
     """Test the `LDPDataBackend.status` method, given a successful request to OVH's
     archive endpoint, the `status` method should return `DataBackendStatus.OK`.
     """
@@ -105,7 +103,7 @@ def test_backends_data_ldp_data_backend_status_method_with_ok_status(
     assert backend.status() == DataBackendStatus.OK
 
 
-def test_backends_data_ldp_data_backend_list_method_with_invalid_target(ldp_backend):
+def test_backends_data_ldp_list_with_invalid_target(ldp_backend):
     """Test the `LDPDataBackend.list` method given no default `stream_id` and no target
     argument should raise a `BackendParameterException`.
     """
@@ -120,9 +118,7 @@ def test_backends_data_ldp_data_backend_list_method_with_invalid_target(ldp_back
     "exception_class",
     [ovh.exceptions.HTTPError, ovh.exceptions.InvalidResponse],
 )
-def test_backends_data_ldp_data_backend_list_method_failure(
-    exception_class, ldp_backend, monkeypatch
-):
+def test_backends_data_ldp_list_failure(exception_class, ldp_backend, monkeypatch):
     """Test the `LDPDataBackend.list` method, given a failed OVH API request should
     raise a `BackendException`.
     """
@@ -155,7 +151,7 @@ def test_backends_data_ldp_data_backend_list_method_failure(
         (["achive_1", "achive_2"], None, "bar"),
     ],
 )
-def test_backends_data_ldp_data_backend_list_method_without_history(
+def test_backends_data_ldp_list_without_history(
     archives, target, expected_stream_id, ldp_backend, monkeypatch
 ):
     """Test the `LDPDataBackend.list` method without history."""
@@ -189,7 +185,7 @@ def test_backends_data_ldp_data_backend_list_method_without_history(
         (["achive_1", "achive_2"], None, "bar"),
     ],
 )
-def test_backends_data_ldp_data_backend_list_method_with_details(
+def test_backends_data_ldp_list_with_details(
     archives, target, expected_stream_id, ldp_backend, monkeypatch
 ):
     """Test the `LDPDataBackend.list` method with `details` set to `True`."""
@@ -227,7 +223,7 @@ def test_backends_data_ldp_data_backend_list_method_with_details(
 
 
 @pytest.mark.parametrize("target,expected_stream_id", [(None, "bar"), ("baz", "baz")])
-def test_backends_data_ldp_data_backend_list_method_with_history(
+def test_backends_data_ldp_list_with_history(
     target, expected_stream_id, ldp_backend, monkeypatch, settings_fs
 ):
     """Test the `LDPDataBackend.list` method with history."""
@@ -306,7 +302,7 @@ def test_backends_data_ldp_data_backend_list_method_with_history(
 
 
 @pytest.mark.parametrize("target,expected_stream_id", [(None, "bar"), ("baz", "baz")])
-def test_backends_data_ldp_data_backend_list_method_with_history_and_details(
+def test_backends_data_ldp_list_with_history_and_details(
     target, expected_stream_id, ldp_backend, monkeypatch, settings_fs
 ):
     """Test the `LDPDataBackend.list` method with a history and detailed output."""
@@ -431,9 +427,7 @@ def test_backends_data_ldp_data_backend_list_method_with_history_and_details(
     assert list(result) == expected
 
 
-def test_backends_data_ldp_data_backend_read_method_without_raw_ouput(
-    ldp_backend, caplog, monkeypatch
-):
+def test_backends_data_ldp_read_without_raw_ouput(ldp_backend, caplog, monkeypatch):
     """Test the `LDPDataBackend.read method, given `raw_output` set to `False`, should
     log a warning message.
     """
@@ -459,9 +453,7 @@ def test_backends_data_ldp_data_backend_read_method_without_raw_ouput(
     ) in caplog.record_tuples
 
 
-def test_backends_data_ldp_data_backend_read_method_without_ignore_errors(
-    ldp_backend, caplog, monkeypatch
-):
+def test_backends_data_ldp_read_without_ignore_errors(ldp_backend, caplog, monkeypatch):
     """Test the `LDPDataBackend.read` method, given `ignore_errors` set to `False`,
     should log a warning message.
     """
@@ -489,7 +481,7 @@ def test_backends_data_ldp_data_backend_read_method_without_ignore_errors(
     ) in caplog.record_tuples
 
 
-def test_backends_data_ldp_data_backend_read_method_with_invalid_query(ldp_backend):
+def test_backends_data_ldp_read_with_invalid_query(ldp_backend):
     """Test the `LDPDataBackend.read` method given an invalid `query` argument should
     raise a `BackendParameterException`.
     """
@@ -500,9 +492,7 @@ def test_backends_data_ldp_data_backend_read_method_with_invalid_query(ldp_backe
         list(backend.read())
 
 
-def test_backends_data_ldp_data_backend_read_method_with_failure(
-    ldp_backend, monkeypatch
-):
+def test_backends_data_ldp_read_with_failure(ldp_backend, monkeypatch):
     """Test the `LDPDataBackend.read` method, given a request failure, should raise a
     `BackendException`.
     """
@@ -554,9 +544,7 @@ def test_backends_data_ldp_data_backend_read_method_with_failure(
         next(backend.read(query="foo"))
 
 
-def test_backends_data_ldp_data_backend_read_method_with_query(
-    ldp_backend, monkeypatch, fs
-):
+def test_backends_data_ldp_read_with_query(ldp_backend, monkeypatch, fs):
     """Test the `LDPDataBackend.read` method, given a query argument."""
 
     # Create fake archive to stream.
@@ -630,7 +618,7 @@ def test_backends_data_ldp_data_backend_read_method_with_query(
         (["baz"], "/dbaas/logs/foo/output/graylog/stream/baz/archive"),
     ],
 )
-def test_backends_data_ldp_data_backend_get_archive_endpoint_method_with_valid_input(
+def test_backends_data_ldp_get_archive_endpoint_with_valid_input(
     ldp_backend, args, expected
 ):
     """Test the `LDPDataBackend.get_archive_endpoint` method, given valid input, should
@@ -643,7 +631,7 @@ def test_backends_data_ldp_data_backend_get_archive_endpoint_method_with_valid_i
 @pytest.mark.parametrize(
     "service_name,stream_id", [(None, "bar"), ("foo", None), (None, None)]
 )
-def test_backends_data_ldp_data_backend_get_archive_endpoint_method_with_invalid_input(
+def test_backends_data_ldp_get_archive_endpoint_with_invalid_input(
     ldp_backend, service_name, stream_id
 ):
     """Test the `LDPDataBackend.get_archive_endpoint` method, given invalid input
@@ -667,7 +655,7 @@ def test_backends_data_ldp_data_backend_get_archive_endpoint_method_with_invalid
         )
 
 
-def test_backends_data_ldp_data_backend_url_method(monkeypatch, ldp_backend):
+def test_backends_data_ldp_url(monkeypatch, ldp_backend):
     """Test the `LDPDataBackend.url` method."""
 
     archive_name = "5d49d1b3-a3eb-498c-9039-6a482166f888"
@@ -690,7 +678,7 @@ def test_backends_data_ldp_data_backend_url_method(monkeypatch, ldp_backend):
     assert backend._url(archive_name) == archive_url
 
 
-def test_backends_data_ldp_data_backend_close_method(ldp_backend, caplog):
+def test_backends_data_ldp_close(ldp_backend, caplog):
     """Test that the `LDPDataBackend.close` method raise an error."""
 
     backend = ldp_backend()
