@@ -168,6 +168,7 @@ select = [
     "D",  # pydocstyle
     "E",  # pycodestyle error
     "F",  # Pyflakes
+    "FIX",  # flake8-fixme
     "I",  # isort
     "PLC",  # Pylint Convention
     "PLE",  # Pylint Error
