@@ -138,9 +138,7 @@ def custom_builds(
         key, value = random.choice(list(optional.items()))
         required[key] = value
         del optional[key]
-    print("Imblue dabedi")
-    print(required)
-    print(optional)
+        
     return st.fixed_dictionaries(required, optional=optional).map(klass.parse_obj)
 
 # def OLD_custom_given(*args: Union[st.SearchStrategy, BaseModel], **kwargs):

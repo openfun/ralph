@@ -334,9 +334,9 @@ async def get(
     # Parse the "agent" parameter (JSON) into multiple string parameters
     if query_params.get("agent") is not None:
         # Overwrite `agent` field
-        query_params["agent"] = _parse_agent_parameters(
+        query_params["agent"] = json.loads(_parse_agent_parameters(
             json.loads(query_params["agent"])
-        )
+        ).model_dump_json())
 
     # mine: If using scopes, only restrict users with limited scopes
     if settings.LRS_RESTRICT_BY_SCOPES:
@@ -348,7 +348,7 @@ async def get(
 
     # Filter by authority if using `mine`
     if mine:
-        query_params["authority"] = _parse_agent_parameters(current_user.agent)
+        query_params["authority"] = json.loads(_parse_agent_parameters(current_user.agent).model_dump_json())
 
     if "mine" in query_params:
         query_params.pop("mine")

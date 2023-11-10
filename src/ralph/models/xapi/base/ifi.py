@@ -48,7 +48,7 @@ class BaseXapiOpenIdIFI(BaseModelWithConfig):
         openid (URI): Consists of an openID that uniquely identifies the Agent.
     """
 
-    openid: AnyUrl
+    openid: str # Changed due to https://github.com/pydantic/pydantic/issues/7186
 
 
 class BaseXapiAccountIFI(BaseModelWithConfig):

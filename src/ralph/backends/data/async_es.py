@@ -45,7 +45,7 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
         """Create an AsyncElasticsearch client if it doesn't exist."""
         if not self._client:
             self._client = AsyncElasticsearch(
-                self.settings.HOSTS, **self.settings.CLIENT_OPTIONS.dict()
+                self.settings.HOSTS, **self.settings.CLIENT_OPTIONS.model_dump()
             )
         return self._client
 
@@ -160,9 +160,16 @@ class AsyncESDataBackend(BaseAsyncDataBackend):
                 raise BackendException(msg % error) from error
 
         limit = query.size
-        kwargs = query.dict(exclude={"query_string", "size"})
+
+        # TODO: fix this temporary workaround linked to Url(...) not being serialized
+        #kwargs = query.model_dump(exclude={"query_string", "size"})
+        import json 
+        kwargs = json.loads(query.model_dump_json(exclude={"query_string", "size"}))
+        
         if query.query_string:
             kwargs["q"] = query.query_string
+
+            # TODO: field "query" is `dict` and therefore model dump does not go recursively
 
         count = chunk_size
         # The first condition is set to comprise either limit as None

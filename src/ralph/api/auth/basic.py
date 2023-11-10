@@ -68,8 +68,6 @@ class ServerUsersCredentials(RootModel[List[UserCredentials]]):
     @classmethod
     def ensure_unique_username(cls, values: Any) -> Any:
         """Every username should be unique among registered users."""
-        logger.warning("azerty")
-        logger.error(values)
         usernames = [entry.username for entry in values]
         if len(usernames) != len(set(usernames)):
             raise ValueError(
@@ -97,7 +95,9 @@ def get_stored_credentials(auth_file: Path) -> ServerUsersCredentials:
         msg = "Credentials file <%s> not found."
         logger.warning(msg, auth_file)
         raise AuthenticationError(msg.format(auth_file))
-    return ServerUsersCredentials.parse_file(auth_file)
+    
+    with open(auth_file, encoding=settings.LOCALE_ENCODING) as f:
+        return ServerUsersCredentials.model_validate_json(f.read())
 
 
 @cached(

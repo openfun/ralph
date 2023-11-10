@@ -349,27 +349,18 @@ def test_cli_auth_command_when_writing_auth_file(
 
     # The authentication file does not exist
 
-    print("yeah yo ok 111")
-
     # Add a first user
     cli_args = _gen_cli_auth_args(
         username_1, password_1, scopes_1, ifi_command_1, ifi_value_1, write=True
     )
 
-    print("yeah yo ok 2")
-
-    print("cli args are", cli_args)
     assert Path(settings.AUTH_FILE).exists() is False
     result = runner.invoke(cli, cli_args)
-    print("yeah yo ok 2.5")
     assert result.exit_code == 0
     assert Path(settings.AUTH_FILE).exists() is True
     with Path(settings.AUTH_FILE).open(encoding="utf-8") as auth_file:
         all_credentials = json.loads("\n".join(auth_file.readlines()))
     assert len(all_credentials) == 1
-
-
-    print("yeah yo ok 3")
 
     # Check that the first user matches
     ifi_type_1 = _ifi_type_from_command(ifi_command=ifi_command_1)
@@ -382,9 +373,6 @@ def test_cli_auth_command_when_writing_auth_file(
         ifi_value=ifi_value_1,
     )
 
-
-    print("yeah yo ok 4")
-
     # Add a second user
     username_2 = "lol"
     password_2 = "baz"
@@ -395,16 +383,11 @@ def test_cli_auth_command_when_writing_auth_file(
     )
     result = runner.invoke(cli, cli_args)
 
-
-    print("yeah yo ok 5")
-
     assert result.exit_code == 0
     with Path(settings.AUTH_FILE).open(encoding="utf-8") as auth_file:
         all_credentials = json.loads("\n".join(auth_file.readlines()))
     assert len(all_credentials) == 2
 
-
-    print("yeah yo ok 6")
 
     # Check that the first user still matches
     _assert_matching_basic_auth_credentials(
@@ -414,9 +397,6 @@ def test_cli_auth_command_when_writing_auth_file(
         ifi_type=ifi_type_1,
         ifi_value=ifi_value_1,
     )
-
-
-    print("yeah yo ok 7")
 
     # Check that the second user matches
     ifi_type_2 = _ifi_type_from_command(ifi_command=ifi_command_2)
@@ -429,8 +409,6 @@ def test_cli_auth_command_when_writing_auth_file(
         ifi_value=ifi_value_2,
     )
 
-
-    print("yeah yo ok 8")
 
 # pylint: disable=invalid-name
 def test_cli_auth_command_when_writing_auth_file_with_incorrect_auth_file(fs):

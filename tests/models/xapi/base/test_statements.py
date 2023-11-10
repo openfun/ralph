@@ -486,9 +486,9 @@ def test_models_xapi_base_statement_with_valid_version(statement):
     """
     statement = statement.dict(exclude_none=True)
     set_dict_value_from_path(statement, ["version"], "1.0.3")
-    assert "1.0.3" == BaseXapiStatement(**statement).dict()["version"]
+    assert "1.0.3" == BaseXapiStatement(**statement).model_dump()["version"]
     del statement["version"]
-    assert "1.0.0" == BaseXapiStatement(**statement).dict()["version"]
+    assert "1.0.0" == BaseXapiStatement(**statement).model_dump()["version"]
 
 
 @settings(deadline=None)

@@ -155,7 +155,7 @@ class ClickHouseDataBackend(BaseDataBackend):
                 database=self.database,
                 username=self.settings.USERNAME,
                 password=self.settings.PASSWORD,
-                settings=self.settings.CLIENT_OPTIONS.dict(),
+                settings=self.settings.CLIENT_OPTIONS.model_dump(),
             )
         return self._client
 

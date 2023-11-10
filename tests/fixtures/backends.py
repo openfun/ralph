@@ -368,7 +368,7 @@ def get_clickhouse_fixture(
     client_options = ClickHouseClientOptions(
         date_time_input_format="best_effort",  # Allows RFC dates
         allow_experimental_object_type=1,  # Allows JSON data type
-    ).dict()
+    ).model_dump()
 
     client = clickhouse_connect.get_client(
         host=host,

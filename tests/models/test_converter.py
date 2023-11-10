@@ -119,7 +119,7 @@ def test_converter_conversion_item_get_value_with_successful_transformers(
 #             """Return a set of ConversionItems used for conversion."""
 #             return set()
 
-#     assert not convert_dict_event(event, "", DummyBaseConversionSet()).dict()
+#     assert not convert_dict_event(event, "", DummyBaseConversionSet()).model_dump()
 
 
 @pytest.mark.parametrize("event", [{"foo": "foo_value", "bar": "bar_value"}])
@@ -148,7 +148,7 @@ def test_converter_convert_dict_event_with_one_conversion_item(
     class DummyBaseModel(BaseModel):
         """Dummy base model with one field."""
 
-        converted: Optional[Any]
+        converted: Optional[Any] = None
 
     class DummyBaseConversionSet(BaseConversionSet):
         """Dummy implementation of abstract BaseConversionSet."""
@@ -160,7 +160,7 @@ def test_converter_convert_dict_event_with_one_conversion_item(
             return {ConversionItem("converted", source, transformer)}
 
     converted = convert_dict_event(event, "", DummyBaseConversionSet())
-    assert converted.dict(exclude_none=True) == expected
+    assert converted.model_dump(exclude_none=True) == expected
 
 
 @pytest.mark.parametrize("item", [ConversionItem("foo", None, lambda x: x / 0)])

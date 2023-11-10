@@ -115,7 +115,7 @@ class MongoLRSBackend(BaseLRSBackend, MongoDataBackend):
             return
 
         if not isinstance(agent_params, dict):
-            agent_params = agent_params.dict()
+            agent_params = agent_params.model_dump()
 
         if agent_params.get("mbox"):
             key = f"_source.{target_field}.mbox"

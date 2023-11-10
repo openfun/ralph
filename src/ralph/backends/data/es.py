@@ -88,7 +88,7 @@ class ESQueryPit(BaseModel):
     id: Union[str, None] = None
     keep_alive: Union[str, None] = None
 
-
+from typing import Any, Dict
 class ESQuery(BaseQuery):
     """Elasticsearch query model.
 
@@ -110,7 +110,7 @@ class ESQuery(BaseQuery):
             Not used. Always set to `False`.
     """  # pylint: disable=line-too-long # noqa: E501
 
-    query: dict = {"match_all": {}}
+    query: dict = {"match_all": {}} 
     pit: ESQueryPit = ESQueryPit()
     size: Union[int, None] = None
     sort: Union[str, List[dict]] = "_shard_doc"
@@ -140,7 +140,7 @@ class ESDataBackend(BaseDataBackend):
         """Create an Elasticsearch client if it doesn't exist."""
         if not self._client:
             self._client = Elasticsearch(
-                self.settings.HOSTS, **self.settings.CLIENT_OPTIONS.dict()
+                self.settings.HOSTS, **self.settings.CLIENT_OPTIONS.model_dump()
             )
         return self._client
 

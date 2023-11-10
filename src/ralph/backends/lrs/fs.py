@@ -106,7 +106,7 @@ class FSLRSBackend(BaseLRSBackend, FSDataBackend):
             return
 
         if not isinstance(agent, dict):
-            agent = agent.dict()
+            agent = agent.model_dump()
         FSLRSBackend._add_filter_by_mbox(filters, agent.get("mbox", None), related)
         FSLRSBackend._add_filter_by_sha1sum(
             filters, agent.get("mbox_sha1sum", None), related
@@ -129,7 +129,7 @@ class FSLRSBackend(BaseLRSBackend, FSDataBackend):
             return
 
         if not isinstance(authority, dict):
-            authority = authority.dict()
+            authority = authority.model_dump()
         FSLRSBackend._add_filter_by_mbox(
             filters, authority.get("mbox", None), field="authority"
         )

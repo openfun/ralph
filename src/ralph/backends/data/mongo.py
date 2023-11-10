@@ -120,7 +120,7 @@ class MongoDataBackend(BaseDataBackend):
         """
         self.settings = settings if settings else self.settings_class()
         self.client = MongoClient(
-            self.settings.CONNECTION_URI, **self.settings.CLIENT_OPTIONS.dict()
+            self.settings.CONNECTION_URI, **self.settings.CLIENT_OPTIONS.model_dump()
         )
         self.database = self.client[self.settings.DEFAULT_DATABASE]
         self.collection = self.database[self.settings.DEFAULT_COLLECTION]

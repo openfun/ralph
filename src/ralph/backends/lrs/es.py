@@ -97,7 +97,7 @@ class ESLRSBackend(BaseLRSBackend, ESDataBackend):
             return
 
         if not isinstance(agent_params, dict):
-            agent_params = agent_params.dict()
+            agent_params = agent_params.model_dump()
 
         if agent_params.get("mbox"):
             field = f"{target_field}.mbox.keyword"

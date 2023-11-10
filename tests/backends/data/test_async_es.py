@@ -465,13 +465,12 @@ async def test_backends_data_async_es_data_backend_read_method_with_query(
                 async for statement in backend.read(query={"not_query": "foo"})
             ]
 
-    assert (
-        "ralph.backends.data.base",
-        logging.ERROR,
-        "The 'query' argument is expected to be a ESQuery instance. "
-        "[{'loc': ('not_query',), 'msg': 'extra fields not permitted', "
-        "'type': 'value_error.extra'}]",
-    ) in caplog.record_tuples
+    assert ('ralph.backends.data.base', 
+     logging.ERROR, 
+     "The 'query' argument is expected to be a ESQuery instance. "
+     "[{'type': 'extra_forbidden', 'loc': ('not_query',), 'msg': 'Extra"
+     " inputs are not permitted', 'input': 'foo', 'url': "
+     "'https://errors.pydantic.dev/2.4/v/extra_forbidden'}]")  in caplog.record_tuples
 
     await backend.close()
 

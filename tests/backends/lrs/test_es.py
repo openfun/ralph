@@ -262,7 +262,7 @@ def test_backends_lrs_es_lrs_backend_query_statements_query(
 
     def mock_read(query, chunk_size):
         """Mock the `ESLRSBackend.read` method."""
-        assert query.dict() == expected_query
+        assert query.model_dump() == expected_query
         assert chunk_size == expected_query.get("size")
         query.pit.id = "foo_pit_id"
         query.search_after = ["bar_search_after", "baz_search_after"]

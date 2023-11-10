@@ -365,11 +365,10 @@ def auth(
     # Import required Pydantic models dynamically so that we don't create a
     # direct dependency between the CLI and the LRS
     # pylint: disable=invalid-name
-    logger.warning('ok aaa')
+    
     ServerUsersCredentials = import_string(
         "ralph.api.auth.basic.ServerUsersCredentials"
     )
-    logger.warning('ok bbb')
     UserCredentialsBasicAuth = import_string("ralph.api.auth.basic.UserCredentials")
 
     # NB: renaming classes below for clarity
@@ -383,14 +382,12 @@ def auth(
         "ralph.models.xapi.base.agents.BaseXapiAgentWithAccount"
     )
 
-    logger.warning('ok ccc')
     if agent_ifi_mbox:
         if agent_ifi_mbox[:7] != "mailto:":
             raise click.UsageError(
                 'Mbox field must start with "mailto:" (e.g.: "mailto:foo@bar.com")'
             )
         agent = AgentMbox(mbox=agent_ifi_mbox, name=agent_name, objectType="Agent")
-        logger.warning('ok ddd')
     if agent_ifi_mbox_sha1sum:
         agent = AgentMboxSha1sum(
             mbox_sha1sum=agent_ifi_mbox_sha1sum, name=agent_name, objectType="Agent"
@@ -412,7 +409,6 @@ def auth(
         scopes=scope,
         agent=agent,
     )
-    logger.warning('ok eee')
 
     if write_to_disk:
         logger.info("Will append new credentials to: %s", settings.AUTH_FILE)
@@ -424,30 +420,17 @@ def auth(
         auth_file.parent.mkdir(parents=True, exist_ok=True)
         auth_file.touch()
 
-        logger.warning('ok fff')
         users = ServerUsersCredentials.model_validate([])
-        logger.warning('ok fffgloser')
-
-        logger.warning(auth_file)
         # Parse credentials file if not empty
         if auth_file.stat().st_size:
             with open(auth_file, encoding=settings.LOCALE_ENCODING) as f:
                 users = ServerUsersCredentials.model_validate_json(f.read())
-
-        logger.warning('ok fffa')
-        logger.warning(type(ServerUsersCredentials.model_validate(
-            [
-                credentials,
-            ]
-        )))
 
         users += ServerUsersCredentials.model_validate(
             [
                 credentials,
             ]
         )
-        
-        logger.warning('ok fffb')
 
         auth_file.write_text(users.model_dump_json(indent=2), encoding=settings.LOCALE_ENCODING)
         logger.info("User %s has been added to: %s", username, settings.AUTH_FILE)
@@ -877,7 +860,7 @@ def runserver(backend: str, host: str, port: int, **options):
             if isinstance(value, tuple):
                 value = ",".join(value)
             if issubclass(type(value), ClientOptions):
-                for key_dict, value_dict in value.dict().items():
+                for key_dict, value_dict in value.model_dump().items():
                     if value_dict is None:
                         continue
                     key_dict = f"{key}__{key_dict}"

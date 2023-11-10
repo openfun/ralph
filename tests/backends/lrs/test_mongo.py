@@ -232,7 +232,7 @@ def test_backends_lrs_mongo_lrs_backend_query_statements_query(
 
     def mock_read(query, chunk_size):
         """Mock the `MongoLRSBackend.read` method."""
-        assert query.dict() == expected_query
+        assert query.model_dump() == expected_query
         assert chunk_size == expected_query.get("limit")
         return [{"_id": "search_after_id", "_source": {}}]
 

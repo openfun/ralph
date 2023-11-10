@@ -38,7 +38,7 @@ class ClickHouseLRSBackend(BaseLRSBackend, ClickHouseDataBackend):
 
     def query_statements(self, params: RalphStatementsQuery) -> StatementQueryResult:
         """Return the statements query payload using xAPI parameters."""
-        ch_params = params.dict(exclude_none=True)
+        ch_params = params.model_dump(exclude_none=True)
         where = []
 
         if params.statement_id:
@@ -153,7 +153,7 @@ class ClickHouseLRSBackend(BaseLRSBackend, ClickHouseDataBackend):
         if not agent_params:
             return
         if not isinstance(agent_params, dict):
-            agent_params = agent_params.dict()
+            agent_params = agent_params.model_dump()
         if agent_params.get("mbox"):
             ch_params[f"{target_field}__mbox"] = agent_params.get("mbox")
             where.append(f"event.{target_field}.mbox = {{{target_field}__mbox:String}}")

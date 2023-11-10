@@ -204,7 +204,8 @@ async def test_api_statements_get_mine(
         "/xAPI/statements/?mine=True",
         headers={"Authorization": f"Basic {credentials_1_bis}"},
     )
-    assert response.status_code == 200
+    
+    assert response.status_code == 200 # TODO: bug here with openid and asynces
     assert response.json() == {"statements": [statements[0]]}
 
     # Only fetch mine (implicit with RALPH_LRS_RESTRICT_BY_AUTHORITY=True): Return

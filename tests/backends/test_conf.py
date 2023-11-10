@@ -69,7 +69,7 @@ def test_conf_es_client_options_with_valid_values(
             "RALPH_BACKENDS__DATA__ES__CLIENT_OPTIONS__verify_certs",
             f"{verify_certs}",
         )
-    assert BackendSettings().BACKENDS.DATA.ES.CLIENT_OPTIONS.dict() == expected
+    assert BackendSettings().BACKENDS.DATA.ES.CLIENT_OPTIONS.model_dump() == expected
 
 
 @pytest.mark.parametrize(
@@ -91,7 +91,7 @@ def test_conf_es_client_options_with_invalid_values(
         f"{verify_certs}",
     )
     with pytest.raises(ValidationError, match="1 validation error for"):
-        BackendSettings().BACKENDS.DATA.ES.CLIENT_OPTIONS.dict()
+        BackendSettings().BACKENDS.DATA.ES.CLIENT_OPTIONS.model_dump()
 
 
 @pytest.mark.parametrize(
@@ -118,7 +118,7 @@ def test_conf_mongo_client_options_with_valid_values(
             "RALPH_BACKENDS__DATA__MONGO__CLIENT_OPTIONS__tz_aware",
             f"{tz_aware}",
         )
-    assert BackendSettings().BACKENDS.DATA.MONGO.CLIENT_OPTIONS.dict() == expected
+    assert BackendSettings().BACKENDS.DATA.MONGO.CLIENT_OPTIONS.model_dump() == expected
 
 
 @pytest.mark.parametrize(
@@ -141,4 +141,4 @@ def test_conf_mongo_client_options_with_invalid_values(
         f"{tz_aware}",
     )
     with pytest.raises(ValidationError, match="1 validation error for"):
-        BackendSettings().BACKENDS.DATA.MONGO.CLIENT_OPTIONS.dict()
+        BackendSettings().BACKENDS.DATA.MONGO.CLIENT_OPTIONS.model_dump()
