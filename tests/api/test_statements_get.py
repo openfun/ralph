@@ -716,7 +716,7 @@ async def test_api_statements_get_with_database_query_failure(
 @pytest.mark.anyio
 @pytest.mark.parametrize("id_param", ["statementId", "voidedStatementId"])
 async def test_api_statements_get_invalid_query_parameters(
-    client, basic_auth_credentials, id_param
+    client, monkeypatch, es, basic_auth_credentials, id_param
 ):
     """Test error response for invalid query parameters"""
 
@@ -757,6 +757,9 @@ async def test_api_statements_get_invalid_query_parameters(
                 "extra parameters"
             )
         }
+
+    backend_client_class_path = "ralph.api.routers.statements.BACKEND_CLIENT"
+    monkeypatch.setattr(backend_client_class_path, get_es_test_backend())
 
     # Check for NO 400 status code when statementId is passed with authorized parameters
     for valid_param, value in [("format", "ids"), ("attachments", "true")]:
