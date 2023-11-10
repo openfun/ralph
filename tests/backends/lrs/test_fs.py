@@ -8,7 +8,6 @@ from ralph.backends.lrs.fs import FSLRSBackend
 
 def test_backends_lrs_fs_lrs_backend_default_instantiation(monkeypatch, fs):
     """Test the `FSLRSBackend` default instantiation."""
-    # pylint: disable=invalid-name
     fs.create_file(".env")
     monkeypatch.delenv("RALPH_BACKENDS__LRS__FS__DEFAULT_LRS_FILE", raising=False)
     backend = FSLRSBackend()

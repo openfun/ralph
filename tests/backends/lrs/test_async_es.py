@@ -17,7 +17,6 @@ from tests.fixtures.backends import ES_TEST_FORWARDING_INDEX, ES_TEST_INDEX
 
 def test_backends_lrs_async_es_lrs_backend_default_instantiation(monkeypatch, fs):
     """Test the `ESLRSBackend` default instantiation."""
-    # pylint: disable=invalid-name
     fs.create_file(".env")
     monkeypatch.delenv("RALPH_BACKENDS__LRS__ES__DEFAULT_INDEX", raising=False)
     backend = AsyncESLRSBackend()
