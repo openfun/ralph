@@ -13,7 +13,6 @@ and this project adheres to
 - Implement Pydantic model for LRS Statements resource query parameters
 - Implement xAPI LMS Profile statements validation
 - `EdX` to `xAPI` converters for enrollment events
-- Helm: Add variable ``ingress.hosts``
 - Backends: Add `Writable` and `Listable` interfaces to distinguish supported
   functionalities among `data` backends
 - Backends: Add `get_backends` function to automatically discover backends
@@ -27,7 +26,6 @@ interface [BC]
 - Refactor LRS `query_statements` and `query_statements_by_ids` backends
 methods under the unified `lrs` backend interface [BC]
 - Refactor LRS Statements resource query parameters defined for `ralph` API
-- Helm chart: improve chart modularity
 - User credentials must now include an "agent" field which can be created
   using the cli
 - `GET /statements` now has "mine" option which matches statements that
@@ -51,8 +49,6 @@ have an authority field matching that of the user
 - API: Add `RALPH_LRS_RESTRICT_BY_AUTHORITY` option making `?mine=True`
   implicit
 - CLI: list cli usage strings in alphabetical order
-- Helm: Fix clickhouse version
-- Helm: improve volumes and ingress configurations
 - API: Add `RALPH_LRS_RESTRICT_BY_SCOPE` option enabling endpoint access
   control by user scopes
 - Backends: Replace reference to a JSON column in ClickHouse with 
@@ -68,7 +64,6 @@ have an authority field matching that of the user
 
 - `school`, `course`, `module` context extensions in Edx to xAPI base converter
 - `name` field in `VideoActivity` xAPI model mistakenly used in `video` profile
-- Helm: remove variable ``ingress.hostname`` and ``ingress.tls``
 
 ## [3.9.0] - 2023-07-21
 
@@ -79,15 +74,6 @@ have an authority field matching that of the user
 - Upgrade `uvicorn` to `0.23.0`
 - Enforce valid IRI for `activity` parameter in `GET /statements`
 - Change how duplicate xAPI statements are handled for `clickhouse` backend
-
-General improvement for the Helm Chart:
-
-- add dependencies for MongoDB and Clickhouse
-- make persistence optional
-- allow use existing PVC
-- remove prefix label from ingress object name
-- add missing namespace label
-- make object name consistent
 
 ## [3.8.0] - 2023-06-21
 
@@ -206,7 +192,6 @@ as per the xAPI specification
 ### Added
 
 - Add a new `auth` subcommand to generate required credentials file for the LRS
-- Add an official Helm Chart (experimental)
 - Implement support for AWS S3 storage backend
 - Add CLI `--version` option
 
