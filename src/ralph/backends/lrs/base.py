@@ -45,8 +45,6 @@ class LRSStatementsQuery(BaseQuery):
     https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#213-get-statements
     """
 
-    # pylint: disable=too-many-instance-attributes
-
     statement_id: Optional[str] = Field(None, alias="statementId")
     voided_statement_id: Optional[str] = Field(None, alias="voidedStatementId")
     agent: Optional[Union[BaseXapiAgent, BaseXapiGroup]]

@@ -753,7 +753,6 @@ def write(  # noqa: PLR0913
     **options,
 ):
     """Write an archive to a configured backend."""
-    # pylint: disable=too-many-arguments
     logger.info("Writing to target %s for the configured %s backend", target, backend)
 
     logger.debug("Backend parameters: %s", options)

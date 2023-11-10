@@ -15,7 +15,6 @@ from tests.fixtures.backends import MONGO_TEST_FORWARDING_COLLECTION
 
 def test_backends_lrs_mongo_lrs_backend_default_instantiation(monkeypatch, fs):
     """Test the `MongoLRSBackend` default instantiation."""
-    # pylint: disable=invalid-name
     fs.create_file(".env")
     monkeypatch.delenv("RALPH_BACKENDS__LRS__MONGO__DEFAULT_COLLECTION", raising=False)
     backend = MongoLRSBackend()

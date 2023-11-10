@@ -14,7 +14,6 @@ from ralph.exceptions import BackendException
 
 def test_backends_lrs_clickhouse_lrs_backend_default_instantiation(monkeypatch, fs):
     """Test the `ClickHouseLRSBackend` default instantiation."""
-    # pylint: disable=invalid-name
     fs.create_file(".env")
     monkeypatch.delenv("RALPH_BACKENDS__LRS__CLICKHOUSE__IDS_CHUNK_SIZE", raising=False)
     backend = ClickHouseLRSBackend()
