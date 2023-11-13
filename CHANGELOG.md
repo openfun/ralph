@@ -36,7 +36,7 @@ have an authority field matching that of the user
 - Upgrade `fastapi` to `0.104.1`
 - Upgrade `more-itertools` to `10.1.0`
 - Upgrade `sentry_sdk` to `1.34.0`
-- Upgrade `uvicorn` to `0.24.0`
+- Upgrade `uvicorn` to `0.24.0.post1`
 - API: Invalid parameters now return 400 status code
 - API: Forwarding PUT now uses PUT (instead of POST)
 - Models: The xAPI `context.contextActivities.category` field is now mandatory
