@@ -234,7 +234,7 @@ class SwiftDataBackend(
                 "backend": self.name,
                 "action": "read",
                 "id": f"{target}/{query.query_string}",
-                "size": resp_headers["Content-Length"],
+                "size": resp_headers["content-length"],
                 "timestamp": now(),
             }
         )
@@ -345,7 +345,7 @@ class SwiftDataBackend(
                 "action": "write",
                 "operation_type": operation_type.value,
                 "id": target,
-                "size": resp["Content-Length"],
+                "size": resp["content-length"],
                 "timestamp": now(),
             }
         )
@@ -379,8 +379,8 @@ class SwiftDataBackend(
 
         return {
             "name": name,
-            "lastModified": resp["Last-Modified"],
-            "size": resp["Content-Length"],
+            "lastModified": resp["last-modified"],
+            "size": resp["content-length"],
         }
 
     @staticmethod
