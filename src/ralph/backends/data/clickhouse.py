@@ -1,7 +1,6 @@
 """ClickHouse data backend for Ralph."""
 
 import json
-import logging
 from datetime import datetime
 from io import IOBase
 from itertools import chain
@@ -36,8 +35,6 @@ from ralph.backends.data.base import (
 from ralph.conf import BaseSettingsConfig, ClientOptions
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import iter_by_batch, parse_dict_to_bytes, parse_iterable_to_dict
-
-logger = logging.getLogger(__name__)
 
 
 class ClickHouseInsert(BaseModel):
@@ -197,7 +194,7 @@ class ClickHouseDataBackend(
             tables = self.client.query(sql).named_results()
         except (ClickHouseError, IndexError, TypeError, ValueError) as error:
             msg = "Failed to read tables: %s"
-            logger.error(msg, error)
+            self.logger.error(msg, error)
             raise BackendException(msg % error) from error
 
         for table in tables:
@@ -246,7 +243,9 @@ class ClickHouseDataBackend(
                 ignore_errors=ignore_errors,
             )
             locale = self.settings.LOCALE_ENCODING
-            yield from parse_dict_to_bytes(documents, locale, ignore_errors, logger)
+            yield from parse_dict_to_bytes(
+                documents, locale, ignore_errors, self.logger
+            )
             return
 
         if target is None:
@@ -283,7 +282,7 @@ class ClickHouseDataBackend(
         if query.limit:
             sql += f"\nLIMIT {query.limit}"
 
-        logger.debug(
+        self.logger.debug(
             "Start reading the %s table of the %s database (chunk size: %d)",
             target,
             self.database,
@@ -297,11 +296,11 @@ class ClickHouseDataBackend(
                 column_oriented=query.column_oriented,
             ).named_results()
             yield from parse_iterable_to_dict(
-                result, ignore_errors, logger, self._parse_event_json
+                result, ignore_errors, self.logger, self._parse_event_json
             )
         except (ClickHouseError, IndexError, TypeError, ValueError) as error:
             msg = "Failed to read documents: %s"
-            logger.error(msg, error)
+            self.logger.error(msg, error)
             raise BackendException(msg % error) from error
 
     def write(  # noqa: PLR0913
@@ -341,7 +340,7 @@ class ClickHouseDataBackend(
             operation_type = self.default_operation_type
         if not chunk_size:
             chunk_size = self.default_chunk_size
-        logger.debug(
+        self.logger.debug(
             "Start writing to the %s table of the %s database (chunk size: %d)",
             target,
             self.database,
@@ -352,16 +351,16 @@ class ClickHouseDataBackend(
         try:
             first_record = next(data)
         except StopIteration:
-            logger.info("Data Iterator is empty; skipping write to target.")
+            self.logger.info("Data Iterator is empty; skipping write to target.")
             return 0
 
         data = chain([first_record], data)
         if isinstance(first_record, bytes):
-            data = parse_iterable_to_dict(data, ignore_errors, logger)
+            data = parse_iterable_to_dict(data, ignore_errors, self.logger)
 
         if operation_type not in [BaseOperationType.CREATE, BaseOperationType.INDEX]:
             msg = "%s operation_type is not allowed."
-            logger.error(msg, operation_type.name)
+            self.logger.error(msg, operation_type.name)
             raise BackendParameterException(msg % operation_type.name)
 
         # operation_type is either CREATE or INDEX
@@ -370,7 +369,7 @@ class ClickHouseDataBackend(
         for batch in iter_by_batch(insert_tuples, chunk_size):
             count += self._bulk_import(batch, ignore_errors, target)
 
-        logger.info("Inserted a total of %d documents with success", count)
+        self.logger.info("Inserted a total of %d documents with success", count)
 
         return count
 
@@ -381,18 +380,18 @@ class ClickHouseDataBackend(
             BackendException: If a failure occurs during the close operation.
         """
         if not self._client:
-            logger.warning("No backend client to close.")
+            self.logger.warning("No backend client to close.")
             return
 
         try:
             self.client.close()
         except ClickHouseError as error:
             msg = "Failed to close ClickHouse client: %s"
-            logger.error(msg, error)
+            self.logger.error(msg, error)
             raise BackendException(msg % error) from error
 
-    @staticmethod
     def _to_insert_tuples(
+        self,
         data: Iterable[dict],
         ignore_errors: bool = False,
     ) -> Generator[InsertTuple, None, None]:
@@ -406,9 +405,9 @@ class ClickHouseDataBackend(
             except (KeyError, ValidationError) as error:
                 msg = "Statement %s has an invalid 'id' or 'timestamp' field"
                 if ignore_errors:
-                    logger.warning(msg, statement)
+                    self.logger.warning(msg, statement)
                     continue
-                logger.error(msg, statement)
+                self.logger.error(msg, statement)
                 raise BackendException(msg % statement) from error
 
             insert_tuple = InsertTuple(
@@ -444,7 +443,7 @@ class ClickHouseDataBackend(
         except (ClickHouseError, BackendException) as error:
             if not ignore_errors:
                 raise BackendException(*error.args) from error
-            logger.warning(
+            self.logger.warning(
                 "Bulk import failed for current chunk but you choose to ignore it.",
             )
             # There is no current way of knowing how many rows from the batch
@@ -452,7 +451,7 @@ class ClickHouseDataBackend(
             return 0
 
         inserted_count = len(batch)
-        logger.debug("Inserted %d documents chunk with success", inserted_count)
+        self.logger.debug("Inserted %d documents chunk with success", inserted_count)
 
         return inserted_count
 

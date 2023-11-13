@@ -1,6 +1,5 @@
 """OVH's LDP data backend for Ralph."""
 
-import logging
 from typing import Iterator, Literal, Optional, Union
 
 import ovh
@@ -14,12 +13,10 @@ from ralph.backends.data.base import (
     Listable,
     enforce_query_checks,
 )
-from ralph.backends.mixins import HistoryMixin
+from ralph.backends.data.mixins import HistoryMixin
 from ralph.conf import BaseSettingsConfig
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import now
-
-logger = logging.getLogger(__name__)
 
 
 class LDPDataBackendSettings(BaseDataBackendSettings):
@@ -96,7 +93,7 @@ class LDPDataBackend(
         try:
             self.client.get(self._get_archive_endpoint())
         except ovh.exceptions.APIError as error:
-            logger.error("Failed to connect to the LDP: %s", error)
+            self.logger.error("Failed to connect to the LDP: %s", error)
             return DataBackendStatus.ERROR
         except BackendParameterException:
             return DataBackendStatus.ERROR
@@ -124,21 +121,21 @@ class LDPDataBackend(
             BackendException: If a failure during retrieval of archives list occurs.
         """
         list_archives_endpoint = self._get_archive_endpoint(stream_id=target)
-        logger.info("List archives endpoint: %s", list_archives_endpoint)
-        logger.info("List archives details: %s", str(details))
+        self.logger.info("List archives endpoint: %s", list_archives_endpoint)
+        self.logger.info("List archives details: %s", str(details))
 
         try:
             archives = self.client.get(list_archives_endpoint)
         except ovh.exceptions.APIError as error:
             msg = "Failed to get archives list: %s"
-            logger.error(msg, error)
+            self.logger.error(msg, error)
             raise BackendException(msg % error) from error
 
-        logger.info("Found %d archives", len(archives))
+        self.logger.info("Found %d archives", len(archives))
 
         if new:
             archives = set(archives) - set(self.get_command_history(self.name, "read"))
-            logger.debug("New archives: %d", len(archives))
+            self.logger.debug("New archives: %d", len(archives))
 
         if not details:
             for archive in archives:
@@ -181,10 +178,12 @@ class LDPDataBackend(
             raise BackendParameterException(msg)
 
         if not raw_output or not ignore_errors:
-            logger.warning("The `raw_output` and `ignore_errors` arguments are ignored")
+            msg = "The `raw_output` and `ignore_errors` arguments are ignored"
+            self.logger.warning(msg)
 
         target = target if target else self.stream_id
-        logger.debug("Getting archive: %s from stream: %s", query.query_string, target)
+        msg = "Getting archive: %s from stream: %s"
+        self.logger.debug(msg, query.query_string, target)
 
         # Stream response (archive content)
         url = self._url(query.query_string)
@@ -195,7 +194,7 @@ class LDPDataBackend(
                     yield chunk
         except requests.exceptions.HTTPError as error:
             msg = "Failed to read archive %s: %s"
-            logger.error(msg, query.query_string, error)
+            self.logger.error(msg, query.query_string, error)
             raise BackendException(msg % (query.query_string, error)) from error
 
         # Get detailed information about the archive to fetch
@@ -219,14 +218,14 @@ class LDPDataBackend(
     def close(self) -> None:
         """LDP data backend has no open connections to close. No action."""
         self._client = None
-        logger.info("No open connections to close; skipping")
+        self.logger.info("No open connections to close; skipping")
 
     def _get_archive_endpoint(self, stream_id: Union[None, str] = None) -> str:
         """Return OVH's archive endpoint."""
         stream_id = stream_id if stream_id else self.stream_id
         if None in (self.service_name, stream_id):
             msg = "LDPDataBackend requires to set both service_name and stream_id"
-            logger.error(msg)
+            self.logger.error(msg)
             raise BackendParameterException(msg)
         return (
             f"/dbaas/logs/{self.service_name}/output/graylog/stream/{stream_id}/archive"
@@ -237,7 +236,7 @@ class LDPDataBackend(
         download_url_endpoint = f"{self._get_archive_endpoint()}/{name}/url"
         response = self.client.post(download_url_endpoint)
         download_url = response.get("url")
-        logger.debug("Temporary URL: %s", download_url)
+        self.logger.debug("Temporary URL: %s", download_url)
         return download_url
 
     def _details(self, stream_id: str, name: str) -> dict:

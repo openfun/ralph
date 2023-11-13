@@ -1,6 +1,5 @@
 """MongoDB LRS backend for Ralph."""
 
-import logging
 from typing import Iterator, List
 
 from bson.objectid import ObjectId
@@ -21,8 +20,6 @@ from ralph.backends.lrs.base import (
 from ralph.conf import BaseSettingsConfig
 from ralph.exceptions import BackendException, BackendParameterException
 
-logger = logging.getLogger(__name__)
-
 
 class MongoLRSBackendSettings(BaseLRSBackendSettings, MongoDataBackendSettings):
     """MongoDB LRS backend default configuration."""
@@ -42,7 +39,7 @@ class MongoLRSBackend(BaseLRSBackend[MongoLRSBackendSettings], MongoDataBackend)
         try:
             mongo_response = list(self.read(query=query, chunk_size=params.limit))
         except (BackendException, BackendParameterException) as error:
-            logger.error("Failed to read from MongoDB")
+            self.logger.error("Failed to read from MongoDB")
             raise error
 
         search_after = None
@@ -61,7 +58,7 @@ class MongoLRSBackend(BaseLRSBackend[MongoLRSBackendSettings], MongoDataBackend)
             mongo_response = self.read(query={"filter": {"_source.id": {"$in": ids}}})
             yield from (document["_source"] for document in mongo_response)
         except (BackendException, BackendParameterException) as error:
-            logger.error("Failed to read from MongoDB")
+            self.logger.error("Failed to read from MongoDB")
             raise error
 
     @staticmethod

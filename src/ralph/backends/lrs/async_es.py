@@ -1,6 +1,5 @@
 """Asynchronous Elasticsearch LRS backend for Ralph."""
 
-import logging
 from typing import Iterator, List
 
 from ralph.backends.data.async_es import AsyncESDataBackend
@@ -11,8 +10,6 @@ from ralph.backends.lrs.base import (
 )
 from ralph.backends.lrs.es import ESLRSBackend, ESLRSBackendSettings
 from ralph.exceptions import BackendException, BackendParameterException
-
-logger = logging.getLogger(__name__)
 
 
 class AsyncESLRSBackend(BaseAsyncLRSBackend[ESLRSBackendSettings], AsyncESDataBackend):
@@ -29,7 +26,7 @@ class AsyncESLRSBackend(BaseAsyncLRSBackend[ESLRSBackendSettings], AsyncESDataBa
                 async for document in self.read(query=query, chunk_size=params.limit)
             ]
         except (BackendException, BackendParameterException) as error:
-            logger.error("Failed to read from Elasticsearch")
+            self.logger.error("Failed to read from Elasticsearch")
             raise error
 
         return StatementQueryResult(
@@ -44,5 +41,5 @@ class AsyncESLRSBackend(BaseAsyncLRSBackend[ESLRSBackendSettings], AsyncESDataBa
             async for document in self.read(query={"query": {"terms": {"_id": ids}}}):
                 yield document["_source"]
         except (BackendException, BackendParameterException) as error:
-            logger.error("Failed to read from Elasticsearch")
+            self.logger.error("Failed to read from Elasticsearch")
             raise error

@@ -433,7 +433,7 @@ def test_backends_data_es_read_with_query(es, es_backend, caplog):
             list(backend.read(query={"not_query": "foo"}))
 
     assert (
-        "ralph.backends.data.base",
+        "ralph.backends.data.es",
         logging.ERROR,
         "The 'query' argument is expected to be a ESQuery instance. "
         "[{'loc': ('not_query',), 'msg': 'extra fields not permitted', "

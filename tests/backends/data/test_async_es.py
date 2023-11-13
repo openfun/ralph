@@ -477,7 +477,7 @@ async def test_backends_data_async_es_read_with_query(es, async_es_backend, capl
             ]
 
     assert (
-        "ralph.backends.data.base",
+        "ralph.backends.data.async_es",
         logging.ERROR,
         "The 'query' argument is expected to be a ESQuery instance. "
         "[{'loc': ('not_query',), 'msg': 'extra fields not permitted', "
