@@ -122,6 +122,7 @@ class AsyncMongoDataBackend(
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
+        max_statements: Optional[int] = None,
     ) -> Union[AsyncIterator[bytes], AsyncIterator[dict]]:
         """Read documents matching the `query` from `target` collection and yield them.
 
@@ -135,6 +136,7 @@ class AsyncMongoDataBackend(
             ignore_errors (bool): If `True`, encoding errors during the read operation
                 will be ignored and logged.
                 If `False` (default), a `BackendException` is raised on any error.
+            max_statements (int): The maximum number of statements to yield.
 
         Yield:
             bytes: The next raw document if `raw_output` is True.
@@ -145,7 +147,9 @@ class AsyncMongoDataBackend(
                 during encoding documents and `ignore_errors` is set to `False`.
             BackendParameterException: If the `target` is not a valid collection name.
         """
-        statements = super().read(query, target, chunk_size, raw_output, ignore_errors)
+        statements = super().read(
+            query, target, chunk_size, raw_output, ignore_errors, max_statements
+        )
         async for statement in statements:
             yield statement
 
