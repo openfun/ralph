@@ -2,6 +2,7 @@
 
 import json
 import logging
+import re
 
 import pytest
 from bson.objectid import ObjectId
@@ -323,9 +324,9 @@ async def test_backends_data_async_mongo_read_with_raw_output(
         {"_id": ObjectId("64945e530468d817b1f756db"), "id": "baz"},
     ]
     expected = [
-        b'{"_id": "64945e53a4ee2699573e0d6f", "id": "foo"}',
-        b'{"_id": "64945e530468d817b1f756da", "id": "bar"}',
-        b'{"_id": "64945e530468d817b1f756db", "id": "baz"}',
+        b'{"_id": "64945e53a4ee2699573e0d6f", "id": "foo"}\n',
+        b'{"_id": "64945e530468d817b1f756da", "id": "bar"}\n',
+        b'{"_id": "64945e530468d817b1f756db", "id": "baz"}\n',
     ]
     await backend.collection.insert_many(documents)
     await backend.database.foobar.insert_many(documents[:2])
@@ -451,14 +452,15 @@ async def test_backends_data_async_mongo_read_with_ignore_errors(
     """
 
     backend = async_mongo_backend()
+    unparsable_value = ObjectId()
     documents = [
         {"_id": ObjectId("64945e53a4ee2699573e0d6f"), "id": "foo"},
-        {"_id": ObjectId("64945e530468d817b1f756da"), "id": ObjectId()},
+        {"_id": ObjectId("64945e530468d817b1f756da"), "id": unparsable_value},
         {"_id": ObjectId("64945e530468d817b1f756db"), "id": "baz"},
     ]
     expected = [
-        b'{"_id": "64945e53a4ee2699573e0d6f", "id": "foo"}',
-        b'{"_id": "64945e530468d817b1f756db", "id": "baz"}',
+        b'{"_id": "64945e53a4ee2699573e0d6f", "id": "foo"}\n',
+        b'{"_id": "64945e530468d817b1f756db", "id": "baz"}\n',
     ]
     await backend.collection.insert_many(documents)
     await backend.database.foobar.insert_many(documents[:2])
@@ -478,8 +480,9 @@ async def test_backends_data_async_mongo_read_with_ignore_errors(
     assert (
         "ralph.backends.data.async_mongo",
         logging.WARNING,
-        "Failed to encode MongoDB document with ID 64945e530468d817b1f756da: "
-        "Object of type ObjectId is not JSON serializable",
+        "Failed to encode JSON: Object of type ObjectId is not "
+        "JSON serializable, for document: {'_id': '64945e530468d817b1f756da', "
+        f"'id': ObjectId('{unparsable_value}')}}, at line 1",
     ) in caplog.record_tuples
 
 
@@ -493,9 +496,10 @@ async def test_backends_data_async_mongo_read_without_ignore_errors(
     """
 
     backend = async_mongo_backend()
+    unparsable_value = ObjectId()
     documents = [
         {"_id": ObjectId("64945e53a4ee2699573e0d6f"), "id": "foo"},
-        {"_id": ObjectId("64945e530468d817b1f756da"), "id": ObjectId()},
+        {"_id": ObjectId("64945e530468d817b1f756da"), "id": unparsable_value},
         {"_id": ObjectId("64945e530468d817b1f756db"), "id": "baz"},
     ]
     expected = b'{"_id": "64945e53a4ee2699573e0d6f", "id": "foo"}'
@@ -503,27 +507,28 @@ async def test_backends_data_async_mongo_read_without_ignore_errors(
     await backend.database.foobar.insert_many(documents[:2])
     kwargs = {"raw_output": True, "ignore_errors": False}
     msg = (
-        "Failed to encode MongoDB document with ID 64945e530468d817b1f756da: "
-        "Object of type ObjectId is not JSON serializable"
+        "Failed to encode JSON: Object of type ObjectId is not JSON serializable, "
+        "for document: {'_id': '64945e530468d817b1f756da', "
+        f"'id': ObjectId('{unparsable_value}')}}, at line 1"
     )
     with caplog.at_level(logging.ERROR):
-        with pytest.raises(BackendException, match=msg):
+        with pytest.raises(BackendException, match=re.escape(msg)):
             result = [statement async for statement in backend.read(**kwargs)]
             assert next(result) == expected
             next(result)
-        with pytest.raises(BackendException, match=msg):
+        with pytest.raises(BackendException, match=re.escape(msg)):
             result = [
                 statement async for statement in backend.read(**kwargs, target="foobar")
             ]
             assert next(result) == expected
             next(result)
-        with pytest.raises(BackendException, match=msg):
+        with pytest.raises(BackendException, match=re.escape(msg)):
             result = [
                 statement async for statement in backend.read(**kwargs, chunk_size=2)
             ]
             assert next(result) == expected
             next(result)
-        with pytest.raises(BackendException, match=msg):
+        with pytest.raises(BackendException, match=re.escape(msg)):
             result = [
                 statement async for statement in backend.read(**kwargs, chunk_size=1000)
             ]
@@ -936,7 +941,7 @@ async def test_backends_data_async_mongo_write_with_unparsable_documents(
     backend = async_mongo_backend()
     msg = (
         "Failed to decode JSON: Expecting value: line 1 column 1 (char 0), "
-        "for document: b'not valid JSON!'"
+        "for document: b'not valid JSON!', at line 0"
     )
     msg_regex = msg.replace("(", r"\(").replace(")", r"\)")
     with pytest.raises(BackendException, match=msg_regex):
@@ -962,13 +967,13 @@ async def test_backends_data_async_mongo_write_with_no_data(
     0.
     """
     backend = async_mongo_backend()
-    with caplog.at_level(logging.WARNING):
+    with caplog.at_level(logging.INFO):
         assert await backend.write(data=[]) == 0
 
     msg = "Data Iterator is empty; skipping write to target."
     assert (
         "ralph.backends.data.async_mongo",
-        logging.WARNING,
+        logging.INFO,
         msg,
     ) in caplog.record_tuples
 

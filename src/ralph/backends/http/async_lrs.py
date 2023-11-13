@@ -8,14 +8,13 @@ from typing import Iterable, Iterator, List, Optional, Union
 from urllib.parse import ParseResult, parse_qs, urljoin, urlparse
 
 from httpx import AsyncClient, HTTPError, HTTPStatusError, RequestError
-from more_itertools import chunked
 from pydantic import AnyHttpUrl, BaseModel, Field, parse_obj_as
 from pydantic.types import PositiveInt
 
 from ralph.backends.lrs.base import LRSStatementsQuery
 from ralph.conf import BaseSettingsConfig, HeadersParameters
 from ralph.exceptions import BackendException, BackendParameterException
-from ralph.utils import gather_with_limited_concurrency
+from ralph.utils import gather_with_limited_concurrency, iter_by_batch
 
 from .base import (
     BaseHTTPBackend,
@@ -257,6 +256,9 @@ class AsyncLRSHTTPBackend(BaseHTTPBackend):
         if not target:
             target = self.settings.STATEMENTS_ENDPOINT
 
+        if not chunk_size:
+            chunk_size = 500
+
         target = ParseResult(
             scheme=urlparse(self.base_url).scheme,
             netloc=urlparse(self.base_url).netloc,
@@ -288,7 +290,7 @@ class AsyncLRSHTTPBackend(BaseHTTPBackend):
 
         # Create tasks
         tasks = set()
-        for chunk in chunked(data, chunk_size):
+        for chunk in iter_by_batch(data, chunk_size):
             tasks.add(self._post_and_raise_for_status(target, chunk, ignore_errors))
 
         # Run POST tasks

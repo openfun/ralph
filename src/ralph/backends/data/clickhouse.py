@@ -35,6 +35,7 @@ from ralph.backends.data.base import (
 )
 from ralph.conf import BaseSettingsConfig, ClientOptions
 from ralph.exceptions import BackendException, BackendParameterException
+from ralph.utils import iter_by_batch, parse_dict_to_bytes, parse_iterable_to_dict
 
 logger = logging.getLogger(__name__)
 
@@ -206,7 +207,7 @@ class ClickHouseDataBackend(
                 yield str(table.get("name"))
 
     @enforce_query_checks
-    def read(  # noqa: PLR0912, PLR0913
+    def read(  # noqa: PLR0913
         self,
         *,
         query: Optional[Union[str, ClickHouseQuery]] = None,
@@ -224,17 +225,30 @@ class ClickHouseDataBackend(
             chunk_size (int or None): The chunk size when reading documents by batches.
                 If chunk_size is `None` it defaults to `default_chunk_size`.
             raw_output (bool): Controls whether to yield dictionaries or bytes.
-            ignore_errors (bool): If `True`, errors during the encoding operation
-                will be ignored and logged. If `False` (default), a `BackendException`
-                will be raised if an error occurs.
+            ignore_errors (bool): If `True`, encoding errors during the read operation
+                will be ignored and logged.
+                If `False` (default), a `BackendException` is raised on any error.
 
         Yield:
             bytes: The next raw document if `raw_output` is True.
             dict: The next JSON parsed document if `raw_output` is False.
 
         Raise:
-            BackendException: If a failure occurs during ClickHouse connection.
+            BackendException: If a failure occurs during ClickHouse connection or
+                during encoding documents and `ignore_errors` is set to `False`.
         """
+        if raw_output:
+            documents = self.read(
+                query=query,
+                target=target,
+                chunk_size=chunk_size,
+                raw_output=False,
+                ignore_errors=ignore_errors,
+            )
+            locale = self.settings.LOCALE_ENCODING
+            yield from parse_dict_to_bytes(documents, locale, ignore_errors, logger)
+            return
+
         if target is None:
             target = self.event_table_name
 
@@ -269,8 +283,6 @@ class ClickHouseDataBackend(
         if query.limit:
             sql += f"\nLIMIT {query.limit}"
 
-        reader = self._read_raw if raw_output else self._read_json
-
         logger.debug(
             "Start reading the %s table of the %s database (chunk size: %d)",
             target,
@@ -284,16 +296,9 @@ class ClickHouseDataBackend(
                 settings={"buffer_size": chunk_size},
                 column_oriented=query.column_oriented,
             ).named_results()
-            for statement in result:
-                try:
-                    yield reader(statement)
-                except (TypeError, ValueError) as error:
-                    msg = "Failed to encode document %s: %s"
-                    if ignore_errors:
-                        logger.warning(msg, statement, error)
-                        continue
-                    logger.error(msg, statement, error)
-                    raise BackendException(msg % (statement, error)) from error
+            yield from parse_iterable_to_dict(
+                result, ignore_errors, logger, self._parse_event_json
+            )
         except (ClickHouseError, IndexError, TypeError, ValueError) as error:
             msg = "Failed to read documents: %s"
             logger.error(msg, error)
@@ -315,9 +320,9 @@ class ClickHouseDataBackend(
                 If target is `None`, the `event_table_name` is used instead.
             chunk_size (int or None): The number of documents to write in one batch.
                 If `chunk_size` is `None` it defaults to `default_chunk_size`.
-            ignore_errors (bool): If `True`, errors during the write operation
-                will be ignored and logged. If `False` (default), a `BackendException`
-                will be raised if an error occurs.
+            ignore_errors (bool): If `True`, errors during decoding, encoding and
+                sending batches of documents are ignored and logged.
+                If `False` (default), a `BackendException` is raised on any error.
             operation_type (BaseOperationType or None): The mode of the write operation.
                 If `operation_type` is `None`, the `default_operation_type` is used
                 instead. See `BaseOperationType`.
@@ -326,8 +331,8 @@ class ClickHouseDataBackend(
             int: The number of documents written.
 
         Raise:
-            BackendException: If a failure occurs while writing to ClickHouse or
-                during document decoding and `ignore_errors` is set to `False`.
+            BackendException: If any failure occurs during the write operation or
+                if an inescapable failure occurs and `ignore_errors` is set to `True`.
             BackendParameterException: If the `operation_type` is `APPEND`, `UPDATE`
                 or `DELETE` as it is not supported.
         """
@@ -352,7 +357,7 @@ class ClickHouseDataBackend(
 
         data = chain([first_record], data)
         if isinstance(first_record, bytes):
-            data = self._parse_bytes_to_dict(data, ignore_errors)
+            data = parse_iterable_to_dict(data, ignore_errors, logger)
 
         if operation_type not in [BaseOperationType.CREATE, BaseOperationType.INDEX]:
             msg = "%s operation_type is not allowed."
@@ -361,30 +366,9 @@ class ClickHouseDataBackend(
 
         # operation_type is either CREATE or INDEX
         count = 0
-        batch = []
-
-        for insert_tuple in self._to_insert_tuples(
-            data,
-            ignore_errors=ignore_errors,
-        ):
-            batch.append(insert_tuple)
-            if len(batch) < chunk_size:
-                continue
-
-            count += self._bulk_import(
-                batch,
-                ignore_errors=ignore_errors,
-                event_table_name=target,
-            )
-            batch = []
-
-        # Edge case: if the total number of documents is lower than the chunk size
-        if len(batch) > 0:
-            count += self._bulk_import(
-                batch,
-                ignore_errors=ignore_errors,
-                event_table_name=target,
-            )
+        insert_tuples = self._to_insert_tuples(data, ignore_errors)
+        for batch in iter_by_batch(insert_tuples, chunk_size):
+            count += self._bulk_import(batch, ignore_errors, target)
 
         logger.info("Inserted a total of %d documents with success", count)
 
@@ -473,35 +457,9 @@ class ClickHouseDataBackend(
         return inserted_count
 
     @staticmethod
-    def _parse_bytes_to_dict(
-        raw_documents: Iterable[bytes], ignore_errors: bool
-    ) -> Iterator[dict]:
-        """Read the `raw_documents` Iterable and yield dictionaries."""
-        for raw_document in raw_documents:
-            try:
-                yield json.loads(raw_document)
-            except (TypeError, json.JSONDecodeError) as error:
-                if ignore_errors:
-                    logger.warning(
-                        "Raised error: %s, for document %s", error, raw_document
-                    )
-                    continue
-                logger.error("Raised error: %s, for document %s", error, raw_document)
-                raise error
-
-    @staticmethod
-    def _read_json(document: Dict[str, Any]) -> Dict[str, Any]:
-        """Read the `documents` row and yield for the event JSON."""
+    def _parse_event_json(document: Dict[str, Any]) -> Dict[str, Any]:
+        """Return the `document` with a JSON parsed `event` field."""
         if "event" in document:
             document["event"] = json.loads(document["event"])
 
         return document
-
-    def _read_raw(self, document: Dict[str, Any]) -> bytes:
-        """Read the `documents` Iterable and yield bytes."""
-        # We want to return a JSON structure of the whole row, so if the event string
-        # is in there we first need to serialize it so that we can deserialize the
-        # whole thing.
-        document = self._read_json(document)
-
-        return json.dumps(document).encode(self.locale_encoding)

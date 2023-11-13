@@ -55,7 +55,6 @@ backend-ldp = [
 ]
 backend-lrs = [
     "httpx<0.25.0", # pin as `pytest-httpx<0.23.0` requires `httpx==0.24.*`
-    "more-itertools==10.1.0",
 ]
 backend-mongo = [
     "motor[srv]>=3.3.0",

@@ -675,7 +675,7 @@ def read(  # noqa: PLR0913
             iter_over_async(statements) if isasyncgen(statements) else statements
         )
         for statement in statements:
-            click.echo(statement)
+            click.echo(statement, nl=False)
     elif isinstance(backend, BaseStreamBackend):
         backend.stream(sys.stdout.buffer)
     elif isinstance(backend, BaseHTTPBackend):

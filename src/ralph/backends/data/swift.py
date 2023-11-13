@@ -1,9 +1,9 @@
 """Base data backend for Ralph."""
 
-import json
 import logging
 from functools import cached_property
 from io import IOBase
+from itertools import chain
 from typing import Iterable, Iterator, Optional, Union
 from uuid import uuid4
 
@@ -22,7 +22,7 @@ from ralph.backends.data.base import (
 from ralph.backends.mixins import HistoryMixin
 from ralph.conf import BaseSettingsConfig
 from ralph.exceptions import BackendException, BackendParameterException
-from ralph.utils import now
+from ralph.utils import now, parse_dict_to_bytes, parse_iterable_to_dict
 
 logger = logging.getLogger(__name__)
 
@@ -110,7 +110,7 @@ class SwiftDataBackend(
     def status(self) -> DataBackendStatus:
         """Implement data backend checks (e.g. connection, cluster status).
 
-        Returns:
+        Return:
             DataBackendStatus: The status of the data backend.
         """
         try:
@@ -133,11 +133,11 @@ class SwiftDataBackend(
             details (bool): Get detailed object information instead of just names.
             new (bool): Given the history, list only not already read objects.
 
-        Yields:
+        Yield:
             str: The next object path. (If details is False)
             dict: The next object details. (If `details` is True.)
 
-        Raises:
+        Raise:
             BackendException: If a failure occurs.
         """
         if target is None:
@@ -184,24 +184,23 @@ class SwiftDataBackend(
                 are encoded as JSON.
                 If the objects are bytes and `raw_output` is set to `False`, they are
                 decoded as JSON by line.
-            ignore_errors (bool): If `True`, errors during the read operation
-                are be ignored and logged. If `False` (default), a `BackendException`
-                is raised if an error occurs.
+            ignore_errors (bool): If `True`, encoding errors during the read operation
+                will be ignored and logged.
+                If `False` (default), a `BackendException` is raised on any error.
 
-        Yields:
+        Yield:
             dict: If `raw_output` is False.
             bytes: If `raw_output` is True.
 
-        Raises:
-            BackendException: If a failure during the read operation occurs and
-                `ignore_errors` is set to `False`.
+        Raise:
+            BackendException: If a failure during the read operation occurs or
+                during encoding records and `ignore_errors` is set to `False`.
             BackendParameterException: If a backend argument value is not valid.
         """
         if query.query_string is None:
             msg = "Invalid query. The query should be a valid archive name."
             logger.error(msg)
-            if not ignore_errors:
-                raise BackendParameterException(msg)
+            raise BackendParameterException(msg)
 
         target = target if target else self.default_container
 
@@ -221,13 +220,13 @@ class SwiftDataBackend(
             msg = "Failed to read %s: %s"
             error = err.msg
             logger.error(msg, query.query_string, error)
-            if not ignore_errors:
-                raise BackendException(msg % (query.query_string, error)) from err
+            raise BackendException(msg % (query.query_string, error)) from err
 
-        reader = self._read_raw if raw_output else self._read_dict
-
-        for chunk in reader(content, chunk_size, ignore_errors):
-            yield chunk
+        if raw_output:
+            while chunk := content.read(chunk_size):
+                yield chunk
+        else:
+            yield from parse_iterable_to_dict(content, ignore_errors, logger)
 
         # Archive read, add a new entry to the history
         self.append_to_history(
@@ -240,7 +239,7 @@ class SwiftDataBackend(
             }
         )
 
-    def write(  # noqa: PLR0912, PLR0913
+    def write(  # noqa: PLR0913
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Optional[str] = None,
@@ -255,26 +254,37 @@ class SwiftDataBackend(
             target (str or None): The target container name.
                 If `target` is `None`, a default value is used instead.
             chunk_size (int or None): Ignored.
-            ignore_errors (bool): If `True`, errors during the write operation
-                are ignored and logged. If `False` (default), a `BackendException`
-                is raised if an error occurs.
+            ignore_errors (bool): If `True`, errors during decoding and encoding of
+                records are ignored and logged.
+                If `False` (default), a `BackendException` is raised on any error.
             operation_type (BaseOperationType or None): The mode of the write operation.
                 If `operation_type` is `None`, the `default_operation_type` is used
                 instead. See `BaseOperationType`.
 
-        Returns:
+        Return:
             int: The number of written records.
 
-        Raises:
-            BackendException: If a failure during the write operation occurs and
-                `ignore_errors` is set to `False`.
+        Raise:
+            BackendException: If any failure occurs during the write operation or
+                if an inescapable failure occurs and `ignore_errors` is set to `True`.
             BackendParameterException: If a backend argument value is not valid.
         """
+        data = iter(data)
         try:
-            first_record = next(iter(data))
+            first_record = next(data)
         except StopIteration:
             logger.info("Data Iterator is empty; skipping write to target.")
             return 0
+
+        data = chain((first_record,), data)
+        if isinstance(first_record, dict):
+            data = parse_dict_to_bytes(
+                data, self.settings.LOCALE_ENCODING, ignore_errors, logger
+            )
+
+        counter = {"count": 0}
+        data = self._count(data, counter)
+
         if not operation_type:
             operation_type = self.default_operation_type
 
@@ -303,21 +313,13 @@ class SwiftDataBackend(
         ]:
             msg = "%s operation_type is not allowed."
             logger.error(msg, operation_type.name)
-            if not ignore_errors:
-                raise BackendParameterException(msg % operation_type.name)
+            raise BackendParameterException(msg % operation_type.name)
 
         if operation_type in [BaseOperationType.CREATE, BaseOperationType.INDEX]:
             if target_object in list(self.list(target=target_container)):
                 msg = "%s already exists and overwrite is not allowed for operation %s"
                 logger.error(msg, target_object, operation_type)
-                if not ignore_errors:
-                    raise BackendException(msg % (target_object, operation_type))
-
-            if isinstance(first_record, dict):
-                data = [
-                    json.dumps(statement).encode(self.locale_encoding)
-                    for statement in data
-                ]
+                raise BackendException(msg % (target_object, operation_type))
 
             try:
                 self.connection.put_object(
@@ -330,10 +332,9 @@ class SwiftDataBackend(
                 msg = "Failed to write to object %s: %s"
                 error = err.msg
                 logger.error(msg, target_object, error)
-                if not ignore_errors:
-                    raise BackendException(msg % (target_object, error)) from err
+                raise BackendException(msg % (target_object, error)) from err
 
-        count = sum(1 for _ in data)
+        count = counter["count"]
         logging.info("Successfully written %s statements to %s", count, target)
 
         # Archive written, add a new entry to the history
@@ -382,23 +383,8 @@ class SwiftDataBackend(
         }
 
     @staticmethod
-    def _read_dict(
-        obj: Iterable, _chunk_size: int, ignore_errors: bool
-    ) -> Iterator[dict]:
-        """Read the `object` by line and yield JSON parsed dictionaries."""
-        for i, line in enumerate(obj):
-            try:
-                yield json.loads(line)
-            except (TypeError, json.JSONDecodeError) as err:
-                msg = "Raised error: %s, at line %s"
-                logger.error(msg, err, i)
-                if not ignore_errors:
-                    raise BackendException(msg % (err, i)) from err
-
-    @staticmethod
-    def _read_raw(
-        obj: Iterable, chunk_size: int, _ignore_errors: bool
-    ) -> Iterator[bytes]:
-        """Read the `object` by line and yield bytes."""
-        while chunk := obj.read(chunk_size):
-            yield chunk
+    def _count(statements: Iterable, counter: dict) -> Iterator:
+        """Count the elements in the `statements` Iterable and yield element."""
+        for statement in statements:
+            yield statement
+            counter["count"] += 1

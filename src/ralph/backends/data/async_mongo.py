@@ -1,10 +1,9 @@
 """Async MongoDB data backend for Ralph."""
 
-import json
 import logging
 from io import IOBase
 from itertools import chain
-from typing import Any, Dict, Iterable, Iterator, Optional, TypeVar, Union
+from typing import Iterable, Iterator, Optional, TypeVar, Union
 
 from bson.errors import BSONError
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -18,7 +17,7 @@ from ralph.backends.data.mongo import (
     MongoQuery,
 )
 from ralph.exceptions import BackendException, BackendParameterException
-from ralph.utils import parse_bytes_to_dict
+from ralph.utils import async_parse_dict_to_bytes, iter_by_batch, parse_iterable_to_dict
 
 from ..data.base import (
     AsyncListable,
@@ -140,16 +139,34 @@ class AsyncMongoDataBackend(
             chunk_size (int or None): The chunk size when reading documents by batches.
                 If chunk_size is `None` the `DEFAULT_CHUNK_SIZE` is used instead.
             raw_output (bool): Whether to yield dictionaries or bytes.
-            ignore_errors (bool): Whether to ignore errors when reading documents.
+            ignore_errors (bool): If `True`, encoding errors during the read operation
+                will be ignored and logged.
+                If `False` (default), a `BackendException` is raised on any error.
 
         Yield:
             bytes: The next raw document if `raw_output` is True.
             dict: The next JSON parsed document if `raw_output` is False.
 
         Raise:
-            BackendException: If a failure occurs during MongoDB connection.
-            BackendParameterException: If a failure occurs with MongoDB collection.
+            BackendException: If a failure occurs during MongoDB connection or
+                during encoding documents and `ignore_errors` is set to `False`.
+            BackendParameterException: If the `target` is not a valid collection name.
         """
+        if raw_output:
+            documents = self.read(
+                query=query,
+                target=target,
+                chunk_size=chunk_size,
+                raw_output=False,
+                ignore_errors=ignore_errors,
+            )
+            async for document in async_parse_dict_to_bytes(
+                documents, self.settings.LOCALE_ENCODING, ignore_errors, logger
+            ):
+                yield document
+
+            return
+
         if not chunk_size:
             chunk_size = self.settings.DEFAULT_CHUNK_SIZE
 
@@ -163,20 +180,10 @@ class AsyncMongoDataBackend(
             logger.error(msg, target, error)
             raise BackendParameterException(msg % (target, error)) from error
 
-        reader = self._read_raw if raw_output else lambda _: _
         try:
             async for document in collection.find(batch_size=chunk_size, **query):
                 document.update({"_id": str(document.get("_id"))})
-                try:
-                    yield reader(document)
-                except (TypeError, ValueError) as error:
-                    msg = "Failed to encode MongoDB document with ID %s: %s"
-                    document_id = document.get("_id")
-                    logger.error(msg, document_id, error)
-                    if ignore_errors:
-                        logger.warning(msg, document_id, error)
-                        continue
-                    raise BackendException(msg % (document_id, error)) from error
+                yield document
         except (PyMongoError, IndexError, TypeError, ValueError) as error:
             msg = "Failed to execute MongoDB query: %s"
             logger.error(msg, error)
@@ -197,7 +204,9 @@ class AsyncMongoDataBackend(
             target (str or None): The target MongoDB collection name.
             chunk_size (int or None): The number of documents to write in one batch.
                 If chunk_size is `None` the `DEFAULT_CHUNK_SIZE` is used instead.
-            ignore_errors (bool): Whether to ignore errors or not.
+            ignore_errors (bool): If `True`, errors during decoding, encoding and
+                sending batches of documents are ignored and logged.
+                If `False` (default), a `BackendException` is raised on any error.
             operation_type (BaseOperationType or None): The mode of the write operation.
                 If `operation_type` is `None`, the `default_operation_type` is used
                     instead. See `BaseOperationType`.
@@ -206,8 +215,8 @@ class AsyncMongoDataBackend(
             int: The number of documents written.
 
         Raise:
-            BackendException: If a failure occurs while writing to MongoDB or
-                during document decoding and `ignore_errors` is set to `False`.
+            BackendException: If any failure occurs during the write operation or
+                if an inescapable failure occurs and `ignore_errors` is set to `True`.
             BackendParameterException: If the `operation_type` is `APPEND` as it is not
                 supported.
         """
@@ -235,29 +244,26 @@ class AsyncMongoDataBackend(
         try:
             first_record = next(data)
         except StopIteration:
-            logger.warning("Data Iterator is empty; skipping write to target.")
+            logger.info("Data Iterator is empty; skipping write to target.")
             return count
         data = chain([first_record], data)
         if isinstance(first_record, bytes):
-            data = parse_bytes_to_dict(data, ignore_errors, logger)
+            data = parse_iterable_to_dict(data, ignore_errors, logger)
 
         if operation_type == BaseOperationType.UPDATE:
-            for batch in MongoDataBackend.iter_by_batch(
-                MongoDataBackend.to_replace_one(data), chunk_size
-            ):
+            data = MongoDataBackend.to_replace_one(data)
+            for batch in iter_by_batch(data, chunk_size):
                 count += await self._bulk_update(batch, ignore_errors, collection)
             logger.info("Updated %d documents with success", count)
         elif operation_type == BaseOperationType.DELETE:
-            for batch in MongoDataBackend.iter_by_batch(
-                MongoDataBackend.to_ids(data), chunk_size
-            ):
+            for batch in iter_by_batch(MongoDataBackend.to_ids(data), chunk_size):
                 count += await self._bulk_delete(batch, ignore_errors, collection)
             logger.info("Deleted %d documents with success", count)
         else:
             data = MongoDataBackend.to_documents(
                 data, ignore_errors, operation_type, logger
             )
-            for batch in MongoDataBackend.iter_by_batch(data, chunk_size):
+            for batch in iter_by_batch(data, chunk_size):
                 count += await self._bulk_import(batch, ignore_errors, collection)
             logger.info("Inserted %d documents with success", count)
 
@@ -326,7 +332,3 @@ class AsyncMongoDataBackend(
         modified_count = updated_documents.modified_count
         logger.debug("Updated %d documents chunk with success", modified_count)
         return modified_count
-
-    def _read_raw(self, document: Dict[str, Any]) -> bytes:
-        """Read the `document` dictionary and return bytes."""
-        return json.dumps(document).encode(self.settings.LOCALE_ENCODING)

@@ -1,6 +1,5 @@
 """S3 data backend for Ralph."""
 
-import json
 import logging
 from io import IOBase
 from itertools import chain
@@ -16,7 +15,6 @@ from botocore.exceptions import (
     ReadTimeoutError,
     ResponseStreamingError,
 )
-from botocore.response import StreamingBody
 from requests_toolbelt import StreamingIterator
 
 from ralph.backends.data.base import (
@@ -32,7 +30,7 @@ from ralph.backends.data.base import (
 from ralph.backends.mixins import HistoryMixin
 from ralph.conf import BaseSettingsConfig
 from ralph.exceptions import BackendException, BackendParameterException
-from ralph.utils import now
+from ralph.utils import now, parse_dict_to_bytes, parse_iterable_to_dict
 
 logger = logging.getLogger(__name__)
 
@@ -121,11 +119,11 @@ class S3DataBackend(
             details (bool): Get detailed object information instead of just object name.
             new (bool): Given the history, list only unread files.
 
-        Yields:
+        Yield:
             str: The next object name. (If details is False).
             dict: The next object details. (If details is True).
 
-        Raises:
+        Raise:
             BackendException: If a failure occurs.
         """
         if target is None:
@@ -169,23 +167,22 @@ class S3DataBackend(
 
         Args:
             query: (str or BaseQuery): The ID of the object to read.
-            target (str or None): The target bucket containing the objects.
+            target (str or None): The target bucket containing the object.
                 If target is `None`, the `default_bucket` is used instead.
             chunk_size (int or None): The chunk size when reading objects by batch.
             raw_output (bool): Controls whether to yield bytes or dictionaries.
-            ignore_errors (bool): If `True`, errors during the read operation
-                will be ignored and logged. If `False` (default), a `BackendException`
-                will be raised if an error occurs.
+            ignore_errors (bool): If `True`, encoding errors during the read operation
+                will be ignored and logged.
+                If `False` (default), a `BackendException` is raised on any error.
 
-        Yields:
+        Yield:
             dict: If `raw_output` is False.
             bytes: If `raw_output` is True.
 
-        Raises:
-            BackendException: If a failure during the read operation occurs and
-                `ignore_errors` is set to `False`.
-            BackendParameterException: If a backend argument value is not valid and
-                `ignore_errors` is set to `False`.
+        Raise:
+            BackendException: If a connection failure occurs while reading from S3 or
+                during object encoding and `ignore_errors` is set to `False`.
+            BackendParameterException: If a backend argument value is not valid.
         """
         if query.query_string is None:
             msg = "Invalid query. The query should be a valid object name."
@@ -204,18 +201,18 @@ class S3DataBackend(
             error_msg = err.response["Error"]["Message"]
             msg = "Failed to download %s: %s"
             logger.error(msg, query.query_string, error_msg)
-            if not ignore_errors:
-                raise BackendException(msg % (query.query_string, error_msg)) from err
+            raise BackendException(msg % (query.query_string, error_msg)) from err
 
-        reader = self._read_raw if raw_output else self._read_dict
         try:
-            for chunk in reader(response["Body"], chunk_size, ignore_errors):
-                yield chunk
+            if raw_output:
+                yield from response["Body"].iter_chunks(chunk_size)
+            else:
+                lines = response["Body"].iter_lines(chunk_size)
+                yield from parse_iterable_to_dict(lines, ignore_errors, logger)
         except (ReadTimeoutError, ResponseStreamingError) as err:
             msg = "Failed to read chunk from object %s"
             logger.error(msg, query.query_string)
-            if not ignore_errors:
-                raise BackendException(msg % (query.query_string)) from err
+            raise BackendException(msg % (query.query_string)) from err
 
         # Archive fetched, add a new entry to the history.
         self.append_to_history(
@@ -247,9 +244,9 @@ class S3DataBackend(
                 If target does not contain a `/`, it is assumed to be the
                 target object and the default bucket is used.
             chunk_size (int or None): Ignored.
-            ignore_errors (bool): If `True`, errors during the write operation
-                are ignored and logged. If `False` (default), a `BackendException`
-                is raised if an error occurs.
+            ignore_errors (bool): If `True`, errors during decoding and encoding of
+                records are ignored and logged.
+                If `False` (default), a `BackendException` is raised on any error.
             operation_type (BaseOperationType or None): The mode of the write
                 operation.
                 If operation_type is `CREATE` or `INDEX`, the target object is
@@ -260,7 +257,8 @@ class S3DataBackend(
             int: The number of written objects.
 
         Raise:
-            BackendException: If a failure during the write operation occurs.
+            BackendException: If any failure occurs during the write operation or
+                if an inescapable failure occurs and `ignore_errors` is set to `True`.
             BackendParameterException: If a backend argument value is not valid.
         """
         data = iter(data)
@@ -307,7 +305,9 @@ class S3DataBackend(
 
         data = chain((first_record,), data)
         if isinstance(first_record, dict):
-            data = self._parse_dict_to_bytes(data, ignore_errors)
+            data = parse_dict_to_bytes(
+                data, self.settings.LOCALE_ENCODING, ignore_errors, logger
+            )
 
         counter = {"count": 0}
         data = self._count(data, counter)
@@ -361,48 +361,8 @@ class S3DataBackend(
             raise BackendException(msg % error) from error
 
     @staticmethod
-    def _read_raw(
-        obj: StreamingBody, chunk_size: int, _ignore_errors: bool
-    ) -> Iterator[bytes]:
-        """Read the `object` in chunks of size `chunk_size` and yield them."""
-        for chunk in obj.iter_chunks(chunk_size):
-            yield chunk
-
-    @staticmethod
-    def _read_dict(
-        obj: StreamingBody, chunk_size: int, ignore_errors: bool
-    ) -> Iterator[dict]:
-        """Read the `object` by line and yield JSON parsed dictionaries."""
-        for line in obj.iter_lines(chunk_size):
-            try:
-                yield json.loads(line)
-            except (TypeError, json.JSONDecodeError) as err:
-                msg = "Raised error: %s"
-                logger.error(msg, err)
-                if not ignore_errors:
-                    raise BackendException(msg % err) from err
-
-    @staticmethod
-    def _parse_dict_to_bytes(
-        statements: Iterable[dict], ignore_errors: bool
-    ) -> Iterator[bytes]:
-        """Read the `statements` Iterable and yield bytes."""
-        for statement in statements:
-            try:
-                yield bytes(f"{json.dumps(statement)}\n", encoding="utf-8")
-            except TypeError as error:
-                msg = "Failed to encode JSON: %s, for document %s"
-                logger.error(msg, error, statement)
-                if ignore_errors:
-                    continue
-                raise BackendException(msg % (error, statement)) from error
-
-    @staticmethod
-    def _count(
-        statements: Union[Iterable[bytes], Iterable[dict]],
-        counter: dict,
-    ) -> Iterator:
+    def _count(statements: Iterable, counter: dict) -> Iterator:
         """Count the elements in the `statements` Iterable and yield element."""
         for statement in statements:
-            counter["count"] += 1
             yield statement
+            counter["count"] += 1
