@@ -457,7 +457,11 @@ def test_backends_data_swift_read_without_ignore_errors(
     result = backend.read(ignore_errors=False, query="2020-06-02.gz")
     assert isinstance(result, Iterable)
     assert next(result) == valid_dictionary
-    with pytest.raises(BackendException, match="Raised error:"):
+    msg = (
+        r"Failed to decode JSON: Expecting value: line 1 column 1 \(char 0\), "
+        r"for document: b'baz\\n', at line 1"
+    )
+    with pytest.raises(BackendException, match=msg):
         next(result)
 
     # When the `read` method fails to read a file entirely, then no entry should be
@@ -474,7 +478,11 @@ def test_backends_data_swift_read_without_ignore_errors(
     # method should raise a `BackendException` at the second line.
     result = backend.read(ignore_errors=False, query="2020-06-03.gz")
     assert isinstance(result, Iterable)
-    with pytest.raises(BackendException, match="Raised error:"):
+    msg = (
+        r"Failed to decode JSON: Expecting value: line 1 column 1 \(char 0\), "
+        r"for document: b'baz\\n', at line 0"
+    )
+    with pytest.raises(BackendException, match=msg):
         next(result)
     backend.close()
 
@@ -625,7 +633,8 @@ def test_backends_data_swift_write_without_target(
     def mock_get_container(*args, **kwargs):
         return (None, [x["name"] for x in listing])
 
-    def mock_put_object(*args, **kwargs):
+    def mock_put_object(container, obj, contents):
+        list(contents)
         return 1
 
     def mock_head_object(*args, **kwargs):

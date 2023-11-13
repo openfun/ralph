@@ -36,7 +36,7 @@ from ralph.backends.data.base import (
 )
 from ralph.conf import BaseSettingsConfig, ClientOptions
 from ralph.exceptions import BackendException, BackendParameterException
-from ralph.utils import parse_bytes_to_dict, read_raw
+from ralph.utils import iter_by_batch, parse_dict_to_bytes, parse_iterable_to_dict
 
 logger = logging.getLogger(__name__)
 
@@ -115,7 +115,7 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
     def status(self) -> DataBackendStatus:
         """Check the MongoDB connection status.
 
-        Returns:
+        Return:
             DataBackendStatus: The status of the data backend.
         """
         # Check MongoDB connection.
@@ -150,7 +150,7 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
             details (bool): Get detailed collection information instead of just IDs.
             new (bool): Ignored.
 
-        Raises:
+        Raise:
             BackendException: If a failure during the list operation occurs.
             BackendParameterException: If the `target` is not a valid database name.
         """
@@ -194,16 +194,31 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
             chunk_size (int or None): The chunk size when reading archives by batch.
                 If chunk_size is `None` the `DEFAULT_CHUNK_SIZE` is used instead.
             raw_output (bool): Whether to yield dictionaries or bytes.
-            ignore_errors (bool): Whether to ignore errors when reading documents.
+            ignore_errors (bool): If `True`, encoding errors during the read operation
+                will be ignored and logged.
+                If `False` (default), a `BackendException` is raised on any error.
 
-        Yields:
+        Yield:
             dict: If `raw_output` is False.
             bytes: If `raw_output` is True.
 
-        Raises:
-            BackendException: If a failure during the read operation occurs.
+        Raise:
+            BackendException: If a failure occurs during MongoDB connection or
+                during encoding documents and `ignore_errors` is set to `False`.
             BackendParameterException: If the `target` is not a valid collection name.
         """
+        if raw_output:
+            documents = self.read(
+                query=query,
+                target=target,
+                chunk_size=chunk_size,
+                raw_output=False,
+                ignore_errors=ignore_errors,
+            )
+            locale = self.settings.LOCALE_ENCODING
+            yield from parse_dict_to_bytes(documents, locale, ignore_errors, logger)
+            return
+
         if not chunk_size:
             chunk_size = self.settings.DEFAULT_CHUNK_SIZE
 
@@ -221,12 +236,7 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
         try:
             documents = collection.find(batch_size=chunk_size, **query)
             documents = (d.update({"_id": str(d.get("_id"))}) or d for d in documents)
-            if raw_output:
-                documents = read_raw(
-                    documents, self.settings.LOCALE_ENCODING, ignore_errors, logger
-                )
-            for document in documents:
-                yield document
+            yield from documents
         except (PyMongoError, IndexError, TypeError, ValueError) as error:
             msg = "Failed to execute MongoDB query: %s"
             logger.error(msg, error)
@@ -247,17 +257,19 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
             target (str or None): The target MongoDB collection name.
             chunk_size (int or None): The number of documents to write in one batch.
                 If chunk_size is `None` the `DEFAULT_CHUNK_SIZE` is used instead.
-            ignore_errors (bool): Whether to ignore errors or not.
+            ignore_errors (bool):  If `True`, errors during decoding, encoding and
+                sending batches of documents are ignored and logged.
+                If `False` (default), a `BackendException` is raised on any error.
             operation_type (BaseOperationType or None): The mode of the write operation.
                 If `operation_type` is `None`, the `default_operation_type` is used
                     instead. See `BaseOperationType`.
 
-        Returns:
+        Return:
             int: The number of documents written.
 
-        Raises:
-            BackendException: If a failure occurs while writing to MongoDB or
-                during document decoding and `ignore_errors` is set to `False`.
+        Raise:
+            BackendException: If any failure occurs during the write operation or
+                if an inescapable failure occurs and `ignore_errors` is set to `True`.
             BackendParameterException: If the `operation_type` is `APPEND` as it is not
                 supported.
         """
@@ -289,19 +301,19 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
             return count
         data = chain([first_record], data)
         if isinstance(first_record, bytes):
-            data = parse_bytes_to_dict(data, ignore_errors, logger)
+            data = parse_iterable_to_dict(data, ignore_errors, logger)
 
         if operation_type == BaseOperationType.UPDATE:
-            for batch in self.iter_by_batch(self.to_replace_one(data), chunk_size):
+            for batch in iter_by_batch(self.to_replace_one(data), chunk_size):
                 count += self._bulk_update(batch, ignore_errors, collection)
             logger.info("Updated %d documents with success", count)
         elif operation_type == BaseOperationType.DELETE:
-            for batch in self.iter_by_batch(self.to_ids(data), chunk_size):
+            for batch in iter_by_batch(self.to_ids(data), chunk_size):
                 count += self._bulk_delete(batch, ignore_errors, collection)
             logger.info("Deleted %d documents with success", count)
         else:
             data = self.to_documents(data, ignore_errors, operation_type, logger)
-            for batch in self.iter_by_batch(data, chunk_size):
+            for batch in iter_by_batch(data, chunk_size):
                 count += self._bulk_import(batch, ignore_errors, collection)
             logger.info("Inserted %d documents with success", count)
 
@@ -319,18 +331,6 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
             msg = "Failed to close MongoDB client: %s"
             logger.error(msg, error)
             raise BackendException(msg % error) from error
-
-    @staticmethod
-    def iter_by_batch(data: Iterable[dict], chunk_size: int):
-        """Iterate over `data` Iterable and yield batches of size `chunk_size`."""
-        batch = []
-        for document in data:
-            batch.append(document)
-            if len(batch) >= chunk_size:
-                yield batch
-                batch = []
-        if batch:
-            yield batch
 
     @staticmethod
     def to_ids(data: Iterable[dict]) -> Iterable[str]:

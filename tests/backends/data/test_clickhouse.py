@@ -2,7 +2,9 @@
 
 import json
 import logging
+import re
 import uuid
+from collections import namedtuple
 from datetime import datetime, timedelta
 
 import pytest
@@ -222,26 +224,23 @@ def test_backends_data_clickhouse_read_with_failures(
 ):
     """Test the `ClickHouseDataBackend.read` method with failures."""
     backend = clickhouse_backend()
-
-    statement = {"id": str(uuid.uuid4()), "timestamp": str(datetime.utcnow())}
-    document = {"event": json.dumps(statement)}
-    backend.write([statement])
+    document = {"event": "Invalid JSON!"}
 
     # JSON encoding error
-    def mock_read_json(*args, **kwargs):
-        """Mock the `ClickHouseDataBackend._read_json` method."""
-        raise TypeError("Error")
+    def mock_clickhouse_client_query(*args, **kwargs):
+        """Mock the `clickhouse.Client.query` returning an unparsable document."""
+        return namedtuple("_", "named_results")(lambda: [document])
 
-    monkeypatch.setattr(backend, "_read_json", mock_read_json)
+    monkeypatch.setattr(backend.client, "query", mock_clickhouse_client_query)
 
-    msg = f"Failed to encode document {document}: Error"
+    msg = (
+        "Failed to decode JSON: Expecting value: line 1 column 1 (char 0), "
+        "for document: {'event': 'Invalid JSON!'}, at line 0"
+    )
 
     # Not ignoring errors
     with caplog.at_level(logging.ERROR):
-        with pytest.raises(
-            BackendException,
-            match=msg,
-        ):
+        with pytest.raises(BackendException, match=re.escape(msg)):
             list(backend.read(raw_output=False, ignore_errors=False))
 
     assert (
@@ -277,10 +276,7 @@ def test_backends_data_clickhouse_read_with_failures(
 
     msg = "Failed to read documents: Something is wrong"
     with caplog.at_level(logging.ERROR):
-        with pytest.raises(
-            BackendException,
-            match=msg,
-        ):
+        with pytest.raises(BackendException, match=re.escape(msg)):
             list(backend.read(ignore_errors=True))
 
     assert (
@@ -549,7 +545,11 @@ def test_backends_data_clickhouse_write_bytes_failed(clickhouse, clickhouse_back
     byte_data.append(json_str.encode("utf-8"))
 
     count = 0
-    with pytest.raises(json.JSONDecodeError):
+    msg = (
+        r"Failed to decode JSON: Expecting value: line 1 column 1 \(char 0\), "
+        r"for document: b'failed_json_str', at line 0"
+    )
+    with pytest.raises(BackendException, match=msg):
         count = backend.write(byte_data)
 
     assert count == 0

@@ -114,11 +114,11 @@ class LDPDataBackend(
             details (bool): Get detailed archive information in addition to archive IDs.
             new (bool): Given the history, list only not already read archives.
 
-        Yields:
+        Yield:
             str: If `details` is False.
             dict: If `details` is True.
 
-        Raises:
+        Raise:
             BackendParameterException: If the `target` is `None` and no
                 `DEFAULT_STREAM_ID` is given.
             BackendException: If a failure during retrieval of archives list occurs.
@@ -167,13 +167,13 @@ class LDPDataBackend(
                 If target is `None`, the `DEFAULT_STREAM_ID` is used instead.
             chunk_size (int or None): The chunk size when reading archives by batch.
             raw_output (bool): Ignored. Always set to `True`.
-            ignore_errors (bool): Ignored.
+            ignore_errors (bool): No impact as no encoding operation is performed.
 
-        Yields:
+        Yield:
             bytes: The content of the archive matching the query.
 
-        Raises:
-            BackendException: If a failure during the read operation occurs.
+        Raise:
+            BackendException: If a failure occurs during LDP connection.
             BackendParameterException: If the `query` argument is not an archive name.
         """
         if query.query_string is None:

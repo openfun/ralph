@@ -672,11 +672,14 @@ async def test_backends_http_async_lrs_write_without_operation(
             max_num_simultaneous=max_num_simultaneous,
         )
 
+    # If no chunk_size is provided, a default value (500) should be used.
+    if chunk_size is None:
+        chunk_size = 500
+
     assert (
         "ralph.backends.http.async_lrs",
         logging.DEBUG,
-        f"Start writing to the {base_url}{target} endpoint (chunk size: "
-        f"{chunk_size})",
+        f"Start writing to the {base_url}{target} endpoint (chunk size: {chunk_size})",
     ) in caplog.record_tuples
 
     assert (

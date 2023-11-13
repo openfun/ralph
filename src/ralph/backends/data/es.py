@@ -22,7 +22,7 @@ from ralph.backends.data.base import (
 )
 from ralph.conf import BaseSettingsConfig, ClientOptions, CommaSeparatedTuple
 from ralph.exceptions import BackendException, BackendParameterException
-from ralph.utils import parse_bytes_to_dict, read_raw
+from ralph.utils import parse_dict_to_bytes, parse_iterable_to_dict
 
 logger = logging.getLogger(__name__)
 
@@ -199,7 +199,7 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
             yield index
 
     @enforce_query_checks
-    def read(  # noqa: PLR0912, PLR0913
+    def read(  # noqa: PLR0913
         self,
         *,
         query: Optional[Union[str, ESQuery]] = None,
@@ -219,7 +219,8 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
             chunk_size (int or None): The chunk size when reading documents by batches.
                 If chunk_size is `None` it defaults to `DEFAULT_CHUNK_SIZE`.
             raw_output (bool): Controls whether to yield dictionaries or bytes.
-            ignore_errors (bool): Ignored.
+            ignore_errors (bool): No impact as encoding errors are not expected in
+                Elasticsearch results.
 
         Yield:
             bytes: The next raw document if `raw_output` is True.
@@ -228,10 +229,19 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
         Raise:
             BackendException: If a failure occurs during Elasticsearch connection.
         """
+        if raw_output:
+            documents = self.read(
+                query=query,
+                target=target,
+                chunk_size=chunk_size,
+                raw_output=False,
+                ignore_errors=ignore_errors,
+            )
+            locale = self.settings.LOCALE_ENCODING
+            yield from parse_dict_to_bytes(documents, locale, ignore_errors, logger)
+            return
         target = target if target else self.settings.DEFAULT_INDEX
         chunk_size = chunk_size if chunk_size else self.settings.DEFAULT_CHUNK_SIZE
-        if ignore_errors:
-            logger.warning("The `ignore_errors` argument is ignored")
 
         if not query.pit.keep_alive:
             query.pit.keep_alive = self.settings.POINT_IN_TIME_KEEP_ALIVE
@@ -269,12 +279,7 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
             if count:
                 query.search_after = [str(part) for part in documents[-1]["sort"]]
             kwargs["search_after"] = query.search_after
-            if raw_output:
-                documents = read_raw(
-                    documents, self.settings.LOCALE_ENCODING, ignore_errors, logger
-                )
-            for document in documents:
-                yield document
+            yield from documents
 
     def write(  # noqa: PLR0913
         self,
@@ -292,9 +297,9 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
                 If target is `None`, the `DEFAULT_INDEX` is used instead.
             chunk_size (int or None): The number of documents to write in one batch.
                 If chunk_size is `None` it defaults to `DEFAULT_CHUNK_SIZE`.
-            ignore_errors (bool): If `True`, errors during the write operation
-                will be ignored and logged. If `False` (default), a `BackendException`
-                will be raised if an error occurs.
+            ignore_errors (bool): If `True`, errors during decoding, encoding and
+                sending batches of documents are ignored and logged.
+                If `False` (default), a `BackendException` is raised on any error.
             operation_type (BaseOperationType or None): The mode of the write operation.
                 If `operation_type` is `None`, the `default_operation_type` is used
                 instead. See `BaseOperationType`.
@@ -303,8 +308,8 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
             int: The number of documents written.
 
         Raise:
-            BackendException: If a failure occurs while writing to Elasticsearch or
-                during document decoding and `ignore_errors` is set to `False`.
+            BackendException: If any failure occurs during the write operation or
+                if an inescapable failure occurs and `ignore_errors` is set to `True`.
             BackendParameterException: If the `operation_type` is `APPEND` as it is not
                 supported.
         """
@@ -326,7 +331,7 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
 
         data = chain((first_record,), data)
         if isinstance(first_record, bytes):
-            data = parse_bytes_to_dict(data, ignore_errors, logger)
+            data = parse_iterable_to_dict(data, ignore_errors, logger)
 
         logger.debug(
             "Start writing to the %s index (chunk size: %d)", target, chunk_size

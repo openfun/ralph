@@ -2,6 +2,7 @@
 
 import json
 import logging
+import re
 
 import pytest
 from bson.objectid import ObjectId
@@ -256,9 +257,9 @@ def test_backends_data_mongo_read_with_raw_output(mongo, mongo_backend):
         {"_id": ObjectId("64945e530468d817b1f756db"), "id": "baz"},
     ]
     expected = [
-        b'{"_id": "64945e53a4ee2699573e0d6f", "id": "foo"}',
-        b'{"_id": "64945e530468d817b1f756da", "id": "bar"}',
-        b'{"_id": "64945e530468d817b1f756db", "id": "baz"}',
+        b'{"_id": "64945e53a4ee2699573e0d6f", "id": "foo"}\n',
+        b'{"_id": "64945e530468d817b1f756da", "id": "bar"}\n',
+        b'{"_id": "64945e530468d817b1f756db", "id": "baz"}\n',
     ]
     backend.collection.insert_many(documents)
     backend.database.foobar.insert_many(documents[:2])
@@ -348,14 +349,15 @@ def test_backends_data_mongo_read_with_ignore_errors(mongo, mongo_backend, caplo
     """
 
     backend = mongo_backend()
+    unparsable_value = ObjectId()
     documents = [
         {"_id": ObjectId("64945e53a4ee2699573e0d6f"), "id": "foo"},
-        {"_id": ObjectId("64945e530468d817b1f756da"), "id": ObjectId()},
+        {"_id": ObjectId("64945e530468d817b1f756da"), "id": unparsable_value},
         {"_id": ObjectId("64945e530468d817b1f756db"), "id": "baz"},
     ]
     expected = [
-        b'{"_id": "64945e53a4ee2699573e0d6f", "id": "foo"}',
-        b'{"_id": "64945e530468d817b1f756db", "id": "baz"}',
+        b'{"_id": "64945e53a4ee2699573e0d6f", "id": "foo"}\n',
+        b'{"_id": "64945e530468d817b1f756db", "id": "baz"}\n',
     ]
     backend.collection.insert_many(documents)
     backend.database.foobar.insert_many(documents[:2])
@@ -369,8 +371,9 @@ def test_backends_data_mongo_read_with_ignore_errors(mongo, mongo_backend, caplo
     assert (
         "ralph.backends.data.mongo",
         logging.WARNING,
-        "Failed to convert document to bytes: "
-        "Object of type ObjectId is not JSON serializable",
+        "Failed to encode JSON: Object of type ObjectId is not "
+        "JSON serializable, for document: {'_id': '64945e530468d817b1f756da', "
+        f"'id': ObjectId('{unparsable_value}')}}, at line 1",
     ) in caplog.record_tuples
     backend.close()
 
@@ -382,33 +385,35 @@ def test_backends_data_mongo_read_without_ignore_errors(mongo, mongo_backend, ca
     """
 
     backend = mongo_backend()
+    unparsable_value = ObjectId()
     documents = [
         {"_id": ObjectId("64945e53a4ee2699573e0d6f"), "id": "foo"},
-        {"_id": ObjectId("64945e530468d817b1f756da"), "id": ObjectId()},
+        {"_id": ObjectId("64945e530468d817b1f756da"), "id": unparsable_value},
         {"_id": ObjectId("64945e530468d817b1f756db"), "id": "baz"},
     ]
-    expected = b'{"_id": "64945e53a4ee2699573e0d6f", "id": "foo"}'
+    expected = b'{"_id": "64945e53a4ee2699573e0d6f", "id": "foo"}\n'
     backend.collection.insert_many(documents)
     backend.database.foobar.insert_many(documents[:2])
     kwargs = {"raw_output": True, "ignore_errors": False}
     msg = (
-        "Failed to convert document to bytes: "
-        "Object of type ObjectId is not JSON serializable"
+        "Failed to encode JSON: Object of type ObjectId is not "
+        "JSON serializable, for document: {'_id': '64945e530468d817b1f756da', "
+        f"'id': ObjectId('{unparsable_value}')}}, at line 1"
     )
     with caplog.at_level(logging.ERROR):
-        with pytest.raises(BackendException, match=msg):
+        with pytest.raises(BackendException, match=re.escape(msg)):
             result = backend.read(**kwargs)
             assert next(result) == expected
             next(result)
-        with pytest.raises(BackendException, match=msg):
+        with pytest.raises(BackendException, match=re.escape(msg)):
             result = backend.read(**kwargs, target="foobar")
             assert next(result) == expected
             next(result)
-        with pytest.raises(BackendException, match=msg):
+        with pytest.raises(BackendException, match=re.escape(msg)):
             result = backend.read(**kwargs, chunk_size=2)
             assert next(result) == expected
             next(result)
-        with pytest.raises(BackendException, match=msg):
+        with pytest.raises(BackendException, match=re.escape(msg)):
             result = backend.read(**kwargs, chunk_size=1000)
             assert next(result) == expected
             next(result)
@@ -785,7 +790,7 @@ def test_backends_data_mongo_write_with_unparsable_documents(mongo_backend, capl
     backend = mongo_backend()
     msg = (
         "Failed to decode JSON: Expecting value: line 1 column 1 (char 0), "
-        "for document: b'not valid JSON!'"
+        "for document: b'not valid JSON!', at line 0"
     )
     msg_regex = msg.replace("(", r"\(").replace(")", r"\)")
     with caplog.at_level(logging.ERROR):

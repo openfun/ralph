@@ -316,19 +316,39 @@ def test_backends_data_es_read_with_failure(  # noqa: PLR0913
 
 
 def test_backends_data_es_read_with_ignore_errors(es, es_backend, monkeypatch, caplog):
-    """Test the `ESDataBackend.read` method, given `ignore_errors` set to `True`,
-    should log a warning message.
+    """Test the `ESDataBackend.read` method, given `ignore_errors` set to `False`,
+    should raise a BackendException if a JSON parsing error occurs.
+
+    Given `ignore_errors` set to `False`, the `read` method should log a warning
+    message instead.
     """
 
+    def mock_es_search(**kwargs):
+        return {"hits": {"hits": [{"foo": 1j, "sort": []}]}}
+
     backend = es_backend()
-    monkeypatch.setattr(backend.client, "search", lambda **_: {"hits": {"hits": []}})
+    monkeypatch.setattr(backend.client, "search", mock_es_search)
+    error = (
+        "Failed to encode JSON: Object of type complex is not JSON serializable, "
+        "for document: {'foo': 1j, 'sort': []}, at line 0"
+    )
+    with pytest.raises(BackendException, match=re.escape(error)):
+        with caplog.at_level(logging.ERROR):
+            list(backend.read(ignore_errors=False, raw_output=True))
+
+    assert (
+        "ralph.backends.data.es",
+        logging.ERROR,
+        error,
+    ) in caplog.record_tuples
+
     with caplog.at_level(logging.WARNING):
-        list(backend.read(ignore_errors=True))
+        list(backend.read(ignore_errors=True, raw_output=True))
 
     assert (
         "ralph.backends.data.es",
         logging.WARNING,
-        "The `ignore_errors` argument is ignored",
+        error,
     ) in caplog.record_tuples
 
     backend.close()
@@ -642,7 +662,7 @@ def test_backends_data_es_write_without_ignore_errors(es, es_backend, caplog):
     # By default, we should raise an error and stop the importation.
     msg = (
         r"Failed to decode JSON: Expecting value: line 1 column 1 \(char 0\), "
-        r"for document: b'This is invalid JSON'"
+        r"for document: b'This is invalid JSON', at line 1"
     )
     with pytest.raises(BackendException, match=msg):
         with caplog.at_level(logging.ERROR):

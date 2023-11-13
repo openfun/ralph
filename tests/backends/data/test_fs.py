@@ -2,6 +2,7 @@
 import json
 import logging
 import os
+import re
 from collections.abc import Iterable
 from operator import itemgetter
 from uuid import uuid4
@@ -623,7 +624,11 @@ def test_backends_data_fs_read_without_ignore_errors(fs_backend, fs, monkeypatch
     result = backend.read(ignore_errors=False)
     assert isinstance(result, Iterable)
     assert next(result) == valid_dictionary
-    with pytest.raises(BackendException, match="Raised error:"):
+    msg = (
+        r"Failed to decode JSON: Expecting value: line 1 column 1 \(char 0\), "
+        r"for document: b'baz\\n', at line 1"
+    )
+    with pytest.raises(BackendException, match=msg):
         next(result)
 
     # When the `read` method fails to read a file entirely, then no entry should be
@@ -638,7 +643,11 @@ def test_backends_data_fs_read_without_ignore_errors(fs_backend, fs, monkeypatch
     result = backend.read(ignore_errors=False, target=absolute_path)
     assert isinstance(result, Iterable)
     assert next(result) == valid_dictionary
-    with pytest.raises(BackendException, match="Raised error:"):
+    msg = (
+        r"Failed to decode JSON: Expecting value: line 1 column 1 \(char 0\), "
+        r"for document: b'baz', at line 0"
+    )
+    with pytest.raises(BackendException, match=msg):
         next(result)
 
     # When the `read` method succeeds to read one file entirely, and fails to read
@@ -661,7 +670,11 @@ def test_backends_data_fs_read_without_ignore_errors(fs_backend, fs, monkeypatch
     # line, the `read` method should raise a `BackendException`.
     result = backend.read(ignore_errors=False, target="bar")
     assert isinstance(result, Iterable)
-    with pytest.raises(BackendException, match="Raised error:"):
+    msg = (
+        r"Failed to decode JSON: Expecting value: line 1 column 1 \(char 0\), "
+        r"for document: b'baz\\n', at line 0"
+    )
+    with pytest.raises(BackendException, match=msg):
         next(result)
 
     # When the `read` method fails to read a file entirely, then no new entry should be
@@ -743,6 +756,22 @@ def test_backends_data_fs_write_with_file_exists_error(operation_type, fs_backen
 
     # When the `write` method fails, then no entry should be added to the history.
     assert not sorted(backend.history, key=itemgetter("id"))
+
+
+def test_backends_data_fs_write_with_file_not_found_error(fs_backend, fs, caplog):
+    """Test the `FSDataBackend.write` method, given a target not matching an existing
+    directory location, should raise a `BackendException`.
+    """
+    backend = fs_backend()
+    msg = (
+        "Failed to write to /unreachable/foo.txt: "
+        "[Errno 2] No such file or directory in the fake filesystem: '/unreachable'"
+    )
+    with pytest.raises(BackendException, match=re.escape(msg)):
+        with caplog.at_level(logging.ERROR):
+            backend.write(target="/unreachable/foo.txt", data=[b"foo"])
+
+    assert ("ralph.backends.data.fs", logging.ERROR, msg) in caplog.record_tuples
 
 
 def test_backends_data_fs_write_with_delete_operation(
@@ -972,11 +1001,15 @@ def test_backends_data_fs_write_without_target(fs_backend, monkeypatch):
     ]
 
 
-def test_backends_data_fs_close(fs_backend):
-    """Test that the `FSDataBackend.close` method raise an error."""
+def test_backends_data_fs_close(fs_backend, caplog):
+    """Test that the `FSDataBackend.close` method produces an info level log."""
 
     backend = fs_backend()
-
-    error = "FS data backend does not support `close` method"
-    with pytest.raises(NotImplementedError, match=error):
+    with caplog.at_level(logging.INFO):
         backend.close()
+
+    assert (
+        "ralph.backends.data.fs",
+        logging.INFO,
+        "No open connections to close; skipping",
+    ) in caplog.record_tuples

@@ -679,7 +679,7 @@ def test_backends_data_ldp_url(monkeypatch, ldp_backend):
 
 
 def test_backends_data_ldp_close(ldp_backend, caplog):
-    """Test that the `LDPDataBackend.close` method raise an error."""
+    """Test that the `LDPDataBackend.close` method produces an info level log."""
 
     backend = ldp_backend()
 

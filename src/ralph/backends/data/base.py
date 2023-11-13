@@ -102,9 +102,8 @@ class Writable(ABC):
             chunk_size (int or None): The number of records or bytes to write in one
                 batch, depending on whether `data` contains dictionaries or bytes.
                 If `chunk_size` is `None`, a default value is used instead.
-            ignore_errors (bool): If `True`, errors during the write operation
-                are ignored and logged. If `False` (default), a `BackendException`
-                is raised if an error occurs.
+            ignore_errors (bool): If `True`, escapable errors are ignored and logged.
+                If `False` (default), a `BackendException` is raised on any error.
             operation_type (BaseOperationType or None): The mode of the write operation.
                 If `operation_type` is `None`, the `default_operation_type` is used
                 instead. See `BaseOperationType`.
@@ -113,8 +112,8 @@ class Writable(ABC):
             int: The number of written records.
 
         Raise:
-            BackendException: If a failure during the write operation occurs and
-                `ignore_errors` is set to `False`.
+            BackendException: If any failure occurs during the write operation or
+                if an inescapable failure occurs and `ignore_errors` is set to `True`.
             BackendParameterException: If a backend argument value is not valid.
         """
 
@@ -262,17 +261,17 @@ class BaseDataBackend(Generic[Settings, Query], ABC):
                 are encoded as JSON.
                 If the records are bytes and `raw_output` is set to `False`, they are
                 decoded as JSON by line.
-            ignore_errors (bool): If `True`, errors during the read operation
-                are be ignored and logged. If `False` (default), a `BackendException`
-                is raised if an error occurs.
+            ignore_errors (bool): If `True`, encoding errors during the read operation
+                will be ignored and logged.
+                If `False` (default), a `BackendException` is raised on any error.
 
         Yield:
             dict: If `raw_output` is False.
             bytes: If `raw_output` is True.
 
         Raise:
-            BackendException: If a failure during the read operation occurs and
-                `ignore_errors` is set to `False`.
+            BackendException: If a failure during the read operation occurs or
+                during encoding records and `ignore_errors` is set to `False`.
             BackendParameterException: If a backend argument value is not valid.
         """
 
@@ -322,9 +321,8 @@ class AsyncWritable(ABC):
             chunk_size (int or None): The number of records or bytes to write in one
                 batch, depending on whether `data` contains dictionaries or bytes.
                 If `chunk_size` is `None`, a default value is used instead.
-            ignore_errors (bool): If `True`, errors during the write operation
-                are ignored and logged. If `False` (default), a `BackendException`
-                is raised if an error occurs.
+            ignore_errors (bool): If `True`, escapable errors are ignored and logged.
+                If `False` (default), a `BackendException` is raised on any error.
             operation_type (BaseOperationType or None): The mode of the write operation.
                 If `operation_type` is `None`, the `default_operation_type` is used
                 instead. See `BaseOperationType`.
@@ -333,8 +331,8 @@ class AsyncWritable(ABC):
             int: The number of written records.
 
         Raise:
-            BackendException: If a failure during the write operation occurs and
-                `ignore_errors` is set to `False`.
+            BackendException: If any failure occurs during the write operation or
+                if an inescapable failure occurs and `ignore_errors` is set to `True`.
             BackendParameterException: If a backend argument value is not valid.
         """
 
@@ -447,17 +445,17 @@ class BaseAsyncDataBackend(Generic[Settings, Query], ABC):
                 are encoded as JSON.
                 If the records are bytes and `raw_output` is set to `False`, they are
                 decoded as JSON by line.
-            ignore_errors (bool): If `True`, errors during the read operation
-                are be ignored and logged. If `False` (default), a `BackendException`
-                is raised if an error occurs.
+            ignore_errors (bool): If `True`, encoding errors during the read operation
+                will be ignored and logged.
+                If `False` (default), a `BackendException` is raised on any error.
 
         Yield:
             dict: If `raw_output` is False.
             bytes: If `raw_output` is True.
 
         Raise:
-            BackendException: If a failure during the read operation occurs and
-                `ignore_errors` is set to `False`.
+            BackendException: If a failure during the read operation occurs or
+                during encoding records and `ignore_errors` is set to `False`.
             BackendParameterException: If a backend argument value is not valid.
         """
 

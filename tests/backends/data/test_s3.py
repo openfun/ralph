@@ -3,6 +3,8 @@
 import datetime
 import json
 import logging
+import re
+from collections import namedtuple
 
 import boto3
 import pytest
@@ -319,7 +321,8 @@ def test_backends_data_s3_read_with_invalid_output_should_log_the_error(
     assert (
         "ralph.backends.data.s3",
         logging.ERROR,
-        "Raised error: Expecting value: line 1 column 1 (char 0)",
+        "Failed to decode JSON: Expecting value: line 1 column 1 (char 0),"
+        " for document: b'some contents in the body', at line 0",
     ) in caplog.record_tuples
 
     backend.clean_history(lambda *_: True)
@@ -425,13 +428,18 @@ def test_backends_data_s3_read_with_iter_error_should_log_the_error(
         Body=body,
     )
 
-    def mock_read_raw(*args, **kwargs):
-        raise ResponseStreamingError(error="error")
+    def mock_get_object(*args, **kwargs):  # pylint: disable=unused-argument
+        """Mock the boto3 client.get_object method raising an exception on iteration."""
+
+        def raising_iter_chunks(*_, **__):  # pylint: disable=unused-argument
+            raise ResponseStreamingError(error="error")
+
+        return {"Body": namedtuple("_", "iter_chunks")(raising_iter_chunks)}
 
     with caplog.at_level(logging.ERROR):
         with pytest.raises(BackendException):
             backend = s3_backend()
-            monkeypatch.setattr(backend, "_read_raw", mock_read_raw)
+            monkeypatch.setattr(backend.client, "get_object", mock_get_object)
             backend.clean_history(lambda *_: True)
             list(backend.read(query=object_name, target=bucket_name, raw_output=True))
 
@@ -581,11 +589,13 @@ def test_backends_data_s3_write_with_create_index_operation(
 
     data = [{"some": "content", "datetime": date}]
 
-    error = "Object of type datetime is not JSON serializable"
-
-    with caplog.at_level(logging.ERROR):
+    msg = (
+        "Failed to encode JSON: Object of type datetime is not JSON serializable, "
+        f"for document: {data[0]}, at line 0"
+    )
+    with caplog.at_level(logging.WARNING):
         # Without ignoring error
-        with pytest.raises(BackendException, match=error):
+        with pytest.raises(BackendException, match=re.escape(msg)):
             response = backend.write(
                 data=data,
                 target=object_name,
@@ -603,18 +613,14 @@ def test_backends_data_s3_write_with_create_index_operation(
 
     assert list(
         filter(
-            lambda record: record[1] == logging.ERROR,
+            lambda record: record[1] in [logging.ERROR, logging.WARNING],
             caplog.record_tuples,
         )
     ) == (
         [
-            (
-                "ralph.backends.data.s3",
-                logging.ERROR,
-                f"Failed to encode JSON: {error}, for document {data[0]}",
-            )
+            ("ralph.backends.data.s3", logging.ERROR, msg),
+            ("ralph.backends.data.s3", logging.WARNING, msg),
         ]
-        * 2
     )
     backend.close()
 
