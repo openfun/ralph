@@ -17,7 +17,6 @@ from ralph.backends.data.base import (
     DataBackendStatus,
     Listable,
     Writable,
-    enforce_query_checks,
 )
 from ralph.conf import BaseSettingsConfig, ClientOptions, CommaSeparatedTuple
 from ralph.exceptions import BackendException, BackendParameterException
@@ -193,10 +192,8 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
         for index in indices:
             yield index
 
-    @enforce_query_checks
     def read(  # noqa: PLR0913
         self,
-        *,
         query: Optional[Union[str, ESQuery]] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
@@ -224,23 +221,29 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
         Raise:
             BackendException: If a failure occurs during Elasticsearch connection.
         """
-        if raw_output:
-            documents = self.read(
-                query=query,
-                target=target,
-                chunk_size=chunk_size,
-                raw_output=False,
-                ignore_errors=ignore_errors,
-            )
-            locale = self.settings.LOCALE_ENCODING
-            yield from parse_dict_to_bytes(
-                documents, locale, ignore_errors, self.logger
-            )
-            return
+        yield from super().read(query, target, chunk_size, raw_output, ignore_errors)
 
+    def _read_bytes(
+        self,
+        query: ESQuery,
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,
+    ) -> Iterator[bytes]:
+        """Method called by `self.read` yielding bytes. See `self.read`."""
+        locale = self.settings.LOCALE_ENCODING
+        statements = self._read_dicts(query, target, chunk_size, ignore_errors)
+        yield from parse_dict_to_bytes(statements, locale, ignore_errors, self.logger)
+
+    def _read_dicts(
+        self,
+        query: ESQuery,
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,  # noqa: ARG002
+    ) -> Iterator[dict]:
+        """Method called by `self.read` yielding dictionaries. See `self.read`."""
         target = target if target else self.settings.DEFAULT_INDEX
-        chunk_size = chunk_size if chunk_size else self.settings.DEFAULT_CHUNK_SIZE
-
         if not query.pit.keep_alive:
             query.pit.keep_alive = self.settings.POINT_IN_TIME_KEEP_ALIVE
         if not query.pit.id:

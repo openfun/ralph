@@ -13,7 +13,6 @@ from ralph.backends.data.base import (
     BaseAsyncDataBackend,
     BaseOperationType,
     DataBackendStatus,
-    async_enforce_query_checks,
 )
 from ralph.backends.data.es import ESDataBackend, ESDataBackendSettings, ESQuery
 from ralph.exceptions import BackendException, BackendParameterException
@@ -108,10 +107,8 @@ class AsyncESDataBackend(
         for index in indices:
             yield index
 
-    @async_enforce_query_checks
-    async def read(  # noqa: PLR0912, PLR0913
+    async def read(  # noqa: PLR0913
         self,
-        *,
         query: Optional[Union[str, ESQuery]] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
@@ -139,24 +136,33 @@ class AsyncESDataBackend(
         Raise:
             BackendException: If a failure occurs during Elasticsearch connection.
         """
-        if raw_output:
-            documents = self.read(
-                query=query,
-                target=target,
-                chunk_size=chunk_size,
-                raw_output=False,
-                ignore_errors=ignore_errors,
-            )
-            async for document in async_parse_dict_to_bytes(
-                documents, self.settings.LOCALE_ENCODING, ignore_errors, self.logger
-            ):
-                yield document
+        statements = super().read(query, target, chunk_size, raw_output, ignore_errors)
+        async for statement in statements:
+            yield statement
 
-            return
+    async def _read_bytes(
+        self,
+        query: ESQuery,
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,
+    ) -> AsyncIterator[bytes]:
+        """Method called by `self.read` yielding bytes. See `self.read`."""
+        statements = self._read_dicts(query, target, chunk_size, ignore_errors)
+        async for statement in async_parse_dict_to_bytes(
+            statements, self.settings.LOCALE_ENCODING, ignore_errors, self.logger
+        ):
+            yield statement
 
+    async def _read_dicts(
+        self,
+        query: ESQuery,
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,  # noqa: ARG002
+    ) -> AsyncIterator[dict]:
+        """Method called by `self.read` yielding dictionaries. See `self.read`."""
         target = target if target else self.settings.DEFAULT_INDEX
-        chunk_size = chunk_size if chunk_size else self.settings.DEFAULT_CHUNK_SIZE
-
         if not query.pit.keep_alive:
             query.pit.keep_alive = self.settings.POINT_IN_TIME_KEEP_ALIVE
         if not query.pit.id:

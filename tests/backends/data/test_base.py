@@ -9,7 +9,6 @@ from ralph.backends.data.base import (
     BaseDataBackend,
     BaseDataBackendSettings,
     BaseQuery,
-    enforce_query_checks,
     get_backend_generic_argument,
 )
 from ralph.exceptions import BackendParameterException
@@ -23,17 +22,17 @@ from ralph.exceptions import BackendParameterException
         (BaseQuery(query_string="foo"), BaseQuery(query_string="foo")),
     ],
 )
-def test_backends_data_base_enforce_query_checks_with_valid_input(value, expected):
+def test_backends_data_base_validate_backend_query_with_valid_input(value, expected):
     """Test the enforce_query_checks function given valid input."""
 
-    class MockBaseDataBackend(BaseDataBackend):
+    class MockBaseDataBackend(BaseDataBackend[BaseDataBackendSettings, BaseQuery]):
         """A class mocking the base data backend class."""
 
-        @enforce_query_checks
-        def read(self, query=None):
-            """Mock the base database read method."""
+        def _read_dicts(self, query, *args):
+            yield query == expected
 
-            assert query == expected
+        def _read_bytes(self, query, *args):
+            yield query == expected
 
         def status(self):
             pass
@@ -41,7 +40,8 @@ def test_backends_data_base_enforce_query_checks_with_valid_input(value, expecte
         def close(self):
             pass
 
-    MockBaseDataBackend().read(query=value)
+    assert list(MockBaseDataBackend().read(query=value, raw_output=True)) == [True]
+    assert list(MockBaseDataBackend().read(query=value, raw_output=False)) == [True]
 
 
 @pytest.mark.parametrize(
@@ -61,14 +61,14 @@ def test_backends_data_base_enforce_query_checks_with_invalid_input(
 ):
     """Test the enforce_query_checks function given invalid input."""
 
-    class MockBaseDataBackend(BaseDataBackend):
+    class MockBaseDataBackend(BaseDataBackend[BaseDataBackendSettings, BaseQuery]):
         """A class mocking the base database class."""
 
-        @enforce_query_checks
-        def read(self, query=None):
-            """Mock the base database read method."""
+        def _read_dicts(self, query, *args):
+            yield
 
-            return None
+        def _read_bytes(self, query, *args):
+            yield
 
         def status(self):
             pass
@@ -78,7 +78,7 @@ def test_backends_data_base_enforce_query_checks_with_invalid_input(
 
     with pytest.raises(BackendParameterException, match=error):
         with caplog.at_level(logging.ERROR):
-            MockBaseDataBackend().read(query=value)
+            list(MockBaseDataBackend().read(query=value))
 
     error = error.replace("\\", "")
     module_name = "tests.backends.data.test_base"
