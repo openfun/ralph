@@ -1,6 +1,7 @@
 """Tests for the base data backend"""
+
 import logging
-from typing import Any
+from typing import Any, Union
 
 import pytest
 
@@ -111,3 +112,10 @@ def test_backends_data_base_get_backend_generic_argument():
 
     assert get_backend_generic_argument(DummyAnyBackend, 0) is DummySettings
     assert get_backend_generic_argument(DummyAnyBackend, 1) is None
+
+    # Given a backend that does not follow type hints, the function should return None.
+    class DummyBadBackend(BaseDataBackend[Union[dict, int], Union[int, str]]):
+        """Dummy bad backend."""
+
+    assert get_backend_generic_argument(DummyBadBackend, 0) is None
+    assert get_backend_generic_argument(DummyBadBackend, 1) is None

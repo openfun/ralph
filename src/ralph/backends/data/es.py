@@ -58,10 +58,8 @@ class ESDataBackendSettings(BaseDataBackendSettings):
 
     ALLOW_YELLOW_STATUS: bool = False
     CLIENT_OPTIONS: ESClientOptions = ESClientOptions()
-    DEFAULT_CHUNK_SIZE: int = 500
     DEFAULT_INDEX: str = "statements"
     HOSTS: CommaSeparatedTuple = ("http://localhost:9200",)
-    LOCALE_ENCODING: str = "utf8"
     POINT_IN_TIME_KEEP_ALIVE: str = "1m"
     REFRESH_AFTER_WRITE: Union[Literal["false", "true", "wait_for"], bool, str, None]
 
@@ -127,7 +125,7 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
         self._client = None
 
     @property
-    def client(self):
+    def client(self) -> Elasticsearch:
         """Create an Elasticsearch client if it doesn't exist."""
         if not self._client:
             self._client = Elasticsearch(
@@ -157,7 +155,7 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
 
     def list(
         self, target: Optional[str] = None, details: bool = False, new: bool = False
-    ) -> Iterator[Union[str, dict]]:
+    ) -> Union[Iterator[str], Iterator[dict]]:
         """List available Elasticsearch indices, data streams and aliases.
 
         Args:
@@ -165,7 +163,7 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
                 and aliases to limit the request. Supports wildcards (*).
                 If target is `None`, lists all available indices, data streams and
                     aliases. Equivalent to (`target` = "*").
-            details (bool): Get detailed informations instead of just names.
+            details (bool): Get detailed information instead of just names.
             new (bool): Ignored.
 
         Yield:
@@ -204,7 +202,7 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-    ) -> Iterator[Union[bytes, dict]]:
+    ) -> Union[Iterator[bytes], Iterator[dict]]:
         """Read documents matching the query in the target index and yield them.
 
         Args:
@@ -239,6 +237,7 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
                 documents, locale, ignore_errors, self.logger
             )
             return
+
         target = target if target else self.settings.DEFAULT_INDEX
         chunk_size = chunk_size if chunk_size else self.settings.DEFAULT_CHUNK_SIZE
 
@@ -324,7 +323,7 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
         target = target if target else self.settings.DEFAULT_INDEX
         chunk_size = chunk_size if chunk_size else self.settings.DEFAULT_CHUNK_SIZE
         if operation_type == BaseOperationType.APPEND:
-            msg = "Append operation_type is not supported."
+            msg = "Append operation_type is not allowed."
             self.logger.error(msg)
             raise BackendParameterException(msg)
 
@@ -332,9 +331,8 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
         if isinstance(first_record, bytes):
             data = parse_iterable_to_dict(data, ignore_errors, self.logger)
 
-        self.logger.debug(
-            "Start writing to the %s index (chunk size: %d)", target, chunk_size
-        )
+        msg = "Start writing to the %s index (chunk size: %d)"
+        self.logger.debug(msg, target, chunk_size)
         try:
             for success, action in streaming_bulk(
                 client=self.client,

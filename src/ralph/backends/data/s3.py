@@ -7,6 +7,7 @@ from uuid import uuid4
 
 import boto3
 from boto3.s3.transfer import TransferConfig
+from botocore.client import BaseClient
 from botocore.exceptions import (
     ClientError,
     EndpointConnectionError,
@@ -52,14 +53,13 @@ class S3DataBackendSettings(BaseDataBackendSettings):
 
         env_prefix = "RALPH_BACKENDS__DATA__S3__"
 
-    ACCESS_KEY_ID: str = None
-    SECRET_ACCESS_KEY: str = None
-    SESSION_TOKEN: str = None
-    ENDPOINT_URL: str = None
-    DEFAULT_REGION: str = None
-    DEFAULT_BUCKET_NAME: str = None
+    ACCESS_KEY_ID: Optional[str] = None
+    SECRET_ACCESS_KEY: Optional[str] = None
+    SESSION_TOKEN: Optional[str] = None
+    ENDPOINT_URL: Optional[str] = None
+    DEFAULT_REGION: Optional[str] = None
+    DEFAULT_BUCKET_NAME: Optional[str] = None
     DEFAULT_CHUNK_SIZE: int = 4096
-    LOCALE_ENCODING: str = "utf8"
 
 
 class S3DataBackend(
@@ -79,7 +79,7 @@ class S3DataBackend(
         self._client = None
 
     @property
-    def client(self):
+    def client(self) -> BaseClient:
         """Create a boto3 client if it doesn't exist."""
         if not self._client:
             self._client = boto3.client(
@@ -107,7 +107,7 @@ class S3DataBackend(
 
     def list(
         self, target: Optional[str] = None, details: bool = False, new: bool = False
-    ) -> Iterator[Union[str, dict]]:
+    ) -> Union[Iterator[str], Iterator[dict]]:
         """List objects for the target bucket.
 
         Args:
@@ -159,7 +159,7 @@ class S3DataBackend(
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-    ) -> Iterator[Union[bytes, dict]]:
+    ) -> Union[Iterator[bytes], Iterator[dict]]:
         """Read an object matching the `query` in the `target` bucket and yield it.
 
         Args:
@@ -311,13 +311,13 @@ class S3DataBackend(
 
         # Using StreamingIterator from requests-toolbelt but without specifying a size
         # as we will not use it. It implements the `read` method for iterators.
-        data = StreamingIterator(0, data)
+        file_object = StreamingIterator(0, data)
 
         try:
             self.client.upload_fileobj(
                 Bucket=target_bucket,
                 Key=target_object,
-                Fileobj=data,
+                Fileobj=file_object,
                 Config=TransferConfig(multipart_chunksize=chunk_size),
             )
             response = self.client.head_object(Bucket=target_bucket, Key=target_object)
