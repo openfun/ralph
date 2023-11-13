@@ -6,7 +6,7 @@ from typing import Iterable, Iterator, List, Literal, Optional, TypeVar, Union
 
 from elasticsearch import ApiError, Elasticsearch, TransportError
 from elasticsearch.helpers import BulkIndexError, streaming_bulk
-from pydantic import BaseModel
+from pydantic import BaseModel, PositiveInt
 
 from ralph.backends.data.base import (
     BaseDataBackend,
@@ -199,6 +199,7 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
+        max_statements: Optional[PositiveInt] = None,
     ) -> Union[Iterator[bytes], Iterator[dict]]:
         """Read documents matching the query in the target index and yield them.
 
@@ -213,6 +214,8 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
             raw_output (bool): Controls whether to yield dictionaries or bytes.
             ignore_errors (bool): No impact as encoding errors are not expected in
                 Elasticsearch results.
+            max_statements (int): The maximum number of statements to yield.
+                If `None` (default), there is no maximum.
 
         Yield:
             bytes: The next raw document if `raw_output` is True.
@@ -221,7 +224,9 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
         Raise:
             BackendException: If a failure occurs during Elasticsearch connection.
         """
-        yield from super().read(query, target, chunk_size, raw_output, ignore_errors)
+        yield from super().read(
+            query, target, chunk_size, raw_output, ignore_errors, max_statements
+        )
 
     def _read_bytes(
         self,

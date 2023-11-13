@@ -4,6 +4,7 @@ from typing import Iterator, Literal, Optional, Union
 
 import ovh
 import requests
+from pydantic import PositiveInt
 
 from ralph.backends.data.base import (
     BaseDataBackend,
@@ -156,6 +157,7 @@ class LDPDataBackend(
         chunk_size: Optional[int] = None,
         raw_output: bool = True,
         ignore_errors: bool = False,
+        max_statements: Optional[PositiveInt] = None,
     ) -> Union[Iterator[bytes], Iterator[dict]]:
         """Read an archive matching the query in the target stream_id and yield it.
 
@@ -166,6 +168,8 @@ class LDPDataBackend(
             chunk_size (int or None): The chunk size when reading archives by batch.
             raw_output (bool): Should always be set to `True`.
             ignore_errors (bool): No impact as no encoding operation is performed.
+            max_statements (int): The maximum number of statements to yield.
+                If `None` (default), there is no maximum.
 
         Yield:
             bytes: The content of the archive matching the query.
@@ -174,7 +178,9 @@ class LDPDataBackend(
             BackendException: If a failure occurs during LDP connection.
             BackendParameterException: If the `query` argument is not an archive name.
         """
-        yield from super().read(query, target, chunk_size, raw_output, ignore_errors)
+        yield from super().read(
+            query, target, chunk_size, raw_output, ignore_errors, max_statements
+        )
 
     def _read_dicts(
         self,
