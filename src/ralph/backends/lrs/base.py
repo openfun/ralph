@@ -3,7 +3,7 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Iterator, List, Literal, Optional, TypeVar, Union
+from typing import Any, AsyncIterator, Iterator, List, Literal, Optional, TypeVar, Union
 from uuid import UUID
 
 from pydantic import BaseModel, Field, NonNegativeInt
@@ -109,5 +109,5 @@ class BaseAsyncLRSBackend(BaseAsyncDataBackend[Settings, Any]):
         """Return the statements query payload using xAPI parameters."""
 
     @abstractmethod
-    async def query_statements_by_ids(self, ids: List[str]) -> Iterator[dict]:
+    async def query_statements_by_ids(self, ids: List[str]) -> AsyncIterator[dict]:
         """Return the list of matching statement IDs from the database."""

@@ -5,7 +5,17 @@ from abc import ABC, abstractmethod
 from enum import Enum, unique
 from functools import cached_property, wraps
 from io import IOBase
-from typing import Any, Generic, Iterable, Iterator, Optional, Type, TypeVar, Union
+from typing import (
+    Any,
+    AsyncIterator,
+    Generic,
+    Iterable,
+    Iterator,
+    Optional,
+    Type,
+    TypeVar,
+    Union,
+)
 
 from pydantic import BaseModel, BaseSettings, ValidationError
 
@@ -22,6 +32,9 @@ class BaseDataBackendSettings(BaseSettings):
         env_prefix = "RALPH_BACKENDS__DATA__"
         env_file = ".env"
         env_file_encoding = core_settings.LOCALE_ENCODING
+
+    DEFAULT_CHUNK_SIZE: int = 500
+    LOCALE_ENCODING: str = "utf8"
 
 
 class BaseQuery(BaseModel):
@@ -131,7 +144,7 @@ class Listable(ABC):
     @abstractmethod
     def list(
         self, target: Optional[str] = None, details: bool = False, new: bool = False
-    ) -> Iterator[Union[str, dict]]:
+    ) -> Union[Iterator[str], Iterator[dict]]:
         """List containers in the data backend. E.g., collections, files, indexes.
 
         Args:
@@ -150,39 +163,6 @@ class Listable(ABC):
         """
 
 
-def get_backend_generic_argument(backend_class: Type, position: int) -> Optional[Type]:
-    """Return the generic argument of `backend_class` at specified `position`."""
-    if not hasattr(backend_class, "__orig_bases__"):
-        return None
-
-    bases = backend_class.__orig_bases__[0]
-    if not hasattr(bases, "__args__") or len(bases.__args__) < abs(position) + 1:
-        return None
-
-    argument = bases.__args__[position]
-    if argument is Any:
-        return None
-
-    if isinstance(argument, TypeVar):
-        return argument.__bound__
-
-    return argument
-
-
-def set_backend_settings_class(backend_class: Type):
-    """Set `settings_class` attribute with `Config.env_prefix` for `backend_class`."""
-    settings_class = get_backend_generic_argument(backend_class, 0)
-    if settings_class:
-        backend_class.settings_class = settings_class
-
-
-def set_backend_query_class(backend_class: Type):
-    """Set `query_class` attribute for `backend_class`."""
-    query_class = get_backend_generic_argument(backend_class, 1)
-    if query_class:
-        backend_class.query_class = query_class
-
-
 Settings = TypeVar("Settings", bound=BaseDataBackendSettings)
 Query = TypeVar("Query", bound=BaseQuery)
 
@@ -194,7 +174,7 @@ class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
     query_class: Type[Query]
     settings_class: Type[Settings]
 
-    def __init_subclass__(cls, **kwargs):  # noqa: D105
+    def __init_subclass__(cls, **kwargs: Any) -> None:  # noqa: D105
         super().__init_subclass__(**kwargs)
         set_backend_settings_class(cls)
         set_backend_query_class(cls)
@@ -254,7 +234,7 @@ class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-    ) -> Iterator[Union[bytes, dict]]:
+    ) -> Union[Iterator[bytes], Iterator[dict]]:
         """Read records matching the `query` in the `target` container and yield them.
 
         Args:
@@ -350,7 +330,7 @@ class AsyncListable(ABC):
     @abstractmethod
     async def list(
         self, target: Optional[str] = None, details: bool = False, new: bool = False
-    ) -> Iterator[Union[str, dict]]:
+    ) -> Union[AsyncIterator[str], AsyncIterator[dict]]:
         """List containers in the data backend. E.g., collections, files, indexes.
 
         Args:
@@ -376,7 +356,7 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
     query_class: Type[Query]
     settings_class: Type[Settings]
 
-    def __init_subclass__(cls, **kwargs):  # noqa: D105
+    def __init_subclass__(cls, **kwargs: Any) -> None:  # noqa: D105
         super().__init_subclass__(**kwargs)
         set_backend_settings_class(cls)
         set_backend_query_class(cls)
@@ -438,7 +418,7 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-    ) -> Iterator[Union[bytes, dict]]:
+    ) -> Union[AsyncIterator[bytes], AsyncIterator[dict]]:
         """Read records matching the `query` in the `target` container and yield them.
 
         Args:
@@ -473,3 +453,45 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
         Raise:
             BackendException: If a failure occurs during the close operation.
         """
+
+
+def get_backend_generic_argument(
+    backend_class: Type[Union[BaseDataBackend, BaseAsyncDataBackend]], position: int
+) -> Optional[Type]:
+    """Return the generic argument of `backend_class` at specified `position`."""
+    if not hasattr(backend_class, "__orig_bases__"):
+        return None
+
+    bases = backend_class.__orig_bases__[0]
+    if not hasattr(bases, "__args__") or len(bases.__args__) < abs(position) + 1:
+        return None
+
+    argument = bases.__args__[position]
+    if argument is Any:
+        return None
+
+    if isinstance(argument, TypeVar):
+        return argument.__bound__
+
+    if isinstance(argument, Type):
+        return argument
+
+    return None
+
+
+def set_backend_settings_class(
+    backend_class: Type[Union[BaseDataBackend, BaseAsyncDataBackend]]
+) -> None:
+    """Set `settings_class` attribute with `Config.env_prefix` for `backend_class`."""
+    settings_class = get_backend_generic_argument(backend_class, 0)
+    if settings_class:
+        backend_class.settings_class = settings_class
+
+
+def set_backend_query_class(
+    backend_class: Type[Union[BaseDataBackend, BaseAsyncDataBackend]]
+) -> None:
+    """Set `query_class` attribute for `backend_class`."""
+    query_class = get_backend_generic_argument(backend_class, 1)
+    if query_class:
+        backend_class.query_class = query_class

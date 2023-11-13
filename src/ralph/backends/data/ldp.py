@@ -26,6 +26,7 @@ class LDPDataBackendSettings(BaseDataBackendSettings):
         APPLICATION_KEY (str): The OVH API application key (AK).
         APPLICATION_SECRET (str): The OVH API application secret (AS).
         CONSUMER_KEY (str): The OVH API consumer key (CK).
+        DEFAULT_CHUNK_SIZE (str): The default chunk size for reading archives.
         DEFAULT_STREAM_ID (str):  The default stream identifier to query.
         ENDPOINT (str): The OVH API endpoint.
         REQUEST_TIMEOUT (int): HTTP request timeout in seconds.
@@ -52,6 +53,7 @@ class LDPDataBackendSettings(BaseDataBackendSettings):
     ] = "ovh-eu"
     REQUEST_TIMEOUT: Optional[int] = None
     SERVICE_NAME: Optional[str] = None
+    DEFAULT_CHUNK_SIZE: int = 4096
 
 
 class LDPDataBackend(
@@ -77,7 +79,7 @@ class LDPDataBackend(
         self._client = None
 
     @property
-    def client(self):
+    def client(self) -> ovh.Client:
         """Create an ovh.Client if it doesn't exist."""
         if not self._client:
             self._client = ovh.Client(
@@ -102,7 +104,7 @@ class LDPDataBackend(
 
     def list(
         self, target: Optional[str] = None, details: bool = False, new: bool = False
-    ) -> Iterator[Union[str, dict]]:
+    ) -> Union[Iterator[str], Iterator[dict]]:
         """List archives for a given target stream_id.
 
         Args:
@@ -152,10 +154,10 @@ class LDPDataBackend(
         *,
         query: Optional[Union[str, BaseQuery]] = None,
         target: Optional[str] = None,
-        chunk_size: Optional[int] = 4096,
+        chunk_size: Optional[int] = None,
         raw_output: bool = True,
         ignore_errors: bool = False,
-    ) -> Iterator[Union[bytes, dict]]:
+    ) -> Union[Iterator[bytes], Iterator[dict]]:
         """Read an archive matching the query in the target stream_id and yield it.
 
         Args:
@@ -175,6 +177,7 @@ class LDPDataBackend(
         """
         if query.query_string is None:
             msg = "Invalid query. The query should be a valid archive name"
+            self.logger.error(msg)
             raise BackendParameterException(msg)
 
         if not raw_output or not ignore_errors:
@@ -220,7 +223,7 @@ class LDPDataBackend(
         self._client = None
         self.logger.info("No open connections to close; skipping")
 
-    def _get_archive_endpoint(self, stream_id: Union[None, str] = None) -> str:
+    def _get_archive_endpoint(self, stream_id: Optional[str] = None) -> str:
         """Return OVH's archive endpoint."""
         stream_id = stream_id if stream_id else self.stream_id
         if None in (self.service_name, stream_id):
@@ -239,7 +242,7 @@ class LDPDataBackend(
         self.logger.debug("Temporary URL: %s", download_url)
         return download_url
 
-    def _details(self, stream_id: str, name: str) -> dict:
+    def _details(self, stream_id: str, name: str) -> Optional[dict]:
         """Return `name` archive details.
 
         Expected JSON response looks like:

@@ -1,12 +1,11 @@
-"""Async MongoDB data backend for Ralph."""
+"""Asynchronous MongoDB data backend for Ralph."""
 
 from io import IOBase
 from itertools import chain
-from typing import Iterable, Iterator, Optional, TypeVar, Union
+from typing import AsyncIterator, Iterable, Optional, TypeVar, Union
 
 from bson.errors import BSONError
-from motor.motor_asyncio import AsyncIOMotorClient
-from pymongo.collection import Collection
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorCollection
 from pymongo.errors import BulkWriteError, ConnectionFailure, InvalidName, PyMongoError
 
 from ralph.backends.data.base import BaseOperationType
@@ -34,7 +33,7 @@ class AsyncMongoDataBackend(
     AsyncWritable,
     AsyncListable,
 ):
-    """Async MongoDB data backend."""
+    """Asynchronous MongoDB data backend."""
 
     name = "async_mongo"
 
@@ -66,9 +65,8 @@ class AsyncMongoDataBackend(
 
         # Check MongoDB server status.
         try:
-            if (await self.client.admin.command("serverStatus")).get(
-                "ok"
-            ) != 1.0:  # noqa: PLR2004
+            server_status = await self.client.admin.command("serverStatus")
+            if server_status.get("ok") != 1.0:  # noqa: PLR2004
                 self.logger.error("MongoDB `serverStatus` command did not return 1.0")
                 return DataBackendStatus.ERROR
         except PyMongoError as error:
@@ -79,7 +77,7 @@ class AsyncMongoDataBackend(
 
     async def list(
         self, target: Optional[str] = None, details: bool = False, new: bool = False
-    ) -> Iterator[Union[str, dict]]:
+    ) -> Union[AsyncIterator[str], AsyncIterator[dict]]:
         """List collections in the target database.
 
         Args:
@@ -127,7 +125,7 @@ class AsyncMongoDataBackend(
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-    ) -> Iterator[Union[bytes, dict]]:
+    ) -> Union[AsyncIterator[bytes], AsyncIterator[dict]]:
         """Read documents matching the `query` from `target` collection and yield them.
 
         Args:
@@ -168,15 +166,9 @@ class AsyncMongoDataBackend(
         if not chunk_size:
             chunk_size = self.settings.DEFAULT_CHUNK_SIZE
 
-        query = (query.query_string if query.query_string else query).dict(
-            exclude={"query_string"}, exclude_unset=True
-        )
-        try:
-            collection = self.database[target] if target else self.collection
-        except InvalidName as error:
-            msg = "The target=`%s` is not a valid collection name: %s"
-            self.logger.error(msg, target, error)
-            raise BackendParameterException(msg % (target, error)) from error
+        query = query.query_string if query.query_string else query
+        query = query.dict(exclude={"query_string"}, exclude_unset=True)
+        collection = self._get_target_collection(target)
 
         try:
             async for document in collection.find(batch_size=chunk_size, **query):
@@ -229,13 +221,9 @@ class AsyncMongoDataBackend(
         if not chunk_size:
             chunk_size = self.settings.DEFAULT_CHUNK_SIZE
 
-        collection = self.database[target] if target else self.collection
-        self.logger.debug(
-            "Start writing to the %s collection of the %s database (chunk size: %d)",
-            collection,
-            self.database,
-            chunk_size,
-        )
+        collection = self._get_target_collection(target)
+        msg = "Start writing to the %s collection of the %s database (chunk size: %d)"
+        self.logger.debug(msg, collection, self.database, chunk_size)
 
         count = 0
         data = iter(data)
@@ -244,7 +232,7 @@ class AsyncMongoDataBackend(
         except StopIteration:
             self.logger.info("Data Iterator is empty; skipping write to target.")
             return count
-        data = chain([first_record], data)
+        data = chain((first_record,), data)
         if isinstance(first_record, bytes):
             data = parse_iterable_to_dict(data, ignore_errors, self.logger)
 
@@ -280,8 +268,19 @@ class AsyncMongoDataBackend(
             self.logger.error(msg, error)
             raise BackendException(msg % error) from error
 
+    def _get_target_collection(
+        self, target: Union[str, None]
+    ) -> AsyncIOMotorCollection:
+        """Return the target collection."""
+        try:
+            return self.database[target] if target else self.collection
+        except InvalidName as error:
+            msg = "The target=`%s` is not a valid collection name: %s"
+            self.logger.error(msg, target, error)
+            raise BackendParameterException(msg % (target, error)) from error
+
     async def _bulk_import(
-        self, batch: list, ignore_errors: bool, collection: Collection
+        self, batch: list, ignore_errors: bool, collection: AsyncIOMotorCollection
     ):
         """Insert a batch of documents into the selected database collection."""
         try:
@@ -298,7 +297,7 @@ class AsyncMongoDataBackend(
         return inserted_count
 
     async def _bulk_delete(
-        self, batch: list, ignore_errors: bool, collection: Collection
+        self, batch: list, ignore_errors: bool, collection: AsyncIOMotorCollection
     ):
         """Delete a batch of documents from the selected database collection."""
         try:
@@ -317,7 +316,7 @@ class AsyncMongoDataBackend(
         return deleted_count
 
     async def _bulk_update(
-        self, batch: list, ignore_errors: bool, collection: Collection
+        self, batch: list, ignore_errors: bool, collection: AsyncIOMotorCollection
     ):
         """Update a batch of documents into the selected database collection."""
         try:

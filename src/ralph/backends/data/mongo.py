@@ -69,8 +69,6 @@ class MongoDataBackendSettings(BaseDataBackendSettings):
         regex=r"^(?!.*\.\.)[^.$\x00]+(?:\.[^.$\x00]+)*$"
     ) = "marsha"
     CLIENT_OPTIONS: MongoClientOptions = MongoClientOptions()
-    DEFAULT_CHUNK_SIZE: int = 500
-    LOCALE_ENCODING: str = "utf8"
 
 
 class BaseMongoQuery(BaseQuery):
@@ -139,7 +137,7 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
 
     def list(
         self, target: Optional[str] = None, details: bool = False, new: bool = False
-    ) -> Iterator[Union[str, dict]]:
+    ) -> Union[Iterator[str], Iterator[dict]]:
         """List collections in the `target` database.
 
         Args:
@@ -182,7 +180,7 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-    ) -> Iterator[Union[bytes, dict]]:
+    ) -> Union[Iterator[bytes], Iterator[dict]]:
         """Read documents matching the `query` from `target` collection and yield them.
 
         Args:
@@ -222,21 +220,13 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
         if not chunk_size:
             chunk_size = self.settings.DEFAULT_CHUNK_SIZE
 
-        query = (query.query_string if query.query_string else query).dict(
-            exclude={"query_string"}, exclude_unset=True
-        )
+        query = query.query_string if query.query_string else query
+        query = query.dict(exclude={"query_string"}, exclude_unset=True)
 
-        try:
-            collection = self.database[target] if target else self.collection
-        except InvalidName as error:
-            msg = "The target=`%s` is not a valid collection name: %s"
-            self.logger.error(msg, target, error)
-            raise BackendParameterException(msg % (target, error)) from error
-
+        collection = self._get_target_collection(target)
         try:
             documents = collection.find(batch_size=chunk_size, **query)
-            documents = (d.update({"_id": str(d.get("_id"))}) or d for d in documents)
-            yield from documents
+            yield from (d.update({"_id": str(d.get("_id"))}) or d for d in documents)
         except (PyMongoError, IndexError, TypeError, ValueError) as error:
             msg = "Failed to execute MongoDB query: %s"
             self.logger.error(msg, error)
@@ -284,13 +274,9 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
         if not chunk_size:
             chunk_size = self.settings.DEFAULT_CHUNK_SIZE
 
-        collection = self.database[target] if target else self.collection
-        self.logger.debug(
-            "Start writing to the %s collection of the %s database (chunk size: %d)",
-            collection,
-            self.database,
-            chunk_size,
-        )
+        collection = self._get_target_collection(target)
+        msg = "Start writing to the %s collection of the %s database (chunk size: %d)"
+        self.logger.debug(msg, collection, self.database, chunk_size)
 
         count = 0
         data = iter(data)
@@ -299,7 +285,7 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
         except StopIteration:
             self.logger.info("Data Iterator is empty; skipping write to target.")
             return count
-        data = chain([first_record], data)
+        data = chain((first_record,), data)
         if isinstance(first_record, bytes):
             data = parse_iterable_to_dict(data, ignore_errors, self.logger)
 
@@ -399,6 +385,15 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
             }
 
             yield document
+
+    def _get_target_collection(self, target: Union[str, None]) -> Collection:
+        """Return the validated target collection."""
+        try:
+            return self.database[target] if target else self.collection
+        except InvalidName as error:
+            msg = "The target=`%s` is not a valid collection name: %s"
+            self.logger.error(msg, target, error)
+            raise BackendParameterException(msg % (target, error)) from error
 
     def _bulk_import(
         self, batch: List, ignore_errors: bool, collection: Collection

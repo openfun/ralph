@@ -1,4 +1,4 @@
-"""Base data backend for Ralph."""
+"""Swift data backend for Ralph."""
 
 from functools import cached_property
 from io import IOBase
@@ -25,7 +25,7 @@ from ralph.utils import now, parse_dict_to_bytes, parse_iterable_to_dict
 
 
 class SwiftDataBackendSettings(BaseDataBackendSettings):
-    """Represent the SWIFT data backend default configuration.
+    """Swift data backend default configuration.
 
     Attributes:
         AUTH_URL (str): The authentication URL.
@@ -39,6 +39,8 @@ class SwiftDataBackendSettings(BaseDataBackendSettings):
         OBJECT_STORAGE_URL (str): The default storage URL.
         USER_DOMAIN_NAME (str): The user domain name.
         DEFAULT_CONTAINER (str): The default target container.
+        DEFAULT_CHUNK_SIZE (str): The default chunk size for reading and writing
+            objects.
         LOCALE_ENCODING (str): The encoding used for reading/writing documents.
     """
 
@@ -48,17 +50,16 @@ class SwiftDataBackendSettings(BaseDataBackendSettings):
         env_prefix = "RALPH_BACKENDS__DATA__SWIFT__"
 
     AUTH_URL: str = "https://auth.cloud.ovh.net/"
-    USERNAME: str = None
-    PASSWORD: str = None
+    USERNAME: Optional[str] = None
+    PASSWORD: Optional[str] = None
     IDENTITY_API_VERSION: str = "3"
-    TENANT_ID: str = None
-    TENANT_NAME: str = None
+    TENANT_ID: Optional[str] = None
+    TENANT_NAME: Optional[str] = None
     PROJECT_DOMAIN_NAME: str = "Default"
-    REGION_NAME: str = None
-    OBJECT_STORAGE_URL: str = None
+    REGION_NAME: Optional[str] = None
+    OBJECT_STORAGE_URL: Optional[str] = None
     USER_DOMAIN_NAME: str = "Default"
-    DEFAULT_CONTAINER: str = None
-    LOCALE_ENCODING: str = "utf8"
+    DEFAULT_CONTAINER: Optional[str] = None
 
 
 class SwiftDataBackend(
@@ -92,7 +93,7 @@ class SwiftDataBackend(
         }
 
     @property
-    def connection(self):
+    def connection(self) -> Connection:
         """Create a Swift Connection if it doesn't exist."""
         if not self._connection:
             self._connection = Connection(
@@ -121,7 +122,7 @@ class SwiftDataBackend(
 
     def list(
         self, target: Optional[str] = None, details: bool = False, new: bool = False
-    ) -> Iterator[Union[str, dict]]:
+    ) -> Union[Iterator[str], Iterator[dict]]:
         """List files for the target container.
 
         Args:
@@ -164,10 +165,10 @@ class SwiftDataBackend(
         *,
         query: Optional[Union[str, BaseQuery]] = None,
         target: Optional[str] = None,
-        chunk_size: Optional[int] = 500,
+        chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-    ) -> Iterator[Union[bytes, dict]]:
+    ) -> Union[Iterator[bytes], Iterator[dict]]:
         """Read objects matching the `query` in the `target` container and yield them.
 
         Args:
@@ -198,6 +199,9 @@ class SwiftDataBackend(
             msg = "Invalid query. The query should be a valid archive name."
             self.logger.error(msg)
             raise BackendParameterException(msg)
+
+        if not chunk_size:
+            chunk_size = self.settings.DEFAULT_CHUNK_SIZE
 
         target = target if target else self.default_container
 
@@ -239,7 +243,7 @@ class SwiftDataBackend(
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Optional[str] = None,
-        chunk_size: Optional[int] = None,  # noqa: ARG002
+        chunk_size: Optional[int] = None,
         ignore_errors: bool = False,
         operation_type: Optional[BaseOperationType] = None,
     ) -> int:
@@ -271,6 +275,9 @@ class SwiftDataBackend(
         except StopIteration:
             self.logger.info("Data Iterator is empty; skipping write to target.")
             return 0
+
+        if not chunk_size:
+            chunk_size = self.settings.DEFAULT_CHUNK_SIZE
 
         data = chain((first_record,), data)
         if isinstance(first_record, dict):
@@ -307,23 +314,26 @@ class SwiftDataBackend(
             self.logger.error(msg, operation_type.name)
             raise BackendParameterException(msg % operation_type.name)
 
-        if operation_type in [BaseOperationType.CREATE, BaseOperationType.INDEX]:
-            if target_object in list(self.list(target=target_container)):
-                msg = "%s already exists and overwrite is not allowed for operation %s"
-                self.logger.error(msg, target_object, operation_type)
-                raise BackendException(msg % (target_object, operation_type))
+        # operation_type is CREATE or INDEX by exclusion.
+        if target_object in list(self.list(target=target_container)):
+            msg = "%s already exists and overwrite is not allowed for operation %s"
+            self.logger.error(msg, target_object, operation_type)
+            raise BackendException(msg % (target_object, operation_type))
 
-            try:
-                self.connection.put_object(
-                    container=target_container, obj=target_object, contents=data
-                )
-                resp = self.connection.head_object(
-                    container=target_container, obj=target_object
-                )
-            except ClientException as error:
-                msg = "Failed to write to object %s: %s"
-                self.logger.error(msg, target_object, error.msg)
-                raise BackendException(msg % (target_object, error.msg)) from error
+        try:
+            self.connection.put_object(
+                container=target_container,
+                obj=target_object,
+                contents=data,
+                chunk_size=chunk_size,
+            )
+            resp = self.connection.head_object(
+                container=target_container, obj=target_object
+            )
+        except ClientException as error:
+            msg = "Failed to write to object %s: %s"
+            self.logger.error(msg, target_object, error.msg)
+            raise BackendException(msg % (target_object, error.msg)) from error
 
         count = counter["count"]
         self.logger.info("Successfully written %s statements to %s", count, target)

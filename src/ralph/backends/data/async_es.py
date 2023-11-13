@@ -2,7 +2,7 @@
 
 from io import IOBase
 from itertools import chain
-from typing import Iterable, Iterator, Optional, TypeVar, Union
+from typing import AsyncIterator, Iterable, Optional, TypeVar, Union
 
 from elasticsearch import ApiError, AsyncElasticsearch, TransportError
 from elasticsearch.helpers import BulkIndexError, async_streaming_bulk
@@ -40,7 +40,7 @@ class AsyncESDataBackend(
         self._client = None
 
     @property
-    def client(self):
+    def client(self) -> AsyncElasticsearch:
         """Create an AsyncElasticsearch client if it doesn't exist."""
         if not self._client:
             self._client = AsyncElasticsearch(
@@ -70,7 +70,7 @@ class AsyncESDataBackend(
 
     async def list(
         self, target: Optional[str] = None, details: bool = False, new: bool = False
-    ) -> Iterator[Union[str, dict]]:
+    ) -> Union[AsyncIterator[str], AsyncIterator[dict]]:
         """List available Elasticsearch indices, data streams and aliases.
 
         Args:
@@ -78,7 +78,7 @@ class AsyncESDataBackend(
                 and aliases to limit the request. Supports wildcards (*).
                 If target is `None`, lists all available indices, data streams and
                     aliases. Equivalent to (`target` = "*").
-            details (bool): Get detailed informations instead of just names.
+            details (bool): Get detailed information instead of just names.
             new (bool): Ignored.
 
         Yield:
@@ -114,10 +114,10 @@ class AsyncESDataBackend(
         *,
         query: Optional[Union[str, ESQuery]] = None,
         target: Optional[str] = None,
-        chunk_size: Union[None, int] = None,
+        chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-    ) -> Iterator[Union[bytes, dict]]:
+    ) -> Union[AsyncIterator[bytes], AsyncIterator[dict]]:
         """Read documents matching the query in the target index and yield them.
 
         Args:
@@ -201,10 +201,10 @@ class AsyncESDataBackend(
     async def write(  # noqa: PLR0913
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
-        target: Union[None, str] = None,
-        chunk_size: Union[None, int] = None,
+        target: Optional[str] = None,
+        chunk_size: Optional[int] = None,
         ignore_errors: bool = False,
-        operation_type: Union[None, BaseOperationType] = None,
+        operation_type: Optional[BaseOperationType] = None,
     ) -> int:
         """Write data documents to the target index and return their count.
 
@@ -242,7 +242,7 @@ class AsyncESDataBackend(
         target = target if target else self.settings.DEFAULT_INDEX
         chunk_size = chunk_size if chunk_size else self.settings.DEFAULT_CHUNK_SIZE
         if operation_type == BaseOperationType.APPEND:
-            msg = "Append operation_type is not supported."
+            msg = "Append operation_type is not allowed."
             self.logger.error(msg)
             raise BackendParameterException(msg)
 
@@ -250,9 +250,8 @@ class AsyncESDataBackend(
         if isinstance(first_record, bytes):
             data = parse_iterable_to_dict(data, ignore_errors, self.logger)
 
-        self.logger.debug(
-            "Start writing to the %s index (chunk size: %d)", target, chunk_size
-        )
+        msg = "Start writing to the %s index (chunk size: %d)"
+        self.logger.debug(msg, target, chunk_size)
         try:
             async for success, action in async_streaming_bulk(
                 client=self.client,

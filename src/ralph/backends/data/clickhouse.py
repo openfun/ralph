@@ -19,6 +19,7 @@ from typing import (
 from uuid import UUID, uuid4
 
 import clickhouse_connect
+from clickhouse_connect.driver.client import Client
 from clickhouse_connect.driver.exceptions import ClickHouseError
 from pydantic import BaseModel, Json, ValidationError
 
@@ -59,7 +60,7 @@ class InsertTuple(NamedTuple):
 
 
 class ClickHouseDataBackendSettings(BaseDataBackendSettings):
-    """Represent the ClickHouse data backend default configuration.
+    """ClickHouse data backend default configuration.
 
     Attributes:
         HOST (str): ClickHouse server host to connect to.
@@ -83,11 +84,9 @@ class ClickHouseDataBackendSettings(BaseDataBackendSettings):
     PORT: int = 8123
     DATABASE: str = "xapi"
     EVENT_TABLE_NAME: str = "xapi_events_all"
-    USERNAME: str = None
-    PASSWORD: str = None
+    USERNAME: Optional[str] = None
+    PASSWORD: Optional[str] = None
     CLIENT_OPTIONS: ClickHouseClientOptions = ClickHouseClientOptions()
-    DEFAULT_CHUNK_SIZE: int = 500
-    LOCALE_ENCODING: str = "utf8"
 
 
 class BaseClickHouseQuery(BaseQuery):
@@ -135,7 +134,7 @@ class ClickHouseDataBackend(
         self._client = None
 
     @property
-    def client(self):
+    def client(self) -> Client:
         """Create a ClickHouse client if it doesn't exist.
 
         We do this here so that we don't interrupt initialization in the case
@@ -169,11 +168,8 @@ class ClickHouseDataBackend(
         return DataBackendStatus.OK
 
     def list(
-        self,
-        target: Optional[str] = None,
-        details: bool = False,
-        new: bool = False,  # noqa: ARG002
-    ) -> Iterator[Union[str, dict]]:
+        self, target: Optional[str] = None, details: bool = False, new: bool = False
+    ) -> Union[Iterator[str], Iterator[dict]]:
         """List tables for a given database.
 
         Args:
@@ -197,6 +193,9 @@ class ClickHouseDataBackend(
             self.logger.error(msg, error)
             raise BackendException(msg % error) from error
 
+        if new:
+            self.logger.warning("The `new` argument is ignored")
+
         for table in tables:
             if details:
                 yield table
@@ -212,7 +211,7 @@ class ClickHouseDataBackend(
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-    ) -> Iterator[Union[bytes, dict]]:
+    ) -> Union[Iterator[bytes], Iterator[dict]]:
         """Read documents matching the query in the target table and yield them.
 
         Args:
@@ -282,12 +281,8 @@ class ClickHouseDataBackend(
         if query.limit:
             sql += f"\nLIMIT {query.limit}"
 
-        self.logger.debug(
-            "Start reading the %s table of the %s database (chunk size: %d)",
-            target,
-            self.database,
-            chunk_size,
-        )
+        msg = "Start reading the %s table of the %s database (chunk size: %d)"
+        self.logger.debug(msg, target, self.database, chunk_size)
         try:
             result = self.client.query(
                 sql,
@@ -340,12 +335,8 @@ class ClickHouseDataBackend(
             operation_type = self.default_operation_type
         if not chunk_size:
             chunk_size = self.default_chunk_size
-        self.logger.debug(
-            "Start writing to the %s table of the %s database (chunk size: %d)",
-            target,
-            self.database,
-            chunk_size,
-        )
+        msg = "Start writing to the %s table of the %s database (chunk size: %d)"
+        self.logger.debug(msg, target, self.database, chunk_size)
 
         data = iter(data)
         try:
@@ -354,7 +345,7 @@ class ClickHouseDataBackend(
             self.logger.info("Data Iterator is empty; skipping write to target.")
             return 0
 
-        data = chain([first_record], data)
+        data = chain((first_record,), data)
         if isinstance(first_record, bytes):
             data = parse_iterable_to_dict(data, ignore_errors, self.logger)
 
@@ -420,7 +411,7 @@ class ClickHouseDataBackend(
 
     def _bulk_import(
         self,
-        batch: list,
+        batch: List[InsertTuple],
         ignore_errors: bool = False,
         event_table_name: Optional[str] = None,
     ):
@@ -443,9 +434,8 @@ class ClickHouseDataBackend(
         except (ClickHouseError, BackendException) as error:
             if not ignore_errors:
                 raise BackendException(*error.args) from error
-            self.logger.warning(
-                "Bulk import failed for current chunk but you choose to ignore it.",
-            )
+            msg = "Bulk import failed for current chunk but you choose to ignore it."
+            self.logger.warning(msg)
             # There is no current way of knowing how many rows from the batch
             # succeeded, we assume 0 here.
             return 0
