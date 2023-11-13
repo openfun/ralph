@@ -267,7 +267,6 @@ jobs:
       - checkout
       - *generate-version-file
       - *docker-login
-
       - run:
           name: Install the kubectl client and k3d
           command: |
@@ -277,18 +276,18 @@ jobs:
             echo "$(</tmp/kubectl.sha256) ${HOME}/bin/kubectl" | sha256sum --check
             chmod 755 "${HOME}/bin/kubectl"
 
-            export K3D_RELEASE="v5.4.6"
+            export K3D_RELEASE="v5.6.0"
             curl -Lo "${HOME}/bin/k3d" "https://github.com/k3d-io/k3d/releases/download/${K3D_RELEASE}/k3d-linux-amd64"
-            # FIXME
-            # Removed checksum checking: https://github.com/k3d-io/k3d/discussions/1037
+            curl -sL https://github.com/k3d-io/k3d/releases/download/${K3D_RELEASE}/checksums.txt | \
+              grep _dist/k3d-linux-amd64 | \
+              sed "s|_dist/k3d-linux-amd64|${HOME}/bin/k3d|" | \
+              sha256sum --check
             chmod 755 "${HOME}/bin/k3d"
-
       - run:
           name: Configure sysctl limits for Elasticsearch
           command: |
             # Elasticsearch requires to increase this setting's default value
             sudo sysctl -w vm/max_map_count=262144
-
       - run:
           name: Run local k3d cluster & configure environment
           command: |
@@ -296,22 +295,18 @@ jobs:
             echo "export ARNOLD_ENVIRONMENT=ci" >> $BASH_ENV
             echo "export RALPH_IMAGE_TAG=${CIRCLE_SHA1}" >> $BASH_ENV
             source $BASH_ENV
-
       - run:
           name: Setup a new Arnold project
           command: make arnold-bootstrap
-
       - run:
           name: Build production image and publish it to the k8s cluster docker registry
           command: |
             RALPH_IMAGE_BUILD_TARGET=production \
             RALPH_IMAGE_TAG=${CIRCLE_SHA1} \
               make k3d-push
-
       - run:
           name: Check built images availability
           command: docker images "ralph:*"
-
       - run:
           name: Bootstrap ralph application
           command: |
@@ -324,6 +319,99 @@ jobs:
             test $(kubectl -n ci-ralph get cj -o name ralph-ci-test | wc -l) -eq 1
             # Test the LRS server health
             curl -sLk $(kubectl -n ci-ralph get ingress/ralph-app-current --output=jsonpath="{.spec.rules[0].host}")/__heartbeat__ | \
+              grep '"database":"ok"'
+
+  # ---- Helm jobs (k8s) ----
+  test-helm:
+    machine:
+      image: default
+      # Prevent cache-related issues
+      docker_layer_caching: false
+    working_directory: ~/fun
+    resource_class: large
+    steps:
+      - checkout
+      - *generate-version-file
+      - *docker-login
+      - run:
+          name: Install the kubectl client, helm and k3d
+          command: |
+            export KUBECTL_RELEASE="v1.25.2"
+            curl -Lo "${HOME}/bin/kubectl" "https://dl.k8s.io/release/${KUBECTL_RELEASE}/bin/linux/amd64/kubectl"
+            curl -Lo /tmp/kubectl.sha256 "https://dl.k8s.io/${KUBECTL_RELEASE}/bin/linux/amd64/kubectl.sha256"
+            echo "$(</tmp/kubectl.sha256) ${HOME}/bin/kubectl" | sha256sum --check
+            chmod 755 "${HOME}/bin/kubectl"
+
+            export HELM_RELEASE="v3.13.2"
+            curl -Lo "/tmp/helm.tar.gz" "https://get.helm.sh/helm-${HELM_RELEASE}-linux-amd64.tar.gz"
+            curl -sL "/tmp/helm.tar.gz.sha256sum" "https://get.helm.sh/helm-${HELM_RELEASE}-linux-amd64.tar.gz.sha256sum" | \
+              sed "s|helm-${HELM_RELEASE}-linux-amd64.tar.gz|/tmp/helm.tar.gz|" | \
+              sha256sum --check
+            tar -xf /tmp/helm.tar.gz --strip-components=1 -C ${HOME}/bin linux-amd64/helm
+            chmod 755 "${HOME}/bin/helm"
+
+            export MINIKUBE_RELEASE="v1.32.0"
+            curl -Lo "${HOME}/bin/minikube" "https://github.com/kubernetes/minikube/releases/download/${MINIKUBE_RELEASE}/minikube-linux-amd64"
+            curl -Lo /tmp/minikube.sha256 "https://github.com/kubernetes/minikube/releases/download/${MINIKUBE_RELEASE}/minikube-linux-amd64.sha256"
+            echo "$(</tmp/minikube.sha256) ${HOME}/bin/minikube" | sha256sum --check
+            chmod 755 "${HOME}/bin/minikube"
+      - run:
+          name: Configure sysctl limits for Elasticsearch
+          command: |
+            # Elasticsearch requires to increase this setting's default value
+            sudo sysctl -w vm/max_map_count=262144
+      - run:
+          name: Run local minikube cluster & configure environment
+          command: |
+            minikube start
+            kubectl create namespace ci-ralph
+            kubectl config set-context --current --namespace=ci-ralph
+      - run:
+          name: Build production image and publish it to the k8s cluster docker registry
+          command: |
+            export RALPH_IMAGE_BUILD_TARGET=production
+            export RALPH_IMAGE_TAG=${CIRCLE_SHA1} 
+            make build
+            minikube image load ralph:${RALPH_IMAGE_TAG}
+      - run:
+          name: Deploy Elasticsearch cluster
+          command: |
+            helm repo add elastic https://helm.elastic.co
+            helm repo update
+            helm install elastic-operator elastic/eck-operator
+            
+            # Deploy a two-nodes elasticsearch cluster
+            kubectl apply -f src/helm/manifests/data-lake.yml
+
+            # Wait for pods to be ready
+            # Still need to wait for pods to be created before waiting for them
+            # to be ready (see https://github.com/kubernetes/kubectl/issues/1516)
+            sleep 5
+            kubectl wait --for=condition=ready pod --selector=common.k8s.elastic.co/type=elasticsearch --timeout=120s
+
+            # Store elastic user password
+            echo 'ELASTIC_PASSWORD="$(kubectl get secret data-lake-es-elastic-user -o jsonpath="{.data.elastic}" | base64 -d)"' >> $BASH_ENV
+            source $BASH_ENV
+
+            # Execute an index creation request in the elasticsearch container
+            kubectl exec data-lake-es-default-0 --container elasticsearch -- \
+              curl -ks -X PUT "https://elastic:${ELASTIC_PASSWORD}@localhost:9200/statements?pretty"
+      - run:
+          name: Deploy Ralph
+          command: |
+            cd src/helm
+            helm dependency build ralph/
+            kubectl create secret generic ralph-auth-secret --from-file=auth.json=manifests/auth-demo.json
+            sed -i -e "s|<PASSWORD>|${ELASTIC_PASSWORD}|g" manifests/ralph-env-secret.yaml
+            kubectl apply -f manifests/ralph-env-secret.yaml
+            kubectl apply -f manifests/ralph-env-cm.yaml
+            helm install -f development.yaml lrs ralph/
+
+            # Test the deployment/switch
+            kubectl wait --for=condition=ready pod --selector=app=ralph --timeout=120s
+
+             # Test the LRS server health
+            kubectl exec svc/lrs-ralph -- curl -s -X GET "http://localhost:8080/__heartbeat__" | \
               grep '"database":"ok"'
 
   # ---- Packaging jobs ----
@@ -614,6 +702,14 @@ workflows:
       - build-docs:
           requires:
             - build
+          filters:
+            tags:
+              only: /.*/
+
+      # Helm
+      #
+      # Deploy ralph in a k8s cluster using helm
+      - helm:
           filters:
             tags:
               only: /.*/
