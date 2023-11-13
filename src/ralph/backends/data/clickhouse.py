@@ -3,7 +3,6 @@
 import json
 from datetime import datetime
 from io import IOBase
-from itertools import chain
 from typing import (
     Any,
     Dict,
@@ -33,7 +32,7 @@ from ralph.backends.data.base import (
     Writable,
 )
 from ralph.conf import BaseSettingsConfig, ClientOptions
-from ralph.exceptions import BackendException, BackendParameterException
+from ralph.exceptions import BackendException
 from ralph.utils import iter_by_batch, parse_dict_to_bytes, parse_iterable_to_dict
 
 
@@ -117,6 +116,11 @@ class ClickHouseDataBackend(
 
     name = "clickhouse"
     default_operation_type = BaseOperationType.CREATE
+    unsupported_operation_types = {
+        BaseOperationType.APPEND,
+        BaseOperationType.DELETE,
+        BaseOperationType.UPDATE,
+    }
 
     def __init__(self, settings: Optional[Settings] = None):
         """Instantiate the ClickHouse configuration.
@@ -332,38 +336,40 @@ class ClickHouseDataBackend(
             BackendParameterException: If the `operation_type` is `APPEND`, `UPDATE`
                 or `DELETE` as it is not supported.
         """
+        return super().write(data, target, chunk_size, ignore_errors, operation_type)
+
+    def _write_bytes(  # noqa: PLR0913
+        self,
+        data: Iterable[bytes],
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing bytes. See `self.write`."""
+        statements = parse_iterable_to_dict(data, ignore_errors, self.logger)
+        return self._write_dicts(
+            statements, target, chunk_size, ignore_errors, operation_type
+        )
+
+    def _write_dicts(  # noqa: PLR0913
+        self,
+        data: Iterable[dict],
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,
+        operation_type: BaseOperationType,  # noqa: ARG002
+    ) -> int:
+        """Method called by `self.write` writing dictionaries. See `self.write`."""
+        count = 0
         target = target if target else self.event_table_name
-        if not operation_type:
-            operation_type = self.default_operation_type
-        if not chunk_size:
-            chunk_size = self.default_chunk_size
         msg = "Start writing to the %s table of the %s database (chunk size: %d)"
         self.logger.debug(msg, target, self.database, chunk_size)
-
-        data = iter(data)
-        try:
-            first_record = next(data)
-        except StopIteration:
-            self.logger.info("Data Iterator is empty; skipping write to target.")
-            return 0
-
-        data = chain((first_record,), data)
-        if isinstance(first_record, bytes):
-            data = parse_iterable_to_dict(data, ignore_errors, self.logger)
-
-        if operation_type not in [BaseOperationType.CREATE, BaseOperationType.INDEX]:
-            msg = "%s operation_type is not allowed."
-            self.logger.error(msg, operation_type.name)
-            raise BackendParameterException(msg % operation_type.name)
-
-        # operation_type is either CREATE or INDEX
-        count = 0
         insert_tuples = self._to_insert_tuples(data, ignore_errors)
         for batch in iter_by_batch(insert_tuples, chunk_size):
             count += self._bulk_import(batch, ignore_errors, target)
 
         self.logger.info("Inserted a total of %d documents with success", count)
-
         return count
 
     def close(self) -> None:
