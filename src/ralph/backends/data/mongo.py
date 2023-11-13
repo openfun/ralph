@@ -32,7 +32,6 @@ from ralph.backends.data.base import (
     DataBackendStatus,
     Listable,
     Writable,
-    enforce_query_checks,
 )
 from ralph.conf import BaseSettingsConfig, ClientOptions
 from ralph.exceptions import BackendException, BackendParameterException
@@ -171,10 +170,8 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
             self.logger.error(msg, error)
             raise BackendException(msg % error) from error
 
-    @enforce_query_checks
     def read(  # noqa: PLR0913
         self,
-        *,
         query: Optional[Union[str, MongoQuery]] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
@@ -203,26 +200,30 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
                 during encoding documents and `ignore_errors` is set to `False`.
             BackendParameterException: If the `target` is not a valid collection name.
         """
-        if raw_output:
-            documents = self.read(
-                query=query,
-                target=target,
-                chunk_size=chunk_size,
-                raw_output=False,
-                ignore_errors=ignore_errors,
-            )
-            locale = self.settings.LOCALE_ENCODING
-            yield from parse_dict_to_bytes(
-                documents, locale, ignore_errors, self.logger
-            )
-            return
+        yield from super().read(query, target, chunk_size, raw_output, ignore_errors)
 
-        if not chunk_size:
-            chunk_size = self.settings.DEFAULT_CHUNK_SIZE
+    def _read_bytes(
+        self,
+        query: MongoQuery,
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,
+    ) -> Iterator[bytes]:
+        """Method called by `self.read` yielding bytes. See `self.read`."""
+        locale = self.settings.LOCALE_ENCODING
+        statements = self._read_dicts(query, target, chunk_size, ignore_errors)
+        yield from parse_dict_to_bytes(statements, locale, ignore_errors, self.logger)
 
+    def _read_dicts(
+        self,
+        query: MongoQuery,
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,  # noqa: ARG002
+    ) -> Iterator[dict]:
+        """Method called by `self.read` yielding dictionaries. See `self.read`."""
         query = query.query_string if query.query_string else query
         query = query.dict(exclude={"query_string"}, exclude_unset=True)
-
         collection = self._get_target_collection(target)
         try:
             documents = collection.find(batch_size=chunk_size, **query)
