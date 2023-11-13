@@ -146,7 +146,9 @@ class LDPDataBackend(
             return
 
         for archive in archives:
-            yield self._details(target, archive)
+            detail = self._details(target, archive)
+            if detail:
+                yield detail
 
     @enforce_query_checks
     def read(  # noqa: PLR0913
@@ -165,7 +167,7 @@ class LDPDataBackend(
             target (str or None): The target stream_id containing the archives.
                 If target is `None`, the `DEFAULT_STREAM_ID` is used instead.
             chunk_size (int or None): The chunk size when reading archives by batch.
-            raw_output (bool): Ignored. Always set to `True`.
+            raw_output (bool): Should always be set to `True`.
             ignore_errors (bool): No impact as no encoding operation is performed.
 
         Yield:
@@ -180,8 +182,19 @@ class LDPDataBackend(
             self.logger.error(msg)
             raise BackendParameterException(msg)
 
-        if not raw_output or not ignore_errors:
-            msg = "The `raw_output` and `ignore_errors` arguments are ignored"
+        if not raw_output:
+            msg = (
+                "Invalid `raw_output` value. LDP data backend doesn't support yielding "
+                "dictionaries with `raw_output=False`"
+            )
+            self.logger.error(msg)
+            raise BackendParameterException(msg)
+
+        if not chunk_size:
+            chunk_size = self.settings.DEFAULT_CHUNK_SIZE
+
+        if not ignore_errors:
+            msg = "The `ignore_errors` argument is ignored"
             self.logger.warning(msg)
 
         target = target if target else self.stream_id
@@ -237,7 +250,13 @@ class LDPDataBackend(
     def _url(self, name: str) -> str:
         """Get archive absolute URL."""
         download_url_endpoint = f"{self._get_archive_endpoint()}/{name}/url"
-        response = self.client.post(download_url_endpoint)
+        try:
+            response = self.client.post(download_url_endpoint)
+        except ovh.exceptions.APIError as error:
+            msg = "Failed to get '%s' archive URL: %s"
+            self.logger.error(msg, name, error)
+            raise BackendException(msg % (name, error)) from error
+
         download_url = response.get("url")
         self.logger.debug("Temporary URL: %s", download_url)
         return download_url
@@ -258,4 +277,9 @@ class LDPDataBackend(
                 "size": 67906662,
             }
         """
-        return self.client.get(f"{self._get_archive_endpoint(stream_id)}/{name}")
+        try:
+            return self.client.get(f"{self._get_archive_endpoint(stream_id)}/{name}")
+        except ovh.exceptions.APIError as error:
+            msg = "Failed to get '%s' archive details: %s"
+            self.logger.error(msg, name, error)
+            raise BackendException(msg % (name, error)) from error
