@@ -622,7 +622,7 @@ async def test_backends_data_async_es_write_with_append_operation(
     should raise a `BackendParameterException`.
     """
     backend = async_es_backend()
-    msg = "Append operation_type is not supported."
+    msg = "Append operation_type is not allowed."
     with pytest.raises(BackendParameterException, match=msg):
         with caplog.at_level(logging.ERROR):
             await backend.write(data=[{}], operation_type=BaseOperationType.APPEND)
@@ -630,7 +630,7 @@ async def test_backends_data_async_es_write_with_append_operation(
     assert (
         "ralph.backends.data.async_es",
         logging.ERROR,
-        "Append operation_type is not supported.",
+        "Append operation_type is not allowed.",
     ) in caplog.record_tuples
 
     await backend.close()

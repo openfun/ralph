@@ -326,6 +326,32 @@ def test_backends_data_clickhouse_list_with_failure(
     backend.close()
 
 
+def test_backends_data_clickhouse_list_with_history(
+    clickhouse_backend, caplog, monkeypatch
+):
+    """Test the `ClickHouseDataBackend.list` method given `new` argument set to True,
+    should log a warning message.
+    """
+    backend = clickhouse_backend()
+
+    def mock_clickhouse_client_query(*args, **kwargs):
+        """Mock the `clickhouse.Client.query` returning no results."""
+        return namedtuple("_", "named_results")(lambda: [])
+
+    monkeypatch.setattr(backend.client, "query", mock_clickhouse_client_query)
+
+    with caplog.at_level(logging.WARNING):
+        assert not list(backend.list(new=True))
+
+    assert (
+        "ralph.backends.data.clickhouse",
+        logging.WARNING,
+        "The `new` argument is ignored",
+    ) in caplog.record_tuples
+
+    backend.close()
+
+
 def test_backends_data_clickhouse_write_with_invalid_timestamp(
     clickhouse, clickhouse_backend
 ):

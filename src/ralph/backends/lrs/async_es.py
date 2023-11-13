@@ -1,6 +1,6 @@
 """Asynchronous Elasticsearch LRS backend for Ralph."""
 
-from typing import Iterator, List
+from typing import AsyncIterator, List
 
 from ralph.backends.data.async_es import AsyncESDataBackend
 from ralph.backends.lrs.base import (
@@ -35,7 +35,7 @@ class AsyncESLRSBackend(BaseAsyncLRSBackend[ESLRSBackendSettings], AsyncESDataBa
             search_after="|".join(query.search_after) if query.search_after else "",
         )
 
-    async def query_statements_by_ids(self, ids: List[str]) -> Iterator[dict]:
+    async def query_statements_by_ids(self, ids: List[str]) -> AsyncIterator[dict]:
         """Yield statements with matching ids from the backend."""
         try:
             async for document in self.read(query={"query": {"terms": {"_id": ids}}}):

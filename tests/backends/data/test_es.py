@@ -565,7 +565,7 @@ def test_backends_data_es_write_with_append_operation(es_backend, caplog):
     should raise a `BackendParameterException`.
     """
     backend = es_backend()
-    msg = "Append operation_type is not supported."
+    msg = "Append operation_type is not allowed."
     with pytest.raises(BackendParameterException, match=msg):
         with caplog.at_level(logging.ERROR):
             backend.write(data=[{}], operation_type=BaseOperationType.APPEND)
@@ -573,7 +573,7 @@ def test_backends_data_es_write_with_append_operation(es_backend, caplog):
     assert (
         "ralph.backends.data.es",
         logging.ERROR,
-        "Append operation_type is not supported.",
+        "Append operation_type is not allowed.",
     ) in caplog.record_tuples
 
     backend.close()

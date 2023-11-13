@@ -490,6 +490,7 @@ def ldp_backend(settings_fs):
             ENDPOINT="ovh-eu",
             SERVICE_NAME=service_name,
             REQUEST_TIMEOUT=None,
+            DEFAULT_CHUNK_SIZE=500,
         )
         return LDPDataBackend(settings)
 
@@ -634,6 +635,7 @@ def swift_backend():
             USER_DOMAIN_NAME="Default",
             DEFAULT_CONTAINER="container_name",
             LOCALE_ENCODING="utf8",
+            DEFAULT_CHUNK_SIZE=500,
         )
         return SwiftDataBackend(settings)
 

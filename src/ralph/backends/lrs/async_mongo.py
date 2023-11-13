@@ -1,6 +1,6 @@
 """Async MongoDB LRS backend for Ralph."""
 
-from typing import Iterator, List
+from typing import AsyncIterator, List
 
 from ralph.backends.data.async_mongo import AsyncMongoDataBackend
 from ralph.backends.lrs.base import (
@@ -41,7 +41,7 @@ class AsyncMongoLRSBackend(
             search_after=search_after,
         )
 
-    async def query_statements_by_ids(self, ids: List[str]) -> Iterator[dict]:
+    async def query_statements_by_ids(self, ids: List[str]) -> AsyncIterator[dict]:
         """Yield statements with matching ids from the backend."""
         try:
             async for document in self.read(

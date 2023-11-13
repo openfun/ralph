@@ -32,6 +32,7 @@ def test_backends_data_ldp_default_instantiation(monkeypatch, fs):
         "ENDPOINT",
         "SERVICE_NAME",
         "REQUEST_TIMEOUT",
+        "DEFAULT_CHUNK_SIZE",
     ]
     for name in backend_settings_names:
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__LDP__{name}", raising=False)
@@ -48,6 +49,7 @@ def test_backends_data_ldp_default_instantiation(monkeypatch, fs):
     monkeypatch.setenv("RALPH_BACKENDS__DATA__LDP__SERVICE_NAME", "foo")
     backend = LDPDataBackend()
     assert backend.service_name == "foo"
+    assert backend.settings.DEFAULT_CHUNK_SIZE == 4096
 
 
 def test_backends_data_ldp_instantiation_with_settings(ldp_backend):
@@ -56,6 +58,7 @@ def test_backends_data_ldp_instantiation_with_settings(ldp_backend):
     assert isinstance(backend.client, ovh.Client)
     assert backend.service_name == "foo"
     assert backend.stream_id == "bar"
+    assert backend.settings.DEFAULT_CHUNK_SIZE == 500
 
     try:
         ldp_backend(service_name="bar")
@@ -142,13 +145,13 @@ def test_backends_data_ldp_list_failure(exception_class, ldp_backend, monkeypatc
         ([], None, "bar"),
         # Given one archive at the OVH's archive endpoint and no `target`, the `list`
         # method should use the default `stream_id` target yield the archive.
-        (["achive_1"], None, "bar"),
+        (["archive_1"], None, "bar"),
         # Given one archive at the OVH's archive endpoint and a `target`, the `list`
         # method should use the provided `stream_id` target yield the archive.
-        (["achive_1"], "foo", "foo"),
+        (["archive_1"], "foo", "foo"),
         # Given some archives at the OVH's archive endpoint and no `target`, the `list`
         # method should use the default `stream_id` target yield the archives.
-        (["achive_1", "achive_2"], None, "bar"),
+        (["archive_1", "archive_2"], None, "bar"),
     ],
 )
 def test_backends_data_ldp_list_without_history(
@@ -176,13 +179,13 @@ def test_backends_data_ldp_list_without_history(
         ([], None, "bar"),
         # Given one archive at the OVH's archive endpoint and no `target`, the `list`
         # method should use the default `stream_id` target yield the archive.
-        (["achive_1"], None, "bar"),
+        (["archive_1"], None, "bar"),
         # Given one archive at the OVH's archive endpoint and a `target`, the `list`
         # method should use the provided `stream_id` target yield the archive.
-        (["achive_1"], "foo", "foo"),
+        (["archive_1"], "foo", "foo"),
         # Given some archives at the OVH's archive endpoint and no `target`, the `list`
         # method should use the default `stream_id` target yield the archives.
-        (["achive_1", "achive_2"], None, "bar"),
+        (["archive_1", "archive_2"], None, "bar"),
     ],
 )
 def test_backends_data_ldp_list_with_details(

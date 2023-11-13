@@ -44,7 +44,6 @@ class FSDataBackendSettings(BaseDataBackendSettings):
     DEFAULT_CHUNK_SIZE: int = 4096
     DEFAULT_DIRECTORY_PATH: Path = Path(".")
     DEFAULT_QUERY_STRING: str = "*"
-    LOCALE_ENCODING: str = "utf8"
 
 
 Settings = TypeVar("Settings", bound=FSDataBackendSettings)
@@ -97,7 +96,7 @@ class FSDataBackend(
 
     def list(
         self, target: Optional[str] = None, details: bool = False, new: bool = False
-    ) -> Iterator[Union[str, dict]]:
+    ) -> Union[Iterator[str], Iterator[dict]]:
         """List files and directories in the target directory.
 
         Args:
@@ -156,7 +155,7 @@ class FSDataBackend(
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-    ) -> Iterator[Union[bytes, dict]]:
+    ) -> Union[Iterator[bytes], Iterator[dict]]:
         """Read files matching the query in the target folder and yield them.
 
         Args:
@@ -206,7 +205,7 @@ class FSDataBackend(
             )
 
     def _iter_files_matching_query(
-        self, target: Union[str, None], query: BaseQuery
+        self, target: Optional[str], query: BaseQuery
     ) -> Iterator[Tuple[BufferedReader, Path]]:
         """Return file/path tuples for files matching the query in the target folder."""
         if not query.query_string:
