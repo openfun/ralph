@@ -186,8 +186,8 @@ def test_backends_data_swift_list(swift_backend, monkeypatch, fs, settings_fs):
     def mock_head_object(container, obj):
         resp = next((x for x in listing if x["name"] == obj), None)
         return {
-            "Last-Modified": resp["lastModified"],
-            "Content-Length": resp["size"],
+            "last-modified": resp["lastModified"],
+            "content-length": resp["size"],
         }
 
     backend = swift_backend()
@@ -213,7 +213,7 @@ def test_backends_data_swift_list_with_failed_details(
     listing = [
         {
             "name": "2020-04-29.gz",
-            "lastModified": frozen_now,
+            "last-modified": frozen_now,
             "size": 12,
         },
     ]
@@ -283,7 +283,7 @@ def test_backends_data_swift_read_with_raw_output(
     backend = swift_backend()
 
     def mock_get_object(*args, **kwargs):
-        resp_headers = {"Content-Length": 14}
+        resp_headers = {"content-length": 14}
         return (resp_headers, BytesIO(content))
 
     monkeypatch.setattr(backend.connection, "get_object", mock_get_object)
@@ -345,7 +345,7 @@ def test_backends_data_swift_read_without_raw_output(
     backend = swift_backend()
 
     def mock_get_object(*args, **kwargs):
-        resp_headers = {"Content-Length": 14}
+        resp_headers = {"content-length": 14}
         return (resp_headers, BytesIO(content_bytes))
 
     monkeypatch.setattr(backend.connection, "get_object", mock_get_object)
@@ -404,7 +404,7 @@ def test_backends_data_swift_read_with_ignore_errors(
     backend = swift_backend()
 
     def mock_get_object_1(*args, **kwargs):
-        resp_headers = {"Content-Length": 14}
+        resp_headers = {"content-length": 14}
         return (resp_headers, BytesIO(valid_invalid_json))
 
     monkeypatch.setattr(backend.connection, "get_object", mock_get_object_1)
@@ -415,7 +415,7 @@ def test_backends_data_swift_read_with_ignore_errors(
     assert list(result) == [valid_dictionary, valid_dictionary]
 
     def mock_get_object_2(*args, **kwargs):
-        resp_headers = {"Content-Length": 14}
+        resp_headers = {"content-length": 14}
         return (resp_headers, BytesIO(invalid_valid_json))
 
     monkeypatch.setattr(backend.connection, "get_object", mock_get_object_2)
@@ -450,7 +450,7 @@ def test_backends_data_swift_read_without_ignore_errors(
     backend = swift_backend()
 
     def mock_get_object_1(*args, **kwargs):
-        resp_headers = {"Content-Length": 14}
+        resp_headers = {"content-length": 14}
         return (resp_headers, BytesIO(valid_invalid_json))
 
     monkeypatch.setattr(backend.connection, "get_object", mock_get_object_1)
@@ -473,7 +473,7 @@ def test_backends_data_swift_read_without_ignore_errors(
     assert not backend.history
 
     def mock_get_object_2(*args, **kwargs):
-        resp_headers = {"Content-Length": 14}
+        resp_headers = {"content-length": 14}
         return (resp_headers, BytesIO(invalid_valid_json))
 
     monkeypatch.setattr(backend.connection, "get_object", mock_get_object_2)
@@ -642,7 +642,7 @@ def test_backends_data_swift_write_without_target(
         return 1
 
     def mock_head_object(*args, **kwargs):
-        return {"Content-Length": 3}
+        return {"content-length": 3}
 
     expected_filename = f"{frozen_now}-{frozen_uuid4}"
     monkeypatch.setattr(backend.connection, "get_container", mock_get_container)
@@ -659,7 +659,7 @@ def test_backends_data_swift_write_without_target(
             "action": "write",
             "operation_type": BaseOperationType.CREATE.value,
             "id": f"container_name/{expected_filename}",
-            "size": mock_head_object()["Content-Length"],
+            "size": mock_head_object()["content-length"],
             "timestamp": frozen_now,
         }
     ]
