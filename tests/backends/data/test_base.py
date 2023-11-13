@@ -6,6 +6,7 @@ from typing import Any, Union
 import pytest
 
 from ralph.backends.data.base import (
+    BaseAsyncDataBackend,
     BaseDataBackend,
     BaseDataBackendSettings,
     BaseQuery,
@@ -119,3 +120,80 @@ def test_backends_data_base_get_backend_generic_argument():
 
     assert get_backend_generic_argument(DummyBadBackend, 0) is None
     assert get_backend_generic_argument(DummyBadBackend, 1) is None
+
+
+def test_backends_data_base_read_with_max_statements():
+    """Test the `BaseDataBackend.read` method with `max_statements` argument."""
+
+    class MockBaseDataBackend(BaseDataBackend[BaseDataBackendSettings, BaseQuery]):
+        """A class mocking the base database class."""
+
+        def _read_dicts(self, *args):
+            yield from ({}, {}, {}, {})
+
+        def _read_bytes(self, *args):
+            yield from (b"", b"", b"")
+
+        def status(self):
+            pass
+
+        def close(self):
+            pass
+
+    backend = MockBaseDataBackend()
+    assert list(backend.read()) == [{}, {}, {}, {}]
+    assert list(backend.read(raw_output=True)) == [b"", b"", b""]
+
+    assert list(backend.read(max_statements=9)) == [{}, {}, {}, {}]
+    assert list(backend.read(max_statements=9, raw_output=True)) == [b"", b"", b""]
+
+    assert list(backend.read(max_statements=3)) == [{}, {}, {}]
+    assert list(backend.read(max_statements=3, raw_output=True)) == [b"", b"", b""]
+
+    assert not list(backend.read(max_statements=0))
+    assert not list(backend.read(max_statements=0, raw_output=True))
+
+
+@pytest.mark.anyio
+async def test_backends_data_base_async_read_with_max_statements():
+    """Test the async `BaseDataBackend.read` method with `max_statements` argument."""
+
+    class MockAsyncBaseDataBackend(
+        BaseAsyncDataBackend[BaseDataBackendSettings, BaseQuery]
+    ):
+        """A class mocking the base database class."""
+
+        async def _read_dicts(self, *args):
+            for _ in range(4):
+                yield {}
+
+        async def _read_bytes(self, *args):
+            for _ in range(3):
+                yield b""
+
+        def status(self):
+            pass
+
+        def close(self):
+            pass
+
+    backend = MockAsyncBaseDataBackend()
+    assert [_ async for _ in backend.read()] == [{}, {}, {}, {}]
+    assert [_ async for _ in backend.read(raw_output=True)] == [b"", b"", b""]
+
+    assert [_ async for _ in backend.read(max_statements=9)] == [{}, {}, {}, {}]
+    assert [_ async for _ in backend.read(max_statements=9, raw_output=True)] == [
+        b"",
+        b"",
+        b"",
+    ]
+
+    assert [_ async for _ in backend.read(max_statements=3)] == [{}, {}, {}]
+    assert [_ async for _ in backend.read(max_statements=3, raw_output=True)] == [
+        b"",
+        b"",
+        b"",
+    ]
+
+    assert not [_ async for _ in backend.read(max_statements=0)]
+    assert not [_ async for _ in backend.read(max_statements=0, raw_output=True)]

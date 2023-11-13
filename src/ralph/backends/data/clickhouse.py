@@ -20,7 +20,7 @@ from uuid import UUID, uuid4
 import clickhouse_connect
 from clickhouse_connect.driver.client import Client
 from clickhouse_connect.driver.exceptions import ClickHouseError
-from pydantic import BaseModel, Json, ValidationError
+from pydantic import BaseModel, Json, PositiveInt, ValidationError
 
 from ralph.backends.data.base import (
     BaseDataBackend,
@@ -212,6 +212,7 @@ class ClickHouseDataBackend(
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
+        max_statements: Optional[PositiveInt] = None,
     ) -> Union[Iterator[bytes], Iterator[dict]]:
         """Read documents matching the query in the target table and yield them.
 
@@ -225,6 +226,8 @@ class ClickHouseDataBackend(
             ignore_errors (bool): If `True`, encoding errors during the read operation
                 will be ignored and logged.
                 If `False` (default), a `BackendException` is raised on any error.
+            max_statements (int): The maximum number of statements to yield.
+                If `None` (default), there is no maximum.
 
         Yield:
             bytes: The next raw document if `raw_output` is True.
@@ -234,7 +237,9 @@ class ClickHouseDataBackend(
             BackendException: If a failure occurs during ClickHouse connection or
                 during encoding documents and `ignore_errors` is set to `False`.
         """
-        yield from super().read(query, target, chunk_size, raw_output, ignore_errors)
+        yield from super().read(
+            query, target, chunk_size, raw_output, ignore_errors, max_statements
+        )
 
     def _read_bytes(
         self,
