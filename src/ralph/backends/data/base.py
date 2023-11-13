@@ -3,7 +3,7 @@
 import logging
 from abc import ABC, abstractmethod
 from enum import Enum, unique
-from functools import cached_property, wraps
+from functools import cached_property
 from io import IOBase
 from typing import (
     Any,
@@ -74,20 +74,6 @@ class DataBackendStatus(Enum):
     OK = "ok"
     AWAY = "away"
     ERROR = "error"
-
-
-def enforce_query_checks(method):
-    """Enforce query argument type checking for methods using it."""
-
-    @wraps(method)
-    def wrapper(*args, **kwargs):
-        """Wrap method execution."""
-        query = kwargs.pop("query", None)
-        self_ = args[0]
-
-        return method(*args, query=self_.validate_query(query), **kwargs)
-
-    return wrapper
 
 
 class Loggable:
@@ -167,6 +153,48 @@ Settings = TypeVar("Settings", bound=BaseDataBackendSettings)
 Query = TypeVar("Query", bound=BaseQuery)
 
 
+def validate_backend_query(
+    query: Union[str, dict, Query, None],
+    query_class: Type[Query],
+    logger: logging.Logger,
+) -> Query:
+    """Validate and transform the backend query."""
+    query_name = query_class.__name__
+    if query is None:
+        try:
+            return query_class()
+        except ValidationError as error:
+            msg = "Invalid %s default query: %s"
+            errors = error.errors()
+            logger.error(msg, query_name, errors)
+            raise BackendParameterException(msg % (query_name, errors)) from error
+
+    if isinstance(query, str):
+        try:
+            return query_class(query_string=query)
+        except ValidationError as error:
+            msg = "Invalid %s query string: %s"
+            errors = error.errors()
+            logger.error(msg, query_name, errors)
+            raise BackendParameterException(msg % (query_name, errors)) from error
+
+    if isinstance(query, dict):
+        try:
+            return query_class(**query)
+        except ValidationError as error:
+            msg = "The 'query' argument is expected to be a %s instance. %s"
+            errors = error.errors()
+            logger.error(msg, query_name, errors)
+            raise BackendParameterException(msg % (query_name, errors)) from error
+
+    if isinstance(query, query_class):
+        return query
+
+    msg = "The 'query' argument is expected to be a %s instance."
+    logger.error(msg, query_name)
+    raise BackendParameterException(msg % query_name)
+
+
 class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
     """Base data backend interface."""
 
@@ -188,34 +216,6 @@ class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
         """
         self.settings: Settings = settings if settings else self.settings_class()
 
-    def validate_query(self, query: Union[str, dict, Query, None] = None) -> Query:
-        """Validate and transform the query."""
-        if query is None:
-            query = self.query_class()
-
-        if isinstance(query, str):
-            query = self.query_class(query_string=query)
-
-        if isinstance(query, dict):
-            try:
-                query = self.query_class(**query)
-            except ValidationError as error:
-                msg = "The 'query' argument is expected to be a %s instance. %s"
-                errors = error.errors()
-                self.logger.error(msg, self.query_class.__name__, errors)
-                raise BackendParameterException(
-                    msg % (self.query_class.__name__, errors)
-                ) from error
-
-        if not isinstance(query, self.query_class):
-            msg = "The 'query' argument is expected to be a %s instance."
-            self.logger.error(msg, self.query_class.__name__)
-            raise BackendParameterException(msg % (self.query_class.__name__,))
-
-        self.logger.debug("Query: %s", str(query))
-
-        return query
-
     @abstractmethod
     def status(self) -> DataBackendStatus:
         """Implement data backend checks (e.g. connection, cluster status).
@@ -224,11 +224,8 @@ class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
             DataBackendStatus: The status of the data backend.
         """
 
-    @abstractmethod
-    @enforce_query_checks
     def read(  # noqa: PLR0913
         self,
-        *,
         query: Optional[Union[str, Query]] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
@@ -261,6 +258,23 @@ class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
                 during encoding records and `ignore_errors` is set to `False`.
             BackendParameterException: If a backend argument value is not valid.
         """
+        chunk_size = chunk_size if chunk_size else self.settings.DEFAULT_CHUNK_SIZE
+        query = validate_backend_query(query, self.query_class, self.logger)
+        reader = self._read_bytes if raw_output else self._read_dicts
+        statements = reader(query, target, chunk_size, ignore_errors)
+        yield from statements
+
+    @abstractmethod
+    def _read_bytes(
+        self, query: Query, target: Optional[str], chunk_size: int, ignore_errors: bool
+    ) -> Iterator[bytes]:
+        """Method called by `self.read` yielding bytes. See `self.read`."""
+
+    @abstractmethod
+    def _read_dicts(
+        self, query: Query, target: Optional[str], chunk_size: int, ignore_errors: bool
+    ) -> Iterator[dict]:
+        """Method called by `self.read` yielding dictionaries. See `self.read`."""
 
     @abstractmethod
     def close(self) -> None:
@@ -269,20 +283,6 @@ class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
         Raise:
             BackendException: If a failure occurs during the close operation.
         """
-
-
-def async_enforce_query_checks(method):
-    """Enforce query argument type checking for methods using it."""
-
-    @wraps(method)
-    async def wrapper(*args, **kwargs):
-        """Wrap method execution."""
-        query = kwargs.pop("query", None)
-        self_ = args[0]
-        async for result in method(*args, query=self_.validate_query(query), **kwargs):
-            yield result
-
-    return wrapper
 
 
 class AsyncWritable(ABC):
@@ -370,36 +370,6 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
         """
         self.settings: Settings = settings if settings else self.settings_class()
 
-    def validate_query(
-        self, query: Union[str, dict, BaseQuery, None] = None
-    ) -> BaseQuery:
-        """Validate and transform the query."""
-        if query is None:
-            query = self.query_class()
-
-        if isinstance(query, str):
-            query = self.query_class(query_string=query)
-
-        if isinstance(query, dict):
-            try:
-                query = self.query_class(**query)
-            except ValidationError as error:
-                msg = "The 'query' argument is expected to be a %s instance. %s"
-                errors = error.errors()
-                self.logger.error(msg, self.query_class.__name__, errors)
-                raise BackendParameterException(
-                    msg % (self.query_class.__name__, errors)
-                ) from error
-
-        if not isinstance(query, self.query_class):
-            msg = "The 'query' argument is expected to be a %s instance."
-            self.logger.error(msg, self.query_class.__name__)
-            raise BackendParameterException(msg % (self.query_class.__name__,))
-
-        self.logger.debug("Query: %s", str(query))
-
-        return query
-
     @abstractmethod
     async def status(self) -> DataBackendStatus:
         """Implement data backend checks (e.g. connection, cluster status).
@@ -408,11 +378,8 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
             DataBackendStatus: The status of the data backend.
         """
 
-    @abstractmethod
-    @async_enforce_query_checks
     async def read(  # noqa: PLR0913
         self,
-        *,
         query: Optional[Union[str, Query]] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
@@ -445,6 +412,24 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
                 during encoding records and `ignore_errors` is set to `False`.
             BackendParameterException: If a backend argument value is not valid.
         """
+        chunk_size = chunk_size if chunk_size else self.settings.DEFAULT_CHUNK_SIZE
+        query = validate_backend_query(query, self.query_class, self.logger)
+        reader = self._read_bytes if raw_output else self._read_dicts
+        statements = reader(query, target, chunk_size, ignore_errors)
+        async for statement in statements:
+            yield statement
+
+    @abstractmethod
+    async def _read_bytes(
+        self, query: Query, target: Optional[str], chunk_size: int, ignore_errors: bool
+    ) -> AsyncIterator[bytes]:
+        """Method called by `self.read` yielding bytes. See `self.read`."""
+
+    @abstractmethod
+    async def _read_dicts(
+        self, query: Query, target: Optional[str], chunk_size: int, ignore_errors: bool
+    ) -> AsyncIterator[dict]:
+        """Method called by `self.read` yielding dictionaries. See `self.read`."""
 
     @abstractmethod
     async def close(self) -> None:

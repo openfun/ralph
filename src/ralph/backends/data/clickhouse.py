@@ -31,7 +31,6 @@ from ralph.backends.data.base import (
     DataBackendStatus,
     Listable,
     Writable,
-    enforce_query_checks,
 )
 from ralph.conf import BaseSettingsConfig, ClientOptions
 from ralph.exceptions import BackendException, BackendParameterException
@@ -202,10 +201,8 @@ class ClickHouseDataBackend(
             else:
                 yield str(table.get("name"))
 
-    @enforce_query_checks
     def read(  # noqa: PLR0913
         self,
-        *,
         query: Optional[Union[str, ClickHouseQuery]] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
@@ -233,25 +230,30 @@ class ClickHouseDataBackend(
             BackendException: If a failure occurs during ClickHouse connection or
                 during encoding documents and `ignore_errors` is set to `False`.
         """
-        if raw_output:
-            documents = self.read(
-                query=query,
-                target=target,
-                chunk_size=chunk_size,
-                raw_output=False,
-                ignore_errors=ignore_errors,
-            )
-            locale = self.settings.LOCALE_ENCODING
-            yield from parse_dict_to_bytes(
-                documents, locale, ignore_errors, self.logger
-            )
-            return
+        yield from super().read(query, target, chunk_size, raw_output, ignore_errors)
 
+    def _read_bytes(
+        self,
+        query: ClickHouseQuery,
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,
+    ) -> Iterator[bytes]:
+        """Method called by `self.read` yielding bytes. See `self.read`."""
+        locale = self.settings.LOCALE_ENCODING
+        statements = self._read_dicts(query, target, chunk_size, ignore_errors)
+        yield from parse_dict_to_bytes(statements, locale, ignore_errors, self.logger)
+
+    def _read_dicts(
+        self,
+        query: ClickHouseQuery,
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,
+    ) -> Iterator[dict]:
+        """Method called by `self.read` yielding dictionaries. See `self.read`."""
         if target is None:
             target = self.event_table_name
-
-        if chunk_size is None:
-            chunk_size = self.default_chunk_size
 
         query = (
             BaseClickHouseQuery(query.query_string)
