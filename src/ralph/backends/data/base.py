@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from enum import Enum, unique
 from functools import cached_property
 from io import IOBase
+from itertools import chain
 from typing import (
     Any,
     AsyncIterator,
@@ -12,6 +13,7 @@ from typing import (
     Iterable,
     Iterator,
     Optional,
+    Set,
     Type,
     TypeVar,
     Union,
@@ -77,7 +79,9 @@ class DataBackendStatus(Enum):
 
 
 class Loggable:
-    """A class with a `logger` property."""
+    """A class with a `logger` and `settings` property."""
+
+    settings: BaseDataBackendSettings
 
     @cached_property
     def logger(self) -> logging.Logger:
@@ -85,12 +89,12 @@ class Loggable:
         return logging.getLogger(self.__class__.__module__)
 
 
-class Writable(ABC):
+class Writable(Loggable, ABC):
     """Data backend interface for backends supporting the write operation."""
 
     default_operation_type = BaseOperationType.INDEX
+    unsupported_operation_types: Set[BaseOperationType] = set()
 
-    @abstractmethod
     def write(  # noqa: PLR0913
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
@@ -122,6 +126,48 @@ class Writable(ABC):
                 if an inescapable failure occurs and `ignore_errors` is set to `True`.
             BackendParameterException: If a backend argument value is not valid.
         """
+        if not operation_type:
+            operation_type = self.default_operation_type
+
+        if operation_type in self.unsupported_operation_types:
+            msg = f"{operation_type.value.capitalize()} operation_type is not allowed."
+            self.logger.error(msg)
+            raise BackendParameterException(msg)
+
+        data = iter(data)
+        try:
+            first_record = next(data)
+        except StopIteration:
+            self.logger.info("Data Iterator is empty; skipping write to target.")
+            return 0
+        data = chain((first_record,), data)
+
+        chunk_size = chunk_size if chunk_size else self.settings.DEFAULT_CHUNK_SIZE
+        is_bytes = isinstance(first_record, bytes)
+        writer = self._write_bytes if is_bytes else self._write_dicts
+        return writer(data, target, chunk_size, ignore_errors, operation_type)
+
+    @abstractmethod
+    def _write_bytes(  # noqa: PLR0913
+        self,
+        data: Iterable[bytes],
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing bytes. See `self.write`."""
+
+    @abstractmethod
+    def _write_dicts(  # noqa: PLR0913
+        self,
+        data: Iterable[dict],
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing dictionaries. See `self.write`."""
 
 
 class Listable(ABC):
@@ -285,12 +331,12 @@ class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
         """
 
 
-class AsyncWritable(ABC):
+class AsyncWritable(Loggable, ABC):
     """Async data backend interface for backends supporting the write operation."""
 
     default_operation_type = BaseOperationType.INDEX
+    unsupported_operation_types: Set[BaseOperationType] = set()
 
-    @abstractmethod
     async def write(  # noqa: PLR0913
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
@@ -322,6 +368,48 @@ class AsyncWritable(ABC):
                 if an inescapable failure occurs and `ignore_errors` is set to `True`.
             BackendParameterException: If a backend argument value is not valid.
         """
+        if not operation_type:
+            operation_type = self.default_operation_type
+
+        if operation_type in self.unsupported_operation_types:
+            msg = f"{operation_type.value.capitalize()} operation_type is not allowed."
+            self.logger.error(msg)
+            raise BackendParameterException(msg)
+
+        data = iter(data)
+        try:
+            first_record = next(data)
+        except StopIteration:
+            self.logger.info("Data Iterator is empty; skipping write to target.")
+            return 0
+        data = chain((first_record,), data)
+
+        chunk_size = chunk_size if chunk_size else self.settings.DEFAULT_CHUNK_SIZE
+        is_bytes = isinstance(first_record, bytes)
+        writer = self._write_bytes if is_bytes else self._write_dicts
+        return await writer(data, target, chunk_size, ignore_errors, operation_type)
+
+    @abstractmethod
+    async def _write_bytes(  # noqa: PLR0913
+        self,
+        data: Iterable[bytes],
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing bytes. See `self.write`."""
+
+    @abstractmethod
+    async def _write_dicts(  # noqa: PLR0913
+        self,
+        data: Iterable[dict],
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing dictionaries. See `self.write`."""
 
 
 class AsyncListable(ABC):

@@ -1,7 +1,6 @@
 """S3 data backend for Ralph."""
 
 from io import IOBase
-from itertools import chain
 from typing import Iterable, Iterator, Optional, Union
 from uuid import uuid4
 
@@ -28,7 +27,7 @@ from ralph.backends.data.base import (
 )
 from ralph.backends.data.mixins import HistoryMixin
 from ralph.conf import BaseSettingsConfig
-from ralph.exceptions import BackendException, BackendParameterException
+from ralph.exceptions import BackendException
 from ralph.utils import now, parse_dict_to_bytes, parse_iterable_to_dict
 
 
@@ -78,6 +77,11 @@ class S3DataBackend(
 
     name = "s3"
     default_operation_type = BaseOperationType.CREATE
+    unsupported_operation_types = {
+        BaseOperationType.APPEND,
+        BaseOperationType.DELETE,
+        BaseOperationType.UPDATE,
+    }
 
     def __init__(self, settings: Optional[S3DataBackendSettings] = None):
         """Instantiate the AWS S3 client."""
@@ -296,23 +300,38 @@ class S3DataBackend(
                 if an inescapable failure occurs and `ignore_errors` is set to `True`.
             BackendParameterException: If a backend argument value is not valid.
         """
-        data = iter(data)
-        try:
-            first_record = next(data)
-        except StopIteration:
-            self.logger.info("Data Iterator is empty; skipping write to target.")
-            return 0
+        return super().write(data, target, chunk_size, ignore_errors, operation_type)
 
-        if not operation_type:
-            operation_type = self.default_operation_type
+    def _write_dicts(  # noqa: PLR0913
+        self,
+        data: Iterable[dict],
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing dictionaries. See `self.write`."""
+        locale = self.settings.LOCALE_ENCODING
+        statements = parse_dict_to_bytes(data, locale, ignore_errors, self.logger)
+        return self._write_bytes(
+            statements, target, chunk_size, ignore_errors, operation_type
+        )
 
+    def _write_bytes(  # noqa: PLR0913
+        self,
+        data: Iterable[bytes],
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,  # noqa: ARG002
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing bytes. See `self.write`."""
         if not target:
             target = f"{self.default_bucket_name}/{now()}-{uuid4()}"
             self.logger.info(
                 "Target not specified; using default bucket with random file name: %s",
                 target,
             )
-
         elif "/" not in target:
             target = f"{self.default_bucket_name}/{target}"
             self.logger.info(
@@ -321,29 +340,12 @@ class S3DataBackend(
             )
 
         target_bucket, target_object = target.split("/", 1)
-
-        if operation_type in [
-            BaseOperationType.APPEND,
-            BaseOperationType.DELETE,
-            BaseOperationType.UPDATE,
-        ]:
-            msg = "%s operation_type is not allowed."
-            self.logger.error(msg, operation_type.name)
-            raise BackendParameterException(msg % operation_type.name)
-
         if target_object in list(self.list(target=target_bucket)):
             msg = "%s already exists and overwrite is not allowed for operation %s"
             self.logger.error(msg, target_object, operation_type)
             raise BackendException(msg % (target_object, operation_type))
 
         self.logger.info("Creating archive: %s", target_object)
-
-        data = chain((first_record,), data)
-        if isinstance(first_record, dict):
-            data = parse_dict_to_bytes(
-                data, self.settings.LOCALE_ENCODING, ignore_errors, self.logger
-            )
-
         counter = {"count": 0}
         data = self._count(data, counter)
 
@@ -359,10 +361,10 @@ class S3DataBackend(
                 Config=TransferConfig(multipart_chunksize=chunk_size),
             )
             response = self.client.head_object(Bucket=target_bucket, Key=target_object)
-        except (ClientError, ParamValidationError, EndpointConnectionError) as exc:
+        except (ClientError, ParamValidationError, EndpointConnectionError) as error:
             msg = "Failed to upload %s"
             self.logger.error(msg, target)
-            raise BackendException(msg % target) from exc
+            raise BackendException(msg % target) from error
 
         # Archive written, add a new entry to the history
         self.append_to_history(
