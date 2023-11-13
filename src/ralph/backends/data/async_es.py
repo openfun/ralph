@@ -5,6 +5,7 @@ from typing import AsyncIterator, Iterable, Optional, TypeVar, Union
 
 from elasticsearch import ApiError, AsyncElasticsearch, TransportError
 from elasticsearch.helpers import BulkIndexError, async_streaming_bulk
+from pydantic import PositiveInt
 
 from ralph.backends.data.base import (
     AsyncListable,
@@ -114,6 +115,7 @@ class AsyncESDataBackend(
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
+        max_statements: Optional[PositiveInt] = None,
     ) -> Union[AsyncIterator[bytes], AsyncIterator[dict]]:
         """Read documents matching the query in the target index and yield them.
 
@@ -128,6 +130,8 @@ class AsyncESDataBackend(
             raw_output (bool): Controls whether to yield dictionaries or bytes.
             ignore_errors (bool): No impact as encoding errors are not expected in
                 Elasticsearch results.
+            max_statements (int): The maximum number of statements to yield.
+                If `None` (default), there is no maximum.
 
         Yield:
             bytes: The next raw document if `raw_output` is True.
@@ -136,7 +140,9 @@ class AsyncESDataBackend(
         Raise:
             BackendException: If a failure occurs during Elasticsearch connection.
         """
-        statements = super().read(query, target, chunk_size, raw_output, ignore_errors)
+        statements = super().read(
+            query, target, chunk_size, raw_output, ignore_errors, max_statements
+        )
         async for statement in statements:
             yield statement
 

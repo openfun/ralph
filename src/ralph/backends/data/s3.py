@@ -14,6 +14,7 @@ from botocore.exceptions import (
     ReadTimeoutError,
     ResponseStreamingError,
 )
+from pydantic import PositiveInt
 from requests_toolbelt import StreamingIterator
 
 from ralph.backends.data.base import (
@@ -170,6 +171,7 @@ class S3DataBackend(
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
+        max_statements: Optional[PositiveInt] = None,
     ) -> Union[Iterator[bytes], Iterator[dict]]:
         """Read an object matching the `query` in the `target` bucket and yield it.
 
@@ -182,6 +184,8 @@ class S3DataBackend(
             ignore_errors (bool): If `True`, encoding errors during the read operation
                 will be ignored and logged.
                 If `False` (default), a `BackendException` is raised on any error.
+            max_statements (int): The maximum number of statements to yield.
+                If `None` (default), there is no maximum.
 
         Yield:
             dict: If `raw_output` is False.
@@ -192,7 +196,9 @@ class S3DataBackend(
                 during object encoding and `ignore_errors` is set to `False`.
             BackendParameterException: If a backend argument value is not valid.
         """
-        yield from super().read(query, target, chunk_size, raw_output, ignore_errors)
+        yield from super().read(
+            query, target, chunk_size, raw_output, ignore_errors, max_statements
+        )
 
     def _read_bytes(
         self,
