@@ -6,7 +6,6 @@ import hashlib
 import logging
 import struct
 from io import IOBase
-from itertools import chain
 from typing import Generator, Iterable, Iterator, List, Optional, Tuple, TypeVar, Union
 from uuid import uuid4
 
@@ -92,6 +91,7 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
     """MongoDB data backend."""
 
     name = "mongo"
+    unsupported_operation_types = {BaseOperationType.APPEND}
 
     def __init__(self, settings: Optional[Settings] = None):
         """Instantiate the MongoDB client.
@@ -264,32 +264,35 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
             BackendParameterException: If the `operation_type` is `APPEND` as it is not
                 supported.
         """
-        if not operation_type:
-            operation_type = self.default_operation_type
+        return super().write(data, target, chunk_size, ignore_errors, operation_type)
 
-        if operation_type == BaseOperationType.APPEND:
-            msg = "Append operation_type is not allowed."
-            self.logger.error(msg)
-            raise BackendParameterException(msg)
+    def _write_bytes(  # noqa: PLR0913
+        self,
+        data: Iterable[bytes],
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing bytes. See `self.write`."""
+        statements = parse_iterable_to_dict(data, ignore_errors, self.logger)
+        return self._write_dicts(
+            statements, target, chunk_size, ignore_errors, operation_type
+        )
 
-        if not chunk_size:
-            chunk_size = self.settings.DEFAULT_CHUNK_SIZE
-
+    def _write_dicts(  # noqa: PLR0913
+        self,
+        data: Iterable[dict],
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing dictionaries. See `self.write`."""
+        count = 0
         collection = self._get_target_collection(target)
         msg = "Start writing to the %s collection of the %s database (chunk size: %d)"
         self.logger.debug(msg, collection, self.database, chunk_size)
-
-        count = 0
-        data = iter(data)
-        try:
-            first_record = next(data)
-        except StopIteration:
-            self.logger.info("Data Iterator is empty; skipping write to target.")
-            return count
-        data = chain((first_record,), data)
-        if isinstance(first_record, bytes):
-            data = parse_iterable_to_dict(data, ignore_errors, self.logger)
-
         if operation_type == BaseOperationType.UPDATE:
             for batch in iter_by_batch(self.to_replace_one(data), chunk_size):
                 count += self._bulk_update(batch, ignore_errors, collection)
