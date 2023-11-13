@@ -126,15 +126,30 @@ def test_backends_data_ldp_list_failure(exception_class, ldp_backend, monkeypatc
     raise a `BackendException`.
     """
 
-    def mock_get(_):
+    def mock_get_list_failure(_):
         """Mock the ovh.Client get method always raising an exception."""
         raise exception_class("OVH Error")
 
     backend = ldp_backend()
-    monkeypatch.setattr(backend.client, "get", mock_get)
+    monkeypatch.setattr(backend.client, "get", mock_get_list_failure)
     msg = r"Failed to get archives list: OVH Error"
     with pytest.raises(BackendException, match=msg):
         list(backend.list())
+
+    def mock_get_details_failure(url):
+        """Mock the ovh.Client get method raising an exception when retrieving archive
+        details.
+        """
+        # list request
+        if url.endswith("archive"):
+            return ["archive_1"]
+        # details request
+        raise exception_class("OVH Error")
+
+    monkeypatch.setattr(backend.client, "get", mock_get_details_failure)
+    msg = r"Failed to get 'archive_1' archive details: OVH Error"
+    with pytest.raises(BackendException, match=msg):
+        list(backend.list(details=True))
 
 
 @pytest.mark.parametrize(
@@ -430,30 +445,20 @@ def test_backends_data_ldp_list_with_history_and_details(
     assert list(result) == expected
 
 
-def test_backends_data_ldp_read_without_raw_ouput(ldp_backend, caplog, monkeypatch):
+def test_backends_data_ldp_read_without_raw_ouput(ldp_backend, caplog):
     """Test the `LDPDataBackend.read method, given `raw_output` set to `False`, should
-    log a warning message.
+    log an error message and raise a `BackendParameterException`.
     """
-
-    def mock_get(url):
-        """Mock the OVH client get request."""
-
-        return {"filename": "archive_name", "size": 10}
-
     backend = ldp_backend()
-    monkeypatch.setattr(backend, "_url", lambda *_: "http://example.com")
-    monkeypatch.setattr(backend.client, "get", mock_get)
+    msg = (
+        "Invalid `raw_output` value. LDP data backend doesn't support yielding "
+        "dictionaries with `raw_output=False`"
+    )
+    with caplog.at_level(logging.ERROR):
+        with pytest.raises(BackendParameterException, match=msg):
+            list(backend.read(query="archiveID", raw_output=False))
 
-    with caplog.at_level(logging.WARNING):
-        with requests_mock.Mocker() as request_mocker:
-            request_mocker.get("http://example.com")
-            assert not list(backend.read(query="archiveID", raw_output=False))
-
-    assert (
-        "ralph.backends.data.ldp",
-        logging.WARNING,
-        "The `raw_output` and `ignore_errors` arguments are ignored",
-    ) in caplog.record_tuples
+    assert ("ralph.backends.data.ldp", logging.ERROR, msg) in caplog.record_tuples
 
 
 def test_backends_data_ldp_read_without_ignore_errors(ldp_backend, caplog, monkeypatch):
@@ -480,7 +485,7 @@ def test_backends_data_ldp_read_without_ignore_errors(ldp_backend, caplog, monke
     assert (
         "ralph.backends.data.ldp",
         logging.WARNING,
-        "The `raw_output` and `ignore_errors` arguments are ignored",
+        "The `ignore_errors` argument is ignored",
     ) in caplog.record_tuples
 
 
@@ -499,6 +504,10 @@ def test_backends_data_ldp_read_with_failure(ldp_backend, monkeypatch):
     """Test the `LDPDataBackend.read` method, given a request failure, should raise a
     `BackendException`.
     """
+
+    def mock_ovh_post_failure(url):
+        """Mock the OVH Client post request always raising an exception."""
+        raise ovh.exceptions.HTTPError("OVH Error")
 
     def mock_ovh_post(url):
         """Mock the OVH Client post request."""
@@ -543,6 +552,11 @@ def test_backends_data_ldp_read_with_failure(ldp_backend, monkeypatch):
     monkeypatch.setattr(requests, "get", mock_requests_get)
 
     error = r"Failed to read archive foo: Failure during request"
+    with pytest.raises(BackendException, match=error):
+        next(backend.read(query="foo"))
+
+    monkeypatch.setattr(backend.client, "post", mock_ovh_post_failure)
+    error = r"Failed to get 'foo' archive URL: OVH Error"
     with pytest.raises(BackendException, match=error):
         next(backend.read(query="foo"))
 
