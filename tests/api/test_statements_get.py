@@ -447,7 +447,7 @@ async def test_api_statements_get_by_activity(
     assert response.status_code == 200
     assert response.json() == {"statements": [statements[1]]}
 
-    # Check that badly formated activity returns an error
+    # Check that badly formatted activity returns an error
     response = await client.get(
         "/xAPI/statements/?activity=INVALID_IRI",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
