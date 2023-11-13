@@ -25,7 +25,6 @@ from ralph.backends.data.base import (
     DataBackendStatus,
     Listable,
     Writable,
-    enforce_query_checks,
 )
 from ralph.backends.data.mixins import HistoryMixin
 from ralph.conf import BaseSettingsConfig
@@ -62,8 +61,18 @@ class S3DataBackendSettings(BaseDataBackendSettings):
     DEFAULT_CHUNK_SIZE: int = 4096
 
 
+class S3Query(BaseQuery):
+    """S3 query model.
+
+    Attributes:
+        query_string (str): The ID of the object to read.
+    """
+
+    query_string: str
+
+
 class S3DataBackend(
-    BaseDataBackend[S3DataBackendSettings, BaseQuery], Writable, Listable, HistoryMixin
+    BaseDataBackend[S3DataBackendSettings, S3Query], Writable, Listable, HistoryMixin
 ):
     """S3 data backend."""
 
@@ -150,11 +159,9 @@ class S3DataBackend(
             self.logger.error(msg, target, error_msg)
             raise BackendException(msg % (target, error_msg)) from err
 
-    @enforce_query_checks
     def read(  # noqa: PLR0913
         self,
-        *,
-        query: Optional[Union[str, BaseQuery]] = None,
+        query: Optional[Union[str, S3Query]] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
@@ -163,7 +170,7 @@ class S3DataBackend(
         """Read an object matching the `query` in the `target` bucket and yield it.
 
         Args:
-            query: (str or BaseQuery): The ID of the object to read.
+            query: (str or S3Query): The ID of the object to read.
             target (str or None): The target bucket containing the object.
                 If target is `None`, the `default_bucket` is used instead.
             chunk_size (int or None): The chunk size when reading objects by batch.
@@ -181,31 +188,20 @@ class S3DataBackend(
                 during object encoding and `ignore_errors` is set to `False`.
             BackendParameterException: If a backend argument value is not valid.
         """
-        if query.query_string is None:
-            msg = "Invalid query. The query should be a valid object name."
-            self.logger.error(msg)
-            raise BackendParameterException(msg)
+        yield from super().read(query, target, chunk_size, raw_output, ignore_errors)
 
-        if not chunk_size:
-            chunk_size = self.default_chunk_size
-
-        if target is None:
-            target = self.default_bucket_name
-
+    def _read_bytes(
+        self,
+        query: BaseQuery,
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,  # noqa: ARG002
+    ) -> Iterator[bytes]:
+        """Method called by `self.read` yielding bytes. See `self.read`."""
+        target = self.default_bucket_name if target is None else target
+        response = self._get_object(target, query.query_string)
         try:
-            response = self.client.get_object(Bucket=target, Key=query.query_string)
-        except (ClientError, EndpointConnectionError) as err:
-            error_msg = err.response["Error"]["Message"]
-            msg = "Failed to download %s: %s"
-            self.logger.error(msg, query.query_string, error_msg)
-            raise BackendException(msg % (query.query_string, error_msg)) from err
-
-        try:
-            if raw_output:
-                yield from response["Body"].iter_chunks(chunk_size)
-            else:
-                lines = response["Body"].iter_lines(chunk_size)
-                yield from parse_iterable_to_dict(lines, ignore_errors, self.logger)
+            yield from response["Body"].iter_chunks(chunk_size)
         except (ReadTimeoutError, ResponseStreamingError) as err:
             msg = "Failed to read chunk from object %s"
             self.logger.error(msg, query.query_string)
@@ -221,6 +217,48 @@ class S3DataBackend(
                 "timestamp": now(),
             }
         )
+
+    def _read_dicts(
+        self,
+        query: BaseQuery,
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,
+    ) -> Iterator[dict]:
+        """Method called by `self.read` yielding dictionaries. See `self.read`."""
+        target = self.default_bucket_name if target is None else target
+        response = self._get_object(target, query.query_string)
+        try:
+            lines = response["Body"].iter_lines(chunk_size)
+            yield from parse_iterable_to_dict(lines, ignore_errors, self.logger)
+        except (ReadTimeoutError, ResponseStreamingError) as err:
+            msg = "Failed to read chunk from object %s"
+            self.logger.error(msg, query.query_string)
+            raise BackendException(msg % (query.query_string)) from err
+
+        # Archive fetched, add a new entry to the history.
+        self.append_to_history(
+            {
+                "backend": self.name,
+                "action": "read",
+                "id": target + "/" + query.query_string,
+                "size": response["ContentLength"],
+                "timestamp": now(),
+            }
+        )
+
+    def _get_object(self, bucket: str, key: str) -> dict:
+        """Return S3 object wrapping the exception."""
+        try:
+            return self.client.get_object(Bucket=bucket, Key=key)
+        except (ClientError, EndpointConnectionError) as error:
+            error_msg = error
+            if isinstance(error, ClientError):
+                error_msg = error.response["Error"]["Message"]
+
+            msg = "Failed to download %s: %s"
+            self.logger.error(msg, key, error_msg)
+            raise BackendException(msg % (key, error_msg)) from error
 
     def write(  # noqa: PLR0913
         self,
