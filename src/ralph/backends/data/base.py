@@ -1,9 +1,9 @@
 """Base data backend for Ralph."""
 
-import functools
 import logging
 from abc import ABC, abstractmethod
 from enum import Enum, unique
+from functools import cached_property, wraps
 from io import IOBase
 from typing import Any, Generic, Iterable, Iterator, Optional, Type, TypeVar, Union
 
@@ -11,8 +11,6 @@ from pydantic import BaseModel, BaseSettings, ValidationError
 
 from ralph.conf import BaseSettingsConfig, core_settings
 from ralph.exceptions import BackendParameterException
-
-logger = logging.getLogger(__name__)
 
 
 class BaseDataBackendSettings(BaseSettings):
@@ -68,7 +66,7 @@ class DataBackendStatus(Enum):
 def enforce_query_checks(method):
     """Enforce query argument type checking for methods using it."""
 
-    @functools.wraps(method)
+    @wraps(method)
     def wrapper(*args, **kwargs):
         """Wrap method execution."""
         query = kwargs.pop("query", None)
@@ -77,6 +75,15 @@ def enforce_query_checks(method):
         return method(*args, query=self_.validate_query(query), **kwargs)
 
     return wrapper
+
+
+class Loggable:
+    """A class with a `logger` property."""
+
+    @cached_property
+    def logger(self) -> logging.Logger:
+        """Return backend logger."""
+        return logging.getLogger(self.__class__.__module__)
 
 
 class Writable(ABC):
@@ -180,7 +187,7 @@ Settings = TypeVar("Settings", bound=BaseDataBackendSettings)
 Query = TypeVar("Query", bound=BaseQuery)
 
 
-class BaseDataBackend(Generic[Settings, Query], ABC):
+class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
     """Base data backend interface."""
 
     name = "base"
@@ -215,17 +222,17 @@ class BaseDataBackend(Generic[Settings, Query], ABC):
             except ValidationError as error:
                 msg = "The 'query' argument is expected to be a %s instance. %s"
                 errors = error.errors()
-                logger.error(msg, self.query_class.__name__, errors)
+                self.logger.error(msg, self.query_class.__name__, errors)
                 raise BackendParameterException(
                     msg % (self.query_class.__name__, errors)
                 ) from error
 
         if not isinstance(query, self.query_class):
             msg = "The 'query' argument is expected to be a %s instance."
-            logger.error(msg, self.query_class.__name__)
+            self.logger.error(msg, self.query_class.__name__)
             raise BackendParameterException(msg % (self.query_class.__name__,))
 
-        logger.debug("Query: %s", str(query))
+        self.logger.debug("Query: %s", str(query))
 
         return query
 
@@ -287,7 +294,7 @@ class BaseDataBackend(Generic[Settings, Query], ABC):
 def async_enforce_query_checks(method):
     """Enforce query argument type checking for methods using it."""
 
-    @functools.wraps(method)
+    @wraps(method)
     async def wrapper(*args, **kwargs):
         """Wrap method execution."""
         query = kwargs.pop("query", None)
@@ -362,7 +369,7 @@ class AsyncListable(ABC):
         """
 
 
-class BaseAsyncDataBackend(Generic[Settings, Query], ABC):
+class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
     """Base async data backend interface."""
 
     name = "base"
@@ -399,17 +406,17 @@ class BaseAsyncDataBackend(Generic[Settings, Query], ABC):
             except ValidationError as error:
                 msg = "The 'query' argument is expected to be a %s instance. %s"
                 errors = error.errors()
-                logger.error(msg, self.query_class.__name__, errors)
+                self.logger.error(msg, self.query_class.__name__, errors)
                 raise BackendParameterException(
                     msg % (self.query_class.__name__, errors)
                 ) from error
 
         if not isinstance(query, self.query_class):
             msg = "The 'query' argument is expected to be a %s instance."
-            logger.error(msg, self.query_class.__name__)
+            self.logger.error(msg, self.query_class.__name__)
             raise BackendParameterException(msg % (self.query_class.__name__,))
 
-        logger.debug("Query: %s", str(query))
+        self.logger.debug("Query: %s", str(query))
 
         return query
 

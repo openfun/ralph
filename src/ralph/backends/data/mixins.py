@@ -1,14 +1,12 @@
 """Backend mixins for Ralph."""
 
 import json
-import logging
 
+from ralph.backends.data.base import Loggable
 from ralph.conf import settings
 
-logger = logging.getLogger(__name__)
 
-
-class HistoryMixin:
+class HistoryMixin(Loggable):
     """Backend history mixin.
 
     Handle backend download history to avoid fetching same files multiple
@@ -18,7 +16,7 @@ class HistoryMixin:
     @property
     def history(self):
         """Get backend history."""
-        logger.debug("Loading history file: %s", str(settings.HISTORY_FILE))
+        self.logger.debug("Loading history file: %s", str(settings.HISTORY_FILE))
 
         if not hasattr(self, "_history"):
             try:
@@ -32,7 +30,7 @@ class HistoryMixin:
 
     def write_history(self, history):
         """Write given history as a JSON file."""
-        logger.debug("Writing history file: %s", str(settings.HISTORY_FILE))
+        self.logger.debug("Writing history file: %s", str(settings.HISTORY_FILE))
 
         if not settings.HISTORY_FILE.parent.exists():
             settings.HISTORY_FILE.parent.mkdir(parents=True)

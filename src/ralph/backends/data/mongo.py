@@ -38,8 +38,6 @@ from ralph.conf import BaseSettingsConfig, ClientOptions
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import iter_by_batch, parse_dict_to_bytes, parse_iterable_to_dict
 
-logger = logging.getLogger(__name__)
-
 
 class MongoClientOptions(ClientOptions):
     """MongoDB additional client options."""
@@ -122,7 +120,7 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
         try:
             self.client.admin.command("ping")
         except (ConnectionFailure, InvalidOperation) as error:
-            logger.error("Failed to connect to MongoDB: %s", error)
+            self.logger.error("Failed to connect to MongoDB: %s", error)
             return DataBackendStatus.AWAY
 
         # Check MongoDB server status.
@@ -131,10 +129,10 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
                 self.client.admin.command("serverStatus").get("ok")
                 != 1.0  # noqa: PLR2004
             ):
-                logger.error("MongoDB `serverStatus` command did not return 1.0")
+                self.logger.error("MongoDB `serverStatus` command did not return 1.0")
                 return DataBackendStatus.ERROR
         except PyMongoError as error:
-            logger.error("Failed to get MongoDB server status: %s", error)
+            self.logger.error("Failed to get MongoDB server status: %s", error)
             return DataBackendStatus.ERROR
 
         return DataBackendStatus.OK
@@ -155,13 +153,13 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
             BackendParameterException: If the `target` is not a valid database name.
         """
         if new:
-            logger.warning("The `new` argument is ignored")
+            self.logger.warning("The `new` argument is ignored")
 
         try:
             database = self.client[target] if target else self.database
         except InvalidName as error:
             msg = "The target=`%s` is not a valid database name: %s"
-            logger.error(msg, target, error)
+            self.logger.error(msg, target, error)
             raise BackendParameterException(msg % (target, error)) from error
 
         try:
@@ -172,7 +170,7 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
                     yield collection_info.get("name")
         except PyMongoError as error:
             msg = "Failed to list MongoDB collections: %s"
-            logger.error(msg, error)
+            self.logger.error(msg, error)
             raise BackendException(msg % error) from error
 
     @enforce_query_checks
@@ -216,7 +214,9 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
                 ignore_errors=ignore_errors,
             )
             locale = self.settings.LOCALE_ENCODING
-            yield from parse_dict_to_bytes(documents, locale, ignore_errors, logger)
+            yield from parse_dict_to_bytes(
+                documents, locale, ignore_errors, self.logger
+            )
             return
 
         if not chunk_size:
@@ -230,7 +230,7 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
             collection = self.database[target] if target else self.collection
         except InvalidName as error:
             msg = "The target=`%s` is not a valid collection name: %s"
-            logger.error(msg, target, error)
+            self.logger.error(msg, target, error)
             raise BackendParameterException(msg % (target, error)) from error
 
         try:
@@ -239,7 +239,7 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
             yield from documents
         except (PyMongoError, IndexError, TypeError, ValueError) as error:
             msg = "Failed to execute MongoDB query: %s"
-            logger.error(msg, error)
+            self.logger.error(msg, error)
             raise BackendException(msg % error) from error
 
     def write(  # noqa: PLR0913
@@ -278,14 +278,14 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
 
         if operation_type == BaseOperationType.APPEND:
             msg = "Append operation_type is not allowed."
-            logger.error(msg)
+            self.logger.error(msg)
             raise BackendParameterException(msg)
 
         if not chunk_size:
             chunk_size = self.settings.DEFAULT_CHUNK_SIZE
 
         collection = self.database[target] if target else self.collection
-        logger.debug(
+        self.logger.debug(
             "Start writing to the %s collection of the %s database (chunk size: %d)",
             collection,
             self.database,
@@ -297,25 +297,25 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
         try:
             first_record = next(data)
         except StopIteration:
-            logger.info("Data Iterator is empty; skipping write to target.")
+            self.logger.info("Data Iterator is empty; skipping write to target.")
             return count
         data = chain([first_record], data)
         if isinstance(first_record, bytes):
-            data = parse_iterable_to_dict(data, ignore_errors, logger)
+            data = parse_iterable_to_dict(data, ignore_errors, self.logger)
 
         if operation_type == BaseOperationType.UPDATE:
             for batch in iter_by_batch(self.to_replace_one(data), chunk_size):
                 count += self._bulk_update(batch, ignore_errors, collection)
-            logger.info("Updated %d documents with success", count)
+            self.logger.info("Updated %d documents with success", count)
         elif operation_type == BaseOperationType.DELETE:
             for batch in iter_by_batch(self.to_ids(data), chunk_size):
                 count += self._bulk_delete(batch, ignore_errors, collection)
-            logger.info("Deleted %d documents with success", count)
+            self.logger.info("Deleted %d documents with success", count)
         else:
-            data = self.to_documents(data, ignore_errors, operation_type, logger)
+            data = self.to_documents(data, ignore_errors, operation_type, self.logger)
             for batch in iter_by_batch(data, chunk_size):
                 count += self._bulk_import(batch, ignore_errors, collection)
-            logger.info("Inserted %d documents with success", count)
+            self.logger.info("Inserted %d documents with success", count)
 
         return count
 
@@ -329,7 +329,7 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
             self.client.close()
         except PyMongoError as error:
             msg = "Failed to close MongoDB client: %s"
-            logger.error(msg, error)
+            self.logger.error(msg, error)
             raise BackendException(msg % error) from error
 
     @staticmethod
@@ -352,7 +352,7 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
         data: Iterable[dict],
         ignore_errors: bool,
         operation_type: BaseOperationType,
-        logger_class: logging.Logger,
+        logger: logging.Logger,
     ) -> Generator[dict, None, None]:
         """Convert `data` statements to MongoDB documents.
 
@@ -364,25 +364,25 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
             if "id" not in statement and operation_type == BaseOperationType.INDEX:
                 msg = "statement %s has no 'id' field"
                 if ignore_errors:
-                    logger_class.warning("statement %s has no 'id' field", statement)
+                    logger.warning("statement %s has no 'id' field", statement)
                     continue
-                logger_class.error(msg, statement)
+                logger.error(msg, statement)
                 raise BackendException(msg % statement)
             if "timestamp" not in statement:
                 msg = "statement %s has no 'timestamp' field"
                 if ignore_errors:
-                    logger_class.warning(msg, statement)
+                    logger.warning(msg, statement)
                     continue
-                logger_class.error(msg, statement)
+                logger.error(msg, statement)
                 raise BackendException(msg % statement)
             try:
                 timestamp = int(isoparse(statement["timestamp"]).timestamp())
             except ValueError as err:
                 msg = "statement %s has an invalid 'timestamp' field"
                 if ignore_errors:
-                    logger_class.warning(msg, statement)
+                    logger.warning(msg, statement)
                     continue
-                logger_class.error(msg, statement)
+                logger.error(msg, statement)
                 raise BackendException(msg % statement) from err
             document = {
                 "_id": ObjectId(
@@ -400,53 +400,56 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
 
             yield document
 
-    @staticmethod
-    def _bulk_import(batch: List, ignore_errors: bool, collection: Collection) -> int:
+    def _bulk_import(
+        self, batch: List, ignore_errors: bool, collection: Collection
+    ) -> int:
         """Insert a `batch` of documents into the MongoDB `collection`."""
         try:
             new_documents = collection.insert_many(batch)
         except (BulkWriteError, PyMongoError, BSONError, ValueError) as error:
             msg = "Failed to insert document chunk: %s"
             if ignore_errors:
-                logger.warning(msg, error)
+                self.logger.warning(msg, error)
                 return getattr(error, "details", {}).get("nInserted", 0)
-            logger.error(msg, error)
+            self.logger.error(msg, error)
             raise BackendException(msg % error) from error
 
         inserted_count = len(new_documents.inserted_ids)
-        logger.debug("Inserted %d documents chunk with success", inserted_count)
+        self.logger.debug("Inserted %d documents chunk with success", inserted_count)
         return inserted_count
 
-    @staticmethod
-    def _bulk_delete(batch: List, ignore_errors: bool, collection: Collection) -> int:
+    def _bulk_delete(
+        self, batch: List, ignore_errors: bool, collection: Collection
+    ) -> int:
         """Delete a `batch` of documents from the MongoDB `collection`."""
         try:
             deleted_documents = collection.delete_many({"_source.id": {"$in": batch}})
         except (BulkWriteError, PyMongoError, BSONError, ValueError) as error:
             msg = "Failed to delete document chunk: %s"
             if ignore_errors:
-                logger.warning(msg, error)
+                self.logger.warning(msg, error)
                 return getattr(error, "details", {}).get("nRemoved", 0)
-            logger.error(msg, error)
+            self.logger.error(msg, error)
             raise BackendException(msg % error) from error
 
         deleted_count = deleted_documents.deleted_count
-        logger.debug("Deleted %d documents chunk with success", deleted_count)
+        self.logger.debug("Deleted %d documents chunk with success", deleted_count)
         return deleted_count
 
-    @staticmethod
-    def _bulk_update(batch: List, ignore_errors: bool, collection: Collection) -> int:
+    def _bulk_update(
+        self, batch: List, ignore_errors: bool, collection: Collection
+    ) -> int:
         """Update a `batch` of documents into the MongoDB `collection`."""
         try:
             updated_documents = collection.bulk_write(batch)
         except (BulkWriteError, PyMongoError, BSONError, ValueError) as error:
             msg = "Failed to update document chunk: %s"
             if ignore_errors:
-                logger.warning(msg, error)
+                self.logger.warning(msg, error)
                 return getattr(error, "details", {}).get("nModified", 0)
-            logger.error(msg, error)
+            self.logger.error(msg, error)
             raise BackendException(msg % error) from error
 
         modified_count = updated_documents.modified_count
-        logger.debug("Updated %d documents chunk with success", modified_count)
+        self.logger.debug("Updated %d documents chunk with success", modified_count)
         return modified_count

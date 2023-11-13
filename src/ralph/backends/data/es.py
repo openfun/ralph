@@ -1,6 +1,5 @@
 """Elasticsearch data backend for Ralph."""
 
-import logging
 from io import IOBase
 from itertools import chain
 from pathlib import Path
@@ -23,8 +22,6 @@ from ralph.backends.data.base import (
 from ralph.conf import BaseSettingsConfig, ClientOptions, CommaSeparatedTuple
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import parse_dict_to_bytes, parse_iterable_to_dict
-
-logger = logging.getLogger(__name__)
 
 
 class ESClientOptions(ClientOptions):
@@ -144,17 +141,17 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
             self.client.info()
             cluster_status = self.client.cat.health()
         except TransportError as error:
-            logger.error("Failed to connect to Elasticsearch: %s", error)
+            self.logger.error("Failed to connect to Elasticsearch: %s", error)
             return DataBackendStatus.AWAY
 
         if "green" in cluster_status:
             return DataBackendStatus.OK
 
         if "yellow" in cluster_status and self.settings.ALLOW_YELLOW_STATUS:
-            logger.info("Cluster status is yellow.")
+            self.logger.info("Cluster status is yellow.")
             return DataBackendStatus.OK
 
-        logger.error("Cluster status is not green: %s", cluster_status)
+        self.logger.error("Cluster status is not green: %s", cluster_status)
 
         return DataBackendStatus.ERROR
 
@@ -183,11 +180,11 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
             indices = self.client.indices.get(index=target)
         except (ApiError, TransportError) as error:
             msg = "Failed to read indices: %s"
-            logger.error(msg, error)
+            self.logger.error(msg, error)
             raise BackendException(msg % error) from error
 
         if new:
-            logger.warning("The `new` argument is ignored")
+            self.logger.warning("The `new` argument is ignored")
 
         if details:
             for index, value in indices.items():
@@ -238,7 +235,9 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
                 ignore_errors=ignore_errors,
             )
             locale = self.settings.LOCALE_ENCODING
-            yield from parse_dict_to_bytes(documents, locale, ignore_errors, logger)
+            yield from parse_dict_to_bytes(
+                documents, locale, ignore_errors, self.logger
+            )
             return
         target = target if target else self.settings.DEFAULT_INDEX
         chunk_size = chunk_size if chunk_size else self.settings.DEFAULT_CHUNK_SIZE
@@ -252,7 +251,7 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
                 )["id"]
             except (ApiError, TransportError, ValueError) as error:
                 msg = "Failed to open Elasticsearch point in time: %s"
-                logger.error(msg, error)
+                self.logger.error(msg, error)
                 raise BackendException(msg % error) from error
 
         limit = query.size
@@ -270,7 +269,7 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
                 documents = self.client.search(**kwargs)["hits"]["hits"]
             except (ApiError, TransportError, TypeError) as error:
                 msg = "Failed to execute Elasticsearch query: %s"
-                logger.error(msg, error)
+                self.logger.error(msg, error)
                 raise BackendException(msg % error) from error
             count = len(documents)
             if limit:
@@ -318,7 +317,7 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
         try:
             first_record = next(data)
         except StopIteration:
-            logger.info("Data Iterator is empty; skipping write to target.")
+            self.logger.info("Data Iterator is empty; skipping write to target.")
             return count
         if not operation_type:
             operation_type = self.default_operation_type
@@ -326,14 +325,14 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
         chunk_size = chunk_size if chunk_size else self.settings.DEFAULT_CHUNK_SIZE
         if operation_type == BaseOperationType.APPEND:
             msg = "Append operation_type is not supported."
-            logger.error(msg)
+            self.logger.error(msg)
             raise BackendParameterException(msg)
 
         data = chain((first_record,), data)
         if isinstance(first_record, bytes):
-            data = parse_iterable_to_dict(data, ignore_errors, logger)
+            data = parse_iterable_to_dict(data, ignore_errors, self.logger)
 
-        logger.debug(
+        self.logger.debug(
             "Start writing to the %s index (chunk size: %d)", target, chunk_size
         )
         try:
@@ -345,13 +344,13 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
                 refresh=self.settings.REFRESH_AFTER_WRITE,
             ):
                 count += success
-                logger.debug("Wrote %d document [action: %s]", success, action)
+                self.logger.debug("Wrote %d document [action: %s]", success, action)
 
-            logger.info("Finished writing %d documents with success", count)
+            self.logger.info("Finished writing %d documents with success", count)
         except (BulkIndexError, ApiError, TransportError) as error:
             msg = "%s %s Total succeeded writes: %s"
             details = getattr(error, "errors", "")
-            logger.error(msg, error, details, count)
+            self.logger.error(msg, error, details, count)
             raise BackendException(msg % (error, details, count)) from error
         return count
 
@@ -362,14 +361,14 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
             BackendException: If a failure occurs during the close operation.
         """
         if not self._client:
-            logger.warning("No backend client to close.")
+            self.logger.warning("No backend client to close.")
             return
 
         try:
             self.client.close()
         except TransportError as error:
             msg = "Failed to close Elasticsearch client: %s"
-            logger.error(msg, error)
+            self.logger.error(msg, error)
             raise BackendException(msg % error) from error
 
     @staticmethod

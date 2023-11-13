@@ -471,7 +471,7 @@ def settings_fs(fs, monkeypatch):
     """Force Path instantiation with fake FS in ralph settings."""
 
     monkeypatch.setattr(
-        "ralph.backends.mixins.settings",
+        "ralph.backends.data.mixins.settings",
         Settings(HISTORY_FILE=Path(core_settings.APP_DIR / "history.json")),
     )
 

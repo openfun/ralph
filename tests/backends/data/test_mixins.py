@@ -4,11 +4,11 @@ import json
 import os.path
 from pathlib import Path
 
-from ralph.backends.mixins import HistoryMixin
+from ralph.backends.data.mixins import HistoryMixin
 from ralph.conf import Settings, settings
 
 
-def test_backends_mixins_history_mixin_empty_history(settings_fs):
+def test_backends_data_mixins_history_mixin_empty_history(settings_fs):
     """Test the history method of the HistoryMixin when history is empty."""
 
     history = HistoryMixin()
@@ -32,7 +32,7 @@ def test_backends_mixins_history_mixin_empty_history(settings_fs):
     assert history._history == history.history
 
 
-def test_backends_mixins_history_mixin_with_history(fs, settings_fs):
+def test_backends_data_mixins_history_mixin_with_history(fs, settings_fs):
     """Test the history method of the HistoryMixin when history is filled."""
 
     history = HistoryMixin()
@@ -44,7 +44,7 @@ def test_backends_mixins_history_mixin_with_history(fs, settings_fs):
     assert history.history == events
 
 
-def test_backends_mixins_history_mixin_write_history(fs, settings_fs):
+def test_backends_data_mixins_history_mixin_write_history(fs, settings_fs):
     """Test the write_history method of the HistoryMixin."""
 
     # Force Path instantiation with fake FS
@@ -73,7 +73,7 @@ def test_backends_mixins_history_mixin_write_history(fs, settings_fs):
     assert history.history == events
 
 
-def test_backends_mixins_history_mixin_clean_history(fs, settings_fs):
+def test_backends_data_mixins_history_mixin_clean_history(fs, settings_fs):
     """Test the clean_history method of the HistoryMixin."""
 
     history = HistoryMixin()
@@ -96,7 +96,7 @@ def test_backends_mixins_history_mixin_clean_history(fs, settings_fs):
     ]
 
 
-def test_backends_mixins_history_mixin_append_to_history(fs):
+def test_backends_data_mixins_history_mixin_append_to_history(fs):
     """Test the append_to_history method of the HistoryMixin."""
 
     history = HistoryMixin()

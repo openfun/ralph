@@ -1,6 +1,5 @@
 """FileSystem data backend for Ralph."""
 
-import logging
 import os
 from datetime import datetime, timezone
 from io import BufferedReader, IOBase
@@ -19,12 +18,10 @@ from ralph.backends.data.base import (
     Writable,
     enforce_query_checks,
 )
-from ralph.backends.mixins import HistoryMixin
+from ralph.backends.data.mixins import HistoryMixin
 from ralph.conf import BaseSettingsConfig
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import now, parse_dict_to_bytes, parse_iterable_to_dict
-
-logger = logging.getLogger(__name__)
 
 
 class FSDataBackendSettings(BaseDataBackendSettings):
@@ -80,16 +77,16 @@ class FSDataBackend(
 
         if not self.default_directory.is_dir():
             msg = "Default directory doesn't exist, creating: %s"
-            logger.info(msg, self.default_directory)
+            self.logger.info(msg, self.default_directory)
             self.default_directory.mkdir(parents=True)
 
-        logger.debug("Default directory: %s", self.default_directory)
+        self.logger.debug("Default directory: %s", self.default_directory)
 
     def status(self) -> DataBackendStatus:
         """Check whether the default directory has appropriate permissions."""
         for mode in [os.R_OK, os.W_OK, os.X_OK]:
             if not os.access(self.default_directory, mode):
-                logger.error(
+                self.logger.error(
                     "Invalid permissions for the default directory at %s. "
                     "The directory should have read, write and execute permissions.",
                     str(self.default_directory.absolute()),
@@ -126,14 +123,14 @@ class FSDataBackend(
             paths = set(target.absolute().iterdir())
         except OSError as error:
             msg = "Invalid target argument"
-            logger.error("%s. %s", msg, error)
+            self.logger.error("%s. %s", msg, error)
             raise BackendParameterException(msg, error.strerror) from error
 
-        logger.debug("Found %d files", len(paths))
+        self.logger.debug("Found %d files", len(paths))
 
         if new:
             paths -= set(map(Path, self.get_command_history(self.name, "read")))
-            logger.debug("New files: %d", len(paths))
+            self.logger.debug("New files: %d", len(paths))
 
         if not details:
             for path in paths:
@@ -191,7 +188,7 @@ class FSDataBackend(
                 while chunk := file.read(chunk_size):
                     yield chunk
             else:
-                yield from parse_iterable_to_dict(file, ignore_errors, logger)
+                yield from parse_iterable_to_dict(file, ignore_errors, self.logger)
 
             # The file has been read, add a new entry to the history.
             self.append_to_history(
@@ -222,10 +219,10 @@ class FSDataBackend(
         paths = list(filter(lambda x: x.is_file(), path.glob(query.query_string)))
         if not paths:
             msg = "No file found for query: %s"
-            logger.info(msg, path / Path(str(query.query_string)))
+            self.logger.info(msg, path / Path(str(query.query_string)))
             return
 
-        logger.debug("Reading matching files: %s", paths)
+        self.logger.debug("Reading matching files: %s", paths)
         for path in paths:
             with path.open("rb") as file:
                 yield file, path
@@ -273,13 +270,13 @@ class FSDataBackend(
         try:
             first_record = next(data)
         except StopIteration:
-            logger.info("Data Iterator is empty; skipping write to target.")
+            self.logger.info("Data Iterator is empty; skipping write to target.")
             return 0
 
         data = chain((first_record,), data)
         if isinstance(first_record, dict):
             data = parse_dict_to_bytes(
-                data, self.locale_encoding, ignore_errors, logger
+                data, self.locale_encoding, ignore_errors, self.logger
             )
 
         if not operation_type:
@@ -287,12 +284,13 @@ class FSDataBackend(
 
         if operation_type == BaseOperationType.DELETE:
             msg = "Delete operation_type is not allowed."
-            logger.error(msg)
+            self.logger.error(msg)
             raise BackendParameterException(msg)
 
         if not target:
             target = f"{now()}-{uuid4()}"
-            logger.info("Target file not specified; using random file name: %s", target)
+            msg = "Target file not specified; using random file name: %s"
+            self.logger.info(msg, target)
 
         target = Path(target)
         path = target if target.is_absolute() else self.default_directory / target
@@ -303,15 +301,15 @@ class FSDataBackend(
                     "%s already exists and overwrite is not allowed with operation_type"
                     " create or index."
                 )
-                logger.error(msg, path)
+                self.logger.error(msg, path)
                 raise BackendException(msg % path)
 
-            logger.debug("Creating file: %s", path)
+            self.logger.debug("Creating file: %s", path)
 
         mode = "wb"
         if operation_type == BaseOperationType.APPEND:
             mode = "ab"
-            logger.debug("Appending to file: %s", path)
+            self.logger.debug("Appending to file: %s", path)
 
         try:
             with path.open(mode) as file:
@@ -319,7 +317,7 @@ class FSDataBackend(
                     file.write(chunk)
         except OSError as error:
             msg = "Failed to write to %s: %s"
-            logger.error(msg, path, error)
+            self.logger.error(msg, path, error)
             raise BackendException(msg % (path, error)) from error
 
         # The file has been created, add a new entry to the history.
@@ -340,4 +338,4 @@ class FSDataBackend(
 
     def close(self) -> None:
         """FS backend has no open connections to close. No action."""
-        logger.info("No open connections to close; skipping")
+        self.logger.info("No open connections to close; skipping")

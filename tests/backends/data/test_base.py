@@ -80,7 +80,8 @@ def test_backends_data_base_enforce_query_checks_with_invalid_input(
             MockBaseDataBackend().read(query=value)
 
     error = error.replace("\\", "")
-    assert ("ralph.backends.data.base", logging.ERROR, error) in caplog.record_tuples
+    module_name = "tests.backends.data.test_base"
+    assert (module_name, logging.ERROR, error) in caplog.record_tuples
 
 
 def test_backends_data_base_get_backend_generic_argument():

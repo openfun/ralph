@@ -1,6 +1,5 @@
 """ClickHouse LRS backend for Ralph."""
 
-import logging
 from typing import Generator, Iterator, List
 
 from ralph.backends.data.clickhouse import (
@@ -16,8 +15,6 @@ from ralph.backends.lrs.base import (
 )
 from ralph.conf import BaseSettingsConfig
 from ralph.exceptions import BackendException, BackendParameterException
-
-logger = logging.getLogger(__name__)
 
 
 class ClickHouseLRSBackendSettings(
@@ -104,7 +101,7 @@ class ClickHouseLRSBackend(
                 )
             )
         except (BackendException, BackendParameterException) as error:
-            logger.error("Failed to read from ClickHouse")
+            self.logger.error("Failed to read from ClickHouse")
             raise error
 
         new_search_after = None
@@ -147,7 +144,7 @@ class ClickHouseLRSBackend(
                 yield from (document["event"] for document in ch_response)
         except (BackendException, BackendParameterException) as error:
             msg = "Failed to read from ClickHouse"
-            logger.error(msg)
+            self.logger.error(msg)
             raise error
 
     @staticmethod

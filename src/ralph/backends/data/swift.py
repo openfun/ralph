@@ -1,6 +1,5 @@
 """Base data backend for Ralph."""
 
-import logging
 from functools import cached_property
 from io import IOBase
 from itertools import chain
@@ -19,12 +18,10 @@ from ralph.backends.data.base import (
     Writable,
     enforce_query_checks,
 )
-from ralph.backends.mixins import HistoryMixin
+from ralph.backends.data.mixins import HistoryMixin
 from ralph.conf import BaseSettingsConfig
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import now, parse_dict_to_bytes, parse_iterable_to_dict
-
-logger = logging.getLogger(__name__)
 
 
 class SwiftDataBackendSettings(BaseDataBackendSettings):
@@ -115,9 +112,9 @@ class SwiftDataBackend(
         """
         try:
             self.connection.head_account()
-        except ClientException as err:
+        except ClientException as error:
             msg = "Unable to connect to the Swift account: %s"
-            logger.error(msg, err.msg)
+            self.logger.error(msg, error.msg)
             return DataBackendStatus.ERROR
 
         return DataBackendStatus.OK
@@ -151,10 +148,10 @@ class SwiftDataBackend(
             _, objects = self.connection.get_container(
                 container=target, full_listing=True
             )
-        except ClientException as err:
+        except ClientException as error:
             msg = "Failed to list container %s: %s"
-            logger.error(msg, target, err.msg)
-            raise BackendException(msg % (target, err.msg)) from err
+            self.logger.error(msg, target, error.msg)
+            raise BackendException(msg % (target, error.msg)) from error
 
         for obj in objects:
             if new and obj in archives_to_skip:
@@ -199,12 +196,12 @@ class SwiftDataBackend(
         """
         if query.query_string is None:
             msg = "Invalid query. The query should be a valid archive name."
-            logger.error(msg)
+            self.logger.error(msg)
             raise BackendParameterException(msg)
 
         target = target if target else self.default_container
 
-        logger.info(
+        self.logger.info(
             "Getting object from container: %s (query_string: %s)",
             target,
             query.query_string,
@@ -216,17 +213,16 @@ class SwiftDataBackend(
                 obj=query.query_string,
                 resp_chunk_size=chunk_size,
             )
-        except ClientException as err:
+        except ClientException as error:
             msg = "Failed to read %s: %s"
-            error = err.msg
-            logger.error(msg, query.query_string, error)
-            raise BackendException(msg % (query.query_string, error)) from err
+            self.logger.error(msg, query.query_string, error.msg)
+            raise BackendException(msg % (query.query_string, error.msg)) from error
 
         if raw_output:
             while chunk := content.read(chunk_size):
                 yield chunk
         else:
-            yield from parse_iterable_to_dict(content, ignore_errors, logger)
+            yield from parse_iterable_to_dict(content, ignore_errors, self.logger)
 
         # Archive read, add a new entry to the history
         self.append_to_history(
@@ -273,13 +269,13 @@ class SwiftDataBackend(
         try:
             first_record = next(data)
         except StopIteration:
-            logger.info("Data Iterator is empty; skipping write to target.")
+            self.logger.info("Data Iterator is empty; skipping write to target.")
             return 0
 
         data = chain((first_record,), data)
         if isinstance(first_record, dict):
             data = parse_dict_to_bytes(
-                data, self.settings.LOCALE_ENCODING, ignore_errors, logger
+                data, self.settings.LOCALE_ENCODING, ignore_errors, self.logger
             )
 
         counter = {"count": 0}
@@ -290,19 +286,15 @@ class SwiftDataBackend(
 
         if not target:
             target = f"{self.default_container}/{now()}-{uuid4()}"
-            logger.info(
-                (
-                    "Target not specified; using default container "
-                    "with random object name: %s"
-                ),
-                target,
+            msg = (
+                "Target not specified; "
+                "using default container with random object name: %s"
             )
+            self.logger.info(msg, target)
         elif "/" not in target:
             target = f"{self.default_container}/{target}"
-            logger.info(
-                "Container not specified; using default container: %s",
-                self.default_container,
-            )
+            msg = "Container not specified; using default container: %s"
+            self.logger.info(msg, self.default_container)
 
         target_container, target_object = target.split("/", 1)
 
@@ -312,13 +304,13 @@ class SwiftDataBackend(
             BaseOperationType.UPDATE,
         ]:
             msg = "%s operation_type is not allowed."
-            logger.error(msg, operation_type.name)
+            self.logger.error(msg, operation_type.name)
             raise BackendParameterException(msg % operation_type.name)
 
         if operation_type in [BaseOperationType.CREATE, BaseOperationType.INDEX]:
             if target_object in list(self.list(target=target_container)):
                 msg = "%s already exists and overwrite is not allowed for operation %s"
-                logger.error(msg, target_object, operation_type)
+                self.logger.error(msg, target_object, operation_type)
                 raise BackendException(msg % (target_object, operation_type))
 
             try:
@@ -328,14 +320,13 @@ class SwiftDataBackend(
                 resp = self.connection.head_object(
                     container=target_container, obj=target_object
                 )
-            except ClientException as err:
+            except ClientException as error:
                 msg = "Failed to write to object %s: %s"
-                error = err.msg
-                logger.error(msg, target_object, error)
-                raise BackendException(msg % (target_object, error)) from err
+                self.logger.error(msg, target_object, error.msg)
+                raise BackendException(msg % (target_object, error.msg)) from error
 
         count = counter["count"]
-        logging.info("Successfully written %s statements to %s", count, target)
+        self.logger.info("Successfully written %s statements to %s", count, target)
 
         # Archive written, add a new entry to the history
         self.append_to_history(
@@ -357,24 +348,24 @@ class SwiftDataBackend(
             BackendException: If a failure occurs during the close operation.
         """
         if not self._connection:
-            logger.warning("No backend client to close.")
+            self.logger.warning("No backend client to close.")
             return
 
         try:
             self.connection.close()
         except ClientException as error:
             msg = "Failed to close Swift backend client: %s"
-            logger.error(msg, error)
+            self.logger.error(msg, error)
             raise BackendException(msg % error) from error
 
     def _details(self, container: str, name: str):
         """Return `name` object details from `container`."""
         try:
             resp = self.connection.head_object(container=container, obj=name)
-        except ClientException as err:
+        except ClientException as error:
             msg = "Unable to retrieve details for object %s: %s"
-            logger.error(msg, name, err.msg)
-            raise BackendException(msg % (name, err.msg)) from err
+            self.logger.error(msg, name, error.msg)
+            raise BackendException(msg % (name, error.msg)) from error
 
         return {
             "name": name,
