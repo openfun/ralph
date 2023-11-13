@@ -19,7 +19,7 @@ from typing import (
     Union,
 )
 
-from pydantic import BaseModel, BaseSettings, ValidationError
+from pydantic import BaseModel, BaseSettings, PositiveInt, ValidationError
 
 from ralph.conf import BaseSettingsConfig, core_settings
 from ralph.exceptions import BackendParameterException
@@ -277,6 +277,7 @@ class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
+        max_statements: Optional[PositiveInt] = None,
     ) -> Union[Iterator[bytes], Iterator[dict]]:
         """Read records matching the `query` in the `target` container and yield them.
 
@@ -294,6 +295,8 @@ class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
             ignore_errors (bool): If `True`, encoding errors during the read operation
                 will be ignored and logged.
                 If `False` (default), a `BackendException` is raised on any error.
+            max_statements (int): The maximum number of statements to yield.
+                If `None` (default), there is no maximum.
 
         Yield:
             dict: If `raw_output` is False.
@@ -308,7 +311,14 @@ class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
         query = validate_backend_query(query, self.query_class, self.logger)
         reader = self._read_bytes if raw_output else self._read_dicts
         statements = reader(query, target, chunk_size, ignore_errors)
-        yield from statements
+        if max_statements is None:
+            yield from statements
+            return
+
+        for i, statement in enumerate(statements):
+            if i >= max_statements:
+                return
+            yield statement
 
     @abstractmethod
     def _read_bytes(
@@ -473,6 +483,7 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
+        max_statements: Optional[PositiveInt] = None,
     ) -> Union[AsyncIterator[bytes], AsyncIterator[dict]]:
         """Read records matching the `query` in the `target` container and yield them.
 
@@ -490,6 +501,8 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
             ignore_errors (bool): If `True`, encoding errors during the read operation
                 will be ignored and logged.
                 If `False` (default), a `BackendException` is raised on any error.
+            max_statements (int): The maximum number of statements to yield.
+                If `None` (default), there is no maximum.
 
         Yield:
             dict: If `raw_output` is False.
@@ -504,8 +517,16 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
         query = validate_backend_query(query, self.query_class, self.logger)
         reader = self._read_bytes if raw_output else self._read_dicts
         statements = reader(query, target, chunk_size, ignore_errors)
+        if max_statements is None:
+            async for statement in statements:
+                yield statement
+            return
+        i = 0
         async for statement in statements:
+            if i >= max_statements:
+                return
             yield statement
+            i += 1
 
     @abstractmethod
     async def _read_bytes(
