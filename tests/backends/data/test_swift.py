@@ -608,7 +608,7 @@ def test_backends_data_swift_write_with_invalid_operation(
 
     backend = swift_backend()
 
-    msg = f"{operation_type.name} operation_type is not allowed."
+    msg = f"{operation_type.value.capitalize()} operation_type is not allowed."
     with pytest.raises(BackendParameterException, match=msg):
         backend.write(data=[b"foo"], operation_type=operation_type)
 

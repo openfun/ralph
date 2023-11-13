@@ -1,7 +1,6 @@
 """Asynchronous Elasticsearch data backend for Ralph."""
 
 from io import IOBase
-from itertools import chain
 from typing import AsyncIterator, Iterable, Optional, TypeVar, Union
 
 from elasticsearch import ApiError, AsyncElasticsearch, TransportError
@@ -15,7 +14,7 @@ from ralph.backends.data.base import (
     DataBackendStatus,
 )
 from ralph.backends.data.es import ESDataBackend, ESDataBackendSettings, ESQuery
-from ralph.exceptions import BackendException, BackendParameterException
+from ralph.exceptions import BackendException
 from ralph.utils import async_parse_dict_to_bytes, parse_iterable_to_dict
 
 Settings = TypeVar("Settings", bound=ESDataBackendSettings)
@@ -27,6 +26,7 @@ class AsyncESDataBackend(
     """Asynchronous Elasticsearch data backend."""
 
     name = "async_es"
+    unsupported_operation_types = {BaseOperationType.APPEND}
 
     def __init__(self, settings: Optional[Settings] = None):
         """Instantiate the asynchronous Elasticsearch client.
@@ -236,26 +236,35 @@ class AsyncESDataBackend(
             BackendParameterException: If the `operation_type` is `APPEND` as it is not
                 supported.
         """
+        return await super().write(
+            data, target, chunk_size, ignore_errors, operation_type
+        )
+
+    async def _write_bytes(  # noqa: PLR0913
+        self,
+        data: Iterable[bytes],
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing bytes. See `self.write`."""
+        statements = parse_iterable_to_dict(data, ignore_errors, self.logger)
+        return await self._write_dicts(
+            statements, target, chunk_size, ignore_errors, operation_type
+        )
+
+    async def _write_dicts(  # noqa: PLR0913
+        self,
+        data: Iterable[dict],
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing dictionaries. See `self.write`."""
         count = 0
-        data = iter(data)
-        try:
-            first_record = next(data)
-        except StopIteration:
-            self.logger.info("Data Iterator is empty; skipping write to target.")
-            return count
-        if not operation_type:
-            operation_type = self.default_operation_type
         target = target if target else self.settings.DEFAULT_INDEX
-        chunk_size = chunk_size if chunk_size else self.settings.DEFAULT_CHUNK_SIZE
-        if operation_type == BaseOperationType.APPEND:
-            msg = "Append operation_type is not allowed."
-            self.logger.error(msg)
-            raise BackendParameterException(msg)
-
-        data = chain((first_record,), data)
-        if isinstance(first_record, bytes):
-            data = parse_iterable_to_dict(data, ignore_errors, self.logger)
-
         msg = "Start writing to the %s index (chunk size: %d)"
         self.logger.debug(msg, target, chunk_size)
         try:
