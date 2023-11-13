@@ -2,7 +2,6 @@
 
 from functools import cached_property
 from io import IOBase
-from itertools import chain
 from typing import Any, Iterable, Iterator, Optional, Tuple, Union
 from uuid import uuid4
 
@@ -19,7 +18,7 @@ from ralph.backends.data.base import (
 )
 from ralph.backends.data.mixins import HistoryMixin
 from ralph.conf import BaseSettingsConfig
-from ralph.exceptions import BackendException, BackendParameterException
+from ralph.exceptions import BackendException
 from ralph.utils import now, parse_dict_to_bytes, parse_iterable_to_dict
 
 
@@ -81,6 +80,11 @@ class SwiftDataBackend(
 
     name = "swift"
     default_operation_type = BaseOperationType.CREATE
+    unsupported_operation_types = {
+        BaseOperationType.APPEND,
+        BaseOperationType.DELETE,
+        BaseOperationType.UPDATE,
+    }
 
     def __init__(self, settings: Optional[SwiftDataBackendSettings] = None):
         """Prepares the options for the SwiftService."""
@@ -304,28 +308,34 @@ class SwiftDataBackend(
                 if an inescapable failure occurs and `ignore_errors` is set to `True`.
             BackendParameterException: If a backend argument value is not valid.
         """
-        data = iter(data)
-        try:
-            first_record = next(data)
-        except StopIteration:
-            self.logger.info("Data Iterator is empty; skipping write to target.")
-            return 0
+        return super().write(data, target, chunk_size, ignore_errors, operation_type)
 
-        if not chunk_size:
-            chunk_size = self.settings.DEFAULT_CHUNK_SIZE
+    def _write_dicts(  # noqa: PLR0913
+        self,
+        data: Iterable[dict],
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing dictionaries. See `self.write`."""
+        locale = self.settings.LOCALE_ENCODING
+        statements = parse_dict_to_bytes(data, locale, ignore_errors, self.logger)
+        return self._write_bytes(
+            statements, target, chunk_size, ignore_errors, operation_type
+        )
 
-        data = chain((first_record,), data)
-        if isinstance(first_record, dict):
-            data = parse_dict_to_bytes(
-                data, self.settings.LOCALE_ENCODING, ignore_errors, self.logger
-            )
-
+    def _write_bytes(  # noqa: PLR0913
+        self,
+        data: Iterable[bytes],
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,  # noqa: ARG002
+        operation_type: BaseOperationType,
+    ) -> int:
+        """Method called by `self.write` writing bytes. See `self.write`."""
         counter = {"count": 0}
         data = self._count(data, counter)
-
-        if not operation_type:
-            operation_type = self.default_operation_type
-
         if not target:
             target = f"{self.default_container}/{now()}-{uuid4()}"
             msg = (
@@ -339,17 +349,6 @@ class SwiftDataBackend(
             self.logger.info(msg, self.default_container)
 
         target_container, target_object = target.split("/", 1)
-
-        if operation_type in [
-            BaseOperationType.APPEND,
-            BaseOperationType.DELETE,
-            BaseOperationType.UPDATE,
-        ]:
-            msg = "%s operation_type is not allowed."
-            self.logger.error(msg, operation_type.name)
-            raise BackendParameterException(msg % operation_type.name)
-
-        # operation_type is CREATE or INDEX by exclusion.
         if target_object in list(self.list(target=target_container)):
             msg = "%s already exists and overwrite is not allowed for operation %s"
             self.logger.error(msg, target_object, operation_type)
