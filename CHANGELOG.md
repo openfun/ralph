@@ -57,6 +57,7 @@ have an authority field matching that of the user
   control by user scopes
 - Backends: Replace reference to a JSON column in ClickHouse with 
   function calls on the String column [BC]
+- API: enhance 'limit' query parameter's validation 
 
 ### Fixed
 
