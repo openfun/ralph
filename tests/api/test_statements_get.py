@@ -733,6 +733,13 @@ async def test_api_statements_get_invalid_query_parameters(
         "detail": "The following parameter is not allowed: `mamamia`"
     }
 
+    # Check for 422 status code when a negative limit parameter is provided
+    response = await client.get(
+        "/xAPI/statements/?limit=-1",
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
+    )
+    assert response.status_code == 422
+
     # Check for 400 status code when both statementId and voidedStatementId are provided
     response = await client.get(
         f"/xAPI/statements/?statementId={id_1}&voidedStatementId={id_2}",

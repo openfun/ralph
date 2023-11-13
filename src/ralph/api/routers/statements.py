@@ -219,6 +219,7 @@ async def get(  # noqa: PLR0913
     ),
     limit: Optional[int] = Query(
         settings.RUNSERVER_MAX_SEARCH_HITS_COUNT,
+        ge=0,
         description=(
             "Maximum number of Statements to return. "
             "0 indicates return the maximum the server will allow"
