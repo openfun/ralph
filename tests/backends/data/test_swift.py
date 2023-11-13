@@ -2,6 +2,7 @@
 
 import json
 import logging
+import re
 from io import BytesIO
 from operator import itemgetter
 from typing import Iterable
@@ -10,8 +11,12 @@ from uuid import uuid4
 import pytest
 from swiftclient.service import ClientException
 
-from ralph.backends.data.base import BaseOperationType, BaseQuery, DataBackendStatus
-from ralph.backends.data.swift import SwiftDataBackend, SwiftDataBackendSettings
+from ralph.backends.data.base import BaseOperationType, DataBackendStatus
+from ralph.backends.data.swift import (
+    SwiftDataBackend,
+    SwiftDataBackendSettings,
+    SwiftQuery,
+)
 from ralph.conf import settings
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import now
@@ -40,7 +45,7 @@ def test_backends_data_swift_default_instantiation(monkeypatch, fs):
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__SWIFT__{name}", raising=False)
 
     assert SwiftDataBackend.name == "swift"
-    assert SwiftDataBackend.query_class == BaseQuery
+    assert SwiftDataBackend.query_class == SwiftQuery
     assert SwiftDataBackend.default_operation_type == BaseOperationType.CREATE
     assert SwiftDataBackend.settings_class == SwiftDataBackendSettings
     backend = SwiftDataBackend()
@@ -375,8 +380,11 @@ def test_backends_data_swift_read_with_invalid_query(swift_backend):
     """
     backend = swift_backend()
     # Given no `query`, the `read` method should raise a `BackendParameterException`.
-    error = "Invalid query. The query should be a valid archive name"
-    with pytest.raises(BackendParameterException, match=error):
+    error = (
+        "Invalid SwiftQuery default query: [{'loc': ('query_string',), 'msg': "
+        "'field required', 'type': 'value_error.missing'}]"
+    )
+    with pytest.raises(BackendParameterException, match=re.escape(error)):
         list(backend.read())
     backend.close()
 

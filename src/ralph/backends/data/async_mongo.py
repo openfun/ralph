@@ -22,7 +22,6 @@ from ..data.base import (
     AsyncWritable,
     BaseAsyncDataBackend,
     DataBackendStatus,
-    async_enforce_query_checks,
 )
 
 Settings = TypeVar("Settings", bound=MongoDataBackendSettings)
@@ -116,10 +115,8 @@ class AsyncMongoDataBackend(
             self.logger.error(msg, error)
             raise BackendException(msg % error) from error
 
-    @async_enforce_query_checks
     async def read(  # noqa: PLR0913
         self,
-        *,
         query: Optional[Union[str, MongoQuery]] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
@@ -148,28 +145,35 @@ class AsyncMongoDataBackend(
                 during encoding documents and `ignore_errors` is set to `False`.
             BackendParameterException: If the `target` is not a valid collection name.
         """
-        if raw_output:
-            documents = self.read(
-                query=query,
-                target=target,
-                chunk_size=chunk_size,
-                raw_output=False,
-                ignore_errors=ignore_errors,
-            )
-            async for document in async_parse_dict_to_bytes(
-                documents, self.settings.LOCALE_ENCODING, ignore_errors, self.logger
-            ):
-                yield document
+        statements = super().read(query, target, chunk_size, raw_output, ignore_errors)
+        async for statement in statements:
+            yield statement
 
-            return
+    async def _read_bytes(
+        self,
+        query: MongoQuery,
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,
+    ) -> AsyncIterator[bytes]:
+        """Method called by `self.read` yielding bytes. See `self.read`."""
+        statements = self._read_dicts(query, target, chunk_size, ignore_errors)
+        async for statement in async_parse_dict_to_bytes(
+            statements, self.settings.LOCALE_ENCODING, ignore_errors, self.logger
+        ):
+            yield statement
 
-        if not chunk_size:
-            chunk_size = self.settings.DEFAULT_CHUNK_SIZE
-
+    async def _read_dicts(
+        self,
+        query: MongoQuery,
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,  # noqa: ARG002
+    ) -> AsyncIterator[dict]:
+        """Method called by `self.read` yielding dictionaries. See `self.read`."""
         query = query.query_string if query.query_string else query
         query = query.dict(exclude={"query_string"}, exclude_unset=True)
         collection = self._get_target_collection(target)
-
         try:
             async for document in collection.find(batch_size=chunk_size, **query):
                 document.update({"_id": str(document.get("_id"))})

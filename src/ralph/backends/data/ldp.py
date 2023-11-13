@@ -11,7 +11,6 @@ from ralph.backends.data.base import (
     BaseQuery,
     DataBackendStatus,
     Listable,
-    enforce_query_checks,
 )
 from ralph.backends.data.mixins import HistoryMixin
 from ralph.conf import BaseSettingsConfig
@@ -150,10 +149,8 @@ class LDPDataBackend(
             if detail:
                 yield detail
 
-    @enforce_query_checks
     def read(  # noqa: PLR0913
         self,
-        *,
         query: Optional[Union[str, BaseQuery]] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
@@ -177,21 +174,35 @@ class LDPDataBackend(
             BackendException: If a failure occurs during LDP connection.
             BackendParameterException: If the `query` argument is not an archive name.
         """
+        yield from super().read(query, target, chunk_size, raw_output, ignore_errors)
+
+    def _read_dicts(
+        self,
+        query: BaseQuery,  # noqa: ARG002
+        target: Optional[str],  # noqa: ARG002
+        chunk_size: int,  # noqa: ARG002
+        ignore_errors: bool,  # noqa: ARG002
+    ) -> Iterator[dict]:
+        """Method called by `self.read` yielding dictionaries. See `self.read`."""
+        msg = (
+            "Invalid `raw_output` value. LDP data backend doesn't support yielding "
+            "dictionaries with `raw_output=False`"
+        )
+        self.logger.error(msg)
+        raise BackendParameterException(msg)
+
+    def _read_bytes(
+        self,
+        query: BaseQuery,
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,
+    ) -> Iterator[bytes]:
+        """Method called by `self.read` yielding bytes. See `self.read`."""
         if query.query_string is None:
             msg = "Invalid query. The query should be a valid archive name"
             self.logger.error(msg)
             raise BackendParameterException(msg)
-
-        if not raw_output:
-            msg = (
-                "Invalid `raw_output` value. LDP data backend doesn't support yielding "
-                "dictionaries with `raw_output=False`"
-            )
-            self.logger.error(msg)
-            raise BackendParameterException(msg)
-
-        if not chunk_size:
-            chunk_size = self.settings.DEFAULT_CHUNK_SIZE
 
         if not ignore_errors:
             msg = "The `ignore_errors` argument is ignored"

@@ -16,7 +16,6 @@ from ralph.backends.data.base import (
     DataBackendStatus,
     Listable,
     Writable,
-    enforce_query_checks,
 )
 from ralph.backends.data.mixins import HistoryMixin
 from ralph.conf import BaseSettingsConfig
@@ -146,10 +145,8 @@ class FSDataBackend(
                 "modified_at": modified_at.isoformat(),
             }
 
-    @enforce_query_checks
     def read(  # noqa: PLR0913
         self,
-        *,
         query: Optional[Union[str, BaseQuery]] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
@@ -179,30 +176,50 @@ class FSDataBackend(
             BackendException: If a failure during the read operation occurs or
                 during JSON encoding lines and `ignore_errors` is set to `False`.
         """
-        if not chunk_size:
-            chunk_size = self.default_chunk_size
+        yield from super().read(query, target, chunk_size, raw_output, ignore_errors)
 
+    def _read_bytes(
+        self,
+        query: BaseQuery,
+        target: Optional[str],
+        chunk_size: int,
+        ignore_errors: bool,  # noqa: ARG002
+    ) -> Iterator[bytes]:
+        """Method called by `self.read` yielding bytes. See `self.read`."""
         for file, path in self._iter_files_matching_query(target, query):
-            if raw_output:
-                while chunk := file.read(chunk_size):
-                    yield chunk
-            else:
-                yield from parse_iterable_to_dict(file, ignore_errors, self.logger)
-
+            while chunk := file.read(chunk_size):
+                yield chunk
             # The file has been read, add a new entry to the history.
-            self.append_to_history(
-                {
-                    "backend": self.name,
-                    "action": "read",
-                    # WARNING: previously only the file name was used as the ID
-                    # By changing this to the absolute file path, previously fetched
-                    # files will not be marked as read anymore.
-                    "id": str(path.absolute()),
-                    "filename": path.name,
-                    "size": path.stat().st_size,
-                    "timestamp": now(),
-                }
-            )
+            self._append_to_history("read", path)
+
+    def _read_dicts(
+        self,
+        query: BaseQuery,
+        target: Optional[str],
+        chunk_size: int,  # noqa: ARG002
+        ignore_errors: bool,
+    ) -> Iterator[dict]:
+        """Method called by `self.read` yielding dictionaries. See `self.read`."""
+        for file, path in self._iter_files_matching_query(target, query):
+            yield from parse_iterable_to_dict(file, ignore_errors, self.logger)
+            # The file has been read, add a new entry to the history.
+            self._append_to_history("read", path)
+
+    def _append_to_history(self, action: str, path: Path):
+        """Append a new entry to the history."""
+        self.append_to_history(
+            {
+                "backend": self.name,
+                "action": action,
+                # WARNING: previously only the file name was used as the ID
+                # By changing this to the absolute file path, previously fetched
+                # files will not be marked as read anymore.
+                "id": str(path.absolute()),
+                "filename": path.name,
+                "size": path.stat().st_size,
+                "timestamp": now(),
+            }
+        )
 
     def _iter_files_matching_query(
         self, target: Optional[str], query: BaseQuery
