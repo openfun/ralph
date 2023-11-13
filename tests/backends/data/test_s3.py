@@ -514,7 +514,7 @@ def test_backends_data_s3_write_with_append_or_delete_operation(
     backend = s3_backend()
     with pytest.raises(
         BackendParameterException,
-        match=f"{operation_type.name} operation_type is not allowed.",
+        match=f"{operation_type.value.capitalize()} operation_type is not allowed.",
     ):
         backend.write(data=[b"foo"], operation_type=operation_type)
     backend.close()
