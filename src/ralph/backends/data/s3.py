@@ -42,9 +42,9 @@ class S3DataBackendSettings(BaseDataBackendSettings):
         ENDPOINT_URL (str): The endpoint URL of the S3.
         DEFAULT_REGION (str): The default region used in instantiating the client.
         DEFAULT_BUCKET_NAME (str): The default bucket name targeted.
-        DEFAULT_CHUNK_SIZE (str): The default chunk size for reading and writing
-            objects.
         LOCALE_ENCODING (str): The encoding used for writing dictionaries to objects.
+        READ_CHUNK_SIZE (str): The default chunk size for reading objects.
+        WRITE_CHUNK_SIZE (str): The default chunk size for writing objects.
     """
 
     class Config(BaseSettingsConfig):
@@ -58,7 +58,8 @@ class S3DataBackendSettings(BaseDataBackendSettings):
     ENDPOINT_URL: Optional[str] = None
     DEFAULT_REGION: Optional[str] = None
     DEFAULT_BUCKET_NAME: Optional[str] = None
-    DEFAULT_CHUNK_SIZE: int = 4096
+    READ_CHUNK_SIZE: int = 4096
+    WRITE_CHUNK_SIZE: int = 4096
 
 
 class S3Query(BaseQuery):
@@ -88,8 +89,6 @@ class S3DataBackend(
         """Instantiate the AWS S3 client."""
         super().__init__(settings)
         self.default_bucket_name = self.settings.DEFAULT_BUCKET_NAME
-        self.default_chunk_size = self.settings.DEFAULT_CHUNK_SIZE
-        self.locale_encoding = self.settings.LOCALE_ENCODING
         self._client = None
 
     @property
@@ -179,7 +178,9 @@ class S3DataBackend(
             query: (str or S3Query): The ID of the object to read.
             target (str or None): The target bucket containing the object.
                 If target is `None`, the `default_bucket` is used instead.
-            chunk_size (int or None): The chunk size when reading objects by batch.
+            chunk_size (int or None): The number of records or bytes to read in one
+                batch, depending on whether the records are dictionaries or bytes.
+                If `chunk_size` is `None` it defaults to `READ_CHUNK_SIZE`.
             raw_output (bool): Controls whether to yield bytes or dictionaries.
             ignore_errors (bool): If `True`, encoding errors during the read operation
                 will be ignored and logged.
@@ -288,7 +289,8 @@ class S3DataBackend(
                 (uuid4) object is created.
                 If target does not contain a `/`, it is assumed to be the
                 target object and the default bucket is used.
-            chunk_size (int or None): Ignored.
+            chunk_size (int or None): The chunk size when writing objects by batch.
+                If `chunk_size` is `None` it defaults to `WRITE_CHUNK_SIZE`.
             ignore_errors (bool): If `True`, errors during decoding and encoding of
                 records are ignored and logged.
                 If `False` (default), a `BackendException` is raised on any error.

@@ -564,6 +564,42 @@ def test_cli_read_command_with_fs_backend(fs, monkeypatch):
     assert '{"foo": "bar"}' in result.output
 
 
+def test_cli_read_command_with_chunk_size(fs, monkeypatch):
+    """Test ralph read command with a chunk_size option."""
+
+    def get_mock_read_bytes(expected_chunk_size: int):
+        """Return a `_read_bytes` function checking the `chunk_size` option."""
+
+        def mock_read_bytes(self, query, target, chunk_size, *_):
+            """Check chunk_size and return an archive."""
+            assert chunk_size == expected_chunk_size
+            yield b'{"foo": "bar"}'
+
+        return mock_read_bytes
+
+    monkeypatch.delenv("RALPH_BACKENDS__DATA__FS__READ_CHUNK_SIZE", raising=False)
+    runner = CliRunner()
+
+    # Given no chunk size, a default chunk size should be used.
+    monkeypatch.setattr(FSDataBackend, "_read_bytes", get_mock_read_bytes(4096))
+    result = runner.invoke(cli, "read -b fs".split())
+    assert result.exit_code == 0
+    assert '{"foo": "bar"}' in result.output
+
+    # Given a chunk size set by the environment, it should overwrite the default.
+    runner = CliRunner(env={"RALPH_BACKENDS__DATA__FS__READ_CHUNK_SIZE": "3"})
+    monkeypatch.setattr(FSDataBackend, "_read_bytes", get_mock_read_bytes(3))
+    result = runner.invoke(cli, "read -b fs".split())
+    assert result.exit_code == 0
+    assert '{"foo": "bar"}' in result.output
+
+    # Given a chunk size set by the chunk-size option, it should overwrite the default.
+    monkeypatch.setattr(FSDataBackend, "_read_bytes", get_mock_read_bytes(1))
+    result = runner.invoke(cli, "read -b fs --chunk-size 1".split())
+    assert result.exit_code == 0
+    assert '{"foo": "bar"}' in result.output
+
+
 def test_cli_read_command_with_es_backend(es):
     """Test ralph read command using the es backend."""
 
@@ -858,6 +894,39 @@ def test_cli_write_command_with_fs_backend(fs):
         content = test_file.read()
 
     assert b"other content" in content
+
+
+def test_cli_write_command_with_chunk_size(fs, monkeypatch):
+    """Test ralph write command with a chunk_size option."""
+
+    def get_mock_write_bytes(expected_chunk_size: int):
+        """Return a `_write_bytes` function checking the `chunk_size` option."""
+
+        def mock_write_bytes(self, query, target, chunk_size, *_):
+            """Check chunk_size and return an archive."""
+            assert chunk_size == expected_chunk_size
+            return 1
+
+        return mock_write_bytes
+
+    monkeypatch.delenv("RALPH_BACKENDS__DATA__FS__WRITE_CHUNK_SIZE", raising=False)
+    runner = CliRunner()
+
+    # Given no chunk size, a default chunk size should be used.
+    monkeypatch.setattr(FSDataBackend, "_write_bytes", get_mock_write_bytes(4096))
+    result = runner.invoke(cli, "write -b fs".split())
+    assert result.exit_code == 0
+
+    # Given a chunk size set by the environment, it should overwrite the default.
+    runner = CliRunner(env={"RALPH_BACKENDS__DATA__FS__WRITE_CHUNK_SIZE": "3"})
+    monkeypatch.setattr(FSDataBackend, "_write_bytes", get_mock_write_bytes(3))
+    result = runner.invoke(cli, "write -b fs".split())
+    assert result.exit_code == 0
+
+    # Given a chunk size set by the chunk-size option, it should overwrite the default.
+    monkeypatch.setattr(FSDataBackend, "_write_bytes", get_mock_write_bytes(1))
+    result = runner.invoke(cli, "write -b fs --chunk-size 1".split())
+    assert result.exit_code == 0
 
 
 def test_cli_write_command_with_es_backend(es):

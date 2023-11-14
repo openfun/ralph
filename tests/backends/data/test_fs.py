@@ -20,10 +20,11 @@ def test_backends_data_fs_default_instantiation(monkeypatch, fs):
 
     fs.create_file(".env")
     backend_settings_names = [
-        "DEFAULT_CHUNK_SIZE",
         "DEFAULT_DIRECTORY_PATH",
         "DEFAULT_QUERY_STRING",
         "LOCALE_ENCODING",
+        "READ_CHUNK_SIZE",
+        "WRITE_CHUNK_SIZE",
     ]
     for name in backend_settings_names:
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__FS__{name}", raising=False)
@@ -35,13 +36,14 @@ def test_backends_data_fs_default_instantiation(monkeypatch, fs):
     backend = FSDataBackend()
     assert str(backend.default_directory) == "."
     assert backend.default_query_string == "*"
-    assert backend.default_chunk_size == 4096
-    assert backend.locale_encoding == "utf8"
+    assert backend.settings.LOCALE_ENCODING == "utf8"
+    assert backend.settings.READ_CHUNK_SIZE == 4096
+    assert backend.settings.WRITE_CHUNK_SIZE == 4096
 
     # Test overriding default values with environment variables.
-    monkeypatch.setenv("RALPH_BACKENDS__DATA__FS__DEFAULT_CHUNK_SIZE", 1)
+    monkeypatch.setenv("RALPH_BACKENDS__DATA__FS__READ_CHUNK_SIZE", 1)
     backend = FSDataBackend()
-    assert backend.default_chunk_size == 1
+    assert backend.settings.READ_CHUNK_SIZE == 1
 
 
 def test_backends_data_fs_instantiation_with_settings(fs):
@@ -52,16 +54,18 @@ def test_backends_data_fs_instantiation_with_settings(fs):
     settings = FSDataBackend.settings_class(
         DEFAULT_DIRECTORY_PATH=deep_path,
         DEFAULT_QUERY_STRING="foo.txt",
-        DEFAULT_CHUNK_SIZE=1,
         LOCALE_ENCODING="utf-16",
+        READ_CHUNK_SIZE=1,
+        WRITE_CHUNK_SIZE=1,
     )
     backend = FSDataBackend(settings)
     assert os.path.exists(deep_path)
     assert str(backend.default_directory) == deep_path
     assert backend.default_directory.is_dir()
     assert backend.default_query_string == "foo.txt"
-    assert backend.default_chunk_size == 1
-    assert backend.locale_encoding == "utf-16"
+    assert backend.settings.LOCALE_ENCODING == "utf-16"
+    assert backend.settings.READ_CHUNK_SIZE == 1
+    assert backend.settings.WRITE_CHUNK_SIZE == 1
 
     try:
         FSDataBackend(settings)

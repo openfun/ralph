@@ -185,7 +185,6 @@ class Settings(BaseSettings):
     AUTH_CACHE_MAX_SIZE = 100
     AUTH_CACHE_TTL = 3600
     CONVERTER_EDX_XAPI_UUID_NAMESPACE: str = None
-    DEFAULT_BACKEND_CHUNK_SIZE: int = 500
     EXECUTION_ENVIRONMENT: str = "development"
     HISTORY_FILE: Path = _CORE.APP_DIR / "history.json"
     LOGGING: dict = {

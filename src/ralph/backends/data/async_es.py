@@ -126,7 +126,7 @@ class AsyncESDataBackend(
             target (str or None): The target Elasticsearch index name to query.
                 If target is `None`, the `DEFAULT_INDEX` is used instead.
             chunk_size (int or None): The chunk size when reading documents by batches.
-                If chunk_size is `None` it defaults to `DEFAULT_CHUNK_SIZE`.
+                If `chunk_size` is `None` it defaults to `READ_CHUNK_SIZE`.
             raw_output (bool): Controls whether to yield dictionaries or bytes.
             ignore_errors (bool): No impact as encoding errors are not expected in
                 Elasticsearch results.
@@ -225,7 +225,7 @@ class AsyncESDataBackend(
             target (str or None): The target Elasticsearch index name.
                 If target is `None`, the `DEFAULT_INDEX` is used instead.
             chunk_size (int or None): The number of documents to write in one batch.
-                If chunk_size is `None` it defaults to `DEFAULT_CHUNK_SIZE`.
+                If `chunk_size` is `None` it defaults to `WRITE_CHUNK_SIZE`.
             ignore_errors (bool): If `True`, errors during decoding, encoding and
                 sending batches of documents are ignored and logged.
                 If `False` (default), a `BackendException` is raised on any error.

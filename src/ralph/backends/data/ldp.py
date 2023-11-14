@@ -26,9 +26,9 @@ class LDPDataBackendSettings(BaseDataBackendSettings):
         APPLICATION_KEY (str): The OVH API application key (AK).
         APPLICATION_SECRET (str): The OVH API application secret (AS).
         CONSUMER_KEY (str): The OVH API consumer key (CK).
-        DEFAULT_CHUNK_SIZE (str): The default chunk size for reading archives.
         DEFAULT_STREAM_ID (str):  The default stream identifier to query.
         ENDPOINT (str): The OVH API endpoint.
+        READ_CHUNK_SIZE (str): The default chunk size for reading archives.
         REQUEST_TIMEOUT (int): HTTP request timeout in seconds.
         SERVICE_NAME (str): The default LDP account name.
     """
@@ -53,7 +53,7 @@ class LDPDataBackendSettings(BaseDataBackendSettings):
     ] = "ovh-eu"
     REQUEST_TIMEOUT: Optional[int] = None
     SERVICE_NAME: Optional[str] = None
-    DEFAULT_CHUNK_SIZE: int = 4096
+    READ_CHUNK_SIZE: int = 4096
 
 
 class LDPDataBackend(
@@ -166,6 +166,7 @@ class LDPDataBackend(
             target (str or None): The target stream_id containing the archives.
                 If target is `None`, the `DEFAULT_STREAM_ID` is used instead.
             chunk_size (int or None): The chunk size when reading archives by batch.
+                If `chunk_size` is `None` it defaults to `READ_CHUNK_SIZE`.
             raw_output (bool): Should always be set to `True`.
             ignore_errors (bool): No impact as no encoding operation is performed.
             max_statements (int): The maximum number of statements to yield.
