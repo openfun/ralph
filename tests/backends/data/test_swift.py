@@ -39,7 +39,8 @@ def test_backends_data_swift_default_instantiation(monkeypatch, fs):
         "USER_DOMAIN_NAME",
         "DEFAULT_CONTAINER",
         "LOCALE_ENCODING",
-        "DEFAULT_CHUNK_SIZE",
+        "READ_CHUNK_SIZE",
+        "WRITE_CHUNK_SIZE",
     ]
     for name in backend_settings_names:
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__SWIFT__{name}", raising=False)
@@ -57,7 +58,8 @@ def test_backends_data_swift_default_instantiation(monkeypatch, fs):
     assert backend.options["user_domain_name"] == "Default"
     assert backend.default_container is None
     assert backend.locale_encoding == "utf8"
-    assert backend.settings.DEFAULT_CHUNK_SIZE == 500
+    assert backend.settings.READ_CHUNK_SIZE == 500
+    assert backend.settings.WRITE_CHUNK_SIZE == 500
 
     # Test overriding default values with environment variables.
     monkeypatch.setenv("RALPH_BACKENDS__DATA__SWIFT__DEFAULT_CONTAINER", "foo")
@@ -83,7 +85,8 @@ def test_backends_data_swift_instantiation_with_settings(fs):
         USER_DOMAIN_NAME="user_domain_name",
         DEFAULT_CONTAINER="default_container",
         LOCALE_ENCODING="utf-16",
-        DEFAULT_CHUNK_SIZE=300,
+        READ_CHUNK_SIZE=300,
+        WRITE_CHUNK_SIZE=299,
     )
     backend = SwiftDataBackend(settings_)
     assert backend.options["tenant_id"] == "tenant_id"
@@ -94,7 +97,8 @@ def test_backends_data_swift_instantiation_with_settings(fs):
     assert backend.options["user_domain_name"] == "user_domain_name"
     assert backend.default_container == "default_container"
     assert backend.locale_encoding == "utf-16"
-    assert backend.settings.DEFAULT_CHUNK_SIZE == 300
+    assert backend.settings.READ_CHUNK_SIZE == 300
+    assert backend.settings.WRITE_CHUNK_SIZE == 299
 
     try:
         SwiftDataBackend(settings_)

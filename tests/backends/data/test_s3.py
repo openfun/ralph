@@ -26,8 +26,9 @@ def test_backends_data_s3_default_instantiation(monkeypatch, fs):
         "ENDPOINT_URL",
         "DEFAULT_REGION",
         "DEFAULT_BUCKET_NAME",
-        "DEFAULT_CHUNK_SIZE",
         "LOCALE_ENCODING",
+        "READ_CHUNK_SIZE",
+        "WRITE_CHUNK_SIZE",
     ]
     for name in backend_settings_names:
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__S3__{name}", raising=False)
@@ -38,13 +39,14 @@ def test_backends_data_s3_default_instantiation(monkeypatch, fs):
     assert S3DataBackend.settings_class == S3DataBackendSettings
     backend = S3DataBackend()
     assert backend.default_bucket_name is None
-    assert backend.default_chunk_size == 4096
-    assert backend.locale_encoding == "utf8"
+    assert backend.settings.LOCALE_ENCODING == "utf8"
+    assert backend.settings.READ_CHUNK_SIZE == 4096
+    assert backend.settings.WRITE_CHUNK_SIZE == 4096
 
     # Test overriding default values with environment variables.
-    monkeypatch.setenv("RALPH_BACKENDS__DATA__S3__DEFAULT_CHUNK_SIZE", 1)
+    monkeypatch.setenv("RALPH_BACKENDS__DATA__S3__READ_CHUNK_SIZE", 1)
     backend = S3DataBackend()
-    assert backend.default_chunk_size == 1
+    assert backend.settings.READ_CHUNK_SIZE == 1
 
 
 def test_backends_data_s3_instantiation_with_settings():
@@ -56,13 +58,15 @@ def test_backends_data_s3_instantiation_with_settings():
         ENDPOINT_URL="http://endpoint/url",
         DEFAULT_REGION="us-west-2",
         DEFAULT_BUCKET_NAME="bucket",
-        DEFAULT_CHUNK_SIZE=1000,
         LOCALE_ENCODING="utf-16",
+        READ_CHUNK_SIZE=1000,
+        WRITE_CHUNK_SIZE=999,
     )
     backend = S3DataBackend(settings_)
     assert backend.default_bucket_name == "bucket"
-    assert backend.default_chunk_size == 1000
-    assert backend.locale_encoding == "utf-16"
+    assert backend.settings.LOCALE_ENCODING == "utf-16"
+    assert backend.settings.READ_CHUNK_SIZE == 1000
+    assert backend.settings.WRITE_CHUNK_SIZE == 999
 
     try:
         S3DataBackend(settings_)

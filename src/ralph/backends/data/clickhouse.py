@@ -69,8 +69,9 @@ class ClickHouseDataBackendSettings(BaseDataBackendSettings):
         PASSWORD (str): Password for the given ClickHouse username (optional).
         CLIENT_OPTIONS (ClickHouseClientOptions): A dictionary of valid options for the
             ClickHouse client connection.
-        DEFAULT_CHUNK_SIZE (int): The default chunk size for reading/writing.
         LOCALE_ENCODING (str): The locale encoding to use when none is provided.
+        READ_CHUNK_SIZE (int): The default chunk size for reading.
+        WRITE_CHUNK_SIZE (int): The default chunk size for writing.
     """
 
     class Config(BaseSettingsConfig):
@@ -132,8 +133,6 @@ class ClickHouseDataBackend(
         super().__init__(settings)
         self.database = self.settings.DATABASE
         self.event_table_name = self.settings.EVENT_TABLE_NAME
-        self.default_chunk_size = self.settings.DEFAULT_CHUNK_SIZE
-        self.locale_encoding = self.settings.LOCALE_ENCODING
         self._client = None
 
     @property
@@ -219,9 +218,9 @@ class ClickHouseDataBackend(
         Args:
             query (str or ClickHouseQuery): The query to use when fetching documents.
             target (str or None): The target table name to query.
-                If target is `None`, the `event_table_name` is used instead.
+                If target is `None`, the `EVENT_TABLE_NAME` is used instead.
             chunk_size (int or None): The chunk size when reading documents by batches.
-                If chunk_size is `None` it defaults to `default_chunk_size`.
+                If `chunk_size` is `None` it defaults to `READ_CHUNK_SIZE`.
             raw_output (bool): Controls whether to yield dictionaries or bytes.
             ignore_errors (bool): If `True`, encoding errors during the read operation
                 will be ignored and logged.
@@ -322,9 +321,9 @@ class ClickHouseDataBackend(
         Args:
             data: (Iterable or IOBase): The data containing documents to write.
             target (str or None): The target table name.
-                If target is `None`, the `event_table_name` is used instead.
+                If target is `None`, the `EVENT_TABLE_NAME` is used instead.
             chunk_size (int or None): The number of documents to write in one batch.
-                If `chunk_size` is `None` it defaults to `default_chunk_size`.
+                If `chunk_size` is `None` it defaults to `WRITE_CHUNK_SIZE`.
             ignore_errors (bool): If `True`, errors during decoding, encoding and
                 sending batches of documents are ignored and logged.
                 If `False` (default), a `BackendException` is raised on any error.

@@ -35,8 +35,9 @@ class BaseDataBackendSettings(BaseSettings):
         env_file = ".env"
         env_file_encoding = core_settings.LOCALE_ENCODING
 
-    DEFAULT_CHUNK_SIZE: int = 500
     LOCALE_ENCODING: str = "utf8"
+    READ_CHUNK_SIZE: int = 500
+    WRITE_CHUNK_SIZE: int = 500
 
 
 class BaseQuery(BaseModel):
@@ -111,7 +112,7 @@ class Writable(Loggable, ABC):
                 If `target` is `None`, a default value is used instead.
             chunk_size (int or None): The number of records or bytes to write in one
                 batch, depending on whether `data` contains dictionaries or bytes.
-                If `chunk_size` is `None`, a default value is used instead.
+                If `chunk_size` is `None` it defaults to `WRITE_CHUNK_SIZE`.
             ignore_errors (bool): If `True`, escapable errors are ignored and logged.
                 If `False` (default), a `BackendException` is raised on any error.
             operation_type (BaseOperationType or None): The mode of the write operation.
@@ -142,7 +143,7 @@ class Writable(Loggable, ABC):
             return 0
         data = chain((first_record,), data)
 
-        chunk_size = chunk_size if chunk_size else self.settings.DEFAULT_CHUNK_SIZE
+        chunk_size = chunk_size if chunk_size else self.settings.WRITE_CHUNK_SIZE
         is_bytes = isinstance(first_record, bytes)
         writer = self._write_bytes if is_bytes else self._write_dicts
         return writer(data, target, chunk_size, ignore_errors, operation_type)
@@ -287,6 +288,7 @@ class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
                 If `target` is `None`, a default value is used instead.
             chunk_size (int or None): The number of records or bytes to read in one
                 batch, depending on whether the records are dictionaries or bytes.
+                If `chunk_size` is `None` it defaults to `READ_CHUNK_SIZE`.
             raw_output (bool): Controls whether to yield bytes or dictionaries.
                 If the records are dictionaries and `raw_output` is set to `True`, they
                 are encoded as JSON.
@@ -307,7 +309,7 @@ class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
                 during encoding records and `ignore_errors` is set to `False`.
             BackendParameterException: If a backend argument value is not valid.
         """
-        chunk_size = chunk_size if chunk_size else self.settings.DEFAULT_CHUNK_SIZE
+        chunk_size = chunk_size if chunk_size else self.settings.READ_CHUNK_SIZE
         query = validate_backend_query(query, self.query_class, self.logger)
         reader = self._read_bytes if raw_output else self._read_dicts
         statements = reader(query, target, chunk_size, ignore_errors)
@@ -363,7 +365,7 @@ class AsyncWritable(Loggable, ABC):
                 If `target` is `None`, a default value is used instead.
             chunk_size (int or None): The number of records or bytes to write in one
                 batch, depending on whether `data` contains dictionaries or bytes.
-                If `chunk_size` is `None`, a default value is used instead.
+                If `chunk_size` is `None` it defaults to `WRITE_CHUNK_SIZE`.
             ignore_errors (bool): If `True`, escapable errors are ignored and logged.
                 If `False` (default), a `BackendException` is raised on any error.
             operation_type (BaseOperationType or None): The mode of the write operation.
@@ -394,7 +396,7 @@ class AsyncWritable(Loggable, ABC):
             return 0
         data = chain((first_record,), data)
 
-        chunk_size = chunk_size if chunk_size else self.settings.DEFAULT_CHUNK_SIZE
+        chunk_size = chunk_size if chunk_size else self.settings.WRITE_CHUNK_SIZE
         is_bytes = isinstance(first_record, bytes)
         writer = self._write_bytes if is_bytes else self._write_dicts
         return await writer(data, target, chunk_size, ignore_errors, operation_type)
@@ -493,6 +495,7 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
                 If `target` is `None`, a default value is used instead.
             chunk_size (int or None): The number of records or bytes to read in one
                 batch, depending on whether the records are dictionaries or bytes.
+                If `chunk_size` is `None` it defaults to `READ_CHUNK_SIZE`.
             raw_output (bool): Controls whether to yield bytes or dictionaries.
                 If the records are dictionaries and `raw_output` is set to `True`, they
                 are encoded as JSON.
@@ -513,7 +516,7 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
                 during encoding records and `ignore_errors` is set to `False`.
             BackendParameterException: If a backend argument value is not valid.
         """
-        chunk_size = chunk_size if chunk_size else self.settings.DEFAULT_CHUNK_SIZE
+        chunk_size = chunk_size if chunk_size else self.settings.READ_CHUNK_SIZE
         query = validate_backend_query(query, self.query_class, self.logger)
         reader = self._read_bytes if raw_output else self._read_dicts
         statements = reader(query, target, chunk_size, ignore_errors)

@@ -37,16 +37,16 @@ class ESDataBackendSettings(BaseDataBackendSettings):
             status to be ok.
         CLIENT_OPTIONS (dict): A dictionary of valid options for the Elasticsearch class
             initialization.
-        DEFAULT_CHUNK_SIZE (int): The default chunk size for reading batches of
-            documents.
         DEFAULT_INDEX (str): The default index to use for querying Elasticsearch.
         HOSTS (str or tuple): The comma-separated list of Elasticsearch nodes to
             connect to.
         LOCALE_ENCODING (str): The encoding used for reading/writing documents.
         POINT_IN_TIME_KEEP_ALIVE (str): The duration for which Elasticsearch should
             keep a point in time alive.
+        READ_CHUNK_SIZE (int): The default chunk size for reading batches of documents.
         REFRESH_AFTER_WRITE (str or bool): Whether the Elasticsearch index should be
             refreshed after the write operation.
+        WRITE_CHUNK_SIZE (int): The default chunk size for writing batches of documents.
     """
 
     class Config(BaseSettingsConfig):
@@ -210,7 +210,7 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
             target (str or None): The target Elasticsearch index name to query.
                 If target is `None`, the `DEFAULT_INDEX` is used instead.
             chunk_size (int or None): The chunk size when reading documents by batches.
-                If chunk_size is `None` it defaults to `DEFAULT_CHUNK_SIZE`.
+                If `chunk_size` is `None` it defaults to `READ_CHUNK_SIZE`.
             raw_output (bool): Controls whether to yield dictionaries or bytes.
             ignore_errors (bool): No impact as encoding errors are not expected in
                 Elasticsearch results.
@@ -302,7 +302,7 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
             target (str or None): The target Elasticsearch index name.
                 If target is `None`, the `DEFAULT_INDEX` is used instead.
             chunk_size (int or None): The number of documents to write in one batch.
-                If chunk_size is `None` it defaults to `DEFAULT_CHUNK_SIZE`.
+                If `chunk_size` is `None` it defaults to `WRITE_CHUNK_SIZE`.
             ignore_errors (bool): If `True`, errors during decoding, encoding and
                 sending batches of documents are ignored and logged.
                 If `False` (default), a `BackendException` is raised on any error.

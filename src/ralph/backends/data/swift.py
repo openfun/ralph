@@ -38,9 +38,9 @@ class SwiftDataBackendSettings(BaseDataBackendSettings):
         OBJECT_STORAGE_URL (str): The default storage URL.
         USER_DOMAIN_NAME (str): The user domain name.
         DEFAULT_CONTAINER (str): The default target container.
-        DEFAULT_CHUNK_SIZE (str): The default chunk size for reading and writing
-            objects.
         LOCALE_ENCODING (str): The encoding used for reading/writing documents.
+        READ_CHUNK_SIZE (str): The default chunk size for reading objects.
+        WRITE_CHUNK_SIZE (str): The default chunk size for writing objects.
     """
 
     class Config(BaseSettingsConfig):
@@ -190,6 +190,7 @@ class SwiftDataBackend(
                 If `target` is `None`, a default value is used instead.
             chunk_size (int or None): The number of records or bytes to read in one
                 batch, depending on whether the records are dictionaries or bytes.
+                If `chunk_size` is `None` it defaults to `READ_CHUNK_SIZE`.
             raw_output (bool): Controls whether to yield bytes or dictionaries.
                 If the objects are dictionaries and `raw_output` is set to `True`, they
                 are encoded as JSON.
@@ -298,7 +299,8 @@ class SwiftDataBackend(
             data: (Iterable or IOBase): The data to write.
             target (str or None): The target container name.
                 If `target` is `None`, a default value is used instead.
-            chunk_size (int or None): Ignored.
+            chunk_size (int or None): The chunk size when writing objects by batch.
+                If `chunk_size` is `None` it defaults to `WRITE_CHUNK_SIZE`.
             ignore_errors (bool): If `True`, errors during decoding and encoding of
                 records are ignored and logged.
                 If `False` (default), a `BackendException` is raised on any error.

@@ -612,7 +612,7 @@ def convert(from_, to_, ignore_errors, fail_on_unknown, **conversion_set_kwargs)
     "-c",
     "--chunk-size",
     type=int,
-    default=settings.DEFAULT_BACKEND_CHUNK_SIZE,
+    default=None,
     help="Get events by chunks of size #",
 )
 @click.option(
@@ -701,7 +701,7 @@ def read(  # noqa: PLR0913
     "-c",
     "--chunk-size",
     type=int,
-    default=settings.DEFAULT_BACKEND_CHUNK_SIZE,
+    default=None,
     help="Get events by chunks of size #",
 )
 @click.option(

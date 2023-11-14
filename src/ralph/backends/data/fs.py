@@ -28,12 +28,13 @@ class FSDataBackendSettings(BaseDataBackendSettings):
     """FileSystem data backend default configuration.
 
     Attributes:
-        DEFAULT_CHUNK_SIZE (int): The default chunk size for reading files.
         DEFAULT_DIRECTORY_PATH (str or Path): The default target directory path where to
             perform list, read and write operations.
         DEFAULT_QUERY_STRING (str): The default query string to match files for the read
             operation.
         LOCALE_ENCODING (str): The encoding used for writing dictionaries to files.
+        READ_CHUNK_SIZE (int): The default chunk size for reading files.
+        WRITE_CHUNK_SIZE (int): The default chunk size for writing files.
     """
 
     class Config(BaseSettingsConfig):
@@ -41,9 +42,10 @@ class FSDataBackendSettings(BaseDataBackendSettings):
 
         env_prefix = "RALPH_BACKENDS__DATA__FS__"
 
-    DEFAULT_CHUNK_SIZE: int = 4096
     DEFAULT_DIRECTORY_PATH: Path = Path(".")
     DEFAULT_QUERY_STRING: str = "*"
+    READ_CHUNK_SIZE: int = 4096
+    WRITE_CHUNK_SIZE: int = 4096
 
 
 Settings = TypeVar("Settings", bound=FSDataBackendSettings)
@@ -70,10 +72,8 @@ class FSDataBackend(
         """
         super().__init__(settings)
         self.settings = settings if settings else self.settings_class()
-        self.default_chunk_size = self.settings.DEFAULT_CHUNK_SIZE
         self.default_directory = self.settings.DEFAULT_DIRECTORY_PATH
         self.default_query_string = self.settings.DEFAULT_QUERY_STRING
-        self.locale_encoding = self.settings.LOCALE_ENCODING
 
         if not self.default_directory.is_dir():
             msg = "Default directory doesn't exist, creating: %s"
@@ -164,8 +164,9 @@ class FSDataBackend(
                 If target is `None`, the `default_directory_path` is used instead.
                 If target is a relative path, it is considered to be relative to the
                     `default_directory_path`.
-            chunk_size (int or None): The chunk size when reading documents by batches.
-                Ignored if `raw_output` is set to False.
+            chunk_size (int or None): The chunk size when reading files.
+                If `chunk_size` is `None` it defaults to `READ_CHUNK_SIZE`.
+                If `raw_output` is set to `False`, files are read line by line.
             raw_output (bool): Controls whether to yield bytes or dictionaries.
             ignore_errors (bool): If `True`, encoding errors during the read operation
                 will be ignored and logged.

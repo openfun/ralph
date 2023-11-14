@@ -132,7 +132,7 @@ class AsyncMongoDataBackend(
             target (str or None): The MongoDB collection name to query.
                 If target is `None`, the `DEFAULT_COLLECTION` is used instead.
             chunk_size (int or None): The chunk size when reading documents by batches.
-                If chunk_size is `None` the `DEFAULT_CHUNK_SIZE` is used instead.
+                If `chunk_size` is `None` it defaults to `READ_CHUNK_SIZE`.
             raw_output (bool): Whether to yield dictionaries or bytes.
             ignore_errors (bool): If `True`, encoding errors during the read operation
                 will be ignored and logged.
@@ -203,7 +203,7 @@ class AsyncMongoDataBackend(
             data (Iterable or IOBase): The data containing documents to write.
             target (str or None): The target MongoDB collection name.
             chunk_size (int or None): The number of documents to write in one batch.
-                If chunk_size is `None` the `DEFAULT_CHUNK_SIZE` is used instead.
+                If `chunk_size` is `None` it defaults to `WRITE_CHUNK_SIZE`.
             ignore_errors (bool): If `True`, errors during decoding, encoding and
                 sending batches of documents are ignored and logged.
                 If `False` (default), a `BackendException` is raised on any error.
