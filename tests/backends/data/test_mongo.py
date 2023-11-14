@@ -753,7 +753,7 @@ def test_backends_data_mongo_write_with_append_operation(mongo_backend, caplog):
     should raise a `BackendParameterException`.
     """
     backend = mongo_backend()
-    msg = "Append operation_type is not allowed."
+    msg = "Append operation_type is not allowed"
     with caplog.at_level(logging.ERROR):
         with pytest.raises(BackendParameterException, match=msg):
             backend.write(data=[], operation_type=BaseOperationType.APPEND)
@@ -845,7 +845,7 @@ def test_backends_data_mongo_write_with_no_data(mongo_backend, caplog):
     with caplog.at_level(logging.INFO):
         assert backend.write(data=[]) == 0
 
-    msg = "Data Iterator is empty; skipping write to target."
+    msg = "Data Iterator is empty; skipping write to target"
     assert ("ralph.backends.data.mongo", logging.INFO, msg) in caplog.record_tuples
     backend.close()
 

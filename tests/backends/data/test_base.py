@@ -6,10 +6,13 @@ from typing import Any, Union
 import pytest
 
 from ralph.backends.data.base import (
+    AsyncWritable,
     BaseAsyncDataBackend,
     BaseDataBackend,
     BaseDataBackendSettings,
+    BaseOperationType,
     BaseQuery,
+    Writable,
     get_backend_generic_argument,
 )
 from ralph.exceptions import BackendParameterException
@@ -171,10 +174,10 @@ async def test_backends_data_base_async_read_with_max_statements():
             for _ in range(3):
                 yield b""
 
-        def status(self):
+        async def status(self):
             pass
 
-        def close(self):
+        async def close(self):
             pass
 
     backend = MockAsyncBaseDataBackend()
@@ -197,3 +200,217 @@ async def test_backends_data_base_async_read_with_max_statements():
 
     assert not [_ async for _ in backend.read(max_statements=0)]
     assert not [_ async for _ in backend.read(max_statements=0, raw_output=True)]
+
+
+@pytest.mark.parametrize(
+    "chunk_size,max_num_simultaneous,expected_item_count,expected_write_calls",
+    [
+        # Given a chunk size equal to the size of the data, only one write call should
+        # be performed, regardless of how many simultaneous requests are allowed.
+        (4, None, {4}, 1),
+        (4, 1, {4}, 1),
+        (4, 20, {4}, 1),
+        # Given a chunk size equal to half (or a bit more) of the data, two write
+        # calls should be performed.
+        (2, 2, {2}, 2),
+        (2, 20, {2}, 2),
+        (3, 2, {1, 3}, 2),
+        (3, 20, {1, 3}, 2),
+        # However, given a limit of one simultaneous request, only one write call is
+        # allowed.
+        (2, 1, {4}, 1),
+        (3, 1, {4}, 1),
+        # Given a chunk size equal to one, up to four simultaneous write calls can be
+        # performed.
+        (1, 1, {4}, 1),
+        (1, 2, {1}, 4),
+        (1, 20, {1}, 4),
+    ],
+)
+@pytest.mark.anyio
+async def test_backends_data_base_async_write_with_simultaneous(
+    chunk_size, max_num_simultaneous, expected_item_count, expected_write_calls
+):
+    """Test the async `AsyncWritable.write` method with `simultaneous` parameter."""
+
+    write_calls = {"count": 0}
+    expected_data = {0, 1, 2, 3}
+
+    class MockAsyncBaseDataBackend(
+        BaseAsyncDataBackend[BaseDataBackendSettings, BaseQuery], AsyncWritable
+    ):
+        """A class mocking the base database class."""
+
+        async def _read_dicts(self, *args):
+            pass
+
+        async def _read_bytes(self, *args):
+            pass
+
+        async def _write_bytes(self, data, *args):
+            pass
+
+        async def _write_dicts(self, data, *args):
+            write_calls["count"] += 1
+            item_count = 0
+            for item in data:
+                expected_data.remove(item)
+                item_count += 1
+
+            assert item_count in expected_item_count
+            return item_count
+
+        async def status(self):
+            pass
+
+        async def close(self):
+            pass
+
+    backend = MockAsyncBaseDataBackend()
+    assert (
+        await backend.write(
+            (i for i in range(4)),
+            chunk_size=chunk_size,
+            simultaneous=True,
+            max_num_simultaneous=max_num_simultaneous,
+        )
+    ) == 4
+    # All data should be consumed.
+    assert not expected_data
+    assert write_calls["count"] == expected_write_calls
+
+
+@pytest.mark.anyio
+async def test_backends_data_base_write_with_invalid_parameters(caplog):
+    """Test the Writable backend `write` method, given invalid parameters."""
+
+    class MockBaseDataBackend(
+        BaseDataBackend[BaseDataBackendSettings, BaseQuery], Writable
+    ):
+        """A class mocking the base database class."""
+
+        unsupported_operation_types = {BaseOperationType.DELETE}
+
+        def _read_dicts(self, *args):
+            pass
+
+        def _read_bytes(self, *args):
+            pass
+
+        def _write_bytes(self, *args):
+            pass
+
+        def _write_dicts(self, *args):
+            return 1
+
+        def status(self):
+            pass
+
+        def close(self):
+            pass
+
+    backend = MockBaseDataBackend()
+    # Given an unsupported `operation_type`, the write method should raise a
+    # `BackendParameterException` and log an error.
+    msg = "Delete operation_type is not allowed"
+    with pytest.raises(BackendParameterException, match=msg):
+        with caplog.at_level(logging.ERROR):
+            assert backend.write([{}], operation_type=BaseOperationType.DELETE)
+
+    assert (
+        "tests.backends.data.test_base",
+        logging.ERROR,
+        msg,
+    ) in caplog.record_tuples
+
+    # Given an empty data iterator, the write method should log an info and return 0.
+    msg = "Data Iterator is empty; skipping write to target"
+    with caplog.at_level(logging.INFO):
+        assert backend.write([]) == 0
+
+    assert (
+        "tests.backends.data.test_base",
+        logging.INFO,
+        msg,
+    ) in caplog.record_tuples
+
+
+@pytest.mark.anyio
+async def test_backends_data_base_async_write_with_invalid_parameters(caplog):
+    """Test the AsyncWritable backend `write` method, given invalid parameters."""
+
+    class MockAsyncBaseDataBackend(
+        BaseAsyncDataBackend[BaseDataBackendSettings, BaseQuery], AsyncWritable
+    ):
+        """A class mocking the base database class."""
+
+        unsupported_operation_types = {BaseOperationType.DELETE}
+
+        async def _read_dicts(self, *args):
+            pass
+
+        async def _read_bytes(self, *args):
+            pass
+
+        async def _write_bytes(self, *args):
+            pass
+
+        async def _write_dicts(self, *args):
+            return 1
+
+        async def status(self):
+            pass
+
+        async def close(self):
+            pass
+
+    backend = MockAsyncBaseDataBackend()
+
+    # Given `max_num_simultation` is set to a negative value and `simultaneous` is True,
+    # the write method should raise a `BackendParameterException` and log an error.
+    msg = "max_num_simultaneous must be a strictly positive integer"
+    with pytest.raises(BackendParameterException, match=msg):
+        with caplog.at_level(logging.ERROR):
+            assert await backend.write([{}], simultaneous=True, max_num_simultaneous=-1)
+
+    assert (
+        "tests.backends.data.test_base",
+        logging.ERROR,
+        msg,
+    ) in caplog.record_tuples
+
+    # Given `max_num_simultation` is set and `simultaneous` is False, the write method
+    # should log a warning.
+    msg = "max_num_simultaneous is ignored when `simultaneous=False`"
+    with caplog.at_level(logging.WARNING):
+        assert await backend.write([{}], max_num_simultaneous=-1) == 1
+
+    assert (
+        "tests.backends.data.test_base",
+        logging.WARNING,
+        msg,
+    ) in caplog.record_tuples
+
+    # Given an unsupported `operation_type`, the write method should raise a
+    # `BackendParameterException` and log an error.
+    msg = "Delete operation_type is not allowed"
+    with pytest.raises(BackendParameterException, match=msg):
+        with caplog.at_level(logging.ERROR):
+            assert await backend.write([{}], operation_type=BaseOperationType.DELETE)
+
+    assert (
+        "tests.backends.data.test_base",
+        logging.ERROR,
+        msg,
+    ) in caplog.record_tuples
+
+    # Given an empty data iterator, the write method should log an info and return 0.
+    msg = "Data Iterator is empty; skipping write to target"
+    with caplog.at_level(logging.INFO):
+        assert await backend.write([]) == 0
+
+    assert (
+        "tests.backends.data.test_base",
+        logging.INFO,
+        msg,
+    ) in caplog.record_tuples

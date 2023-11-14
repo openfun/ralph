@@ -492,6 +492,37 @@ async def test_backends_data_async_es_read_with_query(es, async_es_backend, capl
 
 
 @pytest.mark.anyio
+async def test_backends_data_async_es_write_with_simultaneous(
+    es, async_es_backend, caplog
+):
+    """Test the `AsyncESDataBackend.write` method, given `simultaneous` set to `True`,
+    should insert the target documents concurrently.
+    """
+    backend = async_es_backend()
+    data = ({"value": str(idx)} for idx in range(5))
+
+    with caplog.at_level(logging.INFO):
+        assert (
+            await backend.write(
+                data, chunk_size=3, simultaneous=True, max_num_simultaneous=2
+            )
+            == 5
+        )
+
+    assert (
+        "ralph.backends.data.async_es",
+        logging.INFO,
+        "Finished writing 3 documents with success",
+    ) in caplog.record_tuples
+
+    assert (
+        "ralph.backends.data.async_es",
+        logging.INFO,
+        "Finished writing 2 documents with success",
+    ) in caplog.record_tuples
+
+
+@pytest.mark.anyio
 async def test_backends_data_async_es_write_with_create_operation(
     es, async_es_backend, caplog
 ):
@@ -510,7 +541,7 @@ async def test_backends_data_async_es_write_with_create_operation(
     assert (
         "ralph.backends.data.async_es",
         logging.INFO,
-        "Data Iterator is empty; skipping write to target.",
+        "Data Iterator is empty; skipping write to target",
     ) in caplog.record_tuples
 
     # Given an iterator with multiple documents, the write method should write the
@@ -626,7 +657,7 @@ async def test_backends_data_async_es_write_with_append_operation(
     should raise a `BackendParameterException`.
     """
     backend = async_es_backend()
-    msg = "Append operation_type is not allowed."
+    msg = "Append operation_type is not allowed"
     with pytest.raises(BackendParameterException, match=msg):
         with caplog.at_level(logging.ERROR):
             await backend.write(data=[{}], operation_type=BaseOperationType.APPEND)
@@ -634,7 +665,7 @@ async def test_backends_data_async_es_write_with_append_operation(
     assert (
         "ralph.backends.data.async_es",
         logging.ERROR,
-        "Append operation_type is not allowed.",
+        "Append operation_type is not allowed",
     ) in caplog.record_tuples
 
     await backend.close()

@@ -592,6 +592,38 @@ async def test_backends_data_async_mongo_read_with_query(
 
 
 @pytest.mark.anyio
+async def test_backends_data_async_mongo_write_with_simultaneous(
+    mongo, async_mongo_backend, caplog
+):
+    """Test the `AsyncMongoDataBackend.write` method, given `simultaneous` set to
+    `True`, should insert the target documents concurrently.
+    """
+    backend = async_mongo_backend()
+    timestamp = {"timestamp": "2022-06-27T15:36:50"}
+    documents = [{"id": str(i), **timestamp} for i in range(5)]
+
+    with caplog.at_level(logging.INFO):
+        assert (
+            await backend.write(
+                documents, chunk_size=3, simultaneous=True, max_num_simultaneous=2
+            )
+            == 5
+        )
+
+    assert (
+        "ralph.backends.data.async_mongo",
+        logging.INFO,
+        "Inserted 3 documents with success",
+    ) in caplog.record_tuples
+
+    assert (
+        "ralph.backends.data.async_mongo",
+        logging.INFO,
+        "Inserted 2 documents with success",
+    ) in caplog.record_tuples
+
+
+@pytest.mark.anyio
 async def test_backends_data_async_mongo_write_with_target(
     mongo,
     async_mongo_backend,
@@ -899,7 +931,7 @@ async def test_backends_data_async_mongo_write_with_append_operation(
     `operation_type`, should raise a `BackendParameterException`.
     """
     backend = async_mongo_backend()
-    msg = "Append operation_type is not allowed."
+    msg = "Append operation_type is not allowed"
     with pytest.raises(BackendParameterException, match=msg):
         with caplog.at_level(logging.ERROR):
             await backend.write(data=[], operation_type=BaseOperationType.APPEND)
@@ -1008,7 +1040,7 @@ async def test_backends_data_async_mongo_write_with_no_data(
     with caplog.at_level(logging.INFO):
         assert await backend.write(data=[]) == 0
 
-    msg = "Data Iterator is empty; skipping write to target."
+    msg = "Data Iterator is empty; skipping write to target"
     assert (
         "ralph.backends.data.async_mongo",
         logging.INFO,

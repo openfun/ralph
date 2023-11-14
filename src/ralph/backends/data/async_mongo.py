@@ -196,6 +196,8 @@ class AsyncMongoDataBackend(
         chunk_size: Optional[int] = None,
         ignore_errors: bool = False,
         operation_type: Optional[BaseOperationType] = None,
+        simultaneous: bool = False,
+        max_num_simultaneous: Optional[int] = None,
     ) -> int:
         """Write data documents to the target collection and return their count.
 
@@ -210,6 +212,10 @@ class AsyncMongoDataBackend(
             operation_type (BaseOperationType or None): The mode of the write operation.
                 If `operation_type` is `None`, the `default_operation_type` is used
                     instead. See `BaseOperationType`.
+            simultaneous (bool): If `True`, chunks will be written concurrently.
+                If `False` (default), chunks will be written sequentially.
+            max_num_simultaneous (int or None): If simultaneous is `True`, the maximum
+                number of chunks to write concurrently. If `None` it defaults to 1.
 
         Return:
             int: The number of documents written.
@@ -221,7 +227,13 @@ class AsyncMongoDataBackend(
                 supported.
         """
         return await super().write(
-            data, target, chunk_size, ignore_errors, operation_type
+            data,
+            target,
+            chunk_size,
+            ignore_errors,
+            operation_type,
+            simultaneous,
+            max_num_simultaneous,
         )
 
     async def _write_bytes(  # noqa: PLR0913

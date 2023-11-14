@@ -23,6 +23,7 @@ from pydantic import BaseModel, BaseSettings, PositiveInt, ValidationError
 
 from ralph.conf import BaseSettingsConfig, core_settings
 from ralph.exceptions import BackendParameterException
+from ralph.utils import gather_with_limited_concurrency, iter_by_batch
 
 
 class BaseDataBackendSettings(BaseSettings):
@@ -131,7 +132,7 @@ class Writable(Loggable, ABC):
             operation_type = self.default_operation_type
 
         if operation_type in self.unsupported_operation_types:
-            msg = f"{operation_type.value.capitalize()} operation_type is not allowed."
+            msg = f"{operation_type.value.capitalize()} operation_type is not allowed"
             self.logger.error(msg)
             raise BackendParameterException(msg)
 
@@ -139,7 +140,7 @@ class Writable(Loggable, ABC):
         try:
             first_record = next(data)
         except StopIteration:
-            self.logger.info("Data Iterator is empty; skipping write to target.")
+            self.logger.info("Data Iterator is empty; skipping write to target")
             return 0
         data = chain((first_record,), data)
 
@@ -356,6 +357,8 @@ class AsyncWritable(Loggable, ABC):
         chunk_size: Optional[int] = None,
         ignore_errors: bool = False,
         operation_type: Optional[BaseOperationType] = None,
+        simultaneous: bool = False,
+        max_num_simultaneous: Optional[int] = None,
     ) -> int:
         """Write `data` records to the `target` container and return their count.
 
@@ -371,6 +374,10 @@ class AsyncWritable(Loggable, ABC):
             operation_type (BaseOperationType or None): The mode of the write operation.
                 If `operation_type` is `None`, the `default_operation_type` is used
                 instead. See `BaseOperationType`.
+            simultaneous (bool): If `True`, chunks will be written concurrently.
+                If `False` (default), chunks will be written sequentially.
+            max_num_simultaneous (int or None): If simultaneous is `True`, the maximum
+                number of chunks to write concurrently. If `None` it defaults to 1.
 
         Return:
             int: The number of written records.
@@ -384,7 +391,7 @@ class AsyncWritable(Loggable, ABC):
             operation_type = self.default_operation_type
 
         if operation_type in self.unsupported_operation_types:
-            msg = f"{operation_type.value.capitalize()} operation_type is not allowed."
+            msg = f"{operation_type.value.capitalize()} operation_type is not allowed"
             self.logger.error(msg)
             raise BackendParameterException(msg)
 
@@ -392,14 +399,36 @@ class AsyncWritable(Loggable, ABC):
         try:
             first_record = next(data)
         except StopIteration:
-            self.logger.info("Data Iterator is empty; skipping write to target.")
+            self.logger.info("Data Iterator is empty; skipping write to target")
             return 0
         data = chain((first_record,), data)
 
         chunk_size = chunk_size if chunk_size else self.settings.WRITE_CHUNK_SIZE
         is_bytes = isinstance(first_record, bytes)
         writer = self._write_bytes if is_bytes else self._write_dicts
-        return await writer(data, target, chunk_size, ignore_errors, operation_type)
+
+        max_num_simultaneous = max_num_simultaneous if max_num_simultaneous else 1
+        if not simultaneous or max_num_simultaneous == 1:
+            if max_num_simultaneous != 1:
+                msg = "max_num_simultaneous is ignored when `simultaneous=False`"
+                self.logger.warning(msg)
+            return await writer(data, target, chunk_size, ignore_errors, operation_type)
+
+        if max_num_simultaneous < 1:
+            msg = "max_num_simultaneous must be a strictly positive integer"
+            self.logger.error(msg)
+            raise BackendParameterException(msg)
+
+        count = 0
+        batches = iter_by_batch(iter_by_batch(data, chunk_size), max_num_simultaneous)
+        for batch in batches:
+            tasks = set()
+            for chunk in batch:
+                task = writer(chunk, target, chunk_size, ignore_errors, operation_type)
+                tasks.add(task)
+            result = await gather_with_limited_concurrency(max_num_simultaneous, *tasks)
+            count += sum(result)
+        return count
 
     @abstractmethod
     async def _write_bytes(  # noqa: PLR0913
