@@ -787,7 +787,7 @@ def test_backends_data_fs_write_with_delete_operation(
 
     backend = fs_backend()
 
-    msg = "Delete operation_type is not allowed."
+    msg = "Delete operation_type is not allowed"
     with pytest.raises(BackendParameterException, match=msg):
         backend.write(data=[b"foo"], operation_type=BaseOperationType.DELETE)
 
@@ -958,7 +958,7 @@ def test_backends_data_fs_write_with_no_data(fs_backend, caplog):
     with caplog.at_level(logging.INFO):
         assert backend.write(data=[]) == 0
 
-    msg = "Data Iterator is empty; skipping write to target."
+    msg = "Data Iterator is empty; skipping write to target"
     assert ("ralph.backends.data.fs", logging.INFO, msg) in caplog.record_tuples
 
 
