@@ -314,9 +314,9 @@ async def test_backends_data_async_mongo_list_with_history(
 
 
 @pytest.mark.anyio
+@pytest.mark.parametrize("prefetch", [1, 10])
 async def test_backends_data_async_mongo_read_with_raw_output(
-    mongo,
-    async_mongo_backend,
+    prefetch, mongo, async_mongo_backend
 ):
     """Test the `AsyncMongoDataBackend.read` method with `raw_output` set to `True`."""
 
@@ -334,7 +334,10 @@ async def test_backends_data_async_mongo_read_with_raw_output(
     await backend.collection.insert_many(documents)
     await backend.database.foobar.insert_many(documents[:2])
 
-    result = [statement async for statement in backend.read(raw_output=True)]
+    result = [
+        statement
+        async for statement in backend.read(raw_output=True, prefetch=prefetch)
+    ]
     assert result == expected
     result = [
         statement async for statement in backend.read(raw_output=True, target="foobar")
@@ -351,8 +354,9 @@ async def test_backends_data_async_mongo_read_with_raw_output(
 
 
 @pytest.mark.anyio
+@pytest.mark.parametrize("prefetch", [1, 10])
 async def test_backends_data_async_mongo_read_without_raw_output(
-    mongo, async_mongo_backend
+    prefetch, mongo, async_mongo_backend
 ):
     """Test the `AsyncMongoDataBackend.read` method with `raw_output` set to
     `False`.
@@ -372,7 +376,9 @@ async def test_backends_data_async_mongo_read_without_raw_output(
     await backend.collection.insert_many(documents)
     await backend.database.foobar.insert_many(documents[:2])
 
-    assert [statement async for statement in backend.read()] == expected
+    assert [
+        statement async for statement in backend.read(prefetch=prefetch)
+    ] == expected
     assert [statement async for statement in backend.read(target="foobar")] == expected[
         :2
     ]

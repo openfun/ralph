@@ -278,12 +278,7 @@ def test_backends_data_s3_read_with_valid_name_should_write_to_history(
         "timestamp": freezed_now,
     } in backend.history
 
-    list(
-        backend.read(
-            query="2022-09-30.gz",
-            raw_output=False,
-        )
-    )
+    list(backend.read(query="2022-09-30.gz", raw_output=False))
 
     assert {
         "backend": "s3",
