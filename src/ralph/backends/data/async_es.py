@@ -217,6 +217,7 @@ class AsyncESDataBackend(
         chunk_size: Optional[int] = None,
         ignore_errors: bool = False,
         operation_type: Optional[BaseOperationType] = None,
+        concurrency: Optional[PositiveInt] = None,
     ) -> int:
         """Write data documents to the target index and return their count.
 
@@ -232,6 +233,8 @@ class AsyncESDataBackend(
             operation_type (BaseOperationType or None): The mode of the write operation.
                 If `operation_type` is `None`, the `default_operation_type` is used
                 instead. See `BaseOperationType`.
+            concurrency (int): The number of chunks to write concurrently.
+                If `None` it defaults to `1`.
 
         Return:
             int: The number of documents written.
@@ -243,7 +246,7 @@ class AsyncESDataBackend(
                 supported.
         """
         return await super().write(
-            data, target, chunk_size, ignore_errors, operation_type
+            data, target, chunk_size, ignore_errors, operation_type, concurrency
         )
 
     async def _write_bytes(  # noqa: PLR0913

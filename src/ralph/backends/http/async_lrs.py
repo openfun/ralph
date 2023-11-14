@@ -238,7 +238,7 @@ class AsyncLRSHTTPBackend(BaseHTTPBackend):
         try:
             first_record = next(data)
         except StopIteration:
-            logger.info("Data Iterator is empty; skipping write to target.")
+            logger.info("Data Iterator is empty; skipping write to target")
             return 0
 
         if not operation_type:

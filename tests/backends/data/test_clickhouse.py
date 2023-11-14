@@ -631,7 +631,7 @@ def test_backends_data_clickhouse_write_wrong_operation_type(
     ]
 
     backend = clickhouse_backend()
-    msg = "Append operation_type is not allowed."
+    msg = "Append operation_type is not allowed"
     with pytest.raises(BackendParameterException, match=msg):
         backend.write(data=statements, operation_type=BaseOperationType.APPEND)
     backend.close()

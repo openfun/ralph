@@ -14,7 +14,7 @@ from ralph.backends.data.async_mongo import (
     MongoDataBackendSettings,
     MongoQuery,
 )
-from ralph.backends.data.base import BaseOperationType, DataBackendStatus
+from ralph.backends.data.base import AsyncWritable, BaseOperationType, DataBackendStatus
 from ralph.backends.data.mongo import MongoClientOptions
 from ralph.exceptions import BackendException, BackendParameterException
 
@@ -592,6 +592,26 @@ async def test_backends_data_async_mongo_read_with_query(
 
 
 @pytest.mark.anyio
+async def test_backends_data_async_mongo_write_with_concurrency(
+    async_es_backend, monkeypatch
+):
+    """Test the `AsyncMongoDataBackend.write` method, given `concurrency` set,
+    should pass the `concurrency` value to `AsyncWritable.write`.
+    """
+
+    async def mock_write(  # noqa: PLR0913
+        self, data, target, chunk_size, ignore_errors, operation_type, concurrency
+    ):
+        """Mock the AsyncWritable `write` method."""
+        assert concurrency == 4
+        return 3
+
+    backend = async_es_backend()
+    monkeypatch.setattr(AsyncWritable, "write", mock_write)
+    assert await backend.write([b"bar"], concurrency=4) == 3
+
+
+@pytest.mark.anyio
 async def test_backends_data_async_mongo_write_with_target(
     mongo,
     async_mongo_backend,
@@ -899,7 +919,7 @@ async def test_backends_data_async_mongo_write_with_append_operation(
     `operation_type`, should raise a `BackendParameterException`.
     """
     backend = async_mongo_backend()
-    msg = "Append operation_type is not allowed."
+    msg = "Append operation_type is not allowed"
     with pytest.raises(BackendParameterException, match=msg):
         with caplog.at_level(logging.ERROR):
             await backend.write(data=[], operation_type=BaseOperationType.APPEND)
@@ -1008,7 +1028,7 @@ async def test_backends_data_async_mongo_write_with_no_data(
     with caplog.at_level(logging.INFO):
         assert await backend.write(data=[]) == 0
 
-    msg = "Data Iterator is empty; skipping write to target."
+    msg = "Data Iterator is empty; skipping write to target"
     assert (
         "ralph.backends.data.async_mongo",
         logging.INFO,
