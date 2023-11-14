@@ -226,7 +226,9 @@ def test_backends_data_s3_list_with_failed_connection_should_log_the_error(
 
 
 @mock_s3
+@pytest.mark.parametrize("greedy", [False, True])
 def test_backends_data_s3_read_with_valid_name_should_write_to_history(
+    greedy,
     s3_backend,
     monkeypatch,
 ):
@@ -267,6 +269,7 @@ def test_backends_data_s3_read_with_valid_name_should_write_to_history(
             target=bucket_name,
             chunk_size=1000,
             raw_output=True,
+            greedy=greedy,
         )
     )
 
@@ -278,12 +281,7 @@ def test_backends_data_s3_read_with_valid_name_should_write_to_history(
         "timestamp": freezed_now,
     } in backend.history
 
-    list(
-        backend.read(
-            query="2022-09-30.gz",
-            raw_output=False,
-        )
-    )
+    list(backend.read(query="2022-09-30.gz", raw_output=False, greedy=greedy))
 
     assert {
         "backend": "s3",

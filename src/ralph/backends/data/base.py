@@ -279,6 +279,7 @@ class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
+        greedy: bool = False,
         max_statements: Optional[PositiveInt] = None,
     ) -> Union[Iterator[bytes], Iterator[dict]]:
         """Read records matching the `query` in the `target` container and yield them.
@@ -298,6 +299,10 @@ class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
             ignore_errors (bool): If `True`, encoding errors during the read operation
                 will be ignored and logged.
                 If `False` (default), a `BackendException` is raised on any error.
+            greedy: If set to `True`, the client will fetch all available records
+                before they are yielded by the generator. Caution:
+                this might potentially lead to large amounts of API calls and to the
+                memory filling up.
             max_statements (int): The maximum number of statements to yield.
                 If `None` (default), there is no maximum.
 
@@ -310,6 +315,19 @@ class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
                 during encoding records and `ignore_errors` is set to `False`.
             BackendParameterException: If a backend argument value is not valid.
         """
+        if greedy:
+            yield from list(
+                self.read(
+                    query,
+                    target,
+                    chunk_size,
+                    raw_output,
+                    ignore_errors,
+                    False,
+                    max_statements,
+                )
+            )
+            return
         chunk_size = chunk_size if chunk_size else self.settings.READ_CHUNK_SIZE
         query = validate_backend_query(query, self.query_class, self.logger)
         reader = self._read_bytes if raw_output else self._read_dicts
@@ -318,10 +336,14 @@ class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
             yield from statements
             return
 
+        if not max_statements:
+            return
+
+        max_statements -= 1
         for i, statement in enumerate(statements):
+            yield statement
             if i >= max_statements:
                 return
-            yield statement
 
     @abstractmethod
     def _read_bytes(
@@ -507,6 +529,7 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
+        greedy: bool = False,
         max_statements: Optional[PositiveInt] = None,
     ) -> Union[AsyncIterator[bytes], AsyncIterator[dict]]:
         """Read records matching the `query` in the `target` container and yield them.
@@ -526,6 +549,10 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
             ignore_errors (bool): If `True`, encoding errors during the read operation
                 will be ignored and logged.
                 If `False` (default), a `BackendException` is raised on any error.
+            greedy: If set to `True`, the client will fetch all available records
+                before they are yielded by the generator. Caution:
+                this might potentially lead to large amounts of API calls and to the
+                memory filling up.
             max_statements (int): The maximum number of statements to yield.
                 If `None` (default), there is no maximum.
 
@@ -538,6 +565,25 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
                 during encoding records and `ignore_errors` is set to `False`.
             BackendParameterException: If a backend argument value is not valid.
         """
+        if greedy:
+            greedy_statements = [
+                statement
+                async for statement in self.read(
+                    query,
+                    target,
+                    chunk_size,
+                    raw_output,
+                    ignore_errors,
+                    False,
+                    max_statements,
+                )
+            ]
+
+            for greedy_statement in greedy_statements:
+                yield greedy_statement
+
+            return
+
         chunk_size = chunk_size if chunk_size else self.settings.READ_CHUNK_SIZE
         query = validate_backend_query(query, self.query_class, self.logger)
         reader = self._read_bytes if raw_output else self._read_dicts
@@ -546,12 +592,16 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
             async for statement in statements:
                 yield statement
             return
+
+        if not max_statements:
+            return
+
         i = 0
         async for statement in statements:
-            if i >= max_statements:
-                return
             yield statement
             i += 1
+            if i >= max_statements:
+                return
 
     @abstractmethod
     async def _read_bytes(

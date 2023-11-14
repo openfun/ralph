@@ -358,13 +358,14 @@ def test_backends_data_es_read_with_ignore_errors(es, es_backend, monkeypatch, c
     backend.close()
 
 
-def test_backends_data_es_read_with_raw_ouput(es, es_backend):
+@pytest.mark.parametrize("greedy", [False, True])
+def test_backends_data_es_read_with_raw_ouput(greedy, es, es_backend):
     """Test the `ESDataBackend.read` method with `raw_output` set to `True`."""
 
     backend = es_backend()
     documents = [{"id": idx, "timestamp": now()} for idx in range(10)]
     assert backend.write(documents) == 10
-    hits = list(backend.read(raw_output=True))
+    hits = list(backend.read(raw_output=True, greedy=greedy))
     for i, hit in enumerate(hits):
         assert isinstance(hit, bytes)
         assert json.loads(hit).get("_source") == documents[i]
@@ -372,13 +373,14 @@ def test_backends_data_es_read_with_raw_ouput(es, es_backend):
     backend.close()
 
 
-def test_backends_data_es_read_without_raw_ouput(es, es_backend):
+@pytest.mark.parametrize("greedy", [False, True])
+def test_backends_data_es_read_without_raw_ouput(greedy, es, es_backend):
     """Test the `ESDataBackend.read` method with `raw_output` set to `False`."""
 
     backend = es_backend()
     documents = [{"id": idx, "timestamp": now()} for idx in range(10)]
     assert backend.write(documents) == 10
-    hits = backend.read()
+    hits = backend.read(greedy=greedy)
     for i, hit in enumerate(hits):
         assert isinstance(hit, dict)
         assert hit.get("_source") == documents[i]

@@ -199,6 +199,7 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
+        greedy: bool = False,
         max_statements: Optional[PositiveInt] = None,
     ) -> Union[Iterator[bytes], Iterator[dict]]:
         """Read documents matching the query in the target index and yield them.
@@ -214,6 +215,10 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
             raw_output (bool): Controls whether to yield dictionaries or bytes.
             ignore_errors (bool): No impact as encoding errors are not expected in
                 Elasticsearch results.
+            greedy: If set to `True`, the client will fetch all available records
+                before they are yielded by the generator. Caution:
+                this might potentially lead to large amounts of API calls and to the
+                memory filling up.
             max_statements (int): The maximum number of statements to yield.
                 If `None` (default), there is no maximum.
 
@@ -225,7 +230,7 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
             BackendException: If a failure occurs during Elasticsearch connection.
         """
         yield from super().read(
-            query, target, chunk_size, raw_output, ignore_errors, max_statements
+            query, target, chunk_size, raw_output, ignore_errors, greedy, max_statements
         )
 
     def _read_bytes(

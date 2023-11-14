@@ -158,6 +158,56 @@ def test_backends_data_base_read_with_max_statements():
     assert not list(backend.read(max_statements=0, raw_output=True))
 
 
+def test_backends_data_base_read_with_greedy():
+    """Test the `BaseDataBackend.read` method with `greedy` argument."""
+
+    def get_mock_read_dicts(data):
+        """Return a `_read_dict` mock method yielding data."""
+
+        def mock_read_dicts(self, *args):
+            """Mock the `BaseDataBackend._read_dicts` method yielding data."""
+            for item in data:
+                yield item
+
+        return mock_read_dicts
+
+    class MockBaseDataBackend(BaseDataBackend[BaseDataBackendSettings, BaseQuery]):
+        """A class mocking the base database class."""
+
+        def _read_dicts(self, *args):
+            pass
+
+        def _read_bytes(self, *args):
+            pass
+
+        def status(self):
+            pass
+
+        def close(self):
+            pass
+
+    backend = MockBaseDataBackend()
+    # Given `greedy` set to `False`, the `read` method should consume data on demand.
+    data = ({"foo": "bar"} for _ in range(4))
+    backend._read_dicts = get_mock_read_dicts(data)
+    assert next(backend.read()) == {"foo": "bar"}
+    assert len(list(data)) == 3  # one item was requested - one item was consumed.
+
+    # Given `greedy` set to `True`, the `read` method should consume all data.
+    data = ({"foo": "bar"} for _ in range(4))
+    backend._read_dicts = get_mock_read_dicts(data)
+    assert next(backend.read(greedy=True)) == {"foo": "bar"}
+    assert not list(data)  # all items are consumed.
+
+    # Given `greedy` set to `True` and a `max_statements` limit, the `read` method
+    # should consume all data until reaching `max_statements`.
+    data = ({"foo": "bar"} for _ in range(4))
+    backend._read_dicts = get_mock_read_dicts(data)
+    statements = backend.read(greedy=True, max_statements=3)
+    assert next(statements) == {"foo": "bar"}
+    assert list(data) == [{"foo": "bar"}]  # 3 items are consumed.
+
+
 @pytest.mark.anyio
 async def test_backends_data_base_async_read_with_max_statements():
     """Test the async `BaseDataBackend.read` method with `max_statements` argument."""

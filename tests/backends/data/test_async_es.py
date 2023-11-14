@@ -398,13 +398,16 @@ async def test_backends_data_async_es_read_with_ignore_errors(
 
 
 @pytest.mark.anyio
-async def test_backends_data_async_es_read_with_raw_ouput(es, async_es_backend):
+@pytest.mark.parametrize("greedy", [False, True])
+async def test_backends_data_async_es_read_with_raw_ouput(greedy, es, async_es_backend):
     """Test the `AsyncESDataBackend.read` method with `raw_output` set to `True`."""
 
     backend = async_es_backend()
     documents = [{"id": idx, "timestamp": now()} for idx in range(10)]
     assert await backend.write(documents) == 10
-    hits = [statement async for statement in backend.read(raw_output=True)]
+    hits = [
+        statement async for statement in backend.read(raw_output=True, greedy=greedy)
+    ]
     for i, hit in enumerate(hits):
         assert isinstance(hit, bytes)
         assert json.loads(hit).get("_source") == documents[i]
@@ -413,13 +416,16 @@ async def test_backends_data_async_es_read_with_raw_ouput(es, async_es_backend):
 
 
 @pytest.mark.anyio
-async def test_backends_data_async_es_read_without_raw_ouput(es, async_es_backend):
+@pytest.mark.parametrize("greedy", [False, True])
+async def test_backends_data_async_es_read_without_raw_ouput(
+    greedy, es, async_es_backend
+):
     """Test the `AsyncESDataBackend.read` method with `raw_output` set to `False`."""
 
     backend = async_es_backend()
     documents = [{"id": idx, "timestamp": now()} for idx in range(10)]
     assert await backend.write(documents) == 10
-    hits = [statement async for statement in backend.read()]
+    hits = [statement async for statement in backend.read(greedy=greedy)]
     for i, hit in enumerate(hits):
         assert isinstance(hit, dict)
         assert hit.get("_source") == documents[i]

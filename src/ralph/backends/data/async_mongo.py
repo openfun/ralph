@@ -123,6 +123,7 @@ class AsyncMongoDataBackend(
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
+        greedy: bool = False,
         max_statements: Optional[PositiveInt] = None,
     ) -> Union[AsyncIterator[bytes], AsyncIterator[dict]]:
         """Read documents matching the `query` from `target` collection and yield them.
@@ -137,6 +138,10 @@ class AsyncMongoDataBackend(
             ignore_errors (bool): If `True`, encoding errors during the read operation
                 will be ignored and logged.
                 If `False` (default), a `BackendException` is raised on any error.
+            greedy: If set to `True`, the client will fetch all available records
+                before they are yielded by the generator. Caution:
+                this might potentially lead to large amounts of API calls and to the
+                memory filling up.
             max_statements (int): The maximum number of statements to yield.
                 If `None` (default), there is no maximum.
 
@@ -150,7 +155,7 @@ class AsyncMongoDataBackend(
             BackendParameterException: If the `target` is not a valid collection name.
         """
         statements = super().read(
-            query, target, chunk_size, raw_output, ignore_errors, max_statements
+            query, target, chunk_size, raw_output, ignore_errors, greedy, max_statements
         )
         async for statement in statements:
             yield statement
