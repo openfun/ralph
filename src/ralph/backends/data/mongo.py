@@ -52,8 +52,9 @@ class MongoDataBackendSettings(BaseDataBackendSettings):
         DEFAULT_DATABASE (str): The MongoDB database to connect to.
         DEFAULT_COLLECTION (str): The MongoDB database collection to get objects from.
         CLIENT_OPTIONS (MongoClientOptions): A dictionary of MongoDB client options.
-        DEFAULT_CHUNK_SIZE (int): The default chunk size to use when none is provided.
         LOCALE_ENCODING (str): The locale encoding to use when none is provided.
+        READ_CHUNK_SIZE (int): The default chunk size for reading batches of documents.
+        WRITE_CHUNK_SIZE (int): The default chunk size for writing batches of documents.
     """
 
     class Config(BaseSettingsConfig):
@@ -186,7 +187,7 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
             target (str or None): The MongoDB collection name to query.
                 If target is `None`, the `DEFAULT_COLLECTION` is used instead.
             chunk_size (int or None): The chunk size when reading archives by batch.
-                If chunk_size is `None` the `DEFAULT_CHUNK_SIZE` is used instead.
+                If `chunk_size` is `None` it defaults to `READ_CHUNK_SIZE`.
             raw_output (bool): Whether to yield dictionaries or bytes.
             ignore_errors (bool): If `True`, encoding errors during the read operation
                 will be ignored and logged.
@@ -252,7 +253,7 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
             data (Iterable or IOBase): The data containing documents to write.
             target (str or None): The target MongoDB collection name.
             chunk_size (int or None): The number of documents to write in one batch.
-                If chunk_size is `None` the `DEFAULT_CHUNK_SIZE` is used instead.
+                If `chunk_size` is `None` it defaults to `WRITE_CHUNK_SIZE`.
             ignore_errors (bool):  If `True`, errors during decoding, encoding and
                 sending batches of documents are ignored and logged.
                 If `False` (default), a `BackendException` is raised on any error.

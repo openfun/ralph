@@ -31,8 +31,9 @@ def test_backends_data_ldp_default_instantiation(monkeypatch, fs):
         "DEFAULT_STREAM_ID",
         "ENDPOINT",
         "SERVICE_NAME",
+        "READ_CHUNK_SIZE",
         "REQUEST_TIMEOUT",
-        "DEFAULT_CHUNK_SIZE",
+        "WRITE_CHUNK_SIZE",
     ]
     for name in backend_settings_names:
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__LDP__{name}", raising=False)
@@ -49,7 +50,8 @@ def test_backends_data_ldp_default_instantiation(monkeypatch, fs):
     monkeypatch.setenv("RALPH_BACKENDS__DATA__LDP__SERVICE_NAME", "foo")
     backend = LDPDataBackend()
     assert backend.service_name == "foo"
-    assert backend.settings.DEFAULT_CHUNK_SIZE == 4096
+    assert backend.settings.READ_CHUNK_SIZE == 4096
+    assert backend.settings.WRITE_CHUNK_SIZE == 500
 
 
 def test_backends_data_ldp_instantiation_with_settings(ldp_backend):
@@ -58,7 +60,8 @@ def test_backends_data_ldp_instantiation_with_settings(ldp_backend):
     assert isinstance(backend.client, ovh.Client)
     assert backend.service_name == "foo"
     assert backend.stream_id == "bar"
-    assert backend.settings.DEFAULT_CHUNK_SIZE == 500
+    assert backend.settings.READ_CHUNK_SIZE == 500
+    assert backend.settings.WRITE_CHUNK_SIZE == 499
 
     try:
         ldp_backend(service_name="bar")

@@ -28,11 +28,11 @@ from ralph.backends.data.clickhouse import (
     ClickHouseDataBackend,
 )
 from ralph.backends.data.es import ESDataBackend
-from ralph.backends.data.fs import FSDataBackend, FSDataBackendSettings
+from ralph.backends.data.fs import FSDataBackend
 from ralph.backends.data.ldp import LDPDataBackend
 from ralph.backends.data.mongo import MongoDataBackend
-from ralph.backends.data.s3 import S3DataBackend, S3DataBackendSettings
-from ralph.backends.data.swift import SwiftDataBackend, SwiftDataBackendSettings
+from ralph.backends.data.s3 import S3DataBackend
+from ralph.backends.data.swift import SwiftDataBackend
 from ralph.backends.lrs.async_es import AsyncESLRSBackend
 from ralph.backends.lrs.async_mongo import AsyncMongoLRSBackend
 from ralph.backends.lrs.clickhouse import ClickHouseLRSBackend
@@ -120,12 +120,13 @@ def get_async_es_test_backend(index: str = ES_TEST_INDEX):
     settings = AsyncESLRSBackend.settings_class(
         ALLOW_YELLOW_STATUS=False,
         CLIENT_OPTIONS={"ca_certs": None, "verify_certs": None},
-        DEFAULT_CHUNK_SIZE=500,
         DEFAULT_INDEX=index,
         HOSTS=ES_TEST_HOSTS,
         LOCALE_ENCODING="utf8",
         POINT_IN_TIME_KEEP_ALIVE="1m",
+        READ_CHUNK_SIZE=500,
         REFRESH_AFTER_WRITE=True,
+        WRITE_CHUNK_SIZE=499,
     )
     return AsyncESLRSBackend(settings)
 
@@ -153,8 +154,9 @@ def get_async_mongo_test_backend(
         DEFAULT_DATABASE=MONGO_TEST_DATABASE,
         DEFAULT_COLLECTION=default_collection,
         CLIENT_OPTIONS=client_options if client_options else {},
-        DEFAULT_CHUNK_SIZE=500,
         LOCALE_ENCODING="utf8",
+        READ_CHUNK_SIZE=500,
+        WRITE_CHUNK_SIZE=499,
     )
     return AsyncMongoLRSBackend(settings)
 
@@ -201,11 +203,12 @@ def fs_backend(fs, settings_fs):
 
     def get_fs_data_backend(path: str = "foo"):
         """Return an instance of `FSDataBackend`."""
-        settings = FSDataBackendSettings(
-            DEFAULT_CHUNK_SIZE=1024,
+        settings = FSDataBackend.settings_class(
             DEFAULT_DIRECTORY_PATH=path,
             DEFAULT_QUERY_STRING="*",
             LOCALE_ENCODING="utf8",
+            READ_CHUNK_SIZE=1024,
+            WRITE_CHUNK_SIZE=999,
         )
         return FSDataBackend(settings)
 
@@ -221,10 +224,11 @@ def fs_lrs_backend(fs, settings_fs):
     def get_fs_lrs_backend(path: str = "foo"):
         """Return an instance of FSLRSBackend."""
         settings = FSLRSBackend.settings_class(
-            DEFAULT_CHUNK_SIZE=1024,
             DEFAULT_DIRECTORY_PATH=path,
             DEFAULT_QUERY_STRING="*",
             LOCALE_ENCODING="utf8",
+            READ_CHUNK_SIZE=1024,
+            WRITE_CHUNK_SIZE=999,
         )
         return FSLRSBackend(settings)
 
@@ -252,8 +256,9 @@ def async_mongo_backend():
             DEFAULT_DATABASE=MONGO_TEST_DATABASE,
             DEFAULT_COLLECTION=default_collection,
             CLIENT_OPTIONS=client_options if client_options else {},
-            DEFAULT_CHUNK_SIZE=500,
             LOCALE_ENCODING="utf8",
+            READ_CHUNK_SIZE=500,
+            WRITE_CHUNK_SIZE=499,
         )
         return AsyncMongoDataBackend(settings)
 
@@ -315,8 +320,9 @@ def mongo_backend():
             DEFAULT_DATABASE=MONGO_TEST_DATABASE,
             DEFAULT_COLLECTION=default_collection,
             CLIENT_OPTIONS=client_options if client_options else {},
-            DEFAULT_CHUNK_SIZE=500,
             LOCALE_ENCODING="utf8",
+            READ_CHUNK_SIZE=500,
+            WRITE_CHUNK_SIZE=499,
         )
         return MongoDataBackend(settings)
 
@@ -338,8 +344,9 @@ def mongo_lrs_backend():
             DEFAULT_DATABASE=MONGO_TEST_DATABASE,
             DEFAULT_COLLECTION=default_collection,
             CLIENT_OPTIONS=client_options if client_options else {},
-            DEFAULT_CHUNK_SIZE=500,
             LOCALE_ENCODING="utf8",
+            READ_CHUNK_SIZE=500,
+            WRITE_CHUNK_SIZE=499,
         )
         return MongoLRSBackend(settings)
 
@@ -490,7 +497,8 @@ def ldp_backend(settings_fs):
             ENDPOINT="ovh-eu",
             SERVICE_NAME=service_name,
             REQUEST_TIMEOUT=None,
-            DEFAULT_CHUNK_SIZE=500,
+            READ_CHUNK_SIZE=500,
+            WRITE_CHUNK_SIZE=499,
         )
         return LDPDataBackend(settings)
 
@@ -506,11 +514,12 @@ def async_es_backend():
         settings = AsyncESDataBackend.settings_class(
             ALLOW_YELLOW_STATUS=False,
             CLIENT_OPTIONS={"ca_certs": None, "verify_certs": None},
-            DEFAULT_CHUNK_SIZE=500,
             DEFAULT_INDEX=ES_TEST_INDEX,
             HOSTS=ES_TEST_HOSTS,
             LOCALE_ENCODING="utf8",
+            READ_CHUNK_SIZE=500,
             REFRESH_AFTER_WRITE=True,
+            WRITE_CHUNK_SIZE=499,
         )
         return AsyncESDataBackend(settings)
 
@@ -542,8 +551,9 @@ def clickhouse_backend():
             CLIENT_OPTIONS={
                 "date_time_input_format": "best_effort",
             },
-            DEFAULT_CHUNK_SIZE=500,
             LOCALE_ENCODING="utf8",
+            READ_CHUNK_SIZE=500,
+            WRITE_CHUNK_SIZE=499,
         )
         return ClickHouseDataBackend(settings)
 
@@ -566,9 +576,10 @@ def clickhouse_lrs_backend():
             CLIENT_OPTIONS={
                 "date_time_input_format": "best_effort",
             },
-            DEFAULT_CHUNK_SIZE=500,
             LOCALE_ENCODING="utf8",
             IDS_CHUNK_SIZE=10000,
+            READ_CHUNK_SIZE=500,
+            WRITE_CHUNK_SIZE=499,
         )
         return ClickHouseLRSBackend(settings)
 
@@ -584,11 +595,12 @@ def es_backend():
         settings = ESDataBackend.settings_class(
             ALLOW_YELLOW_STATUS=False,
             CLIENT_OPTIONS={"ca_certs": None, "verify_certs": None},
-            DEFAULT_CHUNK_SIZE=500,
             DEFAULT_INDEX=ES_TEST_INDEX,
             HOSTS=ES_TEST_HOSTS,
             LOCALE_ENCODING="utf8",
+            READ_CHUNK_SIZE=500,
             REFRESH_AFTER_WRITE=True,
+            WRITE_CHUNK_SIZE=499,
         )
         return ESDataBackend(settings)
 
@@ -604,12 +616,13 @@ def es_lrs_backend():
         settings = ESLRSBackend.settings_class(
             ALLOW_YELLOW_STATUS=False,
             CLIENT_OPTIONS={"ca_certs": None, "verify_certs": None},
-            DEFAULT_CHUNK_SIZE=500,
             DEFAULT_INDEX=index,
             HOSTS=ES_TEST_HOSTS,
             LOCALE_ENCODING="utf8",
             POINT_IN_TIME_KEEP_ALIVE="1m",
+            READ_CHUNK_SIZE=500,
             REFRESH_AFTER_WRITE=True,
+            WRITE_CHUNK_SIZE=499,
         )
         return ESLRSBackend(settings)
 
@@ -622,7 +635,7 @@ def swift_backend():
 
     def get_swift_data_backend():
         """Return an instance of SwiftDataBackend."""
-        settings = SwiftDataBackendSettings(
+        settings = SwiftDataBackend.settings_class(
             AUTH_URL="https://auth.cloud.ovh.net/",
             USERNAME="os_username",
             PASSWORD="os_password",
@@ -635,7 +648,8 @@ def swift_backend():
             USER_DOMAIN_NAME="Default",
             DEFAULT_CONTAINER="container_name",
             LOCALE_ENCODING="utf8",
-            DEFAULT_CHUNK_SIZE=500,
+            READ_CHUNK_SIZE=500,
+            WRITE_CHUNK_SIZE=499,
         )
         return SwiftDataBackend(settings)
 
@@ -657,15 +671,16 @@ def s3_backend():
 
     def get_s3_data_backend():
         """Return an instance of S3DataBackend."""
-        settings = S3DataBackendSettings(
+        settings = S3DataBackend.settings_class(
             ACCESS_KEY_ID="access_key_id",
             SECRET_ACCESS_KEY="secret_access_key",
             SESSION_TOKEN="session_token",
             ENDPOINT_URL=None,
             DEFAULT_REGION="default-region",
             DEFAULT_BUCKET_NAME="bucket_name",
-            DEFAULT_CHUNK_SIZE=4096,
             LOCALE_ENCODING="utf8",
+            READ_CHUNK_SIZE=4096,
+            WRITE_CHUNK_SIZE=3999,
         )
         return S3DataBackend(settings)
 

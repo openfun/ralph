@@ -34,7 +34,7 @@ def test_backends_data_mongo_default_instantiation(monkeypatch, fs):
         "DEFAULT_DATABASE",
         "DEFAULT_COLLECTION",
         "CLIENT_OPTIONS",
-        "DEFAULT_CHUNK_SIZE",
+        "READ_CHUNK_SIZE",
         "LOCALE_ENCODING",
     ]
     for name in backend_settings_names:
@@ -50,8 +50,9 @@ def test_backends_data_mongo_default_instantiation(monkeypatch, fs):
     assert backend.collection.name == "marsha"
     assert backend.settings.CONNECTION_URI == "mongodb://localhost:27017/"
     assert backend.settings.CLIENT_OPTIONS == MongoClientOptions()
-    assert backend.settings.DEFAULT_CHUNK_SIZE == 500
     assert backend.settings.LOCALE_ENCODING == "utf8"
+    assert backend.settings.READ_CHUNK_SIZE == 500
+    assert backend.settings.WRITE_CHUNK_SIZE == 500
 
     # Test overriding default values with environment variables.
     monkeypatch.setenv("RALPH_BACKENDS__DATA__MONGO__CLIENT_OPTIONS__tz_aware", True)
@@ -67,16 +68,18 @@ def test_backends_data_mongo_instantiation_with_settings():
         DEFAULT_DATABASE=MONGO_TEST_DATABASE,
         DEFAULT_COLLECTION="foo",
         CLIENT_OPTIONS={"tz_aware": "True"},
-        DEFAULT_CHUNK_SIZE=1000,
         LOCALE_ENCODING="utf8",
+        READ_CHUNK_SIZE=1000,
+        WRITE_CHUNK_SIZE=999,
     )
     backend = MongoDataBackend(settings)
     assert backend.database.name == MONGO_TEST_DATABASE
     assert backend.collection.name == "foo"
     assert backend.settings.CONNECTION_URI == MONGO_TEST_CONNECTION_URI
     assert backend.settings.CLIENT_OPTIONS == MongoClientOptions(tz_aware=True)
-    assert backend.settings.DEFAULT_CHUNK_SIZE == 1000
     assert backend.settings.LOCALE_ENCODING == "utf8"
+    assert backend.settings.READ_CHUNK_SIZE == 1000
+    assert backend.settings.WRITE_CHUNK_SIZE == 999
 
     try:
         MongoDataBackend(settings)

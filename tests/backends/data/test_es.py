@@ -40,12 +40,13 @@ def test_backends_data_es_default_instantiation(monkeypatch, fs):
         "CLIENT_OPTIONS",
         "CLIENT_OPTIONS__ca_certs",
         "CLIENT_OPTIONS__verify_certs",
-        "DEFAULT_CHUNK_SIZE",
         "DEFAULT_INDEX",
         "HOSTS",
         "LOCALE_ENCODING",
         "POINT_IN_TIME_KEEP_ALIVE",
+        "READ_CHUNK_SIZE",
         "REFRESH_AFTER_WRITE",
+        "WRITE_CHUNK_SIZE",
     ]
     for name in backend_settings_names:
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__ES__{name}", raising=False)
@@ -57,12 +58,13 @@ def test_backends_data_es_default_instantiation(monkeypatch, fs):
     backend = ESDataBackend()
     assert not backend.settings.ALLOW_YELLOW_STATUS
     assert backend.settings.CLIENT_OPTIONS == ESClientOptions()
-    assert backend.settings.DEFAULT_CHUNK_SIZE == 500
     assert backend.settings.DEFAULT_INDEX == "statements"
     assert backend.settings.HOSTS == ("http://localhost:9200",)
     assert backend.settings.LOCALE_ENCODING == "utf8"
     assert backend.settings.POINT_IN_TIME_KEEP_ALIVE == "1m"
+    assert backend.settings.READ_CHUNK_SIZE == 500
     assert not backend.settings.REFRESH_AFTER_WRITE
+    assert backend.settings.WRITE_CHUNK_SIZE == 500
     assert isinstance(backend.client, Elasticsearch)
     elasticsearch_node = backend.client.transport.node_pool.get()
     assert elasticsearch_node.config.ca_certs is None
@@ -84,24 +86,26 @@ def test_backends_data_es_instantiation_with_settings():
     settings = ESDataBackendSettings(
         ALLOW_YELLOW_STATUS=True,
         CLIENT_OPTIONS={"verify_certs": True, "ca_certs": "/path/to/ca/bundle"},
-        DEFAULT_CHUNK_SIZE=5000,
         DEFAULT_INDEX=ES_TEST_INDEX,
         HOSTS=["https://elasticsearch_hostname:9200"],
         LOCALE_ENCODING="utf-16",
         POINT_IN_TIME_KEEP_ALIVE="5m",
+        READ_CHUNK_SIZE=5000,
         REFRESH_AFTER_WRITE=True,
+        WRITE_CHUNK_SIZE=4999,
     )
     backend = ESDataBackend(settings)
     assert backend.settings.ALLOW_YELLOW_STATUS
     assert backend.settings.CLIENT_OPTIONS == ESClientOptions(
         verify_certs=True, ca_certs="/path/to/ca/bundle"
     )
-    assert backend.settings.DEFAULT_CHUNK_SIZE == 5000
     assert backend.settings.DEFAULT_INDEX == ES_TEST_INDEX
     assert backend.settings.HOSTS == ("https://elasticsearch_hostname:9200",)
     assert backend.settings.LOCALE_ENCODING == "utf-16"
     assert backend.settings.POINT_IN_TIME_KEEP_ALIVE == "5m"
+    assert backend.settings.READ_CHUNK_SIZE == 5000
     assert backend.settings.REFRESH_AFTER_WRITE
+    assert backend.settings.WRITE_CHUNK_SIZE == 4999
     assert isinstance(backend.client, Elasticsearch)
     elasticsearch_node = backend.client.transport.node_pool.get()
     assert elasticsearch_node.config.ca_certs == Path("/path/to/ca/bundle")
