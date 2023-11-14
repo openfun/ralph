@@ -2,6 +2,7 @@
 
 import logging
 from abc import ABC, abstractmethod
+from asyncio import Queue, create_task
 from enum import Enum, unique
 from functools import cached_property
 from io import IOBase
@@ -299,7 +300,7 @@ class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
                 will be ignored and logged.
                 If `False` (default), a `BackendException` is raised on any error.
             max_statements (int): The maximum number of statements to yield.
-                If `None` (default), there is no maximum.
+                If `None` (default) or `0`, there is no maximum.
 
         Yield:
             dict: If `raw_output` is False.
@@ -314,14 +315,15 @@ class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
         query = validate_backend_query(query, self.query_class, self.logger)
         reader = self._read_bytes if raw_output else self._read_dicts
         statements = reader(query, target, chunk_size, ignore_errors)
-        if max_statements is None:
+        if not max_statements:
             yield from statements
             return
 
+        max_statements -= 1
         for i, statement in enumerate(statements):
+            yield statement
             if i >= max_statements:
                 return
-            yield statement
 
     @abstractmethod
     def _read_bytes(
@@ -507,6 +509,7 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
+        prefetch: Optional[PositiveInt] = None,
         max_statements: Optional[PositiveInt] = None,
     ) -> Union[AsyncIterator[bytes], AsyncIterator[dict]]:
         """Read records matching the `query` in the `target` container and yield them.
@@ -526,8 +529,11 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
             ignore_errors (bool): If `True`, encoding errors during the read operation
                 will be ignored and logged.
                 If `False` (default), a `BackendException` is raised on any error.
+            prefetch (int): The number of records to prefetch (queue) while yielding.
+                If `prefetch` is `None` it defaults to `1`, i.e. no records are
+                prefetched.
             max_statements (int): The maximum number of statements to yield.
-                If `None` (default), there is no maximum.
+                If `None` (default) or `0`, there is no maximum.
 
         Yield:
             dict: If `raw_output` is False.
@@ -538,20 +544,50 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
                 during encoding records and `ignore_errors` is set to `False`.
             BackendParameterException: If a backend argument value is not valid.
         """
+        prefetch = prefetch if prefetch else 1
+        if prefetch < 1:
+            msg = "prefetch must be a strictly positive integer"
+            self.logger.error(msg)
+            raise BackendParameterException(msg)
+
+        if prefetch > 1:
+            queue = Queue(prefetch - 1)
+            statements = self.read(
+                query,
+                target,
+                chunk_size,
+                raw_output,
+                ignore_errors,
+                None,
+                max_statements,
+            )
+            task = create_task(self._queue_records(queue, statements))
+            while True:
+                statement = await queue.get()
+                if statement is None:
+                    error = task.exception()
+                    if error:
+                        raise error
+
+                    return
+
+                yield statement
+
         chunk_size = chunk_size if chunk_size else self.settings.READ_CHUNK_SIZE
         query = validate_backend_query(query, self.query_class, self.logger)
         reader = self._read_bytes if raw_output else self._read_dicts
         statements = reader(query, target, chunk_size, ignore_errors)
-        if max_statements is None:
+        if not max_statements:
             async for statement in statements:
                 yield statement
             return
+
         i = 0
         async for statement in statements:
-            if i >= max_statements:
-                return
             yield statement
             i += 1
+            if i >= max_statements:
+                return
 
     @abstractmethod
     async def _read_bytes(
@@ -572,6 +608,20 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
         Raise:
             BackendException: If a failure occurs during the close operation.
         """
+
+    async def _queue_records(
+        self, queue: Queue, records: Union[AsyncIterator[bytes], AsyncIterator[dict]]
+    ):
+        """Iterate over the `records` and put them into the `queue`."""
+        try:
+            async for record in records:
+                await queue.put(record)
+        except Exception as error:
+            # None signals that the queue is done
+            await queue.put(None)
+            raise error
+
+        await queue.put(None)
 
 
 def get_backend_generic_argument(

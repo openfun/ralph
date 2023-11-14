@@ -215,7 +215,7 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
             ignore_errors (bool): No impact as encoding errors are not expected in
                 Elasticsearch results.
             max_statements (int): The maximum number of statements to yield.
-                If `None` (default), there is no maximum.
+                If `None` (default) or `0`, there is no maximum.
 
         Yield:
             bytes: The next raw document if `raw_output` is True.
