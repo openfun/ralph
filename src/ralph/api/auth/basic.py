@@ -9,7 +9,7 @@ from typing import Any, Iterator, List, Optional
 import bcrypt
 from cachetools import TTLCache, cached
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBasic, HTTPBasicCredentials, SecurityScopes
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel, root_validator
 from starlette.authentication import AuthenticationError
 
@@ -102,17 +102,15 @@ def get_stored_credentials(auth_file: Path) -> ServerUsersCredentials:
 @cached(
     TTLCache(maxsize=settings.AUTH_CACHE_MAX_SIZE, ttl=settings.AUTH_CACHE_TTL),
     lock=Lock(),
-    key=lambda credentials, security_scopes: (
+    key=lambda credentials: (
         credentials.username,
         credentials.password,
-        security_scopes.scope_str,
     )
     if credentials is not None
     else None,
 )
 def get_basic_auth_user(
     credentials: Optional[HTTPBasicCredentials] = Depends(security),
-    security_scopes: SecurityScopes = SecurityScopes([]),
 ) -> AuthenticatedUser:
     """Check valid auth parameters.
 
@@ -121,18 +119,13 @@ def get_basic_auth_user(
 
     Args:
         credentials (iterator): auth parameters from the Authorization header
-        security_scopes: scopes requested for access
 
     Raises:
         HTTPException
     """
     if not credentials:
-        logger.error("The basic authentication mode requires a Basic Auth header")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Basic"},
-        )
+        logger.debug("No credentials were found for Basic auth")
+        return None
 
     try:
         user = next(
@@ -185,13 +178,4 @@ def get_basic_auth_user(
 
     user = AuthenticatedUser(scopes=user.scopes, agent=dict(user.agent))
 
-    # Restrict access by scopes
-    if settings.LRS_RESTRICT_BY_SCOPES:
-        for requested_scope in security_scopes.scopes:
-            if not user.scopes.is_authorized(requested_scope):
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail=f'Access not authorized to scope: "{requested_scope}".',
-                    headers={"WWW-Authenticate": "Basic"},
-                )
     return user

@@ -6,7 +6,7 @@ from typing import Dict, Optional
 
 import requests
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OpenIdConnect, SecurityScopes
+from fastapi.security import HTTPBearer, OpenIdConnect
 from jose import ExpiredSignatureError, JWTError, jwt
 from jose.exceptions import JWTClaimsError
 from pydantic import AnyUrl, BaseModel, Extra
@@ -94,8 +94,7 @@ def get_public_keys(jwks_uri: AnyUrl) -> Dict:
 
 
 def get_oidc_user(
-    auth_header: Annotated[Optional[str], Depends(oauth2_scheme)],
-    security_scopes: SecurityScopes = SecurityScopes([]),
+    auth_header: Annotated[Optional[HTTPBearer], Depends(oauth2_scheme)],
 ) -> AuthenticatedUser:
     """Decode and validate OpenId Connect ID token against issuer in config.
 
@@ -110,13 +109,12 @@ def get_oidc_user(
     Raises:
         HTTPException
     """
-    if auth_header is None or "Bearer" not in auth_header:
-        logger.error("The OpenID Connect authentication mode requires a Bearer token")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
+    if auth_header is None or "bearer" not in auth_header.lower():
+        logger.debug(
+            "Not using OIDC auth. The OpenID Connect authentication mode requires a "
+            "Bearer token"
         )
+        return None
 
     id_token = auth_header.split(" ")[-1]
     provider_config = discover_provider(settings.RUNSERVER_AUTH_OIDC_ISSUER_URI)
@@ -150,15 +148,5 @@ def get_oidc_user(
         agent={"openid": f"{id_token.iss}/{id_token.sub}"},
         scopes=UserScopes(id_token.scope.split(" ") if id_token.scope else []),
     )
-
-    # Restrict access by scopes
-    if settings.LRS_RESTRICT_BY_SCOPES:
-        for requested_scope in security_scopes.scopes:
-            if not user.scopes.is_authorized(requested_scope):
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail=f'Access not authorized to scope: "{requested_scope}".',
-                    headers={"WWW-Authenticate": "Basic"},
-                )
 
     return user

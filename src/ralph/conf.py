@@ -4,7 +4,7 @@ import io
 import sys
 from enum import Enum
 from pathlib import Path
-from typing import List, Sequence, Union
+from typing import List, Sequence, Tuple, Union
 
 from pydantic import AnyHttpUrl, AnyUrl, BaseModel, BaseSettings, Extra, root_validator
 
@@ -53,19 +53,19 @@ core_settings = CoreSettings()
 
 
 class CommaSeparatedTuple(str):
-    """Pydantic field type validating comma separated strings or lists/tuples."""
+    """Pydantic field type validating comma-separated strings or lists/tuples."""
 
     @classmethod
     def __get_validators__(cls):  # noqa: D105
         def validate(value: Union[str, Sequence[str]]) -> Sequence[str]:
-            """Check whether the value is a comma separated string or a list/tuple."""
+            """Check whether the value is a comma-separated string or a list/tuple."""
             if isinstance(value, (tuple, list)):
                 return tuple(value)
 
             if isinstance(value, str):
                 return tuple(value.split(","))
 
-            raise TypeError("Invalid comma separated list")
+            raise TypeError("Invalid comma-separated list")
 
         yield validate
 
@@ -133,6 +133,44 @@ class XapiForwardingConfigurationSettings(BaseModel):
     timeout: float
 
 
+class AuthBackend(str, Enum):
+    """Model for valid authentication methods."""
+
+    BASIC = "basic"
+    OIDC = "oidc"
+
+
+class AuthBackends(Tuple[AuthBackend]):
+    """Model representing a tuple of authentication backends."""
+
+    @classmethod
+    def __get_validators__(cls):
+        """Check whether the value is a comma-separated string or a tuple representing
+        an AuthBackend.
+        """  # noqa: D205
+
+        def validate(
+            auth_backends: Union[
+                str, AuthBackend, Tuple[AuthBackend], List[AuthBackend]
+            ]
+        ) -> Tuple[AuthBackend]:
+            """Check whether the value is a comma-separated string or a list/tuple."""
+            if isinstance(auth_backends, str):
+                return tuple(
+                    AuthBackend(value.lower()) for value in auth_backends.split(",")
+                )
+
+            if isinstance(auth_backends, AuthBackend):
+                return (auth_backends,)
+
+            if isinstance(auth_backends, (tuple, list)):
+                return tuple(auth_backends)
+
+            raise TypeError("Invalid comma-separated list")
+
+        yield validate
+
+
 class Settings(BaseSettings):
     """Pydantic model for Ralph's global environment & configuration settings."""
 
@@ -141,12 +179,6 @@ class Settings(BaseSettings):
 
         env_file = ".env"
         env_file_encoding = core_settings.LOCALE_ENCODING
-
-    class AuthBackends(Enum):
-        """Enum of the authentication backends."""
-
-        BASIC = "basic"
-        OIDC = "oidc"
 
     _CORE: CoreSettings = core_settings
     AUTH_FILE: Path = _CORE.APP_DIR / "auth.json"
@@ -188,7 +220,7 @@ class Settings(BaseSettings):
         },
     }
     PARSERS: ParserSettings = ParserSettings()
-    RUNSERVER_AUTH_BACKEND: AuthBackends = AuthBackends.BASIC
+    RUNSERVER_AUTH_BACKENDS: AuthBackends = AuthBackends([AuthBackend.BASIC])
     RUNSERVER_AUTH_OIDC_AUDIENCE: str = None
     RUNSERVER_AUTH_OIDC_ISSUER_URI: AnyHttpUrl = None
     RUNSERVER_BACKEND: Literal[

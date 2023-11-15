@@ -8,15 +8,18 @@ import responses
 from httpx import AsyncClient
 
 from ralph.api import app
-from ralph.api.auth import get_authenticated_user
 from ralph.api.auth.basic import get_basic_auth_user
-from ralph.api.auth.oidc import get_oidc_user
 from ralph.backends.lrs.es import ESLRSBackend
 from ralph.backends.lrs.mongo import MongoLRSBackend
-from ralph.conf import XapiForwardingConfigurationSettings
+from ralph.conf import AuthBackend, XapiForwardingConfigurationSettings
 from ralph.exceptions import BackendException
 
-from tests.fixtures.auth import mock_basic_auth_user, mock_oidc_user
+from tests.fixtures.auth import (
+    AUDIENCE,
+    ISSUER_URI,
+    mock_basic_auth_user,
+    mock_oidc_user,
+)
 from tests.fixtures.backends import (
     ES_TEST_FORWARDING_INDEX,
     ES_TEST_HOSTS,
@@ -709,7 +712,6 @@ async def test_api_statements_post_scopes(  # noqa: PLR0913
         credentials = mock_basic_auth_user(fs, scopes=scopes, agent=agent)
         headers = {"Authorization": f"Basic {credentials}"}
 
-        app.dependency_overrides[get_authenticated_user] = get_basic_auth_user
         get_basic_auth_user.cache_clear()
 
     elif auth_method == "oidc":
@@ -718,16 +720,18 @@ async def test_api_statements_post_scopes(  # noqa: PLR0913
         oidc_token = mock_oidc_user(sub=sub, scopes=scopes)
         headers = {"Authorization": f"Bearer {oidc_token}"}
 
+        monkeypatch.setenv("RUNSERVER_AUTH_BACKENDS", "oidc")
+        monkeypatch.setattr(
+            "ralph.api.auth.settings.RUNSERVER_AUTH_BACKENDS", [AuthBackend.OIDC]
+        )
         monkeypatch.setattr(
             "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_ISSUER_URI",
-            "http://providerHost:8080/auth/realms/real_name",
+            ISSUER_URI,
         )
         monkeypatch.setattr(
             "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_AUDIENCE",
-            "http://clientHost:8100",
+            AUDIENCE,
         )
-
-        app.dependency_overrides[get_authenticated_user] = get_oidc_user
 
     statement = mock_statement()
 
@@ -748,5 +752,3 @@ async def test_api_statements_post_scopes(  # noqa: PLR0913
         assert response.json() == {
             "detail": 'Access not authorized to scope: "statements/write".'
         }
-
-    app.dependency_overrides.pop(get_authenticated_user, None)

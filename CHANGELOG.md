@@ -54,6 +54,8 @@ have an authority field matching that of the user
 - Backends: Replace reference to a JSON column in ClickHouse with 
   function calls on the String column [BC]
 - API: enhance 'limit' query parameter's validation 
+- API: Variable `RUNSERVER_AUTH_BACKEND` becomes `RUNSERVER_AUTH_BACKENDS`, and
+  multiple authentication methods are supported simultaneously
 
 ### Fixed
 

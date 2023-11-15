@@ -6,7 +6,13 @@ import pytest
 
 from ralph import conf
 from ralph.backends.data.es import ESDataBackend
-from ralph.conf import CommaSeparatedTuple, Settings, settings
+from ralph.conf import (
+    AuthBackend,
+    AuthBackends,
+    CommaSeparatedTuple,
+    Settings,
+    settings,
+)
 from ralph.exceptions import ConfigurationException
 
 
@@ -54,8 +60,31 @@ def test_conf_comma_separated_list_with_valid_values(value, expected, monkeypatc
 @pytest.mark.parametrize("value", [{}, None])
 def test_conf_comma_separated_list_with_invalid_values(value):
     """Test the CommaSeparatedTuple pydantic data type with invalid values."""
-    with pytest.raises(TypeError, match="Invalid comma separated list"):
+    with pytest.raises(TypeError, match="Invalid comma-separated list"):
         next(CommaSeparatedTuple.__get_validators__())(value)
+
+
+@pytest.mark.parametrize(
+    "value,is_valid,expected",
+    [
+        ("oidc", True, (AuthBackend.OIDC,)),
+        ("basic", True, (AuthBackend.BASIC,)),
+        ("bASIc", True, (AuthBackend.BASIC,)),
+        ("oidc,basic", True, (AuthBackend.OIDC, AuthBackend.BASIC)),
+        ("notvalid", False, None),
+        ("basic,notvalid", False, None),
+    ],
+)
+def test_conf_auth_backend(value, is_valid, expected, monkeypatch):
+    """Test the AuthBackends data type with valid and invalid values."""
+    if is_valid:
+        assert next(AuthBackends.__get_validators__())(value) == expected
+        monkeypatch.setenv("RALPH_RUNSERVER_AUTH_BACKENDS", "".join(value))
+        reload(conf)
+        assert conf.settings.RUNSERVER_AUTH_BACKENDS == expected
+    else:
+        with pytest.raises(ValueError, match="'notvalid' is not a valid AuthBackend"):
+            next(AuthBackends.__get_validators__())(value)
 
 
 def test_conf_core_settings_should_impact_settings_defaults(monkeypatch):
