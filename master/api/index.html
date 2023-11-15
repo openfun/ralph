@@ -1091,8 +1091,8 @@ recommend).</p>
 </code></pre></div>
 <h3 id="openid_connect_authentication">OpenID Connect authentication<a class="headerlink" href="#openid_connect_authentication" title="Permanent link">&para;</a></h3>
 <p>Ralph LRS API server supports OpenID Connect (OIDC) on top of OAuth 2.0 for authentication and authorization.</p>
-<p>To enable OIDC auth, you should set the <code>RALPH_RUNSERVER_AUTH_BACKEND</code> environment variable as follows:
-<div class="highlight"><pre><span></span><code><span class="nv">RALPH_RUNSERVER_AUTH_BACKEND</span><span class="o">=</span>oidc
+<p>To enable OIDC auth, you should modify the <code>RALPH_RUNSERVER_AUTH_BACKENDS</code> environment variable by adding (or replacing by) <code>oidc</code>:
+<div class="highlight"><pre><span></span><code><span class="nv">RALPH_RUNSERVER_AUTH_BACKENDS</span><span class="o">=</span>basic,oidc
 </code></pre></div>
 and you should define the <code>RALPH_RUNSERVER_AUTH_OIDC_ISSUER_URI</code> environment variable with your identity provider&rsquo;s Issuer Identifier URI as follows:
 <div class="highlight"><pre><span></span><code><span class="nv">RALPH_RUNSERVER_AUTH_OIDC_ISSUER_URI</span><span class="o">=</span>http://<span class="o">{</span>provider_host<span class="o">}</span>:<span class="o">{</span>provider_port<span class="o">}</span>/auth/realms/<span class="o">{</span>realm_name<span class="o">}</span>
