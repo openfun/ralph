@@ -29,7 +29,7 @@ from ralph.utils import gather_with_limited_concurrency
     ],
 )
 def test_backends_data_base_validate_backend_query_with_valid_input(value, expected):
-    """Test the enforce_query_checks function given valid input."""
+    """Test the validate_backend_query function given valid input."""
 
     class MockBaseDataBackend(BaseDataBackend[BaseDataBackendSettings, BaseQuery]):
         """A class mocking the base data backend class."""
@@ -62,10 +62,10 @@ def test_backends_data_base_validate_backend_query_with_valid_input(value, expec
         ),
     ],
 )
-def test_backends_data_base_enforce_query_checks_with_invalid_input(
+def test_backends_data_base_validate_backend_query_with_invalid_input(
     value, error, caplog
 ):
-    """Test the enforce_query_checks function given invalid input."""
+    """Test the validate_backend_query function given invalid input."""
 
     class MockBaseDataBackend(BaseDataBackend[BaseDataBackendSettings, BaseQuery]):
         """A class mocking the base database class."""

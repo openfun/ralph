@@ -4,7 +4,7 @@ import json
 import logging
 import re
 import sys
-from inspect import isasyncgen, isclass, iscoroutinefunction
+from inspect import isasyncgen, isclass
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Any, Callable, Dict, Optional, Type, Union
@@ -29,11 +29,11 @@ from click_option_group import optgroup
 
 from ralph import __version__ as ralph_version
 from ralph.backends.data.base import (
+    AsyncWritable,
     BaseAsyncDataBackend,
     BaseDataBackend,
     BaseOperationType,
 )
-from ralph.backends.http.base import BaseHTTPBackend
 from ralph.backends.loader import (
     get_cli_backends,
     get_cli_list_backends,
@@ -609,7 +609,7 @@ def convert(from_, to_, ignore_errors, fail_on_unknown, **conversion_set_kwargs)
 @RalphCLI.lazy_backends_options(get_cli_backends)
 @click.argument("archive", required=False)
 @click.option(
-    "-c",
+    "-s",
     "--chunk-size",
     type=int,
     default=None,
@@ -678,18 +678,6 @@ def read(  # noqa: PLR0913
             click.echo(statement, nl=False)
     elif isinstance(backend, BaseStreamBackend):
         backend.stream(sys.stdout.buffer)
-    elif isinstance(backend, BaseHTTPBackend):
-        if query is not None:
-            query = backend.query(query=query)
-        for statement in backend.read(
-            target=target, query=query, chunk_size=chunk_size
-        ):
-            click.echo(
-                bytes(
-                    json.dumps(statement) if isinstance(statement, dict) else statement,
-                    encoding="utf-8",
-                )
-            )
     else:
         msg = "Cannot find an implemented backend type for backend %s"
         logger.error(msg, backend)
@@ -698,18 +686,18 @@ def read(  # noqa: PLR0913
 
 @RalphCLI.lazy_backends_options(get_cli_write_backends)
 @click.option(
-    "-c",
+    "-t",
+    "--target",
+    type=str,
+    default=None,
+    help="The target container to write into",
+)
+@click.option(
+    "-s",
     "--chunk-size",
     type=int,
     default=None,
     help="Get events by chunks of size #",
-)
-@click.option(
-    "-f",
-    "--force",
-    default=False,
-    is_flag=True,
-    help="Overwrite existing archives or records",
 )
 @click.option(
     "-I",
@@ -719,37 +707,26 @@ def read(  # noqa: PLR0913
     help="Continue writing regardless of raised errors",
 )
 @click.option(
-    "-s",
-    "--simultaneous",
-    default=False,
-    is_flag=True,
-    help="With HTTP backend, POST all chunks simultaneously (instead of sequentially)",
+    "-o",
+    "--operation-type",
+    type=click.Choice([op_type.value for op_type in BaseOperationType]),
+    metavar="OP_TYPE",
+    required=False,
+    help="Either index, create, delete, update or append",
 )
 @click.option(
-    "-m",
-    "--max-num-simultaneous",
-    type=int,
-    default=-1,
-    help=(
-        "The maximum number of chunks to send at once, when using `--simultaneous`. "
-        "Use `-1` to not set a limit."
-    ),
-)
-@click.option(
-    "-t",
-    "--target",
-    type=str,
-    default=None,
-    help="The target container to write into",
+    "-c",
+    "--concurrency",
+    default=1,
+    help="Number of chunks to write concurrently. (async backends only)",
 )
 def write(  # noqa: PLR0913
     backend,
-    chunk_size,
-    force,
-    ignore_errors,
-    simultaneous,
-    max_num_simultaneous,
     target,
+    chunk_size,
+    ignore_errors,
+    operation_type,
+    concurrency,
     **options,
 ):
     """Write an archive to a configured backend."""
@@ -757,40 +734,23 @@ def write(  # noqa: PLR0913
 
     logger.debug("Backend parameters: %s", options)
 
-    if max_num_simultaneous == 1:
-        max_num_simultaneous = None
-
     backend_class = get_backend_class(get_cli_write_backends(), backend)
     backend = get_backend_instance(backend_class, options)
 
-    if isinstance(backend, (BaseDataBackend, BaseAsyncDataBackend)):
-        writer = (
-            execute_async(backend.write)
-            if iscoroutinefunction(backend.write)
-            else backend.write
-        )
-        writer(
-            data=sys.stdin.buffer,
-            target=target,
-            chunk_size=chunk_size,
-            ignore_errors=ignore_errors,
-            operation_type=BaseOperationType.UPDATE
-            if force
-            else BaseOperationType.INDEX,
-        )
-    elif isinstance(backend, BaseHTTPBackend):
-        backend.write(
-            target=target,
-            data=sys.stdin.buffer,
-            chunk_size=chunk_size,
-            ignore_errors=ignore_errors,
-            simultaneous=simultaneous,
-            max_num_simultaneous=max_num_simultaneous,
-        )
-    else:
-        msg = "Cannot find an implemented backend type for backend %s"
-        logger.error(msg, backend)
-        raise UnsupportedBackendException(msg, backend)
+    writer = backend.write
+    async_options = {}
+    if isinstance(backend, AsyncWritable):
+        writer = execute_async(backend.write)
+        async_options = {"concurrency": concurrency}
+
+    writer(
+        data=sys.stdin.buffer,
+        target=target,
+        chunk_size=chunk_size,
+        ignore_errors=ignore_errors,
+        operation_type=BaseOperationType(operation_type) if operation_type else None,
+        **async_options,
+    )
 
 
 @RalphCLI.lazy_backends_options(get_cli_list_backends, name="list")

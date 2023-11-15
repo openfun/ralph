@@ -321,8 +321,8 @@ class FSDataBackend(
             msg = "Target file not specified; using random file name: %s"
             self.logger.info(msg, target)
 
-        target = Path(target)
-        path = target if target.is_absolute() else self.default_directory / target
+        path = Path(target)
+        path = path if path.is_absolute() else self.default_directory / path
 
         if operation_type in [BaseOperationType.CREATE, BaseOperationType.INDEX]:
             if path.is_file():
@@ -363,6 +363,7 @@ class FSDataBackend(
                 "timestamp": now(),
             }
         )
+        self.logger.debug("Written %s with success", path.absolute())
         return 1
 
     def close(self) -> None:
