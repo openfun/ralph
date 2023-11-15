@@ -16,7 +16,6 @@ from ralph.backends.data.base import (
     Listable,
     Writable,
 )
-from ralph.backends.http.base import BaseHTTPBackend
 from ralph.backends.lrs.base import BaseAsyncLRSBackend, BaseLRSBackend
 from ralph.backends.stream.base import BaseStreamBackend
 
@@ -78,13 +77,11 @@ def get_cli_backends() -> Dict[str, Type]:
     """Return Ralph's backend classes for cli usage."""
     dotted_paths = (
         "ralph.backends.data",
-        "ralph.backends.http",
         "ralph.backends.stream",
     )
     base_backends = (
         BaseAsyncDataBackend,
         BaseDataBackend,
-        BaseHTTPBackend,
         BaseStreamBackend,
     )
     return get_backends(dotted_paths, base_backends)
@@ -97,7 +94,7 @@ def get_cli_write_backends() -> Dict[str, Type]:
     return {
         name: backend
         for name, backend in backends.items()
-        if issubclass(backend, (Writable, AsyncWritable, BaseHTTPBackend))
+        if issubclass(backend, (Writable, AsyncWritable))
     }
 
 
