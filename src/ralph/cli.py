@@ -61,7 +61,7 @@ logger = logging.getLogger(__name__)
 
 
 class CommaSeparatedTupleParamType(click.ParamType):
-    """Comma separated tuple parameter type."""
+    """Comma-separated tuple parameter type."""
 
     name = "value1,value2,value3"
 
@@ -81,7 +81,7 @@ class CommaSeparatedTupleParamType(click.ParamType):
 
 
 class CommaSeparatedKeyValueParamType(click.ParamType):
-    """Comma separated key=value parameter type."""
+    """Comma-separated key=value parameter type."""
 
     name = "key=value,key=value"
 
@@ -123,7 +123,7 @@ class CommaSeparatedKeyValueParamType(click.ParamType):
 
 
 class ClientOptionsParamType(CommaSeparatedKeyValueParamType):
-    """Comma separated key=value parameter type for client options."""
+    """Comma-separated key=value parameter type for client options."""
 
     def __init__(self, client_options_type: Any) -> None:
         """Instantiate ClientOptionsParamType for a client_options_type.
@@ -145,7 +145,7 @@ class ClientOptionsParamType(CommaSeparatedKeyValueParamType):
 
 
 class HeadersParametersParamType(CommaSeparatedKeyValueParamType):
-    """Comma separated key=value parameter type for headers parameters."""
+    """Comma-separated key=value parameter type for headers parameters."""
 
     def __init__(self, headers_parameters_type: Any) -> None:
         """Instantiate HeadersParametersParamType for a headers_parameters_type.

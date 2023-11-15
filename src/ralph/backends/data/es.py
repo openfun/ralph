@@ -45,7 +45,7 @@ class ESDataBackendSettings(BaseDataBackendSettings):
         DEFAULT_CHUNK_SIZE (int): The default chunk size for reading batches of
             documents.
         DEFAULT_INDEX (str): The default index to use for querying Elasticsearch.
-        HOSTS (str or tuple): The comma separated list of Elasticsearch nodes to
+        HOSTS (str or tuple): The comma-separated list of Elasticsearch nodes to
             connect to.
         LOCALE_ENCODING (str): The encoding used for reading/writing documents.
         POINT_IN_TIME_KEEP_ALIVE (str): The duration for which Elasticsearch should

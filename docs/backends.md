@@ -159,7 +159,7 @@ Elasticsearch backend parameters required to connect to a cluster are:
 
 - `hosts`: a list of cluster hosts to connect to (_e.g._ `["http://elasticsearch-node:9200"]`)
 - `index`: the elasticsearch index where to get/put documents
-- `client_options`: a comma separated key=value list of Elasticsearch client options
+- `client_options`: a comma-separated key=value list of Elasticsearch client options
 
 The Elasticsearch client options supported in Ralph are:
 - `ca_certs`: the path to the CA certificate file.
@@ -177,7 +177,7 @@ MongoDB backend parameters required to connect to a cluster are:
 - `connection_uri`: the connection URI to connect to (_e.g._ `["mongodb://mongo:27017/"]`)
 - `database`: the database to connect to
 - `collection`: the collection to get/put objects to
-- `client_options`: a comma separated key=value list of MongoDB client options
+- `client_options`: a comma-separated key=value list of MongoDB client options
 
 The MongoDB client options supported in Ralph are:
 - `document_class`: default class to use for documents returned from queries
@@ -196,7 +196,7 @@ ClickHouse parameters required to connect are:
 - `port`: the port to the ClickHouse HTTPS interface (_e.g._ `8123`)
 - `database`: the name of the database to connect to
 - `event_table_name`: the name of the table to write statements to
-- `client_options`: a comma separated key=value list of ClickHouse client options
+- `client_options`: a comma-separated key=value list of ClickHouse client options
 
 Secondary parameters are needed if not using the default ClickHouse user:
 
