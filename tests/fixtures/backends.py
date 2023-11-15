@@ -9,6 +9,7 @@ from contextlib import asynccontextmanager
 from functools import lru_cache
 from multiprocessing import Process
 from pathlib import Path
+from typing import Callable
 
 import boto3
 import botocore
@@ -22,6 +23,7 @@ from pymongo import MongoClient
 from pymongo.errors import CollectionInvalid
 
 from ralph.backends.data.async_es import AsyncESDataBackend
+from ralph.backends.data.async_lrs import AsyncLRSDataBackend
 from ralph.backends.data.async_mongo import AsyncMongoDataBackend
 from ralph.backends.data.clickhouse import (
     ClickHouseClientOptions,
@@ -132,6 +134,28 @@ def get_async_es_test_backend(index: str = ES_TEST_INDEX):
 
 
 @lru_cache
+def get_async_lrs_test_backend(
+    base_url: str = "http://fake-lrs.com",
+) -> AsyncLRSDataBackend:
+    """Return an AsyncESLRSBackend backend instance using test defaults."""
+    settings = AsyncLRSDataBackend.settings_class(
+        BASE_URL=base_url,
+        USERNAME="user",
+        PASSWORD="pass",
+        HEADERS={
+            "X_EXPERIENCE_API_VERSION": "1.0.3",
+            "CONTENT_TYPE": "application/json",
+        },
+        LOCALE_ENCODING="utf8",
+        STATUS_ENDPOINT="/__heartbeat__",
+        STATEMENTS_ENDPOINT="/xAPI/statements/",
+        READ_CHUNK_SIZE=500,
+        WRITE_CHUNK_SIZE=500,
+    )
+    return AsyncLRSDataBackend(settings)
+
+
+@lru_cache
 def get_mongo_test_backend():
     """Return a MongoDatabase backend instance using test defaults."""
     settings = MongoLRSBackend.settings_class(
@@ -239,6 +263,12 @@ def fs_lrs_backend(fs, settings_fs):
 def anyio_backend():
     """Select asyncio backend for pytest anyio."""
     return "asyncio"
+
+
+@pytest.fixture()
+def async_lrs_backend() -> Callable[[], AsyncLRSDataBackend]:
+    """Return the `get_async_lrs_test_backend` function."""
+    return get_async_lrs_test_backend
 
 
 @pytest.fixture

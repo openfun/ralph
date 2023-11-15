@@ -882,11 +882,11 @@ def test_cli_write_command_with_fs_backend(fs):
     assert result.exit_code == 1
     assert "file1 already exists and overwrite is not allowed" in result.output
 
-    # Try to create the same file with -f
+    # Try to create the same file with -o update
     runner = CliRunner()
     result = runner.invoke(
         cli,
-        "write -b fs -t file1 -f --fs-default-directory-path foo".split(),
+        "write -b fs -t file1 -o update --fs-default-directory-path foo".split(),
         input=b"other content",
     )
 

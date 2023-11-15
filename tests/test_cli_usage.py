@@ -127,10 +127,13 @@ def test_cli_read_command_usage():
         "  async_lrs backend: \n"
         "    --async-lrs-base-url TEXT\n"
         "    --async-lrs-headers KEY=VALUE,KEY=VALUE\n"
+        "    --async-lrs-locale-encoding TEXT\n"
         "    --async-lrs-password TEXT\n"
+        "    --async-lrs-read-chunk-size INTEGER\n"
         "    --async-lrs-statements-endpoint TEXT\n"
         "    --async-lrs-status-endpoint TEXT\n"
         "    --async-lrs-username TEXT\n"
+        "    --async-lrs-write-chunk-size INTEGER\n"
         "  async_mongo backend: \n"
         "    --async-mongo-client-options KEY=VALUE,KEY=VALUE\n"
         "    --async-mongo-connection-uri MONGODSN\n"
@@ -180,10 +183,13 @@ def test_cli_read_command_usage():
         "  lrs backend: \n"
         "    --lrs-base-url TEXT\n"
         "    --lrs-headers KEY=VALUE,KEY=VALUE\n"
+        "    --lrs-locale-encoding TEXT\n"
         "    --lrs-password TEXT\n"
+        "    --lrs-read-chunk-size INTEGER\n"
         "    --lrs-statements-endpoint TEXT\n"
         "    --lrs-status-endpoint TEXT\n"
         "    --lrs-username TEXT\n"
+        "    --lrs-write-chunk-size INTEGER\n"
         "  mongo backend: \n"
         "    --mongo-client-options KEY=VALUE,KEY=VALUE\n"
         "    --mongo-connection-uri MONGODSN\n"
@@ -229,8 +235,8 @@ def test_cli_read_command_usage():
         "  -i, --ignore_errors BOOLEAN     Ignore errors during the encoding operation."
         "\n"
         "                                  [default: False]\n"
-        "  --help                          Show this message and exit."
-    ) in result.output
+        "  --help                          Show this message and exit.\n"
+    ) == result.output
     logging.warning(result.output)
     result = runner.invoke(cli, ["read"])
     assert result.exit_code > 0
@@ -346,7 +352,7 @@ def test_cli_list_command_usage():
         "  -n, --new / -a, --all           List not fetched (or all) documents\n"
         "  -D, --details / -I, --ids       Get documents detailed output (JSON)\n"
         "  --help                          Show this message and exit.\n"
-    ) in result.output
+    ) == result.output
 
     result = runner.invoke(cli, ["list"])
     assert result.exit_code > 0
@@ -385,10 +391,13 @@ def test_cli_write_command_usage():
         "  async_lrs backend: \n"
         "    --async-lrs-base-url TEXT\n"
         "    --async-lrs-headers KEY=VALUE,KEY=VALUE\n"
+        "    --async-lrs-locale-encoding TEXT\n"
         "    --async-lrs-password TEXT\n"
+        "    --async-lrs-read-chunk-size INTEGER\n"
         "    --async-lrs-statements-endpoint TEXT\n"
         "    --async-lrs-status-endpoint TEXT\n"
         "    --async-lrs-username TEXT\n"
+        "    --async-lrs-write-chunk-size INTEGER\n"
         "  async_mongo backend: \n"
         "    --async-mongo-client-options KEY=VALUE,KEY=VALUE\n"
         "    --async-mongo-connection-uri MONGODSN\n"
@@ -427,10 +436,13 @@ def test_cli_write_command_usage():
         "  lrs backend: \n"
         "    --lrs-base-url TEXT\n"
         "    --lrs-headers KEY=VALUE,KEY=VALUE\n"
+        "    --lrs-locale-encoding TEXT\n"
         "    --lrs-password TEXT\n"
+        "    --lrs-read-chunk-size INTEGER\n"
         "    --lrs-statements-endpoint TEXT\n"
         "    --lrs-status-endpoint TEXT\n"
         "    --lrs-username TEXT\n"
+        "    --lrs-write-chunk-size INTEGER\n"
         "  mongo backend: \n"
         "    --mongo-client-options KEY=VALUE,KEY=VALUE\n"
         "    --mongo-connection-uri MONGODSN\n"
@@ -464,22 +476,23 @@ def test_cli_write_command_usage():
         "    --swift-username TEXT\n"
         "    --swift-user-domain-name TEXT\n"
         "    --swift-write-chunk-size INTEGER\n"
+        "  -t, --target TEXT               The target container to write into\n"
         "  -c, --chunk-size INTEGER        Get events by chunks of size #\n"
-        "  -f, --force                     Overwrite existing archives or records\n"
         "  -I, --ignore-errors             Continue writing regardless of raised errors"
         "\n"
-        "  -s, --simultaneous              With HTTP backend, POST all chunks\n"
-        "                                  simultaneously (instead of sequentially)\n"
+        "  -o, --operation-type OP_TYPE    Either index, create, delete, update or "
+        "append\n"
+        "  -s, --simultaneous              Write chunks simultaneously (instead of\n"
+        "                                  sequentially). (async backends only)\n"
         "  -m, --max-num-simultaneous INTEGER\n"
         "                                  The maximum number of chunks to send at once"
         ",\n"
-        "                                  when using `--simultaneous`. Use `-1` to not"
+        "                                  when using `--simultaneous`. (async backends"
         "\n"
-        "                                  set a limit.\n"
-        "  -t, --target TEXT               The target container to write into\n"
+        "                                  only)\n"
         "  --help                          Show this message and exit.\n"
     )
-    assert expected_output in result.output
+    assert expected_output == result.output
 
     result = runner.invoke(cli, ["write"])
     assert result.exit_code > 0

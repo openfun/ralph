@@ -16,6 +16,7 @@ from .fixtures.backends import (  # noqa: F401
     anyio_backend,
     async_es_backend,
     async_es_lrs_backend,
+    async_lrs_backend,
     async_mongo_backend,
     async_mongo_lrs_backend,
     clickhouse,
