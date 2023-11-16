@@ -18,7 +18,7 @@ from ralph.backends.data.base import (
 from ralph.backends.lrs.base import LRSStatementsQuery
 from ralph.conf import BaseSettingsConfig, HeadersParameters
 from ralph.exceptions import BackendException
-from ralph.utils import async_parse_dict_to_bytes, iter_by_batch, parse_to_dict
+from ralph.utils import iter_by_batch, parse_dict_to_bytes, parse_iterable_to_dict
 
 
 class LRSHeaders(HeadersParameters):
@@ -159,7 +159,7 @@ class LRSDataBackend(
     ) -> Iterator[bytes]:
         """Method called by `self.read` yielding bytes. See `self.read`."""
         statements = self._read_dicts(query, target, chunk_size, ignore_errors)
-        yield from async_parse_dict_to_bytes(
+        yield from parse_dict_to_bytes(
             statements, self.settings.LOCALE_ENCODING, ignore_errors, self.logger
         )
 
@@ -202,9 +202,9 @@ class LRSDataBackend(
             for statement in statements_generator:
                 yield statement
         except HTTPError as error:
-            msg = "Failed to fetch statements."
-            self.logger.error("%s. %s", msg, error)
-            raise BackendException(msg, *error.args) from error
+            msg = "Failed to fetch statements: %s"
+            self.logger.error(msg, error)
+            raise BackendException(msg % (error,)) from error
 
     def write(  # noqa: PLR0913
         self,
@@ -213,8 +213,6 @@ class LRSDataBackend(
         chunk_size: Optional[int] = None,
         ignore_errors: bool = False,
         operation_type: Optional[BaseOperationType] = None,
-        simultaneous: bool = False,
-        max_num_simultaneous: Optional[int] = None,
     ) -> int:
         """Write `data` records to the `target` endpoint and return their count.
 
@@ -231,21 +229,8 @@ class LRSDataBackend(
             operation_type (BaseOperationType or None): The mode of the write operation.
                 If `operation_type` is `None`, the `default_operation_type` is used
                 instead. See `BaseOperationType`.
-            simultaneous (bool): If `True`, chunks requests will be made concurrently.
-                If `False` (default), chunks will be sent sequentially
-            max_num_simultaneous (int or None): If simultaneous is `True`, the maximum
-                number of chunks to POST concurrently. If `None` (default), no limit is
-                set.
         """
-        return super().write(
-            data,
-            target,
-            chunk_size,
-            ignore_errors,
-            operation_type,
-            simultaneous,
-            max_num_simultaneous,
-        )
+        return super().write(data, target, chunk_size, ignore_errors, operation_type)
 
     def _write_bytes(  # noqa: PLR0913
         self,
@@ -256,7 +241,7 @@ class LRSDataBackend(
         operation_type: BaseOperationType,
     ) -> int:
         """Method called by `self.write` writing bytes. See `self.write`."""
-        statements = parse_to_dict(data, ignore_errors, self.logger)
+        statements = parse_iterable_to_dict(data, ignore_errors, self.logger)
         return self._write_dicts(
             statements, target, chunk_size, ignore_errors, operation_type
         )

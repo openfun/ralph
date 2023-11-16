@@ -7,6 +7,8 @@ import sys
 import pytest
 from click.testing import CliRunner
 
+from ralph import cli
+
 
 def test_dependencies_ralph_command_requires_click(monkeypatch):
     """Test Click module installation while executing the ralph command."""
@@ -30,16 +32,10 @@ def test_dependencies_ralph_command_requires_click(monkeypatch):
 def test_dependencies_runserver_subcommand_requires_uvicorn(monkeypatch):
     """Test Uvicorn module installation while executing the runserver sub command."""
 
-    monkeypatch.setitem(sys.modules, "uvicorn", None)
-
-    # Force ralph.cli reload now that uvicorn is considered as missing
-    if "ralph.cli" in sys.modules:
-        del sys.modules["ralph.cli"]
-    cli = importlib.import_module("ralph.cli")
-
+    monkeypatch.delattr(cli, "uvicorn")
+    monkeypatch.setattr(cli, "configure_logging", lambda: None)
     runner = CliRunner()
     result = runner.invoke(cli.cli, "runserver -b es".split())
-
     assert isinstance(result.exception, ModuleNotFoundError)
     assert str(result.exception) == (
         "You need to install 'lrs' optional dependencies to use the runserver "

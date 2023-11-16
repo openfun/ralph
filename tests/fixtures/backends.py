@@ -6,10 +6,10 @@ import os
 import random
 import time
 from contextlib import asynccontextmanager
-from functools import lru_cache
+from functools import lru_cache, wraps
 from multiprocessing import Process
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Optional, Union
 
 import boto3
 import botocore
@@ -19,6 +19,7 @@ import uvicorn
 import websockets
 from elasticsearch import BadRequestError, Elasticsearch
 from httpx import AsyncClient, ConnectError
+from pydantic import AnyHttpUrl, parse_obj_as
 from pymongo import MongoClient
 from pymongo.errors import CollectionInvalid
 
@@ -32,6 +33,7 @@ from ralph.backends.data.clickhouse import (
 from ralph.backends.data.es import ESDataBackend
 from ralph.backends.data.fs import FSDataBackend
 from ralph.backends.data.ldp import LDPDataBackend
+from ralph.backends.data.lrs import LRSDataBackend, LRSHeaders
 from ralph.backends.data.mongo import MongoDataBackend
 from ralph.backends.data.s3 import S3DataBackend
 from ralph.backends.data.swift import SwiftDataBackend
@@ -131,28 +133,6 @@ def get_async_es_test_backend(index: str = ES_TEST_INDEX):
         WRITE_CHUNK_SIZE=499,
     )
     return AsyncESLRSBackend(settings)
-
-
-@lru_cache
-def get_async_lrs_test_backend(
-    base_url: str = "http://fake-lrs.com",
-) -> AsyncLRSDataBackend:
-    """Return an AsyncESLRSBackend backend instance using test defaults."""
-    settings = AsyncLRSDataBackend.settings_class(
-        BASE_URL=base_url,
-        USERNAME="user",
-        PASSWORD="pass",
-        HEADERS={
-            "X_EXPERIENCE_API_VERSION": "1.0.3",
-            "CONTENT_TYPE": "application/json",
-        },
-        LOCALE_ENCODING="utf8",
-        STATUS_ENDPOINT="/__heartbeat__",
-        STATEMENTS_ENDPOINT="/xAPI/statements/",
-        READ_CHUNK_SIZE=500,
-        WRITE_CHUNK_SIZE=500,
-    )
-    return AsyncLRSDataBackend(settings)
 
 
 @lru_cache
@@ -265,10 +245,65 @@ def anyio_backend():
     return "asyncio"
 
 
-@pytest.fixture()
-def async_lrs_backend() -> Callable[[], AsyncLRSDataBackend]:
-    """Return the `get_async_lrs_test_backend` function."""
-    return get_async_lrs_test_backend
+@pytest.mark.anyio
+@pytest.fixture(params=["sync", "async"])
+def lrs_backend(
+    request,
+) -> Callable[[Optional[str]], Union[LRSDataBackend, AsyncLRSDataBackend]]:
+    """Return the `get_lrs_test_backend` function."""
+    backend_class = LRSDataBackend if request.param == "sync" else AsyncLRSDataBackend
+
+    def make_awaitable(sync_func):
+        """Make a synchronous callable awaitable."""
+
+        @wraps(sync_func)
+        async def async_func(*args, **kwargs):
+            kwargs.pop("concurrency", None)
+            return sync_func(*args, **kwargs)
+
+        return async_func
+
+    def make_awaitable_generator(sync_func):
+        """Make a synchronous generator awaitable."""
+
+        @wraps(sync_func)
+        async def async_func(*args, **kwargs):
+            kwargs.pop("greedy", None)
+            for item in sync_func(*args, **kwargs):
+                yield item
+
+        return async_func
+
+    def _get_lrs_test_backend(
+        base_url: Optional[str] = "http://fake-lrs.com",
+    ) -> Union[LRSDataBackend, AsyncLRSDataBackend]:
+        """Return an (Async)LRSDataBackend backend instance using test defaults."""
+        headers = {
+            "X_EXPERIENCE_API_VERSION": "1.0.3",
+            "CONTENT_TYPE": "application/json",
+        }
+        settings = backend_class.settings_class(
+            BASE_URL=parse_obj_as(AnyHttpUrl, base_url),
+            USERNAME="user",
+            PASSWORD="pass",
+            HEADERS=LRSHeaders.parse_obj(headers),
+            LOCALE_ENCODING="utf8",
+            STATUS_ENDPOINT="/__heartbeat__",
+            STATEMENTS_ENDPOINT="/xAPI/statements/",
+            READ_CHUNK_SIZE=500,
+            WRITE_CHUNK_SIZE=500,
+        )
+        backend = backend_class(settings)
+
+        if isinstance(backend, LRSDataBackend):
+            backend.status = make_awaitable(backend.status)  # type: ignore
+            backend.read = make_awaitable_generator(backend.read)  # type: ignore
+            backend.write = make_awaitable(backend.write)  # type: ignore
+            backend.close = make_awaitable(backend.close)  # type: ignore
+
+        return backend
+
+    return _get_lrs_test_backend
 
 
 @pytest.fixture

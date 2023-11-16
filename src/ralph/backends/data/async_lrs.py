@@ -17,7 +17,7 @@ from ralph.backends.data.base import (
 from ralph.backends.data.lrs import LRSDataBackendSettings, StatementResponse
 from ralph.backends.lrs.base import LRSStatementsQuery
 from ralph.exceptions import BackendException
-from ralph.utils import async_parse_dict_to_bytes, iter_by_batch, parse_to_dict
+from ralph.utils import async_parse_dict_to_bytes, iter_by_batch, parse_iterable_to_dict
 
 
 class AsyncLRSDataBackend(
@@ -175,8 +175,7 @@ class AsyncLRSDataBackend(
         chunk_size: Optional[int] = None,
         ignore_errors: bool = False,
         operation_type: Optional[BaseOperationType] = None,
-        simultaneous: bool = False,
-        max_num_simultaneous: Optional[int] = None,
+        concurrency: Optional[int] = None,
     ) -> int:
         """Write `data` records to the `target` endpoint and return their count.
 
@@ -193,20 +192,11 @@ class AsyncLRSDataBackend(
             operation_type (BaseOperationType or None): The mode of the write operation.
                 If `operation_type` is `None`, the `default_operation_type` is used
                 instead. See `BaseOperationType`.
-            simultaneous (bool): If `True`, chunks requests will be made concurrently.
-                If `False` (default), chunks will be sent sequentially
-            max_num_simultaneous (int or None): If simultaneous is `True`, the maximum
-                number of chunks to POST concurrently. If `None` (default), no limit is
-                set.
+            concurrency (int): The number of chunks to write concurrently.
+                If `None` it defaults to `1`.
         """
         return await super().write(
-            data,
-            target,
-            chunk_size,
-            ignore_errors,
-            operation_type,
-            simultaneous,
-            max_num_simultaneous,
+            data, target, chunk_size, ignore_errors, operation_type, concurrency
         )
 
     async def _write_bytes(  # noqa: PLR0913
@@ -218,7 +208,7 @@ class AsyncLRSDataBackend(
         operation_type: BaseOperationType,
     ) -> int:
         """Method called by `self.write` writing bytes. See `self.write`."""
-        statements = parse_to_dict(data, ignore_errors, self.logger)
+        statements = parse_iterable_to_dict(data, ignore_errors, self.logger)
         return await self._write_dicts(
             statements, target, chunk_size, ignore_errors, operation_type
         )
