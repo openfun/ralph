@@ -14,7 +14,7 @@ from ralph.backends.data.async_mongo import (
     MongoDataBackendSettings,
     MongoQuery,
 )
-from ralph.backends.data.base import BaseOperationType, DataBackendStatus
+from ralph.backends.data.base import AsyncWritable, BaseOperationType, DataBackendStatus
 from ralph.backends.data.mongo import MongoClientOptions
 from ralph.exceptions import BackendException, BackendParameterException
 
@@ -592,35 +592,23 @@ async def test_backends_data_async_mongo_read_with_query(
 
 
 @pytest.mark.anyio
-async def test_backends_data_async_mongo_write_with_simultaneous(
-    mongo, async_mongo_backend, caplog
+async def test_backends_data_async_mongo_write_with_concurrency(
+    async_es_backend, monkeypatch
 ):
-    """Test the `AsyncMongoDataBackend.write` method, given `simultaneous` set to
-    `True`, should insert the target documents concurrently.
+    """Test the `AsyncMongoDataBackend.write` method, given `concurrency` set,
+    should pass the `concurrency` value to `AsyncWritable.write`.
     """
-    backend = async_mongo_backend()
-    timestamp = {"timestamp": "2022-06-27T15:36:50"}
-    documents = [{"id": str(i), **timestamp} for i in range(5)]
 
-    with caplog.at_level(logging.INFO):
-        assert (
-            await backend.write(
-                documents, chunk_size=3, simultaneous=True, max_num_simultaneous=2
-            )
-            == 5
-        )
+    async def mock_write(  # noqa: PLR0913
+        self, data, target, chunk_size, ignore_errors, operation_type, concurrency
+    ):
+        """Mock the AsyncWritable `write` method."""
+        assert concurrency == 4
+        return 3
 
-    assert (
-        "ralph.backends.data.async_mongo",
-        logging.INFO,
-        "Inserted 3 documents with success",
-    ) in caplog.record_tuples
-
-    assert (
-        "ralph.backends.data.async_mongo",
-        logging.INFO,
-        "Inserted 2 documents with success",
-    ) in caplog.record_tuples
+    backend = async_es_backend()
+    monkeypatch.setattr(AsyncWritable, "write", mock_write)
+    assert await backend.write([b"bar"], concurrency=4) == 3
 
 
 @pytest.mark.anyio

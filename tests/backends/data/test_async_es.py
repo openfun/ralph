@@ -18,7 +18,7 @@ from ralph.backends.data.async_es import (
     ESDataBackendSettings,
     ESQuery,
 )
-from ralph.backends.data.base import BaseOperationType, DataBackendStatus
+from ralph.backends.data.base import AsyncWritable, BaseOperationType, DataBackendStatus
 from ralph.backends.data.es import ESClientOptions
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import now
@@ -492,34 +492,23 @@ async def test_backends_data_async_es_read_with_query(es, async_es_backend, capl
 
 
 @pytest.mark.anyio
-async def test_backends_data_async_es_write_with_simultaneous(
-    es, async_es_backend, caplog
+async def test_backends_data_async_es_write_with_concurrency(
+    async_es_backend, monkeypatch
 ):
-    """Test the `AsyncESDataBackend.write` method, given `simultaneous` set to `True`,
-    should insert the target documents concurrently.
+    """Test the `AsyncESDataBackend.write` method, given `concurrency` set,
+    should pass the `concurrency` value to `AsyncWritable.write`.
     """
+
+    async def mock_write(  # noqa: PLR0913
+        self, data, target, chunk_size, ignore_errors, operation_type, concurrency
+    ):
+        """Mock the AsyncWritable `write` method."""
+        assert concurrency == 4
+        return 3
+
     backend = async_es_backend()
-    data = ({"value": str(idx)} for idx in range(5))
-
-    with caplog.at_level(logging.INFO):
-        assert (
-            await backend.write(
-                data, chunk_size=3, simultaneous=True, max_num_simultaneous=2
-            )
-            == 5
-        )
-
-    assert (
-        "ralph.backends.data.async_es",
-        logging.INFO,
-        "Finished writing 3 documents with success",
-    ) in caplog.record_tuples
-
-    assert (
-        "ralph.backends.data.async_es",
-        logging.INFO,
-        "Finished writing 2 documents with success",
-    ) in caplog.record_tuples
+    monkeypatch.setattr(AsyncWritable, "write", mock_write)
+    assert await backend.write([b"bar"], concurrency=4) == 3
 
 
 @pytest.mark.anyio

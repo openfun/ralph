@@ -357,8 +357,7 @@ class AsyncWritable(Loggable, ABC):
         chunk_size: Optional[int] = None,
         ignore_errors: bool = False,
         operation_type: Optional[BaseOperationType] = None,
-        simultaneous: bool = False,
-        max_num_simultaneous: Optional[int] = None,
+        concurrency: Optional[int] = None,
     ) -> int:
         """Write `data` records to the `target` container and return their count.
 
@@ -374,10 +373,8 @@ class AsyncWritable(Loggable, ABC):
             operation_type (BaseOperationType or None): The mode of the write operation.
                 If `operation_type` is `None`, the `default_operation_type` is used
                 instead. See `BaseOperationType`.
-            simultaneous (bool): If `True`, chunks will be written concurrently.
-                If `False` (default), chunks will be written sequentially.
-            max_num_simultaneous (int or None): If simultaneous is `True`, the maximum
-                number of chunks to write concurrently. If `None` it defaults to 1.
+            concurrency (int): The number of chunks to write concurrently.
+                If `None` it defaults to `1`.
 
         Return:
             int: The number of written records.
@@ -407,26 +404,22 @@ class AsyncWritable(Loggable, ABC):
         is_bytes = isinstance(first_record, bytes)
         writer = self._write_bytes if is_bytes else self._write_dicts
 
-        max_num_simultaneous = max_num_simultaneous if max_num_simultaneous else 1
-        if not simultaneous or max_num_simultaneous == 1:
-            if max_num_simultaneous != 1:
-                msg = "max_num_simultaneous is ignored when `simultaneous=False`"
-                self.logger.warning(msg)
+        concurrency = concurrency if concurrency else 1
+        if concurrency == 1:
             return await writer(data, target, chunk_size, ignore_errors, operation_type)
 
-        if max_num_simultaneous < 1:
-            msg = "max_num_simultaneous must be a strictly positive integer"
+        if concurrency < 1:
+            msg = "concurrency must be a strictly positive integer"
             self.logger.error(msg)
             raise BackendParameterException(msg)
 
         count = 0
-        batches = iter_by_batch(iter_by_batch(data, chunk_size), max_num_simultaneous)
-        for batch in batches:
+        for batch in iter_by_batch(iter_by_batch(data, chunk_size), concurrency):
             tasks = set()
             for chunk in batch:
                 task = writer(chunk, target, chunk_size, ignore_errors, operation_type)
                 tasks.add(task)
-            result = await gather_with_limited_concurrency(max_num_simultaneous, *tasks)
+            result = await gather_with_limited_concurrency(concurrency, *tasks)
             count += sum(result)
         return count
 

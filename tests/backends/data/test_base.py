@@ -16,6 +16,7 @@ from ralph.backends.data.base import (
     get_backend_generic_argument,
 )
 from ralph.exceptions import BackendParameterException
+from ralph.utils import gather_with_limited_concurrency
 
 
 @pytest.mark.parametrize(
@@ -203,10 +204,10 @@ async def test_backends_data_base_async_read_with_max_statements():
 
 
 @pytest.mark.parametrize(
-    "chunk_size,max_num_simultaneous,expected_item_count,expected_write_calls",
+    "chunk_size,concurrency,expected_item_count,expected_write_calls",
     [
         # Given a chunk size equal to the size of the data, only one write call should
-        # be performed, regardless of how many simultaneous requests are allowed.
+        # be performed, regardless of how many concurrent requests are allowed.
         (4, None, {4}, 1),
         (4, 1, {4}, 1),
         (4, 20, {4}, 1),
@@ -216,11 +217,11 @@ async def test_backends_data_base_async_read_with_max_statements():
         (2, 20, {2}, 2),
         (3, 2, {1, 3}, 2),
         (3, 20, {1, 3}, 2),
-        # However, given a limit of one simultaneous request, only one write call is
+        # However, given a limit of one concurrent request, only one write call is
         # allowed.
         (2, 1, {4}, 1),
         (3, 1, {4}, 1),
-        # Given a chunk size equal to one, up to four simultaneous write calls can be
+        # Given a chunk size equal to one, up to four concurrent write calls can be
         # performed.
         (1, 1, {4}, 1),
         (1, 2, {1}, 4),
@@ -228,13 +229,16 @@ async def test_backends_data_base_async_read_with_max_statements():
     ],
 )
 @pytest.mark.anyio
-async def test_backends_data_base_async_write_with_simultaneous(
-    chunk_size, max_num_simultaneous, expected_item_count, expected_write_calls
+async def test_backends_data_base_async_write_with_concurrency(
+    chunk_size, concurrency, expected_item_count, expected_write_calls, monkeypatch
 ):
-    """Test the async `AsyncWritable.write` method with `simultaneous` parameter."""
+    """Test the async `AsyncWritable.write` method with `concurrency` argument."""
 
     write_calls = {"count": 0}
+    gather_calls = {"count": 0}
+    data = (i for i in range(4))
     expected_data = {0, 1, 2, 3}
+    expected_concurrency = concurrency if concurrency else 1
 
     class MockAsyncBaseDataBackend(
         BaseAsyncDataBackend[BaseDataBackendSettings, BaseQuery], AsyncWritable
@@ -266,18 +270,32 @@ async def test_backends_data_base_async_write_with_simultaneous(
         async def close(self):
             pass
 
+    async def mock_gather_with_limited_concurrency(num_tasks, *tasks):
+        """Mock the gather_with_limited_concurrency method."""
+        assert len(tasks) <= expected_concurrency
+        assert num_tasks == expected_concurrency
+        gather_calls["count"] += 1
+        return await gather_with_limited_concurrency(num_tasks, *tasks)
+
     backend = MockAsyncBaseDataBackend()
+    monkeypatch.setattr(
+        "ralph.backends.data.base.gather_with_limited_concurrency",
+        mock_gather_with_limited_concurrency,
+    )
+
     assert (
-        await backend.write(
-            (i for i in range(4)),
-            chunk_size=chunk_size,
-            simultaneous=True,
-            max_num_simultaneous=max_num_simultaneous,
-        )
-    ) == 4
+        await backend.write(data, chunk_size=chunk_size, concurrency=concurrency) == 4
+    )
     # All data should be consumed.
     assert not expected_data
     assert write_calls["count"] == expected_write_calls
+
+    if expected_concurrency == 1:
+        assert not gather_calls["count"]
+    else:
+        assert gather_calls["count"] == max(
+            1, int(4 / chunk_size / expected_concurrency)
+        )
 
 
 @pytest.mark.anyio
@@ -366,28 +384,16 @@ async def test_backends_data_base_async_write_with_invalid_parameters(caplog):
 
     backend = MockAsyncBaseDataBackend()
 
-    # Given `max_num_simultation` is set to a negative value and `simultaneous` is True,
-    # the write method should raise a `BackendParameterException` and log an error.
-    msg = "max_num_simultaneous must be a strictly positive integer"
+    # Given `concurrency` is set to a negative value, the write method should raise a
+    # `BackendParameterException` and produce an error log.
+    msg = "concurrency must be a strictly positive integer"
     with pytest.raises(BackendParameterException, match=msg):
         with caplog.at_level(logging.ERROR):
-            assert await backend.write([{}], simultaneous=True, max_num_simultaneous=-1)
+            assert await backend.write([{}], concurrency=-1)
 
     assert (
         "tests.backends.data.test_base",
         logging.ERROR,
-        msg,
-    ) in caplog.record_tuples
-
-    # Given `max_num_simultation` is set and `simultaneous` is False, the write method
-    # should log a warning.
-    msg = "max_num_simultaneous is ignored when `simultaneous=False`"
-    with caplog.at_level(logging.WARNING):
-        assert await backend.write([{}], max_num_simultaneous=-1) == 1
-
-    assert (
-        "tests.backends.data.test_base",
-        logging.WARNING,
         msg,
     ) in caplog.record_tuples
 
