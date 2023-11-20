@@ -76,7 +76,7 @@ class AsyncLRSDataBackend(
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-        greedy: bool = False,
+        prefetch: Optional[int] = None,
         max_statements: Optional[int] = None,
     ) -> Union[AsyncIterator[bytes], AsyncIterator[dict]]:
         """Get statements from LRS `target` endpoint.
@@ -99,14 +99,22 @@ class AsyncLRSDataBackend(
             ignore_errors (bool): If `True`, errors during the read operation
                 are ignored and logged. If `False` (default), a `BackendException`
                 is raised if an error occurs.
-            greedy: If set to True, the client will fetch all available pages even
-                before the statements yielded by the generator are consumed. Caution:
-                this might potentially lead to large amounts of API calls and to the
-                memory filling up.
+            prefetch: The number of records to prefetch (queue) while yielding.
+                If `prefetch` is `None` or `0` it defaults to `1` - no records are
+                prefetched.
+                If `prefetch` is less than zero, all records are prefetched.
+                Caution: setting `prefetch<0` might potentially lead to large amounts
+                of API calls and to the memory filling up.
             max_statements: The maximum number of statements to yield.
         """
         statements = super().read(
-            query, target, chunk_size, raw_output, ignore_errors, greedy, max_statements
+            query,
+            target,
+            chunk_size,
+            raw_output,
+            ignore_errors,
+            prefetch,
+            max_statements,
         )
         async for statement in statements:
             yield statement

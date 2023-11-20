@@ -268,7 +268,7 @@ def lrs_backend(
 
         @wraps(sync_func)
         async def async_func(*args, **kwargs):
-            kwargs.pop("greedy", None)
+            kwargs.pop("prefetch", None)
             for item in sync_func(*args, **kwargs):
                 yield item
 

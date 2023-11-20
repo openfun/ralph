@@ -117,7 +117,6 @@ class LRSDataBackend(
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-        greedy: bool = False,
         max_statements: Optional[int] = None,
     ) -> Union[Iterator[bytes], Iterator[dict]]:
         """Get statements from LRS `target` endpoint.
@@ -140,14 +139,10 @@ class LRSDataBackend(
             ignore_errors (bool): If `True`, errors during the read operation
                 are ignored and logged. If `False` (default), a `BackendException`
                 is raised if an error occurs.
-            greedy: If set to True, the client will fetch all available pages even
-                before the statements yielded by the generator are consumed. Caution:
-                this might potentially lead to large amounts of API calls and to the
-                memory filling up.
             max_statements: The maximum number of statements to yield.
         """
         yield from super().read(
-            query, target, chunk_size, raw_output, ignore_errors, greedy, max_statements
+            query, target, chunk_size, raw_output, ignore_errors, max_statements
         )
 
     def _read_bytes(

@@ -609,7 +609,7 @@ def convert(from_, to_, ignore_errors, fail_on_unknown, **conversion_set_kwargs)
 @RalphCLI.lazy_backends_options(get_cli_backends)
 @click.argument("archive", required=False)
 @click.option(
-    "-c",
+    "-s",
     "--chunk-size",
     type=int,
     default=None,
@@ -693,7 +693,7 @@ def read(  # noqa: PLR0913
     help="The target container to write into",
 )
 @click.option(
-    "-c",
+    "-s",
     "--chunk-size",
     type=int,
     default=None,
@@ -715,21 +715,10 @@ def read(  # noqa: PLR0913
     help="Either index, create, delete, update or append",
 )
 @click.option(
-    "-s",
-    "--simultaneous",
-    default=False,
-    is_flag=True,
-    help="Write chunks simultaneously (instead of sequentially). (async backends only)",
-)
-@click.option(
-    "-m",
-    "--max-num-simultaneous",
-    type=int,
-    default=None,
-    help=(
-        "The maximum number of chunks to send at once, when using `--simultaneous`. "
-        "(async backends only)"
-    ),
+    "-c",
+    "--concurrency",
+    default=1,
+    help="Number of chunks to write concurrently. (async backends only)",
 )
 def write(  # noqa: PLR0913
     backend,
@@ -737,17 +726,13 @@ def write(  # noqa: PLR0913
     chunk_size,
     ignore_errors,
     operation_type,
-    simultaneous,
-    max_num_simultaneous,
+    concurrency,
     **options,
 ):
     """Write an archive to a configured backend."""
     logger.info("Writing to target %s for the configured %s backend", target, backend)
 
     logger.debug("Backend parameters: %s", options)
-
-    if max_num_simultaneous == 1:
-        max_num_simultaneous = None
 
     backend_class = get_backend_class(get_cli_write_backends(), backend)
     backend = get_backend_instance(backend_class, options)
@@ -756,10 +741,7 @@ def write(  # noqa: PLR0913
     async_options = {}
     if isinstance(backend, AsyncWritable):
         writer = execute_async(backend.write)
-        async_options = {
-            "simultaneous": simultaneous,
-            "max_num_simultaneous": max_num_simultaneous,
-        }
+        async_options = {"concurrency": concurrency}
 
     writer(
         data=sys.stdin.buffer,

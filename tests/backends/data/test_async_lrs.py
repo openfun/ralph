@@ -183,9 +183,9 @@ async def test_backends_data_async_lrs_read_max_statements(
 
 
 @pytest.mark.anyio
-@pytest.mark.parametrize("greedy", [False, True])
+@pytest.mark.parametrize("prefetch", [1, 10])
 async def test_backends_data_async_lrs_read_without_target(
-    greedy: bool, httpx_mock: HTTPXMock, lrs_backend
+    prefetch: int, httpx_mock: HTTPXMock, lrs_backend
 ):
     """Test that the LRS backend `read` method without target parameter value fetches
     statements from '/xAPI/statements/' default endpoint.
@@ -194,15 +194,15 @@ async def test_backends_data_async_lrs_read_without_target(
     response = {"statements": mock_statement()}
     url = "http://fake-lrs.com/xAPI/statements/?limit=500"
     httpx_mock.add_response(url=url, method="GET", json=response)
-    result = [x async for x in backend.read(greedy=greedy)]
+    result = [x async for x in backend.read(prefetch=prefetch)]
     assert result == [response["statements"]]
     await backend.close()
 
 
 @pytest.mark.anyio
-@pytest.mark.parametrize("greedy", [False, True])
+@pytest.mark.parametrize("prefetch", [1, 10])
 async def test_backends_data_async_lrs_read_backend_error(
-    httpx_mock: HTTPXMock, caplog, greedy: bool, lrs_backend
+    httpx_mock: HTTPXMock, caplog, prefetch: int, lrs_backend
 ):
     """Test the LRS backend `read` method raises a `BackendException` when the server
     returns an error.
@@ -217,7 +217,7 @@ async def test_backends_data_async_lrs_read_backend_error(
     )
     with pytest.raises(BackendException, match=re.escape(error)):
         with caplog.at_level(logging.ERROR):
-            _ = [x async for x in backend.read(greedy=greedy)]
+            _ = [x async for x in backend.read(prefetch=prefetch)]
 
     assert (
         f"ralph.backends.data.{backend.name}",
@@ -228,9 +228,9 @@ async def test_backends_data_async_lrs_read_backend_error(
 
 
 @pytest.mark.anyio
-@pytest.mark.parametrize("greedy", [False, True])
+@pytest.mark.parametrize("prefetch", [1, 10])
 async def test_backends_data_async_lrs_read_without_pagination(
-    httpx_mock: HTTPXMock, greedy: bool, lrs_backend
+    httpx_mock: HTTPXMock, prefetch: int, lrs_backend
 ):
     """Test the LRS backend `read` method when the request on the target endpoint
     returns statements without pagination.
@@ -248,11 +248,11 @@ async def test_backends_data_async_lrs_read_without_pagination(
     httpx_mock.add_response(url=url, method="GET", json=response)
 
     # Return an iterable of dict
-    result = [x async for x in backend.read(raw_output=False, greedy=greedy)]
+    result = [x async for x in backend.read(raw_output=False, prefetch=prefetch)]
     assert result == statements
 
     # Return an iterable of bytes
-    result = [x async for x in backend.read(raw_output=True, greedy=greedy)]
+    result = [x async for x in backend.read(raw_output=True, prefetch=prefetch)]
     assert result == [
         f"{json.dumps(statement)}\n".encode("utf-8") for statement in statements
     ]
@@ -260,9 +260,9 @@ async def test_backends_data_async_lrs_read_without_pagination(
 
 
 @pytest.mark.anyio
-@pytest.mark.parametrize("greedy", [False, True])
+@pytest.mark.parametrize("prefetch", [1, 10])
 async def test_backends_data_async_lrs_read_without_pagination_with_query(
-    httpx_mock: HTTPXMock, greedy: bool, lrs_backend
+    httpx_mock: HTTPXMock, prefetch: int, lrs_backend
 ):
     """Test the LRS backend `read` method with a query when the request on the target
     endpoint returns statements without pagination.
@@ -279,12 +279,12 @@ async def test_backends_data_async_lrs_read_without_pagination_with_query(
     url = f"http://fake-lrs.com/xAPI/statements/?limit=500&verb={verb_id}"
     httpx_mock.add_response(url=url, method="GET", json=response)
     # Return an iterable of dict
-    reader = backend.read(query=query, raw_output=False, greedy=greedy)
+    reader = backend.read(query=query, raw_output=False, prefetch=prefetch)
     result = [x async for x in reader]
     assert result == statements
 
     # Return an iterable of bytes
-    reader = backend.read(query=query, raw_output=True, greedy=greedy)
+    reader = backend.read(query=query, raw_output=True, prefetch=prefetch)
     result = [x async for x in reader]
     assert result == [
         f"{json.dumps(statement)}\n".encode("utf-8") for statement in statements
@@ -701,22 +701,22 @@ async def test_backends_data_async_lrs_read_concurrency(
             method="GET",
         )
 
-    # Check that greedy read is faster than non-greedy when processing is slow
+    # Check that read with `prefetch` is faster than without when processing is slow
     time_1 = time.time()
-    async for _ in backend.read(target=targets[0], chunk_size=chunk_size, greedy=False):
+    async for _ in backend.read(target=targets[0], chunk_size=chunk_size):
         await _simulate_slow_processing()
-    duration_non_greedy = time.time() - time_1
+    without_prefetch_duration = time.time() - time_1
 
     time_2 = time.time()
-    async for _ in backend.read(target=targets[0], chunk_size=chunk_size, greedy=True):
+    async for _ in backend.read(target=targets[0], chunk_size=chunk_size, prefetch=-1):
         await _simulate_slow_processing()
-    duration_greedy = time.time() - time_2
+    prefetch_duration = time.time() - time_2
 
     # Assert gains are close enough to theoretical gains
     proximity_ratio = 0.9
     assert (
-        duration_non_greedy
-        > duration_greedy + proximity_ratio * (num_pages - 1) * network_latency_time
+        without_prefetch_duration
+        > prefetch_duration + proximity_ratio * (num_pages - 1) * network_latency_time
     )
 
 
