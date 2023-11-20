@@ -250,8 +250,7 @@ def test_backends_data_mongo_list_with_history(mongo_backend, caplog):
     backend.close()
 
 
-@pytest.mark.parametrize("greedy", [False, True])
-def test_backends_data_mongo_read_with_raw_output(greedy, mongo, mongo_backend):
+def test_backends_data_mongo_read_with_raw_output(mongo, mongo_backend):
     """Test the `MongoDataBackend.read` method with `raw_output` set to `True`."""
 
     backend = mongo_backend()
@@ -267,15 +266,14 @@ def test_backends_data_mongo_read_with_raw_output(greedy, mongo, mongo_backend):
     ]
     backend.collection.insert_many(documents)
     backend.database.foobar.insert_many(documents[:2])
-    assert list(backend.read(raw_output=True, greedy=greedy)) == expected
+    assert list(backend.read(raw_output=True)) == expected
     assert list(backend.read(raw_output=True, target="foobar")) == expected[:2]
     assert list(backend.read(raw_output=True, chunk_size=2)) == expected
     assert list(backend.read(raw_output=True, chunk_size=1000)) == expected
     backend.close()
 
 
-@pytest.mark.parametrize("greedy", [False, True])
-def test_backends_data_mongo_read_without_raw_output(greedy, mongo, mongo_backend):
+def test_backends_data_mongo_read_without_raw_output(mongo, mongo_backend):
     """Test the `MongoDataBackend.read` method with `raw_output` set to `False`."""
 
     backend = mongo_backend()
@@ -291,7 +289,7 @@ def test_backends_data_mongo_read_without_raw_output(greedy, mongo, mongo_backen
     ]
     backend.collection.insert_many(documents)
     backend.database.foobar.insert_many(documents[:2])
-    assert list(backend.read(greedy=greedy)) == expected
+    assert list(backend.read()) == expected
     assert list(backend.read(target="foobar")) == expected[:2]
     assert list(backend.read(chunk_size=2)) == expected
     assert list(backend.read(chunk_size=1000)) == expected

@@ -278,9 +278,8 @@ def test_backends_data_swift_list_with_failed_connection(
     backend.close()
 
 
-@pytest.mark.parametrize("greedy", [False, True])
 def test_backends_data_swift_read_with_raw_output(
-    greedy, swift_backend, monkeypatch, fs, settings_fs
+    swift_backend, monkeypatch, fs, settings_fs
 ):
     """Test the `SwiftDataBackend.read` method with `raw_output` set to `True`."""
 
@@ -301,7 +300,7 @@ def test_backends_data_swift_read_with_raw_output(
     fs.create_file(settings.HISTORY_FILE, contents=json.dumps([]))
 
     # The `read` method should read the object and yield bytes.
-    result = backend.read(raw_output=True, query="2020-04-29.gz", greedy=greedy)
+    result = backend.read(raw_output=True, query="2020-04-29.gz")
     assert isinstance(result, Iterable)
     assert list(result) == [content]
 
@@ -340,9 +339,8 @@ def test_backends_data_swift_read_with_raw_output(
     backend.close()
 
 
-@pytest.mark.parametrize("greedy", [False, True])
 def test_backends_data_swift_read_without_raw_output(
-    greedy, swift_backend, monkeypatch, fs, settings_fs
+    swift_backend, monkeypatch, fs, settings_fs
 ):
     """Test the `SwiftDataBackend.read` method with `raw_output` set to `False`."""
 
@@ -364,7 +362,7 @@ def test_backends_data_swift_read_without_raw_output(
     fs.create_file(settings.HISTORY_FILE, contents=json.dumps([]))
 
     # The `read` method should read the object and yield bytes.
-    result = backend.read(raw_output=False, query="2020-04-29.gz", greedy=greedy)
+    result = backend.read(raw_output=False, query="2020-04-29.gz")
     assert isinstance(result, Iterable)
     assert list(result) == [content_dict]
 

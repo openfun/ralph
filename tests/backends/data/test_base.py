@@ -1,5 +1,6 @@
 """Tests for the base data backend"""
 
+import asyncio
 import logging
 from typing import Any, Union
 
@@ -158,54 +159,51 @@ def test_backends_data_base_read_with_max_statements():
     assert not list(backend.read(max_statements=0, raw_output=True))
 
 
-def test_backends_data_base_read_with_greedy():
-    """Test the `BaseDataBackend.read` method with `greedy` argument."""
+@pytest.mark.anyio
+@pytest.mark.parametrize(
+    "prefetch,expected_consumed_items",
+    [
+        # Given `prefetch` set to `None`, 0 or 1, the `read` method should consume data
+        # on demand.
+        (None, 1),  # One item read -> one item consumed.
+        (0, 1),
+        (1, 1),
+        # Given `prefetch>1`, the `read` method should consume `prefetch` number of
+        # items ahead.
+        (2, 3),  # One item read -> one item consumed + 2 items prefetched.
+        (3, 4),
+        # Given `prefetch<0`, the `read` method should consume all items.
+        (-1, 6),  # One item read -> one item consumed + 5 (remaining) items prefetched.
+    ],
+)
+async def test_backends_data_base_async_read_with_prefetch(
+    prefetch, expected_consumed_items
+):
+    """Test the `BaseAsyncDataBackend.read` method with `prefetch` argument."""
+    consumed_items = {"count": 0}
 
-    def get_mock_read_dicts(data):
-        """Return a `_read_dict` mock method yielding data."""
-
-        def mock_read_dicts(self, *args):
-            """Mock the `BaseDataBackend._read_dicts` method yielding data."""
-            for item in data:
-                yield item
-
-        return mock_read_dicts
-
-    class MockBaseDataBackend(BaseDataBackend[BaseDataBackendSettings, BaseQuery]):
+    class MockDataBackend(BaseAsyncDataBackend[BaseDataBackendSettings, BaseQuery]):
         """A class mocking the base database class."""
 
-        def _read_dicts(self, *args):
+        async def _read_dicts(self, *args):
+            """Yield 6 chunks of `chunk_size` size."""
+            for _ in range(6):
+                consumed_items["count"] += 1
+                yield {"foo": "bar"}
+
+        async def _read_bytes(self, *args):
             pass
 
-        def _read_bytes(self, *args):
+        async def status(self):
             pass
 
-        def status(self):
+        async def close(self):
             pass
 
-        def close(self):
-            pass
-
-    backend = MockBaseDataBackend()
-    # Given `greedy` set to `False`, the `read` method should consume data on demand.
-    data = ({"foo": "bar"} for _ in range(4))
-    backend._read_dicts = get_mock_read_dicts(data)
-    assert next(backend.read()) == {"foo": "bar"}
-    assert len(list(data)) == 3  # one item was requested - one item was consumed.
-
-    # Given `greedy` set to `True`, the `read` method should consume all data.
-    data = ({"foo": "bar"} for _ in range(4))
-    backend._read_dicts = get_mock_read_dicts(data)
-    assert next(backend.read(greedy=True)) == {"foo": "bar"}
-    assert not list(data)  # all items are consumed.
-
-    # Given `greedy` set to `True` and a `max_statements` limit, the `read` method
-    # should consume all data until reaching `max_statements`.
-    data = ({"foo": "bar"} for _ in range(4))
-    backend._read_dicts = get_mock_read_dicts(data)
-    statements = backend.read(greedy=True, max_statements=3)
-    assert next(statements) == {"foo": "bar"}
-    assert list(data) == [{"foo": "bar"}]  # 3 items are consumed.
+    backend = MockDataBackend()
+    assert await backend.read(prefetch=prefetch).__anext__() == {"foo": "bar"}
+    await asyncio.sleep(0.2)
+    assert consumed_items["count"] == expected_consumed_items
 
 
 @pytest.mark.anyio
@@ -253,6 +251,7 @@ async def test_backends_data_base_async_read_with_max_statements():
     assert not [_ async for _ in backend.read(max_statements=0, raw_output=True)]
 
 
+@pytest.mark.anyio
 @pytest.mark.parametrize(
     "chunk_size,concurrency,expected_item_count,expected_write_calls",
     [
@@ -278,7 +277,6 @@ async def test_backends_data_base_async_read_with_max_statements():
         (1, 20, {1}, 4),
     ],
 )
-@pytest.mark.anyio
 async def test_backends_data_base_async_write_with_concurrency(
     chunk_size, concurrency, expected_item_count, expected_write_calls, monkeypatch
 ):

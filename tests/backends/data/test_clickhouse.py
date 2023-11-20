@@ -110,10 +110,7 @@ def test_backends_data_clickhouse_status(clickhouse, clickhouse_backend, monkeyp
     backend.close()
 
 
-@pytest.mark.parametrize("greedy", [False, True])
-def test_backends_data_clickhouse_read_with_raw_output(
-    greedy, clickhouse, clickhouse_backend
-):
+def test_backends_data_clickhouse_read_with_raw_output(clickhouse, clickhouse_backend):
     """Test the `ClickHouseDataBackend.read` method."""
 
     # Create records
@@ -130,19 +127,19 @@ def test_backends_data_clickhouse_read_with_raw_output(
     backend = clickhouse_backend()
     backend.write(statements)
 
-    results = list(backend.read(greedy=greedy))
+    results = list(backend.read())
     assert len(results) == 3
     assert results[0]["event"] == statements[0]
     assert results[1]["event"] == statements[1]
     assert results[2]["event"] == statements[2]
 
-    results = list(backend.read(chunk_size=10, greedy=greedy))
+    results = list(backend.read(chunk_size=10))
     assert len(results) == 3
     assert results[0]["event"] == statements[0]
     assert results[1]["event"] == statements[1]
     assert results[2]["event"] == statements[2]
 
-    results = list(backend.read(raw_output=True, greedy=greedy))
+    results = list(backend.read(raw_output=True))
     assert len(results) == 3
     assert isinstance(results[0], bytes)
     assert json.loads(results[0])["event"] == statements[0]

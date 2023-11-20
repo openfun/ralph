@@ -358,8 +358,7 @@ def test_backends_data_fs_list_with_history_and_details(fs_backend, fs):
     assert sorted(result, key=itemgetter("path")) == expected
 
 
-@pytest.mark.parametrize("greedy", [False, True])
-def test_backends_data_fs_read_with_raw_ouput(greedy, fs_backend, fs, monkeypatch):
+def test_backends_data_fs_read_with_raw_ouput(fs_backend, fs, monkeypatch):
     """Test the `FSDataBackend.read` method with `raw_output` set to `True`."""
 
     # Create files in absolute path directory.
@@ -379,7 +378,7 @@ def test_backends_data_fs_read_with_raw_ouput(greedy, fs_backend, fs, monkeypatc
 
     # Given no `target`, the `read` method should read all files in the default
     # directory and yield bytes.
-    result = backend.read(raw_output=True, greedy=greedy)
+    result = backend.read(raw_output=True)
     assert isinstance(result, Iterable)
     assert list(result) == [b"baz"]
 
@@ -398,7 +397,7 @@ def test_backends_data_fs_read_with_raw_ouput(greedy, fs_backend, fs, monkeypatc
 
     # Given an absolute `target` path, the `read` method should read all files in the
     # target directory and yield bytes.
-    result = backend.read(raw_output=True, target=absolute_path, greedy=greedy)
+    result = backend.read(raw_output=True, target=absolute_path)
     assert isinstance(result, Iterable)
     assert list(result) == [b"foo", b"bar"]
 
@@ -425,7 +424,7 @@ def test_backends_data_fs_read_with_raw_ouput(greedy, fs_backend, fs, monkeypatc
 
     # Given a relative `target` path, the `read` method should read all files in the
     # target directory relative to the default directory and yield bytes.
-    result = backend.read(raw_output=True, target="./bar", greedy=greedy)
+    result = backend.read(raw_output=True, target="./bar")
     assert isinstance(result, Iterable)
     assert list(result) == [b"qux"]
 
@@ -445,9 +444,7 @@ def test_backends_data_fs_read_with_raw_ouput(greedy, fs_backend, fs, monkeypatc
     # Given a `chunk_size` and an absolute `target` path,
     # the `read` method should write the output bytes in chunks of the specified
     # `chunk_size`.
-    result = backend.read(
-        raw_output=True, target=absolute_path, chunk_size=2, greedy=greedy
-    )
+    result = backend.read(raw_output=True, target=absolute_path, chunk_size=2)
     assert isinstance(result, Iterable)
     assert list(result) == [b"fo", b"o", b"ba", b"r"]
 
@@ -473,8 +470,7 @@ def test_backends_data_fs_read_with_raw_ouput(greedy, fs_backend, fs, monkeypatc
     ]
 
 
-@pytest.mark.parametrize("greedy", [False, True])
-def test_backends_data_fs_read_without_raw_output(greedy, fs_backend, fs, monkeypatch):
+def test_backends_data_fs_read_without_raw_output(fs_backend, fs, monkeypatch):
     """Test the `FSDataBackend.read` method with `raw_output` set to `False`."""
 
     # File contents.
@@ -499,7 +495,7 @@ def test_backends_data_fs_read_without_raw_output(greedy, fs_backend, fs, monkey
 
     # Given no `target`, the `read` method should read all files in the default
     # directory and yield dictionaries.
-    result = backend.read(raw_output=False, greedy=greedy)
+    result = backend.read(raw_output=False)
     assert isinstance(result, Iterable)
     assert list(result) == [valid_dictionary, valid_dictionary]
 
@@ -518,7 +514,7 @@ def test_backends_data_fs_read_without_raw_output(greedy, fs_backend, fs, monkey
 
     # Given an absolute `target` path, the `read` method should read all files in the
     # target directory and yield dictionaries.
-    result = backend.read(raw_output=False, target=absolute_path, greedy=greedy)
+    result = backend.read(raw_output=False, target=absolute_path)
     assert isinstance(result, Iterable)
     assert list(result) == [valid_dictionary]
 
@@ -537,7 +533,7 @@ def test_backends_data_fs_read_without_raw_output(greedy, fs_backend, fs, monkey
 
     # Given a relative `target` path, the `read` method should read all files in the
     # target directory relative to the default directory and yield dictionaries.
-    result = backend.read(raw_output=False, target="bar", greedy=greedy)
+    result = backend.read(raw_output=False, target="bar")
     assert isinstance(result, Iterable)
     assert list(result) == [valid_dictionary, valid_dictionary, valid_dictionary]
 

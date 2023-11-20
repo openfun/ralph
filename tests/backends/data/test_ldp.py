@@ -564,8 +564,7 @@ def test_backends_data_ldp_read_with_failure(ldp_backend, monkeypatch):
         next(backend.read(query="foo"))
 
 
-@pytest.mark.parametrize("greedy", [False, True])
-def test_backends_data_ldp_read_with_query(greedy, ldp_backend, monkeypatch, fs):
+def test_backends_data_ldp_read_with_query(ldp_backend, monkeypatch, fs):
     """Test the `LDPDataBackend.read` method, given a query argument."""
 
     # Create fake archive to stream.
@@ -615,9 +614,7 @@ def test_backends_data_ldp_read_with_query(greedy, ldp_backend, monkeypatch, fs)
 
     with requests_mock.Mocker() as request_mocker:
         request_mocker.get("http://example.com", content=archive)
-        result = b"".join(
-            backend.read(query="5d5c4c93-04a4-42c5-9860-f51fa4044aa1", greedy=greedy)
-        )
+        result = b"".join(backend.read(query="5d5c4c93-04a4-42c5-9860-f51fa4044aa1"))
 
     assert os.path.exists(settings.HISTORY_FILE)
     assert backend.history == [
