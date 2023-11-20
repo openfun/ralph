@@ -18,15 +18,15 @@
         <link rel="prev" href="../backends/">
       
       
-        <link rel="next" href="edx/">
+        <link rel="next" href="../tutorials/development_contributing/">
       
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      <link rel="icon" href="../img/favicon.png">
       <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.8">
     
     
       
-        <title>Rationale - Ralph</title>
+        <title>Learning statements models - Ralph</title>
       
     
     
@@ -54,6 +54,8 @@
     
       <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
+      <link rel="stylesheet" href="../css/neoteroi-mkdocs.css">
+    
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -69,7 +71,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="indigo">
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="pink" data-md-color-accent="indigo">
   
     
     
@@ -78,8 +80,27 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#learning_statement_models" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
+      
+        <aside class="md-banner">
+          <div class="md-banner__inner md-grid md-typeset">
+            
+            
+  <!-- the following line is displayed in the announcement bar -->
+<!-- keep length under 164 characters (less HTML tags) to fit on 1280px desktop window -->
+🌟 Big News! Ralph v4 is here. Don't forget to check out our 
+<a href=https://github.com/openfun/ralph/blob/master/UPGRADE.md>migration guide</a> 
+for a seamless transition. 🚀
+
+          </div>
+          
+        </aside>
       
     </div>
     
@@ -90,14 +111,11 @@
     
       
 
-  
-
-<header class="md-header md-header--shadow" data-md-component="header">
+<header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href=".." title="Ralph" class="md-header__button md-logo" aria-label="Ralph" data-md-component="logo">
       
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+  <img src="../img/ralph-white.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -114,7 +132,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Rationale
+              Learning statements models
             
           </span>
         </div>
@@ -184,6 +202,122 @@
       
         
           
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+    
+  
+  Ralph
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../api/" class="md-tabs__link">
+          
+  
+  Features
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../tutorials/development_contributing/" class="md-tabs__link">
+          
+  
+  Tutorials
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../contribute/" class="md-tabs__link">
+        
+  
+    
+  
+  Contributing
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../UPGRADE/" class="md-tabs__link">
+        
+  
+    
+  
+  Migration
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../CHANGELOG/" class="md-tabs__link">
+          
+  
+  About the project
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
         
       
       <main class="md-main" data-md-component="main">
@@ -197,13 +331,14 @@
                     
 
 
+  
 
-<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href=".." title="Ralph" class="md-nav__button md-logo" aria-label="Ralph" data-md-component="logo">
       
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+  <img src="../img/ralph-white.png" alt="logo">
 
     </a>
     Ralph
@@ -228,48 +363,12 @@
   
   
   
-    
-    
-    
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
-        
-          
-          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
-            
-  
-  <span class="md-ellipsis">
-    Getting started
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_1">
-            <span class="md-nav__icon md-icon"></span>
-            Getting started
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
     <li class="md-nav__item">
       <a href=".." class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Introduction
+    Ralph
   </span>
   
 
@@ -277,14 +376,6 @@
     </li>
   
 
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
     
       
       
@@ -298,7 +389,10 @@
     
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
@@ -306,11 +400,11 @@
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
             
   
   <span class="md-ellipsis">
-    User guide
+    Features
   </span>
   
 
@@ -320,7 +414,7 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
-            User guide
+            Features
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -330,11 +424,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../commands/" class="md-nav__link">
+      <a href="../api/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Commands
+    LRS HTTP server
   </span>
   
 
@@ -354,7 +448,7 @@
         
   
   <span class="md-ellipsis">
-    Backends
+    Backends for data storage
   </span>
   
 
@@ -363,44 +457,6 @@
   
 
               
-            
-              
-                
-  
-  
-    
-  
-  
-    
-    
-    
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
-            
-  
-  <span class="md-ellipsis">
-    Learning event models
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_2_3">
-            <span class="md-nav__icon md-icon"></span>
-            Learning event models
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
             
               
                 
@@ -414,85 +470,70 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Learning statements models
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
-    Rationale
+    Learning statements models
   </span>
   
 
       </a>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="edx/" class="md-nav__link">
         
-  
-  <span class="md-ellipsis">
-    Open edX events
-  </span>
-  
 
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
   
-    <li class="md-nav__item">
-      <a href="xapi/" class="md-nav__link">
-        
+    
   
-  <span class="md-ellipsis">
-    xAPI events
-  </span>
   
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
-    </li>
+        <li class="md-nav__item">
+  <a href="#supported_statements" class="md-nav__link">
+    Supported statements
+  </a>
   
-
-              
-            
-              
-                
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#statements_validation" class="md-nav__link">
+    Statements validation
+  </a>
   
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#statements_conversion" class="md-nav__link">
+    Statements conversion
+  </a>
   
+</li>
+      
+    </ul>
   
-    <li class="md-nav__item">
-      <a href="../api/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    API
-  </span>
-  
-
-      </a>
+</nav>
+      
     </li>
   
 
@@ -515,7 +556,10 @@
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+      
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
@@ -523,11 +567,11 @@
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   <span class="md-ellipsis">
-    Developer guide
+    Tutorials
   </span>
   
 
@@ -537,7 +581,7 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
-            Developer guide
+            Tutorials
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -547,11 +591,51 @@
   
   
     <li class="md-nav__item">
-      <a href="../contribute/" class="md-nav__link">
+      <a href="../tutorials/development_contributing/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Contribute
+    Development - Contributing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/cli/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Use Ralph as a CLI
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/library/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Use Ralph as a library
   </span>
   
 
@@ -573,20 +657,61 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../contribute/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Contributing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../UPGRADE/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migration
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+      
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
             
   
   <span class="md-ellipsis">
@@ -597,8 +722,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             About the project
           </label>
@@ -668,6 +793,37 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#supported_statements" class="md-nav__link">
+    Supported statements
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#statements_validation" class="md-nav__link">
+    Statements validation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#statements_conversion" class="md-nav__link">
+    Statements conversion
+  </a>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -679,28 +835,100 @@
             <div class="md-content" data-md-component="content">
               <article class="md-content__inner md-typeset">
                 
+  
                   
 
   
   
 
 
-  <h1>Rationale</h1>
-
-<p>Ralph can be considered versatile since at some point it is
-log-content-agnostic: most commands will work as expected without transforming
-logged events content or format.</p>
-<p>But on the other side, Ralph is a tool dedicated to learning events processing
-so we&rsquo;ve implemented key features related to learning events validation and
-conversion. For now, we mostly focus on two learning events standards: <a href="https://edx.readthedocs.io/projects/edx-developer-guide/en/latest/analytics.html">Open
-edX</a>
-and <a href="https://adlnet.gov/projects/xapi/">xAPI</a>.</p>
-<p>Data validation and serialisation/de-serialisation are achieved using
-<a href="https://pydantic-docs.helpmanual.io">pydantics</a> models that are documented in
-the following subsections:</p>
+<h1 id="learning_statement_models">Learning statement models<a class="headerlink" href="#learning_statement_models" title="Permanent link">&para;</a></h1>
+<p>The learning statement models validation and conversion tools in Ralph empower you to work with an LRS and ensure the quality of xAPI statements.
+These features not only enhance the integrity of your learning data but also facilitate integration and compliance with industry standards.</p>
+<p>This section provides insights into the supported models, their conversion, and validation.</p>
+<h2 id="supported_statements">Supported statements<a class="headerlink" href="#supported_statements" title="Permanent link">&para;</a></h2>
+<p>Learning statement models encompass a wide array of xAPI and OpenEdx statement types, ensuring comprehensive support for your e-learning data.</p>
+<ol>
+<li>
+<p><strong>xAPI statements models</strong>:</p>
 <ul>
-<li><a href="./edx/">Open edX events</a></li>
-<li><a href="./xapi/">xAPI events</a></li>
+<li><a href="https://profiles.adlnet.gov/profile/c4e8732c-428a-4aa0-9585-91bebcdea91d">LMS</a></li>
+<li><a href="https://profiles.adlnet.gov/profile/90b2c849-d744-4d0c-8bd0-403e7859a35b">Video</a></li>
+<li><a href="https://profiles.adlnet.gov/profile/4719f43e-28ef-4108-b76a-5fbde91c6f68">Virtual classroom</a></li>
+</ul>
+</li>
+<li>
+<p><strong>OpenEdx statements models</strong>:</p>
+<ul>
+<li><a href="https://edx.readthedocs.io/projects/devdata/en/latest/internal_data_formats/tracking_logs/student_event_types.html#enrollment-events">Enrollment</a></li>
+<li><a href="https://edx.readthedocs.io/projects/devdata/en/latest/internal_data_formats/tracking_logs/student_event_types.html#course-navigation-events">Navigational</a></li>
+<li><a href="https://edx.readthedocs.io/projects/devdata/en/latest/internal_data_formats/tracking_logs/student_event_types.html#open-response-assessment-events">Open Reponse Assessment</a></li>
+<li><a href="https://edx.readthedocs.io/projects/devdata/en/latest/internal_data_formats/tracking_logs/student_event_types.html#peer-instruction-events">Peer instruction</a></li>
+<li><a href="https://edx.readthedocs.io/projects/devdata/en/latest/internal_data_formats/tracking_logs/student_event_types.html#problem-interaction-events">Problem interaction</a></li>
+<li><a href="https://edx.readthedocs.io/projects/devdata/en/latest/internal_data_formats/tracking_logs/student_event_types.html#textbook-interaction-events">Textbook interaction</a></li>
+<li><a href="https://edx.readthedocs.io/projects/devdata/en/latest/internal_data_formats/tracking_logs/student_event_types.html#video-interaction-events">Video interaction</a></li>
+</ul>
+</li>
+</ol>
+<h2 id="statements_validation">Statements validation<a class="headerlink" href="#statements_validation" title="Permanent link">&para;</a></h2>
+<p>In learning analytics, the validation of statements takes on significant importance. 
+These statements, originating from diverse sources, systems or applications, must align with specific standards such as <a href="https://xapi.com/">xAPI</a> for the best known. 
+The validation process becomes essential in ensuring that these statements meet the required standards, facilitating data quality and reliability. </p>
+<p>Ralph allows you to automate the validation process in your production stack. 
+OpenEdx related events and xAPI statements are supported.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>For now, validation is effective only with supported <a href="#learning-statement-models">learning statement models</a> on Ralph. About xAPI statements, an <a href="https://github.com/openfun/ralph/issues/388">issue</a> is open to extend validation to any xAPI statement.</p>
+</div>
+<p>Check out tutorials to test the validation feature:</p>
+<ul>
+<li><a href="../tutorials/cli/#validate-command"><code>validate</code> with Ralph as a CLI</a></li>
+<li><a href="../tutorials/library/#validate-method"><code>validate</code> with Ralph as a library</a></li>
+</ul>
+<h2 id="statements_conversion">Statements conversion<a class="headerlink" href="#statements_conversion" title="Permanent link">&para;</a></h2>
+<p>Ralph currently supports conversion from OpenEdx learning events to xAPI statements. Here is the up-to-date conversion sets availables: </p>
+<table>
+<thead>
+<tr>
+<th>FROM</th>
+<th>TO</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://edx.readthedocs.io/projects/devdata/en/latest/internal_data_formats/tracking_logs/student_event_types.html#edx-course-enrollment-activated-and-edx-course-enrollment-deactivated">edx.course.enrollment.activated</a></td>
+<td><a href="https://profiles.adlnet.gov/profile/d0f8a66c-df56-4cb4-bfaf-10c2febd87a1/templates/685a9da1-0d8c-4ae5-82bf-fff7b601c288">registered to a course</a></td>
+</tr>
+<tr>
+<td><a href="https://edx.readthedocs.io/projects/devdata/en/latest/internal_data_formats/tracking_logs/student_event_types.html#edx-course-enrollment-activated-and-edx-course-enrollment-deactivated">edx.course.enrollment.deactivated</a></td>
+<td><a href="https://profiles.adlnet.gov/profile/d0f8a66c-df56-4cb4-bfaf-10c2febd87a1/templates/685a9da1-0d8c-4ae5-82bf-fff7b601c288">unregistered to a course</a></td>
+</tr>
+<tr>
+<td><a href="https://edx.readthedocs.io/projects/devdata/en/latest/internal_data_formats/tracking_logs/student_event_types.html#load-video-edx-video-loaded">load_video/edx.video.loaded</a></td>
+<td><a href="https://profiles.adlnet.gov/profile/90b2c849-d744-4d0c-8bd0-403e7859a35b/templates/117b577e-5d35-40c1-b062-96bc912c0106">initialized a video</a></td>
+</tr>
+<tr>
+<td><a href="https://edx.readthedocs.io/projects/devdata/en/latest/internal_data_formats/tracking_logs/student_event_types.html#play-video-edx-video-played">play_video/edx.video.played</a></td>
+<td><a href="https://profiles.adlnet.gov/profile/90b2c849-d744-4d0c-8bd0-403e7859a35b/templates/e25acdb9-813e-4b1a-93bc-8dea1eac83ce">played a video</a></td>
+</tr>
+<tr>
+<td><a href="https://edx.readthedocs.io/projects/devdata/en/latest/internal_data_formats/tracking_logs/student_event_types.html#pause-video-edx-video-paused">pause_video/edx.video.paused</a></td>
+<td><a href="https://profiles.adlnet.gov/profile/90b2c849-d744-4d0c-8bd0-403e7859a35b/templates/6fd56cdf-794f-4ecd-b21c-0cbc109491b3">paused a video</a></td>
+</tr>
+<tr>
+<td><a href="https://edx.readthedocs.io/projects/devdata/en/latest/internal_data_formats/tracking_logs/student_event_types.html#stop-video-edx-video-stopped">stop_video/edx.video.stopped</a></td>
+<td><a href="https://profiles.adlnet.gov/profile/90b2c849-d744-4d0c-8bd0-403e7859a35b/templates/ac270a91-7629-49a8-b5a0-832dcbf30e4c">terminated a video</a></td>
+</tr>
+<tr>
+<td><a href="https://edx.readthedocs.io/projects/devdata/en/latest/internal_data_formats/tracking_logs/student_event_types.html#seek-video-edx-video-position-changed">seek_video/edx.video.position.changed</a></td>
+<td><a href="https://profiles.adlnet.gov/profile/90b2c849-d744-4d0c-8bd0-403e7859a35b/templates/d0ee8f46-5704-428c-b21e-b583f99cd571">seeked in a video</a></td>
+</tr>
+</tbody>
+</table>
+<p>Check out tutorials to test the conversion feature:</p>
+<ul>
+<li><a href="../tutorials/cli/#convert-command"><code>convert</code> with Ralph as a CLI</a></li>
+<li><a href="../tutorials/library/#convert-method"><code>convert</code> with Ralph as a library</a></li>
 </ul>
 
 
@@ -708,10 +936,15 @@ the following subsections:</p>
 
 
                 
+  <script src="/flarelytics/client.js"></script>
+  
+
               </article>
             </div>
           
           
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
         </div>
         
       </main>
@@ -744,7 +977,7 @@ the following subsections:</p>
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link", "content.code.annotate", "content.code.copy", "navigation.tabs"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
       <script src="../assets/javascripts/bundle.81fa17fe.min.js"></script>
