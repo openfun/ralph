@@ -21,7 +21,6 @@ from typing import (
     List,
     Optional,
     Sequence,
-    Tuple,
     Type,
     TypeVar,
     Union,
@@ -195,19 +194,40 @@ def parse_iterable_to_dict(
     ignore_errors: bool,
     logger_class: logging.Logger,
     parser: Callable[[T], Dict[str, Any]] = json.loads,
-    exceptions: Tuple[Type[Exception], ...] = (TypeError, json.JSONDecodeError),
 ) -> Iterator[dict]:
     """Read the `raw_documents` Iterable and yield dictionaries."""
     for i, raw_document in enumerate(raw_documents):
         try:
             yield parser(raw_document)
-        except exceptions as error:
+        except (TypeError, json.JSONDecodeError) as error:
             msg = "Failed to decode JSON: %s, for document: %s, at line %s"
             if ignore_errors:
                 logger_class.warning(msg, error, raw_document, i)
                 continue
             logger_class.error(msg, error, raw_document, i)
             raise BackendException(msg % (error, raw_document, i)) from error
+
+
+async def async_parse_iterable_to_dict(
+    raw_documents: AsyncIterable[T],
+    ignore_errors: bool,
+    logger_class: logging.Logger,
+    parser: Callable[[T], Dict[str, Any]] = json.loads,
+) -> AsyncIterator[dict]:
+    """Read the `raw_documents` Iterable and yield dictionaries."""
+    i = 0
+    async for raw_document in raw_documents:
+        try:
+            yield parser(raw_document)
+        except (TypeError, json.JSONDecodeError) as error:
+            msg = "Failed to decode JSON: %s, for document: %s, at line %s"
+            if ignore_errors:
+                logger_class.warning(msg, error, raw_document, i)
+                continue
+            logger_class.error(msg, error, raw_document, i)
+            raise BackendException(msg % (error, raw_document, i)) from error
+
+        i += 1
 
 
 def parse_dict_to_bytes(
@@ -267,12 +287,12 @@ def iter_by_batch(iterable: Iterable, n: int) -> Iterable[list]:
 def iter_over_async(agenerator) -> Iterable:
     """Iterate synchronously over an asynchronous generator."""
     loop = asyncio.get_event_loop()
-    aiterator = aiter(agenerator)
+    aiterator = agenerator.__aiter__()
 
     async def get_next():
         """Get the next element from the async iterator."""
         try:
-            obj = await anext(aiterator)
+            obj = await aiterator.__anext__()
             return False, obj
         except StopAsyncIteration:
             return True, None

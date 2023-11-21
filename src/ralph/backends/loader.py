@@ -17,7 +17,6 @@ from ralph.backends.data.base import (
     Writable,
 )
 from ralph.backends.lrs.base import BaseAsyncLRSBackend, BaseLRSBackend
-from ralph.backends.stream.base import BaseStreamBackend
 
 logger = logging.getLogger(__name__)
 
@@ -75,25 +74,16 @@ def get_backends(packages: Tuple[str], base_backends: Tuple[Type]) -> Dict[str, 
 @lru_cache(maxsize=1)
 def get_cli_backends() -> Dict[str, Type]:
     """Return Ralph's backend classes for cli usage."""
-    dotted_paths = (
-        "ralph.backends.data",
-        "ralph.backends.stream",
-    )
-    base_backends = (
-        BaseAsyncDataBackend,
-        BaseDataBackend,
-        BaseStreamBackend,
-    )
-    return get_backends(dotted_paths, base_backends)
+    base_backends = (BaseAsyncDataBackend, BaseDataBackend)
+    return get_backends(("ralph.backends.data",), base_backends)
 
 
 @lru_cache(maxsize=1)
 def get_cli_write_backends() -> Dict[str, Type]:
     """Return Ralph's backends classes for cli write usage."""
-    backends = get_cli_backends()
     return {
         name: backend
-        for name, backend in backends.items()
+        for name, backend in get_cli_backends().items()
         if issubclass(backend, (Writable, AsyncWritable))
     }
 
@@ -101,10 +91,9 @@ def get_cli_write_backends() -> Dict[str, Type]:
 @lru_cache(maxsize=1)
 def get_cli_list_backends() -> Dict[str, Type]:
     """Return Ralph's backends classes for cli list usage."""
-    backends = get_cli_backends()
     return {
         name: backend
-        for name, backend in backends.items()
+        for name, backend in get_cli_backends().items()
         if issubclass(backend, (Listable, AsyncListable))
     }
 
@@ -112,10 +101,4 @@ def get_cli_list_backends() -> Dict[str, Type]:
 @lru_cache(maxsize=1)
 def get_lrs_backends() -> Dict[str, Type]:
     """Return Ralph's backend classes for LRS usage."""
-    return get_backends(
-        ("ralph.backends.lrs",),
-        (
-            BaseAsyncLRSBackend,
-            BaseLRSBackend,
-        ),
-    )
+    return get_backends(("ralph.backends.lrs",), (BaseAsyncLRSBackend, BaseLRSBackend))

@@ -263,7 +263,12 @@ class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
             settings (Settings or None): The data backend settings.
                 If `settings` is `None`, a default settings instance is used instead.
         """
-        self.settings: Settings = settings if settings else self.settings_class()
+        try:
+            self.settings: Settings = settings if settings else self.settings_class()
+        except ValidationError as error:
+            msg = "Failed to instantiate default data backend settings: %s"
+            self.logger.error(msg, error)
+            raise BackendParameterException(msg % error) from error
 
     @abstractmethod
     def status(self) -> DataBackendStatus:
@@ -492,7 +497,12 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
             settings (Settings or None): The backend settings.
                 If `settings` is `None`, a default settings instance is used instead.
         """
-        self.settings: Settings = settings if settings else self.settings_class()
+        try:
+            self.settings: Settings = settings if settings else self.settings_class()
+        except ValidationError as error:
+            msg = "Failed to instantiate default async data backend settings: %s"
+            self.logger.error(msg, error)
+            raise BackendParameterException(msg % error) from error
 
     @abstractmethod
     async def status(self) -> DataBackendStatus:

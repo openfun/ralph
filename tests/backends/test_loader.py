@@ -5,6 +5,8 @@ import logging
 from ralph.backends.data.async_es import AsyncESDataBackend
 from ralph.backends.data.async_lrs import AsyncLRSDataBackend
 from ralph.backends.data.async_mongo import AsyncMongoDataBackend
+from ralph.backends.data.async_ws import AsyncWSDataBackend
+from ralph.backends.data.base import BaseDataBackend
 from ralph.backends.data.clickhouse import ClickHouseDataBackend
 from ralph.backends.data.es import ESDataBackend
 from ralph.backends.data.fs import FSDataBackend
@@ -26,8 +28,6 @@ from ralph.backends.lrs.clickhouse import ClickHouseLRSBackend
 from ralph.backends.lrs.es import ESLRSBackend
 from ralph.backends.lrs.fs import FSLRSBackend
 from ralph.backends.lrs.mongo import MongoLRSBackend
-from ralph.backends.stream.base import BaseStreamBackend
-from ralph.backends.stream.ws import WSStreamBackend
 
 
 def test_backends_loader_get_backends(caplog):
@@ -35,7 +35,7 @@ def test_backends_loader_get_backends(caplog):
 
     # Given a non existing module name, the `get_backends` function should skip it.
     with caplog.at_level(logging.WARNING):
-        assert not get_backends(("non_existent_package.foo",), (BaseStreamBackend,))
+        assert not get_backends(("non_existent_package.foo",), (BaseDataBackend,))
 
     assert (
         "ralph.backends.loader",
@@ -47,7 +47,7 @@ def test_backends_loader_get_backends(caplog):
     # the `get_backends` function should skip it.
     paths = ("tests.backends.test_utils_backends",)
     with caplog.at_level(logging.DEBUG):
-        assert get_backends(paths, (BaseStreamBackend,)) == {"ws": WSStreamBackend}
+        assert get_backends(paths, (BaseDataBackend,)) == {"fs": FSDataBackend}
 
     assert (
         "ralph.backends.loader",
@@ -63,6 +63,7 @@ def test_backends_loader_get_cli_backends():
         "async_es": AsyncESDataBackend,
         "async_lrs": AsyncLRSDataBackend,
         "async_mongo": AsyncMongoDataBackend,
+        "async_ws": AsyncWSDataBackend,
         "clickhouse": ClickHouseDataBackend,
         "es": ESDataBackend,
         "fs": FSDataBackend,
@@ -71,7 +72,6 @@ def test_backends_loader_get_cli_backends():
         "mongo": MongoDataBackend,
         "s3": S3DataBackend,
         "swift": SwiftDataBackend,
-        "ws": WSStreamBackend,
     }
 
 
