@@ -28,7 +28,7 @@ ralph list --backend swift # [...] more options
 The general patterns for backend parameters are:
 
 - `--{{ backend_name }}-{{ parameter | underscore_to_dash }}` for command options, and,
-- `RALPH_BACKENDS__{{ backend_type | uppercase }}__{{ backend_name | uppercase }}__{{ parameter | uppercase }}` for environment variables, where the `backend_type` is one of `DATA`, `LRS` and `STREAM`.
+- `RALPH_BACKENDS__DATA__{{ backend_name | uppercase }}__{{ parameter | uppercase }}` for environment variables.
 
 ## Elasticsearch
 
@@ -68,6 +68,11 @@ documents from it.
       show_source: false
       members: 
         - attributes
+
+The ClickHouse client options supported in Ralph can be found in these locations:
+
+- [Python driver specific](https://clickhouse.com/docs/en/integrations/language-clients/python/driver-api#settings-argument)
+- [General ClickHouse client settings](https://clickhouse.com/docs/en/operations/settings/settings/)
 
 ## OVH - Log Data Platform (LDP)
 
@@ -150,23 +155,12 @@ The only required parameter is the `path` we want to list or stream content from
       members: 
         - attributes
 
-The ClickHouse client options supported in Ralph can be found in these locations:
-
-- [Python driver specific](https://clickhouse.com/docs/en/integrations/language-clients/python/driver-api#settings-argument)
-- [General ClickHouse client settings](https://clickhouse.com/docs/en/operations/settings/settings/)
-
-## Learning Record Store (LRS) - HTTP backend interface 
-
-!!! warning
-
-    `HTTP` backend type will soon be merged into the `Data` backend type.
-
-    PR [#521](https://github.com/openfun/ralph/pull/521) prepares `Data` backend alignments with `HTTP` backend `read` method signature
+## Learning Record Store (LRS)
 
 The LRS backend is used to store and retrieve xAPI statements from various systems that follow the [xAPI specification](https://github.com/adlnet/xAPI-Spec/tree/master) (such as our own Ralph LRS, which can be run from this package). 
 LRS systems are mostly used in e-learning infrastructures.
 
-### ::: ralph.backends.http.async_lrs.LRSHTTPBackendSettings
+### ::: ralph.backends.data.lrs.LRSDataBackendSettings
     handler: python
     options:
       show_root_heading: false
@@ -174,7 +168,7 @@ LRS systems are mostly used in e-learning infrastructures.
       members: 
         - attributes
 
-## WebSocket - Stream backend interface
+## WebSocket
 
 The webSocket backend is **read-only** and can be used to get real-time events.
 
@@ -182,11 +176,10 @@ The webSocket backend is **read-only** and can be used to get real-time events.
 > data stream by following instructions from the
 > [official documentation](https://docs.ovh.com/gb/en/logs-data-platform/ldp-tail/#retrieve-your-websocket-address).
 
-### ::: ralph.backends.stream.ws.WSStreamBackendSettings
+### ::: ralph.backends.data.async_ws.WSDataBackendSettings
     handler: python
     options:
       show_root_heading: false
       show_source: false
       members: 
         - attributes
-

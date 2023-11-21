@@ -112,7 +112,8 @@ def test_cli_read_command_usage():
         "  Read an archive or records from a configured backend.\n\n"
         "Options:\n"
         "  -b, --backend "
-        "[async_es|async_lrs|async_mongo|clickhouse|es|fs|ldp|lrs|mongo|s3|swift|ws]\n"
+        "[async_es|async_lrs|async_mongo|async_ws|clickhouse|es|fs|ldp|lrs|mongo|s3|"
+        "swift]\n"
         "                                  Backend  [required]\n"
         "  async_es backend: \n"
         "    --async-es-allow-yellow-status / --no-async-es-allow-yellow-status\n"
@@ -142,6 +143,11 @@ def test_cli_read_command_usage():
         "    --async-mongo-locale-encoding TEXT\n"
         "    --async-mongo-read-chunk-size INTEGER\n"
         "    --async-mongo-write-chunk-size INTEGER\n"
+        "  async_ws backend: \n"
+        "    --async-ws-locale-encoding TEXT\n"
+        "    --async-ws-read-chunk-size INTEGER\n"
+        "    --async-ws-uri TEXT\n"
+        "    --async-ws-write-chunk-size INTEGER\n"
         "  clickhouse backend: \n"
         "    --clickhouse-client-options KEY=VALUE,KEY=VALUE\n"
         "    --clickhouse-database TEXT\n"
@@ -223,8 +229,6 @@ def test_cli_read_command_usage():
         "    --swift-username TEXT\n"
         "    --swift-user-domain-name TEXT\n"
         "    --swift-write-chunk-size INTEGER\n"
-        "  ws backend: \n"
-        "    --ws-uri TEXT\n"
         "  -s, --chunk-size INTEGER        Get events by chunks of size #\n"
         "  -t, --target TEXT               Endpoint from which to read events (e.g.\n"
         "                                  `/statements`)\n"
@@ -242,8 +246,8 @@ def test_cli_read_command_usage():
     assert result.exit_code > 0
     assert (
         "Error: Missing option '-b' / '--backend'. "
-        "Choose from:\n\tasync_es,\n\tasync_lrs,\n\tasync_mongo,\n\tclickhouse,\n\tes,"
-        "\n\tfs,\n\tldp,\n\tlrs,\n\tmongo,\n\ts3,\n\tswift,\n\tws\n"
+        "Choose from:\n\tasync_es,\n\tasync_lrs,\n\tasync_mongo,\n\tasync_ws,"
+        "\n\tclickhouse,\n\tes,\n\tfs,\n\tldp,\n\tlrs,\n\tmongo,\n\ts3,\n\tswift\n"
     ) in result.output
 
 

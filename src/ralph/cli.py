@@ -31,7 +31,6 @@ from ralph import __version__ as ralph_version
 from ralph.backends.data.base import (
     AsyncWritable,
     BaseAsyncDataBackend,
-    BaseDataBackend,
     BaseOperationType,
 )
 from ralph.backends.loader import (
@@ -40,9 +39,7 @@ from ralph.backends.loader import (
     get_cli_write_backends,
     get_lrs_backends,
 )
-from ralph.backends.stream.base import BaseStreamBackend
 from ralph.conf import ClientOptions, CommaSeparatedTuple, HeadersParameters, settings
-from ralph.exceptions import UnsupportedBackendException
 from ralph.logger import configure_logging
 from ralph.models.converter import Converter
 from ralph.models.selector import ModelSelector
@@ -663,25 +660,18 @@ def read(  # noqa: PLR0913
     backend_class = get_backend_class(get_cli_backends(), backend)
     backend = get_backend_instance(backend_class, options)
 
-    if isinstance(backend, (BaseDataBackend, BaseAsyncDataBackend)):
-        statements = backend.read(
-            query=query,
-            target=target,
-            chunk_size=chunk_size,
-            raw_output=True,
-            ignore_errors=ignore_errors,
-        )
-        statements = (
-            iter_over_async(statements) if isasyncgen(statements) else statements
-        )
-        for statement in statements:
-            click.echo(statement, nl=False)
-    elif isinstance(backend, BaseStreamBackend):
-        backend.stream(sys.stdout.buffer)
-    else:
-        msg = "Cannot find an implemented backend type for backend %s"
-        logger.error(msg, backend)
-        raise UnsupportedBackendException(msg, backend)
+    statements = backend.read(
+        query=query,
+        target=target,
+        chunk_size=chunk_size,
+        raw_output=True,
+        ignore_errors=ignore_errors,
+    )
+    if isinstance(backend, BaseAsyncDataBackend):
+        statements = iter_over_async(statements)
+
+    for statement in statements:
+        click.echo(statement, nl=False)
 
 
 @RalphCLI.lazy_backends_options(get_cli_write_backends)

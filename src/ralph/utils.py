@@ -210,6 +210,29 @@ def parse_iterable_to_dict(
             raise BackendException(msg % (error, raw_document, i)) from error
 
 
+async def async_parse_iterable_to_dict(
+    raw_documents: AsyncIterable[T],
+    ignore_errors: bool,
+    logger_class: logging.Logger,
+    parser: Callable[[T], Dict[str, Any]] = json.loads,
+    exceptions: Tuple[Type[Exception], ...] = (TypeError, json.JSONDecodeError),
+) -> AsyncIterator[dict]:
+    """Read the `raw_documents` Iterable and yield dictionaries."""
+    i = 0
+    async for raw_document in raw_documents:
+        try:
+            yield parser(raw_document)
+        except exceptions as error:
+            msg = "Failed to decode JSON: %s, for document: %s, at line %s"
+            if ignore_errors:
+                logger_class.warning(msg, error, raw_document, i)
+                continue
+            logger_class.error(msg, error, raw_document, i)
+            raise BackendException(msg % (error, raw_document, i)) from error
+
+        i += 1
+
+
 def parse_dict_to_bytes(
     documents: Iterable[Dict[str, Any]],
     encoding: str,
