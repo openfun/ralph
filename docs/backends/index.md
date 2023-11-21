@@ -168,7 +168,7 @@ LRS systems are mostly used in e-learning infrastructures.
       members: 
         - attributes
 
-## WebSocket - Stream backend interface
+## WebSocket
 
 The webSocket backend is **read-only** and can be used to get real-time events.
 
@@ -176,7 +176,7 @@ The webSocket backend is **read-only** and can be used to get real-time events.
 > data stream by following instructions from the
 > [official documentation](https://docs.ovh.com/gb/en/logs-data-platform/ldp-tail/#retrieve-your-websocket-address).
 
-### ::: ralph.backends.stream.ws.WSStreamBackendSettings
+### ::: ralph.backends.data.async_ws.WSDataBackendSettings
     handler: python
     options:
       show_root_heading: false
@@ -184,3 +184,10 @@ The webSocket backend is **read-only** and can be used to get real-time events.
       members: 
         - attributes
 
+### ::: ralph.backends.data.async_ws.WSClientOptions
+    handler: python
+    options:
+      show_root_heading: false
+      show_source: false
+      members:
+        - attributes

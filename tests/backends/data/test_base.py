@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+import re
 from typing import Any, Union
 
 import pytest
@@ -18,6 +19,88 @@ from ralph.backends.data.base import (
 )
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import gather_with_limited_concurrency
+
+
+def test_backends_data_base_instantiation(caplog):
+    """Test the `BaseDataBackend` instantiation."""
+
+    class MockBaseDataBackendSettigns(BaseDataBackendSettings):
+        """Settings for `MockBaseDataBackend`."""
+
+        FOO: str
+
+    class MockBaseDataBackend(BaseDataBackend[MockBaseDataBackendSettigns, BaseQuery]):
+        """A DataBackend with required settings."""
+
+        def _read_dicts(self, query, *args):
+            pass
+
+        def _read_bytes(self, query, *args):
+            pass
+
+        def status(self):
+            pass
+
+        def close(self):
+            pass
+
+    backend = MockBaseDataBackend(MockBaseDataBackendSettigns(FOO="foo"))
+    assert backend.settings.FOO == "foo"
+
+    # Given missing required settings, the `DataBackend` should raise a
+    # `BackendParameterException` on instantiation.
+    msg = (
+        "Failed to instantiate default data backend settings: "
+        "1 validation error for MockBaseDataBackendSettigns\nFOO\n  "
+        "field required (type=value_error.missing)"
+    )
+    with pytest.raises(BackendParameterException, match=re.escape(msg)):
+        with caplog.at_level(logging.ERROR):
+            MockBaseDataBackend()
+
+    assert ("tests.backends.data.test_base", logging.ERROR, msg) in caplog.record_tuples
+
+
+def test_backends_data_base_async_instantiation(caplog):
+    """Test the `BaseAsyncDataBackend` instantiation."""
+
+    class MockBaseAsyncDataBackendSettigns(BaseDataBackendSettings):
+        """Settings for `MockBaseAsyncDataBackend`."""
+
+        FOO: str
+
+    class MockBaseAsyncDataBackend(
+        BaseAsyncDataBackend[MockBaseAsyncDataBackendSettigns, BaseQuery]
+    ):
+        """A DataBackend with required settings."""
+
+        async def _read_dicts(self, query, *args):
+            pass
+
+        async def _read_bytes(self, query, *args):
+            pass
+
+        async def status(self):
+            pass
+
+        async def close(self):
+            pass
+
+    backend = MockBaseAsyncDataBackend(MockBaseAsyncDataBackendSettigns(FOO="foo"))
+    assert backend.settings.FOO == "foo"
+
+    # Given missing required settings, the `AsyncDataBackend` should raise a
+    # `BackendParameterException` on instantiation.
+    msg = (
+        "Failed to instantiate default async data backend settings: "
+        "1 validation error for MockBaseAsyncDataBackendSettigns\nFOO\n  "
+        "field required (type=value_error.missing)"
+    )
+    with pytest.raises(BackendParameterException, match=re.escape(msg)):
+        with caplog.at_level(logging.ERROR):
+            MockBaseAsyncDataBackend()
+
+    assert ("tests.backends.data.test_base", logging.ERROR, msg) in caplog.record_tuples
 
 
 @pytest.mark.parametrize(

@@ -1,6 +1,7 @@
 """Tests for Ralph cli."""
 import json
 import logging
+from contextlib import contextmanager
 from importlib import reload
 from pathlib import Path
 from typing import Union
@@ -26,6 +27,7 @@ from ralph.conf import settings
 from ralph.exceptions import ConfigurationException
 from ralph.models.edx.navigational.statements import UIPageClose
 from ralph.models.xapi.navigation.statements import PageTerminated
+from ralph.utils import iter_over_async
 
 from tests.fixtures.backends import (
     ES_TEST_HOSTS,
@@ -714,12 +716,18 @@ def test_cli_read_command_with_es_backend_query(es):
 
 def test_cli_read_command_with_ws_backend(events, ws):
     """Test ralph read command using the ws backend."""
-    runner = CliRunner()
-    result = runner.invoke(
-        cli,
-        ["read", "-b", "ws", "--ws-uri", f"ws://{WS_TEST_HOST}:{WS_TEST_PORT}"],
-    )
-    assert "\n".join([json.dumps(event) for event in events]) in result.output
+
+    # The ws fixture is async, however the `CliRunner` does not support running in an
+    # async context, thus we wrap it into a sync contextmanager.
+    @contextmanager
+    def websocket():
+        yield from iter_over_async(ws)
+
+    with websocket():
+        runner = CliRunner()
+        uri = f"ws://{WS_TEST_HOST}:{WS_TEST_PORT}"
+        result = runner.invoke(cli, ["read", "-b", "async_ws", "--async-ws-uri", uri])
+        assert "\n".join([json.dumps(event) for event in events]) in result.output
 
 
 def test_cli_list_command_with_ldp_backend(monkeypatch):

@@ -4,7 +4,6 @@ import asyncio
 import json
 import os
 import random
-import time
 from contextlib import asynccontextmanager
 from functools import lru_cache, wraps
 from multiprocessing import Process
@@ -764,28 +763,19 @@ def events():
     return [{"id": idx} for idx in range(10)]
 
 
+@pytest.mark.anyio
 @pytest.fixture
-def ws(events):
+async def ws(events):
     """Return a websocket server instance."""
 
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-
-    async def forward(websocket, path):
+    async def forward(websocket):
         """Stupid test server that sends events."""
-
         for event in events:
             await websocket.send(json.dumps(event))
-            time.sleep(random.randrange(0, 500) / 10000.0)
+            await asyncio.sleep(random.randrange(0, 500) / 10000.0)
 
-    server = websockets.serve(forward, "0.0.0.0", WS_TEST_PORT)
-    asyncio.get_event_loop().run_until_complete(server)
-    yield server
-
-    server.ws_server.close()
-
-    asyncio.get_event_loop().run_until_complete(server.ws_server.wait_closed())
-    loop.close()
+    async with websockets.serve(forward, "0.0.0.0", WS_TEST_PORT) as server:
+        yield server
 
 
 @pytest.fixture
