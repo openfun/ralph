@@ -290,12 +290,12 @@ def iter_by_batch(iterable: Iterable, n: int) -> Iterable[list]:
 def iter_over_async(agenerator) -> Iterable:
     """Iterate synchronously over an asynchronous generator."""
     loop = asyncio.get_event_loop()
-    aiterator = aiter(agenerator)
+    aiterator = agenerator.__aiter__()
 
     async def get_next():
         """Get the next element from the async iterator."""
         try:
-            obj = await anext(aiterator)
+            obj = await aiterator.__anext__()
             return False, obj
         except StopAsyncIteration:
             return True, None
