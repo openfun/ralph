@@ -13,14 +13,13 @@ from ralph.backends.data.base import (
     BaseDataBackend,
     BaseDataBackendSettings,
     BaseOperationType,
-    BaseQuery,
     DataBackendStatus,
     Listable,
     Writable,
 )
 from ralph.backends.data.mixins import HistoryMixin
 from ralph.conf import BaseSettingsConfig
-from ralph.exceptions import BackendException
+from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import now, parse_iterable_to_dict
 
 logger = logging.getLogger(__name__)
@@ -64,18 +63,8 @@ class SwiftDataBackendSettings(BaseDataBackendSettings):
     DEFAULT_CONTAINER: Optional[str] = None
 
 
-class SwiftQuery(BaseQuery):
-    """Swift query model.
-
-    Attributes:
-        query_string (str): The name of the Swift object to query.
-    """
-
-    query_string: str
-
-
 class SwiftDataBackend(
-    BaseDataBackend[SwiftDataBackendSettings, SwiftQuery],
+    BaseDataBackend[SwiftDataBackendSettings, str],
     HistoryMixin,
     Writable,
     Listable,
@@ -178,7 +167,7 @@ class SwiftDataBackend(
 
     def read(  # noqa: PLR0913
         self,
-        query: Optional[Union[str, SwiftQuery]] = None,
+        query: Optional[str] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
@@ -188,7 +177,7 @@ class SwiftDataBackend(
         """Read objects matching the `query` in the `target` container and yield them.
 
         Args:
-            query: (str or SwiftQuery): The query to select objects to read.
+            query (str): The query to select objects to read.
             target (str or None): The target container name.
                 If `target` is `None`, a default value is used instead.
             chunk_size (int or None): The number of records or bytes to read in one
@@ -220,7 +209,7 @@ class SwiftDataBackend(
 
     def _read_bytes(
         self,
-        query: SwiftQuery,
+        query: str,
         target: Optional[str],
         chunk_size: int,
         ignore_errors: bool,  # noqa: ARG002
@@ -228,11 +217,11 @@ class SwiftDataBackend(
         """Method called by `self.read` yielding bytes. See `self.read`."""
         target = target if target else self.default_container
         logger.info(
-            "Getting object from container: %s (query_string: %s)",
+            "Getting object from container: %s (query: %s)",
             target,
-            query.query_string,
+            query,
         )
-        resp_headers, content = self._get_object(target, query.query_string, chunk_size)
+        resp_headers, content = self._get_object(target, query, chunk_size)
         while chunk := content.read(chunk_size):
             yield chunk
         # Archive read, add a new entry to the history
@@ -240,7 +229,7 @@ class SwiftDataBackend(
             {
                 "backend": self.name,
                 "action": "read",
-                "id": f"{target}/{query.query_string}",
+                "id": f"{target}/{query}",
                 "size": resp_headers["content-length"],
                 "timestamp": now(),
             }
@@ -248,35 +237,41 @@ class SwiftDataBackend(
 
     def _read_dicts(
         self,
-        query: SwiftQuery,
+        query: str,
         target: Optional[str],
         chunk_size: int,
         ignore_errors: bool,
     ) -> Iterator[dict]:
         """Method called by `self.read` yielding dictionaries. See `self.read`."""
         target = target if target else self.default_container
-        logger.info(
-            "Getting object from container: %s (query_string: %s)",
-            target,
-            query.query_string,
-        )
-        resp_headers, content = self._get_object(target, query.query_string, chunk_size)
+        logger.info("Getting object: %s from target container: %s", query, target)
+        resp_headers, content = self._get_object(target, query, chunk_size)
         yield from parse_iterable_to_dict(content, ignore_errors)
         # Archive read, add a new entry to the history
         self.append_to_history(
             {
                 "backend": self.name,
                 "action": "read",
-                "id": f"{target}/{query.query_string}",
+                "id": f"{target}/{query}",
                 "size": resp_headers["content-length"],
                 "timestamp": now(),
             }
         )
 
     def _get_object(
-        self, container: str, obj: str, chunk_size: int
+        self, container: Optional[str], obj: Optional[str], chunk_size: int
     ) -> Tuple[dict, Any]:
-        """Return Swift object wrapping the exception."""
+        """Validate container and obj and return Swift object wrapping the exception."""
+        if not container:
+            msg = "The target container is not set"
+            logger.error(msg)
+            raise BackendParameterException(msg)
+
+        if not obj:
+            msg = "The object query is not set"
+            logger.error(msg)
+            raise BackendParameterException(msg)
+
         try:
             return self.connection.get_object(
                 container=container,
@@ -299,7 +294,7 @@ class SwiftDataBackend(
         """Write `data` records to the `target` container and returns their count.
 
         Args:
-            data: (Iterable or IOBase): The data to write.
+            data (Iterable or IOBase): The data to write.
             target (str or None): The target container name.
                 If `target` is `None`, a default value is used instead.
             chunk_size (int or None): The chunk size when writing objects by batch.

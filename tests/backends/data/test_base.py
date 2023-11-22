@@ -3,7 +3,7 @@
 import asyncio
 import logging
 import re
-from typing import Any, Union
+from typing import Any, Dict, Generic, TypeVar, Union
 
 import pytest
 
@@ -16,6 +16,7 @@ from ralph.backends.data.base import (
     BaseQuery,
     Writable,
     get_backend_generic_argument,
+    validate_backend_query,
 )
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import gather_with_limited_concurrency
@@ -97,82 +98,59 @@ def test_backends_data_base_async_instantiation(caplog):
     assert ("ralph.backends.data.base", logging.ERROR, msg) in caplog.record_tuples
 
 
-@pytest.mark.parametrize(
-    "value,expected",
-    [
-        (None, BaseQuery()),
-        ("foo", BaseQuery(query_string="foo")),
-        (BaseQuery(query_string="foo"), BaseQuery(query_string="foo")),
-    ],
-)
-def test_backends_data_base_validate_backend_query_with_valid_input(value, expected):
-    """Test the validate_backend_query function given valid input."""
+def test_backends_data_base_validate_backend_query(caplog):
+    """Test the `validate_backend_query` function."""
+    # Given `query=None` the function should return a default value.
+    assert validate_backend_query(None, str) == ""
+    assert validate_backend_query(None, BaseQuery) == BaseQuery()
+    assert validate_backend_query(None, dict) == {}
 
-    class MockBaseDataBackend(BaseDataBackend[BaseDataBackendSettings, BaseQuery]):
-        """A class mocking the base data backend class."""
+    # Given `query=None` and a QueryModel without a default value, the function should
+    # raise a `BackendParameterException`.
+    class NonDefaultQuery(BaseQuery):
+        """A query with a required value."""
 
-        def _read_dicts(self, query, *args):
-            yield query == expected
+        required_value: int
 
-        def _read_bytes(self, query, *args):
-            yield query == expected
+    msg = (
+        "Invalid NonDefaultQuery default query: "
+        "[{'loc': ('required_value',), 'msg': 'field required', "
+        "'type': 'value_error.missing'}]"
+    )
+    with pytest.raises(BackendParameterException, match=re.escape(msg)):
+        validate_backend_query(None, NonDefaultQuery)
 
-        def status(self):
-            pass
+    assert ("ralph.backends.data.base", logging.ERROR, msg) in caplog.record_tuples
 
-        def close(self):
-            pass
+    # Given `query` is an instance of the query model, the function should return the
+    # `query` unchanged.
+    assert validate_backend_query("a string!", str) == "a string!"
+    assert validate_backend_query(
+        NonDefaultQuery(required_value=1), NonDefaultQuery
+    ) == NonDefaultQuery(required_value=1)
+    assert validate_backend_query({"foo": "bar"}, dict) == {"foo": "bar"}
 
-    assert list(MockBaseDataBackend().read(query=value, raw_output=True)) == [True]
-    assert list(MockBaseDataBackend().read(query=value, raw_output=False)) == [True]
+    # Given `query` not an instance of the query model, the function
+    # should raise a `BackendParameterException`.
+    msg = "The 'query' argument is expected to be a str instance"
+    with pytest.raises(BackendParameterException, match=msg):
+        assert validate_backend_query(BaseQuery(), str)
 
+    assert ("ralph.backends.data.base", logging.ERROR, msg) in caplog.record_tuples
 
-@pytest.mark.parametrize(
-    "value,error",
-    [
-        ([], r"The 'query' argument is expected to be a BaseQuery instance."),
-        (
-            {"foo": "bar"},
-            r"The 'query' argument is expected to be a BaseQuery instance. "
-            r"\[\{'loc': \('foo',\), 'msg': 'extra fields not permitted', "
-            r"'type': 'value_error.extra'\}\]",
-        ),
-    ],
-)
-def test_backends_data_base_validate_backend_query_with_invalid_input(
-    value, error, caplog
-):
-    """Test the validate_backend_query function given invalid input."""
+    msg = "The 'query' argument is expected to be a NonDefaultQuery instance"
+    with pytest.raises(BackendParameterException, match=msg):
+        assert validate_backend_query(BaseQuery(), NonDefaultQuery)
 
-    class MockBaseDataBackend(BaseDataBackend[BaseDataBackendSettings, BaseQuery]):
-        """A class mocking the base database class."""
-
-        def _read_dicts(self, query, *args):
-            yield
-
-        def status(self):
-            pass
-
-        def close(self):
-            pass
-
-    with pytest.raises(BackendParameterException, match=error):
-        with caplog.at_level(logging.ERROR):
-            list(MockBaseDataBackend().read(query=value))
-
-    error = error.replace("\\", "")
-    assert ("ralph.backends.data.base", logging.ERROR, error) in caplog.record_tuples
+    assert ("ralph.backends.data.base", logging.ERROR, msg) in caplog.record_tuples
 
 
 def test_backends_data_base_get_backend_generic_argument():
-    """Test the get_backend_generic_argument function."""
+    """Test the `get_backend_generic_argument` function."""
 
     assert get_backend_generic_argument(BaseDataBackendSettings, 0) is None
-    assert get_backend_generic_argument(BaseDataBackend, -2) is None
-    assert get_backend_generic_argument(BaseDataBackend, -1) is BaseQuery
-    assert get_backend_generic_argument(BaseDataBackend, 0) is BaseDataBackendSettings
-    assert get_backend_generic_argument(BaseDataBackend, 1) is BaseQuery
-    assert get_backend_generic_argument(BaseDataBackend, 2) is None
+    assert get_backend_generic_argument(BaseDataBackend, 0) is None
+    assert get_backend_generic_argument(BaseDataBackend, 1) is None
 
     class DummySettings(BaseDataBackendSettings):
         """Dummy Settings."""
@@ -180,11 +158,26 @@ def test_backends_data_base_get_backend_generic_argument():
     class DummyQuery(BaseQuery):
         """Dummy Query."""
 
-    class DummyBackend(BaseDataBackend[DummySettings, DummyQuery]):
+    class NotDataBackendClass:
+        """Some class that is not a DataBackend nor a Generic class."""
+
+    T = TypeVar("T", bound=NotDataBackendClass)
+
+    class GenericNotDataBackendClass(Generic[T]):
+        """Some generic class that is not a DataBackend."""
+
+    class DummyBackend(
+        NotDataBackendClass,
+        GenericNotDataBackendClass[NotDataBackendClass],
+        BaseDataBackend[DummySettings, DummyQuery],
+    ):
         """Dummy Backend."""
 
+    assert get_backend_generic_argument(DummyBackend, -2) is None
+    assert get_backend_generic_argument(DummyBackend, -1) is DummyQuery
     assert get_backend_generic_argument(DummyBackend, 0) is DummySettings
     assert get_backend_generic_argument(DummyBackend, 1) is DummyQuery
+    assert get_backend_generic_argument(DummyBackend, 2) is None
 
     class DummyAnyBackend(BaseDataBackend[DummySettings, Any]):
         """Dummy Any Backend."""
@@ -193,11 +186,29 @@ def test_backends_data_base_get_backend_generic_argument():
     assert get_backend_generic_argument(DummyAnyBackend, 1) is None
 
     # Given a backend that does not follow type hints, the function should return None.
-    class DummyBadBackend(BaseDataBackend[Union[dict, int], Union[int, str]]):
+    class DummyBadBackend(BaseDataBackend[Dict[dict, int], Any]):  # type: ignore
         """Dummy bad backend."""
 
     assert get_backend_generic_argument(DummyBadBackend, 0) is None
     assert get_backend_generic_argument(DummyBadBackend, 1) is None
+
+    # Given a backend with type hints containing a `Union`, the function should return
+    # the first item of the Union.
+    T = TypeVar("T", bound=Union[int, str])
+
+    class DummyUnionBackend(BaseDataBackend[Union[dict, int], T]):  # type: ignore
+        """Dummy Union backend."""
+
+    assert get_backend_generic_argument(DummyUnionBackend, 0) is dict
+    assert get_backend_generic_argument(DummyUnionBackend, 1) is int
+
+    # Given a backend with a string query model, the function should return str for
+    # the query argument.
+    class DummyStrQueryBackend(BaseDataBackend[Any, str]):
+        """Dummy string query backend."""
+
+    assert get_backend_generic_argument(DummyStrQueryBackend, 0) is None
+    assert get_backend_generic_argument(DummyStrQueryBackend, 1) is str
 
 
 def test_backends_data_base_read_with_max_statements():

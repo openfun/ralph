@@ -24,7 +24,7 @@ from ralph.cli import (
     cli,
 )
 from ralph.conf import settings
-from ralph.exceptions import ConfigurationException
+from ralph.exceptions import BackendParameterException, ConfigurationException
 from ralph.models.edx.navigational.statements import UIPageClose
 from ralph.models.xapi.navigation.statements import PageTerminated
 from ralph.utils import iter_over_async
@@ -689,7 +689,7 @@ def test_cli_read_command_with_es_backend_query(es):
         "-b es "
         f"--es-hosts {es_hosts} "
         f"--es-default-index {ES_TEST_INDEX} "
-        f"--query {query_str}"
+        f"{query_str}"
     )
     result = runner.invoke(cli, command.split())
     assert result.exit_code == 0
@@ -712,6 +712,21 @@ def test_cli_read_command_with_es_backend_query(es):
     )
 
     assert expected == result.output
+
+    # Test with an invalid json query string
+    invalid_query_str = "wrong_query_string"
+
+    command = f"-v ERROR read -b mongo {invalid_query_str}"
+    result = runner.invoke(cli, command.split())
+    assert result.exit_code > 0
+    assert isinstance(result.exception, BackendParameterException)
+    msg = (
+        "Invalid MongoQuery query string: "
+        "[{'loc': ('__root__',), 'msg': 'Expecting value: line 1 column 1 (char 0)', "
+        "'type': 'value_error.jsondecode', 'ctx': {'msg': 'Expecting value', "
+        "'doc': 'wrong_query_string', 'pos': 0, 'lineno': 1, 'colno': 1}}]"
+    )
+    assert str(result.exception) == msg
 
 
 def test_cli_read_command_with_ws_backend(events, ws):

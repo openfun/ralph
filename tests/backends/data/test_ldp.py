@@ -13,7 +13,7 @@ import pytest
 import requests
 import requests_mock
 
-from ralph.backends.data.base import BaseQuery, DataBackendStatus
+from ralph.backends.data.base import DataBackendStatus
 from ralph.backends.data.ldp import LDPDataBackend
 from ralph.conf import settings
 from ralph.exceptions import BackendException, BackendParameterException
@@ -39,7 +39,7 @@ def test_backends_data_ldp_default_instantiation(monkeypatch, fs):
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__LDP__{name}", raising=False)
 
     assert LDPDataBackend.name == "ldp"
-    assert LDPDataBackend.query_class == BaseQuery
+    assert LDPDataBackend.query_class == str
     backend = LDPDataBackend()
     assert isinstance(backend.client, ovh.Client)
     assert backend.service_name is None

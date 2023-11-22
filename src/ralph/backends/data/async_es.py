@@ -111,7 +111,7 @@ class AsyncESDataBackend(
 
     async def read(  # noqa: PLR0913
         self,
-        query: Optional[Union[str, ESQuery]] = None,
+        query: Optional[ESQuery] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
@@ -122,9 +122,7 @@ class AsyncESDataBackend(
         """Read documents matching the query in the target index and yield them.
 
         Args:
-            query (str or ESQuery): A query in the Lucene query string syntax or a
-                dictionary defining a search definition using the Elasticsearch Query
-                DSL. The Lucene query overrides the query DSL if present. See ESQuery.
+            query (ESQuery): The Elasticsearch query to use when fetching documents.
             target (str or None): The target Elasticsearch index name to query.
                 If target is `None`, the `DEFAULT_INDEX` is used instead.
             chunk_size (int or None): The chunk size when reading documents by batches.
@@ -181,10 +179,7 @@ class AsyncESDataBackend(
                 raise BackendException(msg % error) from error
 
         limit = query.size
-        kwargs = query.dict(exclude={"query_string", "size"})
-        if query.query_string:
-            kwargs["q"] = query.query_string
-
+        kwargs = query.dict()
         count = chunk_size
         # The first condition is set to comprise either limit as None
         # (when the backend query does not have `size` parameter),
@@ -219,7 +214,7 @@ class AsyncESDataBackend(
         """Write data documents to the target index and return their count.
 
         Args:
-            data: (Iterable or IOBase): The data containing documents to write.
+            data (Iterable or IOBase): The data containing documents to write.
             target (str or None): The target Elasticsearch index name.
                 If target is `None`, the `DEFAULT_INDEX` is used instead.
             chunk_size (int or None): The number of documents to write in one batch.

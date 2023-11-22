@@ -10,7 +10,6 @@ from pydantic import PositiveInt
 from ralph.backends.data.base import (
     BaseDataBackend,
     BaseDataBackendSettings,
-    BaseQuery,
     DataBackendStatus,
     Listable,
 )
@@ -60,7 +59,7 @@ class LDPDataBackendSettings(BaseDataBackendSettings):
 
 
 class LDPDataBackend(
-    BaseDataBackend[LDPDataBackendSettings, BaseQuery],
+    BaseDataBackend[LDPDataBackendSettings, str],
     Listable,
     HistoryMixin,
 ):
@@ -155,7 +154,7 @@ class LDPDataBackend(
 
     def read(  # noqa: PLR0913
         self,
-        query: Optional[Union[str, BaseQuery]] = None,
+        query: Optional[str] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
         raw_output: bool = True,
@@ -188,7 +187,7 @@ class LDPDataBackend(
 
     def _read_dicts(
         self,
-        query: BaseQuery,  # noqa: ARG002
+        query: str,  # noqa: ARG002
         target: Optional[str],  # noqa: ARG002
         chunk_size: int,  # noqa: ARG002
         ignore_errors: bool,  # noqa: ARG002
@@ -203,13 +202,13 @@ class LDPDataBackend(
 
     def _read_bytes(
         self,
-        query: BaseQuery,
+        query: str,
         target: Optional[str],
         chunk_size: int,
         ignore_errors: bool,
     ) -> Iterator[bytes]:
         """Method called by `self.read` yielding bytes. See `self.read`."""
-        if query.query_string is None:
+        if not query:
             msg = "Invalid query. The query should be a valid archive name"
             logger.error(msg)
             raise BackendParameterException(msg)
@@ -220,10 +219,10 @@ class LDPDataBackend(
 
         target = target if target else self.stream_id
         msg = "Getting archive: %s from stream: %s"
-        logger.debug(msg, query.query_string, target)
+        logger.debug(msg, query, target)
 
         # Stream response (archive content)
-        url = self._url(query.query_string)
+        url = self._url(query)
         try:
             with requests.get(url, stream=True, timeout=self.timeout) as result:
                 result.raise_for_status()
@@ -231,11 +230,11 @@ class LDPDataBackend(
                     yield chunk
         except requests.exceptions.HTTPError as error:
             msg = "Failed to read archive %s: %s"
-            logger.error(msg, query.query_string, error)
-            raise BackendException(msg % (query.query_string, error)) from error
+            logger.error(msg, query, error)
+            raise BackendException(msg % (query, error)) from error
 
         # Get detailed information about the archive to fetch
-        details = self._details(target, query.query_string)
+        details = self._details(target, query)
         # Archive is supposed to have been fully read, add a new entry to
         # the history.
         self.append_to_history(
@@ -245,7 +244,7 @@ class LDPDataBackend(
                 # WARNING: previously only the filename was used as the ID
                 # By changing this and prepending the `target` stream_id previously
                 # fetched archives will not be marked as read anymore.
-                "id": f"{target}/{query.query_string}",
+                "id": f"{target}/{query}",
                 "filename": details.get("filename"),
                 "size": details.get("size"),
                 "timestamp": now(),

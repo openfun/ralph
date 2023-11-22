@@ -14,7 +14,6 @@ from ralph.backends.data.base import (
     BaseDataBackend,
     BaseDataBackendSettings,
     BaseOperationType,
-    BaseQuery,
     DataBackendStatus,
     Listable,
     Writable,
@@ -55,7 +54,7 @@ Settings = TypeVar("Settings", bound=FSDataBackendSettings)
 
 
 class FSDataBackend(
-    BaseDataBackend[Settings, BaseQuery],
+    BaseDataBackend[Settings, str],
     Writable,
     Listable,
     HistoryMixin,
@@ -152,7 +151,7 @@ class FSDataBackend(
 
     def read(  # noqa: PLR0913
         self,
-        query: Optional[Union[str, BaseQuery]] = None,
+        query: Optional[str] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
@@ -162,7 +161,7 @@ class FSDataBackend(
         """Read files matching the query in the target folder and yield them.
 
         Args:
-            query: (str or BaseQuery): The relative pattern for the files to read.
+            query (str): The relative pattern for the files to read.
             target (str or None): The target directory path containing the files.
                 If target is `None`, the `default_directory_path` is used instead.
                 If target is a relative path, it is considered to be relative to the
@@ -191,7 +190,7 @@ class FSDataBackend(
 
     def _read_bytes(
         self,
-        query: BaseQuery,
+        query: str,
         target: Optional[str],
         chunk_size: int,
         ignore_errors: bool,  # noqa: ARG002
@@ -205,7 +204,7 @@ class FSDataBackend(
 
     def _read_dicts(
         self,
-        query: BaseQuery,
+        query: str,
         target: Optional[str],
         chunk_size: int,  # noqa: ARG002
         ignore_errors: bool,
@@ -233,20 +232,20 @@ class FSDataBackend(
         )
 
     def _iter_files_matching_query(
-        self, target: Optional[str], query: BaseQuery
+        self, target: Optional[str], query: str
     ) -> Iterator[Tuple[BufferedReader, Path]]:
         """Return file/path tuples for files matching the query in the target folder."""
-        if not query.query_string:
-            query.query_string = self.default_query_string
+        if not query:
+            query = self.default_query_string
 
         path = Path(target) if target else self.default_directory
         if not path.is_absolute() and path != self.default_directory:
             path = self.default_directory / path
 
-        paths = list(filter(lambda x: x.is_file(), path.glob(query.query_string)))
+        paths = list(filter(lambda x: x.is_file(), path.glob(query)))
         if not paths:
             msg = "No file found for query: %s"
-            logger.info(msg, path / Path(str(query.query_string)))
+            logger.info(msg, path / Path(str(query)))
             return
 
         logger.debug("Reading matching files: %s", paths)
@@ -265,7 +264,7 @@ class FSDataBackend(
         """Write data records to the target file and return their count.
 
         Args:
-            data: (Iterable or IOBase): The data to write.
+            data (Iterable or IOBase): The data to write.
             target (str or None): The target file path.
                 If target is a relative path, it is considered to be relative to the
                     `default_directory_path`.

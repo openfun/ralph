@@ -120,7 +120,7 @@ class AsyncMongoDataBackend(
 
     async def read(  # noqa: PLR0913
         self,
-        query: Optional[Union[str, MongoQuery]] = None,
+        query: Optional[MongoQuery] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
@@ -131,7 +131,7 @@ class AsyncMongoDataBackend(
         """Read documents matching the `query` from `target` collection and yield them.
 
         Args:
-            query (str or MongoQuery): The MongoDB query to use when fetching documents.
+            query (MongoQuery): The MongoDB query to use when fetching documents.
             target (str or None): The MongoDB collection name to query.
                 If target is `None`, the `DEFAULT_COLLECTION` is used instead.
             chunk_size (int or None): The chunk size when reading documents by batches.
@@ -175,11 +175,10 @@ class AsyncMongoDataBackend(
         ignore_errors: bool,  # noqa: ARG002
     ) -> AsyncIterator[dict]:
         """Method called by `self.read` yielding dictionaries. See `self.read`."""
-        query = query.query_string if query.query_string else query
-        query = query.dict(exclude={"query_string"}, exclude_unset=True)
+        kwargs = query.dict(exclude_unset=True)
         collection = self._get_target_collection(target)
         try:
-            async for document in collection.find(batch_size=chunk_size, **query):
+            async for document in collection.find(batch_size=chunk_size, **kwargs):
                 document.update({"_id": str(document.get("_id"))})
                 yield document
         except (PyMongoError, IndexError, TypeError, ValueError) as error:

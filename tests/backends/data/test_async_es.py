@@ -465,8 +465,16 @@ async def test_backends_data_async_es_read_with_query(es, async_es_backend, capl
     assert results[0]["_source"]["id"] == 0
     assert results[1]["_source"]["id"] == 2
     assert results[2]["_source"]["id"] == 4
+
     # Find every odd item.
-    query = {"query": {"term": {"modulo": 1}}}
+    query = ESQuery(query={"term": {"modulo": 1}})
+    results = [statement async for statement in backend.read(query=query)]
+    assert len(results) == 2
+    assert results[0]["_source"]["id"] == 1
+    assert results[1]["_source"]["id"] == 3
+
+    # Find every odd item with a json query string.
+    query = ESQuery.from_string(json.dumps({"query": {"term": {"modulo": 1}}}))
     results = [statement async for statement in backend.read(query=query)]
     assert len(results) == 2
     assert results[0]["_source"]["id"] == 1
@@ -474,14 +482,21 @@ async def test_backends_data_async_es_read_with_query(es, async_es_backend, capl
 
     # Find documents with ID equal to one or five.
     query = "id:(1 OR 5)"
-    results = [statement async for statement in backend.read(query=query)]
+    with caplog.at_level(logging.INFO):
+        query = ESQuery.from_string(query)
+        results = [statement async for statement in backend.read(query=query)]
     assert len(results) == 1
     assert results[0]["_source"]["id"] == 1
+    assert (
+        "ralph.backends.data.es",
+        logging.INFO,
+        "Fallback to Lucene Query as the query is not an ESQuery: id:(1 OR 5)",
+    ) in caplog.record_tuples
 
     # Check query argument type
     with pytest.raises(
         BackendParameterException,
-        match="'query' argument is expected to be a ESQuery instance.",
+        match="'query' argument is expected to be a ESQuery instance",
     ):
         with caplog.at_level(logging.ERROR):
             _ = [
@@ -492,9 +507,7 @@ async def test_backends_data_async_es_read_with_query(es, async_es_backend, capl
     assert (
         "ralph.backends.data.base",
         logging.ERROR,
-        "The 'query' argument is expected to be a ESQuery instance. "
-        "[{'loc': ('not_query',), 'msg': 'extra fields not permitted', "
-        "'type': 'value_error.extra'}]",
+        "The 'query' argument is expected to be a ESQuery instance",
     ) in caplog.record_tuples
 
     await backend.close()

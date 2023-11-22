@@ -10,7 +10,6 @@ from websockets.http import USER_AGENT
 from ralph.backends.data.base import (
     BaseAsyncDataBackend,
     BaseDataBackendSettings,
-    BaseQuery,
     DataBackendStatus,
 )
 from ralph.conf import BaseSettingsConfig, ClientOptions
@@ -78,7 +77,7 @@ class WSDataBackendSettings(BaseDataBackendSettings):
     URI: AnyUrl
 
 
-class AsyncWSDataBackend(BaseAsyncDataBackend[WSDataBackendSettings, BaseQuery]):
+class AsyncWSDataBackend(BaseAsyncDataBackend[WSDataBackendSettings, str]):
     """Websocket stream backend."""
 
     name = "async_ws"
@@ -125,7 +124,7 @@ class AsyncWSDataBackend(BaseAsyncDataBackend[WSDataBackendSettings, BaseQuery])
 
     async def read(  # noqa: PLR0913
         self,
-        query: Optional[Union[str, BaseQuery]] = None,
+        query: Optional[str] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
@@ -136,7 +135,7 @@ class AsyncWSDataBackend(BaseAsyncDataBackend[WSDataBackendSettings, BaseQuery])
         """Read records matching the `query` in the `target` container and yield them.
 
         Args:
-            query: (str or Query): Ignored.
+            query (str): Ignored.
             target (str or None): Ignored.
             chunk_size (int or None): Ignored.
             raw_output (bool): Controls whether to yield bytes or dictionaries.
@@ -174,7 +173,7 @@ class AsyncWSDataBackend(BaseAsyncDataBackend[WSDataBackendSettings, BaseQuery])
 
     async def _read_bytes(
         self,
-        query: BaseQuery,  # noqa: ARG002
+        query: str,  # noqa: ARG002
         target: Optional[str],
         chunk_size: int,
         ignore_errors: bool,  # noqa: ARG002
@@ -198,7 +197,7 @@ class AsyncWSDataBackend(BaseAsyncDataBackend[WSDataBackendSettings, BaseQuery])
 
     async def _read_dicts(
         self,
-        query: BaseQuery,
+        query: str,
         target: Optional[str],
         chunk_size: int,
         ignore_errors: bool,

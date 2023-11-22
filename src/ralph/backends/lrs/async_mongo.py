@@ -46,10 +46,9 @@ class AsyncMongoLRSBackend(
 
     async def query_statements_by_ids(self, ids: List[str]) -> AsyncIterator[dict]:
         """Yield statements with matching ids from the backend."""
+        query = self.query_class(filter={"_source.id": {"$in": ids}})
         try:
-            async for document in self.read(
-                query={"filter": {"_source.id": {"$in": ids}}}
-            ):
+            async for document in self.read(query=query):
                 yield document["_source"]
         except (BackendException, BackendParameterException) as error:
             logger.error("Failed to read from MongoDB")

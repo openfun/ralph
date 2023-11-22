@@ -172,7 +172,7 @@ class AsyncLRSDataBackend(
         """Write `data` records to the `target` endpoint and return their count.
 
         Args:
-            data: (Iterable): The data to write.
+            data (Iterable): The data to write.
             target (str or None): Endpoint in which to write data (e.g. `/statements`).
                 If `target` is `None`, `/xAPI/statements` default endpoint is used.
             chunk_size (int or None): The number of records or bytes to write in one

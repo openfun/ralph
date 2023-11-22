@@ -703,7 +703,7 @@ def es_lrs_backend():
 def swift_backend():
     """Return get_swift_data_backend function."""
 
-    def get_swift_data_backend():
+    def get_swift_data_backend(container: str = "container_name"):
         """Return an instance of SwiftDataBackend."""
         settings = SwiftDataBackend.settings_class(
             AUTH_URL="https://auth.cloud.ovh.net/",
@@ -716,7 +716,7 @@ def swift_backend():
             REGION_NAME="os_region_name",
             OBJECT_STORAGE_URL="os_storage_url/ralph_logs_container",
             USER_DOMAIN_NAME="Default",
-            DEFAULT_CONTAINER="container_name",
+            DEFAULT_CONTAINER=container,
             LOCALE_ENCODING="utf8",
             READ_CHUNK_SIZE=500,
             WRITE_CHUNK_SIZE=499,
@@ -739,7 +739,7 @@ def moto_fs(fs):
 def s3_backend():
     """Return the `get_s3_data_backend` function."""
 
-    def get_s3_data_backend():
+    def get_s3_data_backend(bucket_name: str = "bucket_name"):
         """Return an instance of S3DataBackend."""
         settings = S3DataBackend.settings_class(
             ACCESS_KEY_ID="access_key_id",
@@ -747,7 +747,7 @@ def s3_backend():
             SESSION_TOKEN="session_token",
             ENDPOINT_URL=None,
             DEFAULT_REGION="default-region",
-            DEFAULT_BUCKET_NAME="bucket_name",
+            DEFAULT_BUCKET_NAME=bucket_name,
             LOCALE_ENCODING="utf8",
             READ_CHUNK_SIZE=4096,
             WRITE_CHUNK_SIZE=3999,
