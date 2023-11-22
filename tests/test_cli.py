@@ -565,15 +565,17 @@ def test_cli_read_command_with_fs_backend(fs, monkeypatch):
 
 
 def test_cli_read_command_with_chunk_size(fs, monkeypatch):
-    """Test ralph read command with a chunk_size option."""
+    """Test ralph `read` command with a `chunk_size` option."""
 
     def get_mock_read_bytes(expected_chunk_size: int):
         """Return a `_read_bytes` function checking the `chunk_size` option."""
 
         def mock_read_bytes(self, query, target, chunk_size, *_):
-            """Check chunk_size and return an archive."""
+            """Check `chunk_size` and return an archive."""
             assert chunk_size == expected_chunk_size
-            yield b'{"foo": "bar"}'
+            data = b'{"foo": "bar"}'
+            for i in range(0, len(data), chunk_size):
+                yield data[i : i + chunk_size]
 
         return mock_read_bytes
 
@@ -601,7 +603,7 @@ def test_cli_read_command_with_chunk_size(fs, monkeypatch):
 
 
 def test_cli_read_command_with_es_backend(es):
-    """Test ralph read command using the es backend."""
+    """Test ralph `read` command using the es backend."""
 
     # Insert documents
     bulk(
@@ -897,13 +899,13 @@ def test_cli_write_command_with_fs_backend(fs):
 
 
 def test_cli_write_command_with_chunk_size(fs, monkeypatch):
-    """Test ralph write command with a chunk_size option."""
+    """Test ralph `write` command with a `chunk_size` option."""
 
     def get_mock_write_bytes(expected_chunk_size: int):
         """Return a `_write_bytes` function checking the `chunk_size` option."""
 
         def mock_write_bytes(self, query, target, chunk_size, *_):
-            """Check chunk_size and return an archive."""
+            """Check `chunk_size` and return an archive."""
             assert chunk_size == expected_chunk_size
             return 1
 
