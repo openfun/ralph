@@ -22,14 +22,13 @@ from ralph.backends.data.base import (
     BaseDataBackend,
     BaseDataBackendSettings,
     BaseOperationType,
-    BaseQuery,
     DataBackendStatus,
     Listable,
     Writable,
 )
 from ralph.backends.data.mixins import HistoryMixin
 from ralph.conf import BaseSettingsConfig
-from ralph.exceptions import BackendException
+from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import now, parse_iterable_to_dict
 
 logger = logging.getLogger(__name__)
@@ -65,18 +64,8 @@ class S3DataBackendSettings(BaseDataBackendSettings):
     WRITE_CHUNK_SIZE: int = 4096
 
 
-class S3Query(BaseQuery):
-    """S3 query model.
-
-    Attributes:
-        query_string (str): The ID of the object to read.
-    """
-
-    query_string: str
-
-
 class S3DataBackend(
-    BaseDataBackend[S3DataBackendSettings, S3Query], Writable, Listable, HistoryMixin
+    BaseDataBackend[S3DataBackendSettings, str], Writable, Listable, HistoryMixin
 ):
     """S3 data backend."""
 
@@ -168,7 +157,7 @@ class S3DataBackend(
 
     def read(  # noqa: PLR0913
         self,
-        query: Optional[Union[str, S3Query]] = None,
+        query: Optional[str] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
@@ -178,7 +167,7 @@ class S3DataBackend(
         """Read an object matching the `query` in the `target` bucket and yield it.
 
         Args:
-            query: (str or S3Query): The ID of the object to read.
+            query (str): The ID of the object to read.
             target (str or None): The target bucket containing the object.
                 If target is `None`, the `default_bucket` is used instead.
             chunk_size (int or None): The number of records or bytes to read in one
@@ -206,27 +195,27 @@ class S3DataBackend(
 
     def _read_bytes(
         self,
-        query: BaseQuery,
+        query: str,
         target: Optional[str],
         chunk_size: int,
         ignore_errors: bool,  # noqa: ARG002
     ) -> Iterator[bytes]:
         """Method called by `self.read` yielding bytes. See `self.read`."""
         target = self.default_bucket_name if target is None else target
-        response = self._get_object(target, query.query_string)
+        response = self._get_object(target, query)
         try:
             yield from response["Body"].iter_chunks(chunk_size)
         except (ReadTimeoutError, ResponseStreamingError) as err:
             msg = "Failed to read chunk from object %s"
-            logger.error(msg, query.query_string)
-            raise BackendException(msg % (query.query_string)) from err
+            logger.error(msg, query)
+            raise BackendException(msg % (query)) from err
 
         # Archive fetched, add a new entry to the history.
         self.append_to_history(
             {
                 "backend": self.name,
                 "action": "read",
-                "id": target + "/" + query.query_string,
+                "id": target + "/" + query,
                 "size": response["ContentLength"],
                 "timestamp": now(),
             }
@@ -234,35 +223,45 @@ class S3DataBackend(
 
     def _read_dicts(
         self,
-        query: BaseQuery,
+        query: str,
         target: Optional[str],
         chunk_size: int,
         ignore_errors: bool,
     ) -> Iterator[dict]:
         """Method called by `self.read` yielding dictionaries. See `self.read`."""
         target = self.default_bucket_name if target is None else target
-        response = self._get_object(target, query.query_string)
+        response = self._get_object(target, query)
         try:
             lines = response["Body"].iter_lines(chunk_size)
             yield from parse_iterable_to_dict(lines, ignore_errors)
         except (ReadTimeoutError, ResponseStreamingError) as err:
             msg = "Failed to read chunk from object %s"
-            logger.error(msg, query.query_string)
-            raise BackendException(msg % (query.query_string)) from err
+            logger.error(msg, query)
+            raise BackendException(msg % query) from err
 
         # Archive fetched, add a new entry to the history.
         self.append_to_history(
             {
                 "backend": self.name,
                 "action": "read",
-                "id": target + "/" + query.query_string,
+                "id": target + "/" + query,
                 "size": response["ContentLength"],
                 "timestamp": now(),
             }
         )
 
-    def _get_object(self, bucket: str, key: str) -> dict:
-        """Return S3 object wrapping the exception."""
+    def _get_object(self, bucket: Optional[str], key: str) -> dict:
+        """Validate bucket (target) and key (query) and return the S3 object."""
+        if not bucket:
+            msg = "The target bucket is not set"
+            logger.error(msg)
+            raise BackendParameterException(msg)
+
+        if not key:
+            msg = "The object ID query is not set"
+            logger.error(msg)
+            raise BackendParameterException(msg)
+
         try:
             return self.client.get_object(Bucket=bucket, Key=key)
         except (ClientError, EndpointConnectionError) as error:
@@ -285,7 +284,7 @@ class S3DataBackend(
         """Write `data` records to the `target` bucket and return their count.
 
         Args:
-            data: (Iterable or IOBase): The data to write.
+            data (Iterable or IOBase): The data to write.
             target (str or None): The target bucket and the target object
                 separated by a `/`.
                 If target is `None`, the default bucket is used and a random

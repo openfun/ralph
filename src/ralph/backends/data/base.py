@@ -3,7 +3,8 @@
 import logging
 from abc import ABC, abstractmethod
 from asyncio import Queue, create_task
-from enum import Enum, unique
+from enum import Enum, IntEnum, unique
+from inspect import isclass
 from io import IOBase
 from itertools import chain
 from typing import (
@@ -17,9 +18,12 @@ from typing import (
     Type,
     TypeVar,
     Union,
+    get_args,
+    get_origin,
 )
 
 from pydantic import BaseModel, BaseSettings, PositiveInt, ValidationError
+from typing_extensions import Self, get_original_bases
 
 from ralph.conf import BaseSettingsConfig, core_settings
 from ralph.exceptions import BackendParameterException
@@ -58,7 +62,16 @@ class BaseQuery(BaseModel):
 
         extra = "forbid"
 
-    query_string: Union[str, None] = None
+    @classmethod
+    def from_string(cls, query: str) -> Self:
+        """Return an instance of BaseQuery from a string."""
+        try:
+            return cls.parse_raw(query)
+        except ValidationError as error:
+            msg = "Invalid %s query string: %s"
+            errors = error.errors()
+            logger.error(msg, cls.__name__, errors)
+            raise BackendParameterException(msg % (cls.__name__, errors)) from error
 
 
 @unique
@@ -112,7 +125,7 @@ class Writable(Configurable, ABC):
         """Write `data` records to the `target` container and return their count.
 
         Args:
-            data: (Iterable or IOBase): The data to write.
+            data (Iterable or IOBase): The data to write.
             target (str or None): The target container name.
                 If `target` is `None`, a default value is used instead.
             chunk_size (int or None): The number of records or bytes to write in one
@@ -210,11 +223,11 @@ class Listable(ABC):
 
 
 Settings = TypeVar("Settings", bound=BaseDataBackendSettings)
-Query = TypeVar("Query", bound=BaseQuery)
+Query = TypeVar("Query", bound=Union[BaseQuery, str])
 
 
 def validate_backend_query(
-    query: Union[str, dict, Query, None],
+    query: Optional[Query],
     query_class: Type[Query],
 ) -> Query:
     """Validate and transform the backend query."""
@@ -228,30 +241,19 @@ def validate_backend_query(
             logger.error(msg, query_name, errors)
             raise BackendParameterException(msg % (query_name, errors)) from error
 
-    if isinstance(query, str):
-        try:
-            return query_class(query_string=query)
-        except ValidationError as error:
-            msg = "Invalid %s query string: %s"
-            errors = error.errors()
-            logger.error(msg, query_name, errors)
-            raise BackendParameterException(msg % (query_name, errors)) from error
-
-    if isinstance(query, dict):
-        try:
-            return query_class(**query)
-        except ValidationError as error:
-            msg = "The 'query' argument is expected to be a %s instance. %s"
-            errors = error.errors()
-            logger.error(msg, query_name, errors)
-            raise BackendParameterException(msg % (query_name, errors)) from error
-
     if isinstance(query, query_class):
         return query
 
-    msg = "The 'query' argument is expected to be a %s instance."
+    msg = "The 'query' argument is expected to be a %s instance"
     logger.error(msg, query_name)
     raise BackendParameterException(msg % query_name)
+
+
+class DataBackendArgument(IntEnum):
+    """Enumerate data backend generic arguments."""
+
+    SETTINGS = 0
+    QUERY = 1
 
 
 class BaseDataBackend(Generic[Settings, Query], ABC):
@@ -290,7 +292,7 @@ class BaseDataBackend(Generic[Settings, Query], ABC):
 
     def read(  # noqa: PLR0913
         self,
-        query: Optional[Union[str, Query]] = None,
+        query: Optional[Query] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
@@ -300,7 +302,7 @@ class BaseDataBackend(Generic[Settings, Query], ABC):
         """Read records matching the `query` in the `target` container and yield them.
 
         Args:
-            query: (str or Query): The query to select records to read.
+            query (Query): The query to select records to read.
             target (str or None): The target container name.
                 If `target` is `None`, a default value is used instead.
             chunk_size (int or None): The number of records or bytes to read in one
@@ -383,7 +385,7 @@ class AsyncWritable(Configurable, ABC):
         """Write `data` records to the `target` container and return their count.
 
         Args:
-            data: (Iterable or IOBase): The data to write.
+            data (Iterable or IOBase): The data to write.
             target (str or None): The target container name.
                 If `target` is `None`, a default value is used instead.
             chunk_size (int or None): The number of records or bytes to write in one
@@ -536,7 +538,7 @@ class BaseAsyncDataBackend(Generic[Settings, Query], ABC):
 
     async def read(  # noqa: PLR0913
         self,
-        query: Optional[Union[str, Query]] = None,
+        query: Optional[Query] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
@@ -547,7 +549,7 @@ class BaseAsyncDataBackend(Generic[Settings, Query], ABC):
         """Read records matching the `query` in the `target` container and yield them.
 
         Args:
-            query: (str or Query): The query to select records to read.
+            query (Query): The query to select records to read.
             target (str or None): The target container name.
                 If `target` is `None`, a default value is used instead.
             chunk_size (int or None): The number of records or bytes to read in one
@@ -665,25 +667,35 @@ class BaseAsyncDataBackend(Generic[Settings, Query], ABC):
 
 
 def get_backend_generic_argument(
-    backend_class: Type[Union[BaseDataBackend, BaseAsyncDataBackend]], position: int
+    backend_class: Type[Union[BaseDataBackend, BaseAsyncDataBackend]],
+    position: DataBackendArgument,
 ) -> Optional[Type]:
     """Return the generic argument of `backend_class` at specified `position`."""
-    if not hasattr(backend_class, "__orig_bases__"):
-        return None
+    for base in get_original_bases(backend_class):
+        origin = get_origin(base)
+        if not (
+            origin
+            and isclass(origin)
+            and issubclass(origin, (BaseDataBackend, BaseAsyncDataBackend))
+        ):
+            continue
 
-    bases = backend_class.__orig_bases__[0]
-    if not hasattr(bases, "__args__") or len(bases.__args__) < abs(position) + 1:
-        return None
+        args = get_args(base)
+        if len(args) < abs(position) + 1:
+            return None
 
-    argument = bases.__args__[position]
-    if argument is Any:
-        return None
+        argument = args[position]
+        if argument is Any:
+            return None
 
-    if isinstance(argument, TypeVar):
-        return argument.__bound__
+        if isinstance(argument, TypeVar):
+            argument = argument.__bound__
 
-    if isinstance(argument, Type):
-        return argument
+        if get_origin(argument) is Union:
+            argument = get_args(argument)[0]
+
+        if isinstance(argument, Type):
+            return argument
 
     return None
 
@@ -692,7 +704,9 @@ def set_backend_settings_class(
     backend_class: Type[Union[BaseDataBackend, BaseAsyncDataBackend]]
 ) -> None:
     """Set `settings_class` attribute with `Config.env_prefix` for `backend_class`."""
-    settings_class = get_backend_generic_argument(backend_class, 0)
+    settings_class = get_backend_generic_argument(
+        backend_class, DataBackendArgument.SETTINGS
+    )
     if settings_class:
         backend_class.settings_class = settings_class
 
@@ -701,6 +715,6 @@ def set_backend_query_class(
     backend_class: Type[Union[BaseDataBackend, BaseAsyncDataBackend]]
 ) -> None:
     """Set `query_class` attribute for `backend_class`."""
-    query_class = get_backend_generic_argument(backend_class, 1)
+    query_class = get_backend_generic_argument(backend_class, DataBackendArgument.QUERY)
     if query_class:
         backend_class.query_class = query_class

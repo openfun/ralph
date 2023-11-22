@@ -273,13 +273,13 @@ def test_backends_database_clickhouse_query_statements_query(
     def mock_read(query, target, ignore_errors):
         """Mock the `ClickHouseDataBackend.read` method."""
 
-        assert query == {
-            "select": ["event_id", "emission_time", "event"],
-            "where": expected_params["where"],
-            "parameters": expected_params["params"],
-            "limit": expected_params["limit"],
-            "sort": expected_params["sort"],
-        }
+        assert query == backend.query_class(
+            select=["event_id", "emission_time", "event"],
+            where=expected_params["where"],
+            parameters=expected_params["params"],
+            limit=expected_params["limit"],
+            sort=expected_params["sort"],
+        )
 
         return {}
 

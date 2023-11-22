@@ -12,7 +12,7 @@ from botocore.exceptions import ClientError, ResponseStreamingError
 from moto import mock_s3
 
 from ralph.backends.data.base import BaseOperationType, DataBackendStatus
-from ralph.backends.data.s3 import S3DataBackend, S3DataBackendSettings, S3Query
+from ralph.backends.data.s3 import S3DataBackend, S3DataBackendSettings
 from ralph.exceptions import BackendException, BackendParameterException
 
 
@@ -34,7 +34,7 @@ def test_backends_data_s3_default_instantiation(monkeypatch, fs):
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__S3__{name}", raising=False)
 
     assert S3DataBackend.name == "s3"
-    assert S3DataBackend.query_class == S3Query
+    assert S3DataBackend.query_class == str
     assert S3DataBackend.default_operation_type == BaseOperationType.CREATE
     assert S3DataBackend.settings_class == S3DataBackendSettings
     backend = S3DataBackend()
@@ -335,7 +335,7 @@ def test_backends_data_s3_read_with_invalid_name_should_log_the_error(
     """Test that given `S3DataBackend.read` method fails to retrieve from the S3
     data the object with the provided name (the object does not exists on S3),
     the S3 backend read method should log the error, not write to history and raise a
-    BackendException.
+    BackendParameterException.
     """
     # Regions outside of us-east-1 require the appropriate LocationConstraint
     s3_client = boto3.client("s3", region_name="us-east-1")
@@ -351,16 +351,28 @@ def test_backends_data_s3_read_with_invalid_name_should_log_the_error(
         Body=body,
     )
 
+    msg = "The object ID query is not set"
     with caplog.at_level(logging.ERROR):
-        with pytest.raises(BackendParameterException):
+        with pytest.raises(BackendParameterException, match=msg):
             backend = s3_backend()
-            list(backend.read(query=None, target=bucket_name))
+            list(backend.read(target=bucket_name))
 
     assert (
-        "ralph.backends.data.base",
+        "ralph.backends.data.s3",
         logging.ERROR,
-        "Invalid S3Query default query: [{'loc': ('query_string',), 'msg': "
-        "'field required', 'type': 'value_error.missing'}]",
+        msg,
+    ) in caplog.record_tuples
+
+    msg = "The target bucket is not set"
+    with caplog.at_level(logging.ERROR):
+        with pytest.raises(BackendParameterException, match=msg):
+            backend = s3_backend(bucket_name=None)
+            list(backend.read())
+
+    assert (
+        "ralph.backends.data.s3",
+        logging.ERROR,
+        msg,
     ) in caplog.record_tuples
 
     backend.clean_history(lambda *_: True)

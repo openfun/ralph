@@ -7,7 +7,8 @@ from typing import Iterable, Iterator, List, Literal, Optional, TypeVar, Union
 
 from elasticsearch import ApiError, Elasticsearch, TransportError
 from elasticsearch.helpers import BulkIndexError, streaming_bulk
-from pydantic import BaseModel, PositiveInt
+from pydantic import BaseModel, PositiveInt, ValidationError
+from typing_extensions import Self
 
 from ralph.backends.data.base import (
     BaseDataBackend,
@@ -81,12 +82,12 @@ class ESQuery(BaseQuery):
     """Elasticsearch query model.
 
     Attributes:
+        q (str): The Elastisearch query in the Lucene query string syntax.
+            See Elasticsearch search reference for Lucene query syntax:
+            https://www.elastic.co/guide/en/elasticsearch/reference/8.9/search-search.html#search-api-query-params-q
         query (dict): A search query definition using the Elasticsearch Query DSL.
             See Elasticsearch search reference for query DSL syntax:
             https://www.elastic.co/guide/en/elasticsearch/reference/8.9/search-search.html#request-body-search-query
-        query_string (str): The Elastisearch query in the Lucene query string syntax.
-            See Elasticsearch search reference for Lucene query syntax:
-            https://www.elastic.co/guide/en/elasticsearch/reference/8.9/search-search.html#search-api-query-params-q
         pit (dict): Limit the search to a point in time (PIT). See ESQueryPit.
         size (int): The maximum number of documents to yield.
         sort (str or list): Specify how to sort search results. Set to `_doc` or
@@ -98,12 +99,23 @@ class ESQuery(BaseQuery):
             Not used. Always set to `False`.
     """
 
+    q: Optional[str] = None
     query: dict = {"match_all": {}}
     pit: ESQueryPit = ESQueryPit()
-    size: Union[int, None]
+    size: Optional[int] = None
     sort: Union[str, List[dict]] = "_shard_doc"
-    search_after: Union[list, None]
+    search_after: Optional[list] = None
     track_total_hits: Literal[False] = False
+
+    @classmethod
+    def from_string(cls, query: str) -> Self:
+        """Return an instance of itself from a string."""
+        try:
+            return cls.parse_raw(query)
+        except ValidationError:
+            msg = "Fallback to Lucene Query as the query is not an ESQuery: %s"
+            logger.info(msg, query)
+            return cls(q=query)
 
 
 Settings = TypeVar("Settings", bound=ESDataBackendSettings)
@@ -196,7 +208,7 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
 
     def read(  # noqa: PLR0913
         self,
-        query: Optional[Union[str, ESQuery]] = None,
+        query: Optional[ESQuery] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
@@ -206,9 +218,7 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
         """Read documents matching the query in the target index and yield them.
 
         Args:
-            query (str or ESQuery): A query in the Lucene query string syntax or a
-                dictionary defining a search definition using the Elasticsearch Query
-                DSL. The Lucene query overrides the query DSL if present. See ESQuery.
+            query (ESQuery): The Elasticsearch query to use when fetching documents.
             target (str or None): The target Elasticsearch index name to query.
                 If target is `None`, the `DEFAULT_INDEX` is used instead.
             chunk_size (int or None): The chunk size when reading documents by batches.
@@ -252,10 +262,7 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
                 raise BackendException(msg % error) from error
 
         limit = query.size
-        kwargs = query.dict(exclude={"query_string", "size"})
-        if query.query_string:
-            kwargs["q"] = query.query_string
-
+        kwargs = query.dict()
         count = chunk_size
         # The first condition is set to comprise either limit as None
         # (when the backend query does not have `size` parameter),
@@ -288,7 +295,7 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
         """Write data documents to the target index and return their count.
 
         Args:
-            data: (Iterable or IOBase): The data containing documents to write.
+            data (Iterable or IOBase): The data containing documents to write.
             target (str or None): The target Elasticsearch index name.
                 If target is `None`, the `DEFAULT_INDEX` is used instead.
             chunk_size (int or None): The number of documents to write in one batch.

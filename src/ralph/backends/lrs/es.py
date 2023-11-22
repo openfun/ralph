@@ -52,8 +52,9 @@ class ESLRSBackend(BaseLRSBackend[ESLRSBackendSettings], ESDataBackend):
 
     def query_statements_by_ids(self, ids: List[str]) -> Iterator[dict]:
         """Yield statements with matching ids from the backend."""
+        query = self.query_class(query={"terms": {"_id": ids}})
         try:
-            es_response = self.read(query={"query": {"terms": {"_id": ids}}})
+            es_response = self.read(query=query)
             yield from (document["_source"] for document in es_response)
         except (BackendException, BackendParameterException) as error:
             logger.error("Failed to read from Elasticsearch")

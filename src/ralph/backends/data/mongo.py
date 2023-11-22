@@ -12,7 +12,7 @@ from uuid import uuid4
 from bson.errors import BSONError
 from bson.objectid import ObjectId
 from dateutil.parser import isoparse
-from pydantic import Json, MongoDsn, PositiveInt, constr
+from pydantic import MongoDsn, PositiveInt, constr
 from pymongo import MongoClient, ReplaceOne
 from pymongo.collection import Collection
 from pymongo.errors import (
@@ -72,19 +72,20 @@ class MongoDataBackendSettings(BaseDataBackendSettings):
     CLIENT_OPTIONS: MongoClientOptions = MongoClientOptions()
 
 
-class BaseMongoQuery(BaseQuery):
-    """Base MongoDB query model."""
+class MongoQuery(BaseQuery):
+    """MongoDB query model.
 
-    filter: Union[dict, None]
-    limit: Union[int, None]
-    projection: Union[dict, None]
-    sort: Union[List[Tuple], None]
+    Attributes:
+        filter (dict): A filter query to select which documents to include.
+        limit (int): The maximum number of results to return.
+        projection (dict): Dictionary specifying the fields to include or exclude.
+        sort (list): A list of (key, direction) pairs specifying the sort order.
+    """
 
-
-class MongoQuery(BaseMongoQuery):
-    """MongoDB query model."""
-
-    query_string: Union[Json[BaseMongoQuery], None]
+    filter: Optional[dict] = None
+    limit: Optional[int] = None
+    projection: Optional[dict] = None
+    sort: Optional[List[Tuple]] = None
 
 
 Settings = TypeVar("Settings", bound=MongoDataBackendSettings)
@@ -175,7 +176,7 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
 
     def read(  # noqa: PLR0913
         self,
-        query: Optional[Union[str, MongoQuery]] = None,
+        query: Optional[MongoQuery] = None,
         target: Optional[str] = None,
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
@@ -185,7 +186,7 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
         """Read documents matching the `query` from `target` collection and yield them.
 
         Args:
-            query (str or MongoQuery): The MongoDB query to use when reading documents.
+            query (MongoQuery): The MongoDB query to use when reading documents.
             target (str or None): The MongoDB collection name to query.
                 If target is `None`, the `DEFAULT_COLLECTION` is used instead.
             chunk_size (int or None): The chunk size when reading archives by batch.
@@ -218,11 +219,10 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
         ignore_errors: bool,  # noqa: ARG002
     ) -> Iterator[dict]:
         """Method called by `self.read` yielding dictionaries. See `self.read`."""
-        query = query.query_string if query.query_string else query
-        query = query.dict(exclude={"query_string"}, exclude_unset=True)
+        kwargs = query.dict(exclude_unset=True)
         collection = self._get_target_collection(target)
         try:
-            documents = collection.find(batch_size=chunk_size, **query)
+            documents = collection.find(batch_size=chunk_size, **kwargs)
             yield from (d.update({"_id": str(d.get("_id"))}) or d for d in documents)
         except (PyMongoError, IndexError, TypeError, ValueError) as error:
             msg = "Failed to execute MongoDB query: %s"

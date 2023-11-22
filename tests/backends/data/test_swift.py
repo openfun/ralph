@@ -15,7 +15,6 @@ from ralph.backends.data.base import BaseOperationType, DataBackendStatus
 from ralph.backends.data.swift import (
     SwiftDataBackend,
     SwiftDataBackendSettings,
-    SwiftQuery,
 )
 from ralph.conf import settings
 from ralph.exceptions import BackendException, BackendParameterException
@@ -46,7 +45,7 @@ def test_backends_data_swift_default_instantiation(monkeypatch, fs):
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__SWIFT__{name}", raising=False)
 
     assert SwiftDataBackend.name == "swift"
-    assert SwiftDataBackend.query_class == SwiftQuery
+    assert SwiftDataBackend.query_class == str
     assert SwiftDataBackend.default_operation_type == BaseOperationType.CREATE
     assert SwiftDataBackend.settings_class == SwiftDataBackendSettings
     backend = SwiftDataBackend()
@@ -378,18 +377,29 @@ def test_backends_data_swift_read_without_raw_output(
     backend.close()
 
 
-def test_backends_data_swift_read_with_invalid_query(swift_backend):
+def test_backends_data_swift_read_with_invalid_query(swift_backend, caplog):
     """Test the `SwiftDataBackend.read` method given an invalid `query` argument should
     raise a `BackendParameterException`.
     """
-    backend = swift_backend()
-    # Given no `query`, the `read` method should raise a `BackendParameterException`.
-    error = (
-        "Invalid SwiftQuery default query: [{'loc': ('query_string',), 'msg': "
-        "'field required', 'type': 'value_error.missing'}]"
-    )
-    with pytest.raises(BackendParameterException, match=re.escape(error)):
-        list(backend.read())
+    backend = swift_backend(container=None)
+    # Given no target `container` name, the `read` method should raise a
+    # `BackendParameterException`.
+    msg = "The target container is not set"
+    with pytest.raises(BackendParameterException, match=re.escape(msg)):
+        with caplog.at_level(logging.ERROR):
+            list(backend.read())
+
+    assert ("ralph.backends.data.swift", logging.ERROR, msg) in caplog.record_tuples
+
+    # Given no object `query`, the `read` method should raise a
+    # `BackendParameterException`.
+    msg = "The object query is not set"
+    with pytest.raises(BackendParameterException, match=re.escape(msg)):
+        with caplog.at_level(logging.ERROR):
+            list(backend.read(target="container_name"))
+
+    assert ("ralph.backends.data.swift", logging.ERROR, msg) in caplog.record_tuples
+
     backend.close()
 
 

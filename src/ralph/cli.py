@@ -32,6 +32,7 @@ from ralph.backends.data.base import (
     AsyncWritable,
     BaseAsyncDataBackend,
     BaseOperationType,
+    BaseQuery,
 )
 from ralph.backends.loader import (
     get_cli_backends,
@@ -604,7 +605,7 @@ def convert(from_, to_, ignore_errors, fail_on_unknown, **conversion_set_kwargs)
 
 
 @RalphCLI.lazy_backends_options(get_cli_backends)
-@click.argument("archive", required=False)
+@click.argument("query", required=False)
 @click.option(
     "-s",
     "--chunk-size",
@@ -620,13 +621,6 @@ def convert(from_, to_, ignore_errors, fail_on_unknown, **conversion_set_kwargs)
     help="Endpoint from which to read events (e.g. `/statements`)",
 )
 @click.option(
-    "-q",
-    "--query",
-    type=JSONStringParamType(),
-    default=None,
-    help="Query object as a JSON string (database and HTTP backends ONLY)",
-)
-@click.option(
     "-i",
     "--ignore_errors",
     is_flag=False,
@@ -634,23 +628,21 @@ def convert(from_, to_, ignore_errors, fail_on_unknown, **conversion_set_kwargs)
     default=False,
     help="Ignore errors during the encoding operation.",
 )
-def read(  # noqa: PLR0913
+def read(
     backend,
-    archive,
     chunk_size,
     target,
     query,
     ignore_errors,
     **options,
 ):
-    """Read an archive or records from a configured backend."""
+    """Read records matching the QUERY (json or string) from a configured backend."""
     logger.info(
         (
             "Fetching data from the configured %s backend "
-            "(archive: %s | chunk size: %s | target: %s | query: %s)"
+            "(chunk size: %s | target: %s | query: %s)"
         ),
         backend,
-        archive,
         chunk_size,
         target,
         query,
@@ -659,6 +651,9 @@ def read(  # noqa: PLR0913
 
     backend_class = get_backend_class(get_cli_backends(), backend)
     backend = get_backend_instance(backend_class, options)
+
+    if query and issubclass(backend.query_class, BaseQuery):
+        query = backend.query_class.from_string(query)
 
     statements = backend.read(
         query=query,

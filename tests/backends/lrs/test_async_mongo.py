@@ -39,7 +39,6 @@ def test_backends_lrs_async_mongo_default_instantiation(monkeypatch, fs):
                     ("_source.timestamp", DESCENDING),
                     ("_id", DESCENDING),
                 ],
-                "query_string": None,
             },
         ),
         # 1. Query by statementId.
@@ -53,7 +52,6 @@ def test_backends_lrs_async_mongo_default_instantiation(monkeypatch, fs):
                     ("_source.timestamp", DESCENDING),
                     ("_id", DESCENDING),
                 ],
-                "query_string": None,
             },
         ),
         # 2. Query by statementId and agent with mbox IFI.
@@ -70,7 +68,6 @@ def test_backends_lrs_async_mongo_default_instantiation(monkeypatch, fs):
                     ("_source.timestamp", DESCENDING),
                     ("_id", DESCENDING),
                 ],
-                "query_string": None,
             },
         ),
         # 3. Query by statementId and agent with mbox_sha1sum IFI.
@@ -92,7 +89,6 @@ def test_backends_lrs_async_mongo_default_instantiation(monkeypatch, fs):
                     ("_source.timestamp", DESCENDING),
                     ("_id", DESCENDING),
                 ],
-                "query_string": None,
             },
         ),
         # 4. Query by statementId and agent with openid IFI.
@@ -112,7 +108,6 @@ def test_backends_lrs_async_mongo_default_instantiation(monkeypatch, fs):
                     ("_source.timestamp", DESCENDING),
                     ("_id", DESCENDING),
                 ],
-                "query_string": None,
             },
         ),
         # 5. Query by statementId and agent with account IFI.
@@ -136,7 +131,6 @@ def test_backends_lrs_async_mongo_default_instantiation(monkeypatch, fs):
                     ("_source.timestamp", DESCENDING),
                     ("_id", DESCENDING),
                 ],
-                "query_string": None,
             },
         ),
         # 6. Query by verb and activity.
@@ -157,7 +151,6 @@ def test_backends_lrs_async_mongo_default_instantiation(monkeypatch, fs):
                     ("_source.timestamp", DESCENDING),
                     ("_id", DESCENDING),
                 ],
-                "query_string": None,
             },
         ),
         # 7. Query by timerange (with since/until).
@@ -179,7 +172,6 @@ def test_backends_lrs_async_mongo_default_instantiation(monkeypatch, fs):
                     ("_source.timestamp", DESCENDING),
                     ("_id", DESCENDING),
                 ],
-                "query_string": None,
             },
         ),
         # 8. Query by timerange (with only until).
@@ -199,7 +191,6 @@ def test_backends_lrs_async_mongo_default_instantiation(monkeypatch, fs):
                     ("_source.timestamp", DESCENDING),
                     ("_id", DESCENDING),
                 ],
-                "query_string": None,
             },
         ),
         # 9. Query with pagination.
@@ -215,7 +206,6 @@ def test_backends_lrs_async_mongo_default_instantiation(monkeypatch, fs):
                     ("_source.timestamp", DESCENDING),
                     ("_id", DESCENDING),
                 ],
-                "query_string": None,
             },
         ),
         # 10. Query with pagination in ascending order.
@@ -231,7 +221,6 @@ def test_backends_lrs_async_mongo_default_instantiation(monkeypatch, fs):
                     ("_source.timestamp", ASCENDING),
                     ("_id", ASCENDING),
                 ],
-                "query_string": None,
             },
         ),
     ],

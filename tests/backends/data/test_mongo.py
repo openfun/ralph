@@ -430,17 +430,6 @@ def test_backends_data_mongo_read_without_ignore_errors(mongo, mongo_backend, ca
     "query",
     [
         '{"filter": {"id": {"$eq": "bar"}}, "projection": {"id": 1}}',
-        {"filter": {"id": {"$eq": "bar"}}, "projection": {"id": 1}},
-        MongoQuery(
-            query_string='{"filter": {"id": {"$eq": "bar"}}, "projection": {"id": 1}}'
-        ),
-        # Given both `query_string` and other query arguments, only the `query_string`
-        # should be applied.
-        MongoQuery(
-            query_string='{"filter": {"id": {"$eq": "bar"}}, "projection": {"id": 1}}',
-            filter={"id": {"$eq": "foo"}},
-            projection={"id": 0},
-        ),
         MongoQuery(filter={"id": {"$eq": "bar"}}, projection={"id": 1}),
     ],
 )
@@ -449,6 +438,8 @@ def test_backends_data_mongo_read_with_query(query, mongo, mongo_backend):
 
     # Create records
     backend = mongo_backend()
+    if isinstance(query, str):
+        query = MongoQuery.from_string(query)
     documents = [
         {"_id": ObjectId("64945e53a4ee2699573e0d6f"), "id": "foo", "qux": "foo"},
         {"_id": ObjectId("64945e530468d817b1f756da"), "id": "bar", "qux": "foo"},
