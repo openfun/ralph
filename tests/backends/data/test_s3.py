@@ -60,13 +60,13 @@ def test_backends_data_s3_instantiation_with_settings():
         DEFAULT_BUCKET_NAME="bucket",
         LOCALE_ENCODING="utf-16",
         READ_CHUNK_SIZE=1000,
-        WRITE_CHUNK_SIZE=1000,
+        WRITE_CHUNK_SIZE=999,
     )
     backend = S3DataBackend(settings_)
     assert backend.default_bucket_name == "bucket"
     assert backend.settings.LOCALE_ENCODING == "utf-16"
     assert backend.settings.READ_CHUNK_SIZE == 1000
-    assert backend.settings.WRITE_CHUNK_SIZE == 1000
+    assert backend.settings.WRITE_CHUNK_SIZE == 999
 
     try:
         S3DataBackend(settings_)

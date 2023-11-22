@@ -75,7 +75,7 @@ async def test_backends_data_async_mongo_instantiation_with_settings(
     assert backend.settings.CLIENT_OPTIONS == MongoClientOptions()
     assert backend.settings.LOCALE_ENCODING == "utf8"
     assert backend.settings.READ_CHUNK_SIZE == 500
-    assert backend.settings.WRITE_CHUNK_SIZE == 500
+    assert backend.settings.WRITE_CHUNK_SIZE == 499
 
 
 @pytest.mark.anyio

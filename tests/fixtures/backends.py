@@ -126,7 +126,7 @@ def get_async_es_test_backend(index: str = ES_TEST_INDEX):
         POINT_IN_TIME_KEEP_ALIVE="1m",
         READ_CHUNK_SIZE=500,
         REFRESH_AFTER_WRITE=True,
-        WRITE_CHUNK_SIZE=500,
+        WRITE_CHUNK_SIZE=499,
     )
     return AsyncESLRSBackend(settings)
 
@@ -156,7 +156,7 @@ def get_async_mongo_test_backend(
         CLIENT_OPTIONS=client_options if client_options else {},
         LOCALE_ENCODING="utf8",
         READ_CHUNK_SIZE=500,
-        WRITE_CHUNK_SIZE=500,
+        WRITE_CHUNK_SIZE=499,
     )
     return AsyncMongoLRSBackend(settings)
 
@@ -208,7 +208,7 @@ def fs_backend(fs, settings_fs):
             DEFAULT_QUERY_STRING="*",
             LOCALE_ENCODING="utf8",
             READ_CHUNK_SIZE=1024,
-            WRITE_CHUNK_SIZE=1024,
+            WRITE_CHUNK_SIZE=999,
         )
         return FSDataBackend(settings)
 
@@ -228,7 +228,7 @@ def fs_lrs_backend(fs, settings_fs):
             DEFAULT_QUERY_STRING="*",
             LOCALE_ENCODING="utf8",
             READ_CHUNK_SIZE=1024,
-            WRITE_CHUNK_SIZE=1024,
+            WRITE_CHUNK_SIZE=999,
         )
         return FSLRSBackend(settings)
 
@@ -258,7 +258,7 @@ def async_mongo_backend():
             CLIENT_OPTIONS=client_options if client_options else {},
             LOCALE_ENCODING="utf8",
             READ_CHUNK_SIZE=500,
-            WRITE_CHUNK_SIZE=500,
+            WRITE_CHUNK_SIZE=499,
         )
         return AsyncMongoDataBackend(settings)
 
@@ -322,7 +322,7 @@ def mongo_backend():
             CLIENT_OPTIONS=client_options if client_options else {},
             LOCALE_ENCODING="utf8",
             READ_CHUNK_SIZE=500,
-            WRITE_CHUNK_SIZE=500,
+            WRITE_CHUNK_SIZE=499,
         )
         return MongoDataBackend(settings)
 
@@ -346,7 +346,7 @@ def mongo_lrs_backend():
             CLIENT_OPTIONS=client_options if client_options else {},
             LOCALE_ENCODING="utf8",
             READ_CHUNK_SIZE=500,
-            WRITE_CHUNK_SIZE=500,
+            WRITE_CHUNK_SIZE=499,
         )
         return MongoLRSBackend(settings)
 
@@ -498,7 +498,7 @@ def ldp_backend(settings_fs):
             SERVICE_NAME=service_name,
             REQUEST_TIMEOUT=None,
             READ_CHUNK_SIZE=500,
-            WRITE_CHUNK_SIZE=500,
+            WRITE_CHUNK_SIZE=499,
         )
         return LDPDataBackend(settings)
 
@@ -519,7 +519,7 @@ def async_es_backend():
             LOCALE_ENCODING="utf8",
             READ_CHUNK_SIZE=500,
             REFRESH_AFTER_WRITE=True,
-            WRITE_CHUNK_SIZE=500,
+            WRITE_CHUNK_SIZE=499,
         )
         return AsyncESDataBackend(settings)
 
@@ -553,7 +553,7 @@ def clickhouse_backend():
             },
             LOCALE_ENCODING="utf8",
             READ_CHUNK_SIZE=500,
-            WRITE_CHUNK_SIZE=500,
+            WRITE_CHUNK_SIZE=499,
         )
         return ClickHouseDataBackend(settings)
 
@@ -579,7 +579,7 @@ def clickhouse_lrs_backend():
             LOCALE_ENCODING="utf8",
             IDS_CHUNK_SIZE=10000,
             READ_CHUNK_SIZE=500,
-            WRITE_CHUNK_SIZE=500,
+            WRITE_CHUNK_SIZE=499,
         )
         return ClickHouseLRSBackend(settings)
 
@@ -600,7 +600,7 @@ def es_backend():
             LOCALE_ENCODING="utf8",
             READ_CHUNK_SIZE=500,
             REFRESH_AFTER_WRITE=True,
-            WRITE_CHUNK_SIZE=500,
+            WRITE_CHUNK_SIZE=499,
         )
         return ESDataBackend(settings)
 
@@ -622,7 +622,7 @@ def es_lrs_backend():
             POINT_IN_TIME_KEEP_ALIVE="1m",
             READ_CHUNK_SIZE=500,
             REFRESH_AFTER_WRITE=True,
-            WRITE_CHUNK_SIZE=500,
+            WRITE_CHUNK_SIZE=499,
         )
         return ESLRSBackend(settings)
 
@@ -649,7 +649,7 @@ def swift_backend():
             DEFAULT_CONTAINER="container_name",
             LOCALE_ENCODING="utf8",
             READ_CHUNK_SIZE=500,
-            WRITE_CHUNK_SIZE=500,
+            WRITE_CHUNK_SIZE=499,
         )
         return SwiftDataBackend(settings)
 
@@ -680,7 +680,7 @@ def s3_backend():
             DEFAULT_BUCKET_NAME="bucket_name",
             LOCALE_ENCODING="utf8",
             READ_CHUNK_SIZE=4096,
-            WRITE_CHUNK_SIZE=4096,
+            WRITE_CHUNK_SIZE=3999,
         )
         return S3DataBackend(settings)
 

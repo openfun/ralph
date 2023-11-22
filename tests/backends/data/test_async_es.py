@@ -95,7 +95,7 @@ async def test_backends_data_async_es_instantiation_with_settings():
         POINT_IN_TIME_KEEP_ALIVE="5m",
         READ_CHUNK_SIZE=5000,
         REFRESH_AFTER_WRITE=True,
-        WRITE_CHUNK_SIZE=5000,
+        WRITE_CHUNK_SIZE=4999,
     )
     backend = AsyncESDataBackend(settings)
     assert backend.settings.ALLOW_YELLOW_STATUS
@@ -108,7 +108,7 @@ async def test_backends_data_async_es_instantiation_with_settings():
     assert backend.settings.POINT_IN_TIME_KEEP_ALIVE == "5m"
     assert backend.settings.READ_CHUNK_SIZE == 5000
     assert backend.settings.REFRESH_AFTER_WRITE
-    assert backend.settings.WRITE_CHUNK_SIZE == 5000
+    assert backend.settings.WRITE_CHUNK_SIZE == 4999
     assert isinstance(backend.client, AsyncElasticsearch)
     elasticsearch_node = backend.client.transport.node_pool.get()
     assert elasticsearch_node.host == "elasticsearch_hostname"

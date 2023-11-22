@@ -70,7 +70,7 @@ def test_backends_data_mongo_instantiation_with_settings():
         CLIENT_OPTIONS={"tz_aware": "True"},
         LOCALE_ENCODING="utf8",
         READ_CHUNK_SIZE=1000,
-        WRITE_CHUNK_SIZE=1000,
+        WRITE_CHUNK_SIZE=999,
     )
     backend = MongoDataBackend(settings)
     assert backend.database.name == MONGO_TEST_DATABASE
@@ -79,7 +79,7 @@ def test_backends_data_mongo_instantiation_with_settings():
     assert backend.settings.CLIENT_OPTIONS == MongoClientOptions(tz_aware=True)
     assert backend.settings.LOCALE_ENCODING == "utf8"
     assert backend.settings.READ_CHUNK_SIZE == 1000
-    assert backend.settings.WRITE_CHUNK_SIZE == 1000
+    assert backend.settings.WRITE_CHUNK_SIZE == 999
 
     try:
         MongoDataBackend(settings)

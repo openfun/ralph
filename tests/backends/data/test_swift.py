@@ -86,7 +86,7 @@ def test_backends_data_swift_instantiation_with_settings(fs):
         DEFAULT_CONTAINER="default_container",
         LOCALE_ENCODING="utf-16",
         READ_CHUNK_SIZE=300,
-        WRITE_CHUNK_SIZE=300,
+        WRITE_CHUNK_SIZE=299,
     )
     backend = SwiftDataBackend(settings_)
     assert backend.options["tenant_id"] == "tenant_id"
@@ -98,7 +98,7 @@ def test_backends_data_swift_instantiation_with_settings(fs):
     assert backend.default_container == "default_container"
     assert backend.locale_encoding == "utf-16"
     assert backend.settings.READ_CHUNK_SIZE == 300
-    assert backend.settings.WRITE_CHUNK_SIZE == 300
+    assert backend.settings.WRITE_CHUNK_SIZE == 299
 
     try:
         SwiftDataBackend(settings_)

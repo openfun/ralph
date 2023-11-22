@@ -82,7 +82,7 @@ def test_backends_data_clickhouse_instantiation_with_settings():
         },
         LOCALE_ENCODING="utf-16",
         READ_CHUNK_SIZE=1000,
-        WRITE_CHUNK_SIZE=1000,
+        WRITE_CHUNK_SIZE=999,
     )
     backend = ClickHouseDataBackend(settings)
 
@@ -90,7 +90,7 @@ def test_backends_data_clickhouse_instantiation_with_settings():
     assert backend.event_table_name == CLICKHOUSE_TEST_TABLE_NAME
     assert backend.settings.LOCALE_ENCODING == "utf-16"
     assert backend.settings.READ_CHUNK_SIZE == 1000
-    assert backend.settings.WRITE_CHUNK_SIZE == 1000
+    assert backend.settings.WRITE_CHUNK_SIZE == 999
     backend.close()
 
 

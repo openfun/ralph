@@ -56,7 +56,7 @@ def test_backends_data_fs_instantiation_with_settings(fs):
         DEFAULT_QUERY_STRING="foo.txt",
         LOCALE_ENCODING="utf-16",
         READ_CHUNK_SIZE=1,
-        WRITE_CHUNK_SIZE=1,
+        WRITE_CHUNK_SIZE=9,
     )
     backend = FSDataBackend(settings)
     assert os.path.exists(deep_path)
@@ -65,7 +65,7 @@ def test_backends_data_fs_instantiation_with_settings(fs):
     assert backend.default_query_string == "foo.txt"
     assert backend.settings.LOCALE_ENCODING == "utf-16"
     assert backend.settings.READ_CHUNK_SIZE == 1
-    assert backend.settings.WRITE_CHUNK_SIZE == 1
+    assert backend.settings.WRITE_CHUNK_SIZE == 9
 
     try:
         FSDataBackend(settings)

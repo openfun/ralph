@@ -61,7 +61,7 @@ def test_backends_data_ldp_instantiation_with_settings(ldp_backend):
     assert backend.service_name == "foo"
     assert backend.stream_id == "bar"
     assert backend.settings.READ_CHUNK_SIZE == 500
-    assert backend.settings.WRITE_CHUNK_SIZE == 500
+    assert backend.settings.WRITE_CHUNK_SIZE == 499
 
     try:
         ldp_backend(service_name="bar")
