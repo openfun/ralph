@@ -3,9 +3,10 @@
 import logging
 from typing import Union
 
-from fastapi import APIRouter, status
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Response, status
+from pydantic import BaseModel
 
+from ralph.backends.data.base import DataBackendStatus
 from ralph.backends.loader import get_lrs_backends
 from ralph.backends.lrs.base import BaseAsyncLRSBackend, BaseLRSBackend
 from ralph.conf import settings
@@ -20,6 +21,17 @@ BACKEND_CLIENT: Union[BaseLRSBackend, BaseAsyncLRSBackend] = get_backend_class(
 )()
 
 
+class Heartbeat(BaseModel):
+    """Ralph backends status."""
+
+    database: DataBackendStatus
+
+    @property
+    def is_alive(self):
+        """A helper that checks the overall status."""
+        return self.database == DataBackendStatus.OK
+
+
 @router.get("/__lbheartbeat__")
 async def lbheartbeat() -> None:
     """Load balancer heartbeat.
@@ -29,17 +41,16 @@ async def lbheartbeat() -> None:
     return
 
 
-@router.get("/__heartbeat__")
-async def heartbeat() -> JSONResponse:
+@router.get("/__heartbeat__", status_code=status.HTTP_200_OK)
+async def heartbeat(response: Response) -> Heartbeat:
     """Application heartbeat.
 
     Return a 200 if all checks are successful.
     """
-    content = {"database": (await await_if_coroutine(BACKEND_CLIENT.status())).value}
-    status_code = (
-        status.HTTP_200_OK
-        if all(v == "ok" for v in content.values())
-        else status.HTTP_500_INTERNAL_SERVER_ERROR
+    statuses = Heartbeat.construct(
+        database=await await_if_coroutine(BACKEND_CLIENT.status())
     )
+    if not statuses.is_alive:
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
-    return JSONResponse(status_code=status_code, content=content)
+    return statuses
