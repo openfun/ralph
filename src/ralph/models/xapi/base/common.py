@@ -35,8 +35,9 @@ class LanguageTag(str):
 
 from typing import Annotated
 from pydantic import Field
+from ralph.conf import NonEmptyStrictStr
 
-LanguageMap = Dict[LanguageTag, Annotated[StrictStr, Field(min_length=1)]]
+LanguageMap = Dict[LanguageTag, NonEmptyStrictStr]
 
 # pattern = r'mailto:\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
 # MailtoEmail = Field(regex=pattern)#MailtoEmail
