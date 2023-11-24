@@ -5,6 +5,8 @@ from pydantic import AnyUrl, StrictStr, constr
 from ..config import BaseModelWithConfig
 from .common import IRI, MailtoEmail
 
+from ralph.conf import NonEmptyStrictStr
+
 
 class BaseXapiAccount(BaseModelWithConfig):
     """Pydantic model for IFI `account` property.
@@ -15,8 +17,10 @@ class BaseXapiAccount(BaseModelWithConfig):
     """
 
     homePage: IRI
-    name: StrictStr
+    name: NonEmptyStrictStr
 
+from typing import Annotated
+from pydantic import Field
 
 class BaseXapiMboxIFI(BaseModelWithConfig):
     """Pydantic model for mailto Inverse Functional Identifier.
@@ -24,8 +28,8 @@ class BaseXapiMboxIFI(BaseModelWithConfig):
     Attributes:
         mbox (MailtoEmail): Consists of the Agent's email address.
     """
-
-    mbox: MailtoEmail
+    pattern = r'mailto:\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
+    mbox: Annotated[str, Field(regex=pattern)]#MailtoEmail
 
 
 class BaseXapiMboxSha1SumIFI(BaseModelWithConfig):

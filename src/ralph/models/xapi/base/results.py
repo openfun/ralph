@@ -9,6 +9,8 @@ from pydantic import StrictBool, StrictStr, conint, root_validator
 from ..config import BaseModelWithConfig
 from .common import IRI
 
+from ralph.conf import NonEmptyStrictStr
+
 
 class BaseXapiResultScore(BaseModelWithConfig):
     """Pydantic model for result `score` property.
@@ -44,7 +46,8 @@ class BaseXapiResultScore(BaseModelWithConfig):
 
         return values
 
-
+from pydantic import Field
+from typing import Annotated
 class BaseXapiResult(BaseModelWithConfig):
     """Pydantic model for `result` property.
 
@@ -61,6 +64,6 @@ class BaseXapiResult(BaseModelWithConfig):
     score: Optional[BaseXapiResultScore]
     success: Optional[StrictBool]
     completion: Optional[StrictBool]
-    response: Optional[StrictStr]
+    response: Optional[NonEmptyStrictStr]
     duration: Optional[timedelta]
     extensions: Optional[Dict[IRI, Union[str, int, bool, list, dict, None]]]

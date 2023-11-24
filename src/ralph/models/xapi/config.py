@@ -6,7 +6,7 @@ from pydantic import BaseModel, Extra
 class BaseModelWithConfig(BaseModel):
     """Pydantic model for base configuration shared among all models."""
 
-    class Config:  # noqa: D106
+    class Config:  # noqa: D106 # TODO: doing
         extra = Extra.forbid
         min_anystr_length = 1
 

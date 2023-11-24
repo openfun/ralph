@@ -102,6 +102,14 @@ def custom_given(*args: Union[st.SearchStrategy, BaseModel], **kwargs):
         strategies.append(custom_builds(arg) if is_base_model(arg) else arg)
     return given(*strategies, **kwargs)
 
+# from polyfactory.factories.pydantic_factory import ModelFactory
+
+# def custom_given(klass):
+#     def wrapper(func):
+#         ModelFactor.create_factory(model=klass)
+#         func()
+#     return wrapper
+
 
 OVERWRITTEN_STRATEGIES = {
     UISeqPrev: {

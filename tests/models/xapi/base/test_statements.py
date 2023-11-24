@@ -27,14 +27,51 @@ from ralph.utils import set_dict_value_from_path
 
 from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 
+from polyfactory.factories.pydantic_factory import ModelFactory
+from polyfactory import Use
+from ralph.models.xapi.base.common import IRI
+from ralph.models.xapi.base.agents import BaseXapiAgentWithMbox
+from typing import Dict, Type, Any
+
+
+from uuid import UUID, uuid4
+
+# class IRIFactory(ModelFactory[IRI]):
+#     __model__ = IRI
+#     name = Use(ModelFactory.__random__.choice, ["Roxy", "Spammy", "Moshe"])
+
+from ralph.models.xapi.base.common import LanguageTag
+
+class BaseXapiStatementFactory(ModelFactory[BaseXapiStatement]):
+    __model__ = BaseXapiStatement
+
+    @classmethod
+    def get_provider_map(cls) -> Dict[Type, Any]:
+        providers_map = super().get_provider_map()
+        return {
+            IRI: lambda: IRI("https://w3id.org/xapi/video/verbs/played"),
+            BaseXapiAgentWithMbox: lambda: BaseXapiAgentWithMbox(mbox="mailto:test@toast.com"),
+            UUID: lambda: UUID(uuid4()),
+            LanguageTag: lambda: LanguageTag("en-US"),
+            **providers_map,
+            
+        }
+    
+    @classmethod
+    def _get_or_create_factory(cls, model: type):
+        created_factory = super()._get_or_create_factory(model)
+        created_factory.get_provider_map = cls.get_provider_map
+        created_factory._get_or_create_factory = cls._get_or_create_factory
+        return created_factory
+
 
 @pytest.mark.parametrize(
     "path",
     ["id", "stored", "verb__display", "context__contextActivities__parent"],
 )
 @pytest.mark.parametrize("value", [None, "", {}])
-@custom_given(BaseXapiStatement)
-def test_models_xapi_base_statement_with_invalid_null_values(path, value, statement):
+#@custom_given(BaseXapiStatement)
+def test_models_xapi_base_statement_with_invalid_null_values(path, value):
     """Test that the statement does not accept any null values.
 
     XAPI-00001
@@ -42,6 +79,10 @@ def test_models_xapi_base_statement_with_invalid_null_values(path, value, statem
     value is set to "null", an empty object, or has no value, except in an "extensions"
     property.
     """
+    # klass = BaseXapiStatement
+    # factory = ModelFactory.create_factory(model=klass)
+    statement = BaseXapiStatementFactory.build()
+
     statement = statement.dict(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), value)
     with pytest.raises(ValidationError, match="invalid empty value"):

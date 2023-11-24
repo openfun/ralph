@@ -6,7 +6,8 @@ from typing import Optional, Union
 
 from pydantic import StrictStr
 
-from ..config import BaseModelWithConfig
+from ralph.conf import NonEmptyStr, NonEmptyStrictStr
+from ralph.models.xapi.config import BaseModelWithConfig
 from .common import IRI
 from .ifi import (
     BaseXapiAccountIFI,
@@ -30,8 +31,11 @@ class BaseXapiAgentAccount(BaseModelWithConfig):
     """
 
     homePage: IRI
-    name: StrictStr
+    name: NonEmptyStrictStr
 
+
+from typing import Annotated
+from pydantic import Field
 
 class BaseXapiAgentCommonProperties(BaseModelWithConfig, ABC):
     """Pydantic model for core `Agent` type property.
@@ -44,7 +48,7 @@ class BaseXapiAgentCommonProperties(BaseModelWithConfig, ABC):
     """
 
     objectType: Optional[Literal["Agent"]]
-    name: Optional[StrictStr]
+    name: Optional[NonEmptyStrictStr]
 
 
 class BaseXapiAgentWithMbox(BaseXapiAgentCommonProperties, BaseXapiMboxIFI):
