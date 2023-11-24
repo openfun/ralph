@@ -174,12 +174,12 @@ class ClickHouseDataBackend(
 
         Args:
             target (str): The database name to list tables from.
-            details (bool): Get detailed table information instead of just ids.
-            new (bool): Given the history, list only not already fetched archives.
+            details (bool): Get detailed table information instead of just table names.
+            new (bool): Ignored.
 
         Yield:
             str: The next table name. (If `details` is False).
-            dict: The next table name. (If `details` is True).
+            dict: The next table details. (If `details` is True).
 
         Raise:
             BackendException: If a failure during table names retrieval occurs.
