@@ -487,6 +487,36 @@ def test_backends_data_mongo_write_with_target(mongo, mongo_backend):
     backend.close()
 
 
+@pytest.mark.parametrize(
+    "invalid_target,error",
+    [
+        (".foo", "must not start or end with '.': '.foo'"),
+        ("foo.", "must not start or end with '.': 'foo.'"),
+        ("foo$bar", "must not contain '$': 'foo$bar'"),
+        ("foo..bar", "cannot be empty"),
+    ],
+)
+def test_backends_data_mongo_write_with_invalid_target(
+    invalid_target, error, mongo_backend, caplog
+):
+    """Test the `MongoDataBackend.write` method given an invalid `target` argument,
+    should raise a `BackendParameterException`.
+    """
+    backend = mongo_backend()
+    timestamp = {"timestamp": "2022-06-27T15:36:50"}
+    documents = [{"id": "foo", **timestamp}, {"id": "bar", **timestamp}]
+    msg = (
+        f"The target=`{invalid_target}` is not a valid collection name: "
+        f"collection names {error}"
+    )
+    with caplog.at_level(logging.ERROR):
+        with pytest.raises(BackendParameterException, match=msg.replace("$", r"\$")):
+            backend.write(documents, target=invalid_target)
+
+    assert ("ralph.backends.data.mongo", logging.ERROR, msg) in caplog.record_tuples
+    backend.close()
+
+
 def test_backends_data_mongo_write_without_target(mongo, mongo_backend):
     """Test the `MongoDataBackend.write` method, given a no `target` argument, should
     write documents to the default collection.
