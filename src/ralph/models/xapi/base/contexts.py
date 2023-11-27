@@ -3,14 +3,13 @@
 from typing import Dict, List, Optional, Union
 from uuid import UUID
 
-from pydantic import StrictStr
-
 from ..config import BaseModelWithConfig
 from .agents import BaseXapiAgent
 from .common import IRI, LanguageTag
 from .groups import BaseXapiGroup
 from .unnested_objects import BaseXapiActivity, BaseXapiStatementRef
 
+from ralph.conf import NonEmptyStrictStr
 
 class BaseXapiContextContextActivities(BaseModelWithConfig):
     """Pydantic model for context `contextActivities` property.
@@ -50,8 +49,8 @@ class BaseXapiContext(BaseModelWithConfig):
     instructor: Optional[BaseXapiAgent]
     team: Optional[BaseXapiGroup]
     contextActivities: Optional[BaseXapiContextContextActivities]
-    revision: Optional[StrictStr]
-    platform: Optional[StrictStr]
+    revision: Optional[NonEmptyStrictStr]
+    platform: Optional[NonEmptyStrictStr]
     language: Optional[LanguageTag]
     statement: Optional[BaseXapiStatementRef]
     extensions: Optional[Dict[IRI, Union[str, int, bool, list, dict, None]]]

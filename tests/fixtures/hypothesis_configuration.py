@@ -11,6 +11,10 @@ from ralph.models.xapi.base.common import IRI, LanguageTag, MailtoEmail
 settings.register_profile("development", max_examples=1)
 settings.load_profile("development")
 
+# from ralph.conf import NonEmptyStr, NonEmptyStrictStr
+# st.register_type_strategy(NonEmptyStr, st.text(min_size=1))
+# st.register_type_strategy(NonEmptyStrictStr, st.text(min_size=1))
+
 st.register_type_strategy(str, st.text(min_size=1))
 st.register_type_strategy(StrictStr, st.text(min_size=1))
 st.register_type_strategy(AnyUrl, provisional.urls())

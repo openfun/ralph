@@ -1,6 +1,6 @@
 """Base xAPI `Inverse Functional Identifier` definitions."""
 
-from pydantic import AnyUrl, StrictStr, constr
+from pydantic import AnyUrl, constr
 
 from ..config import BaseModelWithConfig
 from .common import IRI, MailtoEmail
@@ -19,8 +19,6 @@ class BaseXapiAccount(BaseModelWithConfig):
     homePage: IRI
     name: NonEmptyStrictStr
 
-from typing import Annotated
-from pydantic import Field
 
 class BaseXapiMboxIFI(BaseModelWithConfig):
     """Pydantic model for mailto Inverse Functional Identifier.

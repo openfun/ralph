@@ -4,8 +4,6 @@ import sys
 from abc import ABC
 from typing import List, Optional, Union
 
-from pydantic import StrictStr
-
 from ..config import BaseModelWithConfig
 from .agents import BaseXapiAgent
 from .ifi import (
@@ -20,6 +18,7 @@ if sys.version_info >= (3, 8):
 else:
     from typing_extensions import Literal
 
+from ralph.conf import NonEmptyStrictStr
 
 class BaseXapiGroupCommonProperties(BaseModelWithConfig, ABC):
     """Pydantic model for core `Group` type property.
@@ -32,7 +31,7 @@ class BaseXapiGroupCommonProperties(BaseModelWithConfig, ABC):
     """
 
     objectType: Literal["Group"]
-    name: Optional[StrictStr]
+    name: Optional[NonEmptyStrictStr]
 
 
 class BaseXapiAnonymousGroup(BaseXapiGroupCommonProperties):

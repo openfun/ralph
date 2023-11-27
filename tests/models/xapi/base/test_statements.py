@@ -29,7 +29,7 @@ from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 
 from polyfactory.factories.pydantic_factory import ModelFactory
 from polyfactory import Use
-from ralph.models.xapi.base.common import IRI
+from ralph.models.xapi.base.common import MailtoEmail, IRI
 from ralph.models.xapi.base.agents import BaseXapiAgentWithMbox
 from typing import Dict, Type, Any
 
@@ -42,9 +42,7 @@ from uuid import UUID, uuid4
 
 from ralph.models.xapi.base.common import LanguageTag
 
-class BaseXapiStatementFactory(ModelFactory[BaseXapiStatement]):
-    __model__ = BaseXapiStatement
-
+class FactoryMixin():
     @classmethod
     def get_provider_map(cls) -> Dict[Type, Any]:
         providers_map = super().get_provider_map()
@@ -53,8 +51,8 @@ class BaseXapiStatementFactory(ModelFactory[BaseXapiStatement]):
             BaseXapiAgentWithMbox: lambda: BaseXapiAgentWithMbox(mbox="mailto:test@toast.com"),
             UUID: lambda: UUID(uuid4()),
             LanguageTag: lambda: LanguageTag("en-US"),
+            MailtoEmail: lambda: MailtoEmail("mailto:test@example.xyz"),
             **providers_map,
-            
         }
     
     @classmethod
@@ -64,6 +62,12 @@ class BaseXapiStatementFactory(ModelFactory[BaseXapiStatement]):
         created_factory._get_or_create_factory = cls._get_or_create_factory
         return created_factory
 
+class BaseXapiStatementFactory(FactoryMixin, ModelFactory[BaseXapiStatement]):
+    __model__ = BaseXapiStatement
+
+
+print('jiglypuf')
+print(BaseXapiStatementFactory.get_provider_map()[IRI])
 
 @pytest.mark.parametrize(
     "path",

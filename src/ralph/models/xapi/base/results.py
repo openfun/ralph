@@ -4,7 +4,7 @@ from datetime import timedelta
 from decimal import Decimal
 from typing import Any, Dict, Optional, Union
 
-from pydantic import StrictBool, StrictStr, conint, root_validator
+from pydantic import StrictBool, conint, root_validator
 
 from ..config import BaseModelWithConfig
 from .common import IRI

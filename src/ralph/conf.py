@@ -6,7 +6,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Annotated, List, Sequence, Tuple, Union
 
-from pydantic import AnyHttpUrl, AnyUrl, BaseModel, BaseSettings, Extra, Field, root_validator, StrictStr
+from pydantic import AnyHttpUrl, AnyUrl, BaseModel, BaseSettings, constr, Extra, Field, root_validator, StrictStr
 
 from ralph.exceptions import ConfigurationException
 

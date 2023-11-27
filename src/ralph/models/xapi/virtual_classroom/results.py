@@ -1,7 +1,5 @@
 """Virtual classroom xAPI events result fields definitions."""
 
-from pydantic import StrictStr
-
 from ..base.results import BaseXapiResult
 
 from ralph.conf import NonEmptyStrictStr
