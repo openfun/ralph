@@ -192,7 +192,7 @@ def validate_backend_query(
 
     msg = "The 'query' argument is expected to be a %s instance."
     logger.error(msg, query_name)
-    raise BackendParameterException(msg % (query_name,))
+    raise BackendParameterException(msg % query_name)
 
 
 class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
