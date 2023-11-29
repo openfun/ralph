@@ -512,7 +512,7 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-        prefetch: Optional[int] = None,
+        prefetch: Optional[PositiveInt] = None,
         max_statements: Optional[PositiveInt] = None,
     ) -> Union[AsyncIterator[bytes], AsyncIterator[dict]]:
         """Read records matching the `query` in the `target` container and yield them.
@@ -532,12 +532,8 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
             ignore_errors (bool): If `True`, encoding errors during the read operation
                 will be ignored and logged.
                 If `False` (default), a `BackendException` is raised on any error.
-            prefetch: The number of records to prefetch (queue) while yielding.
-                If `prefetch` is `None` or `0` it defaults to `1` - no records are
-                prefetched.
-                If `prefetch` is less than zero, all records are prefetched.
-                Caution: setting `prefetch<0` might potentially lead to large amounts
-                of API calls and to the memory filling up.
+            prefetch (int): The number of records to prefetch (queue) while yielding.
+                If `prefetch` is `None` it defaults to `1` - no records are prefetched.
             max_statements (int): The maximum number of statements to yield.
                 If `None` (default), there is no maximum.
 
@@ -550,7 +546,13 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
                 during encoding records and `ignore_errors` is set to `False`.
             BackendParameterException: If a backend argument value is not valid.
         """
-        if prefetch and prefetch != 1:
+        prefetch = prefetch if prefetch else 1
+        if prefetch < 1:
+            msg = "prefetch must be a strictly positive integer"
+            self.logger.error(msg)
+            raise BackendParameterException(msg)
+
+        if prefetch > 1:
             queue = Queue(prefetch - 1)
             statements = self.read(
                 query,
@@ -569,11 +571,9 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
                     if error:
                         raise error
 
-                    break
+                    return
 
                 yield statement
-
-            return
 
         chunk_size = chunk_size if chunk_size else self.settings.READ_CHUNK_SIZE
         query = validate_backend_query(query, self.query_class, self.logger)

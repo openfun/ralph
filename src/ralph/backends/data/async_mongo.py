@@ -123,7 +123,7 @@ class AsyncMongoDataBackend(
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-        prefetch: Optional[int] = None,
+        prefetch: Optional[PositiveInt] = None,
         max_statements: Optional[PositiveInt] = None,
     ) -> Union[AsyncIterator[bytes], AsyncIterator[dict]]:
         """Read documents matching the `query` from `target` collection and yield them.
@@ -138,12 +138,8 @@ class AsyncMongoDataBackend(
             ignore_errors (bool): If `True`, encoding errors during the read operation
                 will be ignored and logged.
                 If `False` (default), a `BackendException` is raised on any error.
-            prefetch: The number of records to prefetch (queue) while yielding.
-                If `prefetch` is `None` or `0` it defaults to `1` - no records are
-                prefetched.
-                If `prefetch` is less than zero, all records are prefetched.
-                Caution: setting `prefetch<0` might potentially lead to large amounts
-                of API calls and to the memory filling up.
+            prefetch (int): The number of records to prefetch (queue) while yielding.
+                If `prefetch` is `None` it defaults to `1` - no records are prefetched.
             max_statements (int): The maximum number of statements to yield.
                 If `None` (default), there is no maximum.
 

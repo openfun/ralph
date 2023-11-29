@@ -16,7 +16,7 @@ from ralph.backends.data.base import (
     Writable,
     get_backend_generic_argument,
 )
-from ralph.exceptions import BackendParameterException
+from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import gather_with_limited_concurrency
 
 
@@ -172,8 +172,6 @@ def test_backends_data_base_read_with_max_statements():
         # items ahead.
         (2, 3),  # One item read -> one item consumed + 2 items prefetched.
         (3, 4),
-        # Given `prefetch<0`, the `read` method should consume all items.
-        (-1, 6),  # One item read -> one item consumed + 5 (remaining) items prefetched.
     ],
 )
 async def test_backends_data_base_async_read_with_prefetch(
@@ -201,9 +199,91 @@ async def test_backends_data_base_async_read_with_prefetch(
             pass
 
     backend = MockDataBackend()
-    assert await backend.read(prefetch=prefetch).__anext__() == {"foo": "bar"}
+    reader = backend.read(prefetch=prefetch)
+    assert await reader.__anext__() == {"foo": "bar"}
     await asyncio.sleep(0.2)
     assert consumed_items["count"] == expected_consumed_items
+    assert [_ async for _ in reader] == [
+        {"foo": "bar"},
+        {"foo": "bar"},
+        {"foo": "bar"},
+        {"foo": "bar"},
+        {"foo": "bar"},
+    ]
+
+
+@pytest.mark.anyio
+async def test_backends_data_base_async_read_with_invalid_prefetch(caplog):
+    """Test the `BaseAsyncDataBackend.read` method given a `prefetch` argument
+    that is less than `0`, should raise a `BackendParameterException`.
+    """
+
+    class MockDataBackend(BaseAsyncDataBackend[BaseDataBackendSettings, BaseQuery]):
+        """A class mocking the base database class."""
+
+        async def _read_dicts(self, *args):
+            pass
+
+        async def _read_bytes(self, *args):
+            pass
+
+        async def status(self):
+            pass
+
+        async def close(self):
+            pass
+
+    msg = "prefetch must be a strictly positive integer"
+    with pytest.raises(BackendParameterException, match=msg):
+        with caplog.at_level(logging.ERROR):
+            _ = [_ async for _ in MockDataBackend().read(prefetch=-1)]
+
+    assert ("tests.backends.data.test_base", logging.ERROR, msg) in caplog.record_tuples
+
+
+@pytest.mark.anyio
+async def test_backends_data_base_async_read_with_an_error_while_prefetching(caplog):
+    """Test the `BaseAsyncDataBackend.read` method given a `prefech` argument and an
+    exception while prefetching records, should yield the remaining records before the
+    exception and once the last record is yielded, should re-raise the exception.
+    """
+    consumed_items = {"count": 0}
+
+    class MockDataBackend(BaseAsyncDataBackend[BaseDataBackendSettings, BaseQuery]):
+        """A class mocking the base database class."""
+
+        async def _read_dicts(self, *args):
+            for _ in range(3):
+                consumed_items["count"] += 1
+                yield {"foo": "bar"}
+
+            self.logger.error("connection error")
+            raise BackendException("connection error")
+
+        async def _read_bytes(self, *args):
+            pass
+
+        async def status(self):
+            pass
+
+        async def close(self):
+            pass
+
+    backend = MockDataBackend()
+    reader = backend.read(prefetch=10)
+    assert await reader.__anext__() == {"foo": "bar"}
+    await asyncio.sleep(0.2)
+    # Backend prefetched all records and catched the exception.
+    assert consumed_items["count"] == 3
+    # Reading the remaining records.
+    assert await reader.__anext__() == {"foo": "bar"}
+    assert await reader.__anext__() == {"foo": "bar"}
+    msg = "connection error"
+    with caplog.at_level(logging.ERROR):
+        with pytest.raises(BackendException, match=msg):
+            await reader.__anext__()
+
+    assert ("tests.backends.data.test_base", logging.ERROR, msg) in caplog.record_tuples
 
 
 @pytest.mark.anyio
