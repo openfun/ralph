@@ -357,7 +357,7 @@ class AsyncWritable(Loggable, ABC):
         chunk_size: Optional[int] = None,
         ignore_errors: bool = False,
         operation_type: Optional[BaseOperationType] = None,
-        concurrency: Optional[int] = None,
+        concurrency: Optional[PositiveInt] = None,
     ) -> int:
         """Write `data` records to the `target` container and return their count.
 

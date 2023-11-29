@@ -217,7 +217,7 @@ class AsyncESDataBackend(
         chunk_size: Optional[int] = None,
         ignore_errors: bool = False,
         operation_type: Optional[BaseOperationType] = None,
-        concurrency: Optional[int] = None,
+        concurrency: Optional[PositiveInt] = None,
     ) -> int:
         """Write data documents to the target index and return their count.
 
