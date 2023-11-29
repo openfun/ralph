@@ -3,6 +3,7 @@
 from typing import AsyncIterator, Dict, Optional, Union
 
 import websockets
+from pydantic import PositiveInt
 
 from ralph.backends.data.base import (
     BaseAsyncDataBackend,
@@ -77,8 +78,8 @@ class AsyncWSDataBackend(BaseAsyncDataBackend[WSDataBackendSettings, BaseQuery])
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-        prefetch: Optional[int] = None,
-        max_statements: Optional[int] = None,
+        prefetch: Optional[PositiveInt] = None,
+        max_statements: Optional[PositiveInt] = None,
     ) -> Union[AsyncIterator[bytes], AsyncIterator[dict]]:
         """Read records matching the `query` in the `target` container and yield them.
 
@@ -95,12 +96,8 @@ class AsyncWSDataBackend(BaseAsyncDataBackend[WSDataBackendSettings, BaseQuery])
             ignore_errors (bool): If `True`, encoding errors during the read operation
                 will be ignored and logged.
                 If `False` (default), a `BackendException` is raised on any error.
-            prefetch: The number of records to prefetch (queue) while yielding.
-                If `prefetch` is `None` or `0` it defaults to `1` - no records are
-                prefetched.
-                If `prefetch` is less than zero, all records are prefetched.
-                Caution: setting `prefetch<0` might potentially lead to large amounts
-                of API calls and to the memory filling up.
+            prefetch (int): The number of records to prefetch (queue) while yielding.
+                If `prefetch` is `None` it defaults to `1` - no records are prefetched.
             max_statements (int): The maximum number of statements to yield.
 
         Yield:
