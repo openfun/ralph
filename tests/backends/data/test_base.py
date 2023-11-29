@@ -41,7 +41,7 @@ def test_backends_data_base_validate_backend_query_with_valid_input(value, expec
             pass
 
     assert list(MockBaseDataBackend().read(query=value, raw_output=True)) == [True]
-    assert list(MockBaseDataBackend().read(query=value, raw_output=True)) == [True]
+    assert list(MockBaseDataBackend().read(query=value, raw_output=False)) == [True]
 
 
 @pytest.mark.parametrize(
