@@ -134,7 +134,7 @@ class AsyncWSDataBackend(BaseAsyncDataBackend[WSDataBackendSettings, BaseQuery])
         count = 0
         try:
             while event := await client.recv():
-                yield bytes(f"{event}" + "\n", encoding=self.settings.LOCALE_ENCODING)
+                yield bytes(f"{event}\n", encoding=self.settings.LOCALE_ENCODING)
                 count += 1
         except websockets.exceptions.ConnectionClosedOK:
             self.logger.info("Read %s records with success", count)
