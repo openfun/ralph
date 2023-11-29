@@ -169,6 +169,7 @@ class FSDataBackend(
                 will be ignored and logged.
                 If `False` (default), a `BackendException` is raised on any error.
             max_statements (int): The maximum number of statements to yield.
+                If `None` (default), there is no maximum.
 
         Yield:
             bytes: The next chunk of the read files if `raw_output` is True.

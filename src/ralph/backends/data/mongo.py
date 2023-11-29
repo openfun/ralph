@@ -192,6 +192,7 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
                 will be ignored and logged.
                 If `False` (default), a `BackendException` is raised on any error.
             max_statements (int): The maximum number of statements to yield.
+                If `None` (default), there is no maximum.
 
         Yield:
             dict: If `raw_output` is False.

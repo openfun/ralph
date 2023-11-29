@@ -227,6 +227,7 @@ class ClickHouseDataBackend(
                 will be ignored and logged.
                 If `False` (default), a `BackendException` is raised on any error.
             max_statements (int): The maximum number of statements to yield.
+                If `None` (default), there is no maximum.
 
         Yield:
             bytes: The next raw document if `raw_output` is True.

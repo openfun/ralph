@@ -168,6 +168,7 @@ class LDPDataBackend(
             raw_output (bool): Should always be set to `True`.
             ignore_errors (bool): No impact as no encoding operation is performed.
             max_statements (int): The maximum number of statements to yield.
+                If `None` (default), there is no maximum.
 
         Yield:
             bytes: The content of the archive matching the query.
