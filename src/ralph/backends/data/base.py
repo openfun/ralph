@@ -19,7 +19,7 @@ from typing import (
     Union,
 )
 
-from pydantic import BaseModel, BaseSettings, ValidationError
+from pydantic import BaseModel, BaseSettings, PositiveInt, ValidationError
 
 from ralph.conf import BaseSettingsConfig, core_settings
 from ralph.exceptions import BackendParameterException
@@ -277,7 +277,7 @@ class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-        max_statements: Optional[int] = None,
+        max_statements: Optional[PositiveInt] = None,
     ) -> Union[Iterator[bytes], Iterator[dict]]:
         """Read records matching the `query` in the `target` container and yield them.
 
@@ -483,7 +483,7 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-        max_statements: Optional[int] = None,
+        max_statements: Optional[PositiveInt] = None,
     ) -> Union[AsyncIterator[bytes], AsyncIterator[dict]]:
         """Read records matching the `query` in the `target` container and yield them.
 

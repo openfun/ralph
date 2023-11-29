@@ -4,6 +4,7 @@ from typing import Iterator, Literal, Optional, Union
 
 import ovh
 import requests
+from pydantic import PositiveInt
 
 from ralph.backends.data.base import (
     BaseDataBackend,
@@ -156,7 +157,7 @@ class LDPDataBackend(
         chunk_size: Optional[int] = None,
         raw_output: bool = True,
         ignore_errors: bool = False,
-        max_statements: Optional[int] = None,
+        max_statements: Optional[PositiveInt] = None,
     ) -> Union[Iterator[bytes], Iterator[dict]]:
         """Read an archive matching the query in the target stream_id and yield it.
 

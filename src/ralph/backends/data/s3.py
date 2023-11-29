@@ -14,6 +14,7 @@ from botocore.exceptions import (
     ReadTimeoutError,
     ResponseStreamingError,
 )
+from pydantic import PositiveInt
 from requests_toolbelt import StreamingIterator
 
 from ralph.backends.data.base import (
@@ -170,7 +171,7 @@ class S3DataBackend(
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-        max_statements: Optional[int] = None,
+        max_statements: Optional[PositiveInt] = None,
     ) -> Union[Iterator[bytes], Iterator[dict]]:
         """Read an object matching the `query` in the `target` bucket and yield it.
 

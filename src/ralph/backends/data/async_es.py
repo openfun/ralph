@@ -5,6 +5,7 @@ from typing import AsyncIterator, Iterable, Optional, TypeVar, Union
 
 from elasticsearch import ApiError, AsyncElasticsearch, TransportError
 from elasticsearch.helpers import BulkIndexError, async_streaming_bulk
+from pydantic import PositiveInt
 
 from ralph.backends.data.base import (
     AsyncListable,
@@ -114,7 +115,7 @@ class AsyncESDataBackend(
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-        max_statements: Optional[int] = None,
+        max_statements: Optional[PositiveInt] = None,
     ) -> Union[AsyncIterator[bytes], AsyncIterator[dict]]:
         """Read documents matching the query in the target index and yield them.
 

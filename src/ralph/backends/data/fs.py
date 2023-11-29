@@ -7,6 +7,8 @@ from pathlib import Path
 from typing import Iterable, Iterator, Optional, Tuple, TypeVar, Union
 from uuid import uuid4
 
+from pydantic import PositiveInt
+
 from ralph.backends.data.base import (
     BaseDataBackend,
     BaseDataBackendSettings,
@@ -152,7 +154,7 @@ class FSDataBackend(
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-        max_statements: Optional[int] = None,
+        max_statements: Optional[PositiveInt] = None,
     ) -> Union[Iterator[bytes], Iterator[dict]]:
         """Read files matching the query in the target folder and yield them.
 

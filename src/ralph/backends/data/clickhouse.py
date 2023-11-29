@@ -20,7 +20,7 @@ from uuid import UUID, uuid4
 import clickhouse_connect
 from clickhouse_connect.driver.client import Client
 from clickhouse_connect.driver.exceptions import ClickHouseError
-from pydantic import BaseModel, Json, ValidationError
+from pydantic import BaseModel, Json, PositiveInt, ValidationError
 
 from ralph.backends.data.base import (
     BaseDataBackend,
@@ -212,7 +212,7 @@ class ClickHouseDataBackend(
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-        max_statements: Optional[int] = None,
+        max_statements: Optional[PositiveInt] = None,
     ) -> Union[Iterator[bytes], Iterator[dict]]:
         """Read documents matching the query in the target table and yield them.
 

@@ -5,6 +5,7 @@ from typing import AsyncIterator, Iterable, Optional, TypeVar, Union
 
 from bson.errors import BSONError
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorCollection
+from pydantic import PositiveInt
 from pymongo.errors import BulkWriteError, ConnectionFailure, InvalidName, PyMongoError
 
 from ralph.backends.data.base import BaseOperationType
@@ -122,7 +123,7 @@ class AsyncMongoDataBackend(
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-        max_statements: Optional[int] = None,
+        max_statements: Optional[PositiveInt] = None,
     ) -> Union[AsyncIterator[bytes], AsyncIterator[dict]]:
         """Read documents matching the `query` from `target` collection and yield them.
 

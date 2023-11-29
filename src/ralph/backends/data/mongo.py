@@ -12,7 +12,7 @@ from uuid import uuid4
 from bson.errors import BSONError
 from bson.objectid import ObjectId
 from dateutil.parser import isoparse
-from pydantic import Json, MongoDsn, constr
+from pydantic import Json, MongoDsn, PositiveInt, constr
 from pymongo import MongoClient, ReplaceOne
 from pymongo.collection import Collection
 from pymongo.errors import (
@@ -177,7 +177,7 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-        max_statements: Optional[int] = None,
+        max_statements: Optional[PositiveInt] = None,
     ) -> Union[Iterator[bytes], Iterator[dict]]:
         """Read documents matching the `query` from `target` collection and yield them.
 
