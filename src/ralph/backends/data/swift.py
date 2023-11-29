@@ -20,7 +20,7 @@ from ralph.backends.data.base import (
 from ralph.backends.data.mixins import HistoryMixin
 from ralph.conf import BaseSettingsConfig
 from ralph.exceptions import BackendException
-from ralph.utils import now, parse_dict_to_bytes, parse_iterable_to_dict
+from ralph.utils import now
 
 
 class SwiftDataBackendSettings(BaseDataBackendSettings):
@@ -258,7 +258,7 @@ class SwiftDataBackend(
             query.query_string,
         )
         resp_headers, content = self._get_object(target, query.query_string, chunk_size)
-        yield from parse_iterable_to_dict(content, ignore_errors, self.logger)
+        yield from self.parse_iterable_to_dict(content, ignore_errors)
         # Archive read, add a new entry to the history
         self.append_to_history(
             {
@@ -327,10 +327,8 @@ class SwiftDataBackend(
         operation_type: BaseOperationType,
     ) -> int:
         """Method called by `self.write` writing dictionaries. See `self.write`."""
-        locale = self.settings.LOCALE_ENCODING
-        statements = parse_dict_to_bytes(data, locale, ignore_errors, self.logger)
-        return self._write_bytes(
-            statements, target, chunk_size, ignore_errors, operation_type
+        return super()._write_dicts(
+            data, target, chunk_size, ignore_errors, operation_type
         )
 
     def _write_bytes(  # noqa: PLR0913

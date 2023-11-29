@@ -33,7 +33,7 @@ from ralph.backends.data.base import (
 )
 from ralph.conf import BaseSettingsConfig, ClientOptions
 from ralph.exceptions import BackendException
-from ralph.utils import iter_by_batch, parse_dict_to_bytes, parse_iterable_to_dict
+from ralph.utils import iter_by_batch
 
 
 class ClickHouseInsert(BaseModel):
@@ -240,18 +240,6 @@ class ClickHouseDataBackend(
             query, target, chunk_size, raw_output, ignore_errors, max_statements
         )
 
-    def _read_bytes(
-        self,
-        query: ClickHouseQuery,
-        target: Optional[str],
-        chunk_size: int,
-        ignore_errors: bool,
-    ) -> Iterator[bytes]:
-        """Method called by `self.read` yielding bytes. See `self.read`."""
-        locale = self.settings.LOCALE_ENCODING
-        statements = self._read_dicts(query, target, chunk_size, ignore_errors)
-        yield from parse_dict_to_bytes(statements, locale, ignore_errors, self.logger)
-
     def _read_dicts(
         self,
         query: ClickHouseQuery,
@@ -300,8 +288,8 @@ class ClickHouseDataBackend(
                 settings={"buffer_size": chunk_size},
                 column_oriented=query.column_oriented,
             ).named_results()
-            yield from parse_iterable_to_dict(
-                result, ignore_errors, self.logger, self._parse_event_json
+            yield from self.parse_iterable_to_dict(
+                result, ignore_errors, self._parse_event_json
             )
         except (ClickHouseError, IndexError, TypeError, ValueError) as error:
             msg = "Failed to read documents: %s"
@@ -341,20 +329,6 @@ class ClickHouseDataBackend(
                 or `DELETE` as it is not supported.
         """
         return super().write(data, target, chunk_size, ignore_errors, operation_type)
-
-    def _write_bytes(  # noqa: PLR0913
-        self,
-        data: Iterable[bytes],
-        target: Optional[str],
-        chunk_size: int,
-        ignore_errors: bool,
-        operation_type: BaseOperationType,
-    ) -> int:
-        """Method called by `self.write` writing bytes. See `self.write`."""
-        statements = parse_iterable_to_dict(data, ignore_errors, self.logger)
-        return self._write_dicts(
-            statements, target, chunk_size, ignore_errors, operation_type
-        )
 
     def _write_dicts(  # noqa: PLR0913
         self,

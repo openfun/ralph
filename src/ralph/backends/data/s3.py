@@ -29,7 +29,7 @@ from ralph.backends.data.base import (
 from ralph.backends.data.mixins import HistoryMixin
 from ralph.conf import BaseSettingsConfig
 from ralph.exceptions import BackendException
-from ralph.utils import now, parse_dict_to_bytes, parse_iterable_to_dict
+from ralph.utils import now
 
 
 class S3DataBackendSettings(BaseDataBackendSettings):
@@ -241,7 +241,7 @@ class S3DataBackend(
         response = self._get_object(target, query.query_string)
         try:
             lines = response["Body"].iter_lines(chunk_size)
-            yield from parse_iterable_to_dict(lines, ignore_errors, self.logger)
+            yield from self.parse_iterable_to_dict(lines, ignore_errors)
         except (ReadTimeoutError, ResponseStreamingError) as err:
             msg = "Failed to read chunk from object %s"
             self.logger.error(msg, query.query_string)
@@ -319,10 +319,8 @@ class S3DataBackend(
         operation_type: BaseOperationType,
     ) -> int:
         """Method called by `self.write` writing dictionaries. See `self.write`."""
-        locale = self.settings.LOCALE_ENCODING
-        statements = parse_dict_to_bytes(data, locale, ignore_errors, self.logger)
-        return self._write_bytes(
-            statements, target, chunk_size, ignore_errors, operation_type
+        return super()._write_dicts(
+            data, target, chunk_size, ignore_errors, operation_type
         )
 
     def _write_bytes(  # noqa: PLR0913

@@ -21,7 +21,7 @@ from ralph.backends.data.base import (
 from ralph.backends.data.mixins import HistoryMixin
 from ralph.conf import BaseSettingsConfig
 from ralph.exceptions import BackendException, BackendParameterException
-from ralph.utils import now, parse_dict_to_bytes, parse_iterable_to_dict
+from ralph.utils import now
 
 
 class FSDataBackendSettings(BaseDataBackendSettings):
@@ -209,7 +209,7 @@ class FSDataBackend(
     ) -> Iterator[dict]:
         """Method called by `self.read` yielding dictionaries. See `self.read`."""
         for file, path in self._iter_files_matching_query(target, query):
-            yield from parse_iterable_to_dict(file, ignore_errors, self.logger)
+            yield from self.parse_iterable_to_dict(file, ignore_errors)
             # The file has been read, add a new entry to the history.
             self._append_to_history("read", path)
 
@@ -301,10 +301,8 @@ class FSDataBackend(
         operation_type: BaseOperationType,
     ) -> int:
         """Method called by `self.write` writing dictionaries. See `self.write`."""
-        locale = self.settings.LOCALE_ENCODING
-        statements = parse_dict_to_bytes(data, locale, ignore_errors, self.logger)
-        return self._write_bytes(
-            statements, target, chunk_size, ignore_errors, operation_type
+        return super()._write_dicts(
+            data, target, chunk_size, ignore_errors, operation_type
         )
 
     def _write_bytes(  # noqa: PLR0913

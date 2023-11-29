@@ -19,7 +19,6 @@ from ralph.backends.data.base import (
 )
 from ralph.conf import BaseSettingsConfig, ClientOptions, CommaSeparatedTuple
 from ralph.exceptions import BackendException
-from ralph.utils import parse_dict_to_bytes, parse_iterable_to_dict
 
 
 class ESClientOptions(ClientOptions):
@@ -228,18 +227,6 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
             query, target, chunk_size, raw_output, ignore_errors, max_statements
         )
 
-    def _read_bytes(
-        self,
-        query: ESQuery,
-        target: Optional[str],
-        chunk_size: int,
-        ignore_errors: bool,
-    ) -> Iterator[bytes]:
-        """Method called by `self.read` yielding bytes. See `self.read`."""
-        locale = self.settings.LOCALE_ENCODING
-        statements = self._read_dicts(query, target, chunk_size, ignore_errors)
-        yield from parse_dict_to_bytes(statements, locale, ignore_errors, self.logger)
-
     def _read_dicts(
         self,
         query: ESQuery,
@@ -320,20 +307,6 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
                 supported.
         """
         return super().write(data, target, chunk_size, ignore_errors, operation_type)
-
-    def _write_bytes(  # noqa: PLR0913
-        self,
-        data: Iterable[bytes],
-        target: Optional[str],
-        chunk_size: int,
-        ignore_errors: bool,
-        operation_type: BaseOperationType,
-    ) -> int:
-        """Method called by `self.write` writing bytes. See `self.write`."""
-        statements = parse_iterable_to_dict(data, ignore_errors, self.logger)
-        return self._write_dicts(
-            statements, target, chunk_size, ignore_errors, operation_type
-        )
 
     def _write_dicts(  # noqa: PLR0913
         self,

@@ -1,5 +1,6 @@
 """Base data backend for Ralph."""
 
+import json
 import logging
 from abc import ABC, abstractmethod
 from asyncio import Queue, create_task
@@ -9,7 +10,10 @@ from io import IOBase
 from itertools import chain
 from typing import (
     Any,
+    AsyncIterable,
     AsyncIterator,
+    Callable,
+    Dict,
     Generic,
     Iterable,
     Iterator,
@@ -23,7 +27,7 @@ from typing import (
 from pydantic import BaseModel, BaseSettings, PositiveInt, ValidationError
 
 from ralph.conf import BaseSettingsConfig, core_settings
-from ralph.exceptions import BackendParameterException
+from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import gather_with_limited_concurrency, iter_by_batch
 
 
@@ -92,7 +96,92 @@ class Loggable:
         return logging.getLogger(self.__class__.__module__)
 
 
-class Writable(Loggable, ABC):
+T = TypeVar("T")
+
+
+class BackendUtilityMixin(Loggable):
+    """Common data backend utilities."""
+
+    def parse_iterable_to_dict(
+        self,
+        raw_documents: Iterable[T],
+        ignore_errors: bool,
+        parser: Callable[[T], Dict[str, Any]] = json.loads,
+    ) -> Iterator[dict]:
+        """Read the `raw_documents` Iterable and yield dictionaries."""
+        for i, raw_document in enumerate(raw_documents):
+            try:
+                yield parser(raw_document)
+            except (TypeError, json.JSONDecodeError) as error:
+                msg = "Failed to decode JSON: %s, for document: %s, at line %s"
+                if ignore_errors:
+                    self.logger.warning(msg, error, raw_document, i)
+                    continue
+                self.logger.error(msg, error, raw_document, i)
+                raise BackendException(msg % (error, raw_document, i)) from error
+
+    async def async_parse_iterable_to_dict(
+        self,
+        raw_documents: AsyncIterable[T],
+        ignore_errors: bool,
+        parser: Callable[[T], Dict[str, Any]] = json.loads,
+    ) -> AsyncIterator[dict]:
+        """Read the `raw_documents` Iterable and yield dictionaries."""
+        i = 0
+        async for raw_document in raw_documents:
+            try:
+                yield parser(raw_document)
+            except (TypeError, json.JSONDecodeError) as error:
+                msg = "Failed to decode JSON: %s, for document: %s, at line %s"
+                if ignore_errors:
+                    self.logger.warning(msg, error, raw_document, i)
+                    continue
+                self.logger.error(msg, error, raw_document, i)
+                raise BackendException(msg % (error, raw_document, i)) from error
+
+            i += 1
+
+    def parse_dict_to_bytes(
+        self,
+        documents: Iterable[Dict[str, Any]],
+        encoding: str,
+        ignore_errors: bool,
+    ) -> Iterator[bytes]:
+        """Read the `documents` Iterable with the `encoding` and yield bytes."""
+        for i, document in enumerate(documents):
+            try:
+                yield f"{json.dumps(document)}\n".encode(encoding)
+            except (TypeError, ValueError) as error:
+                msg = "Failed to encode JSON: %s, for document: %s, at line %s"
+                if ignore_errors:
+                    self.logger.warning(msg, error, document, i)
+                    continue
+                self.logger.error(msg, error, document, i)
+                raise BackendException(msg % (error, document, i)) from error
+
+    async def async_parse_dict_to_bytes(
+        self,
+        documents: AsyncIterable[Dict[str, Any]],
+        encoding: str,
+        ignore_errors: bool,
+    ) -> AsyncIterator[bytes]:
+        """Read the `documents` Iterable with the `encoding` and yield bytes."""
+        i = 0
+        async for document in documents:
+            try:
+                yield f"{json.dumps(document)}\n".encode(encoding)
+            except (TypeError, ValueError) as error:
+                msg = "Failed to encode JSON: %s, for document: %s, at line %s"
+                if ignore_errors:
+                    self.logger.warning(msg, error, document, i)
+                    continue
+                self.logger.error(msg, error, document, i)
+                raise BackendException(msg % (error, document, i)) from error
+
+            i += 1
+
+
+class Writable(BackendUtilityMixin, ABC):
     """Data backend interface for backends supporting the write operation."""
 
     default_operation_type = BaseOperationType.INDEX
@@ -150,7 +239,6 @@ class Writable(Loggable, ABC):
         writer = self._write_bytes if is_bytes else self._write_dicts
         return writer(data, target, chunk_size, ignore_errors, operation_type)
 
-    @abstractmethod
     def _write_bytes(  # noqa: PLR0913
         self,
         data: Iterable[bytes],
@@ -160,6 +248,10 @@ class Writable(Loggable, ABC):
         operation_type: BaseOperationType,
     ) -> int:
         """Method called by `self.write` writing bytes. See `self.write`."""
+        statements = self.parse_iterable_to_dict(data, ignore_errors)
+        return self._write_dicts(
+            statements, target, chunk_size, ignore_errors, operation_type
+        )
 
     @abstractmethod
     def _write_dicts(  # noqa: PLR0913
@@ -171,6 +263,11 @@ class Writable(Loggable, ABC):
         operation_type: BaseOperationType,
     ) -> int:
         """Method called by `self.write` writing dictionaries. See `self.write`."""
+        locale = self.settings.LOCALE_ENCODING
+        statements = self.parse_dict_to_bytes(data, locale, ignore_errors)
+        return self._write_bytes(
+            statements, target, chunk_size, ignore_errors, operation_type
+        )
 
 
 class Listable(ABC):
@@ -244,7 +341,7 @@ def validate_backend_query(
     raise BackendParameterException(msg % query_name)
 
 
-class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
+class BaseDataBackend(Generic[Settings, Query], BackendUtilityMixin, ABC):
     """Base data backend interface."""
 
     name = "base"
@@ -328,17 +425,21 @@ class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
             if i >= max_statements:
                 return
 
-    @abstractmethod
     def _read_bytes(
         self, query: Query, target: Optional[str], chunk_size: int, ignore_errors: bool
     ) -> Iterator[bytes]:
         """Method called by `self.read` yielding bytes. See `self.read`."""
+        locale = self.settings.LOCALE_ENCODING
+        statements = self._read_dicts(query, target, chunk_size, ignore_errors)
+        yield from self.parse_dict_to_bytes(statements, locale, ignore_errors)
 
     @abstractmethod
     def _read_dicts(
         self, query: Query, target: Optional[str], chunk_size: int, ignore_errors: bool
     ) -> Iterator[dict]:
         """Method called by `self.read` yielding dictionaries. See `self.read`."""
+        statements = self._read_bytes(query, target, chunk_size, ignore_errors)
+        yield from self.parse_iterable_to_dict(statements, ignore_errors)
 
     @abstractmethod
     def close(self) -> None:
@@ -349,7 +450,7 @@ class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
         """
 
 
-class AsyncWritable(Loggable, ABC):
+class AsyncWritable(BackendUtilityMixin, ABC):
     """Async data backend interface for backends supporting the write operation."""
 
     default_operation_type = BaseOperationType.INDEX
@@ -428,7 +529,6 @@ class AsyncWritable(Loggable, ABC):
             count += sum(result)
         return count
 
-    @abstractmethod
     async def _write_bytes(  # noqa: PLR0913
         self,
         data: Iterable[bytes],
@@ -438,6 +538,10 @@ class AsyncWritable(Loggable, ABC):
         operation_type: BaseOperationType,
     ) -> int:
         """Method called by `self.write` writing bytes. See `self.write`."""
+        statements = self.parse_iterable_to_dict(data, ignore_errors)
+        return await self._write_dicts(
+            statements, target, chunk_size, ignore_errors, operation_type
+        )
 
     @abstractmethod
     async def _write_dicts(  # noqa: PLR0913
@@ -449,6 +553,11 @@ class AsyncWritable(Loggable, ABC):
         operation_type: BaseOperationType,
     ) -> int:
         """Method called by `self.write` writing dictionaries. See `self.write`."""
+        locale = self.settings.LOCALE_ENCODING
+        statements = self.parse_dict_to_bytes(data, locale, ignore_errors)
+        return await self._write_bytes(
+            statements, target, chunk_size, ignore_errors, operation_type
+        )
 
 
 class AsyncListable(ABC):
@@ -476,7 +585,7 @@ class AsyncListable(ABC):
         """
 
 
-class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
+class BaseAsyncDataBackend(Generic[Settings, Query], BackendUtilityMixin, ABC):
     """Base async data backend interface."""
 
     name = "base"
@@ -594,17 +703,25 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
             if i >= max_statements:
                 return
 
-    @abstractmethod
     async def _read_bytes(
         self, query: Query, target: Optional[str], chunk_size: int, ignore_errors: bool
     ) -> AsyncIterator[bytes]:
         """Method called by `self.read` yielding bytes. See `self.read`."""
+        statements = self._read_dicts(query, target, chunk_size, ignore_errors)
+        async for statement in self.async_parse_dict_to_bytes(
+            statements, self.settings.LOCALE_ENCODING, ignore_errors
+        ):
+            yield statement
 
     @abstractmethod
     async def _read_dicts(
         self, query: Query, target: Optional[str], chunk_size: int, ignore_errors: bool
     ) -> AsyncIterator[dict]:
         """Method called by `self.read` yielding dictionaries. See `self.read`."""
+        statements = self._read_bytes(query, target, chunk_size, ignore_errors)
+        statements = self.async_parse_iterable_to_dict(statements, ignore_errors)
+        async for statement in statements:
+            yield statement
 
     @abstractmethod
     async def close(self) -> None:

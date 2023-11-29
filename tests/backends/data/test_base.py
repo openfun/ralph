@@ -73,9 +73,6 @@ def test_backends_data_base_validate_backend_query_with_invalid_input(
         def _read_dicts(self, query, *args):
             yield
 
-        def _read_bytes(self, query, *args):
-            yield
-
         def status(self):
             pass
 
@@ -189,9 +186,6 @@ async def test_backends_data_base_async_read_with_prefetch(
                 consumed_items["count"] += 1
                 yield {"foo": "bar"}
 
-        async def _read_bytes(self, *args):
-            pass
-
         async def status(self):
             pass
 
@@ -222,9 +216,6 @@ async def test_backends_data_base_async_read_with_invalid_prefetch(caplog):
         """A class mocking the base database class."""
 
         async def _read_dicts(self, *args):
-            pass
-
-        async def _read_bytes(self, *args):
             pass
 
         async def status(self):
@@ -259,9 +250,6 @@ async def test_backends_data_base_async_read_with_an_error_while_prefetching(cap
 
             self.logger.error("connection error")
             raise BackendException("connection error")
-
-        async def _read_bytes(self, *args):
-            pass
 
         async def status(self):
             pass
@@ -376,12 +364,6 @@ async def test_backends_data_base_async_write_with_concurrency(
         async def _read_dicts(self, *args):
             pass
 
-        async def _read_bytes(self, *args):
-            pass
-
-        async def _write_bytes(self, data, *args):
-            pass
-
         async def _write_dicts(self, data, *args):
             write_calls["count"] += 1
             item_count = 0
@@ -440,12 +422,6 @@ async def test_backends_data_base_write_with_invalid_parameters(caplog):
         def _read_dicts(self, *args):
             pass
 
-        def _read_bytes(self, *args):
-            pass
-
-        def _write_bytes(self, *args):
-            pass
-
         def _write_dicts(self, *args):
             return 1
 
@@ -493,12 +469,6 @@ async def test_backends_data_base_async_write_with_invalid_parameters(caplog):
         unsupported_operation_types = {BaseOperationType.DELETE}
 
         async def _read_dicts(self, *args):
-            pass
-
-        async def _read_bytes(self, *args):
-            pass
-
-        async def _write_bytes(self, *args):
             pass
 
         async def _write_dicts(self, *args):

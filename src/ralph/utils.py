@@ -2,7 +2,6 @@
 
 import asyncio
 import datetime
-import json
 import logging
 import operator
 from functools import reduce
@@ -12,22 +11,16 @@ from itertools import islice
 from logging import Logger, getLogger
 from typing import (
     Any,
-    AsyncIterable,
-    AsyncIterator,
-    Callable,
     Dict,
     Iterable,
-    Iterator,
     List,
     Optional,
     Sequence,
-    Tuple,
     Type,
-    TypeVar,
     Union,
 )
 
-from ralph.exceptions import BackendException, UnsupportedBackendException
+from ralph.exceptions import UnsupportedBackendException
 
 logger = logging.getLogger(__name__)
 
@@ -185,93 +178,6 @@ def statements_are_equivalent(statement_1: dict, statement_2: dict) -> bool:
     if any(statement_1.get(field) != statement_2.get(field) for field in fields):
         return False
     return True
-
-
-T = TypeVar("T")
-
-
-def parse_iterable_to_dict(
-    raw_documents: Iterable[T],
-    ignore_errors: bool,
-    logger_class: logging.Logger,
-    parser: Callable[[T], Dict[str, Any]] = json.loads,
-    exceptions: Tuple[Type[Exception], ...] = (TypeError, json.JSONDecodeError),
-) -> Iterator[dict]:
-    """Read the `raw_documents` Iterable and yield dictionaries."""
-    for i, raw_document in enumerate(raw_documents):
-        try:
-            yield parser(raw_document)
-        except exceptions as error:
-            msg = "Failed to decode JSON: %s, for document: %s, at line %s"
-            if ignore_errors:
-                logger_class.warning(msg, error, raw_document, i)
-                continue
-            logger_class.error(msg, error, raw_document, i)
-            raise BackendException(msg % (error, raw_document, i)) from error
-
-
-async def async_parse_iterable_to_dict(
-    raw_documents: AsyncIterable[T],
-    ignore_errors: bool,
-    logger_class: logging.Logger,
-    parser: Callable[[T], Dict[str, Any]] = json.loads,
-    exceptions: Tuple[Type[Exception], ...] = (TypeError, json.JSONDecodeError),
-) -> AsyncIterator[dict]:
-    """Read the `raw_documents` Iterable and yield dictionaries."""
-    i = 0
-    async for raw_document in raw_documents:
-        try:
-            yield parser(raw_document)
-        except exceptions as error:
-            msg = "Failed to decode JSON: %s, for document: %s, at line %s"
-            if ignore_errors:
-                logger_class.warning(msg, error, raw_document, i)
-                continue
-            logger_class.error(msg, error, raw_document, i)
-            raise BackendException(msg % (error, raw_document, i)) from error
-
-        i += 1
-
-
-def parse_dict_to_bytes(
-    documents: Iterable[Dict[str, Any]],
-    encoding: str,
-    ignore_errors: bool,
-    logger_class: logging.Logger,
-) -> Iterator[bytes]:
-    """Read the `documents` Iterable with the `encoding` and yield bytes."""
-    for i, document in enumerate(documents):
-        try:
-            yield f"{json.dumps(document)}\n".encode(encoding)
-        except (TypeError, ValueError) as error:
-            msg = "Failed to encode JSON: %s, for document: %s, at line %s"
-            if ignore_errors:
-                logger_class.warning(msg, error, document, i)
-                continue
-            logger_class.error(msg, error, document, i)
-            raise BackendException(msg % (error, document, i)) from error
-
-
-async def async_parse_dict_to_bytes(
-    documents: AsyncIterable[Dict[str, Any]],
-    encoding: str,
-    ignore_errors: bool,
-    logger_class: logging.Logger,
-) -> AsyncIterator[bytes]:
-    """Read the `documents` Iterable with the `encoding` and yield bytes."""
-    i = 0
-    async for document in documents:
-        try:
-            yield f"{json.dumps(document)}\n".encode(encoding)
-        except (TypeError, ValueError) as error:
-            msg = "Failed to encode JSON: %s, for document: %s, at line %s"
-            if ignore_errors:
-                logger_class.warning(msg, error, document, i)
-                continue
-            logger_class.error(msg, error, document, i)
-            raise BackendException(msg % (error, document, i)) from error
-
-        i += 1
 
 
 def iter_by_batch(iterable: Iterable, n: int) -> Iterable[list]:

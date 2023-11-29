@@ -13,7 +13,6 @@ from ralph.backends.data.base import (
 )
 from ralph.conf import BaseSettingsConfig
 from ralph.exceptions import BackendException
-from ralph.utils import async_parse_iterable_to_dict
 
 
 class WSDataBackendSettings(BaseDataBackendSettings):
@@ -151,10 +150,7 @@ class AsyncWSDataBackend(BaseAsyncDataBackend[WSDataBackendSettings, BaseQuery])
         ignore_errors: bool,
     ) -> AsyncIterator[dict]:
         """Method called by `self.read` yielding dictionaries. See `self.read`."""
-        statements = self._read_bytes(query, target, chunk_size, ignore_errors)
-        statements = async_parse_iterable_to_dict(
-            statements, ignore_errors, self.logger
-        )
+        statements = super()._read_dicts(query, target, chunk_size, ignore_errors)
         async for statement in statements:
             yield statement
 

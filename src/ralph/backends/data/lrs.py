@@ -18,7 +18,7 @@ from ralph.backends.data.base import (
 from ralph.backends.lrs.base import LRSStatementsQuery
 from ralph.conf import BaseSettingsConfig, HeadersParameters
 from ralph.exceptions import BackendException
-from ralph.utils import iter_by_batch, parse_dict_to_bytes, parse_iterable_to_dict
+from ralph.utils import iter_by_batch
 
 
 class LRSHeaders(HeadersParameters):
@@ -145,19 +145,6 @@ class LRSDataBackend(
             query, target, chunk_size, raw_output, ignore_errors, max_statements
         )
 
-    def _read_bytes(
-        self,
-        query: LRSStatementsQuery,
-        target: Optional[str],
-        chunk_size: int,
-        ignore_errors: bool,
-    ) -> Iterator[bytes]:
-        """Method called by `self.read` yielding bytes. See `self.read`."""
-        statements = self._read_dicts(query, target, chunk_size, ignore_errors)
-        yield from parse_dict_to_bytes(
-            statements, self.settings.LOCALE_ENCODING, ignore_errors, self.logger
-        )
-
     def _read_dicts(
         self,
         query: LRSStatementsQuery,
@@ -226,20 +213,6 @@ class LRSDataBackend(
                 instead. See `BaseOperationType`.
         """
         return super().write(data, target, chunk_size, ignore_errors, operation_type)
-
-    def _write_bytes(  # noqa: PLR0913
-        self,
-        data: Iterable[bytes],
-        target: Optional[str],
-        chunk_size: int,
-        ignore_errors: bool,
-        operation_type: BaseOperationType,
-    ) -> int:
-        """Method called by `self.write` writing bytes. See `self.write`."""
-        statements = parse_iterable_to_dict(data, ignore_errors, self.logger)
-        return self._write_dicts(
-            statements, target, chunk_size, ignore_errors, operation_type
-        )
 
     def _write_dicts(  # noqa: PLR0913
         self,
