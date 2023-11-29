@@ -5,7 +5,7 @@ from typing import Iterable, Iterator, List, Optional, Union
 from urllib.parse import ParseResult, parse_qs, urljoin, urlparse
 
 from httpx import Client, HTTPError, HTTPStatusError, RequestError
-from pydantic import AnyHttpUrl, BaseModel, Field, parse_obj_as
+from pydantic import AnyHttpUrl, BaseModel, Field, PositiveInt, parse_obj_as
 
 from ralph.backends.data.base import (
     BaseDataBackend,
@@ -117,7 +117,7 @@ class LRSDataBackend(
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-        max_statements: Optional[int] = None,
+        max_statements: Optional[PositiveInt] = None,
     ) -> Union[Iterator[bytes], Iterator[dict]]:
         """Get statements from LRS `target` endpoint.
 

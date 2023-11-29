@@ -708,7 +708,7 @@ async def test_backends_data_async_lrs_read_concurrency(
     without_prefetch_duration = time.time() - time_1
 
     time_2 = time.time()
-    async for _ in backend.read(target=targets[0], chunk_size=chunk_size, prefetch=-1):
+    async for _ in backend.read(target=targets[0], chunk_size=chunk_size, prefetch=100):
         await _simulate_slow_processing()
     prefetch_duration = time.time() - time_2
 

@@ -5,7 +5,7 @@ from typing import AsyncIterator, Iterable, Optional, Union
 from urllib.parse import ParseResult, parse_qs, urljoin, urlparse
 
 from httpx import AsyncClient, HTTPError, HTTPStatusError, RequestError
-from pydantic import AnyHttpUrl, parse_obj_as
+from pydantic import AnyHttpUrl, PositiveInt, parse_obj_as
 
 from ralph.backends.data.base import (
     AsyncWritable,
@@ -76,8 +76,8 @@ class AsyncLRSDataBackend(
         chunk_size: Optional[int] = None,
         raw_output: bool = False,
         ignore_errors: bool = False,
-        prefetch: Optional[int] = None,
-        max_statements: Optional[int] = None,
+        prefetch: Optional[PositiveInt] = None,
+        max_statements: Optional[PositiveInt] = None,
     ) -> Union[AsyncIterator[bytes], AsyncIterator[dict]]:
         """Get statements from LRS `target` endpoint.
 
@@ -99,12 +99,8 @@ class AsyncLRSDataBackend(
             ignore_errors (bool): If `True`, errors during the read operation
                 are ignored and logged. If `False` (default), a `BackendException`
                 is raised if an error occurs.
-            prefetch: The number of records to prefetch (queue) while yielding.
-                If `prefetch` is `None` or `0` it defaults to `1` - no records are
-                prefetched.
-                If `prefetch` is less than zero, all records are prefetched.
-                Caution: setting `prefetch<0` might potentially lead to large amounts
-                of API calls and to the memory filling up.
+            prefetch (int): The number of records to prefetch (queue) while yielding.
+                If `prefetch` is `None` it defaults to `1` - no records are prefetched.
             max_statements: The maximum number of statements to yield.
         """
         statements = super().read(
