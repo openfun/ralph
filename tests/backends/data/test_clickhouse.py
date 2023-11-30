@@ -248,7 +248,7 @@ def test_backends_data_clickhouse_read_with_failures(
             list(backend.read(raw_output=False, ignore_errors=False))
 
     assert (
-        "ralph.backends.data.clickhouse",
+        "ralph.utils",
         logging.ERROR,
         msg,
     ) in caplog.record_tuples
@@ -260,13 +260,13 @@ def test_backends_data_clickhouse_read_with_failures(
         list(backend.read(raw_output=False, ignore_errors=True))
 
     assert (
-        "ralph.backends.data.clickhouse",
+        "ralph.utils",
         logging.WARNING,
         msg,
     ) in caplog.record_tuples
 
     assert (
-        "ralph.backends.data.clickhouse",
+        "ralph.utils",
         logging.ERROR,
         msg,
     ) not in caplog.record_tuples

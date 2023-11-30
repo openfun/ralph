@@ -61,7 +61,6 @@ def insert_mongo_statements(mongo_client, statements):
                 data=statements,
                 ignore_errors=True,
                 operation_type=BaseOperationType.CREATE,
-                logger=None,
             )
         )
     )

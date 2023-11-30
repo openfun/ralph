@@ -341,7 +341,7 @@ def test_backends_data_es_read_with_ignore_errors(es, es_backend, monkeypatch, c
             list(backend.read(ignore_errors=False, raw_output=True))
 
     assert (
-        "ralph.backends.data.es",
+        "ralph.utils",
         logging.ERROR,
         error,
     ) in caplog.record_tuples
@@ -350,7 +350,7 @@ def test_backends_data_es_read_with_ignore_errors(es, es_backend, monkeypatch, c
         list(backend.read(ignore_errors=True, raw_output=True))
 
     assert (
-        "ralph.backends.data.es",
+        "ralph.utils",
         logging.WARNING,
         error,
     ) in caplog.record_tuples
@@ -437,7 +437,7 @@ def test_backends_data_es_read_with_query(es, es_backend, caplog):
             list(backend.read(query={"not_query": "foo"}))
 
     assert (
-        "ralph.backends.data.es",
+        "ralph.backends.data.base",
         logging.ERROR,
         "The 'query' argument is expected to be a ESQuery instance. "
         "[{'loc': ('not_query',), 'msg': 'extra fields not permitted', "
@@ -461,7 +461,7 @@ def test_backends_data_es_write_with_create_operation(es, es_backend, caplog):
         assert backend.write(data, operation_type=BaseOperationType.CREATE) == 0
 
     assert (
-        "ralph.backends.data.es",
+        "ralph.backends.data.base",
         logging.INFO,
         "Data Iterator is empty; skipping write to target",
     ) in caplog.record_tuples
@@ -575,7 +575,7 @@ def test_backends_data_es_write_with_append_operation(es_backend, caplog):
             backend.write(data=[{}], operation_type=BaseOperationType.APPEND)
 
     assert (
-        "ralph.backends.data.es",
+        "ralph.backends.data.base",
         logging.ERROR,
         "Append operation_type is not allowed",
     ) in caplog.record_tuples
@@ -673,7 +673,7 @@ def test_backends_data_es_write_without_ignore_errors(es, es_backend, caplog):
             backend.write(data, chunk_size=2)
 
     assert (
-        "ralph.backends.data.es",
+        "ralph.utils",
         logging.ERROR,
         msg.replace("\\", ""),
     ) in caplog.record_tuples

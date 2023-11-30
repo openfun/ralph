@@ -4,7 +4,6 @@ import logging
 from abc import ABC, abstractmethod
 from asyncio import Queue, create_task
 from enum import Enum, unique
-from functools import cached_property
 from io import IOBase
 from itertools import chain
 from typing import (
@@ -25,6 +24,8 @@ from pydantic import BaseModel, BaseSettings, PositiveInt, ValidationError
 from ralph.conf import BaseSettingsConfig, core_settings
 from ralph.exceptions import BackendParameterException
 from ralph.utils import gather_with_limited_concurrency, iter_by_batch
+
+logger = logging.getLogger(__name__)
 
 
 class BaseDataBackendSettings(BaseSettings):
@@ -81,18 +82,7 @@ class DataBackendStatus(Enum):
     ERROR = "error"
 
 
-class Loggable:
-    """A class with a `logger` and `settings` property."""
-
-    settings: BaseDataBackendSettings
-
-    @cached_property
-    def logger(self) -> logging.Logger:
-        """Return backend logger."""
-        return logging.getLogger(self.__class__.__module__)
-
-
-class Writable(Loggable, ABC):
+class Writable(ABC):
     """Data backend interface for backends supporting the write operation."""
 
     default_operation_type = BaseOperationType.INDEX
@@ -134,14 +124,14 @@ class Writable(Loggable, ABC):
 
         if operation_type in self.unsupported_operation_types:
             msg = f"{operation_type.value.capitalize()} operation_type is not allowed"
-            self.logger.error(msg)
+            logger.error(msg)
             raise BackendParameterException(msg)
 
         data = iter(data)
         try:
             first_record = next(data)
         except StopIteration:
-            self.logger.info("Data Iterator is empty; skipping write to target")
+            logger.info("Data Iterator is empty; skipping write to target")
             return 0
         data = chain((first_record,), data)
 
@@ -205,7 +195,6 @@ Query = TypeVar("Query", bound=BaseQuery)
 def validate_backend_query(
     query: Union[str, dict, Query, None],
     query_class: Type[Query],
-    logger: logging.Logger,
 ) -> Query:
     """Validate and transform the backend query."""
     query_name = query_class.__name__
@@ -244,7 +233,7 @@ def validate_backend_query(
     raise BackendParameterException(msg % query_name)
 
 
-class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
+class BaseDataBackend(Generic[Settings, Query], ABC):
     """Base data backend interface."""
 
     name = "base"
@@ -267,7 +256,7 @@ class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
             self.settings: Settings = settings if settings else self.settings_class()
         except ValidationError as error:
             msg = "Failed to instantiate default data backend settings: %s"
-            self.logger.error(msg, error)
+            logger.error(msg, error)
             raise BackendParameterException(msg % error) from error
 
     @abstractmethod
@@ -317,7 +306,7 @@ class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
             BackendParameterException: If a backend argument value is not valid.
         """
         chunk_size = chunk_size if chunk_size else self.settings.READ_CHUNK_SIZE
-        query = validate_backend_query(query, self.query_class, self.logger)
+        query = validate_backend_query(query, self.query_class)
         reader = self._read_bytes if raw_output else self._read_dicts
         statements = reader(query, target, chunk_size, ignore_errors)
         if not max_statements:
@@ -351,7 +340,7 @@ class BaseDataBackend(Generic[Settings, Query], Loggable, ABC):
         """
 
 
-class AsyncWritable(Loggable, ABC):
+class AsyncWritable(ABC):
     """Async data backend interface for backends supporting the write operation."""
 
     default_operation_type = BaseOperationType.INDEX
@@ -396,14 +385,14 @@ class AsyncWritable(Loggable, ABC):
 
         if operation_type in self.unsupported_operation_types:
             msg = f"{operation_type.value.capitalize()} operation_type is not allowed"
-            self.logger.error(msg)
+            logger.error(msg)
             raise BackendParameterException(msg)
 
         data = iter(data)
         try:
             first_record = next(data)
         except StopIteration:
-            self.logger.info("Data Iterator is empty; skipping write to target")
+            logger.info("Data Iterator is empty; skipping write to target")
             return 0
         data = chain((first_record,), data)
 
@@ -417,7 +406,7 @@ class AsyncWritable(Loggable, ABC):
 
         if concurrency < 1:
             msg = "concurrency must be a strictly positive integer"
-            self.logger.error(msg)
+            logger.error(msg)
             raise BackendParameterException(msg)
 
         count = 0
@@ -478,7 +467,7 @@ class AsyncListable(ABC):
         """
 
 
-class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
+class BaseAsyncDataBackend(Generic[Settings, Query], ABC):
     """Base async data backend interface."""
 
     name = "base"
@@ -501,7 +490,7 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
             self.settings: Settings = settings if settings else self.settings_class()
         except ValidationError as error:
             msg = "Failed to instantiate default async data backend settings: %s"
-            self.logger.error(msg, error)
+            logger.error(msg, error)
             raise BackendParameterException(msg % error) from error
 
     @abstractmethod
@@ -557,7 +546,7 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
         prefetch = prefetch if prefetch else 1
         if prefetch < 1:
             msg = "prefetch must be a strictly positive integer"
-            self.logger.error(msg)
+            logger.error(msg)
             raise BackendParameterException(msg)
 
         if prefetch > 1:
@@ -584,7 +573,7 @@ class BaseAsyncDataBackend(Generic[Settings, Query], Loggable, ABC):
                 yield statement
 
         chunk_size = chunk_size if chunk_size else self.settings.READ_CHUNK_SIZE
-        query = validate_backend_query(query, self.query_class, self.logger)
+        query = validate_backend_query(query, self.query_class)
         reader = self._read_bytes if raw_output else self._read_dicts
         statements = reader(query, target, chunk_size, ignore_errors)
         if not max_statements:

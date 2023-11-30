@@ -487,7 +487,7 @@ async def test_backends_data_async_mongo_read_with_ignore_errors(
         ] == expected
 
     assert (
-        "ralph.backends.data.async_mongo",
+        "ralph.utils",
         logging.WARNING,
         "Failed to encode JSON: Object of type ObjectId is not "
         "JSON serializable, for document: {'_id': '64945e530468d817b1f756da', "
@@ -545,7 +545,7 @@ async def test_backends_data_async_mongo_read_without_ignore_errors(
             next(result)
 
     assert (
-        "ralph.backends.data.async_mongo",
+        "ralph.utils",
         logging.ERROR,
         msg,
     ) in caplog.record_tuples
@@ -931,7 +931,7 @@ async def test_backends_data_async_mongo_write_with_append_operation(
             await backend.write(data=[], operation_type=BaseOperationType.APPEND)
 
     assert (
-        "ralph.backends.data.async_mongo",
+        "ralph.backends.data.base",
         logging.ERROR,
         msg,
     ) in caplog.record_tuples
@@ -989,7 +989,7 @@ async def test_backends_data_async_mongo_write_with_invalid_documents(
         assert await backend.write([document], ignore_errors=True) == 0
 
     assert (
-        "ralph.backends.data.async_mongo",
+        "ralph.backends.data.mongo",
         logging.WARNING,
         error,
     ) in caplog.record_tuples
@@ -1017,7 +1017,7 @@ async def test_backends_data_async_mongo_write_with_unparsable_documents(
         assert await backend.write([b"not valid JSON!"], ignore_errors=True) == 0
 
     assert (
-        "ralph.backends.data.async_mongo",
+        "ralph.utils",
         logging.WARNING,
         msg,
     ) in caplog.record_tuples
@@ -1036,7 +1036,7 @@ async def test_backends_data_async_mongo_write_with_no_data(
 
     msg = "Data Iterator is empty; skipping write to target"
     assert (
-        "ralph.backends.data.async_mongo",
+        "ralph.backends.data.base",
         logging.INFO,
         msg,
     ) in caplog.record_tuples

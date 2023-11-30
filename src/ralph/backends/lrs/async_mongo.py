@@ -1,5 +1,6 @@
 """Async MongoDB LRS backend for Ralph."""
 
+import logging
 from typing import AsyncIterator, List
 
 from ralph.backends.data.async_mongo import AsyncMongoDataBackend
@@ -10,6 +11,8 @@ from ralph.backends.lrs.base import (
 )
 from ralph.backends.lrs.mongo import MongoLRSBackend, MongoLRSBackendSettings
 from ralph.exceptions import BackendException, BackendParameterException
+
+logger = logging.getLogger(__name__)
 
 
 class AsyncMongoLRSBackend(
@@ -28,7 +31,7 @@ class AsyncMongoLRSBackend(
                 async for document in self.read(query=query, chunk_size=params.limit)
             ]
         except (BackendException, BackendParameterException) as error:
-            self.logger.error("Failed to read from async MongoDB")
+            logger.error("Failed to read from async MongoDB")
             raise error
 
         search_after = None
@@ -49,5 +52,5 @@ class AsyncMongoLRSBackend(
             ):
                 yield document["_source"]
         except (BackendException, BackendParameterException) as error:
-            self.logger.error("Failed to read from MongoDB")
+            logger.error("Failed to read from MongoDB")
             raise error

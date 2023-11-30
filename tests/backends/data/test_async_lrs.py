@@ -440,7 +440,7 @@ async def test_backends_data_async_lrs_write_without_data(caplog, lrs_backend):
         result = await backend.write([])
 
     assert (
-        f"ralph.backends.data.{backend.name}",
+        "ralph.backends.data.base",
         logging.INFO,
         "Data Iterator is empty; skipping write to target",
     ) in caplog.record_tuples
@@ -470,7 +470,7 @@ async def test_backends_data_async_lrs_write_with_unsupported_operation(
             await backend.write(data=[b"foo"], operation_type=operation_type)
 
     assert (
-        f"ralph.backends.data.{backend.name}",
+        "ralph.backends.data.base",
         logging.ERROR,
         error_msg,
     ) in caplog.record_tuples
@@ -496,7 +496,7 @@ async def test_backends_data_async_lrs_write_with_invalid_parameters(
             await backend.write(data=[b"foo"], concurrency=-1)
 
     assert (
-        f"ralph.backends.data.{backend.name}",
+        "ralph.backends.data.base",
         logging.ERROR,
         error,
     ) in caplog.record_tuples

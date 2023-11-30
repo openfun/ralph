@@ -39,7 +39,7 @@ def test_backends_data_async_ws_default_instantiation(caplog, monkeypatch, fs):
         with caplog.at_level(logging.ERROR):
             AsyncWSDataBackend()
 
-    assert ("ralph.backends.data.async_ws", logging.ERROR, msg) in caplog.record_tuples
+    assert ("ralph.backends.data.base", logging.ERROR, msg) in caplog.record_tuples
 
 
 def test_backends_data_async_ws_instantiation_with_settings(monkeypatch):
