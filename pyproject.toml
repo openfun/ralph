@@ -74,6 +74,12 @@ backend-swift = [
 backend-ws = [
     "websockets>=10.3",
 ]
+backends = [
+    "ralph-malph[backend-clickhouse,backend-es,backend-ldp,backend-lrs,backend-mongo,backend-s3,backend-swift]",
+]
+ci = [
+    "twine==4.0.2",
+]
 cli = [
     "bcrypt>=4.0.0",
     "click>=8.1.0",
@@ -109,9 +115,6 @@ dev = [
     "types-requests<2.31.0.11",
     "types-cachetools ==5.3.0.7",
 ]
-ci = [
-    "twine==4.0.2",
-]
 lrs = [
     "bcrypt==4.0.1",
     "fastapi==0.104.1",
@@ -120,6 +123,9 @@ lrs = [
     "sentry_sdk==1.34.0",
     "python-jose==3.3.0",
     "uvicorn[standard]==0.24.0.post1",
+]
+full = [
+    "ralph-malph[backends,cli,lrs]",
 ]
 
 
