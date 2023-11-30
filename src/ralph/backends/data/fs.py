@@ -22,7 +22,7 @@ from ralph.backends.data.base import (
 from ralph.backends.data.mixins import HistoryMixin
 from ralph.conf import BaseSettingsConfig
 from ralph.exceptions import BackendException, BackendParameterException
-from ralph.utils import now, parse_dict_to_bytes, parse_iterable_to_dict
+from ralph.utils import now, parse_iterable_to_dict
 
 logger = logging.getLogger(__name__)
 
@@ -304,10 +304,8 @@ class FSDataBackend(
         operation_type: BaseOperationType,
     ) -> int:
         """Method called by `self.write` writing dictionaries. See `self.write`."""
-        locale = self.settings.LOCALE_ENCODING
-        statements = parse_dict_to_bytes(data, locale, ignore_errors)
-        return self._write_bytes(
-            statements, target, chunk_size, ignore_errors, operation_type
+        return super()._write_dicts(
+            data, target, chunk_size, ignore_errors, operation_type
         )
 
     def _write_bytes(  # noqa: PLR0913

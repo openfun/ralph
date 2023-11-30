@@ -23,7 +23,14 @@ from pydantic import BaseModel, BaseSettings, PositiveInt, ValidationError
 
 from ralph.conf import BaseSettingsConfig, core_settings
 from ralph.exceptions import BackendParameterException
-from ralph.utils import gather_with_limited_concurrency, iter_by_batch
+from ralph.utils import (
+    async_parse_dict_to_bytes,
+    async_parse_iterable_to_dict,
+    gather_with_limited_concurrency,
+    iter_by_batch,
+    parse_dict_to_bytes,
+    parse_iterable_to_dict,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -82,7 +89,13 @@ class DataBackendStatus(Enum):
     ERROR = "error"
 
 
-class Writable(ABC):
+class Configurable:
+    """A class that is configurable via data backend settings."""
+
+    settings: BaseDataBackendSettings
+
+
+class Writable(Configurable, ABC):
     """Data backend interface for backends supporting the write operation."""
 
     default_operation_type = BaseOperationType.INDEX
@@ -140,7 +153,6 @@ class Writable(ABC):
         writer = self._write_bytes if is_bytes else self._write_dicts
         return writer(data, target, chunk_size, ignore_errors, operation_type)
 
-    @abstractmethod
     def _write_bytes(  # noqa: PLR0913
         self,
         data: Iterable[bytes],
@@ -150,6 +162,10 @@ class Writable(ABC):
         operation_type: BaseOperationType,
     ) -> int:
         """Method called by `self.write` writing bytes. See `self.write`."""
+        statements = parse_iterable_to_dict(data, ignore_errors)
+        return self._write_dicts(
+            statements, target, chunk_size, ignore_errors, operation_type
+        )
 
     @abstractmethod
     def _write_dicts(  # noqa: PLR0913
@@ -161,6 +177,11 @@ class Writable(ABC):
         operation_type: BaseOperationType,
     ) -> int:
         """Method called by `self.write` writing dictionaries. See `self.write`."""
+        locale = self.settings.LOCALE_ENCODING
+        statements = parse_dict_to_bytes(data, locale, ignore_errors)
+        return self._write_bytes(
+            statements, target, chunk_size, ignore_errors, operation_type
+        )
 
 
 class Listable(ABC):
@@ -319,17 +340,21 @@ class BaseDataBackend(Generic[Settings, Query], ABC):
             if i >= max_statements:
                 return
 
-    @abstractmethod
     def _read_bytes(
         self, query: Query, target: Optional[str], chunk_size: int, ignore_errors: bool
     ) -> Iterator[bytes]:
         """Method called by `self.read` yielding bytes. See `self.read`."""
+        locale = self.settings.LOCALE_ENCODING
+        statements = self._read_dicts(query, target, chunk_size, ignore_errors)
+        yield from parse_dict_to_bytes(statements, locale, ignore_errors)
 
     @abstractmethod
     def _read_dicts(
         self, query: Query, target: Optional[str], chunk_size: int, ignore_errors: bool
     ) -> Iterator[dict]:
         """Method called by `self.read` yielding dictionaries. See `self.read`."""
+        statements = self._read_bytes(query, target, chunk_size, ignore_errors)
+        yield from parse_iterable_to_dict(statements, ignore_errors)
 
     @abstractmethod
     def close(self) -> None:
@@ -340,7 +365,7 @@ class BaseDataBackend(Generic[Settings, Query], ABC):
         """
 
 
-class AsyncWritable(ABC):
+class AsyncWritable(Configurable, ABC):
     """Async data backend interface for backends supporting the write operation."""
 
     default_operation_type = BaseOperationType.INDEX
@@ -419,7 +444,6 @@ class AsyncWritable(ABC):
             count += sum(result)
         return count
 
-    @abstractmethod
     async def _write_bytes(  # noqa: PLR0913
         self,
         data: Iterable[bytes],
@@ -429,6 +453,10 @@ class AsyncWritable(ABC):
         operation_type: BaseOperationType,
     ) -> int:
         """Method called by `self.write` writing bytes. See `self.write`."""
+        statements = parse_iterable_to_dict(data, ignore_errors)
+        return await self._write_dicts(
+            statements, target, chunk_size, ignore_errors, operation_type
+        )
 
     @abstractmethod
     async def _write_dicts(  # noqa: PLR0913
@@ -440,6 +468,11 @@ class AsyncWritable(ABC):
         operation_type: BaseOperationType,
     ) -> int:
         """Method called by `self.write` writing dictionaries. See `self.write`."""
+        locale = self.settings.LOCALE_ENCODING
+        statements = parse_dict_to_bytes(data, locale, ignore_errors)
+        return await self._write_bytes(
+            statements, target, chunk_size, ignore_errors, operation_type
+        )
 
 
 class AsyncListable(ABC):
@@ -588,17 +621,25 @@ class BaseAsyncDataBackend(Generic[Settings, Query], ABC):
             if i >= max_statements:
                 return
 
-    @abstractmethod
     async def _read_bytes(
         self, query: Query, target: Optional[str], chunk_size: int, ignore_errors: bool
     ) -> AsyncIterator[bytes]:
         """Method called by `self.read` yielding bytes. See `self.read`."""
+        statements = self._read_dicts(query, target, chunk_size, ignore_errors)
+        async for statement in async_parse_dict_to_bytes(
+            statements, self.settings.LOCALE_ENCODING, ignore_errors
+        ):
+            yield statement
 
     @abstractmethod
     async def _read_dicts(
         self, query: Query, target: Optional[str], chunk_size: int, ignore_errors: bool
     ) -> AsyncIterator[dict]:
         """Method called by `self.read` yielding dictionaries. See `self.read`."""
+        statements = self._read_bytes(query, target, chunk_size, ignore_errors)
+        statements = async_parse_iterable_to_dict(statements, ignore_errors)
+        async for statement in statements:
+            yield statement
 
     @abstractmethod
     async def close(self) -> None:
