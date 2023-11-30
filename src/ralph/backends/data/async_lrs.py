@@ -17,7 +17,7 @@ from ralph.backends.data.base import (
 from ralph.backends.data.lrs import LRSDataBackendSettings, StatementResponse
 from ralph.backends.lrs.base import LRSStatementsQuery
 from ralph.exceptions import BackendException
-from ralph.utils import async_parse_dict_to_bytes, iter_by_batch, parse_iterable_to_dict
+from ralph.utils import iter_by_batch
 
 logger = logging.getLogger(__name__)
 
@@ -117,20 +117,6 @@ class AsyncLRSDataBackend(
         async for statement in statements:
             yield statement
 
-    async def _read_bytes(
-        self,
-        query: LRSStatementsQuery,
-        target: Optional[str],
-        chunk_size: int,
-        ignore_errors: bool,
-    ) -> AsyncIterator[bytes]:
-        """Method called by `self.read` yielding bytes. See `self.read`."""
-        statements = self._read_dicts(query, target, chunk_size, ignore_errors)
-        async for statement in async_parse_dict_to_bytes(
-            statements, self.settings.LOCALE_ENCODING, ignore_errors
-        ):
-            yield statement
-
     async def _read_dicts(
         self,
         query: LRSStatementsQuery,
@@ -203,20 +189,6 @@ class AsyncLRSDataBackend(
         """
         return await super().write(
             data, target, chunk_size, ignore_errors, operation_type, concurrency
-        )
-
-    async def _write_bytes(  # noqa: PLR0913
-        self,
-        data: Iterable[bytes],
-        target: Optional[str],
-        chunk_size: int,
-        ignore_errors: bool,
-        operation_type: BaseOperationType,
-    ) -> int:
-        """Method called by `self.write` writing bytes. See `self.write`."""
-        statements = parse_iterable_to_dict(data, ignore_errors)
-        return await self._write_dicts(
-            statements, target, chunk_size, ignore_errors, operation_type
         )
 
     async def _write_dicts(  # noqa: PLR0913
