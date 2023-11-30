@@ -17,6 +17,7 @@ and this project adheres to
   functionalities among `data` backends
 - Backends: Add `get_backends` function to automatically discover backends
   for CLI and LRS usage
+- Add aliases for `ralph-malph` extra dependencies: `backends` and `full`
 
 ### Changed
 

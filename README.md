@@ -150,7 +150,7 @@ Ralph is distributed as a standard python package; it can be installed _via_
 ```bash
 # Install the full package
 pip install \
-    ralph-malph[backend-es,backend-ldp,backend-mongo,backend-swift,backend-ws,cli,lrs]
+    ralph-malph[full]
 
 # Install only the core package (library usage without backends, CLI and LRS)
 pip install ralph-malph

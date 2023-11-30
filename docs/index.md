@@ -73,11 +73,18 @@ pip install ralph-malph[backend-es,lrs]
 pip install ralph-malph[backend-es,lrs,cli]
 ```
 
+- If you want to play around with backends with Ralph as a library, you can install: 
+
+```bash
+pip install ralph-malph[backends]
+```
+
 - If you have various uses for Ralph's features or would like to discover all the existing functionnalities, it is recommended to install the **full package**: 
 
 ```bash
-pip install ralph-malph[backend-clickhouse,backend-es,backend-ldp,backend-lrs,backend-mongo,backend-s3,backend-swift,backend-ws,cli,lrs]
+pip install ralph-malph[full]
 ```
+
 
 ### Install from DockerHub
 
