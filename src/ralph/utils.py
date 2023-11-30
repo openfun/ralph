@@ -192,7 +192,6 @@ T = TypeVar("T")
 def parse_iterable_to_dict(
     raw_documents: Iterable[T],
     ignore_errors: bool,
-    logger_class: logging.Logger,
     parser: Callable[[T], Dict[str, Any]] = json.loads,
 ) -> Iterator[dict]:
     """Read the `raw_documents` Iterable and yield dictionaries."""
@@ -202,16 +201,15 @@ def parse_iterable_to_dict(
         except (TypeError, json.JSONDecodeError) as error:
             msg = "Failed to decode JSON: %s, for document: %s, at line %s"
             if ignore_errors:
-                logger_class.warning(msg, error, raw_document, i)
+                logger.warning(msg, error, raw_document, i)
                 continue
-            logger_class.error(msg, error, raw_document, i)
+            logger.error(msg, error, raw_document, i)
             raise BackendException(msg % (error, raw_document, i)) from error
 
 
 async def async_parse_iterable_to_dict(
     raw_documents: AsyncIterable[T],
     ignore_errors: bool,
-    logger_class: logging.Logger,
     parser: Callable[[T], Dict[str, Any]] = json.loads,
 ) -> AsyncIterator[dict]:
     """Read the `raw_documents` Iterable and yield dictionaries."""
@@ -222,9 +220,9 @@ async def async_parse_iterable_to_dict(
         except (TypeError, json.JSONDecodeError) as error:
             msg = "Failed to decode JSON: %s, for document: %s, at line %s"
             if ignore_errors:
-                logger_class.warning(msg, error, raw_document, i)
+                logger.warning(msg, error, raw_document, i)
                 continue
-            logger_class.error(msg, error, raw_document, i)
+            logger.error(msg, error, raw_document, i)
             raise BackendException(msg % (error, raw_document, i)) from error
 
         i += 1
@@ -234,7 +232,6 @@ def parse_dict_to_bytes(
     documents: Iterable[Dict[str, Any]],
     encoding: str,
     ignore_errors: bool,
-    logger_class: logging.Logger,
 ) -> Iterator[bytes]:
     """Read the `documents` Iterable with the `encoding` and yield bytes."""
     for i, document in enumerate(documents):
@@ -243,9 +240,9 @@ def parse_dict_to_bytes(
         except (TypeError, ValueError) as error:
             msg = "Failed to encode JSON: %s, for document: %s, at line %s"
             if ignore_errors:
-                logger_class.warning(msg, error, document, i)
+                logger.warning(msg, error, document, i)
                 continue
-            logger_class.error(msg, error, document, i)
+            logger.error(msg, error, document, i)
             raise BackendException(msg % (error, document, i)) from error
 
 
@@ -253,7 +250,6 @@ async def async_parse_dict_to_bytes(
     documents: AsyncIterable[Dict[str, Any]],
     encoding: str,
     ignore_errors: bool,
-    logger_class: logging.Logger,
 ) -> AsyncIterator[bytes]:
     """Read the `documents` Iterable with the `encoding` and yield bytes."""
     i = 0
@@ -263,9 +259,9 @@ async def async_parse_dict_to_bytes(
         except (TypeError, ValueError) as error:
             msg = "Failed to encode JSON: %s, for document: %s, at line %s"
             if ignore_errors:
-                logger_class.warning(msg, error, document, i)
+                logger.warning(msg, error, document, i)
                 continue
-            logger_class.error(msg, error, document, i)
+            logger.error(msg, error, document, i)
             raise BackendException(msg % (error, document, i)) from error
 
         i += 1

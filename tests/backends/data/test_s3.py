@@ -318,7 +318,7 @@ def test_backends_data_s3_read_with_invalid_output_should_log_the_error(
             list(backend.read(query="2022-09-29.gz", raw_output=False))
 
     assert (
-        "ralph.backends.data.s3",
+        "ralph.utils",
         logging.ERROR,
         "Failed to decode JSON: Expecting value: line 1 column 1 (char 0),"
         " for document: b'some contents in the body', at line 0",
@@ -357,7 +357,7 @@ def test_backends_data_s3_read_with_invalid_name_should_log_the_error(
             list(backend.read(query=None, target=bucket_name))
 
     assert (
-        "ralph.backends.data.s3",
+        "ralph.backends.data.base",
         logging.ERROR,
         "Invalid S3Query default query: [{'loc': ('query_string',), 'msg': "
         "'field required', 'type': 'value_error.missing'}]",
@@ -618,8 +618,8 @@ def test_backends_data_s3_write_with_create_index_operation(
         )
     ) == (
         [
-            ("ralph.backends.data.s3", logging.ERROR, msg),
-            ("ralph.backends.data.s3", logging.WARNING, msg),
+            ("ralph.utils", logging.ERROR, msg),
+            ("ralph.utils", logging.WARNING, msg),
         ]
     )
     backend.close()

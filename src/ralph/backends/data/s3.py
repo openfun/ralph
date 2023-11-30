@@ -1,5 +1,6 @@
 """S3 data backend for Ralph."""
 
+import logging
 from io import IOBase
 from typing import Iterable, Iterator, Optional, Union
 from uuid import uuid4
@@ -30,6 +31,8 @@ from ralph.backends.data.mixins import HistoryMixin
 from ralph.conf import BaseSettingsConfig
 from ralph.exceptions import BackendException
 from ralph.utils import now, parse_dict_to_bytes, parse_iterable_to_dict
+
+logger = logging.getLogger(__name__)
 
 
 class S3DataBackendSettings(BaseDataBackendSettings):
@@ -160,7 +163,7 @@ class S3DataBackend(
         except ClientError as err:
             error_msg = err.response["Error"]["Message"]
             msg = "Failed to list the bucket %s: %s"
-            self.logger.error(msg, target, error_msg)
+            logger.error(msg, target, error_msg)
             raise BackendException(msg % (target, error_msg)) from err
 
     def read(  # noqa: PLR0913
@@ -215,7 +218,7 @@ class S3DataBackend(
             yield from response["Body"].iter_chunks(chunk_size)
         except (ReadTimeoutError, ResponseStreamingError) as err:
             msg = "Failed to read chunk from object %s"
-            self.logger.error(msg, query.query_string)
+            logger.error(msg, query.query_string)
             raise BackendException(msg % (query.query_string)) from err
 
         # Archive fetched, add a new entry to the history.
@@ -241,10 +244,10 @@ class S3DataBackend(
         response = self._get_object(target, query.query_string)
         try:
             lines = response["Body"].iter_lines(chunk_size)
-            yield from parse_iterable_to_dict(lines, ignore_errors, self.logger)
+            yield from parse_iterable_to_dict(lines, ignore_errors)
         except (ReadTimeoutError, ResponseStreamingError) as err:
             msg = "Failed to read chunk from object %s"
-            self.logger.error(msg, query.query_string)
+            logger.error(msg, query.query_string)
             raise BackendException(msg % (query.query_string)) from err
 
         # Archive fetched, add a new entry to the history.
@@ -268,7 +271,7 @@ class S3DataBackend(
                 error_msg = error.response["Error"]["Message"]
 
             msg = "Failed to download %s: %s"
-            self.logger.error(msg, key, error_msg)
+            logger.error(msg, key, error_msg)
             raise BackendException(msg % (key, error_msg)) from error
 
     def write(  # noqa: PLR0913
@@ -320,7 +323,7 @@ class S3DataBackend(
     ) -> int:
         """Method called by `self.write` writing dictionaries. See `self.write`."""
         locale = self.settings.LOCALE_ENCODING
-        statements = parse_dict_to_bytes(data, locale, ignore_errors, self.logger)
+        statements = parse_dict_to_bytes(data, locale, ignore_errors)
         return self._write_bytes(
             statements, target, chunk_size, ignore_errors, operation_type
         )
@@ -336,13 +339,13 @@ class S3DataBackend(
         """Method called by `self.write` writing bytes. See `self.write`."""
         if not target:
             target = f"{self.default_bucket_name}/{now()}-{uuid4()}"
-            self.logger.info(
+            logger.info(
                 "Target not specified; using default bucket with random file name: %s",
                 target,
             )
         elif "/" not in target:
             target = f"{self.default_bucket_name}/{target}"
-            self.logger.info(
+            logger.info(
                 "Target not specified; using default bucket: %s",
                 target,
             )
@@ -350,10 +353,10 @@ class S3DataBackend(
         target_bucket, target_object = target.split("/", 1)
         if target_object in list(self.list(target=target_bucket)):
             msg = "%s already exists and overwrite is not allowed for operation %s"
-            self.logger.error(msg, target_object, operation_type)
+            logger.error(msg, target_object, operation_type)
             raise BackendException(msg % (target_object, operation_type))
 
-        self.logger.info("Creating archive: %s", target_object)
+        logger.info("Creating archive: %s", target_object)
         counter = {"count": 0}
         data = self._count(data, counter)
 
@@ -371,7 +374,7 @@ class S3DataBackend(
             response = self.client.head_object(Bucket=target_bucket, Key=target_object)
         except (ClientError, ParamValidationError, EndpointConnectionError) as error:
             msg = "Failed to upload %s"
-            self.logger.error(msg, target)
+            logger.error(msg, target)
             raise BackendException(msg % target) from error
 
         # Archive written, add a new entry to the history
@@ -395,14 +398,14 @@ class S3DataBackend(
             BackendException: If a failure occurs during the close operation.
         """
         if not self._client:
-            self.logger.warning("No backend client to close.")
+            logger.warning("No backend client to close.")
             return
 
         try:
             self.client.close()
         except ClientError as error:
             msg = "Failed to close S3 backend client: %s"
-            self.logger.error(msg, error)
+            logger.error(msg, error)
             raise BackendException(msg % error) from error
 
     @staticmethod

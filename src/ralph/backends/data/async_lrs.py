@@ -1,5 +1,6 @@
 """Async LRS data backend for Ralph."""
 
+import logging
 from io import IOBase
 from typing import AsyncIterator, Iterable, Optional, Union
 from urllib.parse import ParseResult, parse_qs, urljoin, urlparse
@@ -12,18 +13,18 @@ from ralph.backends.data.base import (
     BaseAsyncDataBackend,
     BaseOperationType,
     DataBackendStatus,
-    Loggable,
 )
 from ralph.backends.data.lrs import LRSDataBackendSettings, StatementResponse
 from ralph.backends.lrs.base import LRSStatementsQuery
 from ralph.exceptions import BackendException
 from ralph.utils import async_parse_dict_to_bytes, iter_by_batch, parse_iterable_to_dict
 
+logger = logging.getLogger(__name__)
+
 
 class AsyncLRSDataBackend(
     BaseAsyncDataBackend[LRSDataBackendSettings, LRSStatementsQuery],
     AsyncWritable,
-    Loggable,
 ):
     """Asynchronous LRS data backend."""
 
@@ -62,10 +63,10 @@ class AsyncLRSDataBackend(
             response = await self.client.get(status_url)
             response.raise_for_status()
         except RequestError:
-            self.logger.error("Unable to request the server")
+            logger.error("Unable to request the server")
             return DataBackendStatus.AWAY
         except HTTPStatusError:
-            self.logger.error("Response raised an HTTP status of 4xx or 5xx")
+            logger.error("Response raised an HTTP status of 4xx or 5xx")
             return DataBackendStatus.ERROR
 
         return DataBackendStatus.OK
@@ -126,7 +127,7 @@ class AsyncLRSDataBackend(
         """Method called by `self.read` yielding bytes. See `self.read`."""
         statements = self._read_dicts(query, target, chunk_size, ignore_errors)
         async for statement in async_parse_dict_to_bytes(
-            statements, self.settings.LOCALE_ENCODING, ignore_errors, self.logger
+            statements, self.settings.LOCALE_ENCODING, ignore_errors
         ):
             yield statement
 
@@ -142,7 +143,7 @@ class AsyncLRSDataBackend(
             target = self.settings.STATEMENTS_ENDPOINT
 
         if query.limit:
-            self.logger.warning(
+            logger.warning(
                 "The limit query parameter value is overwritten by the chunk_size "
                 "parameter value."
             )
@@ -170,7 +171,7 @@ class AsyncLRSDataBackend(
                 yield statement
         except HTTPError as error:
             msg = "Failed to fetch statements: %s"
-            self.logger.error(msg, error)
+            logger.error(msg, error)
             raise BackendException(msg % (error,)) from error
 
     async def write(  # noqa: PLR0913
@@ -213,7 +214,7 @@ class AsyncLRSDataBackend(
         operation_type: BaseOperationType,
     ) -> int:
         """Method called by `self.write` writing bytes. See `self.write`."""
-        statements = parse_iterable_to_dict(data, ignore_errors, self.logger)
+        statements = parse_iterable_to_dict(data, ignore_errors)
         return await self._write_dicts(
             statements, target, chunk_size, ignore_errors, operation_type
         )
@@ -239,7 +240,7 @@ class AsyncLRSDataBackend(
             fragment="",
         ).geturl()
 
-        self.logger.debug(
+        logger.debug(
             "Start writing to the %s endpoint (chunk size: %s)", target, chunk_size
         )
 
@@ -247,7 +248,7 @@ class AsyncLRSDataBackend(
         for chunk in iter_by_batch(data, chunk_size):
             count += await self._post_and_raise_for_status(target, chunk, ignore_errors)
 
-        self.logger.debug("Posted %d statements", count)
+        logger.debug("Posted %d statements", count)
         return count
 
     async def close(self) -> None:
@@ -257,7 +258,7 @@ class AsyncLRSDataBackend(
             BackendException: If a failure occurs during the close operation.
         """
         if not self._client:
-            self.logger.warning("No backend client to close.")
+            logger.warning("No backend client to close.")
             return
 
         await self.client.aclose()
@@ -289,7 +290,7 @@ class AsyncLRSDataBackend(
         except HTTPError as error:
             msg = "Failed to post statements: %s"
             if ignore_errors:
-                self.logger.warning(msg, error)
+                logger.warning(msg, error)
                 return 0
-            self.logger.error(msg, error)
+            logger.error(msg, error)
             raise BackendException(msg % (error,)) from error

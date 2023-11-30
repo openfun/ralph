@@ -380,7 +380,7 @@ async def test_backends_data_async_es_read_with_ignore_errors(
             _ = [x async for x in backend.read(ignore_errors=False, raw_output=True)]
 
     assert (
-        "ralph.backends.data.async_es",
+        "ralph.utils",
         logging.ERROR,
         error,
     ) in caplog.record_tuples
@@ -389,7 +389,7 @@ async def test_backends_data_async_es_read_with_ignore_errors(
         _ = [x async for x in backend.read(ignore_errors=True, raw_output=True)]
 
     assert (
-        "ralph.backends.data.async_es",
+        "ralph.utils",
         logging.WARNING,
         error,
     ) in caplog.record_tuples
@@ -490,7 +490,7 @@ async def test_backends_data_async_es_read_with_query(es, async_es_backend, capl
             ]
 
     assert (
-        "ralph.backends.data.async_es",
+        "ralph.backends.data.base",
         logging.ERROR,
         "The 'query' argument is expected to be a ESQuery instance. "
         "[{'loc': ('not_query',), 'msg': 'extra fields not permitted', "
@@ -537,7 +537,7 @@ async def test_backends_data_async_es_write_with_create_operation(
         assert await backend.write(data, operation_type=BaseOperationType.CREATE) == 0
 
     assert (
-        "ralph.backends.data.async_es",
+        "ralph.backends.data.base",
         logging.INFO,
         "Data Iterator is empty; skipping write to target",
     ) in caplog.record_tuples
@@ -661,7 +661,7 @@ async def test_backends_data_async_es_write_with_append_operation(
             await backend.write(data=[{}], operation_type=BaseOperationType.APPEND)
 
     assert (
-        "ralph.backends.data.async_es",
+        "ralph.backends.data.base",
         logging.ERROR,
         "Append operation_type is not allowed",
     ) in caplog.record_tuples
@@ -774,7 +774,7 @@ async def test_backends_data_async_es_write_without_ignore_errors(
             await backend.write(data, chunk_size=2)
 
     assert (
-        "ralph.backends.data.async_es",
+        "ralph.utils",
         logging.ERROR,
         msg.replace("\\", ""),
     ) in caplog.record_tuples
@@ -830,7 +830,7 @@ async def test_backends_data_async_es_write_with_ignore_errors(
     assert [hit["_source"] for hit in hits[9:]] == [{"foo": "bar"}, {"foo": "baz"}]
 
     assert (
-        "ralph.backends.data.async_es",
+        "ralph.utils",
         logging.WARNING,
         msg,
     ) in caplog.record_tuples

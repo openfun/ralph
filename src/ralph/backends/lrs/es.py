@@ -1,5 +1,6 @@
 """Elasticsearch LRS backend for Ralph."""
 
+import logging
 from typing import Iterator, List
 
 from ralph.backends.data.es import (
@@ -17,6 +18,8 @@ from ralph.backends.lrs.base import (
 )
 from ralph.conf import BaseSettingsConfig
 from ralph.exceptions import BackendException, BackendParameterException
+
+logger = logging.getLogger(__name__)
 
 
 class ESLRSBackendSettings(BaseLRSBackendSettings, ESDataBackendSettings):
@@ -38,7 +41,7 @@ class ESLRSBackend(BaseLRSBackend[ESLRSBackendSettings], ESDataBackend):
             es_documents = self.read(query=query, chunk_size=params.limit)
             statements = [document["_source"] for document in es_documents]
         except (BackendException, BackendParameterException) as error:
-            self.logger.error("Failed to read from Elasticsearch")
+            logger.error("Failed to read from Elasticsearch")
             raise error
 
         return StatementQueryResult(
@@ -53,7 +56,7 @@ class ESLRSBackend(BaseLRSBackend[ESLRSBackendSettings], ESDataBackend):
             es_response = self.read(query={"query": {"terms": {"_id": ids}}})
             yield from (document["_source"] for document in es_response)
         except (BackendException, BackendParameterException) as error:
-            self.logger.error("Failed to read from Elasticsearch")
+            logger.error("Failed to read from Elasticsearch")
             raise error
 
     @staticmethod

@@ -959,7 +959,7 @@ def test_backends_data_fs_write_with_no_data(fs_backend, caplog):
         assert backend.write(data=[]) == 0
 
     msg = "Data Iterator is empty; skipping write to target"
-    assert ("ralph.backends.data.fs", logging.INFO, msg) in caplog.record_tuples
+    assert ("ralph.backends.data.base", logging.INFO, msg) in caplog.record_tuples
 
 
 def test_backends_data_fs_write_without_target(fs_backend, monkeypatch):

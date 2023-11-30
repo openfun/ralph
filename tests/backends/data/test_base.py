@@ -58,7 +58,7 @@ def test_backends_data_base_instantiation(caplog):
         with caplog.at_level(logging.ERROR):
             MockBaseDataBackend()
 
-    assert ("tests.backends.data.test_base", logging.ERROR, msg) in caplog.record_tuples
+    assert ("ralph.backends.data.base", logging.ERROR, msg) in caplog.record_tuples
 
 
 def test_backends_data_base_async_instantiation(caplog):
@@ -100,7 +100,7 @@ def test_backends_data_base_async_instantiation(caplog):
         with caplog.at_level(logging.ERROR):
             MockBaseAsyncDataBackend()
 
-    assert ("tests.backends.data.test_base", logging.ERROR, msg) in caplog.record_tuples
+    assert ("ralph.backends.data.base", logging.ERROR, msg) in caplog.record_tuples
 
 
 @pytest.mark.parametrize(
@@ -170,8 +170,7 @@ def test_backends_data_base_validate_backend_query_with_invalid_input(
             list(MockBaseDataBackend().read(query=value))
 
     error = error.replace("\\", "")
-    module_name = "tests.backends.data.test_base"
-    assert (module_name, logging.ERROR, error) in caplog.record_tuples
+    assert ("ralph.backends.data.base", logging.ERROR, error) in caplog.record_tuples
 
 
 def test_backends_data_base_get_backend_generic_argument():
@@ -320,7 +319,7 @@ async def test_backends_data_base_async_read_with_invalid_prefetch(caplog):
         with caplog.at_level(logging.ERROR):
             _ = [_ async for _ in MockDataBackend().read(prefetch=-1)]
 
-    assert ("tests.backends.data.test_base", logging.ERROR, msg) in caplog.record_tuples
+    assert ("ralph.backends.data.base", logging.ERROR, msg) in caplog.record_tuples
 
 
 @pytest.mark.anyio
@@ -339,7 +338,6 @@ async def test_backends_data_base_async_read_with_an_error_while_prefetching(cap
                 consumed_items["count"] += 1
                 yield {"foo": "bar"}
 
-            self.logger.error("connection error")
             raise BackendException("connection error")
 
         async def _read_bytes(self, *args):
@@ -361,11 +359,8 @@ async def test_backends_data_base_async_read_with_an_error_while_prefetching(cap
     assert await reader.__anext__() == {"foo": "bar"}
     assert await reader.__anext__() == {"foo": "bar"}
     msg = "connection error"
-    with caplog.at_level(logging.ERROR):
-        with pytest.raises(BackendException, match=msg):
-            await reader.__anext__()
-
-    assert ("tests.backends.data.test_base", logging.ERROR, msg) in caplog.record_tuples
+    with pytest.raises(BackendException, match=msg):
+        await reader.__anext__()
 
 
 @pytest.mark.anyio
@@ -549,7 +544,7 @@ async def test_backends_data_base_write_with_invalid_parameters(caplog):
             assert backend.write([{}], operation_type=BaseOperationType.DELETE)
 
     assert (
-        "tests.backends.data.test_base",
+        "ralph.backends.data.base",
         logging.ERROR,
         msg,
     ) in caplog.record_tuples
@@ -560,7 +555,7 @@ async def test_backends_data_base_write_with_invalid_parameters(caplog):
         assert backend.write([]) == 0
 
     assert (
-        "tests.backends.data.test_base",
+        "ralph.backends.data.base",
         logging.INFO,
         msg,
     ) in caplog.record_tuples
@@ -605,7 +600,7 @@ async def test_backends_data_base_async_write_with_invalid_parameters(caplog):
             assert await backend.write([{}], concurrency=-1)
 
     assert (
-        "tests.backends.data.test_base",
+        "ralph.backends.data.base",
         logging.ERROR,
         msg,
     ) in caplog.record_tuples
@@ -618,7 +613,7 @@ async def test_backends_data_base_async_write_with_invalid_parameters(caplog):
             assert await backend.write([{}], operation_type=BaseOperationType.DELETE)
 
     assert (
-        "tests.backends.data.test_base",
+        "ralph.backends.data.base",
         logging.ERROR,
         msg,
     ) in caplog.record_tuples
@@ -629,7 +624,7 @@ async def test_backends_data_base_async_write_with_invalid_parameters(caplog):
         assert await backend.write([]) == 0
 
     assert (
-        "tests.backends.data.test_base",
+        "ralph.backends.data.base",
         logging.INFO,
         msg,
     ) in caplog.record_tuples

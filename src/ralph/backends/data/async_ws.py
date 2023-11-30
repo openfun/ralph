@@ -1,5 +1,6 @@
 """Websocket stream backend for Ralph."""
 
+import logging
 from typing import AsyncIterator, Optional, Union
 
 import websockets
@@ -15,6 +16,8 @@ from ralph.backends.data.base import (
 from ralph.conf import BaseSettingsConfig, ClientOptions
 from ralph.exceptions import BackendException
 from ralph.utils import async_parse_iterable_to_dict
+
+logger = logging.getLogger(__name__)
 
 
 class WSClientOptions(ClientOptions):
@@ -100,7 +103,7 @@ class AsyncWSDataBackend(BaseAsyncDataBackend[WSDataBackendSettings, BaseQuery])
                 )
             except (websockets.WebSocketException, OSError, TimeoutError) as error:
                 msg = "Failed open websocket connection for %s: %s"
-                self.logger.error(msg, self.settings.URI, error)
+                logger.error(msg, self.settings.URI, error)
                 raise BackendException(msg % (self.settings.URI, error)) from error
         return self._client
 
@@ -117,7 +120,7 @@ class AsyncWSDataBackend(BaseAsyncDataBackend[WSDataBackendSettings, BaseQuery])
         except BackendException:
             return DataBackendStatus.ERROR
         except (websockets.WebSocketException, RuntimeError) as error:
-            self.logger.error("Failed to Ping %s: %s", self.settings.URI, error)
+            logger.error("Failed to Ping %s: %s", self.settings.URI, error)
             return DataBackendStatus.AWAY
         return DataBackendStatus.OK
 
@@ -179,7 +182,7 @@ class AsyncWSDataBackend(BaseAsyncDataBackend[WSDataBackendSettings, BaseQuery])
     ) -> AsyncIterator[bytes]:
         """Method called by `self.read` yielding bytes. See `self.read`."""
         if target or chunk_size:
-            self.logger.warning("The `target` and `chunk_size` arguments are ignored")
+            logger.warning("The `target` and `chunk_size` arguments are ignored")
 
         client = await self.client()
         count = 0
@@ -188,10 +191,10 @@ class AsyncWSDataBackend(BaseAsyncDataBackend[WSDataBackendSettings, BaseQuery])
                 yield bytes(f"{event}\n", encoding=self.settings.LOCALE_ENCODING)
                 count += 1
         except websockets.exceptions.ConnectionClosedOK:
-            self.logger.info("Read %s records with success", count)
+            logger.info("Read %s records with success", count)
         except (websockets.WebSocketException, RuntimeError) as error:
             msg = "Failed to receive message from websocket %s: %s"
-            self.logger.error(msg, self.settings.URI, error)
+            logger.error(msg, self.settings.URI, error)
             raise BackendException(msg % (self.settings.URI, error)) from error
 
     async def _read_dicts(
@@ -203,9 +206,7 @@ class AsyncWSDataBackend(BaseAsyncDataBackend[WSDataBackendSettings, BaseQuery])
     ) -> AsyncIterator[dict]:
         """Method called by `self.read` yielding dictionaries. See `self.read`."""
         statements = self._read_bytes(query, target, chunk_size, ignore_errors)
-        statements = async_parse_iterable_to_dict(
-            statements, ignore_errors, self.logger
-        )
+        statements = async_parse_iterable_to_dict(statements, ignore_errors)
         async for statement in statements:
             yield statement
 
@@ -216,7 +217,7 @@ class AsyncWSDataBackend(BaseAsyncDataBackend[WSDataBackendSettings, BaseQuery])
             BackendException: If a failure occurs during the close operation.
         """
         if not self._client:
-            self.logger.warning("No backend client to close.")
+            logger.warning("No backend client to close.")
             return
 
         client = await self.client()
@@ -224,5 +225,5 @@ class AsyncWSDataBackend(BaseAsyncDataBackend[WSDataBackendSettings, BaseQuery])
             await client.close()
         except (websockets.WebSocketException, OSError, TimeoutError) as error:
             msg = "Failed to close websocket connection for %s: %s"
-            self.logger.error(msg, self.settings.URI, error)
+            logger.error(msg, self.settings.URI, error)
             raise BackendException(msg % (self.settings.URI, error)) from error

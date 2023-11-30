@@ -1,5 +1,6 @@
 """FileSystem LRS backend for Ralph."""
 
+import logging
 from datetime import datetime
 from io import IOBase
 from typing import Iterable, List, Literal, Optional, Union
@@ -15,6 +16,8 @@ from ralph.backends.lrs.base import (
     StatementQueryResult,
 )
 from ralph.conf import BaseSettingsConfig
+
+logger = logging.getLogger(__name__)
 
 
 class FSLRSBackendSettings(BaseLRSBackendSettings, FSDataBackendSettings):
@@ -334,7 +337,7 @@ class FSLRSBackend(BaseLRSBackend[FSLRSBackendSettings], FSDataBackend):
                 statement_timestamp = datetime.fromisoformat(statement.get("timestamp"))
             except (TypeError, ValueError) as error:
                 msg = "Statement with id=%s contains unparsable timestamp=%s"
-                self.logger.debug(msg, statement.get("id"), error)
+                logger.debug(msg, statement.get("id"), error)
                 return False
             return statement_timestamp > timestamp
 
@@ -354,7 +357,7 @@ class FSLRSBackend(BaseLRSBackend[FSLRSBackendSettings], FSDataBackend):
                 statement_timestamp = datetime.fromisoformat(statement.get("timestamp"))
             except (TypeError, ValueError) as error:
                 msg = "Statement with id=%s contains unparsable timestamp=%s"
-                self.logger.debug(msg, statement.get("id"), error)
+                logger.debug(msg, statement.get("id"), error)
                 return False
             return statement_timestamp <= timestamp
 
