@@ -33,7 +33,7 @@ jobs:
   # Check that the git history is clean and complies with our expectations
   lint-git:
     docker:
-      - image: cimg/python:3.11
+      - image: cimg/python:3.12
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -166,7 +166,7 @@ jobs:
 
   lint:
     docker:
-      - image: cimg/python:3.11
+      - image: cimg/python:3.12
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -175,7 +175,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-dependencies-python:3.11-{{ .Revision }}
+            - v1-dependencies-python:3.12-{{ .Revision }}
       - run:
           name: Lint code with black
           command: ~/.local/bin/black src/ralph tests --check
@@ -329,7 +329,7 @@ jobs:
   # ---- Packaging jobs ----
   package:
     docker:
-      - image: cimg/python:3.11
+      - image: cimg/python:3.12
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -358,7 +358,7 @@ jobs:
   #     environment variables in CircleCI UI (with your PyPI credentials)
   pypi:
     docker:
-      - image: cimg/python:3.11
+      - image: cimg/python:3.12
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -448,7 +448,7 @@ jobs:
   # ---- Documentation jobs ----
   build-docs:
     docker:
-      - image: cimg/python:3.11
+      - image: cimg/python:3.12
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
@@ -457,7 +457,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-dependencies-python:3.11-{{ .Revision }}
+            - v1-dependencies-python:3.12-{{ .Revision }}
       - run:
           name: Build documentation
           command: ~/.local/bin/mkdocs build
@@ -465,7 +465,7 @@ jobs:
   # Deploy the docs website to GitHub pages.
   deploy-docs:
     docker:
-      - image: cimg/python:3.11
+      - image: cimg/python:3.12
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
@@ -474,7 +474,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-dependencies-python:3.11-{{ .Revision }}
+            - v1-dependencies-python:3.12-{{ .Revision }}
       - add_ssh_keys:
           fingerprints:
             - "43:a9:5b:a0:b5:8b:f5:b4:6d:73:66:a0:27:b1:ce:92"
@@ -579,7 +579,7 @@ workflows:
       - build:
           matrix:
             parameters:
-              python-image: [python:3.8, python:3.9, python:3.10, python:3.11]
+              python-image: [python:3.8, python:3.9, python:3.10, python:3.11, python:3.12]
           filters:
             tags:
               only: /.*/
@@ -592,7 +592,7 @@ workflows:
       - test:
           matrix:
             parameters:
-              python-image: [python:3.8, python:3.9, python:3.10, python:3.11]
+              python-image: [python:3.8, python:3.9, python:3.10, python:3.11, python:3.12]
           requires:
             - build
           filters:
@@ -602,7 +602,7 @@ workflows:
           matrix:
             parameters:
               python-image:
-                [python:3.8, python:3.9, python:3.10, python:3.11]
+                [python:3.8, python:3.9, python:3.10, python:3.11, python:3.12]
           filters:
             tags:
               only: /.*/
