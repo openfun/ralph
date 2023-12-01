@@ -20,6 +20,9 @@
 <a href="https://hub.docker.com/r/fundocker/ralph/tags">
     <img src="https://img.shields.io/docker/v/fundocker/ralph/latest?label=Docker+image" alt="Docker image version">
 </a>
+<a href="https://hub.docker.com/r/openfuncharts/ralph/tags">
+    <img src="https://img.shields.io/docker/v/openfuncharts/ralph?label=Helm+chart&color=blue" alt="Helm chart version">
+</a>
 <a href="https://discord.gg/vYx6YWxJCS">
     <img src="https://img.shields.io/discord/1082704478463082496?label=Discord&logo=discord&style=shield" alt="Discord">
 </a>
