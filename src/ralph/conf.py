@@ -29,8 +29,10 @@ except ImportError:
 
 MODEL_PATH_SEPARATOR = "__"
 
-NonEmptyStr = Annotated[str, Field(min_length=1)]
-NonEmptyStrictStr = Annotated[StrictStr, Field(min_length=1)]
+from pydantic import constr
+
+NonEmptyStr = constr(min_length=1)
+NonEmptyStrictStr = constr(min_length=1, strict=True)
 
 class BaseSettingsConfig:
     """Pydantic model for BaseSettings Configuration."""

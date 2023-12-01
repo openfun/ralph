@@ -36,13 +36,13 @@ class BaseXapiAgentCommonProperties(BaseModelWithConfig, ABC):
 
     It defines who performed the action.
 
-    Attributes:
+    Attributes:name:
         objectType (str): Consists of the value `Agent`.
         name (str): Consists of the full name of the Agent.
     """
 
     objectType: Optional[Literal["Agent"]]
-    name: Optional[NonEmptyStr]
+    name: Optional[NonEmptyStrictStr    ]
 
 
 class BaseXapiAgentWithMbox(BaseXapiAgentCommonProperties, BaseXapiMboxIFI):

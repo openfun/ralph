@@ -27,7 +27,7 @@ class BaseXapiResultScore(BaseModelWithConfig):
     min: Optional[Decimal]
     max: Optional[Decimal]
 
-    @root_validator
+    @root_validator # TODO: check if adding pre is still valid
     @classmethod
     def check_raw_min_max_relation(cls, values: Any) -> Any:
         """Check the relationship `min < raw < max`."""
@@ -36,18 +36,20 @@ class BaseXapiResultScore(BaseModelWithConfig):
         max_value = values.get("max", None)
 
         if min_value:
+            print("max value is", max_value)
+            print("min value is", min_value)
             if max_value and min_value > max_value:
                 raise ValueError("min cannot be greater than max")
             if raw_value and min_value > raw_value:
                 raise ValueError("min cannot be greater than raw")
         if max_value:
+            print("raw value is", raw_value)
             if raw_value and raw_value > max_value:
                 raise ValueError("raw cannot be greater than max")
 
         return values
+    
 
-from pydantic import Field
-from typing import Annotated
 class BaseXapiResult(BaseModelWithConfig):
     """Pydantic model for `result` property.
 

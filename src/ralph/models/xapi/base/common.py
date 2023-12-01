@@ -6,7 +6,7 @@ from langcodes import tag_is_valid
 from pydantic import StrictStr, validate_email
 from rfc3987 import parse
 
-
+from ralph.conf import NonEmptyStrictStr
 class IRI(str):
     """Pydantic custom data type validating RFC 3987 IRIs."""
 
@@ -33,11 +33,9 @@ class LanguageTag(str):
 
         yield validate
 
-from typing import Annotated
-from pydantic import Field
-from ralph.conf import NonEmptyStrictStr
 
 LanguageMap = Dict[LanguageTag, NonEmptyStrictStr]
+
 
 # pattern = r'mailto:\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
 # MailtoEmail = Field(regex=pattern)#MailtoEmail

@@ -29,7 +29,6 @@ class BaseXapiContextContextActivities(BaseModelWithConfig):
     category: Optional[Union[BaseXapiActivity, List[BaseXapiActivity]]]
     other: Optional[Union[BaseXapiActivity, List[BaseXapiActivity]]]
 
-
 class BaseXapiContext(BaseModelWithConfig):
     """Pydantic model for `context` property.
 

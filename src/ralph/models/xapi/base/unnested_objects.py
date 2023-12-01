@@ -1,10 +1,10 @@
 """Base xAPI `Object` definitions (1)."""
 
 import sys
-from typing import Any, Dict, List, Optional, Union
+from typing import Annotated, Any, Dict, List, Optional, Union
 from uuid import UUID
 
-from pydantic import AnyUrl, StrictStr, constr, validator
+from pydantic import AnyUrl, Field, StrictStr, constr, validator
 
 from ..config import BaseModelWithConfig
 from .common import IRI, LanguageMap
@@ -100,11 +100,10 @@ class BaseXapiActivity(BaseModelWithConfig):
     id: IRI
     objectType: Optional[Literal["Activity"]]
     definition: Optional[
-        Union[
-            BaseXapiActivityDefinition,
-            BaseXapiActivityInteractionDefinition,
-        ]
-    ]
+            Union[
+                BaseXapiActivityDefinition,
+                BaseXapiActivityInteractionDefinition,
+            ]]
 
 
 class BaseXapiStatementRef(BaseModelWithConfig):

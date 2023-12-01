@@ -16,6 +16,8 @@ from .results import BaseXapiResult
 from .verbs import BaseXapiVerb
 
 
+from pprint import pprint # TODO: remove
+
 class BaseXapiStatement(BaseModelWithConfig):
     """Pydantic model for base xAPI statements.
 
@@ -55,8 +57,10 @@ class BaseXapiStatement(BaseModelWithConfig):
         """
         for field, value in list(values.items()):
             if value in [None, "", {}]:
+                print("field is:", field, "value is:", value)
                 raise ValueError(f"{field}: invalid empty value")
             if isinstance(value, dict) and field != "extensions":
+                print("nested field is:", field)
                 cls.check_absence_of_empty_and_invalid_values(value)
 
         context = dict(values.get("context", {}))
@@ -65,8 +69,16 @@ class BaseXapiStatement(BaseModelWithConfig):
             revision = context.get("revision", {})
             object_type = dict(values["object"]).get("objectType", "Activity")
             if (platform or revision) and object_type != "Activity":
+                pprint('gigoglin')
+                pprint(context)
+                print(">>> context platform:")
+                pprint(context.get("platform"))
+                print(">>> context revision:")
+                pprint(context.get("revision"))
+                print("///object:///")
+                pprint(values["object"])
                 raise ValueError(
-                    "revision and platform properties can only be used if the "
-                    "Statement's Object is an Activity"
+                    "context revision and platform properties can only be used"
+                    " if the Statement's Object is an Activity"
                 )
         return values

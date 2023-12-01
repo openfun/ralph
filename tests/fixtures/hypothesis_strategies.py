@@ -122,11 +122,11 @@ OVERWRITTEN_STRATEGIES = {
         "revision": False,
         "platform": False,
     },
-    BaseXapiResultScore: {
-        "raw": False,
-        "min": False,
-        "max": False,
-    },
+    # BaseXapiResultScore: {
+    #     "raw": False,
+    #     "min": False,
+    #     "max": False,
+    # },
     LMSContextContextActivities: {"category": custom_builds(LMSProfileActivity)},
     VideoContextContextActivities: {"category": custom_builds(VideoProfileActivity)},
     VirtualClassroomContextContextActivities: {
