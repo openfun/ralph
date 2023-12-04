@@ -1343,7 +1343,7 @@ documents from it.</p>
 <a id="ralph.backends.data.clickhouse.ClickHouseDataBackendSettings"></a>
     <div class="doc doc-contents first">
 
-      <p>Represent the ClickHouse data backend default configuration.</p>
+      <p>ClickHouse data backend default configuration.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -1462,6 +1462,11 @@ requests on the <code>/dbaas/logs/*</code> path.</p>
         <td><p>The OVH API consumer key (CK).</p></td>
       </tr>
       <tr>
+        <td><code>DEFAULT_CHUNK_SIZE</code></td>
+        <td><code>str</code></td>
+        <td><p>The default chunk size for reading archives.</p></td>
+      </tr>
+      <tr>
         <td><code>DEFAULT_STREAM_ID</code></td>
         <td><code>str</code></td>
         <td><p>The default stream identifier to query.</p></td>
@@ -1504,7 +1509,7 @@ OpenStack Keystone service and configuration to work with the target container.<
 <a id="ralph.backends.data.swift.SwiftDataBackendSettings"></a>
     <div class="doc doc-contents first">
 
-      <p>Represent the SWIFT data backend default configuration.</p>
+      <p>Swift data backend default configuration.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -1570,6 +1575,12 @@ OpenStack Keystone service and configuration to work with the target container.<
         <td><code>DEFAULT_CONTAINER</code></td>
         <td><code>str</code></td>
         <td><p>The default target container.</p></td>
+      </tr>
+      <tr>
+        <td><code>DEFAULT_CHUNK_SIZE</code></td>
+        <td><code>str</code></td>
+        <td><p>The default chunk size for reading and writing
+objects.</p></td>
       </tr>
       <tr>
         <td><code>LOCALE_ENCODING</code></td>

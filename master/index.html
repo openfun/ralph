@@ -971,21 +971,26 @@ You also have to choose the type of backend you will use for LRS data storage (<
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ralph-malph<span class="o">[</span>backend-es,lrs,cli<span class="o">]</span>
 </span></code></pre></div>
 <ul>
+<li>If you want to play around with backends with Ralph as a library, you can install: </li>
+</ul>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ralph-malph<span class="o">[</span>backends<span class="o">]</span>
+</span></code></pre></div>
+<ul>
 <li>If you have various uses for Ralph&rsquo;s features or would like to discover all the existing functionnalities, it is recommended to install the <strong>full package</strong>: </li>
 </ul>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ralph-malph<span class="o">[</span>backend-clickhouse,backend-es,backend-ldp,backend-lrs,backend-mongo,backend-s3,backend-swift,backend-ws,cli,lrs<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ralph-malph<span class="o">[</span>full<span class="o">]</span>
 </span></code></pre></div>
 <h3 id="install_from_dockerhub">Install from DockerHub<a class="headerlink" href="#install_from_dockerhub" title="Permanent link">&para;</a></h3>
 <p>Ralph is distributed as a <a href="https://hub.docker.com/repository/docker/fundocker/ralph">Docker
 image</a>. If
 <a href="https://docs.docker.com/get-docker/">Docker</a> is installed on your machine, it
 can be pulled from DockerHub:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-i<span class="w"> </span>fundocker/ralph:latest<span class="w"> </span>ralph<span class="w"> </span>--help
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-i<span class="w"> </span>fundocker/ralph:latest<span class="w"> </span>ralph<span class="w"> </span>--help
 </span></code></pre></div>
 <details class="tip" open="open">
 <summary>Use a <code>ralph</code> alias in your local environment</summary>
 <p>Simplify your workflow by creating an alias for easy access to Ralph commands:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nb">alias</span><span class="w"> </span><span class="nv">ralph</span><span class="o">=</span><span class="s2">&quot;docker run --rm -i fundocker/ralph:latest ralph&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nb">alias</span><span class="w"> </span><span class="nv">ralph</span><span class="o">=</span><span class="s2">&quot;docker run --rm -i fundocker/ralph:latest ralph&quot;</span>
 </span></code></pre></div>
 </details>
 <h2 id="wip_start_using_ralph">[WIP] Start using Ralph<a class="headerlink" href="#wip_start_using_ralph" title="Permanent link">&para;</a></h2>
