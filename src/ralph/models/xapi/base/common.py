@@ -6,50 +6,54 @@ from langcodes import tag_is_valid
 from pydantic import StrictStr, validate_email
 from rfc3987 import parse
 
-from ralph.conf import NonEmptyStrictStr
-class IRI(str):
+from ralph.conf import NonEmptyStr, NonEmptyStrictStr
+class IRI(NonEmptyStrictStr):
     """Pydantic custom data type validating RFC 3987 IRIs."""
 
-    @classmethod
-    def __get_validators__(cls) -> Generator:  # noqa: D105
-        def validate(iri: str) -> Type["IRI"]:
-            """Check whether the provided IRI is a valid RFC 3987 IRI."""
-            parse(iri, rule="IRI")
-            return cls(iri)
+    # TODO: Put this back
+    # @classmethod
+    # def __get_validators__(cls) -> Generator:  # noqa: D105
+    #     def validate(iri: str) -> Type["IRI"]:
+    #         """Check whether the provided IRI is a valid RFC 3987 IRI."""
+    #         parse(iri, rule="IRI")
+    #         return cls(iri)
 
-        yield validate
+    #     yield validate
 
 
-class LanguageTag(str):
+class LanguageTag(NonEmptyStr):
     """Pydantic custom data type validating RFC 5646 Language tags."""
 
-    @classmethod
-    def __get_validators__(cls) -> Generator:  # noqa: D105
-        def validate(tag: str) -> Type["LanguageTag"]:
-            """Check whether the provided tag is a valid RFC 5646 Language tag."""
-            if not tag_is_valid(tag):
-                raise TypeError("Invalid RFC 5646 Language tag")
-            return cls(tag)
+    # TODO: Put this back
+    # @classmethod
+    # def __get_validators__(cls) -> Generator:  # noqa: D105
+    #     def validate(tag: str) -> Type["LanguageTag"]:
+    #         """Check whether the provided tag is a valid RFC 5646 Language tag."""
+    #         if not tag_is_valid(tag):
+    #             raise TypeError("Invalid RFC 5646 Language tag")
+    #         return cls(tag)
 
-        yield validate
+    #     yield validate
 
 
 LanguageMap = Dict[LanguageTag, NonEmptyStrictStr]
 
+from typing import Annotated
+from pydantic import Field
 
-# pattern = r'mailto:\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
-# MailtoEmail = Field(regex=pattern)#MailtoEmail
+email_pattern = r"(^mailto:[-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\[[\t -Z^-~]*])"
+MailtoEmail = Annotated[str, Field(regex=email_pattern)]
 
-class MailtoEmail(str):
-    """Pydantic custom data type validating `mailto:email` format."""
+# class MailtoEmail(str):
+#     """Pydantic custom data type validating `mailto:email` format."""
 
-    @classmethod
-    def __get_validators__(cls) -> Generator:  # noqa: D105
-        def validate(mailto: str) -> Type["MailtoEmail"]:
-            """Check whether the provided value follows the `mailto:email` format."""
-            if not mailto.startswith("mailto:"):
-                raise TypeError("Invalid `mailto:email` value")
-            valid = validate_email(mailto[7:])
-            return cls(f"mailto:{valid[1]}")
+#     @classmethod
+#     def __get_validators__(cls) -> Generator:  # noqa: D105
+#         def validate(mailto: str) -> Type["MailtoEmail"]:
+#             """Check whether the provided value follows the `mailto:email` format."""
+#             if not mailto.startswith("mailto:"):
+#                 raise TypeError(f"Invalid `mailto:email` value: {str(mailto)}")
+#             valid = validate_email(mailto[7:])
+#             return cls(f"mailto:{valid[1]}")
 
-        yield validate
+#         yield validate

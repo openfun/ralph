@@ -36,14 +36,11 @@ class BaseXapiResultScore(BaseModelWithConfig):
         max_value = values.get("max", None)
 
         if min_value:
-            print("max value is", max_value)
-            print("min value is", min_value)
             if max_value and min_value > max_value:
                 raise ValueError("min cannot be greater than max")
             if raw_value and min_value > raw_value:
                 raise ValueError("min cannot be greater than raw")
         if max_value:
-            print("raw value is", raw_value)
             if raw_value and raw_value > max_value:
                 raise ValueError("raw cannot be greater than max")
 

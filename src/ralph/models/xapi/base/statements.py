@@ -52,16 +52,19 @@ class BaseXapiStatement(BaseModelWithConfig):
     def check_absence_of_empty_and_invalid_values(cls, values: Any) -> Any:
         """Check the model for empty and invalid values.
 
+        Check that there are no empty values except in branch of `extenstions`.
+
         Check that the `context` field contains `platform` and `revision` fields
         only if the `object.objectType` property is equal to `Activity`.
         """
         for field, value in list(values.items()):
-            if value in [None, "", {}]:
-                print("field is:", field, "value is:", value)
-                raise ValueError(f"{field}: invalid empty value")
-            if isinstance(value, dict) and field != "extensions":
-                print("nested field is:", field)
-                cls.check_absence_of_empty_and_invalid_values(value)
+            if field != "extensions":
+                if value in [None, "", {}]:
+                    print("field is:", field, "value is:", value)
+                    raise ValueError(f"{field}: invalid empty value")
+                if isinstance(value, dict):
+                    print("nested field is:", field)
+                    cls.check_absence_of_empty_and_invalid_values(value)
 
         context = dict(values.get("context", {}))
         if context:
@@ -69,14 +72,6 @@ class BaseXapiStatement(BaseModelWithConfig):
             revision = context.get("revision", {})
             object_type = dict(values["object"]).get("objectType", "Activity")
             if (platform or revision) and object_type != "Activity":
-                pprint('gigoglin')
-                pprint(context)
-                print(">>> context platform:")
-                pprint(context.get("platform"))
-                print(">>> context revision:")
-                pprint(context.get("revision"))
-                print("///object:///")
-                pprint(values["object"])
                 raise ValueError(
                     "context revision and platform properties can only be used"
                     " if the Statement's Object is an Activity"

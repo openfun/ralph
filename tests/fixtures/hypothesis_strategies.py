@@ -95,6 +95,7 @@ def custom_builds(
     return st.fixed_dictionaries(required, optional=optional).map(klass.parse_obj)
 
 
+
 def custom_given(*args: Union[st.SearchStrategy, BaseModel], **kwargs):
     """Wrap the Hypothesis `given` function. Replace st.builds with custom_builds."""
     strategies = []
