@@ -23,12 +23,46 @@
 
 Ralph is a toolbox for your learning analytics, it can be used as a:
 
-- **[LRS](https://en.wikipedia.org/wiki/Learning_Record_Store)**, a HTTP API server to collect xAPI statements (learning events), following the [ADL LRS standard](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#partthree)
-- **command-line interface** (CLI), to build data pipelines the UNIX-way™️,
-- **library**, to fetch learning events from various backends, (de)serialize or
+- **LRS**, an HTTP API server to collect xAPI statements (learning events), following the [ADL LRS standard](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#part-three-data-processing-validation-and-security)
+- [**command-line interface**](./tutorials/cli.md) (CLI), to build data pipelines the UNIX-way™️,
+- [**library**](./tutorials/library.md), to fetch learning events from various backends, (de)serialize or
     convert them from and to various standard formats such as
     [xAPI](https://adlnet.gov/projects/xapi/), or
     [openedx](https://docs.openedx.org/en/latest/developers/references/internal_data_formats/tracking_logs/index.html)
+
+## What is an LRS?
+
+A Learning Record Store, or LRS, is a key component in the context of learning analytics and the Experience API (xAPI).
+
+The [Experience API](https://github.com/adlnet/xAPI-Spec) (or Tin Can API) is a standard for tracking and reporting learning experiences. 
+In particular, it defines:
+
+- the [xAPI format](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#part-two-experience-api-data) of the learning events. xAPI statements includes an `actor` (e.g. *learner*), a `verb` (e.g. *watched*, *passed*) and an `object` (e.g. *video*, *quiz*) as well as contextual and optional information (e.g. *timestamp* of the event, *result* of an activity). Here's a simplistic statement: 
+```json
+{
+    "id": "12345678-1234-5678-1234-567812345678",
+    "actor":{
+        "mbox":"mailto:xapi@adlnet.gov"
+    },
+    "verb":{
+        "id":"http://adlnet.gov/expapi/verbs/created",
+        "display":{
+            "en-US":"created"
+        }
+    },
+    "object":{
+        "id":"http://example.adlnet.gov/xapi/example/activity"
+    }
+}
+```
+- the [Learning Record Store](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#part-three-data-processing-validation-and-security) (LRS), is a RESTful API that collects, stores and retrieves these events. Think of it as a learning database that unifies data from various learning platforms and applications. 
+These events can come from an LMS (*Moodle*, *edX*), or any other learning component that supports xAPI generation (e.g. an embedded video player), from various platforms.
+
+
+!!! info "xAPI specification version"
+    In Ralph, we're following the xAPI specification **1.0.3** that you can find [here](https://github.com/adlnet/xAPI-Spec/tree/master).
+
+    For your information, xAPI specification **2.0** is out! It's not currently supported in Ralph, but you can check it [here](https://opensource.ieee.org/xapi).
 
 ## Installation
 
@@ -51,7 +85,7 @@ Ralph is distributed as a standard python package; it can be installed _via_
     source venv/bin/activate
     ```
 
-If you only need to integrate [learning statement models](./models/index.md) feature in your project, you don't need to
+If you want to generate xAPI statements from your application and only need to integrate [learning statement models](./models/index.md) in your project, you don't need to
 install the `backends`, `cli` or `lrs` extra dependencies, the **core library** is what you need:
 
 ```bash
@@ -105,8 +139,9 @@ docker run --rm -i fundocker/ralph:latest ralph --help
     alias ralph="docker run --rm -i fundocker/ralph:latest ralph"
     ```
 
-## [WIP] Start using Ralph
+## LRS specification compliance
 
+WIP.
 
 ## Contributing to Ralph
 

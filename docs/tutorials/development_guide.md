@@ -1,17 +1,23 @@
-# How to start developing with Ralph?
+# Development guide
 
-### Prepare your environment 
+Welcome to our developer contribution guidelines!
 
-Welcome to our developer contribution guidelines! 
-If you're interested in contributing to our project, there are a few prerequisites to get you started. 
-Ralph development environment is containerized with Docker for consistency.
-Before diving in, ensure you have the following installed:
+You should know that we would be glad to help you contribute to Ralph! Here's our [Discord](https://discord.gg/vYx6YWxJCS) to contact us easily.
 
-- [Docker Engine](https://docs.docker.com/engine/install/)
-- [Docker Compose](https://docs.docker.com/compose/install/)
-- [make](https://www.gnu.org/software/make/manual/make.html)
 
-### Bootstrap Ralph for development
+## Preparation
+
+!!! note "Prerequisites"
+    Ralph development environment is containerized with Docker for consistency.
+    Before diving in, ensure you have the following installed:
+
+    - [Docker Engine](https://docs.docker.com/engine/install/)
+    - [Docker Compose](https://docs.docker.com/compose/install/)
+    - [make](https://www.gnu.org/software/make/manual/make.html)
+
+
+!!! info
+    In this tutorial, and even more generally in others tutorials, we tend to use Elasticsearch backend. Note that you can do the same with [another LRS backend](../backends) implemented in Ralph.
 
 To start playing with `ralph`, you should first `bootstrap` using:
 
@@ -19,9 +25,9 @@ To start playing with `ralph`, you should first `bootstrap` using:
 make bootstrap
 ```
 
-Once the project has been bootstrapped, you may want to edit generated `.env`
-file to set up available backend parameters that will be injected into the
-running container as environment variables to configure Ralph (see [backends documentation](../backends/index.md)):
+
+When boostrapping the project for the first time, , the `env.dist` template file is copied to the `.env` file.
+You may want to edit generated `.env` file to set up available backend parameters that will be injected into the running container as environment variables to configure Ralph (see [backends documentation](../backends/index.md)):
 
 ```bash
 # Elasticsearch backend
@@ -33,94 +39,89 @@ RALPH_BACKENDS__LRS__ES__TEST_INDEX=test-index
 # [...]
 ```
 
-???+ info "Uncomment lines to define environment variables"
+!!! info "Default configuration in `.env` file"
 
-    Lines starting with a `#` are considered as commented and thus will
-    have no effect while running Ralph.
+    Defaults configuration are provided for some environment variables that you can use by uncommenting them.
 
-### Working with backends
+## Backends
 
-To configure the backends, we provide default parameters in the `.env.dist`
-template which is copied to the `.env` file when bootstrapping the project for the first time. 
-You can uncomment them so that they are properly injected in running containers.
+!!! tips "Virtual memory for Elasticsearch"
+    In order to run the Elasticsearch backend locally on GNU/Linux operating
+    systems, ensure that your virtual memory limits are not too low and increase
+    them if needed by typing this command from your terminal (as
+    `root` or using `sudo`):
 
-> In order to run the Elasticsearch backend locally on GNU/Linux operating
-> systems, ensure that your virtual memory limits are not too low and increase
-> them if needed by typing this command from your terminal (as
-> `root` or using `sudo`):
->
-> `sysctl -w vm.max_map_count=262144`
->
-> Reference:
-> https://www.elastic.co/guide/en/elasticsearch/reference/master/vm-max-map-count.html
+    `sysctl -w vm.max_map_count=262144`
 
-Once configured, start the backend container using:
+    Reference:
+    https://www.elastic.co/guide/en/elasticsearch/reference/master/vm-max-map-count.html
+
+!!! warning "Disk space for Elasticsearch"
+
+    Ensure that you have at least **10%** of available disk space on your machine to run Elasticsearch. 
+
+Once configured, start the database container using the following command, substituting `[BACKEND]` by the backend name (_e.g._ `es` for Elasticsearch):
 
 ```bash
 make run-[BACKEND]
 ```
 
-Substitute `[BACKEND]` by the backend name, _e.g._ `es` for Elasticsearch or
-`swift` for OpenStack Swift:
-
+You can also start other services with the following commands:
 ```bash
-# Start Elasticsearch backend
 make run-es
-# Start Swift backend
 make run-swift
-# Start Mongo backend
 make run-mongo
-# Start ClickHouse backend
 make run-clickhouse
 # Start all backends
 make run-all
 ```
 
-!!! warning "Disk space for Elasticsearch"
+Now that you have started the `elasticsearch` and `swift` backends,
+it's time to play with them with Ralph CLI:
 
-    Ensure that you have at least 10% of available disk space on your machine to run Elasticsearch. 
-
-Now that you have started at least the `elasticsearch` and `swift` backends,
-it's time to play with them:
-
+We can store a JSON file in the Swift backend:
 ```bash
-# Store a JSON file in the Swift backend
 echo '{"id": 1, "foo": "bar"}' | \
     ./bin/ralph write -b swift -t foo.json
+```
 
-# Check that we have created a new JSON file in the Swift backend
+We can check that we have created a new JSON file in the Swift backend:
+```bash
 bin/ralph list -b swift
 >>> foo.json
+```
 
-# Read the content of the JSON file and index it in Elasticsearch
+Let's read the content of the JSON file and index it in Elasticsearch
+```bash
 bin/ralph read -b swift -t foo.json | \
     bin/ralph write -b es
+```
 
-# Check that we have properly indexed the JSON file in Elasticsearch
+We can now check that we have properly indexed the JSON file in Elasticsearch
+```bash
 bin/ralph read -b es
 >>> {"id": 1, "foo": "bar"}
 ```
 
-### [WIP] Working with the LRS
+## [WIP] LRS
 
-## Working with Ralph's tray
+## Tray
 
 Ralph is distributed along with its tray (a deployable package for Kubernetes
 clusters using [Arnold](https://github.com/openfun/arnold)). If you intend to
 work on this tray, please refer to Arnold's documentation first.
 
-### Prerequisites
-
-- [Kubectl](https://kubernetes.io/docs/tasks/tools/) (>`v.1.23.5`):
-  This CLI is used to communicate with the running Kubernetes instance you
-  will use.
-- [k3d](https://k3d.io/) (>`v.5.0.0`): This tool is used to set up
-  and run a lightweight Kubernetes cluster, in order to have a local
-  environment (it is required to complete quickstart instructions below to
-  avoid depending on an existing Kubernetes cluster).
-- [curl](https://curl.se/) is required by Arnold's CLI.
-- [gnupg](https://gnupg.org/) to encrypt Ansible vaults passwords and
-  collaborate with your team.
+!!! note "Prerequisites"
+    - [Kubectl](https://kubernetes.io/docs/tasks/tools/) (>`v.1.23.5`):
+      This CLI is used to communicate with the running Kubernetes instance you
+      will use.
+    - [k3d](https://k3d.io/) (>`v.5.0.0`): This tool is used to set up
+      and run a lightweight Kubernetes cluster, in order to have a local
+      environment (it is required to complete quickstart instructions below to
+      avoid depending on an existing Kubernetes cluster).
+    - [curl](https://curl.se/) is required by Arnold's CLI.
+    - [gnupg](https://gnupg.org/) to encrypt Ansible vaults passwords and
+      collaborate with your team.
 
 ### Create a local `k3d` cluster
 
@@ -324,8 +325,9 @@ When finished to work on the Tray, you can stop the `k3d` cluster using the `k3d
 make k3d-stop
 ```
 
+## After your development
 
-## Test your development
+### Testing
 
 To run tests on your code, either use the `test` Make target or the
 `bin/pytest` script to pass specific arguments to the test runner:
@@ -341,7 +343,7 @@ bin/pytest -x -k mixins
 bin/pytest tests/api -x -vvv -s --log-level=DEBUG -k mixins
 ```
 
-## Lint your code
+### Linting
 
 To lint your code, either use the `lint` meta target or one of the linting tools we use:
 
@@ -359,7 +361,7 @@ make lint-ruff-fix
 make help | grep lint-
 ```
 
-## Document your modification
+### Documentation
 
 In case you need to document your code, use the following targets:
 
