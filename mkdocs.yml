@@ -47,7 +47,7 @@ nav:
         - 'Backends for data storage': backends/index.md
         - 'Learning statements models': models/index.md
     - 'Tutorials':
-        - 'Development - Contributing': tutorials/development_contributing.md
+        - 'Development Guide': tutorials/development_guide.md
         - 'Use Ralph as a CLI': tutorials/cli.md
         - 'Use Ralph as a library': tutorials/library.md
     - 'Contributing': contribute.md
