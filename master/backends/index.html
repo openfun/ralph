@@ -1232,12 +1232,6 @@ status to be ok.</p></td>
 initialization.</p></td>
       </tr>
       <tr>
-        <td><code>DEFAULT_CHUNK_SIZE</code></td>
-        <td><code>int</code></td>
-        <td><p>The default chunk size for reading batches of
-documents.</p></td>
-      </tr>
-      <tr>
         <td><code>DEFAULT_INDEX</code></td>
         <td><code>str</code></td>
         <td><p>The default index to use for querying Elasticsearch.</p></td>
@@ -1260,10 +1254,20 @@ connect to.</p></td>
 keep a point in time alive.</p></td>
       </tr>
       <tr>
+        <td><code>READ_CHUNK_SIZE</code></td>
+        <td><code>int</code></td>
+        <td><p>The default chunk size for reading batches of documents.</p></td>
+      </tr>
+      <tr>
         <td><code>REFRESH_AFTER_WRITE</code></td>
         <td><code>str or bool</code></td>
         <td><p>Whether the Elasticsearch index should be
 refreshed after the write operation.</p></td>
+      </tr>
+      <tr>
+        <td><code>WRITE_CHUNK_SIZE</code></td>
+        <td><code>int</code></td>
+        <td><p>The default chunk size for writing batches of documents.</p></td>
       </tr>
   </tbody>
 </table>
@@ -1316,14 +1320,19 @@ it can also be used to fetch collections of documents from it.</p>
         <td><p>A dictionary of MongoDB client options.</p></td>
       </tr>
       <tr>
-        <td><code>DEFAULT_CHUNK_SIZE</code></td>
-        <td><code>int</code></td>
-        <td><p>The default chunk size to use when none is provided.</p></td>
-      </tr>
-      <tr>
         <td><code>LOCALE_ENCODING</code></td>
         <td><code>str</code></td>
         <td><p>The locale encoding to use when none is provided.</p></td>
+      </tr>
+      <tr>
+        <td><code>READ_CHUNK_SIZE</code></td>
+        <td><code>int</code></td>
+        <td><p>The default chunk size for reading batches of documents.</p></td>
+      </tr>
+      <tr>
+        <td><code>WRITE_CHUNK_SIZE</code></td>
+        <td><code>int</code></td>
+        <td><p>The default chunk size for writing batches of documents.</p></td>
       </tr>
   </tbody>
 </table>
@@ -1392,14 +1401,19 @@ documents from it.</p>
 ClickHouse client connection.</p></td>
       </tr>
       <tr>
-        <td><code>DEFAULT_CHUNK_SIZE</code></td>
-        <td><code>int</code></td>
-        <td><p>The default chunk size for reading/writing.</p></td>
-      </tr>
-      <tr>
         <td><code>LOCALE_ENCODING</code></td>
         <td><code>str</code></td>
         <td><p>The locale encoding to use when none is provided.</p></td>
+      </tr>
+      <tr>
+        <td><code>READ_CHUNK_SIZE</code></td>
+        <td><code>int</code></td>
+        <td><p>The default chunk size for reading.</p></td>
+      </tr>
+      <tr>
+        <td><code>WRITE_CHUNK_SIZE</code></td>
+        <td><code>int</code></td>
+        <td><p>The default chunk size for writing.</p></td>
       </tr>
   </tbody>
 </table>
@@ -1462,11 +1476,6 @@ requests on the <code>/dbaas/logs/*</code> path.</p>
         <td><p>The OVH API consumer key (CK).</p></td>
       </tr>
       <tr>
-        <td><code>DEFAULT_CHUNK_SIZE</code></td>
-        <td><code>str</code></td>
-        <td><p>The default chunk size for reading archives.</p></td>
-      </tr>
-      <tr>
         <td><code>DEFAULT_STREAM_ID</code></td>
         <td><code>str</code></td>
         <td><p>The default stream identifier to query.</p></td>
@@ -1475,6 +1484,11 @@ requests on the <code>/dbaas/logs/*</code> path.</p>
         <td><code>ENDPOINT</code></td>
         <td><code>str</code></td>
         <td><p>The OVH API endpoint.</p></td>
+      </tr>
+      <tr>
+        <td><code>READ_CHUNK_SIZE</code></td>
+        <td><code>str</code></td>
+        <td><p>The default chunk size for reading archives.</p></td>
       </tr>
       <tr>
         <td><code>REQUEST_TIMEOUT</code></td>
@@ -1577,15 +1591,19 @@ OpenStack Keystone service and configuration to work with the target container.<
         <td><p>The default target container.</p></td>
       </tr>
       <tr>
-        <td><code>DEFAULT_CHUNK_SIZE</code></td>
-        <td><code>str</code></td>
-        <td><p>The default chunk size for reading and writing
-objects.</p></td>
-      </tr>
-      <tr>
         <td><code>LOCALE_ENCODING</code></td>
         <td><code>str</code></td>
         <td><p>The encoding used for reading/writing documents.</p></td>
+      </tr>
+      <tr>
+        <td><code>READ_CHUNK_SIZE</code></td>
+        <td><code>str</code></td>
+        <td><p>The default chunk size for reading objects.</p></td>
+      </tr>
+      <tr>
+        <td><code>WRITE_CHUNK_SIZE</code></td>
+        <td><code>str</code></td>
+        <td><p>The default chunk size for writing objects.</p></td>
       </tr>
   </tbody>
 </table>
@@ -1650,15 +1668,19 @@ and configuration to work with the target bucket.</p>
         <td><p>The default bucket name targeted.</p></td>
       </tr>
       <tr>
-        <td><code>DEFAULT_CHUNK_SIZE</code></td>
-        <td><code>str</code></td>
-        <td><p>The default chunk size for reading and writing
-objects.</p></td>
-      </tr>
-      <tr>
         <td><code>LOCALE_ENCODING</code></td>
         <td><code>str</code></td>
         <td><p>The encoding used for writing dictionaries to objects.</p></td>
+      </tr>
+      <tr>
+        <td><code>READ_CHUNK_SIZE</code></td>
+        <td><code>str</code></td>
+        <td><p>The default chunk size for reading objects.</p></td>
+      </tr>
+      <tr>
+        <td><code>WRITE_CHUNK_SIZE</code></td>
+        <td><code>str</code></td>
+        <td><p>The default chunk size for writing objects.</p></td>
       </tr>
   </tbody>
 </table>
@@ -1692,11 +1714,6 @@ It is a &ldquo;dummy&rdquo; backend as it is not intended for practical use (UNI
   </thead>
   <tbody>
       <tr>
-        <td><code>DEFAULT_CHUNK_SIZE</code></td>
-        <td><code>int</code></td>
-        <td><p>The default chunk size for reading files.</p></td>
-      </tr>
-      <tr>
         <td><code>DEFAULT_DIRECTORY_PATH</code></td>
         <td><code>str or Path</code></td>
         <td><p>The default target directory path where to
@@ -1712,6 +1729,16 @@ operation.</p></td>
         <td><code>LOCALE_ENCODING</code></td>
         <td><code>str</code></td>
         <td><p>The encoding used for writing dictionaries to files.</p></td>
+      </tr>
+      <tr>
+        <td><code>READ_CHUNK_SIZE</code></td>
+        <td><code>int</code></td>
+        <td><p>The default chunk size for reading files.</p></td>
+      </tr>
+      <tr>
+        <td><code>WRITE_CHUNK_SIZE</code></td>
+        <td><code>int</code></td>
+        <td><p>The default chunk size for writing files.</p></td>
       </tr>
   </tbody>
 </table>

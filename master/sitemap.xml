@@ -2,62 +2,62 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://openfun.github.io/ralph/latest/</loc>
-         <lastmod>2023-12-04</lastmod>
+         <lastmod>2023-12-05</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://openfun.github.io/ralph/latest/CHANGELOG/</loc>
-         <lastmod>2023-12-04</lastmod>
+         <lastmod>2023-12-05</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://openfun.github.io/ralph/latest/LICENSE/</loc>
-         <lastmod>2023-12-04</lastmod>
+         <lastmod>2023-12-05</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://openfun.github.io/ralph/latest/UPGRADE/</loc>
-         <lastmod>2023-12-04</lastmod>
+         <lastmod>2023-12-05</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://openfun.github.io/ralph/latest/commands/</loc>
-         <lastmod>2023-12-04</lastmod>
+         <lastmod>2023-12-05</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://openfun.github.io/ralph/latest/contribute/</loc>
-         <lastmod>2023-12-04</lastmod>
+         <lastmod>2023-12-05</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://openfun.github.io/ralph/latest/api/</loc>
-         <lastmod>2023-12-04</lastmod>
+         <lastmod>2023-12-05</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://openfun.github.io/ralph/latest/backends/</loc>
-         <lastmod>2023-12-04</lastmod>
+         <lastmod>2023-12-05</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://openfun.github.io/ralph/latest/models/</loc>
-         <lastmod>2023-12-04</lastmod>
+         <lastmod>2023-12-05</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://openfun.github.io/ralph/latest/tutorials/cli/</loc>
-         <lastmod>2023-12-04</lastmod>
+         <lastmod>2023-12-05</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://openfun.github.io/ralph/latest/tutorials/development_contributing/</loc>
-         <lastmod>2023-12-04</lastmod>
+         <lastmod>2023-12-05</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://openfun.github.io/ralph/latest/tutorials/library/</loc>
-         <lastmod>2023-12-04</lastmod>
+         <lastmod>2023-12-05</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
