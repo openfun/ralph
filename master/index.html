@@ -79,7 +79,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#installation" class="md-skip">
+        <a href="#what_is_an_lrs" class="md-skip">
           Skip to content
         </a>
       
@@ -249,7 +249,7 @@ for a seamless transition. 🚀
     
     
       <li class="md-tabs__item">
-        <a href="tutorials/development_contributing/" class="md-tabs__link">
+        <a href="tutorials/development_guide/" class="md-tabs__link">
           
   
   Tutorials
@@ -404,6 +404,13 @@ for a seamless transition. 🚀
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#what_is_an_lrs" class="md-nav__link">
+    What is an LRS?
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#installation" class="md-nav__link">
     Installation
   </a>
@@ -431,8 +438,8 @@ for a seamless transition. 🚀
 </li>
       
         <li class="md-nav__item">
-  <a href="#wip_start_using_ralph" class="md-nav__link">
-    [WIP] Start using Ralph
+  <a href="#lrs_specification_compliance" class="md-nav__link">
+    LRS specification compliance
   </a>
   
 </li>
@@ -617,11 +624,11 @@ for a seamless transition. 🚀
   
   
     <li class="md-nav__item">
-      <a href="tutorials/development_contributing/" class="md-nav__link">
+      <a href="tutorials/development_guide/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Development - Contributing
+    Development Guide
   </span>
   
 
@@ -827,6 +834,13 @@ for a seamless transition. 🚀
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#what_is_an_lrs" class="md-nav__link">
+    What is an LRS?
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#installation" class="md-nav__link">
     Installation
   </a>
@@ -854,8 +868,8 @@ for a seamless transition. 🚀
 </li>
       
         <li class="md-nav__item">
-  <a href="#wip_start_using_ralph" class="md-nav__link">
-    [WIP] Start using Ralph
+  <a href="#lrs_specification_compliance" class="md-nav__link">
+    LRS specification compliance
   </a>
   
 </li>
@@ -927,13 +941,43 @@ for a seamless transition. 🚀
 
 <p>Ralph is a toolbox for your learning analytics, it can be used as a:</p>
 <ul>
-<li><strong><a href="https://en.wikipedia.org/wiki/Learning_Record_Store">LRS</a></strong>, a HTTP API server to collect xAPI statements (learning events), following the <a href="https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#partthree">ADL LRS standard</a></li>
-<li><strong>command-line interface</strong> (CLI), to build data pipelines the UNIX-way™️,</li>
-<li><strong>library</strong>, to fetch learning events from various backends, (de)serialize or
+<li><strong>LRS</strong>, an HTTP API server to collect xAPI statements (learning events), following the <a href="https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#part-three-data-processing-validation-and-security">ADL LRS standard</a></li>
+<li><a href="tutorials/cli/"><strong>command-line interface</strong></a> (CLI), to build data pipelines the UNIX-way™️,</li>
+<li><a href="tutorials/library/"><strong>library</strong></a>, to fetch learning events from various backends, (de)serialize or
     convert them from and to various standard formats such as
     <a href="https://adlnet.gov/projects/xapi/">xAPI</a>, or
     <a href="https://docs.openedx.org/en/latest/developers/references/internal_data_formats/tracking_logs/index.html">openedx</a></li>
 </ul>
+<h2 id="what_is_an_lrs">What is an LRS?<a class="headerlink" href="#what_is_an_lrs" title="Permanent link">&para;</a></h2>
+<p>A Learning Record Store, or LRS, is a key component in the context of learning analytics and the Experience API (xAPI).</p>
+<p>The <a href="https://github.com/adlnet/xAPI-Spec">Experience API</a> (or Tin Can API) is a standard for tracking and reporting learning experiences. 
+In particular, it defines:</p>
+<ul>
+<li>the <a href="https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#part-two-experience-api-data">xAPI format</a> of the learning events. xAPI statements includes an <code>actor</code> (e.g. <em>learner</em>), a <code>verb</code> (e.g. <em>watched</em>, <em>passed</em>) and an <code>object</code> (e.g. <em>video</em>, <em>quiz</em>) as well as contextual and optional information (e.g. <em>timestamp</em> of the event, <em>result</em> of an activity). Here&rsquo;s a simplistic statement: 
+<div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;12345678-1234-5678-1234-567812345678&quot;</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="nt">&quot;actor&quot;</span><span class="p">:{</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">        </span><span class="nt">&quot;mbox&quot;</span><span class="p">:</span><span class="s2">&quot;mailto:xapi@adlnet.gov&quot;</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="p">},</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="nt">&quot;verb&quot;</span><span class="p">:{</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">        </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;http://adlnet.gov/expapi/verbs/created&quot;</span><span class="p">,</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">        </span><span class="nt">&quot;display&quot;</span><span class="p">:{</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">            </span><span class="nt">&quot;en-US&quot;</span><span class="p">:</span><span class="s2">&quot;created&quot;</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">        </span><span class="p">}</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="p">},</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">    </span><span class="nt">&quot;object&quot;</span><span class="p">:{</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">        </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;http://example.adlnet.gov/xapi/example/activity&quot;</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="p">}</span>
+</span></code></pre></div></li>
+<li>the <a href="https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#part-three-data-processing-validation-and-security">Learning Record Store</a> (LRS), is a RESTful API that collects, stores and retrieves these events. Think of it as a learning database that unifies data from various learning platforms and applications. 
+These events can come from an LMS (<em>Moodle</em>, <em>edX</em>), or any other learning component that supports xAPI generation (e.g. an embedded video player), from various platforms.</li>
+</ul>
+<div class="admonition info">
+<p class="admonition-title">xAPI specification version</p>
+<p>In Ralph, we&rsquo;re following the xAPI specification <strong>1.0.3</strong> that you can find <a href="https://github.com/adlnet/xAPI-Spec/tree/master">here</a>.</p>
+<p>For your information, xAPI specification <strong>2.0</strong> is out! It&rsquo;s not currently supported in Ralph, but you can check it <a href="https://opensource.ieee.org/xapi">here</a>.</p>
+</div>
 <h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
 <h3 id="install_from_pypi">Install from PyPI<a class="headerlink" href="#install_from_pypi" title="Permanent link">&para;</a></h3>
 <p>Ralph is distributed as a standard python package; it can be installed <em>via</em>
@@ -944,56 +988,57 @@ for a seamless transition. 🚀
 <ul>
 <li>
 <p>Create a virtual environment:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python3.12<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>&lt;path-to-virtual-environment&gt;
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python3.12<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>&lt;path-to-virtual-environment&gt;
 </span></code></pre></div></p>
 </li>
 <li>
 <p>Activate the virtual environment:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">source</span><span class="w"> </span>venv/bin/activate
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">source</span><span class="w"> </span>venv/bin/activate
 </span></code></pre></div></p>
 </li>
 </ul>
 </details>
-<p>If you only need to integrate <a href="models/">learning statement models</a> feature in your project, you don&rsquo;t need to
+<p>If you want to generate xAPI statements from your application and only need to integrate <a href="models/">learning statement models</a> in your project, you don&rsquo;t need to
 install the <code>backends</code>, <code>cli</code> or <code>lrs</code> extra dependencies, the <strong>core library</strong> is what you need:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ralph-malph
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ralph-malph
 </span></code></pre></div>
 <p>If you want to use the <a href="api/">Ralph LRS server</a>, add the <code>lrs</code> flavour in your installation. 
 You also have to choose the type of backend you will use for LRS data storage (<code>backend-clickhouse</code>,<code>backend-es</code>,<code>backend-mongo</code>).</p>
 <ul>
 <li>Install the <strong>core package</strong> with the LRS and the Elasticsearch backend. For example:</li>
 </ul>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ralph-malph<span class="o">[</span>backend-es,lrs<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ralph-malph<span class="o">[</span>backend-es,lrs<span class="o">]</span>
 </span></code></pre></div>
 <ul>
 <li>Add the <code>cli</code> flavour if you want to use the LRS on the command line: </li>
 </ul>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ralph-malph<span class="o">[</span>backend-es,lrs,cli<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ralph-malph<span class="o">[</span>backend-es,lrs,cli<span class="o">]</span>
 </span></code></pre></div>
 <ul>
 <li>If you want to play around with backends with Ralph as a library, you can install: </li>
 </ul>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ralph-malph<span class="o">[</span>backends<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ralph-malph<span class="o">[</span>backends<span class="o">]</span>
 </span></code></pre></div>
 <ul>
 <li>If you have various uses for Ralph&rsquo;s features or would like to discover all the existing functionnalities, it is recommended to install the <strong>full package</strong>: </li>
 </ul>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ralph-malph<span class="o">[</span>full<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ralph-malph<span class="o">[</span>full<span class="o">]</span>
 </span></code></pre></div>
 <h3 id="install_from_dockerhub">Install from DockerHub<a class="headerlink" href="#install_from_dockerhub" title="Permanent link">&para;</a></h3>
 <p>Ralph is distributed as a <a href="https://hub.docker.com/repository/docker/fundocker/ralph">Docker
 image</a>. If
 <a href="https://docs.docker.com/get-docker/">Docker</a> is installed on your machine, it
 can be pulled from DockerHub:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-i<span class="w"> </span>fundocker/ralph:latest<span class="w"> </span>ralph<span class="w"> </span>--help
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-i<span class="w"> </span>fundocker/ralph:latest<span class="w"> </span>ralph<span class="w"> </span>--help
 </span></code></pre></div>
 <details class="tip" open="open">
 <summary>Use a <code>ralph</code> alias in your local environment</summary>
 <p>Simplify your workflow by creating an alias for easy access to Ralph commands:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nb">alias</span><span class="w"> </span><span class="nv">ralph</span><span class="o">=</span><span class="s2">&quot;docker run --rm -i fundocker/ralph:latest ralph&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nb">alias</span><span class="w"> </span><span class="nv">ralph</span><span class="o">=</span><span class="s2">&quot;docker run --rm -i fundocker/ralph:latest ralph&quot;</span>
 </span></code></pre></div>
 </details>
-<h2 id="wip_start_using_ralph">[WIP] Start using Ralph<a class="headerlink" href="#wip_start_using_ralph" title="Permanent link">&para;</a></h2>
+<h2 id="lrs_specification_compliance">LRS specification compliance<a class="headerlink" href="#lrs_specification_compliance" title="Permanent link">&para;</a></h2>
+<p>WIP.</p>
 <h2 id="contributing_to_ralph">Contributing to Ralph<a class="headerlink" href="#contributing_to_ralph" title="Permanent link">&para;</a></h2>
 <p>If you&rsquo;re interested in contributing to Ralph, whether it&rsquo;s by reporting issues, suggesting improvements, or submitting code changes, please head over to our dedicated <a href="contribute/">Contributing to Ralph</a> page. 
 There, you&rsquo;ll find detailed guidelines and instructions on how to take part in the project.</p>
