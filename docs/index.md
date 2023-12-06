@@ -37,7 +37,7 @@ A Learning Record Store, or LRS, is a key component in the context of learning a
 The [Experience API](https://github.com/adlnet/xAPI-Spec) (or Tin Can API) is a standard for tracking and reporting learning experiences. 
 In particular, it defines:
 
-- the [xAPI format](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#part-two-experience-api-data) of the learning events. xAPI statements includes an `actor` (e.g. *learner*), a `verb` (e.g. *watched*, *passed*) and an `object` (e.g. *video*, *quiz*) as well as contextual and optional information (e.g. *timestamp* of the event, *result* of an activity). Here's a simplistic statement: 
+- the [xAPI format](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#part-two-experience-api-data) of the learning events. xAPI statements include an `actor`, a `verb`, an `object` as well as contextual information. Here's an example statement: 
 ```json
 {
     "id": "12345678-1234-5678-1234-567812345678",
@@ -56,7 +56,7 @@ In particular, it defines:
 }
 ```
 - the [Learning Record Store](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#part-three-data-processing-validation-and-security) (LRS), is a RESTful API that collects, stores and retrieves these events. Think of it as a learning database that unifies data from various learning platforms and applications. 
-These events can come from an LMS (*Moodle*, *edX*), or any other learning component that supports xAPI generation (e.g. an embedded video player), from various platforms.
+These events can come from an LMS (*Moodle*, *edX*), or any other learning component that supports sending xAPI statements to an LRS (e.g. an embedded video player), from various platforms.
 
 
 !!! info "xAPI specification version"
