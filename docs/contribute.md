@@ -76,7 +76,7 @@ git checkout -b your-new-feature
 
 Implement the changes or additions to the code, ensuring it follows [OpenFUN coding and documentation standards](https://handbook.openfun.fr/python).
 
-For comprehensive guidance on starting your development journey with Ralph and preparing your pull request, please refer to our dedicated [Start developing with Ralph](./tutorials/development_contributing.md) tutorial.
+For comprehensive guidance on starting your development journey with Ralph and preparing your pull request, please refer to our dedicated [Start developing with Ralph](./tutorials/development_guide.md) tutorial.
 
 When committing your changes, please adhere to [OpenFUN commit practices](https://handbook.openfun.fr/git#git-conventions). 
 Follow the low granularity commit splitting approach and use commit messages based on the Angular commit message guidelines. 
