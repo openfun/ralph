@@ -519,7 +519,7 @@ def test_models_xapi_base_statement_should_consider_valid_all_defined_xapi_model
     
     # All specific xAPI models should inherit BaseXapiStatement
     assert issubclass(model, BaseXapiStatement)
-    statement = mock_instance(model) # TODO: check that we are not losing info by mocking random model
+    statement = mock_instance(model).json(exclude_none=True, by_alias=True) # TODO: check that we are not losing info by mocking random model
     try:
         BaseXapiStatement(**json.loads(statement))
     except ValidationError as err:
