@@ -11,6 +11,7 @@ from .unnested_objects import BaseXapiActivity, BaseXapiStatementRef
 
 from ralph.conf import NonEmptyStrictStr
 
+
 class BaseXapiContextContextActivities(BaseModelWithConfig):
     """Pydantic model for context `contextActivities` property.
 
@@ -44,6 +45,7 @@ class BaseXapiContext(BaseModelWithConfig):
         statement (dict): Another Statement giving context for this Statement.
         extensions (dict): Consists of a dictionary of other properties as needed.
     """
+
     registration: Optional[UUID]
     instructor: Optional[BaseXapiAgent]
     team: Optional[BaseXapiGroup]

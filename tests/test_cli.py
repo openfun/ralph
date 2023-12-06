@@ -352,8 +352,6 @@ def test_cli_auth_command_when_writing_auth_file(
         username_1, password_1, scopes_1, ifi_command_1, ifi_value_1, write=True
     )
 
-    print(cli_args)
-
     assert Path(settings.AUTH_FILE).exists() is False
     result = runner.invoke(cli, cli_args)
     assert result.exit_code == 0

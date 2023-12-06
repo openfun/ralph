@@ -74,7 +74,7 @@ class BaseXapiActivityInteractionDefinition(BaseXapiActivityDefinition):
         "numeric",
         "other",
     ]
-    correctResponsesPattern: Optional[List[NonEmptyStrictStr]] # TODO: change back to strictstr
+    correctResponsesPattern: Optional[List[NonEmptyStrictStr]]
     choices: Optional[List[BaseXapiInteractionComponent]]
     scale: Optional[List[BaseXapiInteractionComponent]]
     source: Optional[List[BaseXapiInteractionComponent]]
@@ -102,10 +102,11 @@ class BaseXapiActivity(BaseModelWithConfig):
     id: IRI
     objectType: Optional[Literal["Activity"]]
     definition: Optional[
-            Union[
-                BaseXapiActivityDefinition,
-                BaseXapiActivityInteractionDefinition,
-            ]]
+        Union[
+            BaseXapiActivityDefinition,
+            BaseXapiActivityInteractionDefinition,
+        ]
+    ]
 
 
 class BaseXapiStatementRef(BaseModelWithConfig):

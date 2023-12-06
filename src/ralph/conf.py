@@ -6,7 +6,17 @@ from enum import Enum
 from pathlib import Path
 from typing import Annotated, List, Sequence, Tuple, Union
 
-from pydantic import AnyHttpUrl, AnyUrl, BaseModel, BaseSettings, constr, Extra, Field, root_validator, StrictStr
+from pydantic import (
+    AnyHttpUrl,
+    AnyUrl,
+    BaseModel,
+    BaseSettings,
+    constr,
+    Extra,
+    Field,
+    root_validator,
+    StrictStr,
+)
 
 from ralph.exceptions import ConfigurationException
 
@@ -31,9 +41,12 @@ MODEL_PATH_SEPARATOR = "__"
 
 from pydantic import constr
 
-NonEmptyStr = Annotated[str, Field(min_length=1)] 
-NonEmptyStrictStrPatch = Annotated[str, Field(min_length=1)] 
-NonEmptyStrictStr = constr(min_length=1, strict=True)#Annotated[StrictStr, Field(min_length=1)] 
+NonEmptyStr = Annotated[str, Field(min_length=1)]
+NonEmptyStrictStrPatch = Annotated[str, Field(min_length=1)]
+NonEmptyStrictStr = constr(
+    min_length=1, strict=True
+)  # Annotated[StrictStr, Field(min_length=1)]
+
 
 class BaseSettingsConfig:
     """Pydantic model for BaseSettings Configuration."""
@@ -122,6 +135,7 @@ class ParserSettings(BaseModel):
 
     GELF: GELFParserSettings = GELFParserSettings()
     ES: ESParserSettings = ESParserSettings()
+
 
 class XapiForwardingConfigurationSettings(BaseModel):
     """Pydantic model for xAPI forwarding configuration item."""

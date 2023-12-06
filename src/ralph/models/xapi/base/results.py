@@ -27,7 +27,7 @@ class BaseXapiResultScore(BaseModelWithConfig):
     min: Optional[Decimal]
     max: Optional[Decimal]
 
-    @root_validator # TODO: check if adding pre is still valid
+    @root_validator
     @classmethod
     def check_raw_min_max_relation(cls, values: Any) -> Any:
         """Check the relationship `min < raw < max`."""
@@ -45,7 +45,7 @@ class BaseXapiResultScore(BaseModelWithConfig):
                 raise ValueError("raw cannot be greater than max")
 
         return values
-    
+
 
 class BaseXapiResult(BaseModelWithConfig):
     """Pydantic model for `result` property.

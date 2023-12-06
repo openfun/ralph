@@ -20,6 +20,7 @@ else:
 
 from ralph.conf import NonEmptyStrictStr
 
+
 class BaseXapiGroupCommonProperties(BaseModelWithConfig, ABC):
     """Pydantic model for core `Group` type property.
 

@@ -31,6 +31,7 @@ class BaseXapiAgentAccount(BaseModelWithConfig):
     homePage: IRI
     name: NonEmptyStrictStr
 
+
 class BaseXapiAgentCommonProperties(BaseModelWithConfig, ABC):
     """Pydantic model for core `Agent` type property.
 

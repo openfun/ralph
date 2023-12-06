@@ -26,6 +26,7 @@ class BaseXapiMboxIFI(BaseModelWithConfig):
     Attributes:
         mbox (MailtoEmail): Consists of the Agent's email address.
     """
+
     # pattern = r'mailto:\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
     # mbox: Annotated[str, Field(regex=pattern)]#
     mbox: MailtoEmail

@@ -16,7 +16,8 @@ from .results import BaseXapiResult
 from .verbs import BaseXapiVerb
 
 
-from pprint import pprint # TODO: remove
+from pprint import pprint  # TODO: remove
+
 
 class BaseXapiStatement(BaseModelWithConfig):
     """Pydantic model for base xAPI statements.

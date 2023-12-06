@@ -4,6 +4,7 @@ from ..base.results import BaseXapiResult
 
 from ralph.conf import NonEmptyStrictStr
 
+
 class VirtualClassroomAnsweredPollResult(BaseXapiResult):
     """Pydantic model for virtual classroom answered poll `result` property.
 
