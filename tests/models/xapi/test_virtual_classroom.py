@@ -30,7 +30,7 @@ from ralph.models.xapi.virtual_classroom.statements import (
 )
 
 from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
-
+from tests.factories import mock_instance
 
 @settings(deadline=None)
 @pytest.mark.parametrize(
@@ -58,7 +58,7 @@ def test_models_xapi_virtual_classroom_selectors_with_valid_statements(class_, d
     """Test given a valid virtual classroom xAPI statement the `get_first_model`
     selector method should return the expected model.
     """
-    statement = json.loads(data.draw(custom_builds(class_)).json())
+    statement = json.loads(mock_instance(class_).json())
     model = ModelSelector(module="ralph.models.xapi").get_first_model(statement)
     assert model is class_
 

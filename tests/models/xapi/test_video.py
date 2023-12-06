@@ -24,8 +24,8 @@ from ralph.models.xapi.video.statements import (
 
 from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 
+from tests.factories import mock_instance
 
-@settings(deadline=None)
 @pytest.mark.parametrize(
     "class_",
     [
@@ -37,12 +37,11 @@ from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
         VideoTerminated,
     ],
 )
-@custom_given(st.data())
-def test_models_xapi_video_selectors_with_valid_statements(class_, data):
+def test_models_xapi_video_selectors_with_valid_statements(class_):
     """Test given a valid video xAPI statement the `get_first_model`
     selector method should return the expected model.
     """
-    statement = json.loads(data.draw(custom_builds(class_)).json())
+    statement = json.loads(mock_instance(class_).json())
     model = ModelSelector(module="ralph.models.xapi").get_first_model(statement)
     assert model is class_
 

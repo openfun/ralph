@@ -12,7 +12,6 @@ from typing import Annotated
 from pydantic import Field
 from pydantic import BaseModel, root_validator
 
-
 class IRI(NonEmptyStrictStrPatch):
     """Pydantic custom data type validating RFC 3987 IRIs."""
 
@@ -25,7 +24,6 @@ class IRI(NonEmptyStrictStrPatch):
 
         yield validate
 
-
 class LanguageTag(NonEmptyStr):
     """Pydantic custom data type validating RFC 5646 Language tags."""
 
@@ -34,14 +32,13 @@ class LanguageTag(NonEmptyStr):
         def validate(tag: str) -> Type["LanguageTag"]:
             """Check whether the provided tag is a valid RFC 5646 Language tag."""
             if not tag_is_valid(tag):
-                print("Provided tag is:", tag)
                 raise TypeError("Invalid RFC 5646 Language tag")
             return cls(tag)
 
         yield validate
 
 
-LanguageMap = Dict[LanguageTag, NonEmptyStrictStr]  # TODO: change  back to strictstr
+LanguageMap = Dict[LanguageTag, NonEmptyStrictStr] # TODO: change   back to strictstr
 
 
 email_pattern = r"(^mailto:[-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\[[\t -Z^-~]*])"

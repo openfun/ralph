@@ -94,22 +94,12 @@ def custom_builds(
         del optional[key]
     return st.fixed_dictionaries(required, optional=optional).map(klass.parse_obj)
 
-
 def custom_given(*args: Union[st.SearchStrategy, BaseModel], **kwargs):
     """Wrap the Hypothesis `given` function. Replace st.builds with custom_builds."""
     strategies = []
     for arg in args:
         strategies.append(custom_builds(arg) if is_base_model(arg) else arg)
     return given(*strategies, **kwargs)
-
-
-# from polyfactory.factories.pydantic_factory import ModelFactory
-
-# def custom_given(klass):
-#     def wrapper(func):
-#         ModelFactor.create_factory(model=klass)
-#         func()
-#     return wrapper
 
 
 OVERWRITTEN_STRATEGIES = {
@@ -123,11 +113,11 @@ OVERWRITTEN_STRATEGIES = {
         "revision": False,
         "platform": False,
     },
-    # BaseXapiResultScore: {
-    #     "raw": False,
-    #     "min": False,
-    #     "max": False,
-    # },
+    BaseXapiResultScore: {
+        "raw": False,
+        "min": False,
+        "max": False,
+    },
     LMSContextContextActivities: {"category": custom_builds(LMSProfileActivity)},
     VideoContextContextActivities: {"category": custom_builds(VideoProfileActivity)},
     VirtualClassroomContextContextActivities: {
