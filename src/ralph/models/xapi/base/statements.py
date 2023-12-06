@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Any, List, Optional, Union
 from uuid import UUID
 
-from pydantic import constr, root_validator
+from pydantic import constr, root_validator, BaseModel
 
 from ..config import BaseModelWithConfig
 from .agents import BaseXapiAgent
@@ -52,19 +52,14 @@ class BaseXapiStatement(BaseModelWithConfig):
     def check_absence_of_empty_and_invalid_values(cls, values: Any) -> Any:
         """Check the model for empty and invalid values.
 
-        Check that there are no empty values except in branch of `extenstions`.
-
         Check that the `context` field contains `platform` and `revision` fields
         only if the `object.objectType` property is equal to `Activity`.
         """
         for field, value in list(values.items()):
-            if field != "extensions":
-                if value in [None, "", {}]:
-                    print("field is:", field, "value is:", value)
-                    raise ValueError(f"{field}: invalid empty value")
-                if isinstance(value, dict):
-                    print("nested field is:", field)
-                    cls.check_absence_of_empty_and_invalid_values(value)
+            if value in [None, "", {}]:
+                raise ValueError(f"{field}: invalid empty value")
+            if isinstance(value, dict) and field != "extensions":
+                cls.check_absence_of_empty_and_invalid_values(value)
 
         context = dict(values.get("context", {}))
         if context:
@@ -73,7 +68,7 @@ class BaseXapiStatement(BaseModelWithConfig):
             object_type = dict(values["object"]).get("objectType", "Activity")
             if (platform or revision) and object_type != "Activity":
                 raise ValueError(
-                    "context revision and platform properties can only be used"
-                    " if the Statement's Object is an Activity"
+                    "revision and platform properties can only be used if the "
+                    "Statement's Object is an Activity"
                 )
         return values

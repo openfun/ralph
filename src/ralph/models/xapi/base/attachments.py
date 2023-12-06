@@ -27,4 +27,4 @@ class BaseXapiAttachment(BaseModelWithConfig):
     contentType: str
     length: int
     sha2: str
-    fileUrl: Optional[AnyUrl]
+    fileUrl: Optional[str] # TODO: change back to AnyUrl

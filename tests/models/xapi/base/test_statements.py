@@ -1,6 +1,7 @@
 """Tests for the BaseXapiStatement."""
 
 import json
+from typing import Callable
 
 import pytest
 from hypothesis import settings
@@ -27,21 +28,22 @@ from ralph.utils import set_dict_value_from_path
 
 from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 
-from polyfactory.factories.pydantic_factory import ModelFactory
+# from polyfactory.factories.pydantic_factory import ModelFactory as PydanticFactory
+
+from polyfactory.factories.pydantic_factory import (
+    ModelFactory as PolyfactoryModelFactory,
+    T,
+)
+
 from polyfactory import Use
 from polyfactory.fields import Ignore, Require
 from ralph.models.xapi.base.common import MailtoEmail, IRI
 from ralph.models.xapi.base.agents import BaseXapiAgentWithMbox
 from typing import Dict, Type, Any
 
-
 from uuid import UUID, uuid4
 
 from pprint import pprint
-
-# class IRIFactory(ModelFactory[IRI]):
-#     __model__ = IRI
-#     name = Use(ModelFactory.__random__.choice, ["Roxy", "Spammy", "Moshe"])
 
 from ralph.models.xapi.base.contexts import BaseXapiContext
 from ralph.models.xapi.base.results import BaseXapiResultScore 
@@ -63,42 +65,46 @@ def prune(d: Any, exceptions:list=[]):
     return False
 
 
-# from pydantic import constr
 
-# Toto = constr(min_length=5, strict=True)
-# class MyClass(Toto):
-#     pass
 
-# test = MyClass("2")
-# Toto("2")
-# assert False
-
-class FactoryMixin():
+class ModelFactory(PolyfactoryModelFactory[T]):
     __allow_none_optionals__ = False 
-
-    # @classmethod
-    # def get_provider_map(cls) -> Dict[Type, Any]:
-    #     providers_map = super().get_provider_map()
-    #     return {
-    #         # IRI: lambda: IRI("https://w3id.org/xapi/video/verbs/played"),
-    #         # BaseXapiAgentWithMbox: lambda: BaseXapiAgentWithMbox(mbox="mailto:test@toast.com"),
-    #         # UUID: lambda: UUID(str(uuid4())),
-    #         LanguageTag: lambda: LanguageTag("en-US"),
-    #         LanguageMap: lambda: {LanguageTag("en-US"): "testval"}, # unsure why this is needed
-    #         #BaseXapiResultScore: lambda: BaseXapiResultScore(min=Decimal("0.0"), max=Decimal("20.0"), raw=Decimal("11")),
-    #         # MailtoEmail: lambda: MailtoEmail("mailto:test@example.xyz"),
-    #         **providers_map,
-    #     }
+    __is_base_factory__ = True
     
-    # @classmethod
-    # def _get_or_create_factory(cls, model: type):
-    #     created_factory = super()._get_or_create_factory(model)
-    #     created_factory.get_provider_map = cls.get_provider_map
-    #     created_factory._get_or_create_factory = cls._get_or_create_factory
-    #     return created_factory             
+    @classmethod
+    def get_provider_map(cls) -> dict[Any, Callable[[], Any]]:
+        provider_map = super().get_provider_map()
+        provider_map[LanguageTag] = lambda: LanguageTag("en-US")
+        provider_map[IRI] = lambda: IRI("https://w3id.org/xapi/video/verbs/played")
+        return provider_map
 
+    @classmethod
+    def _get_or_create_factory(cls, model: type):
+        created_factory = super()._get_or_create_factory(model)
+        created_factory.get_provider_map = cls.get_provider_map
+        created_factory._get_or_create_factory = cls._get_or_create_factory
+        return created_factory
     
-class BaseXapiContextFactory(FactoryMixin, ModelFactory[BaseXapiContext]):
+
+class BaseXapiResultScoreFactory(ModelFactory[BaseXapiResultScore]):
+    __set_as_default_factory_for_type__ = True
+    __model__ = BaseXapiResultScore
+
+    min=Decimal("0.0")
+    max=Decimal("20.0")
+    raw=Decimal("11")
+
+class BaseXapiActivityInteractionDefinitionFactory(ModelFactory[BaseXapiActivityInteractionDefinition]):
+    __set_as_default_factory_for_type__ = True
+    __model__ = BaseXapiActivityInteractionDefinition
+
+    correctResponsesPattern = None
+
+class BaseXapiContextContextActivitiesFactory(ModelFactory[BaseXapiContextContextActivities]):
+    __model__ = BaseXapiContextContextActivities
+
+
+class BaseXapiContextFactory(ModelFactory[BaseXapiContext]):
     __model__ = BaseXapiContext
     __set_as_default_factory_for_type__ = True
 
@@ -107,82 +113,21 @@ class BaseXapiContextFactory(FactoryMixin, ModelFactory[BaseXapiContext]):
 
     contextActivities = lambda: BaseXapiContextContextActivitiesFactory.build() or Ignore()
 
-class BaseXapiResultScoreFactory(FactoryMixin, ModelFactory[BaseXapiResultScore]):
-    __set_as_default_factory_for_type__ = True
-    __model__ = BaseXapiResultScore
-
-    min=Decimal("0.0")
-    max=Decimal("20.0")
-    raw=Decimal("11")
-
-class LanguageTagFactory(FactoryMixin, ModelFactory[LanguageTag]):
-    __is_base_factory__ = True
-    __set_as_default_factory_for_type__ = True
-    __model__ = LanguageTag  
-
-    __root__ = LanguageTag("en-US")
-
-    # @classmethod
-    # def get_provider_map(cls) -> Dict[Type, Any]:
-    #     providers_map = super().get_provider_map()
-    #     return {
-    #         LanguageTag: lambda: LanguageTag("en-US"),
-    #         LanguageMap: lambda: {LanguageTag("en-US"): "testval"}, # unsure why this is needed
-    #         **providers_map,
-    #     }
-
-
-class BaseXapiActivityInteractionDefinitionFactory(FactoryMixin, ModelFactory[BaseXapiActivityInteractionDefinition]):
-    __is_base_factory__ = True
-    __model__ = BaseXapiActivityInteractionDefinition
-
-    correctResponsesPattern = None
-
-class BaseXapiContextContextActivitiesFactory(FactoryMixin, ModelFactory[BaseXapiContextContextActivities]):
-    __model__ = BaseXapiContextContextActivities
-
-class BaseXapiActivityFactory(FactoryMixin, ModelFactory[BaseXapiActivity]):
-    __model__ = BaseXapiActivity
-
-# class BaseXapiAgentWithAccountFactory(FactoryMixin, ModelFactory[BaseXapiAgentWithAccount]):
-#     __model__ = BaseXapiAgentWithAccount
-
-# class BaseXapiAnonymousGroupFactory(FactoryMixin, ModelFactory[BaseXapiAnonymousGroup]):
-#     __model__ = BaseXapiAnonymousGroup
-
-# class BaseXapiIdentifiedGroupWithAccountFactory(ModelFactory[BaseXapiIdentifiedGroupWithAccount]):
-#     __model__ = BaseXapiIdentifiedGroupWithAccount
-
-# class BaseXapiSubStatementFactory(FactoryMixin, ModelFactory[BaseXapiSubStatement]):
-#     __model__ = BaseXapiSubStatement
-
-class BaseXapiStatementFactory(FactoryMixin, ModelFactory[BaseXapiStatement]):
-    __model__ = BaseXapiStatement
-    #result = Ignore()
-
-    #context = lambda: BaseXapiContextFactory.build()
-
-
-
-# def gen_statement(*args, **kwargs): 
-#     # Custom logic necessary as post-processing is not possible in polyfactory (when can generate empty dicts when all fields are optional)
-#     return BaseXapiStatement(**prune(BaseXapiStatementFactory.process_kwargs(*args, **kwargs), exceptions=["extensions"]))
-
 
 def mock_instance(klass, *args, **kwargs):
     """Generate a mock instance of a given class (`klass`)."""
 
-    class KlassFactory(FactoryMixin, ModelFactory[klass]):
+    class KlassFactory(ModelFactory[klass]):
         __model__ = klass
+        
+
+    kwargs = KlassFactory.process_kwargs(*args, **kwargs)
+    kwargs = prune(kwargs)
+    return klass(**kwargs)
+
+
+
     
-    return klass(**prune(KlassFactory.process_kwargs(*args, **kwargs)))
-
-
-for x in range(100):
-    a = BaseXapiStatementFactory.process_kwargs()
-    
-
-
 
 @pytest.mark.parametrize(
     "path",
@@ -224,14 +169,17 @@ def test_models_xapi_base_statement_with_valid_null_values(path, value):
     property.
     """
 
-    statement = mock_instance(BaseXapiStatement, object=mock_instance(BaseXapiActivity))
+    statement = mock_instance(BaseXapiStatement, object=mock_instance(BaseXapiActivity)) # TODO: check that change from Activity to Agent is OK
 
     statement = statement.dict(exclude_none=True)
+    
+    # Error might be linked to empty values being generated
+    # assert BaseXapiStatement(**statement) # TODO: Remove
+
     set_dict_value_from_path(statement, path.split("__"), value)
     try:
         BaseXapiStatement(**statement)
     except ValidationError as err:
-        pprint(statement)
         pytest.fail(f"Valid statement should not raise exceptions: {err}")
 
 # class BaseXapiActivityInteractionDefinitionFactory(ModelFactory[BaseXapiActivityInteractionDefinitionFactory]):

@@ -6,6 +6,8 @@ from uuid import UUID
 
 from pydantic import AnyUrl, Field, StrictStr, constr, validator
 
+from ralph.conf import NonEmptyStr, NonEmptyStrictStr
+
 from ..config import BaseModelWithConfig
 from .common import IRI, LanguageMap
 
@@ -72,7 +74,7 @@ class BaseXapiActivityInteractionDefinition(BaseXapiActivityDefinition):
         "numeric",
         "other",
     ]
-    correctResponsesPattern: Optional[List[StrictStr]]
+    correctResponsesPattern: Optional[List[NonEmptyStrictStr]] # TODO: change back to strictstr
     choices: Optional[List[BaseXapiInteractionComponent]]
     scale: Optional[List[BaseXapiInteractionComponent]]
     source: Optional[List[BaseXapiInteractionComponent]]

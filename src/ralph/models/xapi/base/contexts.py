@@ -29,6 +29,7 @@ class BaseXapiContextContextActivities(BaseModelWithConfig):
     category: Optional[Union[BaseXapiActivity, List[BaseXapiActivity]]]
     other: Optional[Union[BaseXapiActivity, List[BaseXapiActivity]]]
 
+
 class BaseXapiContext(BaseModelWithConfig):
     """Pydantic model for `context` property.
 
@@ -43,7 +44,6 @@ class BaseXapiContext(BaseModelWithConfig):
         statement (dict): Another Statement giving context for this Statement.
         extensions (dict): Consists of a dictionary of other properties as needed.
     """
-
     registration: Optional[UUID]
     instructor: Optional[BaseXapiAgent]
     team: Optional[BaseXapiGroup]

@@ -31,8 +31,9 @@ MODEL_PATH_SEPARATOR = "__"
 
 from pydantic import constr
 
-NonEmptyStr = constr(min_length=1)
-NonEmptyStrictStr = constr(min_length=1, strict=True)
+NonEmptyStr = Annotated[str, Field(min_length=1)] 
+NonEmptyStrictStrPatch = Annotated[str, Field(min_length=1)] 
+NonEmptyStrictStr = constr(min_length=1, strict=True)#Annotated[StrictStr, Field(min_length=1)] 
 
 class BaseSettingsConfig:
     """Pydantic model for BaseSettings Configuration."""

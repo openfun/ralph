@@ -42,7 +42,7 @@ class BaseXapiAgentCommonProperties(BaseModelWithConfig, ABC):
     """
 
     objectType: Optional[Literal["Agent"]]
-    name: Optional[NonEmptyStrictStr    ]
+    name: Optional[NonEmptyStrictStr]
 
 
 class BaseXapiAgentWithMbox(BaseXapiAgentCommonProperties, BaseXapiMboxIFI):
