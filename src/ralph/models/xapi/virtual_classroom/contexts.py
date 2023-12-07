@@ -33,6 +33,7 @@ class VirtualClassroomProfileActivity(ProfileActivity):
     ] = "https://w3id.org/xapi/virtual-classroom"
 
 
+
 class VirtualClassroomContextContextActivities(BaseXapiContextContextActivities):
     """Pydantic model for virtual classroom `context`.`contextActivities` property.
 
@@ -45,28 +46,28 @@ class VirtualClassroomContextContextActivities(BaseXapiContextContextActivities)
         List[Union[VirtualClassroomProfileActivity, BaseXapiActivity]],
     ]
 
-    @validator("category")
-    @classmethod
-    def check_presence_of_profile_activity_category(
-        cls,
-        value: Union[
-            VirtualClassroomProfileActivity,
-            List[Union[VirtualClassroomProfileActivity, BaseXapiActivity]],
-        ],
-    ) -> Union[
-        VirtualClassroomProfileActivity,
-        List[Union[VirtualClassroomProfileActivity, BaseXapiActivity]],
-    ]:
-        """Check that the category list contains a `VirtualClassroomProfileActivity`."""
-        if isinstance(value, VirtualClassroomProfileActivity):
-            return value
-        for activity in value:
-            if isinstance(activity, VirtualClassroomProfileActivity):
-                return value
-        raise ValueError(
-            "The `context.contextActivities.category` field should contain at least "
-            "one valid `VirtualClassroomProfileActivity`"
-        )
+    # @validator("category")
+    # @classmethod
+    # def check_presence_of_profile_activity_category(
+    #     cls,
+    #     value: Union[
+    #         VirtualClassroomProfileActivity,
+    #         List[Union[VirtualClassroomProfileActivity, BaseXapiActivity]],
+    #     ],
+    # ) -> Union[
+    #     VirtualClassroomProfileActivity,
+    #     List[Union[VirtualClassroomProfileActivity, BaseXapiActivity]],
+    # ]:
+    #     """Check that the category list contains a `VirtualClassroomProfileActivity`."""
+    #     if isinstance(value, VirtualClassroomProfileActivity):
+    #         return value
+    #     for activity in value:
+    #         if isinstance(activity, VirtualClassroomProfileActivity):
+    #             return value
+    #     raise ValueError(
+    #         "The `context.contextActivities.category` field should contain at least "
+    #         "one valid `VirtualClassroomProfileActivity`"
+    #     )
 
 
 class VirtualClassroomContextExtensions(BaseExtensionModelWithConfig):
