@@ -953,7 +953,7 @@ for a seamless transition. 🚀
 <p>The <a href="https://github.com/adlnet/xAPI-Spec">Experience API</a> (or Tin Can API) is a standard for tracking and reporting learning experiences. 
 In particular, it defines:</p>
 <ul>
-<li>the <a href="https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#part-two-experience-api-data">xAPI format</a> of the learning events. xAPI statements includes an <code>actor</code> (e.g. <em>learner</em>), a <code>verb</code> (e.g. <em>watched</em>, <em>passed</em>) and an <code>object</code> (e.g. <em>video</em>, <em>quiz</em>) as well as contextual and optional information (e.g. <em>timestamp</em> of the event, <em>result</em> of an activity). Here&rsquo;s a simplistic statement: 
+<li>the <a href="https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#part-two-experience-api-data">xAPI format</a> of the learning events. xAPI statements include an <code>actor</code>, a <code>verb</code>, an <code>object</code> as well as contextual information. Here&rsquo;s an example statement: 
 <div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;12345678-1234-5678-1234-567812345678&quot;</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="nt">&quot;actor&quot;</span><span class="p">:{</span>
@@ -971,7 +971,7 @@ In particular, it defines:</p>
 </span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="p">}</span>
 </span></code></pre></div></li>
 <li>the <a href="https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#part-three-data-processing-validation-and-security">Learning Record Store</a> (LRS), is a RESTful API that collects, stores and retrieves these events. Think of it as a learning database that unifies data from various learning platforms and applications. 
-These events can come from an LMS (<em>Moodle</em>, <em>edX</em>), or any other learning component that supports xAPI generation (e.g. an embedded video player), from various platforms.</li>
+These events can come from an LMS (<em>Moodle</em>, <em>edX</em>), or any other learning component that supports sending xAPI statements to an LRS (e.g. an embedded video player), from various platforms.</li>
 </ul>
 <div class="admonition info">
 <p class="admonition-title">xAPI specification version</p>

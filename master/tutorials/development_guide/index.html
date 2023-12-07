@@ -1041,8 +1041,8 @@ Before diving in, ensure you have the following installed:</p>
 <p>To start playing with <code>ralph</code>, you should first <code>bootstrap</code> using:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>make<span class="w"> </span>bootstrap
 </span></code></pre></div>
-<p>When boostrapping the project for the first time, , the <code>env.dist</code> template file is copied to the <code>.env</code> file.
-You may want to edit generated <code>.env</code> file to set up available backend parameters that will be injected into the running container as environment variables to configure Ralph (see <a href="../../backends/">backends documentation</a>):</p>
+<p>When bootstrapping the project for the first time, the <code>env.dist</code> template file is copied to the <code>.env</code> file.
+You may want to edit the generated <code>.env</code> file to set up available backend parameters that will be injected into the running container as environment variables to configure Ralph (see <a href="../../backends/">backends documentation</a>):</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Elasticsearch backend</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nv">RALPH_BACKENDS__LRS__ES__HOSTS</span><span class="o">=</span>http://elasticsearch:9200
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nv">RALPH_BACKENDS__LRS__ES__INDEX</span><span class="o">=</span>statements
@@ -1053,7 +1053,7 @@ You may want to edit generated <code>.env</code> file to set up available backen
 </span></code></pre></div>
 <div class="admonition info">
 <p class="admonition-title">Default configuration in <code>.env</code> file</p>
-<p>Defaults configuration are provided for some environment variables that you can use by uncommenting them.</p>
+<p>Defaults are provided for some environment variables that you can use by uncommenting them.</p>
 </div>
 <h2 id="backends">Backends<a class="headerlink" href="#backends" title="Permanent link">&para;</a></h2>
 <div class="admonition tips">
