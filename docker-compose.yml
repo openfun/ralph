@@ -37,11 +37,19 @@ services:
       memlock:
         soft: -1
         hard: -1
+    healthcheck:
+      test: curl --fail http://localhost:9200/_cluster/health?wait_for_status=green || exit 1
+      interval: 1s
+      retries: 60
 
   mongo:
     image: mongo:5.0.9
     ports:
       - "27017:27017"
+    healthcheck:
+      test: mongosh --eval 'db.runCommand("ping").ok' localhost:27017/test --quiet
+      interval: 1s
+      retries: 60
 
   clickhouse:
       image: clickhouse/clickhouse-server:23.1.1.3077-alpine
@@ -58,6 +66,10 @@ services:
           nofile:
               soft: 262144
               hard: 262144
+      healthcheck:
+        test:  wget --no-verbose --tries=1 --spider http://localhost:8123/ping || exit 1
+        interval: 1s
+        retries: 60
 
   swift:
     image: kklopfenstein/openstack-swift-keystone-docker
@@ -66,7 +78,7 @@ services:
       - "49178:35357"
     environment:
       KS_SWIFT_PUBLIC_URL: http://127.0.0.1:49177
-
-  # -- tools
-  dockerize:
-    image: jwilder/dockerize
+    healthcheck:
+        test: curl -s http://127.0.0.1:35357 || exit 1
+        interval: 1s
+        retries: 60

@@ -235,9 +235,8 @@ run-all: \
 .PHONY: run-all
 
 run-clickhouse: ## start clickhouse backend
-	@$(COMPOSE) up -d clickhouse
 	@echo "Waiting for clickhouse to be up and running..."
-	@$(COMPOSE_RUN) dockerize -wait tcp://clickhouse:9000 -timeout 60s
+	@$(COMPOSE) up -d --wait clickhouse
 .PHONY: run-clickhouse
 
 run-databases: ## alias for running databases services
@@ -248,21 +247,18 @@ run-databases: \
 .PHONY: run-databases
 
 run-es: ## start elasticsearch backend
-	@$(COMPOSE) up -d elasticsearch
 	@echo "Waiting for elasticsearch to be up and running..."
-	@$(COMPOSE_RUN) dockerize -wait tcp://elasticsearch:9200 -timeout 60s
+	@$(COMPOSE) up -d --wait elasticsearch
 .PHONY: run-es
 
 run-mongo: ## start mongodb backend
-	@$(COMPOSE) up -d mongo
 	@echo "Waiting for mongo to be up and running..."
-	@$(COMPOSE_RUN) dockerize -wait tcp://mongo:27017 -timeout 60s
+	@$(COMPOSE) up -d --wait mongo
 .PHONY: run-mongo
 
 run-swift: ## start swift backend
-	@$(COMPOSE) up -d swift
 	@echo "Waiting for swift to be up and running..."
-	@$(COMPOSE_RUN) dockerize -wait tcp://swift:8080 -wait tcp://swift:35357 -timeout 60s
+	@$(COMPOSE) up -d --wait swift
 .PHONY: run-swift
 
 status: ## an alias for "docker compose ps"
