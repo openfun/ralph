@@ -9,22 +9,22 @@ import pytest
 from pydantic import ValidationError
 
 from ralph.models.selector import ModelSelector
-# from ralph.models.xapi.base.agents import BaseXapiAgentWithAccount
-# from ralph.models.xapi.base.groups import (
-#     BaseXapiAnonymousGroup,
-#     BaseXapiIdentifiedGroupWithAccount,
-#     BaseXapiIdentifiedGroupWithMbox,
-#     BaseXapiIdentifiedGroupWithMboxSha1Sum,
-#     BaseXapiIdentifiedGroupWithOpenId,
-# )
-# from ralph.models.xapi.base.objects import BaseXapiSubStatement
+from ralph.models.xapi.base.agents import BaseXapiAgentWithAccount
+from ralph.models.xapi.base.groups import (
+    BaseXapiAnonymousGroup,
+    BaseXapiIdentifiedGroupWithAccount,
+    BaseXapiIdentifiedGroupWithMbox,
+    BaseXapiIdentifiedGroupWithMboxSha1Sum,
+    BaseXapiIdentifiedGroupWithOpenId,
+)
+from ralph.models.xapi.base.objects import BaseXapiSubStatement
 from ralph.models.xapi.base.statements import BaseXapiStatement
-# from ralph.models.xapi.base.unnested_objects import (
-#     BaseXapiActivity,
-#     BaseXapiActivityInteractionDefinition,
-#     BaseXapiStatementRef,
-# )
-# from ralph.utils import set_dict_value_from_path
+from ralph.models.xapi.base.unnested_objects import (
+    BaseXapiActivity,
+    BaseXapiActivityInteractionDefinition,
+    BaseXapiStatementRef,
+)
+from ralph.utils import set_dict_value_from_path
 
 # from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 
