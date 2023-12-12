@@ -637,16 +637,16 @@ for a seamless transition. 🚀
 </li>
       
         <li class="md-nav__item">
-  <a href="#learning_record_store_lrs_-_http_backend_interface" class="md-nav__link">
-    Learning Record Store (LRS) - HTTP backend interface
+  <a href="#learning_record_store_lrs" class="md-nav__link">
+    Learning Record Store (LRS)
   </a>
   
-    <nav class="md-nav" aria-label="Learning Record Store (LRS) - HTTP backend interface">
+    <nav class="md-nav" aria-label="Learning Record Store (LRS)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ralph.backends.http.async_lrs.LRSHTTPBackendSettings" class="md-nav__link">
-    ralph.backends.http.async_lrs.LRSHTTPBackendSettings
+  <a href="#ralph.backends.data.lrs.LRSDataBackendSettings" class="md-nav__link">
+    ralph.backends.data.lrs.LRSDataBackendSettings
   </a>
   
 </li>
@@ -1116,16 +1116,16 @@ for a seamless transition. 🚀
 </li>
       
         <li class="md-nav__item">
-  <a href="#learning_record_store_lrs_-_http_backend_interface" class="md-nav__link">
-    Learning Record Store (LRS) - HTTP backend interface
+  <a href="#learning_record_store_lrs" class="md-nav__link">
+    Learning Record Store (LRS)
   </a>
   
-    <nav class="md-nav" aria-label="Learning Record Store (LRS) - HTTP backend interface">
+    <nav class="md-nav" aria-label="Learning Record Store (LRS)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ralph.backends.http.async_lrs.LRSHTTPBackendSettings" class="md-nav__link">
-    ralph.backends.http.async_lrs.LRSHTTPBackendSettings
+  <a href="#ralph.backends.data.lrs.LRSDataBackendSettings" class="md-nav__link">
+    ralph.backends.data.lrs.LRSDataBackendSettings
   </a>
   
 </li>
@@ -1195,7 +1195,7 @@ case, prefixed by the program name, <em>e.g.</em> <code>RALPH_</code>):</p>
 <p>The general patterns for backend parameters are:</p>
 <ul>
 <li><code>--{{ backend_name }}-{{ parameter | underscore_to_dash }}</code> for command options, and,</li>
-<li><code>RALPH_BACKENDS__{{ backend_type | uppercase }}__{{ backend_name | uppercase }}__{{ parameter | uppercase }}</code> for environment variables, where the <code>backend_type</code> is one of <code>DATA</code>, <code>LRS</code> and <code>STREAM</code>.</li>
+<li><code>RALPH_BACKENDS__DATA__{{ backend_name | uppercase }}__{{ parameter | uppercase }}</code> for environment variables.</li>
 </ul>
 <h2 id="elasticsearch">Elasticsearch<a class="headerlink" href="#elasticsearch" title="Permanent link">&para;</a></h2>
 <p>Elasticsearch backend is mostly used for indexation purpose (as a datalake) but
@@ -1423,6 +1423,11 @@ ClickHouse client connection.</p></td>
 
   </div>
 
+<p>The ClickHouse client options supported in Ralph can be found in these locations:</p>
+<ul>
+<li><a href="https://clickhouse.com/docs/en/integrations/language-clients/python/driver-api#settings-argument">Python driver specific</a></li>
+<li><a href="https://clickhouse.com/docs/en/operations/settings/settings/">General ClickHouse client settings</a></li>
+</ul>
 <h2 id="ovh_-_log_data_platform_ldp">OVH - Log Data Platform (LDP)<a class="headerlink" href="#ovh_-_log_data_platform_ldp" title="Permanent link">&para;</a></h2>
 <p>LDP is a nice service built by OVH on top of Graylog to follow, analyse and
 store your logs. Learning events (<em>aka</em> tracking logs) can be stored in GELF
@@ -1748,27 +1753,17 @@ operation.</p></td>
 
   </div>
 
-<p>The ClickHouse client options supported in Ralph can be found in these locations:</p>
-<ul>
-<li><a href="https://clickhouse.com/docs/en/integrations/language-clients/python/driver-api#settings-argument">Python driver specific</a></li>
-<li><a href="https://clickhouse.com/docs/en/operations/settings/settings/">General ClickHouse client settings</a></li>
-</ul>
-<h2 id="learning_record_store_lrs_-_http_backend_interface">Learning Record Store (LRS) - HTTP backend interface<a class="headerlink" href="#learning_record_store_lrs_-_http_backend_interface" title="Permanent link">&para;</a></h2>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p><code>HTTP</code> backend type will soon be merged into the <code>Data</code> backend type.</p>
-<p>PR <a href="https://github.com/openfun/ralph/pull/521">#521</a> prepares <code>Data</code> backend alignments with <code>HTTP</code> backend <code>read</code> method signature</p>
-</div>
+<h2 id="learning_record_store_lrs">Learning Record Store (LRS)<a class="headerlink" href="#learning_record_store_lrs" title="Permanent link">&para;</a></h2>
 <p>The LRS backend is used to store and retrieve xAPI statements from various systems that follow the <a href="https://github.com/adlnet/xAPI-Spec/tree/master">xAPI specification</a> (such as our own Ralph LRS, which can be run from this package). 
 LRS systems are mostly used in e-learning infrastructures.</p>
 
 
   <div class="doc doc-object doc-class">
 
-<a id="ralph.backends.http.async_lrs.LRSHTTPBackendSettings"></a>
+<a id="ralph.backends.data.lrs.LRSDataBackendSettings"></a>
     <div class="doc doc-contents first">
 
-      <p>LRS HTTP backend default configuration.</p>
+      <p>LRS data backend default configuration.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -1801,6 +1796,16 @@ LRS systems are mostly used in e-learning infrastructures.</p>
         <td><p>Headers defined for the LRS server connection.</p></td>
       </tr>
       <tr>
+        <td><code>LOCALE_ENCODING</code></td>
+        <td><code>str</code></td>
+        <td><p>The encoding used for reading statements.</p></td>
+      </tr>
+      <tr>
+        <td><code>READ_CHUNK_SIZE</code></td>
+        <td><code>int</code></td>
+        <td><p>The default chunk size for reading statements.</p></td>
+      </tr>
+      <tr>
         <td><code>STATUS_ENDPOINT</code></td>
         <td><code>str</code></td>
         <td><p>Endpoint used to check server status.</p></td>
@@ -1809,6 +1814,11 @@ LRS systems are mostly used in e-learning infrastructures.</p>
         <td><code>STATEMENTS_ENDPOINT</code></td>
         <td><code>str</code></td>
         <td><p>Default endpoint for LRS statements resource.</p></td>
+      </tr>
+      <tr>
+        <td><code>WRITE_CHUNK_SIZE</code></td>
+        <td><code>int</code></td>
+        <td><p>The default chunk size for writing statements.</p></td>
       </tr>
   </tbody>
 </table>
