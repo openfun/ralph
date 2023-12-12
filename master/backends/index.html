@@ -657,16 +657,23 @@ for a seamless transition. 🚀
 </li>
       
         <li class="md-nav__item">
-  <a href="#websocket_-_stream_backend_interface" class="md-nav__link">
-    WebSocket - Stream backend interface
+  <a href="#websocket" class="md-nav__link">
+    WebSocket
   </a>
   
-    <nav class="md-nav" aria-label="WebSocket - Stream backend interface">
+    <nav class="md-nav" aria-label="WebSocket">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ralph.backends.stream.ws.WSStreamBackendSettings" class="md-nav__link">
-    ralph.backends.stream.ws.WSStreamBackendSettings
+  <a href="#ralph.backends.data.async_ws.WSDataBackendSettings" class="md-nav__link">
+    ralph.backends.data.async_ws.WSDataBackendSettings
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ralph.backends.data.async_ws.WSClientOptions" class="md-nav__link">
+    ralph.backends.data.async_ws.WSClientOptions
   </a>
   
 </li>
@@ -1136,16 +1143,23 @@ for a seamless transition. 🚀
 </li>
       
         <li class="md-nav__item">
-  <a href="#websocket_-_stream_backend_interface" class="md-nav__link">
-    WebSocket - Stream backend interface
+  <a href="#websocket" class="md-nav__link">
+    WebSocket
   </a>
   
-    <nav class="md-nav" aria-label="WebSocket - Stream backend interface">
+    <nav class="md-nav" aria-label="WebSocket">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ralph.backends.stream.ws.WSStreamBackendSettings" class="md-nav__link">
-    ralph.backends.stream.ws.WSStreamBackendSettings
+  <a href="#ralph.backends.data.async_ws.WSDataBackendSettings" class="md-nav__link">
+    ralph.backends.data.async_ws.WSDataBackendSettings
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ralph.backends.data.async_ws.WSClientOptions" class="md-nav__link">
+    ralph.backends.data.async_ws.WSClientOptions
   </a>
   
 </li>
@@ -1828,7 +1842,7 @@ LRS systems are mostly used in e-learning infrastructures.</p>
 
   </div>
 
-<h2 id="websocket_-_stream_backend_interface">WebSocket - Stream backend interface<a class="headerlink" href="#websocket_-_stream_backend_interface" title="Permanent link">&para;</a></h2>
+<h2 id="websocket">WebSocket<a class="headerlink" href="#websocket" title="Permanent link">&para;</a></h2>
 <p>The webSocket backend is <strong>read-only</strong> and can be used to get real-time events.</p>
 <blockquote>
 <p>If you use OVH&rsquo;s Logs Data Platform (LDP), you can retrieve a WebSocket URI to test your
@@ -1839,10 +1853,10 @@ data stream by following instructions from the
 
   <div class="doc doc-object doc-class">
 
-<a id="ralph.backends.stream.ws.WSStreamBackendSettings"></a>
+<a id="ralph.backends.data.async_ws.WSDataBackendSettings"></a>
     <div class="doc doc-contents first">
 
-      <p>Websocket stream backend default configuration.</p>
+      <p>Websocket data backend default configuration.</p>
 
 <p><strong>Attributes:</strong></p>
 <table>
@@ -1855,9 +1869,107 @@ data stream by following instructions from the
   </thead>
   <tbody>
       <tr>
+        <td><code>CLIENT_OPTIONS</code></td>
+        <td><code>dict</code></td>
+        <td><p>A dictionary of valid options for the websocket client
+connection. See <code>WSClientOptions</code>.</p></td>
+      </tr>
+      <tr>
         <td><code>URI</code></td>
         <td><code>str</code></td>
         <td><p>The URI to connect to.</p></td>
+      </tr>
+  </tbody>
+</table>
+
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+<a id="ralph.backends.data.async_ws.WSClientOptions"></a>
+    <div class="doc doc-contents first">
+
+      <p>Client options for <code>websockets.connection</code>.</p>
+<p>For mode details, see the
+<a href="https://websockets.readthedocs.io/en/stable/reference/asyncio/client.html#websockets.client.connect">websockets.connection documentation</a></p>
+
+<p><strong>Attributes:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>close_timeout</code></td>
+        <td><code>float</code></td>
+        <td><p>Timeout for opening the connection in seconds.</p></td>
+      </tr>
+      <tr>
+        <td><code>compression</code></td>
+        <td><code>str</code></td>
+        <td><p>Per-message compression (deflate) is activated by default.
+Setting it to <code>None</code> disables compression.</p></td>
+      </tr>
+      <tr>
+        <td><code>max_size</code></td>
+        <td><code>int</code></td>
+        <td><p>Maximum size of incoming messages in bytes.
+Setting it to <code>None</code> disables the limit.</p></td>
+      </tr>
+      <tr>
+        <td><code>max_queue</code></td>
+        <td><code>int</code></td>
+        <td><p>Maximum number of incoming messages in receive buffer.
+Setting it to <code>None</code> disables the limit.</p></td>
+      </tr>
+      <tr>
+        <td><code>open_timeout</code></td>
+        <td><code>float</code></td>
+        <td><p>Timeout for opening the connection in seconds.
+Setting it to <code>None</code> disables the timeout.</p></td>
+      </tr>
+      <tr>
+        <td><code>origin</code></td>
+        <td><code>str</code></td>
+        <td><p>Value of the <code>Origin</code> header, for servers that require it.</p></td>
+      </tr>
+      <tr>
+        <td><code>ping_interval</code></td>
+        <td><code>float</code></td>
+        <td><p>Delay between keepalive pings in seconds.
+Setting it to <code>None</code> disables keepalive pings.</p></td>
+      </tr>
+      <tr>
+        <td><code>ping_timeout</code></td>
+        <td><code>float</code></td>
+        <td><p>Timeout for keepalive pings in seconds.
+Setting it to <code>None</code> disables timeouts.</p></td>
+      </tr>
+      <tr>
+        <td><code>read_limit</code></td>
+        <td><code>int</code></td>
+        <td><p>High-water mark of read buffer in bytes.</p></td>
+      </tr>
+      <tr>
+        <td><code>user_agent_header</code></td>
+        <td><code>str</code></td>
+        <td><p>Value of  the <code>User-Agent</code> request header.
+It defaults to &ldquo;Python/x.y.z websockets/X.Y&rdquo;.
+Setting it to <code>None</code> removes the header.</p></td>
+      </tr>
+      <tr>
+        <td><code>write_limit</code></td>
+        <td><code>int</code></td>
+        <td><p>High-water mark of write buffer in bytes.</p></td>
       </tr>
   </tbody>
 </table>
