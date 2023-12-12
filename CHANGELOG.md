@@ -34,8 +34,9 @@ methods under the unified `lrs` backend interface [BC]
 - `GET /statements` now has "mine" option which matches statements that
 have an authority field matching that of the user
 - CLI: change `push` to `write` and `fetch` to `read` [BC]
-- Upgrade `fastapi` to `0.104.1`
-- Upgrade `sentry_sdk` to `1.34.0`
+- Upgrade `bcrypt` to `4.1.1`
+- Upgrade `fastapi` to `0.105.0`
+- Upgrade `sentry_sdk` to `1.38.0`
 - Upgrade `uvicorn` to `0.24.0.post1`
 - API: Invalid parameters now return 400 status code
 - API: Forwarding PUT now uses PUT (instead of POST)

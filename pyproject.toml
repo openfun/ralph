@@ -87,40 +87,40 @@ cli = [
     "sentry-sdk[fastapi]>=1.9.0",
 ]
 dev = [
-    "anyio<4.0.1", # unpin until fastapi supports new major version of anyio
-    "black==23.11.0",
-    "cryptography==41.0.5",
+    "anyio<4.1.1", # unpin until fastapi supports new major version of anyio
+    "black==23.12.0",
+    "cryptography==41.0.7",
     "factory-boy==3.3.0",
-    "hypothesis==6.88.3",
+    "hypothesis<6.92.0", # pin as hypothesis 6.92.0 observability feature seems broken
     "logging-gelf==0.0.31",
     "mike==2.0.0",
     "mkdocs==1.5.3",
     "mkdocs-click==0.8.1",
-    "mkdocs-material==9.4.8",
-    "mkdocstrings[python-legacy]==0.23.0",
-    "moto==4.2.8",
-    "mypy==1.7.0",
+    "mkdocs-material==9.5.2",
+    "mkdocstrings[python-legacy]==0.24.0",
+    "moto==4.2.11",
+    "mypy==1.7.1",
     "neoteroi-mkdocs==1.0.4",
-    "pyfakefs==5.3.0",
-    "pymdown-extensions==10.4",
+    "pyfakefs==5.3.2",
+    "pymdown-extensions==10.5",
     "pytest==7.4.3",
-    "pytest-asyncio==0.21.1",
+    "pytest-asyncio==0.23.2",
     "pytest-cov==4.1.0",
     "pytest-httpx<0.23.0", # pin as Python 3.8 is no longer supported from release 0.23.0
     "requests-mock==1.11.0",
     "responses==0.24.1",
-    "ruff==0.1.5",
+    "ruff==0.1.7",
     "types-python-dateutil == 2.8.19.14",
     "types-python-jose == 3.3.4.8",
     "types-requests<2.31.0.11",
     "types-cachetools ==5.3.0.7",
 ]
 lrs = [
-    "bcrypt==4.0.1",
-    "fastapi==0.104.1",
+    "bcrypt==4.1.1",
+    "fastapi==0.105.0",
     "cachetools==5.3.2",
     "httpx<0.25.0", # pin as `pytest-httpx<0.23.0` requires `httpx==0.24.*`
-    "sentry_sdk==1.34.0",
+    "sentry_sdk==1.38.0",
     "python-jose==3.3.0",
     "uvicorn[standard]==0.24.0.post1",
 ]
