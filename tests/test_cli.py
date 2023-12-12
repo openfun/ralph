@@ -33,7 +33,8 @@ from tests.fixtures.backends import (
     WS_TEST_HOST,
     WS_TEST_PORT,
 )
-from tests.fixtures.hypothesis_strategies import custom_given
+# from tests.fixtures.hypothesis_strategies import custom_given
+from tests.factories import mock_instance
 
 test_logger = logging.getLogger("ralph")
 
@@ -471,9 +472,10 @@ def test_cli_extract_command_with_es_parser():
     assert "\n".join([json.dumps({"id": idx}) for idx in range(10)]) in result.output
 
 
-@custom_given(UIPageClose)
-def test_cli_validate_command_with_edx_format(event):
+def test_cli_validate_command_with_edx_format():
     """Test ralph validate command using the edx format."""
+    event = mock_instance(UIPageClose)
+
     event_str = event.json()
     runner = CliRunner()
     result = runner.invoke(cli, ["validate", "-f", "edx"], input=event_str)
@@ -481,10 +483,11 @@ def test_cli_validate_command_with_edx_format(event):
 
 
 @hypothesis_settings(deadline=None)
-@custom_given(UIPageClose)
 @pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
-def test_cli_convert_command_from_edx_to_xapi_format(valid_uuid, event):
+def test_cli_convert_command_from_edx_to_xapi_format(valid_uuid):
     """Test ralph convert command from edx to xapi format."""
+    event = mock_instance(UIPageClose)
+    
     event_str = event.json()
     runner = CliRunner()
     command = f"-v ERROR convert -f edx -t xapi -u {valid_uuid} -p https://fun-mooc.fr"

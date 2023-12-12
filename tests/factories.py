@@ -33,6 +33,8 @@ from ralph.models.xapi.video.contexts import (
     VideoProfileActivity,
 )
 
+from ralph.models.xapi.virtual_classroom.contexts import VirtualClassroomStartedPollContextActivities, VirtualClassroomPostedPublicMessageContextActivities
+
 from ralph.models.xapi.virtual_classroom.contexts import (
     VirtualClassroomContextContextActivities,
     VirtualClassroomProfileActivity,
@@ -149,13 +151,27 @@ class VideoContextContextActivitiesFactory(ModelFactory[VideoContextContextActiv
     
     category = lambda: mock_instance(VideoProfileActivity)  
 
-class VirtualClassroomContextContextActivitiesFactory(ModelFactory[VirtualClassroomContextContextActivities]): 
-    __model__ = VirtualClassroomContextContextActivities
+
+class VirtualClassroomStartedPollContextActivitiesFactory(ModelFactory[VirtualClassroomStartedPollContextActivities]): 
+    __model__ = VirtualClassroomStartedPollContextActivities
     __set_as_default_factory_for_type__ = True
     
     category = lambda: mock_instance(VirtualClassroomProfileActivity)
 
-# class VirtualClassroomAnsweredPollContextActivitiesFactory(ModelFactory[VirtualClassroomAnsweredPollContextActivities]):
+class VirtualClassroomAnsweredPollContextActivitiesFactory(ModelFactory[VirtualClassroomAnsweredPollContextActivities]): 
+    __model__ = VirtualClassroomAnsweredPollContextActivities
+    __set_as_default_factory_for_type__ = True
+    
+    category = lambda: mock_instance(VirtualClassroomProfileActivity)
+
+class VirtualClassroomPostedPublicMessageContextActivitiesFactory(ModelFactory[VirtualClassroomPostedPublicMessageContextActivities]): 
+    __model__ = VirtualClassroomPostedPublicMessageContextActivities
+    __set_as_default_factory_for_type__ = True
+    
+    category = lambda: mock_instance(VirtualClassroomProfileActivity)
+
+
+# class VirtualClassroomAnsweredPollFactory(ModelFactory[VirtualClassroomAnsweredPollContextActivities]):
 #     __model__ = VirtualClassroomAnsweredPollContextActivities
 
 #     category = lambda: mock_instance(VirtualClassroomProfileActivity)
