@@ -51,16 +51,18 @@ class SwiftDataBackendSettings(BaseDataBackendSettings):
         env_prefix = "RALPH_BACKENDS__DATA__SWIFT__"
 
     AUTH_URL: str = "https://auth.cloud.ovh.net/"
-    USERNAME: Optional[str] = None
-    PASSWORD: Optional[str] = None
+    DEFAULT_CONTAINER: Optional[str] = None
     IDENTITY_API_VERSION: str = "3"
+    OBJECT_STORAGE_URL: Optional[str] = None
+    PASSWORD: Optional[str] = None
+    PROJECT_DOMAIN_NAME: str = "Default"
+    READ_CHUNK_SIZE: int = 4096
+    REGION_NAME: Optional[str] = None
     TENANT_ID: Optional[str] = None
     TENANT_NAME: Optional[str] = None
-    PROJECT_DOMAIN_NAME: str = "Default"
-    REGION_NAME: Optional[str] = None
-    OBJECT_STORAGE_URL: Optional[str] = None
+    USERNAME: Optional[str] = None
     USER_DOMAIN_NAME: str = "Default"
-    DEFAULT_CONTAINER: Optional[str] = None
+    WRITE_CHUNK_SIZE: int = 4096
 
 
 class SwiftDataBackend(

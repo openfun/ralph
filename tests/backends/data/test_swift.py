@@ -57,8 +57,8 @@ def test_backends_data_swift_default_instantiation(monkeypatch, fs):
     assert backend.options["user_domain_name"] == "Default"
     assert backend.default_container is None
     assert backend.locale_encoding == "utf8"
-    assert backend.settings.READ_CHUNK_SIZE == 500
-    assert backend.settings.WRITE_CHUNK_SIZE == 500
+    assert backend.settings.READ_CHUNK_SIZE == 4096
+    assert backend.settings.WRITE_CHUNK_SIZE == 4096
 
     # Test overriding default values with environment variables.
     monkeypatch.setenv("RALPH_BACKENDS__DATA__SWIFT__DEFAULT_CONTAINER", "foo")
