@@ -10,6 +10,7 @@ from ralph.models.edx.peer_instruction.fields.events import PeerInstructionEvent
 # from tests.fixtures.hypothesis_strategies import custom_given
 from tests.factories import mock_instance
 
+
 def test_models_edx_peer_instruction_event_field_with_valid_field():
     """Test that a valid `PeerInstructionEventField` does not raise a
     `ValidationError`.

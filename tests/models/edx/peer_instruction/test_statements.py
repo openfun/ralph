@@ -3,7 +3,6 @@
 import json
 
 import pytest
-from hypothesis import strategies as st
 
 from ralph.models.edx.peer_instruction.statements import (
     PeerInstructionAccessed,
@@ -14,6 +13,7 @@ from ralph.models.selector import ModelSelector
 
 # from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 from tests.factories import mock_instance
+
 
 @pytest.mark.parametrize(
     "class_",
@@ -32,8 +32,7 @@ def test_models_edx_peer_instruction_selectors_with_valid_statements(class_):
     assert model is class_
 
 
-def test_models_edx_peer_instruction_accessed_with_valid_statement(
-):
+def test_models_edx_peer_instruction_accessed_with_valid_statement():
     """Test that a `ubc.peer_instruction.accessed` statement has the expected
     `event_type`.
     """
@@ -42,9 +41,7 @@ def test_models_edx_peer_instruction_accessed_with_valid_statement(
     assert statement.name == "ubc.peer_instruction.accessed"
 
 
-def test_models_edx_peer_instruction_original_submitted_with_valid_statement(
-
-):
+def test_models_edx_peer_instruction_original_submitted_with_valid_statement():
     """Test that a `ubc.peer_instruction.original_submitted` statement has the
     expected `event_type`.
     """
@@ -53,9 +50,7 @@ def test_models_edx_peer_instruction_original_submitted_with_valid_statement(
     assert statement.name == "ubc.peer_instruction.original_submitted"
 
 
-def test_models_edx_peer_instruction_revised_submitted_with_valid_statement(
-
-):
+def test_models_edx_peer_instruction_revised_submitted_with_valid_statement():
     """Test that a `ubc.peer_instruction.revised_submitted` statement has the
     expected `event_type`.
     """

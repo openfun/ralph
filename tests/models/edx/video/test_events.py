@@ -10,6 +10,7 @@ from ralph.models.edx.video.fields.events import SpeedChangeVideoEventField
 # from tests.fixtures.hypothesis_strategies import custom_given
 from tests.factories import mock_instance
 
+
 def test_models_edx_speed_change_video_event_field_with_valid_field():
     """Test that a valid `SpeedChangeVideoEventField` does not raise a
     `ValidationError`.
@@ -24,7 +25,7 @@ def test_models_edx_speed_change_video_event_field_with_valid_field():
     ["0,75", "1", "-1.0", "1.30"],
 )
 def test_models_edx_speed_change_video_event_field_with_invalid_old_speed_value(
-    old_speed
+    old_speed,
 ):
     """Test that an invalid `old_speed` value in
     `SpeedChangeVideoEventField` raises a `ValidationError`.
@@ -42,7 +43,7 @@ def test_models_edx_speed_change_video_event_field_with_invalid_old_speed_value(
     ["0,75", "1", "-1.0", "1.30"],
 )
 def test_models_edx_speed_change_video_event_field_with_invalid_new_speed_value(
-    new_speed
+    new_speed,
 ):
     """Test that an invalid `new_speed` value in
     `SpeedChangeVideoEventField` raises a `ValidationError`.

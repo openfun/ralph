@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Any, List, Optional, Union
 from uuid import UUID
 
-from pydantic import constr, root_validator, BaseModel
+from pydantic import constr, root_validator
 
 from ..config import BaseModelWithConfig
 from .agents import BaseXapiAgent
@@ -14,9 +14,6 @@ from .groups import BaseXapiGroup
 from .objects import BaseXapiObject
 from .results import BaseXapiResult
 from .verbs import BaseXapiVerb
-
-
-from pprint import pprint  # TODO: remove
 
 
 class BaseXapiStatement(BaseModelWithConfig):

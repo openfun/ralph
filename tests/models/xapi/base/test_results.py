@@ -10,6 +10,7 @@ from ralph.models.xapi.base.results import BaseXapiResultScore
 # from tests.fixtures.hypothesis_strategies import custom_given
 from tests.factories import mock_xapi_instance
 
+
 @pytest.mark.parametrize(
     "raw_value, min_value, max_value, error_msg",
     [

@@ -3,8 +3,6 @@
 import json
 
 import pytest
-from hypothesis import settings
-from hypothesis import strategies as st
 from pydantic import ValidationError
 
 from ralph.models.selector import ModelSelector
@@ -26,6 +24,7 @@ from ralph.models.xapi.lms.statements import (
 
 # from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 from tests.factories import mock_xapi_instance
+
 
 @pytest.mark.parametrize(
     "class_",
@@ -210,9 +209,7 @@ def test_models_xapi_lms_uploaded_audio_with_valid_statement():
         [{"id": "https://foo.bar"}, {"id": "https://w3id.org/xapi/lms"}],
     ],
 )
-def test_models_xapi_lms_context_context_activities_with_valid_category(
-    category
-):
+def test_models_xapi_lms_context_context_activities_with_valid_category(category):
     """Test that a valid `LMSContextContextActivities` should not raise a
     `ValidationError`.
     """
@@ -239,9 +236,7 @@ def test_models_xapi_lms_context_context_activities_with_valid_category(
         [{"id": "https://foo.bar"}, {"id": "https://w3id.org/xapi/not-lms"}],
     ],
 )
-def test_models_xapi_lms_context_context_activities_with_invalid_category(
-    category
-):
+def test_models_xapi_lms_context_context_activities_with_invalid_category(category):
     """Test that an invalid `LMSContextContextActivities` should raise a
     `ValidationError`.
     """

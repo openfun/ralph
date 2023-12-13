@@ -9,7 +9,6 @@ import pytest
 from click.exceptions import BadParameter
 from click.testing import CliRunner
 from elasticsearch.helpers import bulk, scan
-from hypothesis import settings as hypothesis_settings
 from pydantic import ValidationError
 
 from ralph import cli as cli_module
@@ -27,14 +26,13 @@ from ralph.exceptions import ConfigurationException
 from ralph.models.edx.navigational.statements import UIPageClose
 from ralph.models.xapi.navigation.statements import PageTerminated
 
+from tests.factories import mock_instance
 from tests.fixtures.backends import (
     ES_TEST_HOSTS,
     ES_TEST_INDEX,
     WS_TEST_HOST,
     WS_TEST_PORT,
 )
-
-from tests.factories import mock_instance
 
 test_logger = logging.getLogger("ralph")
 

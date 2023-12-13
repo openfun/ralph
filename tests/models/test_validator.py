@@ -5,7 +5,6 @@ import json
 import logging
 
 import pytest
-from hypothesis import HealthCheck, settings
 from pydantic import ValidationError, create_model
 
 from ralph.exceptions import BadFormatException, UnknownEventException
@@ -16,6 +15,7 @@ from ralph.models.validator import Validator
 
 # from tests.fixtures.hypothesis_strategies import custom_given
 from tests.factories import mock_instance
+
 
 def test_models_validator_validate_with_no_events(caplog):
     """Test given no events, the validate method does not write error messages."""
@@ -143,12 +143,10 @@ def test_models_validator_validate_with_invalid_page_close_event_raises_an_excep
 @pytest.mark.parametrize("ignore_errors", [True, False])
 @pytest.mark.parametrize("fail_on_unknown", [True, False])
 # @custom_given(UIPageClose)
-def test_models_validator_validate_with_valid_events(
-    ignore_errors, fail_on_unknown
-):
+def test_models_validator_validate_with_valid_events(ignore_errors, fail_on_unknown):
     """Test given a valid event the validate method should yield it."""
     event = mock_instance(UIPageClose)
-    
+
     event_str = event.json()
     event_dict = json.loads(event_str)
     validator = Validator(ModelSelector(module="ralph.models.edx"))

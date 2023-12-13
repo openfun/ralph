@@ -5,9 +5,6 @@ import logging
 
 import pytest
 from httpx import RequestError
-from hypothesis import HealthCheck
-from hypothesis import settings as hypothesis_settings
-from hypothesis import strategies as st
 from pydantic import ValidationError
 
 from ralph.api.forwarding import forward_xapi_statements, get_active_xapi_forwardings
@@ -17,7 +14,9 @@ from ralph.conf import Settings, XapiForwardingConfigurationSettings
 from tests.factories import mock_instance
 
 
-def test_api_forwarding_with_valid_configuration(monkeypatch, ):
+def test_api_forwarding_with_valid_configuration(
+    monkeypatch,
+):
     """Test the settings, given a valid forwarding configuration, should not raise an
     exception.
     """
@@ -85,8 +84,12 @@ def test_api_forwarding_get_active_xapi_forwardings_with_inactive_forwardings(
     configurations are inactive and return a list containing only active forwardings.
     """
 
-    active_forwarding = mock_instance(XapiForwardingConfigurationSettings, is_active=True)
-    inactive_forwarding = mock_instance(XapiForwardingConfigurationSettings, is_active=False)
+    active_forwarding = mock_instance(
+        XapiForwardingConfigurationSettings, is_active=True
+    )
+    inactive_forwarding = mock_instance(
+        XapiForwardingConfigurationSettings, is_active=False
+    )
 
     active_forwarding_json = active_forwarding.json()
     inactive_forwarding_json = inactive_forwarding.json()
@@ -133,9 +136,9 @@ async def test_api_forwarding_forward_xapi_statements_with_successful_request(
     count if the request was successful.
     """
 
-    forwarding = mock_instance(XapiForwardingConfigurationSettings,
-        max_retries=1,
-        is_active=True)
+    forwarding = mock_instance(
+        XapiForwardingConfigurationSettings, max_retries=1, is_active=True
+    )
 
     class MockSuccessfulResponse:
         """Dummy Successful Response."""

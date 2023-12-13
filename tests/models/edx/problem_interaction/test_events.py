@@ -22,6 +22,7 @@ from ralph.models.edx.problem_interaction.fields.events import (
 # from tests.fixtures.hypothesis_strategies import custom_given
 from tests.factories import mock_instance
 
+
 def test_models_edx_correct_map_with_valid_content():
     """Test that a valid `CorrectMap` does not raise a `ValidationError`."""
     subfield = mock_instance(CorrectMap)
@@ -81,7 +82,7 @@ def test_models_edx_problem_hint_feedback_displayed_event_field_with_valid_field
     ],
 )
 def test_models_edx_problem_hint_feedback_displayed_event_field_with_invalid_question_type_value(  # noqa
-    question_type
+    question_type,
 ):
     """Test that an invalid `question_type` value in
     `EdxProblemHintFeedbackDisplayedEventField` raises a `ValidationError`.
@@ -97,7 +98,7 @@ def test_models_edx_problem_hint_feedback_displayed_event_field_with_invalid_que
 
 @pytest.mark.parametrize("trigger_type", ["jingle", "compund"])
 def test_models_edx_problem_hint_feedback_displayed_event_field_with_invalid_trigger_type_value(  # noqa
-    trigger_type
+    trigger_type,
 ):
     """Test that an invalid `question_type` value in
     `EdxProblemHintFeedbackDisplayedEventField` raises a `ValidationError`.
@@ -152,9 +153,7 @@ def test_models_edx_problem_check_event_field_with_valid_field():
         ),
     ],
 )
-def test_models_edx_problem_check_event_field_with_invalid_problem_id_value(
-    problem_id
-):
+def test_models_edx_problem_check_event_field_with_invalid_problem_id_value(problem_id):
     """Test that an invalid `problem_id` value in `ProblemCheckEventField` raises a
     `ValidationError`.
     """
@@ -169,9 +168,7 @@ def test_models_edx_problem_check_event_field_with_invalid_problem_id_value(
 
 
 @pytest.mark.parametrize("success", ["corect", "incorect"])
-def test_models_edx_problem_check_event_field_with_invalid_success_value(
-    success
-):
+def test_models_edx_problem_check_event_field_with_invalid_success_value(success):
     """Test that an invalid `success` value in `ProblemCheckEventField` raises a
     `ValidationError`.
     """
@@ -226,7 +223,7 @@ def test_models_edx_problem_check_fail_event_field_with_valid_field():
     ],
 )
 def test_models_edx_problem_check_fail_event_field_with_invalid_problem_id_value(
-    problem_id
+    problem_id,
 ):
     """Test that an invalid `problem_id` value in `ProblemCheckFailEventField` raises a
     `ValidationError`.
@@ -242,9 +239,7 @@ def test_models_edx_problem_check_fail_event_field_with_invalid_problem_id_value
 
 
 @pytest.mark.parametrize("failure", ["close", "unresit"])
-def test_models_edx_problem_check_fail_event_field_with_invalid_failure_value(
-    failure
-):
+def test_models_edx_problem_check_fail_event_field_with_invalid_failure_value(failure):
     """Test that an invalid `failure` value in `ProblemCheckFailEventField` raises a
     `ValidationError`.
     """
@@ -299,7 +294,7 @@ def test_models_edx_problem_rescore_event_field_with_valid_field():
     ],
 )
 def test_models_edx_problem_rescore_event_field_with_invalid_problem_id_value(
-    problem_id
+    problem_id,
 ):
     """Test that an invalid `problem_id` value in `ProblemRescoreEventField` raises a
     `ValidationError`.
@@ -315,9 +310,7 @@ def test_models_edx_problem_rescore_event_field_with_invalid_problem_id_value(
 
 
 @pytest.mark.parametrize("success", ["corect", "incorect"])
-def test_models_edx_problem_rescore_event_field_with_invalid_success_value(
-    success
-):
+def test_models_edx_problem_rescore_event_field_with_invalid_success_value(success):
     """Test that an invalid `success` value in `ProblemRescoreEventField` raises a
     `ValidationError`.
     """
@@ -372,7 +365,7 @@ def test_models_edx_problem_rescore_fail_event_field_with_valid_field():
     ],
 )
 def test_models_edx_problem_rescore_fail_event_field_with_invalid_problem_id_value(
-    problem_id
+    problem_id,
 ):
     """Test that an invalid `problem_id` value in `ProblemRescoreFailEventField` raises
     a `ValidationError`.
@@ -389,7 +382,7 @@ def test_models_edx_problem_rescore_fail_event_field_with_invalid_problem_id_val
 
 @pytest.mark.parametrize("failure", ["close", "unresit"])
 def test_models_edx_problem_rescore_fail_event_field_with_invalid_failure_value(
-    failure
+    failure,
 ):
     """Test that an invalid `failure` value in `ProblemRescoreFailEventField` raises a
     `ValidationError`.
@@ -443,9 +436,7 @@ def test_models_edx_reset_problem_event_field_with_valid_field():
         ),
     ],
 )
-def test_models_edx_reset_problem_event_field_with_invalid_problem_id_value(
-    problem_id
-):
+def test_models_edx_reset_problem_event_field_with_invalid_problem_id_value(problem_id):
     """Test that an invalid `problem_id` value in `ResetProblemEventField` raises a
     `ValidationError`.
     """
@@ -502,7 +493,7 @@ def test_models_edx_reset_problem_fail_event_field_with_valid_field():
     ],
 )
 def test_models_edx_reset_problem_fail_event_field_with_invalid_problem_id_value(
-    problem_id
+    problem_id,
 ):
     """Test that an invalid `problem_id` value in `ResetProblemFailEventField` raises
     a `ValidationError`.
@@ -518,9 +509,7 @@ def test_models_edx_reset_problem_fail_event_field_with_invalid_problem_id_value
 
 
 @pytest.mark.parametrize("failure", ["close", "not_close"])
-def test_models_edx_reset_problem_fail_event_field_with_invalid_failure_value(
-    failure
-):
+def test_models_edx_reset_problem_fail_event_field_with_invalid_failure_value(failure):
     """Test that an invalid `failure` value in `ResetProblemFailEventField` raises a
     `ValidationError`.
     """
@@ -575,7 +564,7 @@ def test_models_edx_save_problem_fail_event_field_with_valid_field():
     ],
 )
 def test_models_edx_save_problem_fail_event_field_with_invalid_problem_id_value(
-    problem_id
+    problem_id,
 ):
     """Test that an invalid `problem_id` value in `SaveProblemFailEventField` raises a
     `ValidationError`.
@@ -591,9 +580,7 @@ def test_models_edx_save_problem_fail_event_field_with_invalid_problem_id_value(
 
 
 @pytest.mark.parametrize("failure", ["close", "doned"])
-def test_models_edx_save_problem_fail_event_field_with_invalid_failure_value(
-    failure
-):
+def test_models_edx_save_problem_fail_event_field_with_invalid_failure_value(failure):
     """Test that an invalid `failure` value in `SaveProblemFailEventField` raises a
     `ValidationError`.
     """
@@ -647,7 +634,7 @@ def test_models_edx_save_problem_success_event_field_with_valid_field():
     ],
 )
 def test_models_edx_save_problem_success_event_field_with_invalid_problem_id_value(
-    problem_id
+    problem_id,
 ):
     """Test that an invalid `problem_id` value in `SaveProblemSuccessEventField`
     raises a `ValidationError`.

@@ -2,8 +2,6 @@
 import json
 
 import pytest
-from hypothesis import settings
-from hypothesis import strategies as st
 
 from ralph.models.xapi.concepts.verbs.acrossx_profile import PostedVerb
 from ralph.models.xapi.concepts.verbs.activity_streams_vocabulary import (
@@ -44,6 +42,7 @@ from ralph.models.xapi.concepts.verbs.virtual_classroom import (
 
 # from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 from tests.factories import mock_xapi_instance
+
 
 @pytest.mark.parametrize(
     "class_, verb_id",

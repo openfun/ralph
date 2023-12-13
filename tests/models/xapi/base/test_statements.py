@@ -3,6 +3,7 @@
 import json
 
 import pytest
+
 # from hypothesis import settings
 # from hypothesis import strategies as st
 # from polyfactory import Use
@@ -27,8 +28,7 @@ from ralph.models.xapi.base.unnested_objects import (
 from ralph.utils import set_dict_value_from_path
 
 # from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
-
-from tests.factories import mock_xapi_instance, ModelFactory
+from tests.factories import ModelFactory, mock_xapi_instance
 
 
 @pytest.mark.parametrize(
@@ -71,7 +71,9 @@ def test_models_xapi_base_statement_with_valid_null_values(path, value):
     property.
     """
 
-    statement = mock_xapi_instance(BaseXapiStatement, object=mock_xapi_instance(BaseXapiActivity))
+    statement = mock_xapi_instance(
+        BaseXapiStatement, object=mock_xapi_instance(BaseXapiActivity)
+    )
 
     statement = statement.dict(exclude_none=True)
 
@@ -261,7 +263,9 @@ def test_models_xapi_base_statement_with_invalid_extensions(path):
     An Extension "key" is an IRI. The LRS rejects with 400 a statement which has an
     extension key which is not a valid IRI, if an extension object is present.
     """
-    statement = mock_xapi_instance(BaseXapiStatement, object=mock_xapi_instance(BaseXapiActivity))
+    statement = mock_xapi_instance(
+        BaseXapiStatement, object=mock_xapi_instance(BaseXapiActivity)
+    )
 
     statement = statement.dict(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), "")
@@ -326,11 +330,15 @@ def test_models_xapi_base_statement_with_invalid_group_objects(klass):
             BaseXapiIdentifiedGroupWithAccount,
         ]
     )
-    statement = mock_xapi_instance(BaseXapiStatement, actor=mock_xapi_instance(actor_class))
+    statement = mock_xapi_instance(
+        BaseXapiStatement, actor=mock_xapi_instance(actor_class)
+    )
 
     kwargs = {"exclude_none": True}
     statement = statement.dict(**kwargs)
-    statement["actor"]["member"] = [mock_xapi_instance(klass).dict(**kwargs)] # TODO: check that nothing was lost
+    statement["actor"]["member"] = [
+        mock_xapi_instance(klass).dict(**kwargs)
+    ]  # TODO: check that nothing was lost
     err = "actor -> member -> 0 -> objectType\n  unexpected value; permitted: 'Agent'"
     with pytest.raises(ValidationError, match=err):
         BaseXapiStatement(**statement)
@@ -427,8 +435,9 @@ def test_models_xapi_base_statement_with_invalid_context_value(path, value):
             BaseXapiStatementRef,
         ]
     )
-    statement = mock_xapi_instance(BaseXapiStatement, object=mock_xapi_instance(object_class))
-
+    statement = mock_xapi_instance(
+        BaseXapiStatement, object=mock_xapi_instance(object_class)
+    )
 
     statement = statement.dict(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), value)
@@ -513,14 +522,16 @@ def test_models_xapi_base_statement_with_valid_version():
     list(ModelSelector("ralph.models.xapi").model_rules),
 )
 def test_models_xapi_base_statement_should_consider_valid_all_defined_xapi_models(
-    model
+    model,
 ):
     """Test that all defined xAPI models in the ModelSelector make valid statements."""
-    
+
     # All specific xAPI models should inherit BaseXapiStatement
     assert issubclass(model, BaseXapiStatement)
     statement = mock_xapi_instance(model)
-    statement = statement.json(exclude_none=True, by_alias=True) # TODO: check that we are not losing info by mocking random model
+    statement = statement.json(
+        exclude_none=True, by_alias=True
+    )  # TODO: check that we are not losing info by mocking random model
     try:
         BaseXapiStatement(**json.loads(statement))
     except ValidationError as err:

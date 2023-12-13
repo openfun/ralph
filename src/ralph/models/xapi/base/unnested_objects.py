@@ -1,12 +1,12 @@
 """Base xAPI `Object` definitions (1)."""
 
 import sys
-from typing import Annotated, Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 from uuid import UUID
 
-from pydantic import AnyUrl, Field, StrictStr, constr, validator
+from pydantic import AnyUrl, constr, validator
 
-from ralph.conf import NonEmptyStr, NonEmptyStrictStr
+from ralph.conf import NonEmptyStrictStr
 
 from ..config import BaseModelWithConfig
 from .common import IRI, LanguageMap

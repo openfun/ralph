@@ -4,7 +4,6 @@ import json
 from uuid import UUID, uuid5
 
 import pytest
-from hypothesis import provisional
 
 from ralph.models.converter import convert_dict_event
 from ralph.models.edx.converters.xapi.video import (
@@ -25,9 +24,10 @@ from ralph.models.edx.video.statements import (
 # from tests.fixtures.hypothesis_strategies import custom_given
 from tests.factories import mock_instance, mock_url
 
+
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_models_edx_converters_xapi_video_ui_load_video_to_video_initialized(
-    uuid_namespace
+    uuid_namespace,
 ):
     """Test that converting with `UILoadVideoToVideoInitialized` returns the
     expected xAPI statement.
@@ -83,15 +83,12 @@ def test_models_edx_converters_xapi_video_ui_load_video_to_video_initialized(
 
 
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
-def test_models_edx_converters_xapi_video_ui_play_video_to_video_played(
-    uuid_namespace
-):
+def test_models_edx_converters_xapi_video_ui_play_video_to_video_played(uuid_namespace):
     """Test that converting with `UIPlayVideoToVideoPlayed` returns the expected
     xAPI statement.
     """
     event = mock_instance(UIPlayVideo)
     platform_url = mock_url()
-
 
     event.context.user_id = "1"
     event.session = "af45a0e650c4a4fdb0bcde75a1e4b694"
@@ -146,7 +143,7 @@ def test_models_edx_converters_xapi_video_ui_play_video_to_video_played(
 
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_models_edx_converters_xapi_video_ui_pause_video_to_video_paused(
-    uuid_namespace
+    uuid_namespace,
 ):
     """Test that converting with `UIPauseVideoToVideoPaused` returns the expected xAPI
     statement.
@@ -208,14 +205,13 @@ def test_models_edx_converters_xapi_video_ui_pause_video_to_video_paused(
 
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_models_edx_converters_xapi_video_ui_stop_video_to_video_terminated(
-    uuid_namespace
+    uuid_namespace,
 ):
     """Test that converting with `UIStopVideoToVideoTerminated` returns the expected
     xAPI statement.
     """
     event = mock_instance(UIStopVideo)
     platform_url = mock_url()
-
 
     event.context.user_id = "1"
     event.session = "af45a0e650c4a4fdb0bcde75a1e4b694"
@@ -269,16 +265,14 @@ def test_models_edx_converters_xapi_video_ui_stop_video_to_video_terminated(
         "version": "1.0.0",
     }
 
+
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
-def test_models_edx_converters_xapi_video_ui_seek_video_to_video_seeked(
-    uuid_namespace
-):
+def test_models_edx_converters_xapi_video_ui_seek_video_to_video_seeked(uuid_namespace):
     """Test that converting with `UISeekVideoToVideoSeeked` returns the expected
     xAPI statement.
     """
     event = mock_instance(UISeekVideo)
     platform_url = mock_url()
-
 
     event.context.user_id = "1"
     event.session = "af45a0e650c4a4fdb0bcde75a1e4b694"

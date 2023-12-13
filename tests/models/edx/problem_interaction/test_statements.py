@@ -3,7 +3,6 @@
 import json
 
 import pytest
-from hypothesis import strategies as st
 
 from ralph.models.edx.problem_interaction.statements import (
     EdxProblemHintDemandhintDisplayed,
@@ -28,6 +27,7 @@ from ralph.models.selector import ModelSelector
 # from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 from tests.factories import mock_instance
 
+
 @pytest.mark.parametrize(
     "class_",
     [
@@ -49,9 +49,7 @@ from tests.factories import mock_instance
         UIProblemShow,
     ],
 )
-def test_models_edx_edx_problem_interaction_selectors_with_valid_statements(
-    class_
-):
+def test_models_edx_edx_problem_interaction_selectors_with_valid_statements(class_):
     """Test given a valid problem interaction edX statement the `get_first_model`
     selector method should return the expected model.
     """
@@ -60,8 +58,7 @@ def test_models_edx_edx_problem_interaction_selectors_with_valid_statements(
     assert model is class_
 
 
-def test_models_edx_edx_problem_hint_demandhint_displayed_with_valid_statement(
-):
+def test_models_edx_edx_problem_hint_demandhint_displayed_with_valid_statement():
     """Test that a `edx.problem.hint.demandhint_displayed` statement has the expected
     `event_type` and `page`.
     """

@@ -11,6 +11,7 @@ from ralph.models.selector import ModelSelector
 # from tests.fixtures.hypothesis_strategies import custom_given
 from tests.factories import mock_instance
 
+
 def test_model_selector_server_get_model_with_valid_event():
     """Test given a server statement, the get_model method should return the
     corresponding model.

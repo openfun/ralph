@@ -3,8 +3,6 @@
 import json
 
 import pytest
-from hypothesis import settings
-from hypothesis import strategies as st
 from pydantic import ValidationError
 
 from ralph.models.selector import ModelSelector
@@ -199,9 +197,7 @@ def test_models_xapi_video_screen_change_interaction_with_valid_statement():
         [{"id": "https://foo.bar"}, {"id": "https://w3id.org/xapi/video"}],
     ],
 )
-def test_models_xapi_video_context_activities_with_valid_category(
-    category
-):
+def test_models_xapi_video_context_activities_with_valid_category(category):
     """Test that a valid `VideoContextContextActivities` should not raise a
     `ValidationError`.
     """
@@ -228,9 +224,7 @@ def test_models_xapi_video_context_activities_with_valid_category(
         [{"id": "https://foo.bar"}, {"id": "https://w3id.org/xapi/not-video"}],
     ],
 )
-def test_models_xapi_video_context_activities_with_invalid_category(
-    category
-):
+def test_models_xapi_video_context_activities_with_invalid_category(category):
     """Test that an invalid `VideoContextContextActivities` should raise a
     `ValidationError`.
     """

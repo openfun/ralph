@@ -3,13 +3,13 @@
 from typing import Dict, List, Optional, Union
 from uuid import UUID
 
+from ralph.conf import NonEmptyStrictStr
+
 from ..config import BaseModelWithConfig
 from .agents import BaseXapiAgent
 from .common import IRI, LanguageTag
 from .groups import BaseXapiGroup
 from .unnested_objects import BaseXapiActivity, BaseXapiStatementRef
-
-from ralph.conf import NonEmptyStrictStr
 
 
 class BaseXapiContextContextActivities(BaseModelWithConfig):

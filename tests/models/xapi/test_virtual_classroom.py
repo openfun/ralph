@@ -3,8 +3,6 @@
 import json
 
 import pytest
-from hypothesis import settings
-from hypothesis import strategies as st
 from pydantic import ValidationError
 
 from ralph.models.selector import ModelSelector
@@ -31,6 +29,7 @@ from ralph.models.xapi.virtual_classroom.statements import (
 
 # from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 from tests.factories import mock_xapi_instance
+
 
 @pytest.mark.parametrize(
     "class_",
@@ -246,9 +245,7 @@ def test_models_xapi_virtual_classroom_answered_poll_with_valid_statement():
     )
 
 
-def test_models_xapi_virtual_classroom_posted_public_message_with_valid_statement(
-    
-):
+def test_models_xapi_virtual_classroom_posted_public_message_with_valid_statement():
     statement = mock_xapi_instance(VirtualClassroomPostedPublicMessage)
     """Test that a virtual classroom posted public message statement has the expected
     `verb`.`id` and `object`.`definition`.`type` property values.
@@ -272,9 +269,7 @@ def test_models_xapi_virtual_classroom_posted_public_message_with_valid_statemen
         [{"id": "https://foo.bar"}, {"id": "https://w3id.org/xapi/virtual-classroom"}],
     ],
 )
-def test_models_xapi_virtual_classroom_context_activities_with_valid_category(
-    category
-):
+def test_models_xapi_virtual_classroom_context_activities_with_valid_category(category):
     """Test that a valid `VirtualClassroomContextContextActivities` should not raise a
     `ValidationError`.
     """
@@ -306,7 +301,7 @@ def test_models_xapi_virtual_classroom_context_activities_with_valid_category(
     ],
 )
 def test_models_xapi_virtual_classroom_context_activities_with_invalid_category(
-    category
+    category,
 ):
     """Test that an invalid `VirtualClassroomContextContextActivities` should raise a
     `ValidationError`.

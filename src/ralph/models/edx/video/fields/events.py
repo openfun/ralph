@@ -50,6 +50,7 @@ class PauseVideoEventField(VideoBaseEventField):
 
     currentTime: float
 
+
 class SeekVideoEventField(VideoBaseEventField):
     """Pydantic model for `seek_video`.`event` field.
 
@@ -62,7 +63,7 @@ class SeekVideoEventField(VideoBaseEventField):
             within the video, either `onCaptionSeek` or `onSlideSeek` value.
     """
 
-    new_time: NonNegativeFloat # TODO: Ask Quitterie if this is valid
+    new_time: NonNegativeFloat  # TODO: Ask Quitterie if this is valid
     old_time: NonNegativeFloat
     type: str
 

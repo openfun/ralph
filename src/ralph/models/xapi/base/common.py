@@ -1,16 +1,13 @@
 """Common for xAPI base definitions."""
 
-from typing import Dict, Generator, Type
+from typing import Annotated, Dict, Generator, Type
 
 from langcodes import tag_is_valid
-from pydantic import StrictStr, validate_email
+from pydantic import Field
 from rfc3987 import parse
 
 from ralph.conf import NonEmptyStr, NonEmptyStrictStr, NonEmptyStrictStrPatch
 
-from typing import Annotated
-from pydantic import Field
-from pydantic import BaseModel, root_validator
 
 class IRI(NonEmptyStrictStrPatch):
     """Pydantic custom data type validating RFC 3987 IRIs."""
@@ -23,6 +20,7 @@ class IRI(NonEmptyStrictStrPatch):
             return cls(iri)
 
         yield validate
+
 
 class LanguageTag(NonEmptyStr):
     """Pydantic custom data type validating RFC 5646 Language tags."""
@@ -38,7 +36,7 @@ class LanguageTag(NonEmptyStr):
         yield validate
 
 
-LanguageMap = Dict[LanguageTag, NonEmptyStrictStr] # TODO: change   back to strictstr
+LanguageMap = Dict[LanguageTag, NonEmptyStrictStr]  # TODO: change   back to strictstr
 
 
 email_pattern = r"(^mailto:[-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\[[\t -Z^-~]*])"
@@ -48,7 +46,7 @@ MailtoEmail = Annotated[str, Field(regex=email_pattern)]
 #     """Pydantic custom data type validating `mailto:email` format."""
 
 #     @classmethod
-#     def __get_validators__(cls) -> Generator:  # noqa: D105
+#     def __get_validators__(cls) -> Generator:
 #         def validate(mailto: str) -> Type["MailtoEmail"]:
 #             """Check whether the provided value follows the `mailto:email` format."""
 #             if not mailto.startswith("mailto:"):

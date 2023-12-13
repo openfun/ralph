@@ -4,7 +4,6 @@ import json
 import re
 
 import pytest
-from hypothesis import strategies as st
 from pydantic.error_wrappers import ValidationError
 
 from ralph.models.edx.navigational.fields.events import NavigationalEventField
@@ -18,6 +17,7 @@ from ralph.models.selector import ModelSelector
 
 # from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 from tests.factories import mock_instance
+
 
 @pytest.mark.parametrize(
     "class_",

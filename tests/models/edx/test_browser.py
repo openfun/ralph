@@ -31,9 +31,7 @@ def test_models_edx_base_browser_model_with_valid_statement():
     ],
 )
 # @custom_given(BaseBrowserModel)
-def test_models_edx_base_browser_model_with_invalid_statement(
-    session, error
-):
+def test_models_edx_base_browser_model_with_invalid_statement(session, error):
     """Test that an invalid base browser statement raises a `ValidationError`."""
     statement = mock_instance(BaseBrowserModel)
     invalid_statement = json.loads(statement.json())

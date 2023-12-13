@@ -3,7 +3,6 @@
 import json
 
 import pytest
-from hypothesis import strategies as st
 
 from ralph.models.edx.textbook_interaction.statements import (
     UIBook,
@@ -26,6 +25,7 @@ from ralph.models.selector import ModelSelector
 # from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 from tests.factories import mock_instance
 
+
 @pytest.mark.parametrize(
     "class_",
     [
@@ -45,9 +45,7 @@ from tests.factories import mock_instance
         UITextbookPdfZoomMenuChanged,
     ],
 )
-def test_models_edx_ui_textbook_interaction_selectors_with_valid_statements(
-    class_
-):
+def test_models_edx_ui_textbook_interaction_selectors_with_valid_statements(class_):
     """Test given a valid textbook interaction edX statement the `get_first_model`
     selector method should return the expected model.
     """
@@ -72,8 +70,7 @@ def test_models_edx_ui_textbook_pdf_thumbnails_toggled_with_valid_statement():
     assert statement.name == "textbook.pdf.thumbnails.toggled"
 
 
-def test_models_edx_ui_textbook_pdf_thumbnail_navigated_with_valid_statement(
-):
+def test_models_edx_ui_textbook_pdf_thumbnail_navigated_with_valid_statement():
     """Test that a `textbook.pdf.thumbnail.navigated` statement has the expected
     `event_type` and `name`.
     """
@@ -82,8 +79,7 @@ def test_models_edx_ui_textbook_pdf_thumbnail_navigated_with_valid_statement(
     assert statement.name == "textbook.pdf.thumbnail.navigated"
 
 
-def test_models_edx_ui_textbook_pdf_outline_toggled_with_valid_statement(
-):
+def test_models_edx_ui_textbook_pdf_outline_toggled_with_valid_statement():
     """Test that a `textbook.pdf.outline.toggled` statement has the expected
     `event_type` and `name`.
     """
@@ -92,8 +88,7 @@ def test_models_edx_ui_textbook_pdf_outline_toggled_with_valid_statement(
     assert statement.name == "textbook.pdf.outline.toggled"
 
 
-def test_models_edx_ui_textbook_pdf_chapter_navigated_with_valid_statement(
-):
+def test_models_edx_ui_textbook_pdf_chapter_navigated_with_valid_statement():
     """Test that a `textbook.pdf.chapter.navigated` statement has the expected
     `event_type` and `name`.
     """
@@ -102,8 +97,7 @@ def test_models_edx_ui_textbook_pdf_chapter_navigated_with_valid_statement(
     assert statement.name == "textbook.pdf.chapter.navigated"
 
 
-def test_models_edx_ui_textbook_pdf_page_navigated_with_valid_statement(
-):
+def test_models_edx_ui_textbook_pdf_page_navigated_with_valid_statement():
     """Test that a `textbook.pdf.page.navigated` statement has the expected
     `event_type` and `name`.
     """
@@ -112,8 +106,7 @@ def test_models_edx_ui_textbook_pdf_page_navigated_with_valid_statement(
     assert statement.name == "textbook.pdf.page.navigated"
 
 
-def test_models_edx_ui_textbook_pdf_zoom_buttons_changed_with_valid_statement(
-):
+def test_models_edx_ui_textbook_pdf_zoom_buttons_changed_with_valid_statement():
     """Test that a `textbook.pdf.zoom.buttons.changed` statement has the expected
     `event_type` and `name`.
     """
@@ -158,9 +151,7 @@ def test_models_edx_ui_textbook_pdf_search_executed_with_valid_statement():
     assert statement.name == "textbook.pdf.search.executed"
 
 
-def test_models_edx_ui_textbook_pdf_search_navigated_next_with_valid_statement(
-    
-):
+def test_models_edx_ui_textbook_pdf_search_navigated_next_with_valid_statement():
     """Test that a `textbook.pdf.search.navigatednext` statement has the expected
     `event_type` and `name`.
     """
@@ -169,9 +160,7 @@ def test_models_edx_ui_textbook_pdf_search_navigated_next_with_valid_statement(
     assert statement.name == "textbook.pdf.search.navigatednext"
 
 
-def test_models_edx_ui_textbook_pdf_search_highlight_toggled_with_valid_statement(
-    
-):
+def test_models_edx_ui_textbook_pdf_search_highlight_toggled_with_valid_statement():
     """Test that a `textbook.pdf.search.highlight.toggled` statement has the expected
     `event_type` and `name`.
     """
@@ -180,9 +169,7 @@ def test_models_edx_ui_textbook_pdf_search_highlight_toggled_with_valid_statemen
     assert statement.name == "textbook.pdf.search.highlight.toggled"
 
 
-def test_models_edx_ui_textbook_pdf_search_case_sensitivity_toggled_with_valid_statement(  # noqa
-    
-):
+def test_models_edx_ui_textbook_pdf_search_case_sensitivity_toggled_with_valid_statement():  # noqa
     """Test that a `textbook.pdf.searchcasesensitivity.toggled` statement has the
     expected `event_type` and `name`.
     """

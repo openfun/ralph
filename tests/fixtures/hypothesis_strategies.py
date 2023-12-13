@@ -3,8 +3,7 @@
 # import random
 # from typing import Union
 
-from hypothesis import given
-from hypothesis import strategies as st
+
 # from pydantic import BaseModel
 
 # from ralph.models.edx.navigational.fields.events import NavigationalEventField
@@ -101,12 +100,9 @@ from hypothesis import strategies as st
 #         strategies.append(custom_builds(arg) if is_base_model(arg) else arg)
 #     return given(*strategies, **kwargs)
 
-from ralph.models.xapi.base.statements import BaseXapiStatement
-from pydantic import BaseModel
-from tests.factories import mock_instance, mock_xapi_instance
 
 # def custom_given(model: BaseModel, **kwargs):
-    
+
 #     if issubclass(model, BaseXapiStatement):
 #         func = mock_xapi_instance
 #     else:

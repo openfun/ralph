@@ -2,10 +2,10 @@
 
 from pydantic import AnyUrl, constr
 
+from ralph.conf import NonEmptyStrictStr
+
 from ..config import BaseModelWithConfig
 from .common import IRI, MailtoEmail
-
-from ralph.conf import NonEmptyStrictStr
 
 
 class BaseXapiAccount(BaseModelWithConfig):

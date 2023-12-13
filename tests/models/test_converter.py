@@ -5,7 +5,6 @@ import logging
 from typing import Any, Optional
 
 import pytest
-from hypothesis import HealthCheck, settings
 from pydantic import BaseModel
 from pydantic.error_wrappers import ValidationError
 
@@ -332,7 +331,7 @@ def test_converter_convert_with_an_event_missing_a_conversion_set_raises_an_exce
 @pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 @pytest.mark.parametrize("invalid_platform_url", ["", "not an URL"])
 def test_converter_convert_with_invalid_arguments_raises_an_exception(
-    valid_uuid, invalid_platform_url, caplog    
+    valid_uuid, invalid_platform_url, caplog
 ):
     """Test given invalid arguments causing the conversion to fail at the validation
     step, the convert method should raise a ValidationError.

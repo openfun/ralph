@@ -4,7 +4,6 @@ import json
 from uuid import UUID, uuid5
 
 import pytest
-from hypothesis import provisional
 
 from ralph.models.converter import convert_dict_event
 from ralph.models.edx.converters.xapi.enrollment import (
@@ -19,10 +18,11 @@ from ralph.models.edx.enrollment.statements import (
 # from tests.fixtures.hypothesis_strategies import custom_given
 from tests.factories import mock_instance, mock_url
 
+
 # @custom_given(EdxCourseEnrollmentActivated, provisional.urls())
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_models_edx_converters_xapi_enrollment_edx_course_enrollment_activated_to_lms_registered_course(  # noqa: E501
-    uuid_namespace#, event, platform_url
+    uuid_namespace,  # , event, platform_url
 ):
     """Test that converting with `EdxCourseEnrollmentActivatedToLMSRegisteredCourse`
     returns the expected xAPI statement.
@@ -71,7 +71,7 @@ def test_models_edx_converters_xapi_enrollment_edx_course_enrollment_activated_t
 # @custom_given(EdxCourseEnrollmentDeactivated, provisional.urls())
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_models_edx_converters_xapi_enrollment_edx_course_enrollment_deactivated_to_lms_unregistered_course(  # noqa: E501
-    uuid_namespace
+    uuid_namespace,
 ):
     """Test that converting with
     `EdxCourseEnrollmentDeactivatedToLMSUnregisteredCourse` returns the expected xAPI

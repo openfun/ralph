@@ -3,7 +3,6 @@
 import json
 
 import pytest
-from hypothesis import strategies as st
 
 from ralph.models.edx.enrollment.statements import (
     EdxCourseEnrollmentActivated,
@@ -40,7 +39,7 @@ def test_models_edx_edx_course_enrollment_selectors_with_valid_statements(class_
 
 # @custom_given(EdxCourseEnrollmentActivated)
 def test_models_edx_edx_course_enrollment_activated_with_valid_statement(
-    #statement,
+    # statement,
 ):
     """Test that a `edx.course.enrollment.activated` statement has the expected
     `event_type` and `name`.
@@ -52,7 +51,7 @@ def test_models_edx_edx_course_enrollment_activated_with_valid_statement(
 
 # @custom_given(EdxCourseEnrollmentDeactivated)
 def test_models_edx_edx_course_enrollment_deactivated_with_valid_statement(
-    #statement,
+    # statement,
 ):
     """Test that a `edx.course.enrollment.deactivated` statement has the expected
     `event_type` and `name`.
@@ -64,7 +63,7 @@ def test_models_edx_edx_course_enrollment_deactivated_with_valid_statement(
 
 # @custom_given(EdxCourseEnrollmentModeChanged)
 def test_models_edx_edx_course_enrollment_mode_changed_with_valid_statement(
-    #statement,
+    # statement,
 ):
     """Test that a `edx.course.enrollment.mode_changed` statement has the expected
     `event_type` and `name`.
@@ -76,7 +75,7 @@ def test_models_edx_edx_course_enrollment_mode_changed_with_valid_statement(
 
 # @custom_given(UIEdxCourseEnrollmentUpgradeClicked)
 def test_models_edx_ui_edx_course_enrollment_upgrade_clicked_with_valid_statement(
-    #statement,
+    # statement,
 ):
     """Test that a `edx.course.enrollment.upgrade_clicked` statement has the expected
     `event_type` and `name`.
@@ -88,7 +87,7 @@ def test_models_edx_ui_edx_course_enrollment_upgrade_clicked_with_valid_statemen
 
 # @custom_given(EdxCourseEnrollmentUpgradeSucceeded)
 def test_models_edx_edx_course_enrollment_upgrade_succeeded_with_valid_statement(
-    #statement,
+    # statement,
 ):
     """Test that a `edx.course.enrollment.upgrade.succeeded` statement has the expected
     `event_type` and `name`.

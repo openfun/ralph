@@ -1,8 +1,8 @@
 """Virtual classroom xAPI events result fields definitions."""
 
-from ..base.results import BaseXapiResult
-
 from ralph.conf import NonEmptyStrictStr
+
+from ..base.results import BaseXapiResult
 
 
 class VirtualClassroomAnsweredPollResult(BaseXapiResult):

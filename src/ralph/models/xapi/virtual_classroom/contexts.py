@@ -33,7 +33,6 @@ class VirtualClassroomProfileActivity(ProfileActivity):
     ] = "https://w3id.org/xapi/virtual-classroom"
 
 
-
 class VirtualClassroomContextContextActivities(BaseXapiContextContextActivities):
     """Pydantic model for virtual classroom `context`.`contextActivities` property.
 

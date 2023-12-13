@@ -4,8 +4,9 @@ import sys
 from abc import ABC
 from typing import Optional, Union
 
-from ralph.conf import NonEmptyStr, NonEmptyStrictStr
+from ralph.conf import NonEmptyStrictStr
 from ralph.models.xapi.config import BaseModelWithConfig
+
 from .common import IRI
 from .ifi import (
     BaseXapiAccountIFI,

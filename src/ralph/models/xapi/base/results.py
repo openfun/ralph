@@ -6,10 +6,10 @@ from typing import Any, Dict, Optional, Union
 
 from pydantic import StrictBool, conint, root_validator
 
+from ralph.conf import NonEmptyStrictStr
+
 from ..config import BaseModelWithConfig
 from .common import IRI
-
-from ralph.conf import NonEmptyStrictStr
 
 
 class BaseXapiResultScore(BaseModelWithConfig):

@@ -4,7 +4,6 @@ import json
 from uuid import UUID, uuid5
 
 import pytest
-from hypothesis import provisional, settings
 
 from ralph.models.converter import convert_dict_event, convert_str_event
 from ralph.models.edx.converters.xapi.server import ServerEventToPageViewed
@@ -13,9 +12,10 @@ from ralph.models.edx.server import Server
 # from tests.fixtures.hypothes  is_ strategies import custom_given
 from tests.factories import mock_instance, mock_url
 
+
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_models_edx_converters_xapi_server_server_event_to_page_viewed_constant_uuid(
-    uuid_namespace
+    uuid_namespace,
 ):
     """Test that `ServerEventToPageViewed.convert` returns a JSON string with a
     constant UUID.
@@ -35,9 +35,7 @@ def test_models_edx_converters_xapi_server_server_event_to_page_viewed_constant_
 
 
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
-def test_models_edx_converters_xapi_server_server_event_to_page_viewed(
-    uuid_namespace
-):
+def test_models_edx_converters_xapi_server_server_event_to_page_viewed(uuid_namespace):
     """Test that converting with `ServerEventToPageViewed` returns the expected xAPI
     statement.
     """
@@ -73,7 +71,7 @@ def test_models_edx_converters_xapi_server_server_event_to_page_viewed(
 
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_models_edx_converters_xapi_server_server_event_to_page_viewed_with_anonymous_user(  # noqa: E501
-    uuid_namespace
+    uuid_namespace,
 ):
     """Test that anonymous usernames are replaced with `anonymous`."""
     event = mock_instance(Server)

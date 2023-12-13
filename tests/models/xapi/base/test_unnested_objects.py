@@ -22,8 +22,7 @@ def test_models_xapi_base_object_statement_ref_type_with_valid_field():
     assert field.objectType == "StatementRef"
 
 
-def test_models_xapi_base_object_interaction_component_with_valid_field(
-):
+def test_models_xapi_base_object_interaction_component_with_valid_field():
     """Test a valid BaseXapiInteractionComponent has the expected `id` regex."""
     field = mock_xapi_instance(BaseXapiInteractionComponent)
     assert re.match(r"^[^\s]+$", field.id)
@@ -33,9 +32,7 @@ def test_models_xapi_base_object_interaction_component_with_valid_field(
     "id_value",
     [" test_id", "\ntest"],
 )
-def test_models_xapi_base_object_interaction_component_with_invalid_field(
-    id_value
-):
+def test_models_xapi_base_object_interaction_component_with_invalid_field(id_value):
     """Test an invalid `id` property in
     BaseXapiInteractionComponent raises a `ValidationError`.
     """
@@ -48,8 +45,7 @@ def test_models_xapi_base_object_interaction_component_with_invalid_field(
         BaseXapiInteractionComponent(**invalid_property)
 
 
-def test_models_xapi_base_object_activity_type_interaction_definition_with_valid_field(
-):
+def test_models_xapi_base_object_activity_type_interaction_definition_with_valid_field():
     """Test a valid BaseXapiActivityInteractionDefinition has the expected
     `objectType` value.
     """

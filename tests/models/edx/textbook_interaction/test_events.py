@@ -14,6 +14,7 @@ from ralph.models.edx.textbook_interaction.fields.events import (
 # from tests.fixtures.hypothesis_strategies import custom_given
 from tests.factories import mock_instance
 
+
 def test_fields_edx_textbook_interaction_base_event_field_with_valid_content():
     """Test that a valid `TextbookInteractionBaseEventField` does not raise
     a `ValidationError`.
@@ -61,9 +62,7 @@ def test_fields_edx_textbook_interaction_base_event_field_with_valid_content():
         ),
     ),
 )
-def test_fields_edx_textbook_interaction_base_event_field_with_invalid_content(
-    chapter
-):
+def test_fields_edx_textbook_interaction_base_event_field_with_invalid_content(chapter):
     """Test that an invalid `TextbookInteractionBaseEventField` raises a
     `ValidationError`.
     """
@@ -76,9 +75,7 @@ def test_fields_edx_textbook_interaction_base_event_field_with_invalid_content(
         TextbookInteractionBaseEventField(**invalid_field)
 
 
-def test_fields_edx_textbook_pdf_chapter_navigated_event_field_with_valid_content(
-
-):
+def test_fields_edx_textbook_pdf_chapter_navigated_event_field_with_valid_content():
     """Test that a valid `TextbookPdfChapterNavigatedEventField` does not raise a
     `ValidationError`.
     """
@@ -122,7 +119,7 @@ def test_fields_edx_textbook_pdf_chapter_navigated_event_field_with_valid_conten
     ),
 )
 def test_fields_edx_textbook_pdf_chapter_navigated_event_field_with_invalid_content(
-    chapter
+    chapter,
 ):
     """Test that an invalid `TextbookPdfChapterNavigatedEventField` raises a
     `ValidationError`.

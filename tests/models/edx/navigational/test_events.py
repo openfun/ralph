@@ -11,6 +11,7 @@ from ralph.models.edx.navigational.fields.events import NavigationalEventField
 # from tests.fixtures.hypothesis_strategies import custom_given
 from tests.factories import mock_instance
 
+
 def test_fields_edx_navigational_events_event_field_with_valid_content():
     """Test that a valid `NavigationalEventField` does not raise a
     `ValidationError`.

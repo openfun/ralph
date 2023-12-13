@@ -11,11 +11,10 @@ from pydantic import (
     AnyUrl,
     BaseModel,
     BaseSettings,
-    constr,
     Extra,
     Field,
+    constr,
     root_validator,
-    StrictStr,
 )
 
 from ralph.exceptions import ConfigurationException
@@ -140,7 +139,7 @@ class ParserSettings(BaseModel):
 class XapiForwardingConfigurationSettings(BaseModel):
     """Pydantic model for xAPI forwarding configuration item."""
 
-    # class Config:  # noqa: D106 # TODO: done
+    # class Config:  # TODO: done
     #     min_anystr_length = 1
 
     url: AnyUrl

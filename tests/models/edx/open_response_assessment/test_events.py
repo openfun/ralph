@@ -16,6 +16,7 @@ from ralph.models.edx.open_response_assessment.fields.events import (
 # from tests.fixtures.hypothesis_strategies import custom_given
 from tests.factories import mock_instance
 
+
 def test_models_edx_ora_get_peer_submission_event_field_with_valid_values():
     """Test that a valid `ORAGetPeerSubmissionEventField` does not raise a
     `ValidationError`.
@@ -27,8 +28,7 @@ def test_models_edx_ora_get_peer_submission_event_field_with_valid_values():
     )
 
 
-def test_models_edx_ora_get_submission_for_staff_grading_event_field_with_valid_values(
-):
+def test_models_edx_ora_get_submission_for_staff_grading_event_field_with_valid_values():
     """Test that a valid `ORAGetSubmissionForStaffGradingEventField` does not raise a
     `ValidationError`.
     """
@@ -72,7 +72,7 @@ def test_models_edx_ora_assess_event_field_with_invalid_values(score_type):
     ],
 )
 def test_models_edx_ora_assess_event_rubric_field_with_invalid_problem_id_value(
-    content_hash
+    content_hash,
 ):
     """Test that an invalid `problem_id` value in `ProblemCheckEventField` raises a
     `ValidationError`.

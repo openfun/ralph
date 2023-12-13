@@ -3,7 +3,6 @@
 import json
 
 import pytest
-from hypothesis import strategies as st
 
 from ralph.models.edx.open_response_assessment.statements import (
     ORACreateSubmission,
@@ -21,6 +20,7 @@ from ralph.models.selector import ModelSelector
 
 # from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 from tests.factories import mock_instance
+
 
 @pytest.mark.parametrize(
     "class_",
@@ -56,9 +56,7 @@ def test_models_edx_ora_get_peer_submission_with_valid_statement():
     assert statement.page == "x_module"
 
 
-def test_models_edx_ora_get_submission_for_staff_grading_with_valid_statement(
-    
-):
+def test_models_edx_ora_get_submission_for_staff_grading_with_valid_statement():
     """Test that a `openassessmentblock.get_submission_for_staff_grading` statement has
     the expected `event_type` and `page` fields.
     """
