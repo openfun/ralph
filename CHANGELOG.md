@@ -10,66 +10,80 @@ and this project adheres to
 
 ### Added
 
-- Implement Pydantic model for LRS Statements resource query parameters
-- Implement xAPI LMS Profile statements validation
-- `EdX` to `xAPI` converters for enrollment events
 - Backends: Add `Writable` and `Listable` interfaces to distinguish supported
   functionalities among `data` backends
+- Backends: Add `max_statements` option to data backends `read` method
+- Backends: Add `prefetch` option to async data backends `read` method
+- Backends: Add `concurrency` option to async data backends `write` method
 - Backends: Add `get_backends` function to automatically discover backends
   for CLI and LRS usage
-- Add aliases for `ralph-malph` extra dependencies: `backends` and `full`
+- Backends: Add client options for WSDataBackend
+- Backends: Add `READ_CHUNK_SIZE` and `WRITE_CHUNK_SIZE` data backend settings
+- Models: Implement Pydantic model for LRS Statements resource query parameters
+- Models: Implement xAPI LMS Profile statements validation
+- Models: Add `EdX` to `xAPI` converters for enrollment events
+- Project: Add aliases for `ralph-malph` extra dependencies: `backends` and
+  `full`
 
 ### Changed
 
+- Arnold: Add variable to override PVC name in arnold deployment
+- API: `GET /statements` now has "mine" option which matches statements that
+  have an authority field matching that of the user
+- API: Invalid parameters now return 400 status code
+- API: Forwarding PUT now uses PUT (instead of POST)
+- API: Incoming statements are enriched with `id`, `timestamp`, `stored`
+  and `authority`
+- API: Add `RALPH_LRS_RESTRICT_BY_AUTHORITY` option making `?mine=True`
+  implicit
+- API: Add `RALPH_LRS_RESTRICT_BY_SCOPE` option enabling endpoint access
+  control by user scopes
+- API: Enhance 'limit' query parameter's validation
+- API: Variable `RUNSERVER_AUTH_BACKEND` becomes `RUNSERVER_AUTH_BACKENDS`, and
+  multiple authentication methods are supported simultaneously
+- Backends: Refactor LRS Statements resource query parameters defined for
+  `ralph` API
+- Backends: Refactor `database`, `storage`, `http` and `stream` backends under
+  the unified `data` backend interface [BC]
+- Backends: Refactor LRS `query_statements` and `query_statements_by_ids`
+  backends methods under the unified `lrs` backend interface [BC]
+- Backends: Update `statementId` and `voidedStatementId` to snake_case,
+  with camelCase alias, in `LRSStatementsQuery`
+- Backends: Replace reference to a JSON column in ClickHouse with
+  function calls on the String column [BC]
+- CLI: User credentials must now include an "agent" field which can be created
+  using the cli
+- CLI: Change `push` to `write` and `fetch` to `read` [BC]
+- CLI: Change `-c --chunk-size` option to `-s --chunk-size` [BC]
+- CLI: Change websocket backend name `-b ws` to `-b async_ws` along with it's
+  uri option `--ws-uri` to `--async-ws-uri` [BC]
+- CLI: List cli usage strings in alphabetical order
+- CLI: Change backend configuration environment variable prefixes from
+  `RALPH_BACKENDS__{{DATABASE|HTTP|STORAGE|STREAM}}__{{BACKEND}}__{{OPTION}}`
+  to `RALPH_BACKENDS__DATA__{{BACKEND}}__{{OPTION}}`
+- Models: The xAPI `context.contextActivities.category` field is now mandatory
+  in the video and virtual classroom profiles. [BC]
 - Upgrade base python version to 3.12 for the development stack and Docker
   image
 - Upgrade `cachetools` to `5.3.2`
-- Refactor `database` and `storage` backends under the unified `data` backend
-interface [BC]
-- Refactor LRS `query_statements` and `query_statements_by_ids` backends
-methods under the unified `lrs` backend interface [BC]
-- Refactor LRS Statements resource query parameters defined for `ralph` API
-- User credentials must now include an "agent" field which can be created
-  using the cli
-- `GET /statements` now has "mine" option which matches statements that
-have an authority field matching that of the user
-- CLI: change `push` to `write` and `fetch` to `read` [BC]
-- Upgrade `bcrypt` to `4.1.1`
+- Upgrade `bcrypt` to `>=4.0.0`
 - Upgrade `fastapi` to `0.105.0`
 - Upgrade `sentry_sdk` to `1.38.0`
 - Upgrade `uvicorn` to `0.24.0.post1`
-- API: Invalid parameters now return 400 status code
-- API: Forwarding PUT now uses PUT (instead of POST)
-- Models: The xAPI `context.contextActivities.category` field is now mandatory
-  in the video and virtual classroom profiles. [BC]
-- Backends: `LRSHTTP` methods must not be used in `asyncio` events loop (BC)
-- Add variable to override PVC name in arnold deployment
-- Backends: add `max_statements` option to `AsyncLRSHTTP`
-- API: Incoming statements are enriched with `id`, `timestamp`, `stored`
-  and `authority`
-- Backends: update `statementId` and `voidedStatementId` to snake_case,
-  with camelCase alias, in `LRSStatementsQuery`
-- API: Add `RALPH_LRS_RESTRICT_BY_AUTHORITY` option making `?mine=True`
-  implicit
-- CLI: list cli usage strings in alphabetical order
-- API: Add `RALPH_LRS_RESTRICT_BY_SCOPE` option enabling endpoint access
-  control by user scopes
-- Backends: Replace reference to a JSON column in ClickHouse with 
-  function calls on the String column [BC]
-- API: enhance 'limit' query parameter's validation 
-- API: Variable `RUNSERVER_AUTH_BACKEND` becomes `RUNSERVER_AUTH_BACKENDS`, and
-  multiple authentication methods are supported simultaneously
 
 ### Fixed
 
 - API: Fix a typo ('attachements' -> 'attachments') to ensure compliance with
-    the LRS specification and prevent potential silent bugs.
+  the LRS specification and prevent potential silent bugs
 
 ### Removed
 
-- `school`, `course`, `module` context extensions in Edx to xAPI base converter
-- `name` field in `VideoActivity` xAPI model mistakenly used in `video` profile
-- drop support for python 3.7
+- Project: Drop support for Python 3.7
+- Models: Remove `school`, `course`, `module` context extensions in Edx to xAPI
+  base converter
+- Models: Remove `name` field in `VideoActivity` xAPI model mistakenly used in
+  `video` profile
+- CLI: Remove `DEFAULT_BACKEND_CHUNK_SIZE` environment variable configuration
 
 ## [3.9.0] - 2023-07-21
 

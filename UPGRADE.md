@@ -71,6 +71,55 @@ For example here is a valid `auth.json` file:
 ]
 ```
 
+#### Upgrade Ralph CLI usage
+
+If you are using Ralph's CLI, the following changes may affect you:
+
+- The `ralph fetch` command changed to `ralph read`
+  - The `-b ws` backend option changed to `-b async_ws`
+    - The corresponding `--ws-uri` option changed to `--async-ws-uri`
+  - The `-c --chunk-size` option changed to `-s --chunk-size`
+  - The `DEFAULT_BACKEND_CHUNK_SIZE` environment variable configuration is removed in
+    favor of allowing each backend to define their own defaults:
+
+    | Backend           | Environment variable for default (read) chunk size    |
+    |-------------------|-------------------------------------------------------|
+    | async_es/es       | RALPH_BACKENDS__DATA__ES__READ_CHUNK_SIZE=500         |
+    | async_lrs/lrs     | RALPH_BACKENDS__DATA__LRS__READ_CHUNK_SIZE=500        |
+    | async_mongo/mongo | RALPH_BACKENDS__DATA__MONGO__READ_CHUNK_SIZE=500      |
+    | clickhouse        | RALPH_BACKENDS__DATA__CLICKHOUSE__READ_CHUNK_SIZE=500 |
+    | fs                | RALPH_BACKENDS__DATA__FS__READ_CHUNK_SIZE=4096        |
+    | ldp               | RALPH_BACKENDS__DATA__LDP__READ_CHUNK_SIZE=4096       |
+    | s3                | RALPH_BACKENDS__DATA__S3__READ_CHUNK_SIZE=4096        |
+    | swift             | RALPH_BACKENDS__DATA__SWIFT__READ_CHUNK_SIZE=4096     |
+
+- The `ralph push` command changed to `ralph write`
+  - The `-c --chunk-size` option changed to `-s --chunk-size`
+  - The `DEFAULT_BACKEND_CHUNK_SIZE` environment variable configuration is removed in
+    favor of allowing each backend to define their own defaults:
+
+    | Backend           | Environment variable for default (write) chunk size    |
+    |-------------------|--------------------------------------------------------|
+    | async_es/es       | RALPH_BACKENDS__DATA__ES__WRITE_CHUNK_SIZE=500         |
+    | async_lrs/lrs     | RALPH_BACKENDS__DATA__LRS__WRITE_CHUNK_SIZE=500        |
+    | async_mongo/mongo | RALPH_BACKENDS__DATA__MONGO__WRITE_CHUNK_SIZE=500      |
+    | clickhouse        | RALPH_BACKENDS__DATA__CLICKHOUSE__WRITE_CHUNK_SIZE=500 |
+    | fs                | RALPH_BACKENDS__DATA__FS__WRITE_CHUNK_SIZE=4096        |
+    | ldp               | RALPH_BACKENDS__DATA__LDP__WRITE_CHUNK_SIZE=4096       |
+    | s3                | RALPH_BACKENDS__DATA__S3__WRITE_CHUNK_SIZE=4096        |
+    | swift             | RALPH_BACKENDS__DATA__SWIFT__WRITE_CHUNK_SIZE=4096     |
+
+- Environment variables used to configure backend options for CLI usage
+  (read/write/list commands) changed their prefix:
+  `RALPH_BACKENDS__{{DATABASE or HTTP or STORAGE or STREAM}}__{{BACKEND}}__{{OPTION}}`
+  changed to
+  `RALPH_BACKENDS__DATA__{{BACKEND}}__{{OPTION}}`
+- Environment variables used to configure backend options for LRS usage
+  (runserver command) changed their prefix:
+  `RALPH_BACKENDS__{{DATABASE}}__{{BACKEND}}__{{OPTION}}`
+  changed to
+  `RALPH_BACKENDS__LRS__{{BACKEND}}__{{OPTION}}`
+
 #### Upgrade history syntax
 
 CLI syntax has been changed from `fetch` & `push` to `read` & `write` affecting the command history. You must replace the command history after updating:
@@ -80,6 +129,103 @@ CLI syntax has been changed from `fetch` & `push` to `read` & `write` affecting 
 ```bash
 sed -i 's/"fetch"/"read"/g' { my_history_file_path }
 sed -i 's/"push"/"write"/g' { my_history_file_path }
+```
+
+#### Upgrade Ralph library usage (backends)
+
+If you use Ralph's backends in your application, the following changes might affect you:
+
+Backends from `ralph.backends.database`, `ralph.backends.http`, `ralph.backends.stream`,
+and `ralph.backends.storage` packages have moved to a single `ralph.backends.data`
+package.
+
+| Ralph v3 (database/http/storage/stream) backends        | Ralph v4 data backends                                 |
+|---------------------------------------------------------|--------------------------------------------------------|
+| `ralph.backends.database.clickhouse.ClickHouseDatabase` | `ralph.backends.data.clickhouse.ClickHouseDataBackend` |
+| `ralph.backends.database.es.ESDatabase`                 | `ralph.backends.data.es.ESDataBackend`                 |
+| `ralph.backends.database.mongo.MongoDatabase`           | `ralph.backends.data.mongo.MongoDataBackend`           |
+| `ralph.backends.http.async_lrs.AsyncLRSHTTP`            | `ralph.backends.data.async_lrs.AsyncLRSDataBackend`    |
+| `ralph.backends.http.lrs.LRSHTTP`                       | `ralph.backends.data.lrs.LRSDataBackend`               |
+| `ralph.backends.storage.fs.FSStorage`                   | `ralph.backends.data.fs.FSDataBackend`                 |
+| `ralph.backends.storage.ldp.LDPStorage`                 | `ralph.backends.data.ldp.LDPDataBackend`               |
+| `ralph.backends.storage.s3.S3Storage`                   | `ralph.backends.data.s3.S3DataBackend`                 |
+| `ralph.backends.storage.swift.SwiftStorage`             | `ralph.backends.data.swift.SwiftDataBackend`           |
+| `ralph.backends.stream.ws.WSStream`                     | `ralph.backends.data.async_ws.AsyncWSDataBackend`      |
+
+LRS-specific `query_statements` and `query_statements_by_ids` database backend methods
+have moved to a dedicated `ralph.backends.lrs.BaseLRSBackend` interface that extends the
+data backend interface with these two methods.
+
+The `query_statements_by_ids` method return type changed to `Iterator[dict]`.
+
+| Ralph v3 database backends for lrs usage                | Ralph v4 LRS data backends                             |
+|---------------------------------------------------------|--------------------------------------------------------|
+| `ralph.backends.database.clickhouse.ClickHouseDatabase` | `ralph.backends.lrs.clickhouse.ClickHouseLRSBackend`   |
+| `ralph.backends.database.es.ESDatabase`                 | `ralph.backends.lrs.es.ESLRSBackend`                   |
+| `ralph.backends.database.mongo.MongoDatabase`           | `ralph.backends.lrs.mongo.MongoLRSBackend`             |
+
+**Backend interface differences**
+
+- Data backends are read-only by default
+- Data backends that support write operations inherit from the
+  `ralph.backends.data.base.Writable` interface
+- Data backends that support list operations inherit from the
+  `ralph.backends.data.base.Listable` interface
+- Data backends that support LRS operations
+  (`query_statements`/`query_statements_by_ids`) inherit from the
+  `ralph.backends.lrs.BaseLRSBackend` interface
+- `__init__(self, **kwargs)` changed to `__init__(self, settings: DataBackendSettings)`
+  where each DataBackend defines it's own Settings object
+  For example the `FSDataBackend` uses `FSDataBackendSettings`
+- `stream` and `get` methods changed to `read`
+- `put` methods changed to `write`
+
+**Backend usage migration example**
+
+Ralph v3 using `ESDatabase`:
+
+```python
+from ralph.conf import ESClientOptions
+from ralph.backends.database.es import ESDatabase, ESQuery
+
+# Instantiate the backend.
+backend = ESDatabase(
+  hosts="localhost",
+  index="statements"
+  client_options=ESClientOptions(verify_certs=False)
+)
+# Read records from backend.
+query = ESQuery(query={"query": {"term": {"modulo": 0}}})
+es_statements = list(backend.get(query))
+
+# Write records to backend.
+backend.put([{"id": 1}])
+```
+
+Ralph v4 using `ESDataBackend`:
+
+```python
+from ralph.backends.data.es import (
+  ESClientOptions,
+  ESDataBackend,
+  ESDataBackendSettings,
+  ESQuery,
+)
+
+# Instantiate the backend.
+settings = ESDataBackendSettings(
+  HOSTS="localhost",
+  INDEX="statements",
+  CLIENT_OPTIONS=ESClientOptions(verify_certs=False)
+)
+backend = ESDataBackend(settings)
+
+# Read records from backend.
+query = ESQuery(query={"term": {"modulo": 0}})
+es_statements = list(backend.read(query))
+
+# Write records to backend.
+backend.write([{"id": 1}])
 ```
 
 #### Upgrade ClickHouse schema
