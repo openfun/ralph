@@ -3,6 +3,7 @@
 from typing import Any, Callable
 from decimal import Decimal
 
+from pydantic import NonNegativeFloat
 from polyfactory.factories.pydantic_factory import (
     ModelFactory as PolyfactoryModelFactory,
     T,
@@ -67,7 +68,7 @@ def prune(d: Any, exceptions: list = []):
     elif isinstance(d, list):
         d_list = [prune(v) for v in d]
         return [v for v in d_list if v]
-    if d:
+    if d not in [[], {}, ""]:
         return d
     return False
 
@@ -179,13 +180,13 @@ class UISeqPrev(ModelFactory[UISeqPrev]):
     __model__ = UISeqPrev
     __set_as_default_factory_for_type__ = True
 
-    event = lambda: mock_xapi_instance(NavigationalEventField, old=1, new=0)
+    event = lambda: mock_instance(NavigationalEventField, old=1, new=0)
 
 class UISeqNext(ModelFactory[UISeqNext]):
     __model__ = UISeqNext
     __set_as_default_factory_for_type__ = True
 
-    event = lambda: mock_xapi_instance(NavigationalEventField, old=0, new=1)
+    event = lambda: mock_instance(NavigationalEventField, old=0, new=1)
 
 
 def mock_xapi_instance(klass, *args, **kwargs):

@@ -19,22 +19,22 @@ from ralph.models.edx.problem_interaction.fields.events import (
     SaveProblemSuccessEventField,
 )
 
-from tests.fixtures.hypothesis_strategies import custom_given
+# from tests.fixtures.hypothesis_strategies import custom_given
+from tests.factories import mock_instance
 
-
-@custom_given(CorrectMap)
-def test_models_edx_correct_map_with_valid_content(subfield):
+def test_models_edx_correct_map_with_valid_content():
     """Test that a valid `CorrectMap` does not raise a `ValidationError`."""
+    subfield = mock_instance(CorrectMap)
     assert subfield.correctness in ("correct", "incorrect")
     assert subfield.hintmode in ("on_request", "always", None)
 
 
 @pytest.mark.parametrize("correctness", ["corect", "incorect"])
-@custom_given(CorrectMap)
-def test_models_edx_correct_map_with_invalid_correctness_value(correctness, subfield):
+def test_models_edx_correct_map_with_invalid_correctness_value(correctness):
     """Test that an invalid `correctness` value in `CorrectMap` raises a
     `ValidationError`.
     """
+    subfield = mock_instance(CorrectMap)
     invalid_subfield = json.loads(subfield.json())
     invalid_subfield["correctness"] = correctness
 
@@ -43,11 +43,11 @@ def test_models_edx_correct_map_with_invalid_correctness_value(correctness, subf
 
 
 @pytest.mark.parametrize("hintmode", ["onrequest", "alway"])
-@custom_given(CorrectMap)
-def test_models_edx_correct_map_with_invalid_hintmode_value(hintmode, subfield):
+def test_models_edx_correct_map_with_invalid_hintmode_value(hintmode):
     """Test that an invalid `hintmode` value in `CorrectMap` raises a
     `ValidationError`.
     """
+    subfield = mock_instance(CorrectMap)
     invalid_subfield = json.loads(subfield.json())
     invalid_subfield["hintmode"] = hintmode
 
@@ -55,11 +55,11 @@ def test_models_edx_correct_map_with_invalid_hintmode_value(hintmode, subfield):
         CorrectMap(**invalid_subfield)
 
 
-@custom_given(EdxProblemHintFeedbackDisplayedEventField)
-def test_models_edx_problem_hint_feedback_displayed_event_field_with_valid_field(field):
+def test_models_edx_problem_hint_feedback_displayed_event_field_with_valid_field():
     """Test that a valid `EdxProblemHintFeedbackDisplayedEventField` does not raise a
     `ValidationError`.
     """
+    field = mock_instance(EdxProblemHintFeedbackDisplayedEventField)
     assert field.question_type in (
         "stringresponse",
         "choiceresponse",
@@ -80,13 +80,14 @@ def test_models_edx_problem_hint_feedback_displayed_event_field_with_valid_field
         "optionrespons",
     ],
 )
-@custom_given(EdxProblemHintFeedbackDisplayedEventField)
 def test_models_edx_problem_hint_feedback_displayed_event_field_with_invalid_question_type_value(  # noqa
-    question_type, field
+    question_type
 ):
     """Test that an invalid `question_type` value in
     `EdxProblemHintFeedbackDisplayedEventField` raises a `ValidationError`.
     """
+    field = mock_instance(EdxProblemHintFeedbackDisplayedEventField)
+
     invalid_field = json.loads(field.json())
     invalid_field["question_type"] = question_type
 
@@ -95,13 +96,13 @@ def test_models_edx_problem_hint_feedback_displayed_event_field_with_invalid_que
 
 
 @pytest.mark.parametrize("trigger_type", ["jingle", "compund"])
-@custom_given(EdxProblemHintFeedbackDisplayedEventField)
 def test_models_edx_problem_hint_feedback_displayed_event_field_with_invalid_trigger_type_value(  # noqa
-    trigger_type, field
+    trigger_type
 ):
     """Test that an invalid `question_type` value in
     `EdxProblemHintFeedbackDisplayedEventField` raises a `ValidationError`.
     """
+    field = mock_instance(EdxProblemHintFeedbackDisplayedEventField)
     invalid_field = json.loads(field.json())
     invalid_field["trigger_type"] = trigger_type
 
@@ -109,11 +110,11 @@ def test_models_edx_problem_hint_feedback_displayed_event_field_with_invalid_tri
         EdxProblemHintFeedbackDisplayedEventField(**invalid_field)
 
 
-@custom_given(ProblemCheckEventField)
-def test_models_edx_problem_check_event_field_with_valid_field(field):
+def test_models_edx_problem_check_event_field_with_valid_field():
     """Test that a valid `ProblemCheckEventField` does not raise a
     `ValidationError`.
     """
+    field = mock_instance(ProblemCheckEventField)
     assert re.match(
         (
             r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]"
@@ -151,13 +152,13 @@ def test_models_edx_problem_check_event_field_with_valid_field(field):
         ),
     ],
 )
-@custom_given(ProblemCheckEventField)
 def test_models_edx_problem_check_event_field_with_invalid_problem_id_value(
-    problem_id, field
+    problem_id
 ):
     """Test that an invalid `problem_id` value in `ProblemCheckEventField` raises a
     `ValidationError`.
     """
+    field = mock_instance(ProblemCheckEventField)
     invalid_field = json.loads(field.json())
     invalid_field["problem_id"] = problem_id
 
@@ -168,13 +169,13 @@ def test_models_edx_problem_check_event_field_with_invalid_problem_id_value(
 
 
 @pytest.mark.parametrize("success", ["corect", "incorect"])
-@custom_given(ProblemCheckEventField)
 def test_models_edx_problem_check_event_field_with_invalid_success_value(
-    success, field
+    success
 ):
     """Test that an invalid `success` value in `ProblemCheckEventField` raises a
     `ValidationError`.
     """
+    field = mock_instance(ProblemCheckEventField)
     invalid_field = json.loads(field.json())
     invalid_field["success"] = success
 
@@ -182,11 +183,11 @@ def test_models_edx_problem_check_event_field_with_invalid_success_value(
         ProblemCheckEventField(**invalid_field)
 
 
-@custom_given(ProblemCheckFailEventField)
-def test_models_edx_problem_check_fail_event_field_with_valid_field(field):
+def test_models_edx_problem_check_fail_event_field_with_valid_field():
     """Test that a valid `ProblemCheckFailEventField` does not raise a
     `ValidationError`.
     """
+    field = mock_instance(ProblemCheckFailEventField)
     assert re.match(
         (
             r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]"
@@ -224,13 +225,13 @@ def test_models_edx_problem_check_fail_event_field_with_valid_field(field):
         ),
     ],
 )
-@custom_given(ProblemCheckFailEventField)
 def test_models_edx_problem_check_fail_event_field_with_invalid_problem_id_value(
-    problem_id, field
+    problem_id
 ):
     """Test that an invalid `problem_id` value in `ProblemCheckFailEventField` raises a
     `ValidationError`.
     """
+    field = mock_instance(ProblemCheckFailEventField)
     invalid_field = json.loads(field.json())
     invalid_field["problem_id"] = problem_id
 
@@ -241,13 +242,13 @@ def test_models_edx_problem_check_fail_event_field_with_invalid_problem_id_value
 
 
 @pytest.mark.parametrize("failure", ["close", "unresit"])
-@custom_given(ProblemCheckFailEventField)
 def test_models_edx_problem_check_fail_event_field_with_invalid_failure_value(
-    failure, field
+    failure
 ):
     """Test that an invalid `failure` value in `ProblemCheckFailEventField` raises a
     `ValidationError`.
     """
+    field = mock_instance(ProblemCheckFailEventField)
     invalid_field = json.loads(field.json())
     invalid_field["failure"] = failure
 
@@ -255,11 +256,11 @@ def test_models_edx_problem_check_fail_event_field_with_invalid_failure_value(
         ProblemCheckFailEventField(**invalid_field)
 
 
-@custom_given(ProblemRescoreEventField)
-def test_models_edx_problem_rescore_event_field_with_valid_field(field):
+def test_models_edx_problem_rescore_event_field_with_valid_field():
     """Test that a valid `ProblemRescoreEventField` does not raise a
     `ValidationError`.
     """
+    field = mock_instance(ProblemRescoreEventField)
     assert re.match(
         (
             r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]"
@@ -297,13 +298,13 @@ def test_models_edx_problem_rescore_event_field_with_valid_field(field):
         ),
     ],
 )
-@custom_given(ProblemRescoreEventField)
 def test_models_edx_problem_rescore_event_field_with_invalid_problem_id_value(
-    problem_id, field
+    problem_id
 ):
     """Test that an invalid `problem_id` value in `ProblemRescoreEventField` raises a
     `ValidationError`.
     """
+    field = mock_instance(ProblemRescoreEventField)
     invalid_field = json.loads(field.json())
     invalid_field["problem_id"] = problem_id
 
@@ -314,13 +315,13 @@ def test_models_edx_problem_rescore_event_field_with_invalid_problem_id_value(
 
 
 @pytest.mark.parametrize("success", ["corect", "incorect"])
-@custom_given(ProblemRescoreEventField)
 def test_models_edx_problem_rescore_event_field_with_invalid_success_value(
-    success, field
+    success
 ):
     """Test that an invalid `success` value in `ProblemRescoreEventField` raises a
     `ValidationError`.
     """
+    field = mock_instance(ProblemRescoreEventField)
     invalid_field = json.loads(field.json())
     invalid_field["success"] = success
 
@@ -328,11 +329,11 @@ def test_models_edx_problem_rescore_event_field_with_invalid_success_value(
         ProblemRescoreEventField(**invalid_field)
 
 
-@custom_given(ProblemRescoreFailEventField)
-def test_models_edx_problem_rescore_fail_event_field_with_valid_field(field):
+def test_models_edx_problem_rescore_fail_event_field_with_valid_field():
     """Test that a valid `ProblemRescoreFailEventField` does not raise a
     `ValidationError`.
     """
+    field = mock_instance(ProblemRescoreFailEventField)
     assert re.match(
         (
             r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]"
@@ -370,13 +371,13 @@ def test_models_edx_problem_rescore_fail_event_field_with_valid_field(field):
         ),
     ],
 )
-@custom_given(ProblemRescoreFailEventField)
 def test_models_edx_problem_rescore_fail_event_field_with_invalid_problem_id_value(
-    problem_id, field
+    problem_id
 ):
     """Test that an invalid `problem_id` value in `ProblemRescoreFailEventField` raises
     a `ValidationError`.
     """
+    field = mock_instance(ProblemRescoreFailEventField)
     invalid_field = json.loads(field.json())
     invalid_field["problem_id"] = problem_id
 
@@ -387,13 +388,13 @@ def test_models_edx_problem_rescore_fail_event_field_with_invalid_problem_id_val
 
 
 @pytest.mark.parametrize("failure", ["close", "unresit"])
-@custom_given(ProblemRescoreFailEventField)
 def test_models_edx_problem_rescore_fail_event_field_with_invalid_failure_value(
-    failure, field
+    failure
 ):
     """Test that an invalid `failure` value in `ProblemRescoreFailEventField` raises a
     `ValidationError`.
     """
+    field = mock_instance(ProblemRescoreFailEventField)
     invalid_field = json.loads(field.json())
     invalid_field["failure"] = failure
 
@@ -401,11 +402,11 @@ def test_models_edx_problem_rescore_fail_event_field_with_invalid_failure_value(
         ProblemRescoreFailEventField(**invalid_field)
 
 
-@custom_given(ResetProblemEventField)
-def test_models_edx_reset_problem_event_field_with_valid_field(field):
+def test_models_edx_reset_problem_event_field_with_valid_field():
     """Test that a valid `ResetProblemEventField` does not raise a
     `ValidationError`.
     """
+    field = mock_instance(ResetProblemEventField)
     assert re.match(
         (
             r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]"
@@ -442,13 +443,13 @@ def test_models_edx_reset_problem_event_field_with_valid_field(field):
         ),
     ],
 )
-@custom_given(ResetProblemEventField)
 def test_models_edx_reset_problem_event_field_with_invalid_problem_id_value(
-    problem_id, field
+    problem_id
 ):
     """Test that an invalid `problem_id` value in `ResetProblemEventField` raises a
     `ValidationError`.
     """
+    field = mock_instance(ResetProblemEventField)
     invalid_field = json.loads(field.json())
     invalid_field["problem_id"] = problem_id
 
@@ -458,11 +459,11 @@ def test_models_edx_reset_problem_event_field_with_invalid_problem_id_value(
         ResetProblemEventField(**invalid_field)
 
 
-@custom_given(ResetProblemFailEventField)
-def test_models_edx_reset_problem_fail_event_field_with_valid_field(field):
+def test_models_edx_reset_problem_fail_event_field_with_valid_field():
     """Test that a valid `ResetProblemFailEventField` does not raise a
     `ValidationError`.
     """
+    field = mock_instance(ResetProblemFailEventField)
     assert re.match(
         (
             r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]"
@@ -500,13 +501,13 @@ def test_models_edx_reset_problem_fail_event_field_with_valid_field(field):
         ),
     ],
 )
-@custom_given(ResetProblemFailEventField)
 def test_models_edx_reset_problem_fail_event_field_with_invalid_problem_id_value(
-    problem_id, field
+    problem_id
 ):
     """Test that an invalid `problem_id` value in `ResetProblemFailEventField` raises
     a `ValidationError`.
     """
+    field = mock_instance(ResetProblemFailEventField)
     invalid_field = json.loads(field.json())
     invalid_field["problem_id"] = problem_id
 
@@ -517,13 +518,13 @@ def test_models_edx_reset_problem_fail_event_field_with_invalid_problem_id_value
 
 
 @pytest.mark.parametrize("failure", ["close", "not_close"])
-@custom_given(ResetProblemFailEventField)
 def test_models_edx_reset_problem_fail_event_field_with_invalid_failure_value(
-    failure, field
+    failure
 ):
     """Test that an invalid `failure` value in `ResetProblemFailEventField` raises a
     `ValidationError`.
     """
+    field = mock_instance(ResetProblemFailEventField)
     invalid_field = json.loads(field.json())
     invalid_field["failure"] = failure
 
@@ -531,11 +532,11 @@ def test_models_edx_reset_problem_fail_event_field_with_invalid_failure_value(
         ResetProblemFailEventField(**invalid_field)
 
 
-@custom_given(SaveProblemFailEventField)
-def test_models_edx_save_problem_fail_event_field_with_valid_field(field):
+def test_models_edx_save_problem_fail_event_field_with_valid_field():
     """Test that a valid `SaveProblemFailEventField` does not raise a
     `ValidationError`.
     """
+    field = mock_instance(SaveProblemFailEventField)
     assert re.match(
         (
             r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]"
@@ -573,13 +574,13 @@ def test_models_edx_save_problem_fail_event_field_with_valid_field(field):
         ),
     ],
 )
-@custom_given(SaveProblemFailEventField)
 def test_models_edx_save_problem_fail_event_field_with_invalid_problem_id_value(
-    problem_id, field
+    problem_id
 ):
     """Test that an invalid `problem_id` value in `SaveProblemFailEventField` raises a
     `ValidationError`.
     """
+    field = mock_instance(SaveProblemFailEventField)
     invalid_field = json.loads(field.json())
     invalid_field["problem_id"] = problem_id
 
@@ -590,13 +591,13 @@ def test_models_edx_save_problem_fail_event_field_with_invalid_problem_id_value(
 
 
 @pytest.mark.parametrize("failure", ["close", "doned"])
-@custom_given(SaveProblemFailEventField)
 def test_models_edx_save_problem_fail_event_field_with_invalid_failure_value(
-    failure, field
+    failure
 ):
     """Test that an invalid `failure` value in `SaveProblemFailEventField` raises a
     `ValidationError`.
     """
+    field = mock_instance(SaveProblemFailEventField)
     invalid_field = json.loads(field.json())
     invalid_field["failure"] = failure
 
@@ -604,11 +605,11 @@ def test_models_edx_save_problem_fail_event_field_with_invalid_failure_value(
         SaveProblemFailEventField(**invalid_field)
 
 
-@custom_given(SaveProblemSuccessEventField)
-def test_models_edx_save_problem_success_event_field_with_valid_field(field):
+def test_models_edx_save_problem_success_event_field_with_valid_field():
     """Test that a valid `SaveProblemFailEventField` does not raise a
     `ValidationError`.
     """
+    field = mock_instance(SaveProblemSuccessEventField)
     assert re.match(
         (
             r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]"
@@ -645,13 +646,13 @@ def test_models_edx_save_problem_success_event_field_with_valid_field(field):
         ),
     ],
 )
-@custom_given(SaveProblemSuccessEventField)
 def test_models_edx_save_problem_success_event_field_with_invalid_problem_id_value(
-    problem_id, field
+    problem_id
 ):
     """Test that an invalid `problem_id` value in `SaveProblemSuccessEventField`
     raises a `ValidationError`.
     """
+    field = mock_instance(SaveProblemSuccessEventField)
     invalid_field = json.loads(field.json())
     invalid_field["problem_id"] = problem_id
 

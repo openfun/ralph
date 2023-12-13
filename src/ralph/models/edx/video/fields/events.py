@@ -2,6 +2,8 @@
 
 import sys
 
+from pydantic import NonNegativeFloat
+
 from ...base import AbstractBaseEventField
 
 if sys.version_info >= (3, 8):
@@ -48,7 +50,6 @@ class PauseVideoEventField(VideoBaseEventField):
 
     currentTime: float
 
-
 class SeekVideoEventField(VideoBaseEventField):
     """Pydantic model for `seek_video`.`event` field.
 
@@ -61,8 +62,8 @@ class SeekVideoEventField(VideoBaseEventField):
             within the video, either `onCaptionSeek` or `onSlideSeek` value.
     """
 
-    new_time: float
-    old_time: float
+    new_time: NonNegativeFloat # TODO: Ask Quitterie if this is valid
+    old_time: NonNegativeFloat
     type: str
 
 

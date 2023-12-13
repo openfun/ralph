@@ -156,7 +156,6 @@ def test_models_validator_validate_with_valid_events(
     assert json.loads(next(result)) == event_dict
 
 
-# @settings(suppress_health_check=(HealthCheck.function_scoped_fixture,))
 # @custom_given(UIPageClose)
 def test_models_validator_validate_counter(caplog):
     """Test given multiple events the validate method

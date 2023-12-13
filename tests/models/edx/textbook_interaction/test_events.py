@@ -11,14 +11,14 @@ from ralph.models.edx.textbook_interaction.fields.events import (
     TextbookPdfChapterNavigatedEventField,
 )
 
-from tests.fixtures.hypothesis_strategies import custom_given
+# from tests.fixtures.hypothesis_strategies import custom_given
+from tests.factories import mock_instance
 
-
-@custom_given(TextbookInteractionBaseEventField)
-def test_fields_edx_textbook_interaction_base_event_field_with_valid_content(field):
+def test_fields_edx_textbook_interaction_base_event_field_with_valid_content():
     """Test that a valid `TextbookInteractionBaseEventField` does not raise
     a `ValidationError`.
     """
+    field = mock_instance(TextbookInteractionBaseEventField)
 
     assert re.match(
         r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$",
@@ -61,13 +61,13 @@ def test_fields_edx_textbook_interaction_base_event_field_with_valid_content(fie
         ),
     ),
 )
-@custom_given(TextbookInteractionBaseEventField)
 def test_fields_edx_textbook_interaction_base_event_field_with_invalid_content(
-    chapter, field
+    chapter
 ):
     """Test that an invalid `TextbookInteractionBaseEventField` raises a
     `ValidationError`.
     """
+    field = mock_instance(TextbookInteractionBaseEventField)
 
     invalid_field = json.loads(field.json())
     invalid_field["chapter"] = chapter
@@ -76,13 +76,13 @@ def test_fields_edx_textbook_interaction_base_event_field_with_invalid_content(
         TextbookInteractionBaseEventField(**invalid_field)
 
 
-@custom_given(TextbookPdfChapterNavigatedEventField)
 def test_fields_edx_textbook_pdf_chapter_navigated_event_field_with_valid_content(
-    field,
+
 ):
     """Test that a valid `TextbookPdfChapterNavigatedEventField` does not raise a
     `ValidationError`.
     """
+    field = mock_instance(TextbookPdfChapterNavigatedEventField)
 
     assert re.match(
         (r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"),
@@ -121,13 +121,13 @@ def test_fields_edx_textbook_pdf_chapter_navigated_event_field_with_valid_conten
         ),
     ),
 )
-@custom_given(TextbookPdfChapterNavigatedEventField)
 def test_fields_edx_textbook_pdf_chapter_navigated_event_field_with_invalid_content(
-    chapter, field
+    chapter
 ):
     """Test that an invalid `TextbookPdfChapterNavigatedEventField` raises a
     `ValidationError`.
     """
+    field = mock_instance(TextbookPdfChapterNavigatedEventField)
 
     invalid_field = json.loads(field.json())
     invalid_field["chapter"] = chapter

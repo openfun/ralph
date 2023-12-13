@@ -16,7 +16,7 @@ from ralph.models.edx.navigational.statements import (
 )
 from ralph.models.selector import ModelSelector
 
-from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
+# from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 from tests.factories import mock_instance
 
 @pytest.mark.parametrize(
@@ -28,21 +28,21 @@ from tests.factories import mock_instance
         UISeqPrev,
     ],
 )
-@custom_given(st.data())
-def test_models_edx_navigational_selectors_with_valid_statements(class_, data):
+def test_models_edx_navigational_selectors_with_valid_statements(class_):
     """Test given a valid navigational edX statement the `get_first_model`
     selector method should return the expected model.
     """
-    statement = json.loads(data.draw(custom_builds(class_)).json())
+    statement = json.loads(mock_instance(class_).json())
     model = ModelSelector(module="ralph.models.edx").get_first_model(statement)
     assert model is class_
 
 
-@custom_given(NavigationalEventField)
-def test_fields_edx_navigational_events_event_field_with_valid_content(field):
+def test_fields_edx_navigational_events_event_field_with_valid_content():
     """Test that a valid `NavigationalEventField` does not raise a
     `ValidationError`.
     """
+    field = mock_instance(NavigationalEventField)
+
     assert re.match(
         (
             r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"
@@ -79,9 +79,9 @@ def test_fields_edx_navigational_events_event_field_with_valid_content(field):
         ),
     ],
 )
-@custom_given(NavigationalEventField)
-def test_fields_edx_navigational_events_event_field_with_invalid_content(id, field):
+def test_fields_edx_navigational_events_event_field_with_invalid_content(id):
     """Test that an invalid `NavigationalEventField` raises a `ValidationError`."""
+    field = mock_instance(NavigationalEventField)
     invalid_field = json.loads(field.json())
     invalid_field["id"] = id
 
@@ -89,34 +89,34 @@ def test_fields_edx_navigational_events_event_field_with_invalid_content(id, fie
         NavigationalEventField(**invalid_field)
 
 
-@custom_given(UIPageClose)
-def test_models_edx_ui_page_close_with_valid_statement(statement):
+def test_models_edx_ui_page_close_with_valid_statement():
     """Test that a `page_close` statement has the expected `event`, `event_type` and
     `name`.
     """
+    statement = mock_instance(UIPageClose)
     assert statement.event == "{}"
     assert statement.event_type == "page_close"
     assert statement.name == "page_close"
 
 
-@custom_given(UISeqGoto)
-def test_models_edx_ui_seq_goto_with_valid_statement(statement):
+def test_models_edx_ui_seq_goto_with_valid_statement():
     """Test that a `seq_goto` statement has the expected `event_type` and `name`."""
+    statement = mock_instance(UISeqGoto)
     assert statement.event_type == "seq_goto"
     assert statement.name == "seq_goto"
 
 
-@custom_given(UISeqNext)
-def test_models_edx_ui_seq_next_with_valid_statement(statement):
+def test_models_edx_ui_seq_next_with_valid_statement():
     """Test that a `seq_next` statement has the expected `event_type` and `name`."""
+    statement = mock_instance(UISeqNext)
     assert statement.event_type == "seq_next"
     assert statement.name == "seq_next"
 
 
 @pytest.mark.parametrize("old,new", [("0", "10"), ("10", "0")])
-@custom_given(UISeqNext)
-def test_models_edx_ui_seq_next_with_invalid_statement(old, new, event):
+def test_models_edx_ui_seq_next_with_invalid_statement(old, new):
     """Test that an invalid `seq_next` event raises a ValidationError."""
+    event = mock_instance(UISeqNext)
     invalid_event = json.loads(event.json())
     invalid_event["event"]["old"] = old
     invalid_event["event"]["new"] = new
@@ -128,17 +128,17 @@ def test_models_edx_ui_seq_next_with_invalid_statement(old, new, event):
         UISeqNext(**invalid_event)
 
 
-@custom_given(UISeqPrev)
-def test_models_edx_ui_seq_prev_with_valid_statement(statement):
+def test_models_edx_ui_seq_prev_with_valid_statement():
     """Test that a `seq_prev` statement has the expected `event_type` and `name`."""
+    statement = mock_instance(UISeqPrev)
     assert statement.event_type == "seq_prev"
     assert statement.name == "seq_prev"
 
 
 @pytest.mark.parametrize("old,new", [("0", "10"), ("10", "0")])
-@custom_given(UISeqPrev)
-def test_models_edx_ui_seq_prev_with_invalid_statement(old, new, event):
+def test_models_edx_ui_seq_prev_with_invalid_statement(old, new):
     """Test that an invalid `seq_prev` event raises a ValidationError."""
+    event = mock_instance(UISeqPrev)
     invalid_event = json.loads(event.json())
     invalid_event["event"]["old"] = old
     invalid_event["event"]["new"] = new
