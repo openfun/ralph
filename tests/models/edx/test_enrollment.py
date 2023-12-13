@@ -31,7 +31,6 @@ def test_models_edx_edx_course_enrollment_selectors_with_valid_statements(class_
     selector method should return the expected model.
     """
     statement = json.loads(mock_instance(class_).json())
-    # statement = json.loads(data.draw(custom_builds(class_)).json())
     model = ModelSelector(module="ralph.models.edx").get_first_model(statement)
     assert model is class_
 
@@ -60,7 +59,6 @@ def test_models_edx_edx_course_enrollment_deactivated_with_valid_statement(
     assert statement.name == "edx.course.enrollment.deactivated"
 
 
-# @custom_given(EdxCourseEnrollmentModeChanged)
 def test_models_edx_edx_course_enrollment_mode_changed_with_valid_statement(
     # statement,
 ):
@@ -72,7 +70,6 @@ def test_models_edx_edx_course_enrollment_mode_changed_with_valid_statement(
     assert statement.name == "edx.course.enrollment.mode_changed"
 
 
-# @custom_given(UIEdxCourseEnrollmentUpgradeClicked)
 def test_models_edx_ui_edx_course_enrollment_upgrade_clicked_with_valid_statement(
     # statement,
 ):

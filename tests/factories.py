@@ -52,7 +52,9 @@ def prune(d: Any, exceptions: list = []):
     elif isinstance(d, list):
         d_list = [prune(v) for v in d]
         return [v for v in d_list if v]
-    if d not in [[], {}, ""]:
+    # if d not in [[], {}, ""]: # TODO: put back ?
+    #     return d
+    if d:
         return d
     return False
 
@@ -168,6 +170,14 @@ def mock_xapi_instance(klass, *args, **kwargs):
 
     return klass(**kwargs)
 
+def _call_all_callables(value):
+    if callable(value):
+        return value()
+    if isinstance(value, dict):
+        return {_call_all_callables(k):_call_all_callables(v) for k, v in value.items()}
+    elif isinstance(value, list):
+        return [_call_all_callables(v) for v in value]
+    return value
 
 def mock_instance(klass, *args, **kwargs):
     """Generate a mock instance of a given model."""
@@ -181,9 +191,21 @@ def mock_instance(klass, *args, **kwargs):
     else:
         KlassFactory = BaseFactory._factory_type_mapping[klass]
 
-    kwargs = KlassFactory.process_kwargs(*args, **kwargs)
+    return KlassFactory.build()
 
-    return klass(**kwargs)
+    # kwargs = KlassFactory.process_kwargs(*args, **kwargs)
+
+    # print('OKAY ONE')
+    # from pprint import pprint
+    # pprint(kwargs)
+    # kwargs = _call_all_callables(kwargs)
+
+    # print('OKAY TWO')
+    # from pprint import pprint
+    # pprint(kwargs)
+
+    # return klass(**kwargs)
+
 
 
 def mock_url():

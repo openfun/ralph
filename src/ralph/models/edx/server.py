@@ -4,14 +4,14 @@ import sys
 from pathlib import Path
 from typing import Union
 
-from pydantic import Json
+from pydantic import Json, validator
 
 from ralph.models.selector import LazyModelField, selector
 
 from .base import AbstractBaseEventField, BaseEdxModel
 
 if sys.version_info >= (3, 8):
-    from typing import Literal
+    from typing import Any, Literal
 else:
     from typing_extensions import Literal
 
@@ -20,6 +20,7 @@ class BaseServerModel(BaseEdxModel):
     """Pydantic model for core server statement."""
 
     event_source: Literal["server"]
+
 
 
 class ServerEventField(AbstractBaseEventField):
