@@ -33,7 +33,7 @@ class VideoResultExtensions(BaseExtensionModelWithConfig):
         time (float): Consists of the video time code when the event was emitted.
     """
 
-    time: NonNegativeFloat = Field(alias=RESULT_EXTENSION_TIME)
+    time: NonNegativeFloat = Field(alias=RESULT_EXTENSION_TIME, min=0)
     playedSegments: Optional[str] = Field(alias=CONTEXT_EXTENSION_PLAYED_SEGMENTS)
 
 
@@ -44,7 +44,7 @@ class VideoPausedResultExtensions(VideoResultExtensions):
         progress (float): Consists of the ratio of media consumed by the actor.
     """
 
-    progress: Optional[NonNegativeFloat] = Field(alias=RESULT_EXTENSION_PROGRESS)
+    progress: Optional[NonNegativeFloat] = Field(alias=RESULT_EXTENSION_PROGRESS, min=0)
 
 
 class VideoSeekedResultExtensions(BaseExtensionModelWithConfig):
@@ -57,8 +57,8 @@ class VideoSeekedResultExtensions(BaseExtensionModelWithConfig):
             object during a seek operation.
     """
 
-    timeFrom: NonNegativeFloat = Field(alias=RESULT_EXTENSION_TIME_FROM)
-    timeTo: NonNegativeFloat = Field(alias=RESULT_EXTENSION_TIME_TO)
+    timeFrom: NonNegativeFloat = Field(alias=RESULT_EXTENSION_TIME_FROM, min=0)
+    timeTo: NonNegativeFloat = Field(alias=RESULT_EXTENSION_TIME_TO, min=0)
 
 
 class VideoCompletedResultExtensions(VideoResultExtensions):
@@ -68,7 +68,7 @@ class VideoCompletedResultExtensions(VideoResultExtensions):
         progress (float): Consists of the percentage of media consumed by the actor.
     """
 
-    progress: NonNegativeFloat = Field(alias=RESULT_EXTENSION_PROGRESS)
+    progress: NonNegativeFloat = Field(alias=RESULT_EXTENSION_PROGRESS, min=0)
 
 
 class VideoTerminatedResultExtensions(VideoResultExtensions):
@@ -78,7 +78,7 @@ class VideoTerminatedResultExtensions(VideoResultExtensions):
         progress (float): Consists of the percentage of media consumed by the actor.
     """
 
-    progress: NonNegativeFloat = Field(alias=RESULT_EXTENSION_PROGRESS)
+    progress: NonNegativeFloat = Field(alias=RESULT_EXTENSION_PROGRESS, min=0)
 
 
 class VideoEnableClosedCaptioningResultExtensions(VideoResultExtensions):

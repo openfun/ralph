@@ -8,12 +8,14 @@ from pydantic.error_wrappers import ValidationError
 
 from ralph.models.edx.browser import BaseBrowserModel
 
-from tests.fixtures.hypothesis_strategies import custom_given
+# from tests.fixtures.hypothesis_strategies import custom_given
+from tests.factories import mock_instance
 
 
-@custom_given(BaseBrowserModel)
-def test_models_edx_base_browser_model_with_valid_statement(statement):
+# @custom_given(BaseBrowserModel)
+def test_models_edx_base_browser_model_with_valid_statement():
     """Test that a valid base browser statement does not raise a `ValidationError`."""
+    statement = mock_instance(BaseBrowserModel)
     assert re.match(r"^[a-f0-9]{32}$", statement.session) or statement.session == ""
 
 
@@ -28,11 +30,12 @@ def test_models_edx_base_browser_model_with_valid_statement(statement):
         ("abcdef0123456789_abcdef012345678", "string does not match regex"),
     ],
 )
-@custom_given(BaseBrowserModel)
+# @custom_given(BaseBrowserModel)
 def test_models_edx_base_browser_model_with_invalid_statement(
-    session, error, statement
+    session, error
 ):
     """Test that an invalid base browser statement raises a `ValidationError`."""
+    statement = mock_instance(BaseBrowserModel)
     invalid_statement = json.loads(statement.json())
     invalid_statement["session"] = session
 

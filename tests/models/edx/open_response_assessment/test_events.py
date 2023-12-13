@@ -14,7 +14,7 @@ from ralph.models.edx.open_response_assessment.fields.events import (
 )
 
 from tests.fixtures.hypothesis_strategies import custom_given
-
+from tests.factories import mock_instance
 
 @custom_given(ORAGetPeerSubmissionEventField)
 def test_models_edx_ora_get_peer_submission_event_field_with_valid_values(field):

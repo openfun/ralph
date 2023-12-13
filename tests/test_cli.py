@@ -33,7 +33,7 @@ from tests.fixtures.backends import (
     WS_TEST_HOST,
     WS_TEST_PORT,
 )
-# from tests.fixtures.hypothesis_strategies import custom_given
+
 from tests.factories import mock_instance
 
 test_logger = logging.getLogger("ralph")
@@ -482,12 +482,11 @@ def test_cli_validate_command_with_edx_format():
     assert event_str in result.output
 
 
-@hypothesis_settings(deadline=None)
 @pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_cli_convert_command_from_edx_to_xapi_format(valid_uuid):
     """Test ralph convert command from edx to xapi format."""
     event = mock_instance(UIPageClose)
-    
+
     event_str = event.json()
     runner = CliRunner()
     command = f"-v ERROR convert -f edx -t xapi -u {valid_uuid} -p https://fun-mooc.fr"

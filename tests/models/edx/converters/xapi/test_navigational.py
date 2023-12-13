@@ -10,17 +10,20 @@ from ralph.models.converter import convert_dict_event
 from ralph.models.edx.converters.xapi.navigational import UIPageCloseToPageTerminated
 from ralph.models.edx.navigational.statements import UIPageClose
 
-from tests.fixtures.hypothesis_strategies import custom_given
+# from tests.fixtures.hypothesis_strategies import custom_given
+from tests.factories import mock_instance, mock_url
 
-
-@custom_given(UIPageClose, provisional.urls())
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_models_edx_converters_xapi_navigational_ui_page_close_to_page_terminated(
-    uuid_namespace, event, platform_url
+    uuid_namespace
 ):
     """Test that converting with UIPageCloseToPageTerminated returns the expected xAPI
     statement.
     """
+    event = mock_instance(UIPageClose)
+    platform_url = mock_url()
+    assert platform_url is not None # TODO: remove this
+
     event.context.user_id = "1"
     event_str = event.json()
     event = json.loads(event_str)

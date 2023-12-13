@@ -10,17 +10,19 @@ from ralph.models.converter import convert_dict_event, convert_str_event
 from ralph.models.edx.converters.xapi.server import ServerEventToPageViewed
 from ralph.models.edx.server import Server
 
-from tests.fixtures.hypothesis_strategies import custom_given
+from tests.fixtures.hypothesis_ strategies import custom_given
+from tests.factories import mock_instance, mock_url
 
-
-@custom_given(Server, provisional.urls())
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_models_edx_converters_xapi_server_server_event_to_page_viewed_constant_uuid(
-    uuid_namespace, event, platform_url
+    uuid_namespace
 ):
     """Test that `ServerEventToPageViewed.convert` returns a JSON string with a
     constant UUID.
     """
+    event = mock_instance(Server)
+    platform_url = mock_url()
+
     event_str = event.json()
     event = json.loads(event_str)
     xapi_event1 = convert_str_event(
@@ -32,14 +34,16 @@ def test_models_edx_converters_xapi_server_server_event_to_page_viewed_constant_
     assert xapi_event1.id == xapi_event2.id
 
 
-@custom_given(Server, provisional.urls())
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_models_edx_converters_xapi_server_server_event_to_page_viewed(
-    uuid_namespace, event, platform_url
+    uuid_namespace
 ):
     """Test that converting with `ServerEventToPageViewed` returns the expected xAPI
     statement.
     """
+    event = mock_instance(Server)
+    platform_url = mock_url()
+
     event.event_type = "/main/blog"
     event.context.user_id = "1"
     event_str = event.json()
@@ -67,13 +71,12 @@ def test_models_edx_converters_xapi_server_server_event_to_page_viewed(
     }
 
 
-@settings(deadline=None)
-@custom_given(Server, provisional.urls())
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_models_edx_converters_xapi_server_server_event_to_page_viewed_with_anonymous_user(  # noqa: E501
-    uuid_namespace, event, platform_url
+    uuid_namespace, event
 ):
     """Test that anonymous usernames are replaced with `anonymous`."""
+    platform_url = mock_url()
 
     event.context.user_id = ""
     event_str = event.json()

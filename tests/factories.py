@@ -136,46 +136,42 @@ class BaseXapiContextFactory(ModelFactory[BaseXapiContext]):
     #     lambda: BaseXapiContextContextActivitiesFactory.build() or Ignore()
     # )
 
-
-
-
 class LMSContextContextActivitiesFactory(ModelFactory[LMSContextContextActivities]): 
     __model__ = LMSContextContextActivities
     __set_as_default_factory_for_type__ = True
     
-    category = lambda: mock_instance(LMSProfileActivity) # TODO: Uncomment
+    category = lambda: mock_xapi_instance(LMSProfileActivity) # TODO: Uncomment
 
 class VideoContextContextActivitiesFactory(ModelFactory[VideoContextContextActivities]):
     __model__ = VideoContextContextActivities
     __set_as_default_factory_for_type__ = True
     
-    category = lambda: mock_instance(VideoProfileActivity)  
-
+    category = lambda: mock_xapi_instance(VideoProfileActivity)  
 
 class VirtualClassroomStartedPollContextActivitiesFactory(ModelFactory[VirtualClassroomStartedPollContextActivities]): 
     __model__ = VirtualClassroomStartedPollContextActivities
     __set_as_default_factory_for_type__ = True
     
-    category = lambda: mock_instance(VirtualClassroomProfileActivity)
+    category = lambda: mock_xapi_instance(VirtualClassroomProfileActivity)
 
 class VirtualClassroomAnsweredPollContextActivitiesFactory(ModelFactory[VirtualClassroomAnsweredPollContextActivities]): 
     __model__ = VirtualClassroomAnsweredPollContextActivities
     __set_as_default_factory_for_type__ = True
     
-    category = lambda: mock_instance(VirtualClassroomProfileActivity)
+    category = lambda: mock_xapi_instance(VirtualClassroomProfileActivity)
 
 class VirtualClassroomPostedPublicMessageContextActivitiesFactory(ModelFactory[VirtualClassroomPostedPublicMessageContextActivities]): 
     __model__ = VirtualClassroomPostedPublicMessageContextActivities
     __set_as_default_factory_for_type__ = True
     
-    category = lambda: mock_instance(VirtualClassroomProfileActivity)
+    category = lambda: mock_xapi_instance(VirtualClassroomProfileActivity)
 
 
 # class VirtualClassroomAnsweredPollFactory(ModelFactory[VirtualClassroomAnsweredPollContextActivities]):
 #     __model__ = VirtualClassroomAnsweredPollContextActivities
 
-#     category = lambda: mock_instance(VirtualClassroomProfileActivity)
-#     parent = lambda: mock_instance(VirtualClassroomActivity) # TODO: Remove this. Check that this is valid  
+#     category = lambda: mock_xapi_instance(VirtualClassroomProfileActivity)
+#     parent = lambda: mock_xapi_instance(VirtualClassroomActivity) # TODO: Remove this. Check that this is valid  
    
 
 
@@ -183,14 +179,30 @@ class UISeqPrev(ModelFactory[UISeqPrev]):
     __model__ = UISeqPrev
     __set_as_default_factory_for_type__ = True
 
-    event = lambda: mock_instance(NavigationalEventField, old=1, new=0)
+    event = lambda: mock_xapi_instance(NavigationalEventField, old=1, new=0)
 
 class UISeqNext(ModelFactory[UISeqNext]):
     __model__ = UISeqNext
     __set_as_default_factory_for_type__ = True
 
-    event = lambda: mock_instance(NavigationalEventField, old=0, new=1)
+    event = lambda: mock_xapi_instance(NavigationalEventField, old=0, new=1)
 
+
+def mock_xapi_instance(klass, *args, **kwargs):
+    """Generate a mock instance of a given class (`klass`)."""
+
+    # Avoid redifining custom factories
+    if klass not in BaseFactory._factory_type_mapping:
+        class KlassFactory(ModelFactory[klass]):
+            __model__ = klass
+    else:
+        KlassFactory = BaseFactory._factory_type_mapping[klass]
+
+    kwargs = KlassFactory.process_kwargs(*args, **kwargs)
+
+    kwargs = prune(kwargs, exceptions=["extensions"])
+
+    return klass(**kwargs)
 
 def mock_instance(klass, *args, **kwargs):
     """Generate a mock instance of a given class (`klass`)."""
@@ -204,6 +216,8 @@ def mock_instance(klass, *args, **kwargs):
 
     kwargs = KlassFactory.process_kwargs(*args, **kwargs)
 
-    kwargs = prune(kwargs)
-
     return klass(**kwargs)
+
+
+def mock_url():
+    return ModelFactory.__faker__.url()

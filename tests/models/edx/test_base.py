@@ -8,12 +8,15 @@ from pydantic.error_wrappers import ValidationError
 
 from ralph.models.edx.base import BaseEdxModel
 
-from tests.fixtures.hypothesis_strategies import custom_given
+# from tests.fixtures.hypothesis_strategies import custom_given
+from tests.factories import mock_instance
 
 
-@custom_given(BaseEdxModel)
-def test_models_edx_base_edx_model_with_valid_statement(statement):
+# @custom_given(BaseEdxModel)
+def test_models_edx_base_edx_model_with_valid_statement():
     """Test that a valid base `Edx` statement does not raise a `ValidationError`."""
+    statement = mock_instance(BaseEdxModel)
+
     assert len(statement.username) == 0 or (len(statement.username) in range(2, 31, 1))
     assert (
         re.match(r"^course-v1:.+\+.+\+.+$", statement.context.course_id)
@@ -42,9 +45,10 @@ def test_models_edx_base_edx_model_with_valid_statement(statement):
         ),
     ],
 )
-@custom_given(BaseEdxModel)
-def test_models_edx_base_edx_model_with_invalid_statement(course_id, error, statement):
+# @custom_given(BaseEdxModel)
+def test_models_edx_base_edx_model_with_invalid_statement(course_id, error):
     """Test that an invalid base `Edx` statement raises a `ValidationError`."""
+    statement = mock_instance(BaseEdxModel)
     invalid_statement = json.loads(statement.json())
     invalid_statement["context"]["course_id"] = course_id
 

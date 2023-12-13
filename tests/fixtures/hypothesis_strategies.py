@@ -3,8 +3,8 @@
 # import random
 # from typing import Union
 
-# from hypothesis import given
-# from hypothesis import strategies as st
+from hypothesis import given
+from hypothesis import strategies as st
 # from pydantic import BaseModel
 
 # from ralph.models.edx.navigational.fields.events import NavigationalEventField
@@ -94,12 +94,38 @@
 #         del optional[key]
 #     return st.fixed_dictionaries(required, optional=optional).map(klass.parse_obj)
 
-# def custom_given(*args: Union[st.SearchStrategy, BaseModel], **kwargs):
+# def custom_given(*args: Union[BaseModel], **kwargs):
 #     """Wrap the Hypothesis `given` function. Replace st.builds with custom_builds."""
 #     strategies = []
 #     for arg in args:
 #         strategies.append(custom_builds(arg) if is_base_model(arg) else arg)
 #     return given(*strategies, **kwargs)
+
+from ralph.models.xapi.base.statements import BaseXapiStatement
+from pydantic import BaseModel
+from tests.factories import mock_instance, mock_xapi_instance
+
+# def custom_given(model: BaseModel, **kwargs):
+    
+#     if issubclass(model, BaseXapiStatement):
+#         func = mock_xapi_instance
+#     else:
+#         func = mock_instance
+#     return given(func(model, **kwargs))
+
+# def custom_given(model, **mock_kwargs):
+#     def decorator(function):
+
+#         def new_function(*args, **kwargs):
+
+#             if issubclass(model, BaseXapiStatement):
+#                 instance = mock_xapi_instance(**mock_kwargs)
+#             else:
+#                 instance = mock_instance(**mock_kwargs)
+
+#             return function(instance, *args, **kwargs)
+#         return new_function
+#     return decorator
 
 
 # OVERWRITTEN_STRATEGIES = {

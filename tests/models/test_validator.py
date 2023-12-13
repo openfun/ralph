@@ -14,8 +14,8 @@ from ralph.models.edx.server import Server
 from ralph.models.selector import ModelSelector
 from ralph.models.validator import Validator
 
-from tests.fixtures.hypothesis_strategies import custom_given
-
+# from tests.fixtures.hypothesis_strategies import custom_given
+from tests.factories import mock_instance
 
 def test_models_validator_validate_with_no_events(caplog):
     """Test given no events, the validate method does not write error messages."""
@@ -142,11 +142,13 @@ def test_models_validator_validate_with_invalid_page_close_event_raises_an_excep
 
 @pytest.mark.parametrize("ignore_errors", [True, False])
 @pytest.mark.parametrize("fail_on_unknown", [True, False])
-@custom_given(UIPageClose)
+# @custom_given(UIPageClose)
 def test_models_validator_validate_with_valid_events(
-    ignore_errors, fail_on_unknown, event
+    ignore_errors, fail_on_unknown
 ):
     """Test given a valid event the validate method should yield it."""
+    event = mock_instance(UIPageClose)
+    
     event_str = event.json()
     event_dict = json.loads(event_str)
     validator = Validator(ModelSelector(module="ralph.models.edx"))
@@ -154,12 +156,14 @@ def test_models_validator_validate_with_valid_events(
     assert json.loads(next(result)) == event_dict
 
 
-@settings(suppress_health_check=(HealthCheck.function_scoped_fixture,))
-@custom_given(UIPageClose)
-def test_models_validator_validate_counter(caplog, event):
+# @settings(suppress_health_check=(HealthCheck.function_scoped_fixture,))
+# @custom_given(UIPageClose)
+def test_models_validator_validate_counter(caplog):
     """Test given multiple events the validate method
     should log the total and invalid events.
     """
+    event = mock_instance(UIPageClose)
+
     valid_event = event.json()
     invalid_event_1 = 1
     invalid_event_2 = ""
@@ -176,11 +180,13 @@ def test_models_validator_validate_counter(caplog, event):
     ) in caplog.record_tuples
 
 
-@custom_given(Server)
-def test_models_validator_validate_typing_cleanup(event):
+# @custom_given(Server)
+def test_models_validator_validate_typing_cleanup():
     """Test given a valid event with wrong field types, the validate method should fix
     them.
     """
+    event = mock_instance(Server)
+
     valid_event_str = event.json()
     valid_event = json.loads(valid_event_str)
     valid_event["host"] = "1"

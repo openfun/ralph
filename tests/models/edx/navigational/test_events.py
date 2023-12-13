@@ -8,14 +8,14 @@ from pydantic.error_wrappers import ValidationError
 
 from ralph.models.edx.navigational.fields.events import NavigationalEventField
 
-from tests.fixtures.hypothesis_strategies import custom_given
+# from tests.fixtures.hypothesis_strategies import custom_given
+from tests.factories import mock_instance
 
-
-@custom_given(NavigationalEventField)
-def test_fields_edx_navigational_events_event_field_with_valid_content(field):
+def test_fields_edx_navigational_events_event_field_with_valid_content():
     """Test that a valid `NavigationalEventField` does not raise a
     `ValidationError`.
     """
+    field = mock_instance(NavigationalEventField)
 
     assert re.match(
         (
@@ -53,9 +53,11 @@ def test_fields_edx_navigational_events_event_field_with_valid_content(field):
         ),
     ],
 )
-@custom_given(NavigationalEventField)
-def test_fields_edx_navigational_events_event_field_with_invalid_content(id, field):
+# @custom_given(NavigationalEventField)
+def test_fields_edx_navigational_events_event_field_with_invalid_content(id):
     """Test that an invalid `NavigationalEventField` raises a `ValidationError`."""
+
+    field = mock_instance(NavigationalEventField)
 
     invalid_field = json.loads(field.json())
     invalid_field["id"] = id

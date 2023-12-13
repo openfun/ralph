@@ -24,7 +24,8 @@ from ralph.models.converter import (
 from ralph.models.edx.converters.xapi.base import BaseConversionSet
 from ralph.models.edx.navigational.statements import UIPageClose
 
-from tests.fixtures.hypothesis_strategies import custom_given
+# from tests.fixtures.hypothesis_strategies import custom_given
+from tests.factories import mock_instance
 
 
 @pytest.mark.parametrize(
@@ -328,16 +329,16 @@ def test_converter_convert_with_an_event_missing_a_conversion_set_raises_an_exce
             list(result)
 
 
-@settings(suppress_health_check=(HealthCheck.function_scoped_fixture,))
 @pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 @pytest.mark.parametrize("invalid_platform_url", ["", "not an URL"])
-@custom_given(UIPageClose)
 def test_converter_convert_with_invalid_arguments_raises_an_exception(
-    valid_uuid, invalid_platform_url, caplog, event
+    valid_uuid, invalid_platform_url, caplog    
 ):
     """Test given invalid arguments causing the conversion to fail at the validation
     step, the convert method should raise a ValidationError.
     """
+    event = mock_instance(UIPageClose)
+
     event_str = event.json()
     result = Converter(
         platform_url=invalid_platform_url, uuid_namespace=valid_uuid
@@ -350,11 +351,13 @@ def test_converter_convert_with_invalid_arguments_raises_an_exception(
 @pytest.mark.parametrize("ignore_errors", [True, False])
 @pytest.mark.parametrize("fail_on_unknown", [True, False])
 @pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
-@custom_given(UIPageClose)
 def test_converter_convert_with_valid_events(
-    ignore_errors, fail_on_unknown, valid_uuid, event
+    ignore_errors, fail_on_unknown, valid_uuid
 ):
     """Test given a valid event the convert method should yield it."""
+
+    event = mock_instance(UIPageClose)
+
     event_str = event.json()
     result = Converter(
         platform_url="https://fun-mooc.fr", uuid_namespace=valid_uuid
@@ -365,13 +368,13 @@ def test_converter_convert_with_valid_events(
     )
 
 
-@settings(suppress_health_check=(HealthCheck.function_scoped_fixture,))
-@custom_given(UIPageClose)
 @pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
-def test_converter_convert_counter(valid_uuid, caplog, event):
+def test_converter_convert_counter(valid_uuid, caplog):
     """Test given multiple events the convert method should log the total and invalid
     events.
     """
+    event = mock_instance(UIPageClose)
+
     valid_event = event.json()
     invalid_event_1 = 1
     invalid_event_2 = ""
