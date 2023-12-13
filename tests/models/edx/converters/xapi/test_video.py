@@ -21,7 +21,6 @@ from ralph.models.edx.video.statements import (
     UIStopVideo,
 )
 
-# from tests.fixtures.hypothesis_strategies import custom_given
 from tests.factories import mock_instance, mock_url
 
 

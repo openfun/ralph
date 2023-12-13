@@ -8,7 +8,6 @@ from pydantic import ValidationError
 
 from ralph.models.xapi.base.agents import BaseXapiAgentWithMboxSha1Sum
 
-# from tests.fixtures.hypothesis_strategies import custom_given
 from tests.factories import mock_xapi_instance
 
 

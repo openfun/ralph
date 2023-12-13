@@ -7,7 +7,6 @@ from pydantic import ValidationError
 
 from ralph.models.xapi.base.results import BaseXapiResultScore
 
-# from tests.fixtures.hypothesis_strategies import custom_given
 from tests.factories import mock_xapi_instance
 
 

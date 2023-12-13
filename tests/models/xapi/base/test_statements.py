@@ -3,10 +3,6 @@
 import json
 
 import pytest
-
-# from hypothesis import settings
-# from hypothesis import strategies as st
-# from polyfactory import Use
 from pydantic import ValidationError
 
 from ralph.models.selector import ModelSelector
@@ -27,7 +23,6 @@ from ralph.models.xapi.base.unnested_objects import (
 )
 from ralph.utils import set_dict_value_from_path
 
-# from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 from tests.factories import ModelFactory, mock_xapi_instance
 
 

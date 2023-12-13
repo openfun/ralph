@@ -60,13 +60,13 @@ def prune(d: Any, exceptions: list = []):
 class ModelFactory(PolyfactoryModelFactory[T]):
     __allow_none_optionals__ = False
     __is_base_factory__ = True
-    __random_seed__ = 6  # TODO: remove this
+    # __random_seed__ = 6  # TODO: remove this
 
     @classmethod
     def get_provider_map(cls) -> dict[Any, Callable[[], Any]]:
         provider_map = super().get_provider_map()
         provider_map[LanguageTag] = lambda: LanguageTag("en-US")
-        provider_map[IRI] = lambda: IRI("https://w3id.org/xapi/video/verbs/played")
+        provider_map[IRI] = lambda: IRI(mock_url())
         return provider_map
 
     @classmethod
@@ -87,29 +87,6 @@ class BaseXapiResultScoreFactory(ModelFactory[BaseXapiResultScore]):
     raw = Decimal("11")
 
 
-# TODO: put back ?
-# class BaseXapiActivityInteractionDefinitionFactory(
-#     ModelFactory[BaseXapiActivityInteractionDefinition]
-# ):
-#     __set_as_default_factory_for_type__ = True
-#     __model__ = BaseXapiActivityInteractionDefinition
-
-#     correctResponsesPattern = None
-
-
-def myfunc():
-    raise Exception("WHAT ARE YOU EVEN DOING")
-
-
-# TODO: put back ?
-# class BaseXapiContextContextActivitiesFactory(
-#     ModelFactory[BaseXapiContextContextActivities]
-# ):
-#     __model__ = BaseXapiContextContextActivities
-
-#     category = myfunc
-
-
 class BaseXapiContextFactory(ModelFactory[BaseXapiContext]):
     __model__ = BaseXapiContext
     __set_as_default_factory_for_type__ = True
@@ -117,24 +94,19 @@ class BaseXapiContextFactory(ModelFactory[BaseXapiContext]):
     revision = Ignore()
     platform = Ignore()
 
-    # TODO: see why this was added
-    # contextActivities = (
-    #     lambda: BaseXapiContextContextActivitiesFactory.build() or Ignore()
-    # )
-
 
 class LMSContextContextActivitiesFactory(ModelFactory[LMSContextContextActivities]):
     __model__ = LMSContextContextActivities
     __set_as_default_factory_for_type__ = True
 
-    category = lambda: mock_xapi_instance(LMSProfileActivity)  # TODO: Uncomment
+    category = lambda: mock_xapi_instance(LMSProfileActivity) # noqa: E731
 
 
 class VideoContextContextActivitiesFactory(ModelFactory[VideoContextContextActivities]):
     __model__ = VideoContextContextActivities
     __set_as_default_factory_for_type__ = True
 
-    category = lambda: mock_xapi_instance(VideoProfileActivity)
+    category = lambda: mock_xapi_instance(VideoProfileActivity) # noqa: E731
 
 
 class VirtualClassroomStartedPollContextActivitiesFactory(
@@ -143,7 +115,7 @@ class VirtualClassroomStartedPollContextActivitiesFactory(
     __model__ = VirtualClassroomStartedPollContextActivities
     __set_as_default_factory_for_type__ = True
 
-    category = lambda: mock_xapi_instance(VirtualClassroomProfileActivity)
+    category = lambda: mock_xapi_instance(VirtualClassroomProfileActivity) # noqa: E731
 
 
 class VirtualClassroomAnsweredPollContextActivitiesFactory(
@@ -152,7 +124,7 @@ class VirtualClassroomAnsweredPollContextActivitiesFactory(
     __model__ = VirtualClassroomAnsweredPollContextActivities
     __set_as_default_factory_for_type__ = True
 
-    category = lambda: mock_xapi_instance(VirtualClassroomProfileActivity)
+    category = lambda: mock_xapi_instance(VirtualClassroomProfileActivity) # noqa: E731
 
 
 class VirtualClassroomPostedPublicMessageContextActivitiesFactory(
@@ -161,32 +133,25 @@ class VirtualClassroomPostedPublicMessageContextActivitiesFactory(
     __model__ = VirtualClassroomPostedPublicMessageContextActivities
     __set_as_default_factory_for_type__ = True
 
-    category = lambda: mock_xapi_instance(VirtualClassroomProfileActivity)
-
-
-# class VirtualClassroomAnsweredPollFactory(ModelFactory[VirtualClassroomAnsweredPollContextActivities]):
-#     __model__ = VirtualClassroomAnsweredPollContextActivities
-
-#     category = lambda: mock_xapi_instance(VirtualClassroomProfileActivity)
-#     parent = lambda: mock_xapi_instance(VirtualClassroomActivity) # TODO: Remove this. Check that this is valid
+    category = lambda: mock_xapi_instance(VirtualClassroomProfileActivity) # noqa: E731
 
 
 class UISeqPrev(ModelFactory[UISeqPrev]):
     __model__ = UISeqPrev
     __set_as_default_factory_for_type__ = True
 
-    event = lambda: mock_instance(NavigationalEventField, old=1, new=0)
+    event = lambda: mock_instance(NavigationalEventField, old=1, new=0) # noqa: E731
 
 
 class UISeqNext(ModelFactory[UISeqNext]):
     __model__ = UISeqNext
     __set_as_default_factory_for_type__ = True
 
-    event = lambda: mock_instance(NavigationalEventField, old=0, new=1)
+    event = lambda: mock_instance(NavigationalEventField, old=0, new=1) # noqa: E731
 
 
 def mock_xapi_instance(klass, *args, **kwargs):
-    """Generate a mock instance of a given class (`klass`)."""
+    """Generate a mock instance of a given xAPI model."""
 
     # Avoid redifining custom factories
     if klass not in BaseFactory._factory_type_mapping:
@@ -205,7 +170,7 @@ def mock_xapi_instance(klass, *args, **kwargs):
 
 
 def mock_instance(klass, *args, **kwargs):
-    """Generate a mock instance of a given class (`klass`)."""
+    """Generate a mock instance of a given model."""
 
     # Avoid redifining custom factories
     if klass not in BaseFactory._factory_type_mapping:
@@ -222,4 +187,5 @@ def mock_instance(klass, *args, **kwargs):
 
 
 def mock_url():
+    """Mock a URL."""
     return ModelFactory.__faker__.url()

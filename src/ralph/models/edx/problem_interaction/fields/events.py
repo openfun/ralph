@@ -171,7 +171,7 @@ class ProblemCheckEventField(AbstractBaseEventField):
 
     answers: Dict[
         Annotated[str, Field(regex=r"^[a-f0-9]{32}_[0-9]_[0-9]$")],
-        Union[List[str], str],
+        Union[str, List[str]],
     ]
     attempts: int
     correct_map: Dict[
@@ -208,7 +208,7 @@ class ProblemCheckFailEventField(AbstractBaseEventField):
 
     answers: Dict[
         Annotated[str, Field(regex=r"^[a-f0-9]{32}_[0-9]_[0-9]$")],
-        Union[List[str], str],
+        Union[str, List[str]],
     ]
     failure: Union[Literal["closed"], Literal["unreset"]]
     problem_id: Annotated[

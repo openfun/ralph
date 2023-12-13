@@ -41,17 +41,3 @@ LanguageMap = Dict[LanguageTag, NonEmptyStrictStr]  # TODO: change   back to str
 
 email_pattern = r"(^mailto:[-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\[[\t -Z^-~]*])"
 MailtoEmail = Annotated[str, Field(regex=email_pattern)]
-
-# class MailtoEmail(str):
-#     """Pydantic custom data type validating `mailto:email` format."""
-
-#     @classmethod
-#     def __get_validators__(cls) -> Generator:
-#         def validate(mailto: str) -> Type["MailtoEmail"]:
-#             """Check whether the provided value follows the `mailto:email` format."""
-#             if not mailto.startswith("mailto:"):
-#                 raise TypeError(f"Invalid `mailto:email` value: {str(mailto)}")
-#             valid = validate_email(mailto[7:])
-#             return cls(f"mailto:{valid[1]}")
-
-#         yield validate

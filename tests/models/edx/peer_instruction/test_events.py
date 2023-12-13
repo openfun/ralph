@@ -7,7 +7,6 @@ from pydantic.error_wrappers import ValidationError
 
 from ralph.models.edx.peer_instruction.fields.events import PeerInstructionEventField
 
-# from tests.fixtures.hypothesis_strategies import custom_given
 from tests.factories import mock_instance
 
 

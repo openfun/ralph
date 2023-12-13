@@ -13,7 +13,6 @@ from ralph.models.edx.server import Server
 from ralph.models.selector import ModelSelector
 from ralph.models.validator import Validator
 
-# from tests.fixtures.hypothesis_strategies import custom_given
 from tests.factories import mock_instance
 
 

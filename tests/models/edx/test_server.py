@@ -8,7 +8,6 @@ from ralph.exceptions import UnknownEventException
 from ralph.models.edx.server import Server
 from ralph.models.selector import ModelSelector
 
-# from tests.fixtures.hypothesis_strategies import custom_given
 from tests.factories import mock_instance
 
 

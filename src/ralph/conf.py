@@ -38,7 +38,6 @@ except ImportError:
 
 MODEL_PATH_SEPARATOR = "__"
 
-from pydantic import constr
 
 NonEmptyStr = Annotated[str, Field(min_length=1)]
 NonEmptyStrictStrPatch = Annotated[str, Field(min_length=1)]
@@ -138,9 +137,6 @@ class ParserSettings(BaseModel):
 
 class XapiForwardingConfigurationSettings(BaseModel):
     """Pydantic model for xAPI forwarding configuration item."""
-
-    # class Config:  # TODO: done
-    #     min_anystr_length = 1
 
     url: AnyUrl
     is_active: bool

@@ -19,7 +19,6 @@ from ralph.models.edx.problem_interaction.fields.events import (
     SaveProblemSuccessEventField,
 )
 
-# from tests.fixtures.hypothesis_strategies import custom_given
 from tests.factories import mock_instance
 
 

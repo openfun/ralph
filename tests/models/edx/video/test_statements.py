@@ -18,7 +18,6 @@ from ralph.models.edx.video.statements import (
 )
 from ralph.models.selector import ModelSelector
 
-# from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 from tests.factories import mock_instance
 
 

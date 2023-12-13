@@ -7,7 +7,6 @@ import pytest
 from ralph.models.selector import ModelSelector
 from ralph.models.xapi.navigation.statements import PageTerminated, PageViewed
 
-# from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 from tests.factories import mock_xapi_instance
 
 

@@ -8,7 +8,6 @@ from pydantic.error_wrappers import ValidationError
 
 from ralph.models.edx.base import BaseEdxModel
 
-# from tests.fixtures.hypothesis_strategies import custom_given
 from tests.factories import mock_instance
 
 

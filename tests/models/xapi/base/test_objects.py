@@ -2,7 +2,6 @@
 
 from ralph.models.xapi.base.objects import BaseXapiSubStatement
 
-# from tests.fixtures.hypothesis_strategies import custom_given
 from tests.factories import mock_xapi_instance
 
 

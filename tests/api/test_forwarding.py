@@ -10,7 +10,6 @@ from pydantic import ValidationError
 from ralph.api.forwarding import forward_xapi_statements, get_active_xapi_forwardings
 from ralph.conf import Settings, XapiForwardingConfigurationSettings
 
-# from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 from tests.factories import mock_instance
 
 

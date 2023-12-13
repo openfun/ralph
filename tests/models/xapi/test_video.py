@@ -20,7 +20,6 @@ from ralph.models.xapi.video.statements import (
     VideoVolumeChangeInteraction,
 )
 
-# from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 from tests.factories import mock_xapi_instance
 
 

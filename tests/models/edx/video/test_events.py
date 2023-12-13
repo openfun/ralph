@@ -7,7 +7,6 @@ from pydantic.error_wrappers import ValidationError
 
 from ralph.models.edx.video.fields.events import SpeedChangeVideoEventField
 
-# from tests.fixtures.hypothesis_strategies import custom_given
 from tests.factories import mock_instance
 
 

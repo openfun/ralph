@@ -22,7 +22,6 @@ from ralph.models.xapi.lms.statements import (
     LMSUploadedVideo,
 )
 
-# from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 from tests.factories import mock_xapi_instance
 
 

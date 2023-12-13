@@ -45,7 +45,6 @@ class VirtualClassroomContextContextActivities(BaseXapiContextContextActivities)
         List[Union[VirtualClassroomProfileActivity, BaseXapiActivity]],
     ]
 
-    # 3 validation errors: problem not here # TODO: Remove this message
     @validator("category")
     @classmethod
     def check_presence_of_profile_activity_category(

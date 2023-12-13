@@ -24,7 +24,6 @@ from ralph.models.xapi.concepts.activity_types.virtual_classroom import (
     VirtualClassroomActivity,
 )
 
-# from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 from tests.factories import mock_xapi_instance
 
 

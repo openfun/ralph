@@ -8,7 +8,6 @@ from pydantic.error_wrappers import ValidationError
 
 from ralph.models.edx.browser import BaseBrowserModel
 
-# from tests.fixtures.hypothesis_strategies import custom_given
 from tests.factories import mock_instance
 
 

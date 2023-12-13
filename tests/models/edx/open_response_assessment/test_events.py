@@ -13,7 +13,6 @@ from ralph.models.edx.open_response_assessment.fields.events import (
     ORAGetSubmissionForStaffGradingEventField,
 )
 
-# from tests.fixtures.hypothesis_strategies import custom_given
 from tests.factories import mock_instance
 
 

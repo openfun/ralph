@@ -27,7 +27,6 @@ from ralph.models.xapi.virtual_classroom.statements import (
     VirtualClassroomUnsharedScreen,
 )
 
-# from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
 from tests.factories import mock_xapi_instance
 
 

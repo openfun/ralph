@@ -15,11 +15,9 @@ from ralph.models.edx.enrollment.statements import (
     EdxCourseEnrollmentDeactivated,
 )
 
-# from tests.fixtures.hypothesis_strategies import custom_given
 from tests.factories import mock_instance, mock_url
 
 
-# @custom_given(EdxCourseEnrollmentActivated, provisional.urls())
 @pytest.mark.parametrize("uuid_namespace", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
 def test_models_edx_converters_xapi_enrollment_edx_course_enrollment_activated_to_lms_registered_course(  # noqa: E501
     uuid_namespace,  # , event, platform_url

@@ -9,7 +9,6 @@ from ralph.models.converter import convert_dict_event
 from ralph.models.edx.converters.xapi.navigational import UIPageCloseToPageTerminated
 from ralph.models.edx.navigational.statements import UIPageClose
 
-# from tests.fixtures.hypothesis_strategies import custom_given
 from tests.factories import mock_instance, mock_url
 
 

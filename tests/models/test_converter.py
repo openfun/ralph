@@ -23,7 +23,6 @@ from ralph.models.converter import (
 from ralph.models.edx.converters.xapi.base import BaseConversionSet
 from ralph.models.edx.navigational.statements import UIPageClose
 
-# from tests.fixtures.hypothesis_strategies import custom_given
 from tests.factories import mock_instance
 
 
