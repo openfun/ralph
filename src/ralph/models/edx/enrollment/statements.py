@@ -59,11 +59,10 @@ class EdxCourseEnrollmentDeactivated(BaseServerModel):
     )
 
 
-    event: Json[EnrollmentEventField]
-    # event: Union[
-    #     Json[EnrollmentEventField],
-    #     EnrollmentEventField,
-    # ]
+    event: Union[
+        Json[EnrollmentEventField],
+        EnrollmentEventField,
+    ]
     event_type: Literal["edx.course.enrollment.deactivated"]
     name: Literal["edx.course.enrollment.deactivated"]
 
@@ -85,11 +84,10 @@ class EdxCourseEnrollmentModeChanged(BaseServerModel):
     )
 
 
-    event: Json[EnrollmentEventField]
-    # event: Union[
-    #     EnrollmentEventField,
-    #     Json[EnrollmentEventField],
-    # ]
+    event: Union[
+        EnrollmentEventField,
+        Json[EnrollmentEventField],
+    ]
     event_type: Literal["edx.course.enrollment.mode_changed"]
     name: Literal["edx.course.enrollment.mode_changed"]
 
