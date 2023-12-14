@@ -101,7 +101,6 @@ to the LRS:
 ```bash
 gunzip -c data/statements.json.gz | \
 head -n 100 | \
-sed "s/@timestamp/timestamp/g" | \
 jq -s . | \
 curl -Lk \
     --user ralph:secret \
