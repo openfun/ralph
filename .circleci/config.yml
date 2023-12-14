@@ -420,7 +420,8 @@ jobs:
             # - DOCKER_TAG: 1.1.2 (Git tag v1.1.2)
             echo "DOCKER_TAG: ${DOCKER_TAG} (Git ${RELEASE_TYPE}${CIRCLE_TAG})"
             docker tag ralph:${CIRCLE_SHA1} fundocker/ralph:${DOCKER_TAG}
-            if [[ -n "$CIRCLE_TAG" ]]; then
+            # Tag as "latest" for stable release git tags
+            if [[ -n "$CIRCLE_TAG" ]] && [[ "$CIRCLE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
                 docker tag ralph:${CIRCLE_SHA1} fundocker/ralph:latest
             fi
             docker images | grep -E "^fundocker/ralph\s*(${DOCKER_TAG}.*|latest|master)"
@@ -441,7 +442,7 @@ jobs:
             # - DOCKER_TAG: 1.1.2 (Git tag v1.1.2)
             echo "DOCKER_TAG: ${DOCKER_TAG} (Git ${RELEASE_TYPE}${CIRCLE_TAG})"
             docker push fundocker/ralph:${DOCKER_TAG}
-            if [[ -n "$CIRCLE_TAG" ]]; then
+            if [[ -n "$CIRCLE_TAG" ]] && [[ "$CIRCLE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
               docker push fundocker/ralph:latest
             fi
 
@@ -667,8 +668,7 @@ workflows:
               only: /^v.*/
 
       # Publish the documentation website to GitHub Pages.
-      # Only do it for master and for tagged releases with a tag starting with
-      # the letter v.
+      # Only do it for master and for tagged stable releases with a tag in the format vX.Y.Z
       - deploy-docs:
           requires:
             - tray
@@ -677,7 +677,7 @@ workflows:
             branches:
               only: master
             tags:
-              only: /^v.*/
+              only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
 
       # Release
       - release:
@@ -688,4 +688,4 @@ workflows:
             branches:
               only: master
             tags:
-              only: /^v.*/
+              only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
