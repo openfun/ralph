@@ -690,9 +690,27 @@ for a seamless transition. 🚀
 </li>
         
           <li class="md-nav__item">
+  <a href="#upgrade_ralph_cli_usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      Upgrade Ralph CLI usage
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#upgrade_history_syntax" class="md-nav__link">
     <span class="md-ellipsis">
       Upgrade history syntax
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#upgrade_ralph_library_usage_backends" class="md-nav__link">
+    <span class="md-ellipsis">
+      Upgrade Ralph library usage (backends)
     </span>
   </a>
   
@@ -855,9 +873,27 @@ for a seamless transition. 🚀
 </li>
         
           <li class="md-nav__item">
+  <a href="#upgrade_ralph_cli_usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      Upgrade Ralph CLI usage
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#upgrade_history_syntax" class="md-nav__link">
     <span class="md-ellipsis">
       Upgrade history syntax
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#upgrade_ralph_library_usage_backends" class="md-nav__link">
+    <span class="md-ellipsis">
+      Upgrade Ralph library usage (backends)
     </span>
   </a>
   
@@ -955,12 +991,268 @@ Agent can take one of the following forms, as specified by the <a href="https://
 </span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>  }
 </span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>]
 </span></code></pre></div>
+<h4 id="upgrade_ralph_cli_usage">Upgrade Ralph CLI usage<a class="headerlink" href="#upgrade_ralph_cli_usage" title="Permanent link">&para;</a></h4>
+<p>If you are using Ralph&rsquo;s CLI, the following changes may affect you:</p>
+<ul>
+<li>The <code>ralph fetch</code> command changed to <code>ralph read</code></li>
+<li>The <code>-b ws</code> backend option changed to <code>-b async_ws</code><ul>
+<li>The corresponding <code>--ws-uri</code> option changed to <code>--async-ws-uri</code></li>
+</ul>
+</li>
+<li>The <code>-c --chunk-size</code> option changed to <code>-s --chunk-size</code></li>
+<li>
+<p>The <code>DEFAULT_BACKEND_CHUNK_SIZE</code> environment variable configuration is removed in
+    favor of allowing each backend to define their own defaults:</p>
+<table>
+<thead>
+<tr>
+<th>Backend</th>
+<th>Environment variable for default (read) chunk size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>async_es/es</td>
+<td>RALPH_BACKENDS__DATA__ES__READ_CHUNK_SIZE=500</td>
+</tr>
+<tr>
+<td>async_lrs/lrs</td>
+<td>RALPH_BACKENDS__DATA__LRS__READ_CHUNK_SIZE=500</td>
+</tr>
+<tr>
+<td>async_mongo/mongo</td>
+<td>RALPH_BACKENDS__DATA__MONGO__READ_CHUNK_SIZE=500</td>
+</tr>
+<tr>
+<td>clickhouse</td>
+<td>RALPH_BACKENDS__DATA__CLICKHOUSE__READ_CHUNK_SIZE=500</td>
+</tr>
+<tr>
+<td>fs</td>
+<td>RALPH_BACKENDS__DATA__FS__READ_CHUNK_SIZE=4096</td>
+</tr>
+<tr>
+<td>ldp</td>
+<td>RALPH_BACKENDS__DATA__LDP__READ_CHUNK_SIZE=4096</td>
+</tr>
+<tr>
+<td>s3</td>
+<td>RALPH_BACKENDS__DATA__S3__READ_CHUNK_SIZE=4096</td>
+</tr>
+<tr>
+<td>swift</td>
+<td>RALPH_BACKENDS__DATA__SWIFT__READ_CHUNK_SIZE=4096</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li>
+<p>The <code>ralph push</code> command changed to <code>ralph write</code></p>
+</li>
+<li>The <code>-c --chunk-size</code> option changed to <code>-s --chunk-size</code></li>
+<li>
+<p>The <code>DEFAULT_BACKEND_CHUNK_SIZE</code> environment variable configuration is removed in
+    favor of allowing each backend to define their own defaults:</p>
+<table>
+<thead>
+<tr>
+<th>Backend</th>
+<th>Environment variable for default (write) chunk size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>async_es/es</td>
+<td>RALPH_BACKENDS__DATA__ES__WRITE_CHUNK_SIZE=500</td>
+</tr>
+<tr>
+<td>async_lrs/lrs</td>
+<td>RALPH_BACKENDS__DATA__LRS__WRITE_CHUNK_SIZE=500</td>
+</tr>
+<tr>
+<td>async_mongo/mongo</td>
+<td>RALPH_BACKENDS__DATA__MONGO__WRITE_CHUNK_SIZE=500</td>
+</tr>
+<tr>
+<td>clickhouse</td>
+<td>RALPH_BACKENDS__DATA__CLICKHOUSE__WRITE_CHUNK_SIZE=500</td>
+</tr>
+<tr>
+<td>fs</td>
+<td>RALPH_BACKENDS__DATA__FS__WRITE_CHUNK_SIZE=4096</td>
+</tr>
+<tr>
+<td>ldp</td>
+<td>RALPH_BACKENDS__DATA__LDP__WRITE_CHUNK_SIZE=4096</td>
+</tr>
+<tr>
+<td>s3</td>
+<td>RALPH_BACKENDS__DATA__S3__WRITE_CHUNK_SIZE=4096</td>
+</tr>
+<tr>
+<td>swift</td>
+<td>RALPH_BACKENDS__DATA__SWIFT__WRITE_CHUNK_SIZE=4096</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li>
+<p>Environment variables used to configure backend options for CLI usage
+  (read/write/list commands) changed their prefix:
+  <code>RALPH_BACKENDS__{{DATABASE or HTTP or STORAGE or STREAM}}__{{BACKEND}}__{{OPTION}}</code>
+  changed to
+  <code>RALPH_BACKENDS__DATA__{{BACKEND}}__{{OPTION}}</code></p>
+</li>
+<li>Environment variables used to configure backend options for LRS usage
+  (runserver command) changed their prefix:
+  <code>RALPH_BACKENDS__{{DATABASE}}__{{BACKEND}}__{{OPTION}}</code>
+  changed to
+  <code>RALPH_BACKENDS__LRS__{{BACKEND}}__{{OPTION}}</code></li>
+</ul>
 <h4 id="upgrade_history_syntax">Upgrade history syntax<a class="headerlink" href="#upgrade_history_syntax" title="Permanent link">&para;</a></h4>
 <p>CLI syntax has been changed from <code>fetch</code> &amp; <code>push</code> to <code>read</code> &amp; <code>write</code> affecting the command history. You must replace the command history after updating:
 - locate your history file path, which is in <code>{ RALPH_APP_DIR }/history.json</code> (defaults to <code>.ralph/history.json</code>)
 - run the commands below to update history</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>sed<span class="w"> </span>-i<span class="w"> </span><span class="s1">&#39;s/&quot;fetch&quot;/&quot;read&quot;/g&#39;</span><span class="w"> </span><span class="o">{</span><span class="w"> </span>my_history_file_path<span class="w"> </span><span class="o">}</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>sed<span class="w"> </span>-i<span class="w"> </span><span class="s1">&#39;s/&quot;push&quot;/&quot;write&quot;/g&#39;</span><span class="w"> </span><span class="o">{</span><span class="w"> </span>my_history_file_path<span class="w"> </span><span class="o">}</span>
+</span></code></pre></div>
+<h4 id="upgrade_ralph_library_usage_backends">Upgrade Ralph library usage (backends)<a class="headerlink" href="#upgrade_ralph_library_usage_backends" title="Permanent link">&para;</a></h4>
+<p>If you use Ralph&rsquo;s backends in your application, the following changes might affect you:</p>
+<p>Backends from <code>ralph.backends.database</code>, <code>ralph.backends.http</code>, <code>ralph.backends.stream</code>,
+and <code>ralph.backends.storage</code> packages have moved to a single <code>ralph.backends.data</code>
+package.</p>
+<table>
+<thead>
+<tr>
+<th>Ralph v3 (database/http/storage/stream) backends</th>
+<th>Ralph v4 data backends</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ralph.backends.database.clickhouse.ClickHouseDatabase</code></td>
+<td><code>ralph.backends.data.clickhouse.ClickHouseDataBackend</code></td>
+</tr>
+<tr>
+<td><code>ralph.backends.database.es.ESDatabase</code></td>
+<td><code>ralph.backends.data.es.ESDataBackend</code></td>
+</tr>
+<tr>
+<td><code>ralph.backends.database.mongo.MongoDatabase</code></td>
+<td><code>ralph.backends.data.mongo.MongoDataBackend</code></td>
+</tr>
+<tr>
+<td><code>ralph.backends.http.async_lrs.AsyncLRSHTTP</code></td>
+<td><code>ralph.backends.data.async_lrs.AsyncLRSDataBackend</code></td>
+</tr>
+<tr>
+<td><code>ralph.backends.http.lrs.LRSHTTP</code></td>
+<td><code>ralph.backends.data.lrs.LRSDataBackend</code></td>
+</tr>
+<tr>
+<td><code>ralph.backends.storage.fs.FSStorage</code></td>
+<td><code>ralph.backends.data.fs.FSDataBackend</code></td>
+</tr>
+<tr>
+<td><code>ralph.backends.storage.ldp.LDPStorage</code></td>
+<td><code>ralph.backends.data.ldp.LDPDataBackend</code></td>
+</tr>
+<tr>
+<td><code>ralph.backends.storage.s3.S3Storage</code></td>
+<td><code>ralph.backends.data.s3.S3DataBackend</code></td>
+</tr>
+<tr>
+<td><code>ralph.backends.storage.swift.SwiftStorage</code></td>
+<td><code>ralph.backends.data.swift.SwiftDataBackend</code></td>
+</tr>
+<tr>
+<td><code>ralph.backends.stream.ws.WSStream</code></td>
+<td><code>ralph.backends.data.async_ws.AsyncWSDataBackend</code></td>
+</tr>
+</tbody>
+</table>
+<p>LRS-specific <code>query_statements</code> and <code>query_statements_by_ids</code> database backend methods
+have moved to a dedicated <code>ralph.backends.lrs.BaseLRSBackend</code> interface that extends the
+data backend interface with these two methods.</p>
+<p>The <code>query_statements_by_ids</code> method return type changed to <code>Iterator[dict]</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Ralph v3 database backends for lrs usage</th>
+<th>Ralph v4 LRS data backends</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ralph.backends.database.clickhouse.ClickHouseDatabase</code></td>
+<td><code>ralph.backends.lrs.clickhouse.ClickHouseLRSBackend</code></td>
+</tr>
+<tr>
+<td><code>ralph.backends.database.es.ESDatabase</code></td>
+<td><code>ralph.backends.lrs.es.ESLRSBackend</code></td>
+</tr>
+<tr>
+<td><code>ralph.backends.database.mongo.MongoDatabase</code></td>
+<td><code>ralph.backends.lrs.mongo.MongoLRSBackend</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Backend interface differences</strong></p>
+<ul>
+<li>Data backends are read-only by default</li>
+<li>Data backends that support write operations inherit from the
+  <code>ralph.backends.data.base.Writable</code> interface</li>
+<li>Data backends that support list operations inherit from the
+  <code>ralph.backends.data.base.Listable</code> interface</li>
+<li>Data backends that support LRS operations
+  (<code>query_statements</code>/<code>query_statements_by_ids</code>) inherit from the
+  <code>ralph.backends.lrs.BaseLRSBackend</code> interface</li>
+<li><code>__init__(self, **kwargs)</code> changed to <code>__init__(self, settings: DataBackendSettings)</code>
+  where each DataBackend defines it&rsquo;s own Settings object
+  For example the <code>FSDataBackend</code> uses <code>FSDataBackendSettings</code></li>
+<li><code>stream</code> and <code>get</code> methods changed to <code>read</code></li>
+<li><code>put</code> methods changed to <code>write</code></li>
+</ul>
+<p><strong>Backend usage migration example</strong></p>
+<p>Ralph v3 using <code>ESDatabase</code>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">from</span> <span class="nn">ralph.conf</span> <span class="kn">import</span> <span class="n">ESClientOptions</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kn">from</span> <span class="nn">ralph.backends.database.es</span> <span class="kn">import</span> <span class="n">ESDatabase</span><span class="p">,</span> <span class="n">ESQuery</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Instantiate the backend.</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="n">backend</span> <span class="o">=</span> <span class="n">ESDatabase</span><span class="p">(</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>  <span class="n">hosts</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>  <span class="n">index</span><span class="o">=</span><span class="s2">&quot;statements&quot;</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>  <span class="n">client_options</span><span class="o">=</span><span class="n">ESClientOptions</span><span class="p">(</span><span class="n">verify_certs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="p">)</span>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="c1"># Read records from backend.</span>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="n">query</span> <span class="o">=</span> <span class="n">ESQuery</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;term&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;modulo&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}}})</span>
+</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="n">es_statements</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">backend</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">query</span><span class="p">))</span>
+</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>
+</span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="c1"># Write records to backend.</span>
+</span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="n">backend</span><span class="o">.</span><span class="n">put</span><span class="p">([{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}])</span>
+</span></code></pre></div>
+<p>Ralph v4 using <code>ESDataBackend</code>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">from</span> <span class="nn">ralph.backends.data.es</span> <span class="kn">import</span> <span class="p">(</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>  <span class="n">ESClientOptions</span><span class="p">,</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>  <span class="n">ESDataBackend</span><span class="p">,</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>  <span class="n">ESDataBackendSettings</span><span class="p">,</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>  <span class="n">ESQuery</span><span class="p">,</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="p">)</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="c1"># Instantiate the backend.</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="n">settings</span> <span class="o">=</span> <span class="n">ESDataBackendSettings</span><span class="p">(</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>  <span class="n">HOSTS</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>  <span class="n">INDEX</span><span class="o">=</span><span class="s2">&quot;statements&quot;</span><span class="p">,</span>
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>  <span class="n">CLIENT_OPTIONS</span><span class="o">=</span><span class="n">ESClientOptions</span><span class="p">(</span><span class="n">verify_certs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="p">)</span>
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="n">backend</span> <span class="o">=</span> <span class="n">ESDataBackend</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>
+</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="c1"># Read records from backend.</span>
+</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="n">query</span> <span class="o">=</span> <span class="n">ESQuery</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;term&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;modulo&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}})</span>
+</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="n">es_statements</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">backend</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">query</span><span class="p">))</span>
+</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a>
+</span><span id="__span-8-20"><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="c1"># Write records to backend.</span>
+</span><span id="__span-8-21"><a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="n">backend</span><span class="o">.</span><span class="n">write</span><span class="p">([{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}])</span>
 </span></code></pre></div>
 <h4 id="upgrade_clickhouse_schema">Upgrade ClickHouse schema<a class="headerlink" href="#upgrade_clickhouse_schema" title="Permanent link">&para;</a></h4>
 <p>If you are using the ClickHouse backend, schema changes have been made
@@ -971,10 +1263,10 @@ for details. </p>
 data you will need to manually alter it as an admin user. Note: this 
 will rewrite the statements table, which may take a long time if you
 have many rows. The command to run is:</p>
-<div class="language-sql highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">-- If RALPH_BACKENDS__DATA__CLICKHOUSE__DATABASE is &#39;xapi&#39;</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="c1">-- and RALPH_BACKENDS__DATA__CLICKHOUSE__EVENT_TABLE_NAME is &#39;test&#39;</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">xapi</span><span class="p">.</span><span class="n">test</span><span class="w"> </span><span class="k">DROP</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="n">event</span><span class="p">,</span><span class="w"> </span><span class="k">RENAME</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="n">event_str</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">event</span><span class="p">;</span>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1">-- If RALPH_BACKENDS__DATA__CLICKHOUSE__DATABASE is &#39;xapi&#39;</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="c1">-- and RALPH_BACKENDS__DATA__CLICKHOUSE__EVENT_TABLE_NAME is &#39;test&#39;</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">xapi</span><span class="p">.</span><span class="n">test</span><span class="w"> </span><span class="k">DROP</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="n">event</span><span class="p">,</span><span class="w"> </span><span class="k">RENAME</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="n">event_str</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">event</span><span class="p">;</span>
 </span></code></pre></div>
 
 
