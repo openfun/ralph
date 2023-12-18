@@ -65,10 +65,10 @@ and this project adheres to
   in the video and virtual classroom profiles. [BC]
 - Upgrade base python version to 3.12 for the development stack and Docker
   image
+- Upgrade `bcrypt` to `4.1.2`
 - Upgrade `cachetools` to `5.3.2`
-- Upgrade `bcrypt` to `>=4.0.0`
 - Upgrade `fastapi` to `0.105.0`
-- Upgrade `sentry_sdk` to `1.38.0`
+- Upgrade `sentry_sdk` to `1.39.1`
 - Upgrade `uvicorn` to `0.24.0.post1`
 
 ### Fixed
