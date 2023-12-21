@@ -420,7 +420,7 @@ as per the xAPI specification
 - Add optional sentry integration
 - Distribute Arnold's tray to deploy Ralph in a k8s cluster as cronjobs
 
-[unreleased]: https://github.com/openfun/ralph/compare/v3.9.0...master
+[unreleased]: https://github.com/openfun/ralph/compare/v3.9.0...main
 [3.9.0]: https://github.com/openfun/ralph/compare/v3.8.0...v3.9.0
 [3.8.0]: https://github.com/openfun/ralph/compare/v3.7.0...v3.8.0
 [3.7.0]: https://github.com/openfun/ralph/compare/v3.6.0...v3.7.0

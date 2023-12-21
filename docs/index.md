@@ -7,8 +7,8 @@
 </p>
 
 <p align="center">
-<a href="https://circleci.com/gh/openfun/ralph/tree/master">
-    <img src="https://img.shields.io/circleci/build/gh/openfun/ralph/master?label=Tests&logo=circleci" alt="CircleCI tests">
+<a href="https://circleci.com/gh/openfun/ralph/tree/main">
+    <img src="https://img.shields.io/circleci/build/gh/openfun/ralph/main?label=Tests&logo=circleci" alt="CircleCI tests">
 </a>
 <a href="https://pypi.org/project/ralph-malph">
     <img src="https://img.shields.io/pypi/v/ralph-malph?label=PyPi+package" alt="PyPi version">

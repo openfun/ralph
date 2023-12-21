@@ -9,7 +9,7 @@ We primarily use GitHub as an issue tracker. If however you're encountering an i
 
 ---
 
-Please make sure you have read our [main Readme](https://github.com/openfun/ralph) as well as our [documentation folder](https://github.com/openfun/ralph/tree/master/docs).
+Please make sure you have read our [main Readme](https://github.com/openfun/ralph) as well as our [documentation folder](https://github.com/openfun/ralph/tree/main/docs).
 
 Also make sure it was not already answered in [an open or close issue](https://github.com/openfun/ralph/issues).
 
