@@ -8,8 +8,8 @@
 </p>
 
 <p align="center">
-<a href="https://circleci.com/gh/openfun/ralph/tree/master">
-    <img src="https://img.shields.io/circleci/build/gh/openfun/ralph/master?label=Tests&logo=circleci" alt="Tests Status">
+<a href="https://circleci.com/gh/openfun/ralph/tree/main">
+    <img src="https://img.shields.io/circleci/build/gh/openfun/ralph/main?label=Tests&logo=circleci" alt="Tests Status">
 </a>
 <a href="https://pypi.org/project/ralph-malph">
     <img src="https://img.shields.io/pypi/v/ralph-malph?label=PyPI+package" alt="PyPI package version">
@@ -175,7 +175,7 @@ ralph COMMAND --help
 
 ## Migrating
 
-Some major version changes require updating persistence layers. Check out the [migration guide](https://github.com/openfun/ralph/blob/master/UPGRADE.md) for more information.
+Some major version changes require updating persistence layers. Check out the [migration guide](https://github.com/openfun/ralph/blob/main/UPGRADE.md) for more information.
 
 ## Contributing
 

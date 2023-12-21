@@ -46,11 +46,11 @@ jobs:
       - run:
           name: enforce absence of print statements in code
           command: |
-            ! git diff origin/master..HEAD -- . ':(exclude).circleci' | grep "print("
+            ! git diff origin/main..HEAD -- . ':(exclude).circleci' | grep "print("
       - run:
           name: enforce absence of FIXME in code
           command: |
-            ! git diff origin/master..HEAD -- . ':(exclude).circleci' | grep "FIXME"
+            ! git diff origin/main..HEAD -- . ':(exclude).circleci' | grep "FIXME"
       - run:
           name: Check absence of fixup commits
           command: |
@@ -60,9 +60,9 @@ jobs:
           command: |
             pip install --user gitlint requests
       - run:
-          name: lint commit messages added to master
+          name: lint commit messages added to main
           command: |
-            ~/.local/bin/gitlint --commits origin/master..HEAD
+            ~/.local/bin/gitlint --commits origin/main..HEAD
 
   # Check that the CHANGELOG has been updated in the current branch
   check-changelog:
@@ -415,7 +415,7 @@ jobs:
             DOCKER_TAG=$([[ -z "$CIRCLE_TAG" ]] && echo $CIRCLE_BRANCH || echo ${CIRCLE_TAG} | sed 's/^v//')
             RELEASE_TYPE=$([[ -z "$CIRCLE_TAG" ]] && echo "branch" || echo "tag ")
             # Display either:
-            # - DOCKER_TAG: master (Git branch)
+            # - DOCKER_TAG: main (Git branch)
             # or
             # - DOCKER_TAG: 1.1.2 (Git tag v1.1.2)
             echo "DOCKER_TAG: ${DOCKER_TAG} (Git ${RELEASE_TYPE}${CIRCLE_TAG})"
@@ -424,7 +424,7 @@ jobs:
             if [[ -n "$CIRCLE_TAG" ]] && [[ "$CIRCLE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
                 docker tag ralph:${CIRCLE_SHA1} fundocker/ralph:latest
             fi
-            docker images | grep -E "^fundocker/ralph\s*(${DOCKER_TAG}.*|latest|master)"
+            docker images | grep -E "^fundocker/ralph\s*(${DOCKER_TAG}.*|latest|main)"
 
       # Publish images to DockerHub
       #
@@ -437,7 +437,7 @@ jobs:
             DOCKER_TAG=$([[ -z "$CIRCLE_TAG" ]] && echo $CIRCLE_BRANCH || echo ${CIRCLE_TAG} | sed 's/^v//')
             RELEASE_TYPE=$([[ -z "$CIRCLE_TAG" ]] && echo "branch" || echo "tag ")
             # Display either:
-            # - DOCKER_TAG: master (Git branch)
+            # - DOCKER_TAG: main (Git branch)
             # or
             # - DOCKER_TAG: 1.1.2 (Git tag v1.1.2)
             echo "DOCKER_TAG: ${DOCKER_TAG} (Git ${RELEASE_TYPE}${CIRCLE_TAG})"
@@ -488,7 +488,7 @@ jobs:
             # - DOCS_VERSION: 1.1 (for git tag v1.1.2)
             # - DOCS_ALIAS: latest
             # or
-            # - DOCS_VERSION: master (for master branch)
+            # - DOCS_VERSION: main (for main branch)
             # - No DOCS_ALIAS
             DOCS_VERSION=$([[ -z "$CIRCLE_TAG" ]] && echo $CIRCLE_BRANCH || echo ${CIRCLE_TAG} | sed 's/^v\([0-9]\.[0-9]*\)\..*/\1/')
             DOCS_ALIAS=$([[ -z "$CIRCLE_TAG" ]] && echo "" || echo "latest")
@@ -550,13 +550,13 @@ workflows:
       - check-changelog:
           filters:
             branches:
-              ignore: master
+              ignore: main
             tags:
               only: /(?!^v).*/
       - lint-changelog:
           filters:
             branches:
-              ignore: master
+              ignore: main
             tags:
               only: /.*/
       # Check Renovate
@@ -643,14 +643,14 @@ workflows:
       #
       # Publish docker images only if all build, lint and test jobs succeed
       # and it has been tagged with a tag starting with the letter v or is on
-      # the master branch
+      # the main branch
       - hub:
           requires:
             - build-docker
             - tray
           filters:
             branches:
-              only: master
+              only: main
             tags:
               only: /^v.*/
 
@@ -668,14 +668,14 @@ workflows:
               only: /^v.*/
 
       # Publish the documentation website to GitHub Pages.
-      # Only do it for master and for tagged stable releases with a tag in the format vX.Y.Z
+      # Only do it for main and for tagged stable releases with a tag in the format vX.Y.Z
       - deploy-docs:
           requires:
             - tray
             - package
           filters:
             branches:
-              only: master
+              only: main
             tags:
               only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
 
@@ -686,6 +686,6 @@ workflows:
             - package
           filters:
             branches:
-              only: master
+              only: main
             tags:
               only: /^v[0-9]+\.[0-9]+\.[0-9]+$/

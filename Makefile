@@ -146,8 +146,8 @@ docs-build: ## build documentation site
 .PHONY: docs-build
 
 docs-deploy: ## deploy documentation site
-	@echo "Deploying docs with version master to gh-pages"
-	@${MIKE} deploy master
+	@echo "Deploying docs with version main to gh-pages"
+	@${MIKE} deploy main
 .PHONY: docs-deploy
 
 docs-serve: ## run mkdocs live server for dev docs

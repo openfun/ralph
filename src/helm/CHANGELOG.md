@@ -31,6 +31,6 @@ and this project adheres to
 
 - Add an official Helm Chart (experimental)
 
-[unreleased]: https://github.com/openfun/ralph/tree/master/src/helm
+[unreleased]: https://github.com/openfun/ralph/tree/main/src/helm
 [0.2.0]: https://github.com/openfun/ralph/releases/tag/helm-v0.2.0
 [0.1.0]: https://github.com/openfun/ralph/releases/tag/helm-v0.1.0

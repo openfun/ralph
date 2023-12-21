@@ -93,7 +93,7 @@ git push origin feature/your-new-feature
 
 To initiate a Pull Request (PR), head to Ralph project's GitHub repository and click on <kbd>New Pull Request</kbd>.
 
-Set your branch as the source and Ralph project's `master` branch as the target.
+Set your branch as the source and Ralph project's `main` branch as the target.
 
 Provide a clear title for your PR and make use of the provided PR body template to document the changes made by your PR.
 This helps streamline the review process and maintain a well-documented project history.
