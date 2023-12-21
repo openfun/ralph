@@ -44,6 +44,7 @@ markdown_extensions:
 nav:
     - Ralph: index.md
     - Features:
+        - CLI: cli.md
         - LRS HTTP server: features/api.md
         - Backends for data storage: features/backends.md
         - Learning statements models: features/models.md

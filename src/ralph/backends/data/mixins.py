@@ -2,6 +2,7 @@
 
 import json
 import logging
+from typing import Callable
 
 from ralph.conf import settings
 
@@ -16,7 +17,7 @@ class HistoryMixin:
     """
 
     @property
-    def history(self):
+    def history(self) -> list:
         """Get backend history."""
         logger.debug("Loading history file: %s", str(settings.HISTORY_FILE))
 
@@ -25,12 +26,12 @@ class HistoryMixin:
                 with settings.HISTORY_FILE.open(
                     encoding=settings.LOCALE_ENCODING
                 ) as history_file:
-                    self._history = json.load(history_file)
+                    self._history: list = json.load(history_file)
             except FileNotFoundError:
                 self._history = []
         return self._history
 
-    def write_history(self, history):
+    def write_history(self, history: list) -> None:
         """Write given history as a JSON file."""
         logger.debug("Writing history file: %s", str(settings.HISTORY_FILE))
 
@@ -45,7 +46,7 @@ class HistoryMixin:
         # Update history
         self._history = history
 
-    def clean_history(self, selector):
+    def clean_history(self, selector: Callable[[dict], bool]) -> None:
         """Clean selected events from the history.
 
         selector: a callable that selects events that need to be removed
@@ -53,14 +54,14 @@ class HistoryMixin:
         self._history = list(filter(lambda event: not selector(event), self.history))
         self.write_history(self._history)
 
-    def append_to_history(self, event):
+    def append_to_history(self, event: dict) -> None:
         """Append event to history."""
         self.write_history(self.history + [event])
 
-    def get_command_history(self, backend_name, command):
+    def get_command_history(self, backend_name: str, command: str) -> list:
         """Extract entry ids from the history for a given command and backend_name."""
 
-        def filter_by_name_and_command(entry):
+        def filter_by_name_and_command(entry: dict) -> bool:
             """Check whether the history entry matches the backend_name and command."""
             return entry.get("backend") == backend_name and (
                 command in [entry.get("command"), entry.get("action")]
