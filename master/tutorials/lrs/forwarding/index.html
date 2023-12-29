@@ -12,22 +12,28 @@
         <meta name="author" content="Open FUN (France Universite Numerique)">
       
       
+        <link rel="canonical" href="https://openfun.github.io/ralph/latest/tutorials/lrs/forwarding/">
       
       
+        <link rel="prev" href="../multitenancy/">
       
-      <link rel="icon" href="/ralph/latest/img/favicon.png">
+      
+        <link rel="next" href="../sentry/">
+      
+      
+      <link rel="icon" href="../../../img/favicon.png">
       <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.2">
     
     
       
-        <title>Ralph</title>
+        <title>Forwarding to another LRS - Ralph</title>
       
     
     
-      <link rel="stylesheet" href="/ralph/latest/assets/stylesheets/main.50c56a3b.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.50c56a3b.min.css">
       
         
-        <link rel="stylesheet" href="/ralph/latest/assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -46,11 +52,11 @@
       
     
     
-      <link rel="stylesheet" href="/ralph/latest/assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
     
-      <link rel="stylesheet" href="/ralph/latest/css/mkdocsoad.css">
+      <link rel="stylesheet" href="../../../css/mkdocsoad.css">
     
-    <script>__md_scope=new URL("/ralph/latest",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -72,6 +78,11 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
+      
+        
+        <a href="#forwarding_to_another_lrs" class="md-skip">
+          Skip to content
+        </a>
       
     </div>
     <div data-md-component="announce">
@@ -101,9 +112,9 @@ for a seamless transition. 🚀
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="/ralph/latest/." title="Ralph" class="md-header__button md-logo" aria-label="Ralph" data-md-component="logo">
+    <a href="../../.." title="Ralph" class="md-header__button md-logo" aria-label="Ralph" data-md-component="logo">
       
-  <img src="/ralph/latest/img/ralph-white.png" alt="logo">
+  <img src="../../../img/ralph-white.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -120,7 +131,7 @@ for a seamless transition. 🚀
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              
+              Forwarding to another LRS
             
           </span>
         </div>
@@ -201,7 +212,7 @@ for a seamless transition. 🚀
   
   
     <li class="md-tabs__item">
-      <a href="/ralph/latest/." class="md-tabs__link">
+      <a href="../../.." class="md-tabs__link">
         
   
     
@@ -220,7 +231,7 @@ for a seamless transition. 🚀
     
     
       <li class="md-tabs__item">
-        <a href="/ralph/latest/features/api/" class="md-tabs__link">
+        <a href="../../../features/api/" class="md-tabs__link">
           
   
     
@@ -236,11 +247,13 @@ for a seamless transition. 🚀
         
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="/ralph/latest/tutorials/cli/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../cli/" class="md-tabs__link">
           
   
     
@@ -258,7 +271,7 @@ for a seamless transition. 🚀
   
   
     <li class="md-tabs__item">
-      <a href="/ralph/latest/contribute/" class="md-tabs__link">
+      <a href="../../../contribute/" class="md-tabs__link">
         
   
     
@@ -275,7 +288,7 @@ for a seamless transition. 🚀
   
   
     <li class="md-tabs__item">
-      <a href="/ralph/latest/UPGRADE/" class="md-tabs__link">
+      <a href="../../../UPGRADE/" class="md-tabs__link">
         
   
     
@@ -294,7 +307,7 @@ for a seamless transition. 🚀
     
     
       <li class="md-tabs__item">
-        <a href="/ralph/latest/CHANGELOG/" class="md-tabs__link">
+        <a href="../../../CHANGELOG/" class="md-tabs__link">
           
   
     
@@ -329,9 +342,9 @@ for a seamless transition. 🚀
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="/ralph/latest/." title="Ralph" class="md-nav__button md-logo" aria-label="Ralph" data-md-component="logo">
+    <a href="../../.." title="Ralph" class="md-nav__button md-logo" aria-label="Ralph" data-md-component="logo">
       
-  <img src="/ralph/latest/img/ralph-white.png" alt="logo">
+  <img src="../../../img/ralph-white.png" alt="logo">
 
     </a>
     Ralph
@@ -358,7 +371,7 @@ for a seamless transition. 🚀
   
   
     <li class="md-nav__item">
-      <a href="/ralph/latest/." class="md-nav__link">
+      <a href="../../.." class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -426,7 +439,7 @@ for a seamless transition. 🚀
   
   
     <li class="md-nav__item">
-      <a href="/ralph/latest/features/api/" class="md-nav__link">
+      <a href="../../../features/api/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -447,7 +460,7 @@ for a seamless transition. 🚀
   
   
     <li class="md-nav__item">
-      <a href="/ralph/latest/features/backends/" class="md-nav__link">
+      <a href="../../../features/backends/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -468,7 +481,7 @@ for a seamless transition. 🚀
   
   
     <li class="md-nav__item">
-      <a href="/ralph/latest/features/models/" class="md-nav__link">
+      <a href="../../../features/models/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -493,8 +506,10 @@ for a seamless transition. 🚀
       
   
   
+    
   
   
+  
     
     
       
@@ -513,12 +528,12 @@ for a seamless transition. 🚀
       
       
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
           <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
@@ -532,7 +547,7 @@ for a seamless transition. 🚀
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             Tutorials
@@ -546,7 +561,7 @@ for a seamless transition. 🚀
   
   
     <li class="md-nav__item">
-      <a href="/ralph/latest/tutorials/cli/" class="md-nav__link">
+      <a href="../../cli/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -564,6 +579,8 @@ for a seamless transition. 🚀
                 
   
   
+    
+  
   
   
     
@@ -587,17 +604,17 @@ for a seamless transition. 🚀
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" checked>
         
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="/ralph/latest/tutorials/lrs/" class="md-nav__link ">
+            <a href="../" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -614,7 +631,7 @@ for a seamless transition. 🚀
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_2">
             <span class="md-nav__icon md-icon"></span>
             Ralph LRS Guide
@@ -630,7 +647,7 @@ for a seamless transition. 🚀
   
   
     <li class="md-nav__item">
-      <a href="/ralph/latest/tutorials/lrs/first-steps/" class="md-nav__link">
+      <a href="../first-steps/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -675,7 +692,7 @@ for a seamless transition. 🚀
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="/ralph/latest/tutorials/lrs/authentication/" class="md-nav__link ">
+            <a href="../authentication/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -708,7 +725,7 @@ for a seamless transition. 🚀
   
   
     <li class="md-nav__item">
-      <a href="/ralph/latest/tutorials/lrs/authentication/basic/" class="md-nav__link">
+      <a href="../authentication/basic/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -729,7 +746,7 @@ for a seamless transition. 🚀
   
   
     <li class="md-nav__item">
-      <a href="/ralph/latest/tutorials/lrs/authentication/oidc/" class="md-nav__link">
+      <a href="../authentication/oidc/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -758,7 +775,7 @@ for a seamless transition. 🚀
   
   
     <li class="md-nav__item">
-      <a href="/ralph/latest/tutorials/lrs/backends/" class="md-nav__link">
+      <a href="../backends/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -779,7 +796,7 @@ for a seamless transition. 🚀
   
   
     <li class="md-nav__item">
-      <a href="/ralph/latest/tutorials/lrs/multitenancy/" class="md-nav__link">
+      <a href="../multitenancy/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -797,8 +814,10 @@ for a seamless transition. 🚀
                 
   
   
+    
   
   
+  
     
     
       
@@ -810,12 +829,12 @@ for a seamless transition. 🚀
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2_6" checked>
         
           
           <label class="md-nav__link" for="__nav_3_2_6" id="__nav_3_2_6_label" tabindex="0">
@@ -829,7 +848,7 @@ for a seamless transition. 🚀
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_2_6_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_2_6_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_2_6">
             <span class="md-nav__icon md-icon"></span>
             Additional configurations
@@ -840,10 +859,19 @@ for a seamless transition. 🚀
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="/ralph/latest/tutorials/lrs/forwarding/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -852,6 +880,7 @@ for a seamless transition. 🚀
   
 
       </a>
+      
     </li>
   
 
@@ -864,7 +893,7 @@ for a seamless transition. 🚀
   
   
     <li class="md-nav__item">
-      <a href="/ralph/latest/tutorials/lrs/sentry/" class="md-nav__link">
+      <a href="../sentry/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -901,7 +930,7 @@ for a seamless transition. 🚀
   
   
     <li class="md-nav__item">
-      <a href="/ralph/latest/tutorials/library/" class="md-nav__link">
+      <a href="../../library/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -922,7 +951,7 @@ for a seamless transition. 🚀
   
   
     <li class="md-nav__item">
-      <a href="/ralph/latest/tutorials/development_guide/" class="md-nav__link">
+      <a href="../../development_guide/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -950,7 +979,7 @@ for a seamless transition. 🚀
   
   
     <li class="md-nav__item">
-      <a href="/ralph/latest/contribute/" class="md-nav__link">
+      <a href="../../../contribute/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -970,7 +999,7 @@ for a seamless transition. 🚀
   
   
     <li class="md-nav__item">
-      <a href="/ralph/latest/UPGRADE/" class="md-nav__link">
+      <a href="../../../UPGRADE/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1036,7 +1065,7 @@ for a seamless transition. 🚀
   
   
     <li class="md-nav__item">
-      <a href="/ralph/latest/CHANGELOG/" class="md-nav__link">
+      <a href="../../../CHANGELOG/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1057,7 +1086,7 @@ for a seamless transition. 🚀
   
   
     <li class="md-nav__item">
-      <a href="/ralph/latest/LICENSE/" class="md-nav__link">
+      <a href="../../../LICENSE/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1095,6 +1124,8 @@ for a seamless transition. 🚀
   
   
   
+    
+  
   
 </nav>
                   </div>
@@ -1106,7 +1137,103 @@ for a seamless transition. 🚀
             <div class="md-content" data-md-component="content">
               <article class="md-content__inner md-typeset">
                 
-  <h1>404 - Not found</h1>
+  
+                  
+
+  
+  
+
+
+<h1 id="forwarding_to_another_lrs">Forwarding to another LRS<a class="headerlink" href="#forwarding_to_another_lrs" title="Permanent link">&para;</a></h1>
+<p>Ralph LRS server can be configured to forward xAPI statements it receives to other LRSs.
+Statement forwarding enables the <a href="https://adlnet.gov/projects/tla/">Total Learning Architecture</a> and allows systems containing multiple LRS to share data.</p>
+<p>To configure statement forwarding, you need to create a <code>.env</code> file in the current
+directory and define the <code>RALPH_XAPI_FORWARDINGS</code> variable or define the
+<code>RALPH_XAPI_FORWARDINGS</code> environment variable.</p>
+<p>The value of the <code>RALPH_XAPI_FORWARDINGS</code> variable should be a JSON encoded list of
+dictionaries where each dictionary defines a forwarding configuration and consists of
+the following key/value pairs:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">key</th>
+<th style="text-align: left;">value type</th>
+<th style="text-align: left;">description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>is_active</code></td>
+<td style="text-align: left;"><code>boolean</code></td>
+<td style="text-align: left;">Specifies whether or not this forwarding configuration should take effect.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>url</code></td>
+<td style="text-align: left;"><code>URL</code></td>
+<td style="text-align: left;">Specifies the endpoint URL where forwarded statements should be send.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>basic_username</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Specifies the basic auth username.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>basic_password</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Specifies the basic auth password.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>max_retries</code></td>
+<td style="text-align: left;"><code>number</code></td>
+<td style="text-align: left;">Specifies the number of times a failed forwarding request should be retried.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>timeout</code></td>
+<td style="text-align: left;"><code>number</code></td>
+<td style="text-align: left;">Specifies the duration in seconds of network inactivity leading to a timeout.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>For a forwarding configuration to be valid it is required that all key/value pairs are defined.</p>
+</div>
+<p>Example of a valid forwarding configuration:</p>
+<div class="language-bash highlight"><span class="filename">.env</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">RALPH_XAPI_FORWARDINGS</span><span class="o">=</span><span class="s1">&#39;</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="s1">[</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="s1">  {</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="s1">    &quot;is_active&quot;: true,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="s1">    &quot;url&quot;: &quot;http://lrs1.example.com/xAPI/statements/&quot;,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="s1">    &quot;basic_username&quot;: &quot;admin1@example.com&quot;,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="s1">    &quot;basic_password&quot;: &quot;PASSWORD1&quot;,</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="s1">    &quot;max_retries&quot;: 1,</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="s1">    &quot;timeout&quot;: 5</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="s1">  },</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="s1">  {</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="s1">    &quot;is_active&quot;: true,</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="s1">    &quot;url&quot;: &quot;http://lrs2.example.com/xAPI/statements/&quot;,</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="s1">    &quot;basic_username&quot;: &quot;admin2@example.com&quot;,</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="s1">    &quot;basic_password&quot;: &quot;PASSWORD2&quot;,</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="s1">    &quot;max_retries&quot;: 5,</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="s1">    &quot;timeout&quot;: 0.2</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="s1">  }</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="s1">]</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="s1">&#39;</span>
+</span></code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+  
 
               </article>
             </div>
@@ -1147,10 +1274,10 @@ for a seamless transition. 🚀
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "/ralph/latest", "features": ["content.code.annotate", "content.code.copy", "content.tabs.link", "navigation.indexes", "navigation.tabs"], "search": "/ralph/latest/assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["content.code.annotate", "content.code.copy", "content.tabs.link", "navigation.indexes", "navigation.tabs"], "search": "../../../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="/ralph/latest/assets/javascripts/bundle.d7c377c4.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.d7c377c4.min.js"></script>
       
     
   </body>
