@@ -83,4 +83,4 @@ extra:
         provider: mike
 
 extra_css:
-    - css/neoteroi-mkdocs.css
+    - css/mkdocsoad.css
