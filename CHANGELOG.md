@@ -67,9 +67,9 @@ and this project adheres to
   image
 - Upgrade `bcrypt` to `4.1.2`
 - Upgrade `cachetools` to `5.3.2`
-- Upgrade `fastapi` to `0.105.0`
+- Upgrade `fastapi` to `0.108.0`
 - Upgrade `sentry_sdk` to `1.39.1`
-- Upgrade `uvicorn` to `0.24.0.post1`
+- Upgrade `uvicorn` to `0.25.0`
 
 ### Fixed
 
