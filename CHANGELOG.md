@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [4.0.0] - 2024-01-23
+
 ### Added
 
 - Backends: Add `Writable` and `Listable` interfaces to distinguish supported
@@ -420,7 +422,8 @@ as per the xAPI specification
 - Add optional sentry integration
 - Distribute Arnold's tray to deploy Ralph in a k8s cluster as cronjobs
 
-[unreleased]: https://github.com/openfun/ralph/compare/v3.9.0...main
+[unreleased]: https://github.com/openfun/ralph/compare/v4.0.0...main
+[4.0.0]: https://github.com/openfun/ralph/compare/v3.9.0...v4.0.0
 [3.9.0]: https://github.com/openfun/ralph/compare/v3.8.0...v3.9.0
 [3.8.0]: https://github.com/openfun/ralph/compare/v3.7.0...v3.8.0
 [3.7.0]: https://github.com/openfun/ralph/compare/v3.6.0...v3.7.0
