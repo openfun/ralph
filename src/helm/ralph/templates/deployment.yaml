@@ -6,12 +6,12 @@ metadata:
   labels:
     {{- include "ralph.labels" . | nindent 4 }}
 spec:
-  selector:
-    matchLabels:
-      {{- include "ralph.selectorLabels" . | nindent 6 }}
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
+  selector:
+    matchLabels:
+      {{- include "ralph.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -19,71 +19,87 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "ralph.selectorLabels" . | nindent 8 }}
+        {{- include "ralph.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.securityContext | nindent 8 }}
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command:
-            {{- toYaml .Values.lrs.command | nindent 12 }}
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
           livenessProbe:
             httpGet:
               path: /__heartbeat__
-              port: {{ .Values.lrs.port }}
+              port: http
             initialDelaySeconds: 15
             periodSeconds: 30
           readinessProbe:
             httpGet:
               path: /__lbheartbeat__
-              port: {{ .Values.lrs.port }}
+              port: http
             initialDelaySeconds: 5
             periodSeconds: 5
-          env:
-            - name: RALPH_APP_DIR
-              value: "/app/.ralph"
-            - name: RALPH_AUTH_FILE
-              value: "/var/run/ralph/auth.json"
-            - name: RALPH_EXECUTION_ENVIRONMENT
-              value: "{{ .Values.executionEnvironment }}"
-            - name: RALPH_SENTRY_IGNORE_HEALTH_CHECKS
-              value: "{{ .Values.sentryIgnoreHealthChecks }}"
           envFrom:
+            - configMapRef:
+                name: {{ .Values.lrsConfigMap | quote }}
+            - configMapRef:
+                name: {{ .Values.lrsEnvConfigMap | quote }}
             - secretRef:
-                name: {{ tpl .Values.envFromSecret . | quote }}
+                name: {{ .Values.lrsEnvSecret | quote }}
+          {{ with .Values.podCommand }}
+          command:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-            - name: {{ .Values.volumes.history.name }}
-              mountPath: /app/.ralph
-            {{- if .Values.elastic.mountCACert }}
-            - name: es-ca-certificate
-              mountPath: /usr/local/share/ca-certificates/
-            {{- end }}
             - name: lrs-auth
               mountPath: /var/run/ralph/
+          {{- if and .Values.database.tls.enabled .Values.database.tls.certificatesSecret }}
+            - name: db-certificates
+              mountPath: {{ .Values.database.tls.certificatesMountPath }}
+          {{- end }}
+          {{- if .Values.persistence.enabled }}
+            - name: {{ .Values.persistence.volumes.history.name }}
+              mountPath: {{ .Values.persistence.volumes.history.mountPath }}
+          {{- end }}
+          {{- with .Values.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
       volumes:
-        - name: {{ .Values.volumes.history.name }}
-        {{- if .Values.volumes.history.enabled }}
-          persistentVolumeClaim:
-            claimName: {{ if .Values.volumes.history.existingClaim }}{{ .Values.volumes.history.existingClaim }}{{- else }}{{ .Values.volumes.history.claimName }}{{- end }}
-        {{- else }}
-          emptyDir: {}
-        {{- end }}
-        {{- if .Values.elastic.mountCACert }}
-        - name: es-ca-certificate
-          secret:
-            secretName: {{ .Values.elastic.caSecretName }}
-        {{- end }}
         - name: lrs-auth
           secret:
-            secretName: {{ .Values.lrs.authSecretName }}
+            secretName: {{ .Values.lrsAuthSecret }}
+      {{- if and .Values.database.tls.enabled .Values.database.tls.certificatesSecret }}
+        - name: db-certificates
+          secret:
+            secretName: {{ .Values.database.tls.certificatesSecret }}
+      {{- end }}
+      {{- if .Values.persistence.enabled }}
+        - name: {{ .Values.persistence.volumes.history.name }}
+          persistentVolumeClaim:
+      {{- if .Values.persistence.volumes.history.claimName }}
+            claimName: {{ .Values.persistence.volumes.history.claimName }}
+      {{- else }}
+            claimName: {{ include "ralph.fullname" . }}-pvc-history
+      {{- end }}
+      {{- end }}
+      {{- with .Values.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

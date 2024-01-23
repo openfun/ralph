@@ -1,5 +1,5 @@
-{{- if .Values.ralph_cronjobs }}
-{{- range $job := .Values.ralph_cronjobs }}
+{{- if .Values.cronjobs }}
+{{- range $job := .Values.cronjobs }}
 {{- with $ -}}
 ---
 apiVersion: batch/v1
@@ -15,7 +15,7 @@ spec:
   successfulJobsHistoryLimit: 2
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 1
-  suspend: false
+  suspend: {{ $job.suspend }}
   jobTemplate:
     spec:
       template:
@@ -23,61 +23,74 @@ spec:
           name: "{{ template "ralph.fullname" . }}-{{ $job.name }}"
           labels:
             {{- include "ralph.labels" . | nindent 12 }}
+            {{- with .Values.podLabels }}
+            {{- toYaml . | nindent 8 }}
+            {{- end }}
             type: job
         spec:
-          restartPolicy: Never
           {{- with .Values.imagePullSecrets }}
           imagePullSecrets:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
           containers:
             - name: "{{ template "ralph.fullname" . }}-{{ $job.name }}"
+              securityContext: 
+                {{- toYaml .Values.securityContext | nindent 16 }}
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
               imagePullPolicy: {{ .Values.image.pullPolicy }}
+              envFrom:
+                - configMapRef:
+                    name: {{ .Values.lrsConfigMap | quote }}
+                - configMapRef:
+                    name: {{ .Values.lrsEnvConfigMap | quote }}
+                - secretRef:
+                    name: {{ .Values.lrsEnvSecret | quote }}
               command:
                 - bash
                 - "-c"
-              {{- with $job.command }}
+                {{- with $job.command }}
                 {{ toYaml . | nindent 16 }}
-              {{- end }}
-              env:
-                - name: RALPH_APP_DIR
-                  value: "/app/.ralph"
-                - name: RALPH_AUTH_FILE
-                  value: "/var/run/ralph/auth.json"
-                - name: RALPH_EXECUTION_ENVIRONMENT
-                  value: "{{ .Values.executionEnvironment }}"
-                - name: RALPH_SENTRY_IGNORE_HEALTH_CHECKS
-                  value: "{{ .Values.sentryIgnoreHealthChecks }}"
-                {{- if and .Values.elastic.enabled .Values.elastic.mountCACert }}
-                - name: RALPH_BACKENDS__DATA__ES__CLIENT_OPTIONS__ca_certs
-                  value: "/usr/local/share/ca-certificates/ca.crt"
                 {{- end }}
-              envFrom:
-                - secretRef:
-                    name: {{ tpl .Values.envFromSecret . | quote }}
+              resources:
+                {{- toYaml .Values.resources | nindent 16 }}
               volumeMounts:
-                - name: {{ .Values.volumes.history.name }}
-                  mountPath: /app/.ralph
-                {{- if .Values.elastic.mountCASecret }}
-                - name: es-ca-certificate
-                  mountPath: /usr/local/share/ca-certificates/
-                {{- end }}
+                - name: lrs-auth
+                  mountPath: /var/run/ralph/
+              {{- if and .Values.database.tls.enabled .Values.database.tls.certificatesSecret }}
+                - name: db-certificates
+                  mountPath: {{ .Values.database.tls.certificatesMountPath }}
+              {{- end }}
+              {{- if .Values.persistence.enabled }}
+                - name: {{ .Values.persistence.volumes.history.name }}
+                  mountPath: {{ .Values.persistence.volumes.history.mountPath }}
+              {{- end }}
+              {{- with .Values.extraVolumeMounts }}
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+          restartPolicy: Never
           volumes:
-            - name: {{ .Values.volumes.history.name }}
-            {{- if .Values.volumes.history.enabled }}
-              persistentVolumeClaim:
-                claimName: {{ .Values.volumes.history.claimName }}
-            {{- else }}
-              emptyDir: {}
-            {{- end }}
-            {{- if .Values.elastic.mountCACert }}
-            - name: es-ca-certificate
+            - name: lrs-auth
               secret:
-                secretName: {{ .Values.elastic.caSecretName }}
-            {{- end }}
+                secretName: {{ .Values.lrsAuthSecret }}
+          {{- if and .Values.database.tls.enabled .Values.database.tls.certificatesSecret }}
+            - name: db-certificates
+              secret:
+                secretName: {{ .Values.database.tls.certificatesSecret }}
+          {{- end }}
+          {{- if .Values.persistence.enabled }}
+            - name: {{ .Values.persistence.volumes.history.name }}
+              persistentVolumeClaim:
+          {{- if .Values.persistence.volumes.history.claimName }}
+                claimName: {{ .Values.persistence.volumes.history.claimName }}
+          {{- else }}
+                claimName: {{ include "ralph.fullname" . }}-pvc-history
+          {{- end }}
+          {{- end }}
+          {{- with .Values.extraVolumes }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

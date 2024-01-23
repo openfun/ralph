@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Values.lrsConfigMap }}"
+  labels:
+    {{- include "ralph.labels" . | nindent 4 }}
+data:
+  # App configuration
+  RALPH_APP_DIR: {{ .Values.lrs.appDir | quote }}
+  RALPH_RUNSERVER_BACKEND: {{ .Values.lrs.backend | quote }}
+  RALPH_RUNSERVER_MAX_SEARCH_HITS_COUNT: {{ .Values.lrs.maxSearchHitsCount | quote }}
+  
+  # CLI
+  RALPH_CONVERTER_EDX_XAPI_UUID_NAMESPACE: {{ .Values.lrs.converterNamespace | quote }}
+
+  # Authentication / Security
+  RALPH_AUTH_FILE: {{ .Values.lrs.auth.file | quote }}
+  RALPH_LRS_RESTRICT_BY_AUTHORITY: {{ .Values.lrs.auth.restrictByAuthority | quote }}
+  RALPH_LRS_RESTRICT_BY_SCOPE: {{ .Values.lrs.auth.restrictByScope | quote }}
+  {{- if and .Values.lrs.auth.basic.enabled .Values.lrs.auth.oidc.enabled }}
+  RALPH_RUNSERVER_AUTH_BACKENDS: "basic,oidc"
+  {{- else if .Values.lrs.auth.oidc.enabled }}
+  RALPH_RUNSERVER_AUTH_BACKENDS: "oidc"
+  {{- else }}
+  RALPH_RUNSERVER_AUTH_BACKENDS: "basic"
+  {{- end }}
+  {{- if .Values.lrs.auth.basic.enabled }}
+  RALPH_AUTH_CACHE_MAX_SIZE: {{ .Values.lrs.auth.basic.cacheMaxSize | quote }}
+  RALPH_AUTH_CACHE_TTL: {{ .Values.lrs.auth.basic.cacheTTL | quote }}
+  {{- end }}
+  {{- if .Values.lrs.auth.oidc.enabled }}
+  RALPH_RUNSERVER_AUTH_OIDC_AUDIENCE: {{ .Values.lrs.authOIDCAudience | quote }}
+  RALPH_RUNSERVER_AUTH_OIDC_ISSUER_URI: {{ .Values.lrs.authOIDCIssuerURI | quote }}
+   {{ end }}
+
+  # Sentry
+  RALPH_EXECUTION_ENVIRONMENT: "production"
+  {{- if .Values.lrs.sentry.enabled }}
+  RALPH_SENTRY_DSN: {{ .Values.lrs.sentry.dsn | quote }}
+  RALPH_SENTRY_CLI_TRACES_SAMPLE_RATE: {{ .Values.lrs.sentry.cliSampleRate | quote }}
+  RALPH_SENTRY_LRS_TRACES_SAMPLE_RATE: {{ .Values.lrs.sentry.lrsSampleRate | quote }}
+  RALPH_SENTRY_IGNORE_HEALTH_CHECKS: {{ .Values.lrs.sentry.ignoreHealthChecks | quote }}
+  {{- end }}
+

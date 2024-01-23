@@ -157,8 +157,8 @@ lrsEnvSecret: "ralph-env-secret"
 
 database:
   tls:
-    enabled: false
-    certificatesSecret: ""
+    enabled: true
+    certificatesSecret: "data-lake-es-http-certs-public"
     certificatesMountPath: "/usr/local/share/ca-certificates/"
 
 loggingConfigConfigMap: ralph-logging-config
