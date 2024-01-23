@@ -1,0 +1,14 @@
+ [
+    {
+        "username": "admin",
+        "hash": "$2b$12$JFK.YCdbUWD2rS94fT4.m.KC/fIMzUMPMtjaD4t3t1iAfqki3ZPOq",
+        "agent": {
+            "mbox": "mailto:admin@example.com",
+            "objectType": "Agent",
+            "name": null
+        },
+        "scopes": [
+            "example_scope"
+        ]
+    }
+]

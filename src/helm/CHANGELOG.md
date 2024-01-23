@@ -9,9 +9,25 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- A NOTE.txt file with instructions for chart users
+- A ConfigMap template for Ralph configuration
+- A ConfigMap for logging configuration
+- A secret Manifest for helping user configure Ralph
+- A Helm connection test for Ralph
+
 ### Changed
 
 - Upgrade appVersion to `4.0.0`
+- Environment variables are now provided through a ConfigMap and a Secret
+- Improve Ingress configuration
+- Improved values based on Helm chart template file 
+
+### Removed
+
+- Dependencies to mongodb and clickhouse (managed outside of chart scope)
+- Secrets template and vault values (managed outside of chart scope)
 
 ## [0.2.0] - 2023-11-08
 

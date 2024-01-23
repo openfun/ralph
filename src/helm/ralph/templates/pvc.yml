@@ -1,18 +1,19 @@
-{{- if .Values.volumes.history.enabled }}
-{{- if not .Values.volumes.history.existingClaim -}}
+{{- if .Values.persistence.enabled }}
+{{- if not .Values.persistence.volumes.history.claimName }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: "{{ .Values.volumes.history.name }}"
-  namespace: {{ .Values.namespace }}
+  name: {{ include "ralph.fullname" . }}-pvc-history
   labels:
     {{- include "ralph.labels" . | nindent 4 }}
 spec:
   accessModes:
-    - {{ .Values.volumes.history.accessModes }}
+  {{ with .Values.persistence.accessModes }}
+    {{- toYaml . | indent 4 }}
+  {{- end }}
+  storageClassName: {{ .Values.persistence.storageClass }}
   resources:
     requests:
-      storage: {{ .Values.volumes.history.size }}
-  storageClassName: {{ .Values.volumes.history.storageClass }}
+      storage: {{ .Values.persistence.volumes.history.size }}
 {{- end }}
 {{- end }}

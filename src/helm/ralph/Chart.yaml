@@ -1,17 +1,8 @@
 apiVersion: v2
 
 name: ralph
+description: Ralph, the ultimate Learning Record Store (and more!) for your learning analytics 
 type: application
-description: The official Helm chart for Ralph
 version: 0.2.0
 appVersion: "4.0.0"
-
-dependencies:
-  - name: mongodb
-    version: 13.x.x
-    repository: oci://registry-1.docker.io/bitnamicharts
-    condition: mongodb.enabled
-  - name: clickhouse
-    version: 4.x.x
-    repository: oci://registry-1.docker.io/bitnamicharts
-    condition: clickhouse.enabled
+icon: https://raw.githubusercontent.com/openfun/logos/main/ralph/ralph-color-dark.png
