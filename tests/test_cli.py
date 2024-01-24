@@ -20,7 +20,7 @@ from ralph.cli import (
     CommaSeparatedKeyValueParamType,
     CommaSeparatedTupleParamType,
     JSONStringParamType,
-    backends_options,
+    RalphBackendCLI,
     cli,
 )
 from ralph.conf import settings
@@ -541,14 +541,15 @@ def test_cli_read_command_with_ldp_backend(monkeypatch):
     monkeypatch.setattr(LDPDataBackend, "read", mock_read)
 
     runner = CliRunner()
-    command = "read -b ldp --ldp-endpoint ovh-eu a547d9b3-6f2f-4913-a872-cf4efe699a66"
+    command = "read ldp --endpoint ovh-eu a547d9b3-6f2f-4913-a872-cf4efe699a66"
     result = runner.invoke(cli, command.split())
 
     assert result.exit_code == 0
     assert '{"foo": "bar"}' in result.output
+    del cli.commands["read"].commands["ldp"]
 
 
-def test_cli_read_command_with_fs_backend(fs, monkeypatch):
+def test_cli_read_command_with_fs_backend(monkeypatch):
     """Test ralph read command using the FS backend."""
     archive_content = {"foo": "bar"}
 
@@ -560,13 +561,15 @@ def test_cli_read_command_with_fs_backend(fs, monkeypatch):
     monkeypatch.setattr(FSDataBackend, "read", mock_read)
 
     runner = CliRunner()
-    result = runner.invoke(cli, "read -b fs foo".split())
+    with runner.isolated_filesystem():
+        result = runner.invoke(cli, "read fs foo".split())
 
     assert result.exit_code == 0
     assert '{"foo": "bar"}' in result.output
+    del cli.commands["read"].commands["fs"]
 
 
-def test_cli_read_command_with_chunk_size(fs, monkeypatch):
+def test_cli_read_command_with_chunk_size(monkeypatch):
     """Test ralph `read` command with a `chunk_size` option."""
 
     def get_mock_read_bytes(expected_chunk_size: int):
@@ -581,27 +584,34 @@ def test_cli_read_command_with_chunk_size(fs, monkeypatch):
 
         return mock_read_bytes
 
-    monkeypatch.delenv("RALPH_BACKENDS__DATA__FS__READ_CHUNK_SIZE", raising=False)
+    # monkeypatch.delenv("RALPH_BACKENDS__DATA__FS__READ_CHUNK_SIZE", raising=False)
     runner = CliRunner()
-
-    # Given no chunk size, a default chunk size should be used.
-    monkeypatch.setattr(FSDataBackend, "_read_bytes", get_mock_read_bytes(4096))
-    result = runner.invoke(cli, "read -b fs".split())
-    assert result.exit_code == 0
-    assert '{"foo": "bar"}' in result.output
+    with runner.isolated_filesystem():
+        # Given no chunk size, a default chunk size should be used.
+        monkeypatch.setattr(FSDataBackend, "_read_bytes", get_mock_read_bytes(4096))
+        result = runner.invoke(cli, "read fs".split())
+        assert result.exit_code == 0
+        assert '{"foo": "bar"}' in result.output
 
     # Given a chunk size set by the environment, it should overwrite the default.
     runner = CliRunner(env={"RALPH_BACKENDS__DATA__FS__READ_CHUNK_SIZE": "3"})
-    monkeypatch.setattr(FSDataBackend, "_read_bytes", get_mock_read_bytes(3))
-    result = runner.invoke(cli, "read -b fs".split())
-    assert result.exit_code == 0
-    assert '{"foo": "bar"}' in result.output
+    with runner.isolated_filesystem():
+        monkeypatch.setattr(FSDataBackend, "_read_bytes", get_mock_read_bytes(3))
+        # NB: Command option defaults are set once.
+        # To force the CLI to recreate the command with new option defaults
+        # from environment variables -  we delete the previous command.
+        del cli.commands["read"].commands["fs"]
+        result = runner.invoke(cli, "read fs".split())
+        assert result.exit_code == 0
+        assert '{"foo": "bar"}' in result.output
 
-    # Given a chunk size set by the chunk-size option, it should overwrite the default.
-    monkeypatch.setattr(FSDataBackend, "_read_bytes", get_mock_read_bytes(1))
-    result = runner.invoke(cli, "read -b fs --chunk-size 1".split())
-    assert result.exit_code == 0
-    assert '{"foo": "bar"}' in result.output
+        # Given a chunk size set by the chunk-size option, it should overwrite the
+        # default.
+        monkeypatch.setattr(FSDataBackend, "_read_bytes", get_mock_read_bytes(1))
+        result = runner.invoke(cli, "read fs --chunk-size 1".split())
+        assert result.exit_code == 0
+        assert '{"foo": "bar"}' in result.output
+        del cli.commands["read"].commands["fs"]
 
 
 def test_cli_read_command_with_es_backend(es):
@@ -622,9 +632,9 @@ def test_cli_read_command_with_es_backend(es):
     runner = CliRunner()
     es_hosts = ",".join(ES_TEST_HOSTS)
     es_client_options = "verify_certs=True"
-    command = f"""-v ERROR read -b es --es-hosts {es_hosts}
-        --es-default-index {ES_TEST_INDEX}
-        --es-client-options {es_client_options}"""
+    command = f"""-v ERROR read es --hosts {es_hosts}
+        --default-index {ES_TEST_INDEX}
+        --client-options {es_client_options}"""
     result = runner.invoke(cli, command.split())
     assert result.exit_code == 0
     expected = (
@@ -646,6 +656,7 @@ def test_cli_read_command_with_es_backend(es):
     )
 
     assert expected == result.output
+    del cli.commands["read"].commands["es"]
 
 
 def test_cli_read_command_client_options_with_es_backend(es):
@@ -653,7 +664,7 @@ def test_cli_read_command_client_options_with_es_backend(es):
 
     runner = CliRunner()
     es_client_options = "ca_certs=/path/,verify_certs=True"
-    command = f"""-v ERROR read -b es --es-client-options {es_client_options}"""
+    command = f"""-v ERROR read es --client-options {es_client_options}"""
     result = runner.invoke(cli, command.split())
     assert result.exit_code == 1
     assert "TLS options require scheme to be 'https'" in str(result.exception)
@@ -686,9 +697,9 @@ def test_cli_read_command_with_es_backend_query(es):
     command = (
         "-v ERROR "
         "read "
-        "-b es "
-        f"--es-hosts {es_hosts} "
-        f"--es-default-index {ES_TEST_INDEX} "
+        "es "
+        f"--hosts {es_hosts} "
+        f"--default-index {ES_TEST_INDEX} "
         f"{query_str}"
     )
     result = runner.invoke(cli, command.split())
@@ -712,11 +723,15 @@ def test_cli_read_command_with_es_backend_query(es):
     )
 
     assert expected == result.output
+    del cli.commands["read"].commands["es"]
 
+
+def test_cli_read_command_with_mongo_backend_query():
+    """Test ralph read command using the mongo backend and a query."""
     # Test with an invalid json query string
     invalid_query_str = "wrong_query_string"
-
-    command = f"-v ERROR read -b mongo {invalid_query_str}"
+    command = f"-v DEBUG read mongo {invalid_query_str}"
+    runner = CliRunner()
     result = runner.invoke(cli, command.split())
     assert result.exit_code > 0
     assert isinstance(result.exception, BackendParameterException)
@@ -727,6 +742,7 @@ def test_cli_read_command_with_es_backend_query(es):
         "'doc': 'wrong_query_string', 'pos': 0, 'lineno': 1, 'colno': 1}}]"
     )
     assert str(result.exception) == msg
+    del cli.commands["read"].commands["mongo"]
 
 
 def test_cli_read_command_with_ws_backend(events, ws):
@@ -741,8 +757,9 @@ def test_cli_read_command_with_ws_backend(events, ws):
     with websocket():
         runner = CliRunner()
         uri = f"ws://{WS_TEST_HOST}:{WS_TEST_PORT}"
-        result = runner.invoke(cli, ["read", "-b", "async_ws", "--async-ws-uri", uri])
+        result = runner.invoke(cli, ["read", "async_ws", "--uri", uri])
         assert "\n".join([json.dumps(event) for event in events]) in result.output
+        del cli.commands["read"].commands["async_ws"]
 
 
 def test_cli_list_command_with_ldp_backend(monkeypatch):
@@ -789,12 +806,12 @@ def test_cli_list_command_with_ldp_backend(monkeypatch):
     runner = CliRunner()
 
     # List documents with default options
-    result = runner.invoke(cli, ["list", "-b", "ldp", "--ldp-endpoint", "ovh-eu"])
+    result = runner.invoke(cli, ["list", "ldp", "--endpoint", "ovh-eu"])
     assert result.exit_code == 0
     assert "\n".join(archive_list) in result.output
 
     # List documents with detailed output
-    result = runner.invoke(cli, ["list", "-b", "ldp", "--ldp-endpoint", "ovh-eu", "-D"])
+    result = runner.invoke(cli, ["list", "ldp", "--endpoint", "ovh-eu", "-D"])
     assert result.exit_code == 0
     assert (
         "\n".join(json.dumps(detail) for detail in archive_list_details)
@@ -802,20 +819,21 @@ def test_cli_list_command_with_ldp_backend(monkeypatch):
     )
 
     # List new documents only
-    result = runner.invoke(cli, ["list", "-b", "ldp", "--ldp-endpoint", "ovh-eu", "-n"])
+    result = runner.invoke(cli, ["list", "ldp", "--endpoint", "ovh-eu", "-n"])
     assert result.exit_code == 0
     assert "997db3eb-b9ca-485d-810f-b530a6cef7c6" in result.output
     assert "5d5c4c93-04a4-42c5-9860-f51fa4044aa1" not in result.output
 
     # Edge case: stream contains no document
     monkeypatch.setattr(LDPDataBackend, "list", lambda this, target, details, new: ())
-    result = runner.invoke(cli, ["list", "-b", "ldp", "--ldp-endpoint", "ovh-eu"])
+    result = runner.invoke(cli, ["list", "ldp", "--endpoint", "ovh-eu"])
     assert result.exit_code == 0
     assert "Configured ldp backend contains no document" in result.output
+    del cli.commands["list"].commands["ldp"]
 
 
-def test_cli_list_command_with_fs_backend(fs, monkeypatch):
-    """Test ralph list command using the LDP backend."""
+def test_cli_list_command_with_fs_backend(monkeypatch):
+    """Test ralph list command using the fs backend."""
     archive_list = [
         "file1",
         "file2",
@@ -834,7 +852,7 @@ def test_cli_list_command_with_fs_backend(fs, monkeypatch):
     ]
 
     def mock_list(this, target=None, details=False, new=False):
-        """Mock LDP backend list method."""
+        """Mock FS backend list method."""
 
         response = archive_list
         if details:
@@ -846,82 +864,72 @@ def test_cli_list_command_with_fs_backend(fs, monkeypatch):
     monkeypatch.setattr(FSDataBackend, "list", mock_list)
 
     runner = CliRunner()
+    with runner.isolated_filesystem():
+        # List documents with default options
+        result = runner.invoke(cli, ["list", "fs"])
+        assert result.exit_code == 0
+        assert "\n".join(archive_list) in result.output
 
-    # List documents with default options
-    result = runner.invoke(cli, ["list", "-b", "fs"])
-    assert result.exit_code == 0
-    assert "\n".join(archive_list) in result.output
+        # List documents with detailed output
+        result = runner.invoke(cli, ["list", "fs", "-D"])
+        assert result.exit_code == 0
+        assert (
+            "\n".join(json.dumps(detail) for detail in archive_list_details)
+            in result.output
+        )
 
-    # List documents with detailed output
-    result = runner.invoke(cli, ["list", "-b", "fs", "-D"])
-    assert result.exit_code == 0
-    assert (
-        "\n".join(json.dumps(detail) for detail in archive_list_details)
-        in result.output
-    )
+        # List new documents only
+        result = runner.invoke(cli, ["list", "fs", "-n"])
+        assert result.exit_code == 0
+        assert "file2" in result.output
+        assert "file1" not in result.output
 
-    # List new documents only
-    result = runner.invoke(cli, ["list", "-b", "fs", "-n"])
-    assert result.exit_code == 0
-    assert "file2" in result.output
-    assert "file1" not in result.output
-
-    # Edge case: stream contains no document
-    monkeypatch.setattr(FSDataBackend, "list", lambda this, target, details, new: ())
-    result = runner.invoke(cli, ["list", "-b", "fs"])
-    assert result.exit_code == 0
-    assert "Configured fs backend contains no document" in result.output
+        # Edge case: stream contains no document
+        monkeypatch.setattr(FSDataBackend, "list", lambda *args, **kwargs: ())
+        result = runner.invoke(cli, ["list", "fs"])
+        assert result.exit_code == 0
+        assert "Configured fs backend contains no document" in result.output
+        del cli.commands["list"].commands["fs"]
 
 
-def test_cli_write_command_with_fs_backend(fs):
+def test_cli_write_command_with_fs_backend():
     """Test ralph write command using the FS backend."""
-    fs.create_dir(str(settings.APP_DIR))
-    fs.create_dir("foo")
-
-    filename = Path("foo/file1")
-
+    filename = Path("file1")
     # Create a file
     runner = CliRunner()
-    result = runner.invoke(
-        cli,
-        "write -b fs -t file1 --fs-default-directory-path foo".split(),
-        input=b"test content",
-    )
+    with runner.isolated_filesystem():
+        result = runner.invoke(cli, "write fs -t file1".split(), input=b"test content")
 
-    assert result.exit_code == 0
+        assert result.exit_code == 0
 
-    with filename.open("rb") as test_file:
-        content = test_file.read()
+        with filename.open("rb") as test_file:
+            content = test_file.read()
 
-    assert b"test content" in content
+        assert b"test content" in content
 
-    # Trying to create the same file without -f should raise an error
-    runner = CliRunner()
-    result = runner.invoke(
-        cli,
-        "write -b fs -t file1 --fs-default-directory-path foo".split(),
-        input=b"other content",
-    )
-    assert result.exit_code == 1
-    assert "file1 already exists and overwrite is not allowed" in result.output
+        # Trying to create the same file without -f should raise an error
+        result = runner.invoke(cli, "write fs -t file1".split(), input=b"other content")
+        assert result.exit_code == 1
+        assert "file1 already exists and overwrite is not allowed" in result.output
 
-    # Try to create the same file with -o update
-    runner = CliRunner()
-    result = runner.invoke(
-        cli,
-        "write -b fs -t file1 -o update --fs-default-directory-path foo".split(),
-        input=b"other content",
-    )
+        # Try to create the same file with -o update
+        runner = CliRunner()
+        result = runner.invoke(
+            cli,
+            "write fs -t file1 -o update".split(),
+            input=b"other content",
+        )
 
-    assert result.exit_code == 0
+        assert result.exit_code == 0
 
-    with filename.open("rb") as test_file:
-        content = test_file.read()
+        with filename.open("rb") as test_file:
+            content = test_file.read()
 
-    assert b"other content" in content
+        assert b"other content" in content
+        del cli.commands["write"].commands["fs"]
 
 
-def test_cli_write_command_with_chunk_size(fs, monkeypatch):
+def test_cli_write_command_with_chunk_size(monkeypatch):
     """Test ralph `write` command with a `chunk_size` option."""
 
     def get_mock_write_bytes(expected_chunk_size: int):
@@ -936,22 +944,28 @@ def test_cli_write_command_with_chunk_size(fs, monkeypatch):
 
     monkeypatch.delenv("RALPH_BACKENDS__DATA__FS__WRITE_CHUNK_SIZE", raising=False)
     runner = CliRunner()
+    with runner.isolated_filesystem():
+        # Given no chunk size, a default chunk size should be used.
+        monkeypatch.setattr(FSDataBackend, "_write_bytes", get_mock_write_bytes(4096))
+        result = runner.invoke(cli, "write fs".split())
+        assert result.exit_code == 0
 
-    # Given no chunk size, a default chunk size should be used.
-    monkeypatch.setattr(FSDataBackend, "_write_bytes", get_mock_write_bytes(4096))
-    result = runner.invoke(cli, "write -b fs".split())
-    assert result.exit_code == 0
+        # Given a chunk size set by the environment, it should overwrite the default.
+        runner = CliRunner(env={"RALPH_BACKENDS__DATA__FS__WRITE_CHUNK_SIZE": "3"})
+        monkeypatch.setattr(FSDataBackend, "_write_bytes", get_mock_write_bytes(3))
+        # NB: Command option defaults are set once.
+        # To force the CLI to recreate the command with new option defaults
+        # from environment variables -  we delete the previous command.
+        del cli.commands["write"].commands["fs"]
+        result = runner.invoke(cli, "write fs".split())
+        assert result.exit_code == 0
 
-    # Given a chunk size set by the environment, it should overwrite the default.
-    runner = CliRunner(env={"RALPH_BACKENDS__DATA__FS__WRITE_CHUNK_SIZE": "3"})
-    monkeypatch.setattr(FSDataBackend, "_write_bytes", get_mock_write_bytes(3))
-    result = runner.invoke(cli, "write -b fs".split())
-    assert result.exit_code == 0
-
-    # Given a chunk size set by the chunk-size option, it should overwrite the default.
-    monkeypatch.setattr(FSDataBackend, "_write_bytes", get_mock_write_bytes(1))
-    result = runner.invoke(cli, "write -b fs --chunk-size 1".split())
-    assert result.exit_code == 0
+        # Given a chunk size set by the chunk-size option, it should overwrite the
+        # default.
+        monkeypatch.setattr(FSDataBackend, "_write_bytes", get_mock_write_bytes(1))
+        result = runner.invoke(cli, "write fs --chunk-size 1".split())
+        assert result.exit_code == 0
+        del cli.commands["write"].commands["fs"]
 
 
 def test_cli_write_command_with_es_backend(es):
@@ -964,7 +978,7 @@ def test_cli_write_command_with_es_backend(es):
     es_hosts = ",".join(ES_TEST_HOSTS)
     result = runner.invoke(
         cli,
-        f"write -b es --es-hosts {es_hosts} --es-default-index {ES_TEST_INDEX}".split(),
+        f"write es --hosts {es_hosts} --default-index {ES_TEST_INDEX}".split(),
         input="\n".join(json.dumps(record) for record in records),
     )
     assert result.exit_code == 0
@@ -976,6 +990,7 @@ def test_cli_write_command_with_es_backend(es):
 
     assert len(documents) == 10
     assert [document.get("_source") for document in documents] == records
+    del cli.commands["write"].commands["es"]
 
 
 @pytest.mark.parametrize("host_,port_", [("0.0.0.0", "8000"), ("127.0.0.1", "80")])
@@ -990,9 +1005,10 @@ def test_cli_runserver_command_with_host_and_port_arguments(host_, port_, monkey
     monkeypatch.setattr("ralph.cli.uvicorn.run", mock_uvicorn_run)
 
     runner = CliRunner()
-    result = runner.invoke(cli, f"runserver -h {host_} -p {port_} -b es".split())
+    result = runner.invoke(cli, f"runserver es -h {host_} -p {port_}".split())
     assert result.exit_code == 0
     assert f"Running API server on {host_}:{port_} with es backend" in result.output
+    del cli.commands["runserver"].commands["es"]
 
 
 def test_cli_runserver_command_environment_file_generation(monkeypatch):
@@ -1001,21 +1017,27 @@ def test_cli_runserver_command_environment_file_generation(monkeypatch):
     def mock_uvicorn_run(_, env_file=None, **kwargs):
         """Mock uvicorn.run asserting environment file content."""
         expected_env_lines = [
-            f"RALPH_RUNSERVER_BACKEND={settings.RUNSERVER_BACKEND}\n",
+            "RALPH_RUNSERVER_BACKEND=es\n",
             "RALPH_BACKENDS__LRS__ES__DEFAULT_INDEX=foo\n",
             "RALPH_BACKENDS__LRS__ES__CLIENT_OPTIONS__verify_certs=True\n",
+            "RALPH_BACKENDS__LRS__ES__ALLOW_YELLOW_STATUS=False\n",
+            f"RALPH_BACKENDS__LRS__ES__HOSTS={''.join(ES_TEST_HOSTS)}\n",
+            "RALPH_BACKENDS__LRS__ES__LOCALE_ENCODING=utf8\n",
+            "RALPH_BACKENDS__LRS__ES__POINT_IN_TIME_KEEP_ALIVE=1m\n",
         ]
         with open(env_file, mode="r", encoding=settings.LOCALE_ENCODING) as file:
             assert file.readlines() == expected_env_lines
 
     monkeypatch.setattr("ralph.cli.uvicorn.run", mock_uvicorn_run)
     runner = CliRunner()
-    result = runner.invoke(
-        cli,
-        "runserver -b es --es-default-index foo "
-        "--es-client-options verify_certs=True".split(),
-    )
+    with runner.isolated_filesystem():
+        result = runner.invoke(
+            cli,
+            "runserver es --default-index foo "
+            "--client-options verify_certs=True".split(),
+        )
     assert result.exit_code == 0
+    del cli.commands["runserver"].commands["es"]
 
 
 def test_cli_ralph_cli_lazy_backend_options(monkeypatch):
@@ -1024,21 +1046,31 @@ def test_cli_ralph_cli_lazy_backend_options(monkeypatch):
     reload(cli_module)
     call_counter = {"count": 0}
 
-    def mock_backends_options(backends, name=None):
+    def mock_add_backend_sub_command(self, *args):
         call_counter["count"] += 1
-        return backends_options(backends, name)
+        return RalphBackendCLI.add_backend_sub_command(self, *args)
 
-    monkeypatch.setattr("ralph.cli.backends_options", mock_backends_options)
+    monkeypatch.setattr(
+        "ralph.cli.RalphBackendCLI.add_backend_sub_command",
+        mock_add_backend_sub_command,
+    )
     runner = CliRunner()
     # Given a command that does not require backend options, the `backend_options`
     # function should not be called.
     runner.invoke(cli_module.cli, ["convert --help"])
     assert not call_counter["count"]
-    # Given a command that requires backend options, the `backend_options` function
-    # should be called once.
-    runner.invoke(cli_module.cli, ["list", "--help"])
-    assert call_counter["count"] == 1
-    # Given a command that requires backend options of multiple commands, the
-    # `backend_options` function should be called once for each command.
     runner.invoke(cli_module.cli, ["--help"])
-    assert call_counter["count"] == 4  # list + (read, write, runserver)
+    assert not call_counter["count"]
+    # Given a command that requires backend options, the `backend_options` function
+    # should be called once for each backend.
+    runner.invoke(cli_module.cli, ["list", "--help"])
+    assert call_counter["count"] == 9
+    call_counter["count"] = 0
+    runner.invoke(cli_module.cli, ["read", "--help"])
+    assert call_counter["count"] == 12
+    call_counter["count"] = 0
+    runner.invoke(cli_module.cli, ["write", "--help"])
+    assert call_counter["count"] == 10
+    call_counter["count"] = 0
+    runner.invoke(cli_module.cli, ["runserver", "--help"])
+    assert call_counter["count"] == 6

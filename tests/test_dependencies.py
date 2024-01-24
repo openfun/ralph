@@ -35,7 +35,7 @@ def test_dependencies_runserver_subcommand_requires_uvicorn(monkeypatch):
     monkeypatch.delattr(cli, "uvicorn")
     monkeypatch.setattr(cli, "configure_logging", lambda: None)
     runner = CliRunner()
-    result = runner.invoke(cli.cli, "runserver -b es".split())
+    result = runner.invoke(cli.cli, "runserver es".split())
     assert isinstance(result.exception, ModuleNotFoundError)
     assert str(result.exception) == (
         "You need to install 'lrs' optional dependencies to use the runserver "

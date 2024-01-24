@@ -666,8 +666,11 @@ class BaseAsyncDataBackend(Generic[Settings, Query], ABC):
         await queue.put(None)
 
 
+DataBackend = TypeVar("DataBackend", BaseDataBackend, BaseAsyncDataBackend)
+
+
 def get_backend_generic_argument(
-    backend_class: Type[Union[BaseDataBackend, BaseAsyncDataBackend]],
+    backend_class: Type[DataBackend],
     position: DataBackendArgument,
 ) -> Optional[Type]:
     """Return the generic argument of `backend_class` at specified `position`."""
@@ -700,9 +703,7 @@ def get_backend_generic_argument(
     return None
 
 
-def set_backend_settings_class(
-    backend_class: Type[Union[BaseDataBackend, BaseAsyncDataBackend]]
-) -> None:
+def set_backend_settings_class(backend_class: Type[DataBackend]) -> None:
     """Set `settings_class` attribute with `Config.env_prefix` for `backend_class`."""
     settings_class = get_backend_generic_argument(
         backend_class, DataBackendArgument.SETTINGS
@@ -711,9 +712,7 @@ def set_backend_settings_class(
         backend_class.settings_class = settings_class
 
 
-def set_backend_query_class(
-    backend_class: Type[Union[BaseDataBackend, BaseAsyncDataBackend]]
-) -> None:
+def set_backend_query_class(backend_class: Type[DataBackend]) -> None:
     """Set `query_class` attribute for `backend_class`."""
     query_class = get_backend_generic_argument(backend_class, DataBackendArgument.QUERY)
     if query_class:

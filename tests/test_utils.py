@@ -41,10 +41,10 @@ def test_utils_get_backend_class(caplog):
     [
         # Empty options should produce default result.
         ({}, {"FOO": "FOO"}),
-        # Options not matching the backend name are ignored.
-        ({"foo": "bar", "not_dummy_foo": "baz"}, {"FOO": "FOO"}),
-        # Options matching the backend name update the defaults.
-        ({"dummy_foo": "bar"}, {"FOO": "bar"}),
+        # Not matching options are ignored.
+        ({"dummy_foo": "bar"}, {"FOO": "FOO"}),
+        # Matching options update the defaults.
+        ({"foo": "bar", "not_dummy_foo": "baz"}, {"FOO": "bar"}),
     ],
 )
 def test_utils_get_backend_instance(options, expected):

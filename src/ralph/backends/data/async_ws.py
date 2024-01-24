@@ -4,7 +4,7 @@ import logging
 from typing import AsyncIterator, Optional, Union
 
 import websockets
-from pydantic import AnyUrl, PositiveInt
+from pydantic import AnyUrl, PositiveInt, parse_obj_as
 from websockets.http import USER_AGENT
 
 from ralph.backends.data.base import (
@@ -74,7 +74,7 @@ class WSDataBackendSettings(BaseDataBackendSettings):
         env_prefix = "RALPH_BACKENDS__DATA__WS__"
 
     CLIENT_OPTIONS: WSClientOptions = WSClientOptions()
-    URI: AnyUrl
+    URI: Optional[AnyUrl] = parse_obj_as(AnyUrl, "ws://localhost:8765")
 
 
 class AsyncWSDataBackend(BaseAsyncDataBackend[WSDataBackendSettings, str]):

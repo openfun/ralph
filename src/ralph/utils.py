@@ -84,13 +84,10 @@ def get_backend_class(backends: Dict[str, Type], name: str) -> Any:
 
 def get_backend_instance(backend_class: Type, options: Dict) -> Any:
     """Return the instantiated backend given the backend class and options."""
-    prefix = f"{backend_class.name}_"
     # Filter backend-related parameters. Parameter name is supposed to start
     # with the backend name
     options = {
-        name.replace(prefix, "").upper(): value
-        for name, value in options.items()
-        if name.startswith(prefix) and value is not None
+        name.upper(): value for name, value in options.items() if value is not None
     }
     return backend_class(backend_class.settings_class(**options))
 

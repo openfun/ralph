@@ -1,4 +1,4 @@
-# Commands
+# CLI
 
 ::: mkdocs-click
     :module: ralph.cli

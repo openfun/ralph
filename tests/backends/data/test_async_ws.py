@@ -6,10 +6,11 @@ import re
 
 import pytest
 import websockets
+from websockets.http import USER_AGENT
 
 from ralph.backends.data.async_ws import AsyncWSDataBackend, WSDataBackendSettings
 from ralph.backends.data.base import DataBackendStatus
-from ralph.exceptions import BackendException, BackendParameterException
+from ralph.exceptions import BackendException
 
 from tests.fixtures.backends import WS_TEST_HOST, WS_TEST_PORT
 
@@ -30,16 +31,21 @@ def test_backends_data_async_ws_default_instantiation(caplog, monkeypatch, fs):
 
     assert AsyncWSDataBackend.name == "async_ws"
     assert AsyncWSDataBackend.settings_class == WSDataBackendSettings
-    msg = (
-        "Failed to instantiate default async data backend settings: "
-        "1 validation error for WSDataBackendSettings\nURI\n  "
-        "field required (type=value_error.missing)"
-    )
-    with pytest.raises(BackendParameterException, match=re.escape(msg)):
-        with caplog.at_level(logging.ERROR):
-            AsyncWSDataBackend()
-
-    assert ("ralph.backends.data.base", logging.ERROR, msg) in caplog.record_tuples
+    backend = AsyncWSDataBackend()
+    assert backend.settings.URI == "ws://localhost:8765"
+    assert backend.settings.CLIENT_OPTIONS.dict() == {
+        "close_timeout": None,
+        "compression": "deflate",
+        "max_size": 2**20,
+        "max_queue": 2**5,
+        "open_timeout": 10,
+        "origin": None,
+        "ping_interval": 20,
+        "ping_timeout": 20,
+        "read_limit": 2**16,
+        "user_agent_header": USER_AGENT,
+        "write_limit": 2**16,
+    }
 
 
 def test_backends_data_async_ws_instantiation_with_settings(monkeypatch):
