@@ -1,6 +1,7 @@
 """Basic authentication & authorization related tools for the Ralph API."""
 
 import logging
+import os
 from functools import lru_cache
 from pathlib import Path
 from threading import Lock
@@ -10,7 +11,7 @@ import bcrypt
 from cachetools import TTLCache, cached
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from pydantic import BaseModel, root_validator
+from pydantic import RootModel, model_validator
 from starlette.authentication import AuthenticationError
 
 from ralph.api.auth.user import AuthenticatedUser
@@ -40,45 +41,42 @@ class UserCredentials(AuthenticatedUser):
     username: str
 
 
-class ServerUsersCredentials(BaseModel):
+class ServerUsersCredentials(RootModel[List[UserCredentials]]):
     """Custom root pydantic model.
 
     Describe expected list of all server users credentials as stored in
     the credentials file.
 
     Attributes:
-        __root__ (List): Custom root consisting of the
+        root (List): Custom root consisting of the
                         list of all server users credentials.
     """
 
-    __root__: List[UserCredentials]
-
     def __add__(self, other) -> Any:  # noqa: D105
-        return ServerUsersCredentials.parse_obj(self.__root__ + other.__root__)
+        return ServerUsersCredentials.model_validate(self.root + other.root)
 
     def __getitem__(self, item: int) -> UserCredentials:  # noqa: D105
-        return self.__root__[item]
+        return self.root[item]
 
     def __len__(self) -> int:  # noqa: D105
-        return len(self.__root__)
+        return len(self.root)
 
     def __iter__(self) -> Iterator[UserCredentials]:  # noqa: D105
-        return iter(self.__root__)
+        return iter(self.root)
 
-    @root_validator
-    @classmethod
-    def ensure_unique_username(cls, values: Any) -> Any:
+    @model_validator(mode="after")
+    def ensure_unique_username(self) -> Any:
         """Every username should be unique among registered users."""
-        usernames = [entry.username for entry in values.get("__root__")]
+        usernames = [entry.username for entry in self.root]
         if len(usernames) != len(set(usernames)):
             raise ValueError(
                 "You cannot create multiple credentials with the same username"
             )
-        return values
+        return self
 
 
 @lru_cache()
-def get_stored_credentials(auth_file: Path) -> ServerUsersCredentials:
+def get_stored_credentials(auth_file: os.PathLike) -> ServerUsersCredentials:
     """Helper to read the credentials/scopes file.
 
     Read credentials from JSON file and stored them to avoid reloading them with every
@@ -96,7 +94,9 @@ def get_stored_credentials(auth_file: Path) -> ServerUsersCredentials:
         msg = "Credentials file <%s> not found."
         logger.warning(msg, auth_file)
         raise AuthenticationError(msg.format(auth_file))
-    return ServerUsersCredentials.parse_file(auth_file)
+
+    with open(auth_file, encoding=settings.LOCALE_ENCODING) as f:
+        return ServerUsersCredentials.model_validate_json(f.read())
 
 
 @cached(

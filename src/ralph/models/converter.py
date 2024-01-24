@@ -137,6 +137,7 @@ def convert_dict_event(
         if value not in [None, "", {}]:
             set_dict_value_from_path(converted_event, conversion_item.dest, value)
     logger.debug("Intermediate converted event: %s", converted_event)
+
     return conversion_set.__dest__(**converted_event)
 
 
@@ -198,7 +199,7 @@ class Converter:
         for event_str in input_file:
             try:
                 total += 1
-                yield self._convert_event(event_str).json(
+                yield self._convert_event(event_str).model_dump_json(
                     exclude_none=True, by_alias=True
                 )
                 success += 1
@@ -216,7 +217,7 @@ class Converter:
                 if not ignore_errors:
                     raise err
             except ValidationError as err:
-                message = f"Converted event is not a valid ({err.model}) model"
+                message = "Converted event is not valid"
                 self._log_error(message, event_str, err)
                 if not ignore_errors:
                     raise err

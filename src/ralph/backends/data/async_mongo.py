@@ -46,8 +46,9 @@ class AsyncMongoDataBackend(
             settings (MongoDataBackendSettings or None): The data backend settings.
         """
         super().__init__(settings)
+        host = str(self.settings.CONNECTION_URI)
         self.client = AsyncIOMotorClient(
-            self.settings.CONNECTION_URI, **self.settings.CLIENT_OPTIONS.dict()
+            host, **self.settings.CLIENT_OPTIONS.model_dump()
         )
         self.database = self.client[self.settings.DEFAULT_DATABASE]
         self.collection = self.database[self.settings.DEFAULT_COLLECTION]
@@ -175,7 +176,7 @@ class AsyncMongoDataBackend(
         ignore_errors: bool,  # noqa: ARG002
     ) -> AsyncIterator[dict]:
         """Method called by `self.read` yielding dictionaries. See `self.read`."""
-        kwargs = query.dict(exclude_unset=True)
+        kwargs = query.model_dump(exclude_unset=True)
         collection = self._get_target_collection(target)
         try:
             async for document in collection.find(batch_size=chunk_size, **kwargs):

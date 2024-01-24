@@ -12,22 +12,18 @@ from ralph.models.xapi.base.unnested_objects import (
     BaseXapiStatementRef,
 )
 
-from tests.fixtures.hypothesis_strategies import custom_given
+from tests.factories import mock_xapi_instance
 
 
-@custom_given(BaseXapiStatementRef)
-def test_models_xapi_base_object_statement_ref_type_with_valid_field(field):
+def test_models_xapi_base_object_statement_ref_type_with_valid_field():
     """Test a valid BaseXapiStatementRef has the expected `objectType` value."""
-
+    field = mock_xapi_instance(BaseXapiStatementRef)
     assert field.objectType == "StatementRef"
 
 
-@custom_given(BaseXapiInteractionComponent)
-def test_models_xapi_base_object_interaction_component_with_valid_field(
-    field,
-):
+def test_models_xapi_base_object_interaction_component_with_valid_field():
     """Test a valid BaseXapiInteractionComponent has the expected `id` regex."""
-
+    field = mock_xapi_instance(BaseXapiInteractionComponent)
     assert re.match(r"^[^\s]+$", field.id)
 
 
@@ -35,28 +31,24 @@ def test_models_xapi_base_object_interaction_component_with_valid_field(
     "id_value",
     [" test_id", "\ntest"],
 )
-@custom_given(BaseXapiInteractionComponent)
-def test_models_xapi_base_object_interaction_component_with_invalid_field(
-    id_value, field
-):
+def test_models_xapi_base_object_interaction_component_with_invalid_field(id_value):
     """Test an invalid `id` property in
     BaseXapiInteractionComponent raises a `ValidationError`.
     """
+    field = mock_xapi_instance(BaseXapiInteractionComponent)
 
     invalid_property = json.loads(field.json())
     invalid_property["id"] = id_value
 
-    with pytest.raises(ValidationError, match="id\n  string does not match regex"):
+    with pytest.raises(ValidationError, match="id\n  String should match pattern"):
         BaseXapiInteractionComponent(**invalid_property)
 
 
-@custom_given(BaseXapiActivityInteractionDefinition)
-def test_models_xapi_base_object_activity_type_interaction_definition_with_valid_field(
-    field,
-):
+def test_models_xapi_base_object_activity_type_interaction_definition_with_valid_field():  # noqa: E501
     """Test a valid BaseXapiActivityInteractionDefinition has the expected
     `objectType` value.
     """
+    field = mock_xapi_instance(BaseXapiActivityInteractionDefinition)
 
     assert field.interactionType in (
         "true-false",

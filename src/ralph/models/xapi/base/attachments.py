@@ -23,8 +23,8 @@ class BaseXapiAttachment(BaseModelWithConfig):
 
     usageType: IRI
     display: LanguageMap
-    description: Optional[LanguageMap]
+    description: Optional[LanguageMap] = None
     contentType: str
     length: int
     sha2: str
-    fileUrl: Optional[AnyUrl]
+    fileUrl: Optional[AnyUrl] = None

@@ -3,7 +3,7 @@
 import sys
 from typing import Union
 
-from pydantic import Json, validator
+from pydantic import Json, field_validator
 
 from ralph.models.selector import selector
 
@@ -72,7 +72,7 @@ class UISeqNext(BaseBrowserModel):
     event_type: Literal["seq_next"]
     name: Literal["seq_next"]
 
-    @validator("event")
+    @field_validator("event")
     @classmethod
     def validate_next_jump_event_field(
         cls, value: Union[Json[NavigationalEventField], NavigationalEventField]
@@ -103,7 +103,7 @@ class UISeqPrev(BaseBrowserModel):
     event_type: Literal["seq_prev"]
     name: Literal["seq_prev"]
 
-    @validator("event")
+    @field_validator("event")
     @classmethod
     def validate_prev_jump_event_field(
         cls, value: Union[Json[NavigationalEventField], NavigationalEventField]

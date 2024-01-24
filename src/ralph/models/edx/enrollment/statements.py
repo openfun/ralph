@@ -35,7 +35,6 @@ class EdxCourseEnrollmentActivated(BaseServerModel):
     __selector__ = selector(
         event_source="server", event_type="edx.course.enrollment.activated"
     )
-
     event: Union[
         Json[EnrollmentEventField],
         EnrollmentEventField,
@@ -84,8 +83,8 @@ class EdxCourseEnrollmentModeChanged(BaseServerModel):
     )
 
     event: Union[
-        Json[EnrollmentEventField],
         EnrollmentEventField,
+        Json[EnrollmentEventField],
     ]
     event_type: Literal["edx.course.enrollment.mode_changed"]
     name: Literal["edx.course.enrollment.mode_changed"]

@@ -8,6 +8,9 @@ and this project adheres to
 
 ## [Unreleased]
 
+- Upgrade `pydantic` to `2.5.3`
+- Migrate model tests from hypothesis strategies to polyfactory
+
 ## [4.0.0] - 2024-01-23
 
 ### Added

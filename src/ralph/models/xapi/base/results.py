@@ -4,7 +4,10 @@ from datetime import timedelta
 from decimal import Decimal
 from typing import Any, Dict, Optional, Union
 
-from pydantic import StrictBool, StrictStr, conint, root_validator
+from pydantic import Field, StrictBool, model_validator
+from typing_extensions import Annotated
+
+from ralph.conf import NonEmptyStrictStr
 
 from ..config import BaseModelWithConfig
 from .common import IRI
@@ -20,29 +23,23 @@ class BaseXapiResultScore(BaseModelWithConfig):
         max (Decimal): Consists of the highest possible score.
     """
 
-    scaled: Optional[conint(ge=-1, le=1)]
-    raw: Optional[Decimal]
-    min: Optional[Decimal]
-    max: Optional[Decimal]
+    scaled: Optional[Annotated[int, Field(ge=-1, le=1)]] = None
+    raw: Optional[Decimal] = None
+    min: Optional[Decimal] = None
+    max: Optional[Decimal] = None
 
-    @root_validator
-    @classmethod
-    def check_raw_min_max_relation(cls, values: Any) -> Any:
+    @model_validator(mode="after")
+    def check_raw_min_max_relation(self) -> Any:
         """Check the relationship `min < raw < max`."""
-        raw_value = values.get("raw", None)
-        min_value = values.get("min", None)
-        max_value = values.get("max", None)
-
-        if min_value:
-            if max_value and min_value > max_value:
+        if self.min:
+            if self.max and self.min > self.max:
                 raise ValueError("min cannot be greater than max")
-            if raw_value and min_value > raw_value:
+            if self.raw and self.min > self.raw:
                 raise ValueError("min cannot be greater than raw")
-        if max_value:
-            if raw_value and raw_value > max_value:
+        if self.max:
+            if self.raw and self.raw > self.max:
                 raise ValueError("raw cannot be greater than max")
-
-        return values
+        return self
 
 
 class BaseXapiResult(BaseModelWithConfig):
@@ -58,9 +55,9 @@ class BaseXapiResult(BaseModelWithConfig):
         extensions (dict): Consists of a dictionary of other properties as needed.
     """
 
-    score: Optional[BaseXapiResultScore]
-    success: Optional[StrictBool]
-    completion: Optional[StrictBool]
-    response: Optional[StrictStr]
-    duration: Optional[timedelta]
-    extensions: Optional[Dict[IRI, Union[str, int, bool, list, dict, None]]]
+    score: Optional[BaseXapiResultScore] = None
+    success: Optional[StrictBool] = None
+    completion: Optional[StrictBool] = None
+    response: Optional[NonEmptyStrictStr] = None
+    duration: Optional[timedelta] = None
+    extensions: Optional[Dict[IRI, Union[str, int, bool, list, dict, None]]] = None

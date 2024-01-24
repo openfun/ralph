@@ -138,18 +138,18 @@ async def test_api_statements_get_mine(
     if ifi == "account_same_home_page":
         agent_1 = mock_agent("account", 1, home_page_id=1)
         agent_1_bis = mock_agent(
-            "account", 1, home_page_id=1, name="name", use_object_type=False
+            "account", 1, home_page_id=1, name="myname", use_object_type=False
         )
         agent_2 = mock_agent("account", 2, home_page_id=1)
     elif ifi == "account_different_home_page":
         agent_1 = mock_agent("account", 1, home_page_id=1)
         agent_1_bis = mock_agent(
-            "account", 1, home_page_id=1, name="name", use_object_type=False
+            "account", 1, home_page_id=1, name="myname", use_object_type=False
         )
         agent_2 = mock_agent("account", 1, home_page_id=2)
     else:
         agent_1 = mock_agent(ifi, 1)
-        agent_1_bis = mock_agent(ifi, 1, name="name", use_object_type=False)
+        agent_1_bis = mock_agent(ifi, 1, name="myname", use_object_type=False)
         agent_2 = mock_agent(ifi, 2)
 
     username_1 = "jane"
@@ -451,7 +451,10 @@ async def test_api_statements_get_by_activity(
     )
 
     assert response.status_code == 422
-    assert response.json()["detail"][0]["msg"] == "'INVALID_IRI' is not a valid 'IRI'."
+    assert (
+        response.json()["detail"][0]["msg"]
+        == "Value error, 'INVALID_IRI' is not a valid 'IRI'."
+    )
 
 
 @pytest.mark.anyio
@@ -784,10 +787,9 @@ async def test_api_statements_get_invalid_query_parameters(
         (["all/read"], True),
         (["statements/read/mine"], True),
         (["statements/read"], True),
-        (["profile/write", "statements/read", "all/write"], True),
+        (["profile/write", "statements/read", "profile/read"], True),
         (["statements/write"], False),
         (["profile/read"], False),
-        (["all/write"], False),
         ([], False),
     ],
 )

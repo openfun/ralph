@@ -7,6 +7,7 @@ from typing import Any, Iterable, Iterator, Optional, Tuple, Union
 from uuid import uuid4
 
 from pydantic import PositiveInt
+from pydantic_settings import SettingsConfigDict
 from swiftclient.service import ClientException, Connection
 
 from ralph.backends.data.base import (
@@ -18,7 +19,7 @@ from ralph.backends.data.base import (
     Writable,
 )
 from ralph.backends.data.mixins import HistoryMixin
-from ralph.conf import BaseSettingsConfig
+from ralph.conf import BASE_SETTINGS_CONFIG
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import now, parse_iterable_to_dict
 
@@ -45,10 +46,10 @@ class SwiftDataBackendSettings(BaseDataBackendSettings):
         WRITE_CHUNK_SIZE (str): The default chunk size for writing objects.
     """
 
-    class Config(BaseSettingsConfig):
-        """Pydantic Configuration."""
-
-        env_prefix = "RALPH_BACKENDS__DATA__SWIFT__"
+    model_config = {
+        **BASE_SETTINGS_CONFIG,
+        **SettingsConfigDict(env_prefix="RALPH_BACKENDS__DATA__SWIFT__"),
+    }
 
     AUTH_URL: str = "https://auth.cloud.ovh.net/"
     DEFAULT_CONTAINER: Optional[str] = None

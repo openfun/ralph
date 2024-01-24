@@ -371,7 +371,6 @@ class VirtualClassroomAnsweredPoll(BaseVirtualClassroomStatement):
         object (dict): See CMIInteractionActivity.
         context (dict): See VirtualClassroomAnsweredPollContext.
         result (dict): See AnsweredPollResult.
-        result (dict): See AnsweredPollResult.
         timestamp (datetime): Consists of the timestamp of when the event occurred.
         result (dict): See AnsweredPollResult.
         timestamp (datetime): Consists of the timestamp of when the event occurred.

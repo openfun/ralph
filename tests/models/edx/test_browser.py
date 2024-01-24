@@ -4,16 +4,16 @@ import json
 import re
 
 import pytest
-from pydantic.error_wrappers import ValidationError
+from pydantic import ValidationError
 
 from ralph.models.edx.browser import BaseBrowserModel
 
-from tests.fixtures.hypothesis_strategies import custom_given
+from tests.factories import mock_instance
 
 
-@custom_given(BaseBrowserModel)
-def test_models_edx_base_browser_model_with_valid_statement(statement):
+def test_models_edx_base_browser_model_with_valid_statement():
     """Test that a valid base browser statement does not raise a `ValidationError`."""
+    statement = mock_instance(BaseBrowserModel)
     assert re.match(r"^[a-f0-9]{32}$", statement.session) or statement.session == ""
 
 
@@ -21,19 +21,17 @@ def test_models_edx_base_browser_model_with_valid_statement(statement):
     "session,error",
     [
         # less than 32 characters
-        ("abcdef0123456789", "session\n  string does not match regex"),
+        ("abcdef0123456789", "String should match pattern"),
         # more than 32 characters
-        ("abcdef0123456789abcdef0123456789abcdef", "string does not match regex"),
+        ("abcdef0123456789abcdef0123456789abcdef", "String should match pattern"),
         # with excluded characters
-        ("abcdef0123456789_abcdef012345678", "string does not match regex"),
+        ("abcdef0123456789_abcdef012345678", "String should match pattern"),
     ],
 )
-@custom_given(BaseBrowserModel)
-def test_models_edx_base_browser_model_with_invalid_statement(
-    session, error, statement
-):
+def test_models_edx_base_browser_model_with_invalid_statement(session, error):
     """Test that an invalid base browser statement raises a `ValidationError`."""
-    invalid_statement = json.loads(statement.json())
+    statement = mock_instance(BaseBrowserModel)
+    invalid_statement = json.loads(statement.model_dump_json())
     invalid_statement["session"] = session
 
     with pytest.raises(ValidationError, match=error):

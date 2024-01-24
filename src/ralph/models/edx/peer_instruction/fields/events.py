@@ -1,6 +1,7 @@
 """Peer instruction event field definition."""
 
-from pydantic import constr
+from pydantic import StringConstraints
+from typing_extensions import Annotated
 
 from ...base import AbstractBaseEventField
 
@@ -18,5 +19,5 @@ class PeerInstructionEventField(AbstractBaseEventField):
     """
 
     answer: int
-    rationale: constr(max_length=12500)
+    rationale: Annotated[str, StringConstraints(max_length=12500)]
     truncated: bool
