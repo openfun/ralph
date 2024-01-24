@@ -16,6 +16,7 @@ from botocore.exceptions import (
     ResponseStreamingError,
 )
 from pydantic import PositiveInt
+from pydantic_settings import SettingsConfigDict
 from requests_toolbelt import StreamingIterator
 
 from ralph.backends.data.base import (
@@ -27,7 +28,7 @@ from ralph.backends.data.base import (
     Writable,
 )
 from ralph.backends.data.mixins import HistoryMixin
-from ralph.conf import BaseSettingsConfig
+from ralph.conf import BASE_SETTINGS_CONFIG
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import now, parse_iterable_to_dict
 
@@ -49,10 +50,10 @@ class S3DataBackendSettings(BaseDataBackendSettings):
         WRITE_CHUNK_SIZE (str): The default chunk size for writing objects.
     """
 
-    class Config(BaseSettingsConfig):
-        """Pydantic Configuration."""
-
-        env_prefix = "RALPH_BACKENDS__DATA__S3__"
+    model_config = {
+        **BASE_SETTINGS_CONFIG,
+        **SettingsConfigDict(env_prefix="RALPH_BACKENDS__DATA__S3__"),
+    }
 
     ACCESS_KEY_ID: Optional[str] = None
     SECRET_ACCESS_KEY: Optional[str] = None
@@ -215,7 +216,7 @@ class S3DataBackend(
             {
                 "backend": self.name,
                 "action": "read",
-                "id": target + "/" + query,
+                "id": target.rstrip("/") + "/" + query,
                 "size": response["ContentLength"],
                 "timestamp": now(),
             }
@@ -244,7 +245,7 @@ class S3DataBackend(
             {
                 "backend": self.name,
                 "action": "read",
-                "id": target + "/" + query,
+                "id": target.rstrip("/") + "/" + query,
                 "size": response["ContentLength"],
                 "timestamp": now(),
             }

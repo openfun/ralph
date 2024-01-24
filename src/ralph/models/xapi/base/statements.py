@@ -4,7 +4,8 @@ from datetime import datetime
 from typing import Any, List, Optional, Union
 from uuid import UUID
 
-from pydantic import constr, root_validator
+from pydantic import StringConstraints, model_validator
+from typing_extensions import Annotated
 
 from ..config import BaseModelWithConfig
 from .agents import BaseXapiAgent
@@ -33,19 +34,19 @@ class BaseXapiStatement(BaseModelWithConfig):
         attachments (list): Consists of a list of attachments.
     """
 
-    id: Optional[UUID]
+    id: Optional[UUID] = None
     actor: Union[BaseXapiAgent, BaseXapiGroup]
     verb: BaseXapiVerb
     object: BaseXapiObject
-    result: Optional[BaseXapiResult]
-    context: Optional[BaseXapiContext]
-    timestamp: Optional[datetime]
-    stored: Optional[datetime]
-    authority: Optional[Union[BaseXapiAgent, BaseXapiGroup]]
-    version: constr(regex=r"^1\.0\.[0-9]+$") = "1.0.0"
-    attachments: Optional[List[BaseXapiAttachment]]
+    result: Optional[BaseXapiResult] = None
+    context: Optional[BaseXapiContext] = None
+    timestamp: Optional[datetime] = None
+    stored: Optional[datetime] = None
+    authority: Optional[Union[BaseXapiAgent, BaseXapiGroup]] = None
+    version: Annotated[str, StringConstraints(pattern=r"^1\.0\.[0-9]+$")] = "1.0.0"
+    attachments: Optional[List[BaseXapiAttachment]] = None
 
-    @root_validator(pre=True)
+    @model_validator(mode="before")
     @classmethod
     def check_absence_of_empty_and_invalid_values(cls, values: Any) -> Any:
         """Check the model for empty and invalid values.

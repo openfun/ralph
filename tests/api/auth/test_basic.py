@@ -35,7 +35,7 @@ def test_api_auth_basic_model_serveruserscredentials():
     """Test api.auth ServerUsersCredentials model."""
 
     users = ServerUsersCredentials(
-        __root__=[
+        root=[
             UserCredentials(
                 username="johndoe",
                 hash="notrealhash",
@@ -50,7 +50,7 @@ def test_api_auth_basic_model_serveruserscredentials():
             ),
         ]
     )
-    other_users = ServerUsersCredentials.parse_obj(
+    other_users = ServerUsersCredentials.model_validate(
         [
             UserCredentials(
                 username="janedoe",
@@ -82,7 +82,7 @@ def test_api_auth_basic_model_serveruserscredentials():
         ValueError,
         match="You cannot create multiple credentials with the same username",
     ):
-        users += ServerUsersCredentials.parse_obj(
+        users += ServerUsersCredentials.model_validate(
             [
                 UserCredentials(
                     username="foo",

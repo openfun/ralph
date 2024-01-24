@@ -275,7 +275,7 @@ def test_backends_lrs_es_query_statements_query(
 
     def mock_read(query, chunk_size):
         """Mock the `ESLRSBackend.read` method."""
-        assert query.dict() == expected_query
+        assert query.model_dump() == expected_query
         assert chunk_size == expected_query.get("size")
         query.pit.id = "foo_pit_id"
         query.search_after = ["bar_search_after", "baz_search_after"]
@@ -283,7 +283,7 @@ def test_backends_lrs_es_query_statements_query(
 
     backend = es_lrs_backend()
     monkeypatch.setattr(backend, "read", mock_read)
-    result = backend.query_statements(RalphStatementsQuery.construct(**params))
+    result = backend.query_statements(RalphStatementsQuery.model_construct(**params))
     assert not result.statements
     assert result.pit_id == "foo_pit_id"
     assert result.search_after == "bar_search_after|baz_search_after"
@@ -303,7 +303,7 @@ def test_backends_lrs_es_query_statements(es, es_lrs_backend):
     assert backend.write(documents) == 1
 
     # Check the expected search query results.
-    result = backend.query_statements(RalphStatementsQuery.construct(limit=10))
+    result = backend.query_statements(RalphStatementsQuery.model_construct(limit=10))
     assert result.statements == documents
     assert re.match(r"[0-9]+\|0", result.search_after)
 
@@ -327,7 +327,7 @@ def test_backends_lrs_es_query_statements_with_search_query_failure(
     msg = "Query error"
     with pytest.raises(BackendException, match=msg):
         with caplog.at_level(logging.ERROR):
-            backend.query_statements(RalphStatementsQuery.construct())
+            backend.query_statements(RalphStatementsQuery.model_construct())
 
     assert (
         "ralph.backends.lrs.es",
@@ -355,7 +355,9 @@ def test_backends_lrs_es_query_statements_by_ids_with_search_query_failure(
     msg = r"Failed to execute Elasticsearch query: ApiError\(None, 'Query error'\)"
     with pytest.raises(BackendException, match=msg):
         with caplog.at_level(logging.ERROR):
-            list(backend.query_statements_by_ids(RalphStatementsQuery.construct()))
+            list(
+                backend.query_statements_by_ids(RalphStatementsQuery.model_construct())
+            )
 
     assert (
         "ralph.backends.lrs.es",

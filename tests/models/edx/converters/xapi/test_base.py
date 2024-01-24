@@ -22,7 +22,7 @@ def test_models_edx_converters_xapi_base_xapi_converter_successful_initializatio
             return set()
 
     converter = DummyBaseXapiConverter(uuid_namespace, "https://fun-mooc.fr")
-    assert converter.platform_url == "https://fun-mooc.fr"
+    assert str(converter.platform_url) == "https://fun-mooc.fr"
     assert converter.uuid_namespace == UUID(uuid_namespace)
 
 

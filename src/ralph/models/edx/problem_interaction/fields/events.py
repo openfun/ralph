@@ -4,7 +4,8 @@ import sys
 from datetime import datetime
 from typing import Dict, List, Optional, Union
 
-from pydantic import constr
+from pydantic import Field
+from typing_extensions import Annotated
 
 from ...base import AbstractBaseEventField, BaseModelWithConfig
 
@@ -41,13 +42,13 @@ class CorrectMap(BaseModelWithConfig):
         queuestate (json): see QueueStateField.
     """
 
-    answervariable: Union[Literal[None], None, str]
-    correctness: Union[Literal["correct"], Literal["incorrect"]]
-    hint: Optional[str]
-    hintmode: Optional[Union[Literal["on_request"], Literal["always"]]]
+    answervariable: Optional[str] = None
+    correctness: Literal["correct", "incorrect"]
+    hint: Optional[str] = None
+    hintmode: Optional[Literal["on_request", "always"]] = None
     msg: str
-    npoints: Optional[int]
-    queuestate: Optional[QueueState]
+    npoints: Optional[int] = None
+    queuestate: Optional[QueueState] = None
 
 
 class State(BaseModelWithConfig):
@@ -62,10 +63,10 @@ class State(BaseModelWithConfig):
     """
 
     correct_map: Dict[
-        constr(regex=r"^[a-f0-9]{32}_[0-9]_[0-9]$"),
+        Annotated[str, Field(pattern=r"^[a-f0-9]{32}_[0-9]_[0-9]$")],
         CorrectMap,
     ]
-    done: Optional[bool]
+    done: Optional[bool] = None
     input_state: dict
     seed: int
     student_answers: dict
@@ -135,21 +136,21 @@ class EdxProblemHintFeedbackDisplayedEventField(AbstractBaseEventField):
             `student_answer` response. Consists either of `single` or `compound` value.
     """
 
-    choice_all: Optional[List[str]]
+    choice_all: Optional[List[str]] = None
     correctness: bool
     hint_label: str
     hints: List[dict]
     module_id: str
     problem_part_id: str
-    question_type: Union[
-        Literal["stringresponse"],
-        Literal["choiceresponse"],
-        Literal["multiplechoiceresponse"],
-        Literal["numericalresponse"],
-        Literal["optionresponse"],
+    question_type: Literal[
+        "stringresponse",
+        "choiceresponse",
+        "multiplechoiceresponse",
+        "numericalresponse",
+        "optionresponse",
     ]
     student_answer: List[str]
-    trigger_type: Union[Literal["single"], Literal["compound"]]
+    trigger_type: Literal["single", "compound"]
 
 
 class ProblemCheckEventField(AbstractBaseEventField):
@@ -170,26 +171,29 @@ class ProblemCheckEventField(AbstractBaseEventField):
     """
 
     answers: Dict[
-        constr(regex=r"^[a-f0-9]{32}_[0-9]_[0-9]$"),
-        Union[List[str], str],
+        Annotated[str, Field(pattern=r"^[a-f0-9]{32}_[0-9]_[0-9]$")],
+        Union[str, List[str]],
     ]
     attempts: int
     correct_map: Dict[
-        constr(regex=r"^[a-f0-9]{32}_[0-9]_[0-9]$"),
+        Annotated[str, Field(pattern=r"^[a-f0-9]{32}_[0-9]_[0-9]$")],
         CorrectMap,
     ]
     grade: int
     max_grade: int
-    problem_id: constr(
-        regex=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"
-        r"type@problem\+block@[a-f0-9]{32}$"
-    )
+    problem_id: Annotated[
+        str,
+        Field(
+            pattern=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"
+            r"type@problem\+block@[a-f0-9]{32}$"
+        ),
+    ]
     state: State
     submission: Dict[
-        constr(regex=r"^[a-f0-9]{32}_[0-9]_[0-9]$"),
+        Annotated[str, Field(pattern=r"^[a-f0-9]{32}_[0-9]_[0-9]$")],
         SubmissionAnswerField,
     ]
-    success: Union[Literal["correct"], Literal["incorrect"]]
+    success: Literal["correct", "incorrect"]
 
 
 class ProblemCheckFailEventField(AbstractBaseEventField):
@@ -204,14 +208,17 @@ class ProblemCheckFailEventField(AbstractBaseEventField):
     """
 
     answers: Dict[
-        constr(regex=r"^[a-f0-9]{32}_[0-9]_[0-9]$"),
-        Union[List[str], str],
+        Annotated[str, Field(pattern=r"^[a-f0-9]{32}_[0-9]_[0-9]$")],
+        Union[str, List[str]],
     ]
-    failure: Union[Literal["closed"], Literal["unreset"]]
-    problem_id: constr(
-        regex=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"
-        r"type@problem\+block@[a-f0-9]{32}$"
-    )
+    failure: Literal["closed", "unreset"]
+    problem_id: Annotated[
+        str,
+        Field(
+            pattern=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"
+            r"type@problem\+block@[a-f0-9]{32}$"
+        ),
+    ]
     state: State
 
 
@@ -235,12 +242,15 @@ class ProblemRescoreEventField(AbstractBaseEventField):
     new_total: int
     orig_score: int
     orig_total: int
-    problem_id: constr(
-        regex=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"
-        r"type@problem\+block@[a-f0-9]{32}$"
-    )
+    problem_id: Annotated[
+        str,
+        Field(
+            pattern=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"
+            r"type@problem\+block@[a-f0-9]{32}$"
+        ),
+    ]
     state: State
-    success: Union[Literal["correct"], Literal["incorrect"]]
+    success: Literal["correct", "incorrect"]
 
 
 class ProblemRescoreFailEventField(AbstractBaseEventField):
@@ -252,11 +262,14 @@ class ProblemRescoreFailEventField(AbstractBaseEventField):
         state (json): see StateField.
     """
 
-    failure: Union[Literal["closed"], Literal["unreset"]]
-    problem_id: constr(
-        regex=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"
-        r"type@problem\+block@[a-f0-9]{32}$"
-    )
+    failure: Literal["closed", "unreset"]
+    problem_id: Annotated[
+        str,
+        Field(
+            pattern=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"
+            r"type@problem\+block@[a-f0-9]{32}$"
+        ),
+    ]
     state: State
 
 
@@ -293,10 +306,13 @@ class ResetProblemEventField(AbstractBaseEventField):
 
     new_state: State
     old_state: State
-    problem_id: constr(
-        regex=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"
-        r"type@problem\+block@[a-f0-9]{32}$"
-    )
+    problem_id: Annotated[
+        str,
+        Field(
+            pattern=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"
+            r"type@problem\+block@[a-f0-9]{32}$"
+        ),
+    ]
 
 
 class ResetProblemFailEventField(AbstractBaseEventField):
@@ -308,12 +324,15 @@ class ResetProblemFailEventField(AbstractBaseEventField):
         problem_id (str): Consists of the ID of the problem being reset.
     """
 
-    failure: Union[Literal["closed"], Literal["not_done"]]
+    failure: Literal["closed", "not_done"]
     old_state: State
-    problem_id: constr(
-        regex=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"
-        r"type@problem\+block@[a-f0-9]{32}$"
-    )
+    problem_id: Annotated[
+        str,
+        Field(
+            pattern=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"
+            r"type@problem\+block@[a-f0-9]{32}$"
+        ),
+    ]
 
 
 class SaveProblemFailEventField(AbstractBaseEventField):
@@ -328,11 +347,14 @@ class SaveProblemFailEventField(AbstractBaseEventField):
     """
 
     answers: Dict[str, Union[int, str, list, dict]]
-    failure: Union[Literal["closed"], Literal["done"]]
-    problem_id: constr(
-        regex=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"
-        r"type@problem\+block@[a-f0-9]{32}$"
-    )
+    failure: Literal["closed", "done"]
+    problem_id: Annotated[
+        str,
+        Field(
+            pattern=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"
+            r"type@problem\+block@[a-f0-9]{32}$"
+        ),
+    ]
     state: State
 
 
@@ -347,10 +369,13 @@ class SaveProblemSuccessEventField(AbstractBaseEventField):
     """
 
     answers: Dict[str, Union[int, str, list, dict]]
-    problem_id: constr(
-        regex=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"
-        r"type@problem\+block@[a-f0-9]{32}$"
-    )
+    problem_id: Annotated[
+        str,
+        Field(
+            pattern=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"
+            r"type@problem\+block@[a-f0-9]{32}$"
+        ),
+    ]
     state: State
 
 
@@ -361,7 +386,10 @@ class ShowAnswerEventField(AbstractBaseEventField):
         problem_id (str): Consists of the ID of the problem being shown.
     """
 
-    problem_id: constr(
-        regex=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"
-        r"type@problem\+block@[a-f0-9]{32}$"
-    )
+    problem_id: Annotated[
+        str,
+        Field(
+            pattern=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"
+            r"type@problem\+block@[a-f0-9]{32}$"
+        ),
+    ]

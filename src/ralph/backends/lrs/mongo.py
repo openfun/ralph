@@ -4,6 +4,7 @@ import logging
 from typing import Iterator, List
 
 from bson.objectid import ObjectId
+from pydantic_settings import SettingsConfigDict
 from pymongo import ASCENDING, DESCENDING
 
 from ralph.backends.data.mongo import (
@@ -18,7 +19,7 @@ from ralph.backends.lrs.base import (
     RalphStatementsQuery,
     StatementQueryResult,
 )
-from ralph.conf import BaseSettingsConfig
+from ralph.conf import BASE_SETTINGS_CONFIG
 from ralph.exceptions import BackendException, BackendParameterException
 
 logger = logging.getLogger(__name__)
@@ -27,10 +28,10 @@ logger = logging.getLogger(__name__)
 class MongoLRSBackendSettings(BaseLRSBackendSettings, MongoDataBackendSettings):
     """MongoDB LRS backend default configuration."""
 
-    class Config(BaseSettingsConfig):
-        """Pydantic Configuration."""
-
-        env_prefix = "RALPH_BACKENDS__LRS__MONGO__"
+    model_config = {
+        **BASE_SETTINGS_CONFIG,
+        **SettingsConfigDict(env_prefix="RALPH_BACKENDS__LRS__MONGO__"),
+    }
 
 
 class MongoLRSBackend(BaseLRSBackend[MongoLRSBackendSettings], MongoDataBackend):
@@ -110,7 +111,7 @@ class MongoLRSBackend(BaseLRSBackend[MongoLRSBackendSettings], MongoDataBackend)
         ]
 
         # Note: `params` fields are validated thus we skip MongoQuery validation.
-        return MongoQuery.construct(
+        return MongoQuery.model_construct(
             filter=mongo_query_filters, limit=params.limit, sort=mongo_query_sort
         )
 
@@ -129,7 +130,7 @@ class MongoLRSBackend(BaseLRSBackend[MongoLRSBackendSettings], MongoDataBackend)
             return
 
         if not isinstance(agent_params, dict):
-            agent_params = agent_params.dict()
+            agent_params = agent_params.model_dump()
 
         if agent_params.get("mbox"):
             key = f"_source.{target_field}.mbox"

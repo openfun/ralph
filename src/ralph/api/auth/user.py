@@ -1,8 +1,10 @@
 """Authenticated user for the Ralph API."""
 
-from typing import Dict, FrozenSet, Literal
+from typing import FrozenSet, Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, RootModel
+
+from ralph.models.xapi.base.agents import BaseXapiAgent
 
 Scope = Literal[
     "statements/write",
@@ -18,7 +20,7 @@ Scope = Literal[
 ]
 
 
-class UserScopes(FrozenSet[Scope]):
+class UserScopes(RootModel[FrozenSet[Scope]]):
     """Scopes available to users."""
 
     def is_authorized(self, requested_scope: Scope):
@@ -47,18 +49,10 @@ class UserScopes(FrozenSet[Scope]):
         }
 
         expanded_user_scopes = set()
-        for scope in self:
+        for scope in self.root:
             expanded_user_scopes.update(expanded_scopes.get(scope, {scope}))
 
         return requested_scope in expanded_user_scopes
-
-    @classmethod
-    def __get_validators__(cls):  # noqa: D105
-        def validate(value: FrozenSet[Scope]):
-            """Transform value to an instance of UserScopes."""
-            return cls(value)
-
-        yield validate
 
 
 class AuthenticatedUser(BaseModel):
@@ -69,5 +63,5 @@ class AuthenticatedUser(BaseModel):
         scopes (list): The scopes the user has access to.
     """
 
-    agent: Dict
+    agent: BaseXapiAgent
     scopes: UserScopes

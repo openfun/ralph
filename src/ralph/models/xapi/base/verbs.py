@@ -15,4 +15,4 @@ class BaseXapiVerb(BaseModelWithConfig):
     """
 
     id: IRI
-    display: Optional[LanguageMap]
+    display: Optional[LanguageMap] = None

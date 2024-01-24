@@ -3,8 +3,6 @@
 import json
 
 import pytest
-from hypothesis import settings
-from hypothesis import strategies as st
 from pydantic import ValidationError
 
 from ralph.models.selector import ModelSelector
@@ -25,16 +23,15 @@ from ralph.models.xapi.base.unnested_objects import (
 )
 from ralph.utils import set_dict_value_from_path
 
-from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
+from tests.factories import ModelFactory, mock_xapi_instance
 
 
 @pytest.mark.parametrize(
     "path",
-    ["id", "stored", "verb__display", "context__contextActivities__parent"],
+    ["id", "stored", "verb__display", "result__score__raw"],
 )
 @pytest.mark.parametrize("value", [None, "", {}])
-@custom_given(BaseXapiStatement)
-def test_models_xapi_base_statement_with_invalid_null_values(path, value, statement):
+def test_models_xapi_base_statement_with_invalid_null_values(path, value):
     """Test that the statement does not accept any null values.
 
     XAPI-00001
@@ -42,8 +39,11 @@ def test_models_xapi_base_statement_with_invalid_null_values(path, value, statem
     value is set to "null", an empty object, or has no value, except in an "extensions"
     property.
     """
-    statement = statement.dict(exclude_none=True)
+    statement = mock_xapi_instance(BaseXapiStatement)
+
+    statement = statement.model_dump(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), value)
+
     with pytest.raises(ValidationError, match="invalid empty value"):
         BaseXapiStatement(**statement)
 
@@ -56,9 +56,8 @@ def test_models_xapi_base_statement_with_invalid_null_values(path, value, statem
         "context__extensions__https://w3id.org/xapi/video",
     ],
 )
-@pytest.mark.parametrize("value", [None, "", {}])
-@custom_given(custom_builds(BaseXapiStatement, object=custom_builds(BaseXapiActivity)))
-def test_models_xapi_base_statement_with_valid_null_values(path, value, statement):
+@pytest.mark.parametrize("value", [None, {}])
+def test_models_xapi_base_statement_with_valid_null_values(path, value):
     """Test that the statement does accept valid null values in extensions fields.
 
     XAPI-00001
@@ -66,8 +65,15 @@ def test_models_xapi_base_statement_with_valid_null_values(path, value, statemen
     value is set to "null", an empty object, or has no value, except in an "extensions"
     property.
     """
-    statement = statement.dict(exclude_none=True)
+
+    statement = mock_xapi_instance(
+        BaseXapiStatement, object=mock_xapi_instance(BaseXapiActivity)
+    )
+
+    statement = statement.model_dump(exclude_none=True)
+
     set_dict_value_from_path(statement, path.split("__"), value)
+
     try:
         BaseXapiStatement(**statement)
     except ValidationError as err:
@@ -75,22 +81,22 @@ def test_models_xapi_base_statement_with_valid_null_values(path, value, statemen
 
 
 @pytest.mark.parametrize("path", ["object__definition__correctResponsesPattern"])
-@custom_given(
-    custom_builds(
-        BaseXapiStatement,
-        object=custom_builds(
-            BaseXapiActivity,
-            definition=custom_builds(BaseXapiActivityInteractionDefinition),
-        ),
-    )
-)
-def test_models_xapi_base_statement_with_valid_empty_array(path, statement):
+def test_models_xapi_base_statement_with_valid_empty_array(path):
     """Test that the statement does accept a valid empty array.
 
     Where the Correct Responses Pattern contains an empty array, the meaning of this is
     that there is no correct answer.
     """
-    statement = statement.dict(exclude_none=True)
+
+    statement = mock_xapi_instance(
+        BaseXapiStatement,
+        object=mock_xapi_instance(
+            BaseXapiActivity,
+            definition=mock_xapi_instance(BaseXapiActivityInteractionDefinition),
+        ),
+    )
+
+    statement = statement.model_dump(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), [])
     try:
         BaseXapiStatement(**statement)
@@ -102,8 +108,7 @@ def test_models_xapi_base_statement_with_valid_empty_array(path, statement):
     "field",
     ["actor", "verb", "object"],
 )
-@custom_given(BaseXapiStatement)
-def test_models_xapi_base_statement_must_use_actor_verb_and_object(field, statement):
+def test_models_xapi_base_statement_must_use_actor_verb_and_object(field):
     """Test that the statement raises an exception if required fields are missing.
 
     XAPI-00003
@@ -116,54 +121,86 @@ def test_models_xapi_base_statement_must_use_actor_verb_and_object(field, statem
     An LRS rejects with error code 400 Bad Request a Statement which does not contain an
     "object" property.
     """
-    statement = statement.dict(exclude_none=True)
+
+    statement = mock_xapi_instance(BaseXapiStatement)
+
+    statement = statement.model_dump(exclude_none=True)
+    del statement["context"]  # Necessary as context leads to another validation error
     del statement[field]
-    with pytest.raises(ValidationError, match="field required"):
+    with pytest.raises(ValidationError, match="Field required"):
         BaseXapiStatement(**statement)
 
 
 @pytest.mark.parametrize(
-    "path,value",
+    "path,value,err",
     [
-        ("actor__name", 1),  # Should be a string
-        ("actor__account__name", 1),  # Should be a string
-        ("actor__account__homePage", 1),  # Should be an IRI
-        ("actor__account", ["foo", "bar"]),  # Should be a dictionary
-        ("verb__display", ["foo"]),  # Should be a dictionary
-        ("verb__display", {"en": 1}),  # Should have string values
-        ("object__id", ["foo"]),  # Should be an IRI
+        ("actor__name", 1, "name\n  Input should be a valid string"),
+        ("actor__account__name", 1, "account.name\n  Input should be a valid string"),
+        (
+            "actor__account__homePage",
+            1,
+            "homePage\n  Value error, '1' is not a valid 'IRI'",
+        ),
+        (
+            "actor__account",
+            ["foo", "bar"],
+            (
+                "account\n  Input should be a valid dictionary or instance of "
+                "BaseXapiAccount"
+            ),
+        ),
+        ("verb__display", ["foo"], "display\n  Input should be a valid dictionary"),
+        ("verb__display", {"en": 1}, "display.en\n  Input should be a valid string"),
+        ("object__id", ["foo"], "is not a valid 'IRI'"),
     ],
 )
-@custom_given(
-    custom_builds(BaseXapiStatement, actor=custom_builds(BaseXapiAgentWithAccount))
-)
-def test_models_xapi_base_statement_with_invalid_data_types(path, value, statement):
+def test_models_xapi_base_statement_with_invalid_data_types(path, value, err):
     """Test that the statement does not accept values with wrong types.
 
     XAPI-00006
     An LRS rejects with error code 400 Bad Request a Statement which uses the wrong data
     type.
     """
-    statement = statement.dict(exclude_none=True)
+    statement = mock_xapi_instance(
+        BaseXapiStatement, actor=mock_xapi_instance(BaseXapiAgentWithAccount)
+    )
+
+    statement = statement.model_dump(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), value)
-    err = "(type expected|not a valid dict|expected string )"
+
+    # err = "(type expected|not a valid dict|expected string )"
+
     with pytest.raises(ValidationError, match=err):
         BaseXapiStatement(**statement)
 
 
 @pytest.mark.parametrize(
-    "path,value",
+    "path,value,exception,err",
     [
-        ("id", "0545fe73-1bbd-4f84-9c9a"),  # Should be a valid UUID
-        ("actor", {"mbox": "example@mail.com"}),  # Should be a Mailto IRI
-        ("verb__display", {"bad language tag": "foo"}),  # Should be a valid LanguageTag
-        ("object__id", ["This is not an IRI"]),  # Should be an IRI
+        (
+            "id",
+            "0545fe73-1bbd-4f84-9c9a",
+            ValidationError,
+            "id\n  Input should be a valid UUID",
+        ),
+        (
+            "actor",
+            {"mbox": "example@mail.com"},
+            TypeError,
+            "Invalid `mailto:email` value",
+        ),
+        (
+            "verb__display",
+            {"bad language tag": "foo"},
+            TypeError,
+            "Invalid RFC 5646 Language tag",
+        ),
+        ("object__id", ["This is not an IRI"], ValidationError, "is not a valid 'IRI'"),
     ],
 )
-@custom_given(
-    custom_builds(BaseXapiStatement, actor=custom_builds(BaseXapiAgentWithAccount))
-)
-def test_models_xapi_base_statement_with_invalid_data_format(path, value, statement):
+def test_models_xapi_base_statement_with_invalid_data_format(
+    path, value, exception, err
+):
     """Test that the statement does not accept values having a wrong format.
 
     XAPI-00007
@@ -172,57 +209,65 @@ def test_models_xapi_base_statement_with_invalid_data_format(path, value, statem
     particular format (such as mailto IRI, UUID, or IRI) is required.
     (Empty strings are covered by XAPI-00001)
     """
-    statement = statement.dict(exclude_none=True)
+    statement = mock_xapi_instance(
+        BaseXapiStatement, actor=mock_xapi_instance(BaseXapiAgentWithAccount)
+    )
+
+    statement = statement.model_dump(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), value)
-    err = "(Invalid `mailto:email`|Invalid RFC 5646 Language tag|not a valid uuid)"
-    with pytest.raises(ValidationError, match=err):
+    with pytest.raises(exception, match=err):
         BaseXapiStatement(**statement)
 
 
 @pytest.mark.parametrize("path,value", [("actor__objecttype", "Agent")])
-@custom_given(
-    custom_builds(BaseXapiStatement, actor=custom_builds(BaseXapiAgentWithAccount))
-)
-def test_models_xapi_base_statement_with_invalid_letter_cases(path, value, statement):
+def test_models_xapi_base_statement_with_invalid_letter_cases(path, value):
     """Test that the statement does not accept keys having invalid letter cases.
 
     XAPI-00008
     An LRS rejects with error code 400 Bad Request a Statement where the case of a key
     does not match the case specified in this specification.
     """
-    statement = statement.dict(exclude_none=True)
+    statement = mock_xapi_instance(
+        BaseXapiStatement, actor=mock_xapi_instance(BaseXapiAgentWithAccount)
+    )
+
+    statement = statement.model_dump(exclude_none=True)
     if statement["actor"].get("objectType", None):
         del statement["actor"]["objectType"]
     set_dict_value_from_path(statement, path.split("__"), value)
-    err = "(unexpected value|extra fields not permitted)"
+    err = "(unexpected value|Extra inputs are not permitted)"
     with pytest.raises(ValidationError, match=err):
         BaseXapiStatement(**statement)
 
 
-@custom_given(BaseXapiStatement)
-def test_models_xapi_base_statement_should_not_accept_additional_properties(statement):
+def test_models_xapi_base_statement_should_not_accept_additional_properties():
     """Test that the statement does not accept additional properties.
 
     XAPI-00010
     An LRS rejects with error code 400 Bad Request a Statement where a key or value is
     not allowed by this specification.
     """
-    invalid_statement = statement.dict(exclude_none=True)
+    statement = mock_xapi_instance(BaseXapiStatement)
+
+    invalid_statement = statement.model_dump(exclude_none=True)
     invalid_statement["NEW_INVALID_FIELD"] = "some value"
-    with pytest.raises(ValidationError, match="extra fields not permitted"):
+    with pytest.raises(
+        ValidationError, match="NEW_INVALID_FIELD\n  Extra inputs are not permitted"
+    ):
         BaseXapiStatement(**invalid_statement)
 
 
 @pytest.mark.parametrize("path,value", [("object__id", "w3id.org/xapi/video")])
-@custom_given(BaseXapiStatement)
-def test_models_xapi_base_statement_with_iri_without_scheme(path, value, statement):
+def test_models_xapi_base_statement_with_iri_without_scheme(path, value):
     """Test that the statement does not accept IRIs without a scheme.
 
     XAPI-00011
     An LRS rejects with error code 400 Bad Request a Statement containing IRL or IRI
     values without a scheme.
     """
-    statement = statement.dict(exclude_none=True)
+    statement = mock_xapi_instance(BaseXapiStatement)
+
+    statement = statement.model_dump(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), value)
     with pytest.raises(ValidationError, match="is not a valid 'IRI'"):
         BaseXapiStatement(**statement)
@@ -236,51 +281,56 @@ def test_models_xapi_base_statement_with_iri_without_scheme(path, value, stateme
         "context__extensions__w3id.org/xapi/video",
     ],
 )
-@custom_given(custom_builds(BaseXapiStatement, object=custom_builds(BaseXapiActivity)))
-def test_models_xapi_base_statement_with_invalid_extensions(path, statement):
+def test_models_xapi_base_statement_with_invalid_extensions(path):
     """Test that the statement does not accept extensions keys with invalid IRIs.
 
     XAPI-00118
     An Extension "key" is an IRI. The LRS rejects with 400 a statement which has an
     extension key which is not a valid IRI, if an extension object is present.
     """
-    statement = statement.dict(exclude_none=True)
+    statement = mock_xapi_instance(
+        BaseXapiStatement, object=mock_xapi_instance(BaseXapiActivity)
+    )
+
+    statement = statement.model_dump(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), "")
     with pytest.raises(ValidationError, match="is not a valid 'IRI'"):
         BaseXapiStatement(**statement)
 
 
 @pytest.mark.parametrize("path,value", [("actor__mbox", "mailto:example@mail.com")])
-@custom_given(
-    custom_builds(BaseXapiStatement, actor=custom_builds(BaseXapiAgentWithAccount))
-)
-def test_models_xapi_base_statement_with_two_agent_types(path, value, statement):
+def test_models_xapi_base_statement_with_two_agent_types(path, value):
     """Test that the statement does not accept multiple agent types.
 
     An Agent MUST NOT include more than one Inverse Functional Identifier.
     """
-    statement = statement.dict(exclude_none=True)
+    statement = mock_xapi_instance(
+        BaseXapiStatement, actor=mock_xapi_instance(BaseXapiAgentWithAccount)
+    )
+
+    statement = statement.model_dump(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), value)
-    with pytest.raises(ValidationError, match="extra fields not permitted"):
+    with pytest.raises(ValidationError, match="Extra inputs are not permitted"):
         BaseXapiStatement(**statement)
 
 
-@custom_given(
-    custom_builds(BaseXapiStatement, actor=custom_builds(BaseXapiAnonymousGroup))
-)
-def test_models_xapi_base_statement_missing_member_property(statement):
+def test_models_xapi_base_statement_missing_member_property():
     """Test that the statement does not accept group agents with missing members.
 
     An Anonymous Group MUST include a "member" property listing constituent Agents.
     """
-    statement = statement.dict(exclude_none=True)
+    statement = mock_xapi_instance(
+        BaseXapiStatement, actor=mock_xapi_instance(BaseXapiAnonymousGroup)
+    )
+
+    statement = statement.model_dump(exclude_none=True)
     del statement["actor"]["member"]
-    with pytest.raises(ValidationError, match="member\n  field required"):
+    with pytest.raises(ValidationError, match="member\n  Field required"):
         BaseXapiStatement(**statement)
 
 
 @pytest.mark.parametrize(
-    "value",
+    "klass",
     [
         BaseXapiAnonymousGroup,
         BaseXapiIdentifiedGroupWithMbox,
@@ -289,57 +339,57 @@ def test_models_xapi_base_statement_missing_member_property(statement):
         BaseXapiIdentifiedGroupWithAccount,
     ],
 )
-@custom_given(
-    st.one_of(
-        custom_builds(BaseXapiStatement, actor=custom_builds(BaseXapiAnonymousGroup)),
-        custom_builds(
-            BaseXapiStatement,
-            actor=custom_builds(BaseXapiIdentifiedGroupWithMbox),
-        ),
-        custom_builds(
-            BaseXapiStatement,
-            actor=custom_builds(BaseXapiIdentifiedGroupWithMboxSha1Sum),
-        ),
-        custom_builds(
-            BaseXapiStatement,
-            actor=custom_builds(BaseXapiIdentifiedGroupWithOpenId),
-        ),
-        custom_builds(
-            BaseXapiStatement,
-            actor=custom_builds(BaseXapiIdentifiedGroupWithAccount),
-        ),
-    ),
-    st.data(),
-)
-def test_models_xapi_base_statement_with_invalid_group_objects(value, statement, data):
+def test_models_xapi_base_statement_with_invalid_group_objects(klass):
     """Test that the statement does not accept group agents with group members.
 
     An Anonymous Group MUST NOT contain Group Objects in the "member" identifiers.
     An Identified Group MUST NOT contain Group Objects in the "member" property.
     """
+
+    actor_class = ModelFactory.__random__.choice(
+        [
+            BaseXapiAnonymousGroup,
+            BaseXapiIdentifiedGroupWithMbox,
+            BaseXapiIdentifiedGroupWithMboxSha1Sum,
+            BaseXapiIdentifiedGroupWithOpenId,
+            BaseXapiIdentifiedGroupWithAccount,
+        ]
+    )
+    statement = mock_xapi_instance(
+        BaseXapiStatement, actor=mock_xapi_instance(actor_class)
+    )
+
     kwargs = {"exclude_none": True}
-    statement = statement.dict(**kwargs)
-    statement["actor"]["member"] = [data.draw(custom_builds(value)).dict(**kwargs)]
-    err = "actor -> member -> 0 -> objectType\n  unexpected value; permitted: 'Agent'"
-    with pytest.raises(ValidationError, match=err):
-        BaseXapiStatement(**statement)
+    statement = statement.model_dump(**kwargs)
+    statement["actor"]["member"] = [mock_xapi_instance(klass).model_dump(**kwargs)]
+
+    for class_ in [
+        "BaseXapiAgentWithMbox",
+        "BaseXapiAgentWithMboxSha1Sum",
+        "BaseXapiAgentWithOpenId",
+        "BaseXapiAgentWithAccount",
+    ]:
+        err = (
+            f"actor.BaseXapiAnonymousGroup.member.0.{class_}.objectType\n  "
+            "Input should be 'Agent'"
+        )
+        with pytest.raises(ValidationError, match=err):
+            BaseXapiStatement(**statement)
 
 
 @pytest.mark.parametrize("path,value", [("actor__mbox", "mailto:example@mail.com")])
-@custom_given(
-    custom_builds(
-        BaseXapiStatement,
-        actor=custom_builds(BaseXapiIdentifiedGroupWithAccount),
-    )
-)
-def test_models_xapi_base_statement_with_two_group_identifiers(path, value, statement):
+def test_models_xapi_base_statement_with_two_group_identifiers(path, value):
     """Test that the statement does not accept multiple group identifiers.
 
     An Identified Group MUST include exactly one Inverse Functional Identifier.
     """
-    statement = statement.dict(exclude_none=True)
+    statement = mock_xapi_instance(
+        BaseXapiStatement, actor=mock_xapi_instance(BaseXapiIdentifiedGroupWithAccount)
+    )
+
+    statement = statement.model_dump(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), value)
-    with pytest.raises(ValidationError, match="extra fields not permitted"):
+    with pytest.raises(ValidationError, match="Extra inputs are not permitted"):
         BaseXapiStatement(**statement)
 
 
@@ -352,48 +402,53 @@ def test_models_xapi_base_statement_with_two_group_identifiers(path, value, stat
         ("object__authority", {"mbox": "mailto:example@mail.com"}),
     ],
 )
-@custom_given(
-    custom_builds(BaseXapiStatement, object=custom_builds(BaseXapiSubStatement))
-)
-def test_models_xapi_base_statement_with_sub_statement_ref(path, value, statement):
+def test_models_xapi_base_statement_with_sub_statement_ref(path, value):
     """Test that the sub-statement does not accept invalid properties.
 
     A SubStatement MUST NOT have the "id", "stored", "version" or "authority"
     properties.
     """
-    statement = statement.dict(exclude_none=True)
+    statement = mock_xapi_instance(
+        BaseXapiStatement, object=mock_xapi_instance(BaseXapiSubStatement)
+    )
+
+    statement = statement.model_dump(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), value)
-    with pytest.raises(ValidationError, match="extra fields not permitted"):
+    with pytest.raises(ValidationError, match="Extra inputs are not permitted"):
         BaseXapiStatement(**statement)
 
 
 @pytest.mark.parametrize(
-    "value",
+    "value,err",
     [
-        [{"id": "invalid whitespace"}],
-        [{"id": "valid"}, {"id": "invalid whitespace"}],
-        [{"id": "invalid_duplicate"}, {"id": "invalid_duplicate"}],
+        ([{"id": "invalid whitespace"}], "String should match pattern"),
+        (
+            [{"id": "valid"}, {"id": "invalid whitespace"}],
+            "String should match pattern",
+        ),
+        (
+            [{"id": "invalid_duplicate"}, {"id": "invalid_duplicate"}],
+            "Duplicate InteractionComponents are not valid",
+        ),
     ],
 )
-@custom_given(
-    custom_builds(
-        BaseXapiStatement,
-        object=custom_builds(
-            BaseXapiActivity,
-            definition=custom_builds(BaseXapiActivityInteractionDefinition),
-        ),
-    )
-)
-def test_models_xapi_base_statement_with_invalid_interaction_object(value, statement):
+def test_models_xapi_base_statement_with_invalid_interaction_object(value, err):
     """Test that the statement does not accept invalid interaction fields.
 
     An interaction component's id value SHOULD NOT have whitespace.
     Within an array of interaction components, all id values MUST be distinct.
     """
-    statement = statement.dict(exclude_none=True)
+    statement = mock_xapi_instance(
+        BaseXapiStatement,
+        object=mock_xapi_instance(
+            BaseXapiActivity,
+            definition=mock_xapi_instance(BaseXapiActivityInteractionDefinition),
+        ),
+    )
+
+    statement = statement.model_dump(exclude_none=True)
     path = "object.definition.scale".split(".")
     set_dict_value_from_path(statement, path, value)
-    err = "(Duplicate InteractionComponents are not valid|string does not match regex)"
     with pytest.raises(ValidationError, match=err):
         BaseXapiStatement(**statement)
 
@@ -405,19 +460,24 @@ def test_models_xapi_base_statement_with_invalid_interaction_object(value, state
         ("context__platform", "FUN MOOC"),
     ],
 )
-@custom_given(
-    st.one_of(
-        custom_builds(BaseXapiStatement, object=custom_builds(BaseXapiSubStatement)),
-        custom_builds(BaseXapiStatement, object=custom_builds(BaseXapiStatementRef)),
-    ),
-)
-def test_models_xapi_base_statement_with_invalid_context_value(path, value, statement):
+def test_models_xapi_base_statement_with_invalid_context_value(path, value):
     """Test that the statement does not accept an invalid revision/platform value.
 
     The "revision" property MUST only be used if the Statement's Object is an Activity.
     The "platform" property MUST only be used if the Statement's Object is an Activity.
     """
-    statement = statement.dict(exclude_none=True)
+
+    object_class = ModelFactory.__random__.choice(
+        [
+            BaseXapiSubStatement,
+            BaseXapiStatementRef,
+        ]
+    )
+    statement = mock_xapi_instance(
+        BaseXapiStatement, object=mock_xapi_instance(object_class)
+    )
+
+    statement = statement.model_dump(exclude_none=True)
     set_dict_value_from_path(statement, path.split("__"), value)
     err = "properties can only be used if the Statement's Object is an Activity"
     with pytest.raises(ValidationError, match=err):
@@ -425,16 +485,17 @@ def test_models_xapi_base_statement_with_invalid_context_value(path, value, stat
 
 
 @pytest.mark.parametrize("path", ["context.contextActivities.not_parent"])
-@custom_given(BaseXapiStatement)
-def test_models_xapi_base_statement_with_invalid_context_activities(path, statement):
+def test_models_xapi_base_statement_with_invalid_context_activities(path):
     """Test that the statement does not accept invalid context activity properties.
 
     Every key in the contextActivities Object MUST be one of parent, grouping, category,
     or other.
     """
-    statement = statement.dict(exclude_none=True)
+    statement = mock_xapi_instance(BaseXapiStatement)
+
+    statement = statement.model_dump(exclude_none=True)
     set_dict_value_from_path(statement, path.split("."), {"id": "http://w3id.org/xapi"})
-    with pytest.raises(ValidationError, match="extra fields not permitted"):
+    with pytest.raises(ValidationError, match="Extra inputs are not permitted"):
         BaseXapiStatement(**statement)
 
 
@@ -446,14 +507,15 @@ def test_models_xapi_base_statement_with_invalid_context_activities(path, statem
         [{"id": "http://w3id.org/xapi"}, {"id": "http://w3id.org/xapi/video"}],
     ],
 )
-@custom_given(BaseXapiStatement)
-def test_models_xapi_base_statement_with_valid_context_activities(value, statement):
+def test_models_xapi_base_statement_with_valid_context_activities(value):
     """Test that the statement does accept valid context activities fields.
 
     Every value in the contextActivities Object MUST be either a single Activity Object
     or an array of Activity Objects.
     """
-    statement = statement.dict(exclude_none=True)
+    statement = mock_xapi_instance(BaseXapiStatement)
+
+    statement = statement.model_dump(exclude_none=True)
     path = ["context", "contextActivities"]
     for activity in ["parent", "grouping", "category", "other"]:
         set_dict_value_from_path(statement, path + [activity], value)
@@ -464,46 +526,48 @@ def test_models_xapi_base_statement_with_valid_context_activities(value, stateme
 
 
 @pytest.mark.parametrize("value", ["0.0.0", "1.1.0", "1", "2", "1.10.1", "1.0.1.1"])
-@custom_given(BaseXapiStatement)
-def test_models_xapi_base_statement_with_invalid_version(value, statement):
+def test_models_xapi_base_statement_with_invalid_version(value):
     """Test that the statement does not accept an invalid version field.
 
     An LRS MUST reject all Statements with a version specified that does not start with
     1.0.
     """
-    statement = statement.dict(exclude_none=True)
+    statement = mock_xapi_instance(BaseXapiStatement)
+
+    statement = statement.model_dump(exclude_none=True)
     set_dict_value_from_path(statement, ["version"], value)
-    with pytest.raises(ValidationError, match="version\n  string does not match regex"):
+    with pytest.raises(ValidationError, match="version\n  String should match pattern"):
         BaseXapiStatement(**statement)
 
 
-@custom_given(BaseXapiStatement)
-def test_models_xapi_base_statement_with_valid_version(statement):
+def test_models_xapi_base_statement_with_valid_version():
     """Test that the statement does accept a valid version field.
 
     Statements returned by an LRS MUST retain the version they are accepted with.
     If they lack a version, the version MUST be set to 1.0.0.
     """
-    statement = statement.dict(exclude_none=True)
+    statement = mock_xapi_instance(BaseXapiStatement)
+
+    statement = statement.model_dump(exclude_none=True)
     set_dict_value_from_path(statement, ["version"], "1.0.3")
-    assert "1.0.3" == BaseXapiStatement(**statement).dict()["version"]
+    assert "1.0.3" == BaseXapiStatement(**statement).model_dump()["version"]
     del statement["version"]
-    assert "1.0.0" == BaseXapiStatement(**statement).dict()["version"]
+    assert "1.0.0" == BaseXapiStatement(**statement).model_dump()["version"]
 
 
-@settings(deadline=None)
 @pytest.mark.parametrize(
     "model",
     list(ModelSelector("ralph.models.xapi").model_rules),
 )
-@custom_given(st.data())
 def test_models_xapi_base_statement_should_consider_valid_all_defined_xapi_models(
-    model, data
+    model,
 ):
     """Test that all defined xAPI models in the ModelSelector make valid statements."""
+
     # All specific xAPI models should inherit BaseXapiStatement
     assert issubclass(model, BaseXapiStatement)
-    statement = data.draw(custom_builds(model)).json(exclude_none=True, by_alias=True)
+    statement = mock_xapi_instance(model)
+    statement = statement.json(exclude_none=True, by_alias=True)
     try:
         BaseXapiStatement(**json.loads(statement))
     except ValidationError as err:

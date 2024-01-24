@@ -47,7 +47,7 @@ async def heartbeat(response: Response) -> Heartbeat:
 
     Return a 200 if all checks are successful.
     """
-    statuses = Heartbeat.construct(
+    statuses = Heartbeat.model_construct(
         database=await await_if_coroutine(BACKEND_CLIENT.status())
     )
     if not statuses.is_alive:

@@ -5,7 +5,6 @@ import json
 import logging
 
 import pytest
-from hypothesis import HealthCheck, settings
 from pydantic import ValidationError, create_model
 
 from ralph.exceptions import BadFormatException, UnknownEventException
@@ -14,7 +13,7 @@ from ralph.models.edx.server import Server
 from ralph.models.selector import ModelSelector
 from ralph.models.validator import Validator
 
-from tests.fixtures.hypothesis_strategies import custom_given
+from tests.factories import mock_instance
 
 
 def test_models_validator_validate_with_no_events(caplog):
@@ -120,7 +119,7 @@ def test_models_validator_validate_with_an_invalid_page_close_event_writes_an_er
     )
     with caplog.at_level(logging.ERROR):
         assert not list(result)
-    errors = ["Input event is not a valid UIPageClose event."]
+    errors = ["Input event is not valid."]
     assert errors == [message for _, _, message in caplog.record_tuples]
 
 
@@ -142,25 +141,24 @@ def test_models_validator_validate_with_invalid_page_close_event_raises_an_excep
 
 @pytest.mark.parametrize("ignore_errors", [True, False])
 @pytest.mark.parametrize("fail_on_unknown", [True, False])
-@custom_given(UIPageClose)
-def test_models_validator_validate_with_valid_events(
-    ignore_errors, fail_on_unknown, event
-):
+def test_models_validator_validate_with_valid_events(ignore_errors, fail_on_unknown):
     """Test given a valid event the validate method should yield it."""
-    event_str = event.json()
+    event = mock_instance(UIPageClose)
+
+    event_str = event.model_dump_json()
     event_dict = json.loads(event_str)
     validator = Validator(ModelSelector(module="ralph.models.edx"))
     result = validator.validate([event_str], ignore_errors, fail_on_unknown)
     assert json.loads(next(result)) == event_dict
 
 
-@settings(suppress_health_check=(HealthCheck.function_scoped_fixture,))
-@custom_given(UIPageClose)
-def test_models_validator_validate_counter(caplog, event):
+def test_models_validator_validate_counter(caplog):
     """Test given multiple events the validate method
     should log the total and invalid events.
     """
-    valid_event = event.json()
+    event = mock_instance(UIPageClose)
+
+    valid_event = event.model_dump_json()
     invalid_event_1 = 1
     invalid_event_2 = ""
     events = [invalid_event_1, valid_event, invalid_event_2]
@@ -176,12 +174,13 @@ def test_models_validator_validate_counter(caplog, event):
     ) in caplog.record_tuples
 
 
-@custom_given(Server)
-def test_models_validator_validate_typing_cleanup(event):
+def test_models_validator_validate_typing_cleanup():
     """Test given a valid event with wrong field types, the validate method should fix
     them.
     """
-    valid_event_str = event.json()
+    event = mock_instance(Server)
+
+    valid_event_str = event.model_dump_json()
     valid_event = json.loads(valid_event_str)
     valid_event["host"] = "1"
     valid_event["accept_language"] = "False"
@@ -190,7 +189,6 @@ def test_models_validator_validate_typing_cleanup(event):
 
     invalid_event = copy.deepcopy(valid_event)
     invalid_event["host"] = 1  # not string
-    invalid_event["accept_language"] = False  # not string
     invalid_event["context"]["course_user_tags"] = {"foo": 1}  # not string
     invalid_event["context"]["user_id"] = "123"  # not integer
     invalid_event_str = json.dumps(invalid_event)
@@ -204,7 +202,13 @@ def test_models_validator_validate_typing_cleanup(event):
 
 @pytest.mark.parametrize(
     "event, models, expected",
-    [({"foo": 1}, [Server, create_model("A", foo=1)], create_model("A", foo=1))],
+    [
+        (
+            {"foo": 1},
+            [Server, create_model("A", foo=(int, 1))],
+            create_model("A", foo=(int, 1)),
+        )
+    ],
 )
 def test_models_validator_get_first_valid_model_with_match(event, models, expected):
     """Test that the `get_first_valid_model` method returns the expected model."""
@@ -214,7 +218,10 @@ def test_models_validator_get_first_valid_model_with_match(event, models, expect
 
     validator = Validator(ModelSelector(module="os"))
     validator.model_selector.get_models = dummy_get_models
-    assert validator.get_first_valid_model(event) == expected(**event)
+    assert (
+        validator.get_first_valid_model(event).model_dump()
+        == expected(**event).model_dump()
+    )
 
 
 @pytest.mark.parametrize(

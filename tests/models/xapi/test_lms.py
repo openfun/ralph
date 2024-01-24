@@ -3,8 +3,6 @@
 import json
 
 import pytest
-from hypothesis import settings
-from hypothesis import strategies as st
 from pydantic import ValidationError
 
 from ralph.models.selector import ModelSelector
@@ -24,10 +22,9 @@ from ralph.models.xapi.lms.statements import (
     LMSUploadedVideo,
 )
 
-from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
+from tests.factories import mock_xapi_instance
 
 
-@settings(deadline=None)
 @pytest.mark.parametrize(
     "class_",
     [
@@ -45,21 +42,20 @@ from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
         LMSUploadedAudio,
     ],
 )
-@custom_given(st.data())
-def test_models_xapi_lms_selectors_with_valid_statements(class_, data):
+def test_models_xapi_lms_selectors_with_valid_statements(class_):
     """Test given a valid LMS xAPI statement the `get_first_model`
     selector method should return the expected model.
     """
-    statement = json.loads(data.draw(custom_builds(class_)).json())
+    statement = json.loads(mock_xapi_instance(class_).model_dump_json())
     model = ModelSelector(module="ralph.models.xapi").get_first_model(statement)
     assert model is class_
 
 
-@custom_given(LMSRegisteredCourse)
-def test_models_xapi_lms_registered_course_with_valid_statement(statement):
+def test_models_xapi_lms_registered_course_with_valid_statement():
     """Test that a valid registered to a course statement has the expected `verb`.`id`
     and `object`.`definition`.`type` property values.
     """
+    statement = mock_xapi_instance(LMSRegisteredCourse)
 
     assert statement.verb.id == "http://adlnet.gov/expapi/verbs/registered"
     assert (
@@ -67,11 +63,11 @@ def test_models_xapi_lms_registered_course_with_valid_statement(statement):
     )
 
 
-@custom_given(LMSUnregisteredCourse)
-def test_models_xapi_lms_unregistered_course_with_valid_statement(statement):
+def test_models_xapi_lms_unregistered_course_with_valid_statement():
     """Test that a valid unregistered to a course statement has the expected
     `verb`.`id` and `object`.`definition`.`type` property values.
     """
+    statement = mock_xapi_instance(LMSUnregisteredCourse)
 
     assert statement.verb.id == "http://id.tincanapi.com/verb/unregistered"
     assert (
@@ -79,11 +75,11 @@ def test_models_xapi_lms_unregistered_course_with_valid_statement(statement):
     )
 
 
-@custom_given(LMSAccessedPage)
-def test_models_xapi_lms_accessed_page_with_valid_statement(statement):
+def test_models_xapi_lms_accessed_page_with_valid_statement():
     """Test that a valid accessed a page statement has the expected `verb`.`id` and
     `object`.`definition`.`type` property values.
     """
+    statement = mock_xapi_instance(LMSAccessedPage)
 
     assert statement.verb.id == "https://w3id.org/xapi/netc/verbs/accessed"
     assert (
@@ -92,41 +88,41 @@ def test_models_xapi_lms_accessed_page_with_valid_statement(statement):
     )
 
 
-@custom_given(LMSAccessedFile)
-def test_models_xapi_lms_accessed_file_with_valid_statement(statement):
+def test_models_xapi_lms_accessed_file_with_valid_statement():
     """Test that a valid accessed a file statement has the expected `verb`.`id` and
     `object`.`definition`.`type` property values.
     """
+    statement = mock_xapi_instance(LMSAccessedFile)
 
     assert statement.verb.id == "https://w3id.org/xapi/netc/verbs/accessed"
     assert statement.object.definition.type == "http://activitystrea.ms/file"
 
 
-@custom_given(LMSUploadedFile)
-def test_models_xapi_lms_uploaded_file_with_valid_statement(statement):
+def test_models_xapi_lms_uploaded_file_with_valid_statement():
     """Test that a valid uploaded a file statement has the expected `verb`.`id` and
     `object`.`definition`.`type` property values.
     """
+    statement = mock_xapi_instance(LMSUploadedFile)
 
     assert statement.verb.id == "https://w3id.org/xapi/netc/verbs/uploaded"
     assert statement.object.definition.type == "http://activitystrea.ms/file"
 
 
-@custom_given(LMSDownloadedFile)
-def test_models_xapi_lms_downloaded_file_with_valid_statement(statement):
+def test_models_xapi_lms_downloaded_file_with_valid_statement():
     """Test that a valid downloaded a file statement has the expected `verb`.`id` and
     `object`.`definition`.`type` property values.
     """
+    statement = mock_xapi_instance(LMSDownloadedFile)
 
     assert statement.verb.id == "http://id.tincanapi.com/verb/downloaded"
     assert statement.object.definition.type == "http://activitystrea.ms/file"
 
 
-@custom_given(LMSDownloadedVideo)
-def test_models_xapi_lms_downloaded_video_with_valid_statement(statement):
+def test_models_xapi_lms_downloaded_video_with_valid_statement():
     """Test that a valid downloaded a video statement has the expected `verb`.`id` and
     `object`.`definition`.`type` property values.
     """
+    statement = mock_xapi_instance(LMSDownloadedVideo)
 
     assert statement.verb.id == "http://id.tincanapi.com/verb/downloaded"
     assert (
@@ -135,11 +131,11 @@ def test_models_xapi_lms_downloaded_video_with_valid_statement(statement):
     )
 
 
-@custom_given(LMSUploadedVideo)
-def test_models_xapi_lms_uploaded_video_with_valid_statement(statement):
+def test_models_xapi_lms_uploaded_video_with_valid_statement():
     """Test that a valid uploaded a video statement has the expected `verb`.`id` and
     `object`.`definition`.`type` property values.
     """
+    statement = mock_xapi_instance(LMSUploadedVideo)
 
     assert statement.verb.id == "https://w3id.org/xapi/netc/verbs/uploaded"
     assert (
@@ -148,11 +144,11 @@ def test_models_xapi_lms_uploaded_video_with_valid_statement(statement):
     )
 
 
-@custom_given(LMSDownloadedDocument)
-def test_models_xapi_lms_downloaded_document_with_valid_statement(statement):
+def test_models_xapi_lms_downloaded_document_with_valid_statement():
     """Test that a valid downloaded a document statement has the expected `verb`.`id`
     and `object`.`definition`.`type` property values.
     """
+    statement = mock_xapi_instance(LMSDownloadedDocument)
 
     assert statement.verb.id == "http://id.tincanapi.com/verb/downloaded"
     assert (
@@ -161,11 +157,11 @@ def test_models_xapi_lms_downloaded_document_with_valid_statement(statement):
     )
 
 
-@custom_given(LMSUploadedDocument)
-def test_models_xapi_lms_uploaded_document_with_valid_statement(statement):
+def test_models_xapi_lms_uploaded_document_with_valid_statement():
     """Test that a valid uploaded a document statement has the expected `verb`.`id` and
     `object`.`definition`.`type` property values.
     """
+    statement = mock_xapi_instance(LMSUploadedDocument)
 
     assert statement.verb.id == "https://w3id.org/xapi/netc/verbs/uploaded"
     assert (
@@ -174,11 +170,11 @@ def test_models_xapi_lms_uploaded_document_with_valid_statement(statement):
     )
 
 
-@custom_given(LMSDownloadedAudio)
-def test_models_xapi_lms_downloaded_audio_with_valid_statement(statement):
+def test_models_xapi_lms_downloaded_audio_with_valid_statement():
     """Test that a valid downloaded an audio statement has the expected `verb`.`id` and
     `object`.`definition`.`type` property values.
     """
+    statement = mock_xapi_instance(LMSDownloadedAudio)
 
     assert statement.verb.id == "http://id.tincanapi.com/verb/downloaded"
     assert (
@@ -187,11 +183,11 @@ def test_models_xapi_lms_downloaded_audio_with_valid_statement(statement):
     )
 
 
-@custom_given(LMSUploadedAudio)
-def test_models_xapi_lms_uploaded_audio_with_valid_statement(statement):
+def test_models_xapi_lms_uploaded_audio_with_valid_statement():
     """Test that a valid uploaded an audio statement has the expected `verb`.`id` and
     `object`.`definition`.`type` property values.
     """
+    statement = mock_xapi_instance(LMSUploadedAudio)
 
     assert statement.verb.id == "https://w3id.org/xapi/netc/verbs/uploaded"
     assert (
@@ -200,7 +196,6 @@ def test_models_xapi_lms_uploaded_audio_with_valid_statement(statement):
     )
 
 
-@settings(deadline=None)
 @pytest.mark.parametrize(
     "category",
     [
@@ -213,13 +208,11 @@ def test_models_xapi_lms_uploaded_audio_with_valid_statement(statement):
         [{"id": "https://foo.bar"}, {"id": "https://w3id.org/xapi/lms"}],
     ],
 )
-@custom_given(LMSContextContextActivities)
-def test_models_xapi_lms_context_context_activities_with_valid_category(
-    category, context_activities
-):
+def test_models_xapi_lms_context_context_activities_with_valid_category(category):
     """Test that a valid `LMSContextContextActivities` should not raise a
     `ValidationError`.
     """
+    context_activities = mock_xapi_instance(LMSContextContextActivities)
     activities = json.loads(context_activities.json(exclude_none=True, by_alias=True))
     activities["category"] = category
     try:
@@ -230,31 +223,46 @@ def test_models_xapi_lms_context_context_activities_with_valid_category(
         )
 
 
-@settings(deadline=None)
 @pytest.mark.parametrize(
-    "category",
+    "category,msg",
     [
-        {"id": "https://w3id.org/xapi/not-lms"},
-        {
-            "id": "https://w3id.org/xapi/lms",
-            "definition": {"type": "http://adlnet.gov/expapi/activities/not-profile"},
-        },
-        [{"id": "https://w3id.org/xapi/not-lms"}],
-        [{"id": "https://foo.bar"}, {"id": "https://w3id.org/xapi/not-lms"}],
+        (
+            {"id": "https://w3id.org/xapi/not-lms"},
+            r"Input should be 'https://w3id.org/xapi/lms'",
+        ),
+        (
+            {
+                "id": "https://w3id.org/xapi/lms",
+                "definition": {
+                    "type": "http://adlnet.gov/expapi/activities/not-profile"
+                },
+            },
+            r"Input should be 'http://adlnet.gov/expapi/activities/profile'",
+        ),
+        (
+            [{"id": "https://w3id.org/xapi/not-lms"}],
+            (
+                r"The `context.contextActivities.category` field should contain "
+                r"at least one valid `LMSProfileActivity`"
+            ),
+        ),
+        (
+            [{"id": "https://foo.bar"}, {"id": "https://w3id.org/xapi/not-lms"}],
+            (
+                r"The `context.contextActivities.category` field should contain "
+                r"at least one valid `LMSProfileActivity`"
+            ),
+        ),
     ],
 )
-@custom_given(LMSContextContextActivities)
 def test_models_xapi_lms_context_context_activities_with_invalid_category(
-    category, context_activities
+    category, msg
 ):
     """Test that an invalid `LMSContextContextActivities` should raise a
     `ValidationError`.
     """
+    context_activities = mock_xapi_instance(LMSContextContextActivities)
     activities = json.loads(context_activities.json(exclude_none=True, by_alias=True))
     activities["category"] = category
-    msg = (
-        r"(The `context.contextActivities.category` field should contain at least one "
-        r"valid `LMSProfileActivity`) | (unexpected value)"
-    )
     with pytest.raises(ValidationError, match=msg):
         LMSContextContextActivities(**activities)
