@@ -176,6 +176,10 @@ def get_basic_auth_user(
             headers={"WWW-Authenticate": "Basic"},
         )
 
-    user = AuthenticatedUser(scopes=user.scopes, agent=dict(user.agent))
+    user = AuthenticatedUser(
+        scopes=user.scopes,
+        agent=dict(user.agent),
+        target=user.target,
+    )
 
     return user

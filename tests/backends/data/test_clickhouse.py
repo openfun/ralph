@@ -52,7 +52,7 @@ def test_backends_data_clickhouse_default_instantiation(monkeypatch, fs):
     assert ClickHouseDataBackend.settings_class == ClickHouseDataBackendSettings
     backend = ClickHouseDataBackend()
     assert backend.settings.CLIENT_OPTIONS == ClickHouseClientOptions()
-    assert backend.event_table_name == "xapi_events_all"
+    assert backend.settings.EVENT_TABLE_NAME == "xapi_events_all"
     assert backend.settings.LOCALE_ENCODING == "utf8"
     assert backend.settings.READ_CHUNK_SIZE == 500
     assert backend.settings.WRITE_CHUNK_SIZE == 500
@@ -87,7 +87,7 @@ def test_backends_data_clickhouse_instantiation_with_settings():
     backend = ClickHouseDataBackend(settings)
 
     assert isinstance(backend.client, HttpClient)
-    assert backend.event_table_name == CLICKHOUSE_TEST_TABLE_NAME
+    assert backend.settings.EVENT_TABLE_NAME == CLICKHOUSE_TEST_TABLE_NAME
     assert backend.settings.LOCALE_ENCODING == "utf-16"
     assert backend.settings.READ_CHUNK_SIZE == 1000
     assert backend.settings.WRITE_CHUNK_SIZE == 999

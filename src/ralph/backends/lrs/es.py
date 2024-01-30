@@ -1,7 +1,7 @@
 """Elasticsearch LRS backend for Ralph."""
 
 import logging
-from typing import Iterator, List
+from typing import Iterator, List, Optional
 
 from ralph.backends.data.es import (
     ESDataBackend,
@@ -34,11 +34,15 @@ class ESLRSBackendSettings(BaseLRSBackendSettings, ESDataBackendSettings):
 class ESLRSBackend(BaseLRSBackend[ESLRSBackendSettings], ESDataBackend):
     """Elasticsearch LRS backend implementation."""
 
-    def query_statements(self, params: RalphStatementsQuery) -> StatementQueryResult:
+    def query_statements(
+        self, params: RalphStatementsQuery, target: Optional[str] = None
+    ) -> StatementQueryResult:
         """Return the statements query payload using xAPI parameters."""
         query = self.get_query(params=params)
         try:
-            es_documents = self.read(query=query, chunk_size=params.limit)
+            es_documents = self.read(
+                query=query, target=target, chunk_size=params.limit
+            )
             statements = [document["_source"] for document in es_documents]
         except (BackendException, BackendParameterException) as error:
             logger.error("Failed to read from Elasticsearch")
@@ -50,11 +54,13 @@ class ESLRSBackend(BaseLRSBackend[ESLRSBackendSettings], ESDataBackend):
             search_after="|".join(query.search_after) if query.search_after else "",
         )
 
-    def query_statements_by_ids(self, ids: List[str]) -> Iterator[dict]:
+    def query_statements_by_ids(
+        self, ids: List[str], target: Optional[str] = None
+    ) -> Iterator[dict]:
         """Yield statements with matching ids from the backend."""
         query = self.query_class(query={"terms": {"_id": ids}})
         try:
-            es_response = self.read(query=query)
+            es_response = self.read(query=query, target=target)
             yield from (document["_source"] for document in es_response)
         except (BackendException, BackendParameterException) as error:
             logger.error("Failed to read from Elasticsearch")

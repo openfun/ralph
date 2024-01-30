@@ -103,6 +103,71 @@ async def test_api_statements_post_single_statement_directly(  # noqa: PLR0913
 
 
 @pytest.mark.anyio
+@pytest.mark.parametrize(
+    "backend",
+    [
+        get_async_es_test_backend,
+        get_async_mongo_test_backend,
+        get_es_test_backend,
+        get_clickhouse_test_backend,
+        get_mongo_test_backend,
+    ],
+)
+async def test_api_statements_post_single_statement_to_target(  # noqa: PLR0913
+    fs,
+    client,
+    backend,
+    monkeypatch,
+    basic_auth_credentials,
+    es_custom,
+    mongo_custom,
+    clickhouse_custom,
+):
+    """Test the post statements API route with one statement to a custom target."""
+
+    # Create one user with a specific target
+    username = "jane"
+    password = "janepwd"
+    scopes = []
+    target = "custom_target"
+    agent = mock_agent("account", 1, home_page_id=1)
+
+    credentials = mock_basic_auth_user(fs, username, password, scopes, agent, target)
+
+    # Clear cache before each test iteration
+    get_basic_auth_user.cache_clear()
+
+    # Create custom target
+    es_client = es_custom(index=target)
+    mongo_custom(collection=target)
+    clickhouse_custom(event_table_name=target)
+
+    monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
+    statement = mock_statement()
+
+    response = await client.post(
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {credentials}"},
+        json=statement,
+    )
+
+    assert response.status_code == 200
+    assert response.json() == [statement["id"]]
+
+    es_client.indices.refresh()
+
+    # Check that statements are stored under the custom target
+    response = await client.get(
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {credentials}"},
+    )
+    assert response.status_code == 200
+    assert_statement_get_responses_are_equivalent(
+        response.json(), {"statements": [statement]}
+    )
+
+
+@pytest.mark.anyio
 async def test_api_statements_post_enriching_without_existing_values(
     client, monkeypatch, basic_auth_credentials, es
 ):

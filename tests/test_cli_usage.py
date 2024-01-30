@@ -1,4 +1,5 @@
 """Tests for Ralph cli usage strings."""
+
 import logging
 
 from click.testing import CliRunner
@@ -21,6 +22,7 @@ def test_cli_auth_command_usage():
             "-u, --username TEXT",
             "-p, --password TEXT",
             "-s, --scope TEXT",
+            "-t, --target TEXT",
             "-M, --agent-ifi-mbox TEXT",
             "-S, --agent-ifi-mbox-sha1sum TEXT",
             "-O, --agent-ifi-openid TEXT",

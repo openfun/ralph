@@ -10,7 +10,11 @@ from ralph.backends.lrs.async_mongo import AsyncMongoLRSBackend
 from ralph.backends.lrs.base import RalphStatementsQuery
 from ralph.exceptions import BackendException
 
-from tests.fixtures.backends import MONGO_TEST_FORWARDING_COLLECTION
+from tests.fixtures.backends import (
+    MONGO_TEST_COLLECTION,
+    MONGO_TEST_DATABASE,
+    MONGO_TEST_FORWARDING_COLLECTION,
+)
 
 
 def test_backends_lrs_async_mongo_default_instantiation(monkeypatch, fs):
@@ -233,7 +237,7 @@ async def test_backends_lrs_async_mongo_query_statements_query(
     parameters, should produce the expected MongoDB query.
     """
 
-    async def mock_read(query, chunk_size):
+    async def mock_read(query, target, chunk_size):
         """Mock the `AsyncMongoLRSBackend.read` method."""
         assert query.dict() == expected_query
         assert chunk_size == expected_query.get("limit")
@@ -256,10 +260,13 @@ async def test_backends_lrs_async_mongo_query_statements_with_success(
     """Test the `AsyncMongoLRSBackend.query_statements` method, given a valid search
     query, should return the expected statements.
     """
+    # Create a custom collection
+    custom_target = "custom-target"
+    getattr(mongo, MONGO_TEST_DATABASE).create_collection(custom_target)
 
     backend = async_mongo_lrs_backend()
 
-    # Insert documents
+    # Insert documents into default collection
     timestamp = {"timestamp": "2022-06-27T15:36:50"}
     meta = {
         "actor": {"account": {"name": "test_name", "homePage": "http://example.com"}},
@@ -271,6 +278,13 @@ async def test_backends_lrs_async_mongo_query_statements_with_success(
         {"id": "62b9ce92fcde2b2edba56bf4", **timestamp, **meta},
     ]
     assert await backend.write(documents) == 2
+
+    # Insert documents into the custom collection
+    documents = [
+        {"id": "12b9ce922c26b46b68ffc234", **timestamp, **meta},
+        {"id": "22b9ce92fcde2b2edba56567", **timestamp, **meta},
+    ]
+    assert await backend.write(documents, target=custom_target) == 2
 
     statement_parameters = RalphStatementsQuery.construct(
         statement_id="62b9ce922c26b46b68ffc68f",
@@ -291,6 +305,18 @@ async def test_backends_lrs_async_mongo_query_statements_with_success(
     assert statement_query_result.statements == [
         {"id": "62b9ce922c26b46b68ffc68f", **timestamp, **meta}
     ]
+
+    # Check that statements in the custom collection can also be queried
+    statement_query_result = await backend.query_statements(
+        RalphStatementsQuery.construct(), target=custom_target
+    )
+
+    assert statement_query_result.statements == [
+        {"id": "12b9ce922c26b46b68ffc234", **timestamp, **meta},
+        {"id": "22b9ce92fcde2b2edba56567", **timestamp, **meta},
+    ]
+    # Drop custom collection
+    getattr(mongo, MONGO_TEST_DATABASE).drop_collection(custom_target)
 
 
 @pytest.mark.anyio
@@ -389,3 +415,17 @@ async def test_backends_lrs_mongo_query_statements_by_ids_two_collections(
     assert [
         statement async for statement in backend_2.query_statements_by_ids(["2"])
     ] == [{"id": "2", **timestamp}]
+
+    # Check that backends can also read from another target
+    assert [
+        statement
+        async for statement in backend_1.query_statements_by_ids(
+            ["2"], target=MONGO_TEST_FORWARDING_COLLECTION
+        )
+    ] == [{"id": "2", **timestamp}]
+    assert [
+        statement
+        async for statement in backend_2.query_statements_by_ids(
+            ["1"], target=MONGO_TEST_COLLECTION
+        )
+    ] == [{"id": "1", **timestamp}]

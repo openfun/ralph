@@ -34,13 +34,13 @@ from ..fixtures.auth import AUDIENCE, ISSUER_URI, mock_basic_auth_user, mock_oid
 from ..helpers import mock_activity, mock_agent
 
 
-def insert_es_statements(es_client, statements):
+def insert_es_statements(es_client, statements, index=ES_TEST_INDEX):
     """Insert a bunch of example statements into Elasticsearch for testing."""
     bulk(
         es_client,
         [
             {
-                "_index": ES_TEST_INDEX,
+                "_index": index,
                 "_id": statement["id"],
                 "_op_type": "index",
                 "_source": statement,
@@ -51,10 +51,10 @@ def insert_es_statements(es_client, statements):
     es_client.indices.refresh()
 
 
-def insert_mongo_statements(mongo_client, statements):
+def insert_mongo_statements(mongo_client, statements, collection):
     """Insert a bunch of example statements into MongoDB for testing."""
     database = getattr(mongo_client, MONGO_TEST_DATABASE)
-    collection = getattr(database, MONGO_TEST_COLLECTION)
+    collection = getattr(database, collection)
     collection.insert_many(
         list(
             MongoDataBackend.to_documents(
@@ -66,7 +66,7 @@ def insert_mongo_statements(mongo_client, statements):
     )
 
 
-def insert_clickhouse_statements(statements):
+def insert_clickhouse_statements(statements, table):
     """Insert a bunch of example statements into ClickHouse for testing."""
     settings = ClickHouseDataBackend.settings_class(
         HOST=CLICKHOUSE_TEST_HOST,
@@ -75,39 +75,49 @@ def insert_clickhouse_statements(statements):
         EVENT_TABLE_NAME=CLICKHOUSE_TEST_TABLE_NAME,
     )
     backend = ClickHouseDataBackend(settings=settings)
-    success = backend.write(statements)
+    success = backend.write(statements, target=table)
     assert success == len(statements)
 
 
 @pytest.fixture(params=["async_es", "async_mongo", "es", "mongo", "clickhouse"])
 def insert_statements_and_monkeypatch_backend(
-    request, es, mongo, clickhouse, monkeypatch
+    request, es_custom, mongo_custom, clickhouse_custom, monkeypatch
 ):
     """(Security) Return a function that inserts statements into each backend."""
 
-    def _insert_statements_and_monkeypatch_backend(statements):
+    def _insert_statements_and_monkeypatch_backend(statements, target=None):
         """Insert statements once into each backend."""
         backend_client_class_path = "ralph.api.routers.statements.BACKEND_CLIENT"
         if request.param == "async_es":
-            insert_es_statements(es, statements)
+            target = target if target else ES_TEST_INDEX
+            client = es_custom(index=target)
+            insert_es_statements(client, statements, target)
             monkeypatch.setattr(backend_client_class_path, get_async_es_test_backend())
             return
         if request.param == "async_mongo":
-            insert_mongo_statements(mongo, statements)
+            target = target if target else MONGO_TEST_COLLECTION
+            client = mongo_custom(collection=target)
+            insert_mongo_statements(client, statements, target)
             monkeypatch.setattr(
                 backend_client_class_path, get_async_mongo_test_backend()
             )
             return
         if request.param == "es":
-            insert_es_statements(es, statements)
+            target = target if target else ES_TEST_INDEX
+            client = es_custom(index=target)
+            insert_es_statements(client, statements, target)
             monkeypatch.setattr(backend_client_class_path, get_es_test_backend())
             return
         if request.param == "mongo":
-            insert_mongo_statements(mongo, statements)
+            target = target if target else MONGO_TEST_COLLECTION
+            client = mongo_custom(collection=target)
+            insert_mongo_statements(client, statements, target)
             monkeypatch.setattr(backend_client_class_path, get_mongo_test_backend())
             return
         if request.param == "clickhouse":
-            insert_clickhouse_statements(statements)
+            target = target if target else CLICKHOUSE_TEST_TABLE_NAME
+            _ = clickhouse_custom(event_table_name=target)
+            insert_clickhouse_statements(statements, target)
             monkeypatch.setattr(
                 backend_client_class_path, get_clickhouse_test_backend()
             )
@@ -266,6 +276,63 @@ async def test_api_statements_get(
 
         assert response.status_code == 200
         assert response.json() == {"statements": [statements[1], statements[0]]}
+
+
+@pytest.mark.anyio
+async def test_api_statements_get_from_target(
+    fs, client, insert_statements_and_monkeypatch_backend
+):
+    """Test the get statements API route with a different target."""
+
+    # Create one user with a specific target
+    username = "jane"
+    password = "janepwd"
+    scopes = []
+    target = "custom_target"
+    agent = mock_agent("account", 1, home_page_id=1)
+
+    credentials = mock_basic_auth_user(fs, username, password, scopes, agent, target)
+
+    # Clear cache before each test iteration
+    get_basic_auth_user.cache_clear()
+
+    # Insert statements into the default target
+    statements = [
+        {
+            "id": "be67b160-d958-4f51-b8b8-1892002dbac6",
+            "timestamp": (datetime.now() - timedelta(hours=1)).isoformat(),
+        },
+        {
+            "id": "72c81e98-1763-4730-8cfc-f5ab34f1bad2",
+            "timestamp": datetime.now().isoformat(),
+        },
+    ]
+    insert_statements_and_monkeypatch_backend(statements)
+
+    # Insert statements into the custom target
+    custom_target = "custom_target"
+    statements_custom = [
+        {
+            "id": "1267b160-d958-4f51-b8b8-1892002dba12",
+            "timestamp": (datetime.now() - timedelta(hours=1)).isoformat(),
+        },
+        {
+            "id": "23c81e98-1763-4730-8cfc-f5ab34f1ba23",
+            "timestamp": datetime.now().isoformat(),
+        },
+    ]
+    insert_statements_and_monkeypatch_backend(statements_custom, custom_target)
+
+    # Confirm that calling this for a user with a custom target works retrieved
+    # statements from custom target only
+    response = await client.get(
+        "/xAPI/statements",
+        headers={"Authorization": f"Basic {credentials}"},
+    )
+    assert response.status_code == 200
+    assert response.json() == {
+        "statements": [statements_custom[1], statements_custom[0]]
+    }
 
 
 @pytest.mark.anyio
@@ -693,7 +760,7 @@ async def test_api_statements_get_with_database_query_failure(
     should return an error response with HTTP code 500.
     """
 
-    def mock_query_statements(*_):
+    def mock_query_statements(*_, **__):
         """Mocks the BACKEND_CLIENT.query_statements method."""
         raise BackendException()
 

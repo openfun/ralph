@@ -8,9 +8,22 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Add LRS multitenancy support for user-specific target storage
+
+### Changed
+
+- `query_statements` and `query_statements_by_ids` methods can now take an
+optional user-specific target
+
 ### Fixed
 
 - Backends: switch LRSStatementsQuery since/until field types to iso 8601 string
+
+### Removed
+
+- Removed `event_table_name` attribute of the ClickHouse data backend
 
 ## [4.0.0] - 2024-01-23
 

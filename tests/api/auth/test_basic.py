@@ -26,6 +26,7 @@ STORED_CREDENTIALS = json.dumps(
             "hash": bcrypt.hashpw(b"admin", bcrypt.gensalt()).decode("UTF-8"),
             "scopes": ["statements/read/mine", "statements/write"],
             "agent": {"mbox": "mailto:ralph@example.com"},
+            "target": "custom_target",
         }
     ]
 )
@@ -47,6 +48,7 @@ def test_api_auth_basic_model_serveruserscredentials():
                 hash="notsorealhash",
                 scopes=["all"],
                 agent={"mbox": "mailto:foo@example.com"},
+                target="foo",
             ),
         ]
     )
@@ -112,6 +114,7 @@ def test_api_auth_basic_caching_credentials(fs):
         AuthenticatedUser(
             agent={"mbox": "mailto:ralph@example.com"},
             scopes=UserScopes(["statements/read/mine", "statements/write"]),
+            target="custom_target",
         ),
     )
 

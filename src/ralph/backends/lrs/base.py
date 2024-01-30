@@ -120,11 +120,15 @@ class BaseLRSBackend(BaseDataBackend[Settings, Any]):
     """Base LRS backend interface."""
 
     @abstractmethod
-    def query_statements(self, params: RalphStatementsQuery) -> StatementQueryResult:
+    def query_statements(
+        self, params: RalphStatementsQuery, target: Optional[str] = None
+    ) -> StatementQueryResult:
         """Return the statements query payload using xAPI parameters."""
 
     @abstractmethod
-    def query_statements_by_ids(self, ids: List[str]) -> Iterator[dict]:
+    def query_statements_by_ids(
+        self, ids: List[str], target: Optional[str] = None
+    ) -> Iterator[dict]:
         """Yield statements with matching ids from the backend."""
 
 
@@ -133,10 +137,12 @@ class BaseAsyncLRSBackend(BaseAsyncDataBackend[Settings, Any]):
 
     @abstractmethod
     async def query_statements(
-        self, params: RalphStatementsQuery
+        self, params: RalphStatementsQuery, target: Optional[str] = None
     ) -> StatementQueryResult:
         """Return the statements query payload using xAPI parameters."""
 
     @abstractmethod
-    async def query_statements_by_ids(self, ids: List[str]) -> AsyncIterator[dict]:
+    async def query_statements_by_ids(
+        self, ids: List[str], target: Optional[str] = None
+    ) -> AsyncIterator[dict]:
         """Return the list of matching statement IDs from the database."""

@@ -1,10 +1,11 @@
 """Tests for Ralph cli."""
+
 import json
 import logging
 from contextlib import contextmanager
 from importlib import reload
 from pathlib import Path
-from typing import Union
+from typing import Optional, Union
 
 import pytest
 from click.exceptions import BadParameter
@@ -173,13 +174,16 @@ def _gen_cli_auth_args(  # noqa: PLR0913
     scopes: list,
     ifi_command: str,
     ifi_value: Union[str, dict],
-    agent_name: str = None,
+    agent_name: Optional[str] = None,
+    target: Optional[str] = None,
     write: bool = False,
 ):
     """Generate arguments for cli to create user."""
     cli_args = ["auth", "-u", username, "-p", password]
     for scope in scopes:
         cli_args.extend(["-s", scope])
+    if target:
+        cli_args.extend(["-t", target])
     cli_args.append(ifi_command)
     cli_args.extend(ifi_value.split())
     if agent_name:
@@ -197,6 +201,7 @@ def _assert_matching_basic_auth_credentials(  # noqa: PLR0913
     ifi_value: Union[str, dict],
     agent_name: str = None,
     hash_: str = None,
+    target: str = None,
 ):
     """Assert that credentials match other arguments.
 
@@ -209,6 +214,7 @@ def _assert_matching_basic_auth_credentials(  # noqa: PLR0913
         ifi_value: value of ifi
         agent_name: name to assign to agent. If None, no matching is performed
         hash: hash value of the password. If None, no matching is performed
+        target: target that should match credentials. If None, no matching is performed
     """
     assert credentials["username"] == username
     assert "hash" in credentials
@@ -216,6 +222,9 @@ def _assert_matching_basic_auth_credentials(  # noqa: PLR0913
         assert credentials["hash"] == hash_
     assert sorted(credentials["scopes"]) == sorted(scopes)
     assert "agent" in credentials
+
+    if target is not None:
+        assert credentials["target"] == target
 
     if agent_name is not None:
         assert credentials["agent"]["name"] == agent_name
@@ -275,6 +284,7 @@ def test_cli_auth_command_without_writing_auth_file(scopes, ifi_command, ifi_val
     username = "foo"
     password = "bar"
     agent_name = "foobarname"  # optional name
+    target = "custom_target"
 
     cli_args = _gen_cli_auth_args(
         username,
@@ -283,6 +293,7 @@ def test_cli_auth_command_without_writing_auth_file(scopes, ifi_command, ifi_val
         ifi_command,
         ifi_value,
         agent_name=agent_name,
+        target=target,
         write=False,
     )
 
@@ -303,6 +314,7 @@ def test_cli_auth_command_without_writing_auth_file(scopes, ifi_command, ifi_val
         ifi_type=ifi_type,
         ifi_value=ifi_value,
         agent_name=agent_name,
+        target=target,
     )
 
 
@@ -346,12 +358,19 @@ def test_cli_auth_command_when_writing_auth_file(
     username_1 = "foo"
     password_1 = "bar"
     scopes_1 = ["all"]
+    target_1 = "custom_target"
 
     # The authentication file does not exist
 
     # Add a first user
     cli_args = _gen_cli_auth_args(
-        username_1, password_1, scopes_1, ifi_command_1, ifi_value_1, write=True
+        username_1,
+        password_1,
+        scopes_1,
+        ifi_command_1,
+        ifi_value_1,
+        target=target_1,
+        write=True,
     )
 
     assert Path(settings.AUTH_FILE).exists() is False
@@ -371,15 +390,23 @@ def test_cli_auth_command_when_writing_auth_file(
         scopes=scopes_1,
         ifi_type=ifi_type_1,
         ifi_value=ifi_value_1,
+        target=target_1,
     )
 
     # Add a second user
     username_2 = "lol"
     password_2 = "baz"
     scopes_2 = ["statements/write", "statements/read/mine"]
+    target_2 = "there"
 
     cli_args = _gen_cli_auth_args(
-        username_2, password_2, scopes_2, ifi_command_2, ifi_value_2, write=True
+        username_2,
+        password_2,
+        scopes_2,
+        ifi_command_2,
+        ifi_value_2,
+        target=target_2,
+        write=True,
     )
     result = runner.invoke(cli, cli_args)
 
@@ -395,6 +422,7 @@ def test_cli_auth_command_when_writing_auth_file(
         scopes=scopes_1,
         ifi_type=ifi_type_1,
         ifi_value=ifi_value_1,
+        target=target_1,
     )
 
     # Check that the second user matches
@@ -406,6 +434,7 @@ def test_cli_auth_command_when_writing_auth_file(
         scopes=scopes_2,
         ifi_type=ifi_type_2,
         ifi_value=ifi_value_2,
+        target=target_2,
     )
 
 

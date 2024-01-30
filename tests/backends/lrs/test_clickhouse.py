@@ -294,9 +294,22 @@ def test_backends_lrs_clickhouse_query_statements(clickhouse, clickhouse_lrs_bac
     should return matching statements.
     """
 
+    # Create another table
+    custom_target = "custom_table"
+    sql = f"""
+        CREATE TABLE {custom_target} (
+        event_id UUID NOT NULL,
+        emission_time DateTime64(6) NOT NULL,
+        event String NOT NULL
+        )
+        ENGINE MergeTree ORDER BY (emission_time, event_id)
+        PRIMARY KEY (emission_time, event_id)
+    """
+    clickhouse.command(sql)
+
     backend = clickhouse_lrs_backend()
 
-    # Insert documents
+    # Insert documents into the default table
     date_str = "09-19-2022"
     datetime_object = datetime.strptime(date_str, "%m-%d-%Y").utcnow()
     test_id = str(uuid.uuid4())
@@ -309,15 +322,40 @@ def test_backends_lrs_clickhouse_query_statements(clickhouse, clickhouse_lrs_bac
             "object": {"id": "http://example.com", "objectType": "Activity"},
         },
     ]
-
     success = backend.write(statements, chunk_size=1)
     assert success == 1
 
-    # Check the expected search query results.
+    # Insert documents into the custom table
+    date_str = "01-31-2024"
+    datetime_object = datetime.strptime(date_str, "%m-%d-%Y").utcnow()
+    test_id_custom = str(uuid.uuid4())
+    statements_custom = [
+        {
+            "id": test_id_custom,
+            "timestamp": datetime_object.isoformat(),
+            "actor": {"account": {"name": "test_name"}},
+            "verb": {"id": "verb_id"},
+            "object": {"id": "http://example.com", "objectType": "Activity"},
+        },
+    ]
+    success = backend.write(statements_custom, target=custom_target, chunk_size=1)
+    assert success == 1
+
+    # Check the expected search query results from default target.
     result = backend.query_statements(
         RalphStatementsQuery.construct(statementId=test_id, limit=10)
     )
     assert result.statements == statements
+
+    # Check the expected search query results from custom target.
+    result = backend.query_statements(
+        RalphStatementsQuery.construct(statementId=test_id_custom, limit=10),
+        target=custom_target,
+    )
+    assert result.statements == statements_custom
+
+    sql = f"""DROP TABLE IF EXISTS {custom_target}"""
+    clickhouse.command(sql)
     backend.close()
 
 
@@ -357,9 +395,22 @@ def test_backends_lrs_clickhouse_query_statements_by_ids(
     a list of ids, should return matching statements.
     """
 
+    # Create another table
+    custom_target = "custom_table"
+    sql = f"""
+        CREATE TABLE {custom_target} (
+        event_id UUID NOT NULL,
+        emission_time DateTime64(6) NOT NULL,
+        event String NOT NULL
+        )
+        ENGINE MergeTree ORDER BY (emission_time, event_id)
+        PRIMARY KEY (emission_time, event_id)
+    """
+    clickhouse.command(sql)
+
     backend = clickhouse_lrs_backend()
 
-    # Insert documents
+    # Insert documents into the default table
     date_str = "09-19-2022"
     datetime_object = datetime.strptime(date_str, "%m-%d-%Y").utcnow()
     test_id = str(uuid.uuid4())
@@ -372,13 +423,35 @@ def test_backends_lrs_clickhouse_query_statements_by_ids(
             "object": {"id": "http://example.com", "objectType": "Activity"},
         },
     ]
-
     count = backend.write(statements, chunk_size=1)
     assert count == 1
 
-    # Check the expected search query results.
+    # Insert documents into the custom table
+    date_str = "01-31-2024"
+    datetime_object = datetime.strptime(date_str, "%m-%d-%Y").utcnow()
+    test_id_custom = str(uuid.uuid4())
+    statements_custom = [
+        {
+            "id": test_id_custom,
+            "timestamp": datetime_object.isoformat(),
+            "actor": {"account": {"name": "test_name"}},
+            "verb": {"id": "verb_id"},
+            "object": {"id": "http://example.com", "objectType": "Activity"},
+        },
+    ]
+    count = backend.write(statements_custom, target=custom_target, chunk_size=1)
+    assert count == 1
+
+    # Check the expected search query results from default table.
     result = list(backend.query_statements_by_ids([test_id]))
     assert result[0] == statements[0]
+
+    # Check the expected search query results from custom table.
+    result = list(
+        backend.query_statements_by_ids([test_id_custom], target=custom_target)
+    )
+    assert result[0] == statements_custom[0]
+
     backend.close()
 
 

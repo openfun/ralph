@@ -40,6 +40,7 @@ class IDToken(BaseModel):
                    accepted for processing.
         iat (int): Time at which the JWT was issued.
         scope (str): Scope(s) for resource authorization.
+        target (str): Target for storing the statements.
     """
 
     iss: str
@@ -48,6 +49,7 @@ class IDToken(BaseModel):
     exp: int
     iat: int
     scope: Optional[str]
+    target: Optional[str]
 
     class Config:  # noqa: D106
         extra = Extra.ignore
@@ -147,6 +149,6 @@ def get_oidc_user(
     user = AuthenticatedUser(
         agent={"openid": f"{id_token.iss}/{id_token.sub}"},
         scopes=UserScopes(id_token.scope.split(" ") if id_token.scope else []),
+        target=id_token.target,
     )
-
     return user

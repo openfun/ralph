@@ -322,6 +322,13 @@ def backends_options(backends: Dict[str, Type], name: Optional[str] = None):
     help="The user scope(s). This option can be provided multiple times.",
 )
 @click.option(
+    "-t",
+    "--target",
+    type=str,
+    required=False,
+    help="The target location where statements are stored for the user.",
+)
+@click.option(
     "-M",
     "--agent-ifi-mbox",
     type=str,
@@ -371,6 +378,7 @@ def auth(  # noqa: PLR0913
     username,
     password,
     scope,
+    target,
     write_to_disk,
     agent_ifi_mbox,
     agent_ifi_mbox_sha1sum,
@@ -446,6 +454,7 @@ def auth(  # noqa: PLR0913
             bytes(password, encoding=settings.LOCALE_ENCODING), bcrypt.gensalt()
         ).decode("ascii"),
         scopes=scope,
+        target=target,
         agent=agent,
     )
 
@@ -463,19 +472,17 @@ def auth(  # noqa: PLR0913
         # Parse credentials file if not empty
         if auth_file.stat().st_size:
             users = ServerUsersCredentials.parse_file(auth_file)
-        users += ServerUsersCredentials.parse_obj(
-            [
-                credentials,
-            ]
+        users += ServerUsersCredentials.parse_obj([credentials])
+        auth_file.write_text(
+            users.json(indent=2, exclude_none=True), encoding=settings.LOCALE_ENCODING
         )
-        auth_file.write_text(users.json(indent=2), encoding=settings.LOCALE_ENCODING)
         logger.info("User %s has been added to: %s", username, settings.AUTH_FILE)
     else:
         click.echo(
             (
                 f"Copy/paste the following credentials to your LRS authentication "
                 f"file located in: {settings.AUTH_FILE}\n"
-                f"{credentials.json(indent=2)}"
+                f"{credentials.json(indent=2, exclude_none=True)}"
             )
         )
 
