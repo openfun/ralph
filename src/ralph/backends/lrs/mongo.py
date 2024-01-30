@@ -1,7 +1,7 @@
 """MongoDB LRS backend for Ralph."""
 
 import logging
-from typing import Iterator, List
+from typing import Iterator, List, Optional
 
 from bson.objectid import ObjectId
 from pymongo import ASCENDING, DESCENDING
@@ -36,11 +36,15 @@ class MongoLRSBackendSettings(BaseLRSBackendSettings, MongoDataBackendSettings):
 class MongoLRSBackend(BaseLRSBackend[MongoLRSBackendSettings], MongoDataBackend):
     """MongoDB LRS backend."""
 
-    def query_statements(self, params: RalphStatementsQuery) -> StatementQueryResult:
+    def query_statements(
+        self, params: RalphStatementsQuery, target: Optional[str] = None
+    ) -> StatementQueryResult:
         """Return the results of a statements query using xAPI parameters."""
         query = self.get_query(params)
         try:
-            mongo_response = list(self.read(query=query, chunk_size=params.limit))
+            mongo_response = list(
+                self.read(query=query, target=target, chunk_size=params.limit)
+            )
         except (BackendException, BackendParameterException) as error:
             logger.error("Failed to read from MongoDB")
             raise error
@@ -55,11 +59,13 @@ class MongoLRSBackend(BaseLRSBackend[MongoLRSBackendSettings], MongoDataBackend)
             search_after=search_after,
         )
 
-    def query_statements_by_ids(self, ids: List[str]) -> Iterator[dict]:
+    def query_statements_by_ids(
+        self, ids: List[str], target: Optional[str] = None
+    ) -> Iterator[dict]:
         """Yield statements with matching ids from the backend."""
         query = self.query_class(filter={"_source.id": {"$in": ids}})
         try:
-            mongo_response = self.read(query=query)
+            mongo_response = self.read(query=query, target=target)
             yield from (document["_source"] for document in mongo_response)
         except (BackendException, BackendParameterException) as error:
             logger.error("Failed to read from MongoDB")

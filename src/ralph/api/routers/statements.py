@@ -355,7 +355,10 @@ async def get(  # noqa: PLR0913
     try:
         query_result = await await_if_coroutine(
             BACKEND_CLIENT.query_statements(
-                RalphStatementsQuery.construct(**{**query_params, "limit": limit})
+                params=RalphStatementsQuery.construct(
+                    **{**query_params, "limit": limit}
+                ),
+                target=current_user.target,
             )
         )
     except BackendException as error:
@@ -440,11 +443,16 @@ async def put(
     try:
         if isinstance(BACKEND_CLIENT, BaseLRSBackend):
             existing_statements = list(
-                BACKEND_CLIENT.query_statements_by_ids([statement_id])
+                BACKEND_CLIENT.query_statements_by_ids(
+                    ids=[statement_id], target=current_user.target
+                )
             )
         else:
             existing_statements = [
-                x async for x in BACKEND_CLIENT.query_statements_by_ids([statement_id])
+                x
+                async for x in BACKEND_CLIENT.query_statements_by_ids(
+                    ids=[statement_id], target=current_user.target
+                )
             ]
     except BackendException as error:
         raise HTTPException(
@@ -467,7 +475,11 @@ async def put(
     # For valid requests, perform the bulk indexing of all incoming statements
     try:
         success_count = await await_if_coroutine(
-            BACKEND_CLIENT.write(data=[statement_as_dict], ignore_errors=False)
+            BACKEND_CLIENT.write(
+                data=[statement_as_dict],
+                target=current_user.target,
+                ignore_errors=False,
+            )
         )
     except (BackendException, BadFormatException) as exc:
         logger.error("Failed to index submitted statement")
@@ -526,13 +538,15 @@ async def post(  # noqa: PLR0912
     try:
         if isinstance(BACKEND_CLIENT, BaseLRSBackend):
             existing_statements = list(
-                BACKEND_CLIENT.query_statements_by_ids(list(statements_dict))
+                BACKEND_CLIENT.query_statements_by_ids(
+                    ids=list(statements_dict), target=current_user.target
+                )
             )
         else:
             existing_statements = [
                 x
                 async for x in BACKEND_CLIENT.query_statements_by_ids(
-                    list(statements_dict)
+                    ids=list(statements_dict), target=current_user.target
                 )
             ]
     except BackendException as error:
@@ -573,7 +587,11 @@ async def post(  # noqa: PLR0912
     # For valid requests, perform the bulk indexing of all incoming statements
     try:
         success_count = await await_if_coroutine(
-            BACKEND_CLIENT.write(data=statements_dict.values(), ignore_errors=False)
+            BACKEND_CLIENT.write(
+                data=statements_dict.values(),
+                target=current_user.target,
+                ignore_errors=False,
+            )
         )
     except (BackendException, BadFormatException) as exc:
         logger.error("Failed to index submitted statements")

@@ -274,7 +274,7 @@ async def test_backends_lrs_async_es_query_statements_query(
     parameters, should produce the expected Elasticsearch query.
     """
 
-    async def mock_read(query, chunk_size):
+    async def mock_read(query, target, chunk_size):
         """Mock the `AsyncESLRSBackend.read` method."""
         assert query.dict() == expected_query
         assert chunk_size == expected_query.get("size")
@@ -297,18 +297,32 @@ async def test_backends_lrs_async_es_query_statements(es, async_es_lrs_backend):
     """Test the `AsyncESLRSBackend.query_statements` method, given a query,
     should return matching statements.
     """
+    # Create a custom index
+    custom_target = "custom-target"
+    es.indices.create(index=custom_target)
 
     # Instantiate AsyncESLRSBackend.
     backend = async_es_lrs_backend()
-    # Insert documents.
-    documents = [{"id": "2", "timestamp": "2023-06-24T00:00:20.194929+00:00"}]
-    assert await backend.write(documents) == 1
+    # Insert documents into default target.
+    documents_default = [{"id": "2", "timestamp": "2023-06-24T00:00:20.194929+00:00"}]
+    assert await backend.write(documents_default) == 1
+    # Insert documents into custom target.
+    documents_custom = [{"id": "3", "timestamp": "2023-05-25T00:00:20.194929+00:00"}]
+    assert await backend.write(documents_custom, target=custom_target) == 1
 
     # Check the expected search query results.
     result = await backend.query_statements(RalphStatementsQuery.construct(limit=10))
-    assert result.statements == documents
+    assert result.statements == documents_default
     assert re.match(r"[0-9]+\|0", result.search_after)
 
+    # Check the expected search query results on custom target.
+    result = await backend.query_statements(
+        RalphStatementsQuery.construct(limit=10), target=custom_target
+    )
+    assert result.statements == documents_custom
+    assert re.match(r"[0-9]+\|0", result.search_after)
+
+    es.indices.delete(index=custom_target)
     await backend.close()
 
 
@@ -419,6 +433,20 @@ async def test_backends_lrs_async_es_query_statements_by_ids_many_indexes(
     assert [
         statement async for statement in backend_2.query_statements_by_ids(["2"])
     ] == [index_2_document]
+
+    # Check that backends can also read from another target
+    assert [
+        statement
+        async for statement in backend_1.query_statements_by_ids(
+            ["2"], target=ES_TEST_FORWARDING_INDEX
+        )
+    ] == [index_2_document]
+    assert [
+        statement
+        async for statement in backend_2.query_statements_by_ids(
+            ["1"], target=ES_TEST_INDEX
+        )
+    ] == [index_1_document]
 
     await backend_1.close()
     await backend_2.close()

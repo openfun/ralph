@@ -1,7 +1,7 @@
 """ClickHouse LRS backend for Ralph."""
 
 import logging
-from typing import Generator, Iterator, List
+from typing import Generator, Iterator, List, Optional
 
 from ralph.backends.data.clickhouse import (
     ClickHouseDataBackend,
@@ -42,7 +42,9 @@ class ClickHouseLRSBackend(
 ):
     """ClickHouse LRS backend implementation."""
 
-    def query_statements(self, params: RalphStatementsQuery) -> StatementQueryResult:
+    def query_statements(
+        self, params: RalphStatementsQuery, target: Optional[str] = None
+    ) -> StatementQueryResult:
         """Return the statements query payload using xAPI parameters."""
         ch_params = params.dict(exclude_none=True)
         where = []
@@ -99,7 +101,7 @@ class ClickHouseLRSBackend(
             clickhouse_response = list(
                 self.read(
                     query=query,
-                    target=self.event_table_name,
+                    target=target,
                     ignore_errors=True,
                 )
             )
@@ -123,7 +125,9 @@ class ClickHouseLRSBackend(
             pit_id=new_pit_id,
         )
 
-    def query_statements_by_ids(self, ids: List[str]) -> Iterator[dict]:
+    def query_statements_by_ids(
+        self, ids: List[str], target: Optional[str] = None
+    ) -> Iterator[dict]:
         """Yield statements with matching ids from the backend."""
 
         def chunk_id_list(chunk_size: int = self.settings.IDS_CHUNK_SIZE) -> Generator:
@@ -141,7 +145,7 @@ class ClickHouseLRSBackend(
                 query.parameters["ids"] = chunk_ids
                 ch_response = self.read(
                     query=query,
-                    target=self.event_table_name,
+                    target=target,
                     ignore_errors=True,
                 )
                 yield from (document["event"] for document in ch_response)

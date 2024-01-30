@@ -3,6 +3,7 @@
 import logging
 from datetime import datetime
 from io import IOBase
+from pathlib import Path
 from typing import Iterable, List, Literal, Optional, Union
 from uuid import UUID
 
@@ -50,10 +51,15 @@ class FSLRSBackend(BaseLRSBackend[FSLRSBackendSettings], FSDataBackend):
 
         See `FSDataBackend.write`.
         """
-        target = target if target else self.settings.DEFAULT_LRS_FILE
+        if target:
+            target = str(Path(target) / Path(self.settings.DEFAULT_LRS_FILE))
+        else:
+            target = self.settings.DEFAULT_LRS_FILE
         return super().write(data, target, chunk_size, ignore_errors, operation_type)
 
-    def query_statements(self, params: RalphStatementsQuery) -> StatementQueryResult:
+    def query_statements(
+        self, params: RalphStatementsQuery, target: Optional[str] = None
+    ) -> StatementQueryResult:
         """Return the statements query payload using xAPI parameters."""
         filters = []
         self._add_filter_by_id(filters, params.statement_id)
@@ -72,7 +78,7 @@ class FSLRSBackend(BaseLRSBackend[FSLRSBackendSettings], FSDataBackend):
         statements_count = 0
         search_after = None
         statements = []
-        for statement in self.read(query=self.settings.DEFAULT_LRS_FILE):
+        for statement in self.read(query=self.settings.DEFAULT_LRS_FILE, target=target):
             for query_filter in filters:
                 if not query_filter(statement):
                     break
@@ -91,11 +97,13 @@ class FSLRSBackend(BaseLRSBackend[FSLRSBackendSettings], FSDataBackend):
             search_after=search_after,
         )
 
-    def query_statements_by_ids(self, ids: List[str]) -> List:
+    def query_statements_by_ids(
+        self, ids: List[str], target: Optional[str] = None
+    ) -> List:
         """Return the list of matching statement IDs from the database."""
         statement_ids = set(ids)
         statements = []
-        for statement in self.read(query=self.settings.DEFAULT_LRS_FILE):
+        for statement in self.read(query=self.settings.DEFAULT_LRS_FILE, target=target):
             if statement.get("id") in statement_ids:
                 statements.append(statement)
 

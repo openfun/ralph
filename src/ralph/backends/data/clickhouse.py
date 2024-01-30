@@ -139,7 +139,6 @@ class ClickHouseDataBackend(
         """
         super().__init__(settings)
         self.database = self.settings.DATABASE
-        self.event_table_name = self.settings.EVENT_TABLE_NAME
         self._client = None
 
     @property
@@ -255,8 +254,7 @@ class ClickHouseDataBackend(
         ignore_errors: bool,
     ) -> Iterator[dict]:
         """Method called by `self.read` yielding dictionaries. See `self.read`."""
-        if target is None:
-            target = self.event_table_name
+        target = target if target else self.settings.EVENT_TABLE_NAME
 
         if isinstance(query.select, str):
             query.select = [query.select]
@@ -341,7 +339,7 @@ class ClickHouseDataBackend(
     ) -> int:
         """Method called by `self.write` writing dictionaries. See `self.write`."""
         count = 0
-        target = target if target else self.event_table_name
+        target = target if target else self.settings.EVENT_TABLE_NAME
         msg = "Start writing to the %s table of the %s database (chunk size: %d)"
         logger.debug(msg, target, self.database, chunk_size)
         insert_tuples = self._to_insert_tuples(data, ignore_errors)

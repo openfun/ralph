@@ -278,10 +278,44 @@ def test_backends_lrs_fs_query_statements_query(
     assert ids == expected_statement_ids
 
 
-def test_backends_lrs_fs_query_statements_by_ids(fs_lrs_backend):
+def test_backends_lrs_fs_query_statements(fs, fs_lrs_backend):
+    """Test the `FSLRSBackend.query_statements` method, given a query,
+    should return matching statements.
+    """
+    # Create a custom directory
+    custom_target = "custom_dir"
+    fs.create_dir(f"foo/{custom_target}")
+
+    # Instantiate FSLRSBackend.
+    backend = fs_lrs_backend()
+    # Insert documents into default target.
+    documents_default = [{"id": "2", "timestamp": "2023-06-24T00:00:20.194929+00:00"}]
+    assert backend.write(documents_default) == 1
+    # Insert documents into custom target.
+    documents_custom = [{"id": "3", "timestamp": "2023-05-25T00:00:20.194929+00:00"}]
+    assert backend.write(documents_custom, target=custom_target) == 1
+
+    # Check the expected search query results.
+    result = backend.query_statements(RalphStatementsQuery.construct(limit=10))
+    assert result.statements == documents_default
+
+    # Check the expected search query results on custom target.
+    result = backend.query_statements(
+        RalphStatementsQuery.construct(limit=10), target=custom_target
+    )
+    assert result.statements == documents_custom
+
+    backend.close()
+
+
+def test_backends_lrs_fs_query_statements_by_ids(fs, fs_lrs_backend):
     """Test the `FSLRSBackend.query_statements_by_ids` method, given a valid search
     query, should return the expected results.
     """
+    # Create a custom directory
+    custom_target = "custom_dir"
+    fs.create_dir(f"foo/{custom_target}")
+
     backend = fs_lrs_backend()
     assert not backend.query_statements_by_ids(["foo"])
     backend.write(
@@ -291,10 +325,18 @@ def test_backends_lrs_fs_query_statements_by_ids(fs_lrs_backend):
             {"id": "baz"},
         ]
     )
+    backend.write(
+        [{"id": "foo2"}],
+        target=custom_target,
+    )
     assert not backend.query_statements_by_ids([])
     assert not backend.query_statements_by_ids(["qux", "foobar"])
     assert backend.query_statements_by_ids(["foo"]) == [{"id": "foo"}]
     assert backend.query_statements_by_ids(["bar", "baz"]) == [
         {"id": "bar"},
         {"id": "baz"},
+    ]
+    assert not backend.query_statements_by_ids(["foo"], target=custom_target)
+    assert backend.query_statements_by_ids(["foo2"], target=custom_target) == [
+        {"id": "foo2"}
     ]

@@ -1,4 +1,5 @@
 """Tests for the api.auth.oidc module."""
+
 import pytest
 import responses
 from pydantic import parse_obj_as
@@ -8,7 +9,12 @@ from ralph.conf import AuthBackend
 from ralph.models.xapi.base.agents import BaseXapiAgentWithOpenId
 
 from tests.fixtures.auth import ISSUER_URI, mock_oidc_user
-from tests.helpers import configure_env_for_mock_oidc_auth
+from tests.fixtures.backends import get_es_test_backend
+from tests.helpers import (
+    assert_statement_get_responses_are_equivalent,
+    configure_env_for_mock_oidc_auth,
+    mock_statement,
+)
 
 
 @pytest.mark.anyio
@@ -36,6 +42,61 @@ async def test_api_auth_oidc_get_whoami_valid(
     assert response.json()["agent"] == {"openid": "https://iss.example.com/123|oidc"}
     assert parse_obj_as(BaseXapiAgentWithOpenId, response.json()["agent"])
     assert sorted(response.json()["scopes"]) == ["all", "profile/read"]
+    assert "target" not in response.json()
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize(
+    "runserver_auth_backends",
+    [[AuthBackend.BASIC, AuthBackend.OIDC], [AuthBackend.OIDC]],
+)
+@responses.activate
+async def test_api_auth_oidc_post_statements_to_target(
+    client, monkeypatch, runserver_auth_backends, es_custom
+):
+    """Test a valid OpenId Connect authentication."""
+
+    configure_env_for_mock_oidc_auth(monkeypatch, runserver_auth_backends)
+
+    # Create user pointing to a custom target
+    target = "custom_target"
+    oidc_token = mock_oidc_user(scopes=["all", "profile/read"], target=target)
+
+    monkeypatch.setattr(
+        "ralph.api.routers.statements.BACKEND_CLIENT", get_es_test_backend()
+    )
+    statement = mock_statement()
+
+    # Create both default and custom indexes
+    es_custom()
+    es_client = es_custom(index=target)
+
+    response = await client.post(
+        "/xAPI/statements/",
+        headers={"Authorization": f"Bearer {oidc_token}"},
+        json=statement,
+    )
+    assert response.status_code == 200
+
+    es_client.indices.refresh(index=target)
+
+    response = await client.get(
+        "/xAPI/statements/",
+        headers={"Authorization": f"Bearer {oidc_token}"},
+    )
+    assert response.status_code == 200
+    assert_statement_get_responses_are_equivalent(
+        response.json(), {"statements": [statement]}
+    )
+
+    # Check that a user with default target cannot see these statements
+    oidc_token = mock_oidc_user(scopes=["all", "profile/read"])
+
+    response = await client.get(
+        "/xAPI/statements/",
+        headers={"Authorization": f"Bearer {oidc_token}"},
+    )
+    assert response.status_code == 500
 
 
 @pytest.mark.anyio

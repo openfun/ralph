@@ -1,4 +1,5 @@
 """Test fixtures related to authentication on the API."""
+
 import base64
 import json
 import os
@@ -23,12 +24,13 @@ ISSUER_URI = "http://providerHost:8080/auth/realms/real_name"
 PUBLIC_KEY_ID = "example-key-id"
 
 
-def mock_basic_auth_user(
+def mock_basic_auth_user(  # noqa: PLR0913
     fs_,
     username: str = "jane",
     password: str = "pwd",
     scopes: Optional[list] = None,
     agent: Optional[dict] = None,
+    target: Optional[str] = None,
 ):
     """Create a user using Basic Auth in the (fake) file system.
 
@@ -38,6 +40,7 @@ def mock_basic_auth_user(
         password (str): password used for auth
         scopes (List[str]): list of scopes available to the user
         agent (dict): an agent that represents the user and may be used as authority
+        target (str): The target index or database to store statements into.
     """
 
     # Default values for `scopes` and `agent`
@@ -50,7 +53,7 @@ def mock_basic_auth_user(
     credential_bytes = base64.b64encode(f"{username}:{password}".encode("utf-8"))
     credentials = str(credential_bytes, "utf-8")
 
-    auth_file_path = settings.AUTH_FILE  # settings.APP_DIR / "auth.json"
+    auth_file_path = settings.AUTH_FILE
 
     # Clear lru_cache to allow for basic auth testing within same function
     get_stored_credentials.cache_clear()
@@ -69,6 +72,8 @@ def mock_basic_auth_user(
         "scopes": scopes,
         "agent": agent,
     }
+    if target is not None:
+        user["target"] = target
     all_users.append(user)
 
     fs_.create_file(auth_file_path, contents=json.dumps(all_users))
@@ -77,13 +82,14 @@ def mock_basic_auth_user(
 
 
 @pytest.fixture
-def basic_auth_credentials(fs, user_scopes=None, agent=None):
+def basic_auth_credentials(fs, user_scopes=None, agent=None, target=None):
     """Set up the credentials file for request authentication.
 
     Args:
         fs: fixture provided by pyfakefs (not called in the code)
         user_scopes (List[str]): list of scopes to associate to the user
         agent (dict): valid Agent (per xAPI specification) representing the user
+        target (str): The target index or database to store statements into.
 
     Returns:
         credentials (str): auth parameters that need to be passed
@@ -97,7 +103,9 @@ def basic_auth_credentials(fs, user_scopes=None, agent=None):
     if agent is None:
         agent = {"mbox": "mailto:test_ralph@example.com"}
 
-    credentials = mock_basic_auth_user(fs, username, password, user_scopes, agent)
+    credentials = mock_basic_auth_user(
+        fs, username, password, user_scopes, agent, target
+    )
     return credentials
 
 
@@ -221,17 +229,20 @@ def mock_oidc_jwks():
     return _mock_oidc_jwks()
 
 
-def _create_oidc_token(sub, scopes):
+def _create_oidc_token(sub, scopes, target=None):
     """Encode token with the private key."""
+    claims = {
+        "sub": sub,
+        "iss": "https://iss.example.com",
+        "aud": AUDIENCE,
+        "iat": 0,  # Issued the 1/1/1970
+        "exp": 9999999999,  # Expiring in 11/20/2286
+        "scope": " ".join(scopes),
+    }
+    if target is not None:
+        claims["target"] = target
     return jwt.encode(
-        claims={
-            "sub": sub,
-            "iss": "https://iss.example.com",
-            "aud": AUDIENCE,
-            "iat": 0,  # Issued the 1/1/1970
-            "exp": 9999999999,  # Expiring in 11/20/2286
-            "scope": " ".join(scopes),
-        },
+        claims=claims,
         key=private_key.private_bytes(
             serialization.Encoding.PEM,
             serialization.PrivateFormat.PKCS8,
@@ -244,7 +255,7 @@ def _create_oidc_token(sub, scopes):
     )
 
 
-def mock_oidc_user(sub="123|oidc", scopes=None):
+def mock_oidc_user(sub="123|oidc", scopes=None, target=None):
     """Instantiate mock oidc user and return auth token."""
     # Default value for scope
     if scopes is None:
@@ -270,7 +281,7 @@ def mock_oidc_user(sub="123|oidc", scopes=None):
         status=200,
     )
 
-    oidc_token = _create_oidc_token(sub=sub, scopes=scopes)
+    oidc_token = _create_oidc_token(sub=sub, scopes=scopes, target=target)
     return oidc_token
 
 

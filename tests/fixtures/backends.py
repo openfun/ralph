@@ -199,6 +199,31 @@ def es_forwarding():
 
 
 @pytest.fixture
+def es_custom():
+    """Yield `_es_custom` function."""
+
+    teardown = []
+    client = Elasticsearch(ES_TEST_HOSTS)
+
+    def _es_custom(host=ES_TEST_HOSTS, index=ES_TEST_INDEX):
+        """Create the index and yield an Elasticsearch test client."""
+        try:
+            client.indices.create(index=index)
+        except BadRequestError:
+            # The index might already exist
+            client.indices.delete(index=index)
+            client.indices.create(index=index)
+        teardown.append(index)
+        return client
+
+    yield _es_custom
+
+    for index in teardown:
+        client.indices.delete(index=index)
+    client.close()
+
+
+@pytest.fixture
 def fs_backend(fs, settings_fs):
     """Return the `get_fs_data_backend` function."""
 
@@ -376,6 +401,34 @@ def mongo():
 
 
 @pytest.fixture
+def mongo_custom():
+    """Yield `_mongo_custom` function."""
+
+    teardown = []
+
+    client = MongoClient(MONGO_TEST_CONNECTION_URI)
+    database = getattr(client, MONGO_TEST_DATABASE)
+
+    def _mongo_custom(collection=MONGO_TEST_COLLECTION):
+        """Create the collection and yield the Mongo test client."""
+        try:
+            database.create_collection(collection)
+        except CollectionInvalid:
+            # The collection might already exist
+            database.drop_collection(collection)
+            database.create_collection(collection)
+        teardown.append(collection)
+        return client
+
+    yield _mongo_custom
+
+    for collection in teardown:
+        database.drop_collection(collection)
+    client.drop_database(database)
+    client.close()
+
+
+@pytest.fixture
 def mongo_backend():
     """Return the `get_mongo_data_backend` function."""
 
@@ -489,6 +542,72 @@ def clickhouse():
     """
     for clickhouse_client in get_clickhouse_fixture():
         yield clickhouse_client
+
+
+@pytest.fixture
+def clickhouse_custom():
+    """Return the `_clickhouse_custom` function."""
+
+    teardown = []
+
+    host = CLICKHOUSE_TEST_HOST
+    port = CLICKHOUSE_TEST_PORT
+    database = CLICKHOUSE_TEST_DATABASE
+
+    client_options = ClickHouseClientOptions(
+        date_time_input_format="best_effort",  # Allows RFC dates
+    ).dict()
+
+    client = clickhouse_connect.get_client(
+        host=host,
+        port=port,
+        settings=client_options,
+    )
+
+    sql = f"""CREATE DATABASE IF NOT EXISTS {database}"""
+    client.command(sql)
+
+    # Now get a client with the correct database
+    client_db = clickhouse_connect.get_client(
+        host=host,
+        port=port,
+        database=database,
+        settings=client_options,
+    )
+
+    def _clickhouse_custom(
+        host=CLICKHOUSE_TEST_HOST,
+        port=CLICKHOUSE_TEST_PORT,
+        database=CLICKHOUSE_TEST_DATABASE,
+        event_table_name=CLICKHOUSE_TEST_TABLE_NAME,
+    ):
+        """Create / delete a ClickHouse test database + table and yield an
+        instantiated client.
+        """
+
+        sql = f"DROP TABLE IF EXISTS {event_table_name}"
+        client_db.command(sql)
+
+        sql = f"""
+            CREATE TABLE {event_table_name} (
+            event_id UUID NOT NULL,
+            emission_time DateTime64(6) NOT NULL,
+            event String NOT NULL
+            )
+            ENGINE MergeTree ORDER BY (emission_time, event_id)
+            PRIMARY KEY (emission_time, event_id)
+        """
+
+        client_db.command(sql)
+        teardown.append((client_db, event_table_name))
+        return client_db
+
+    yield _clickhouse_custom
+
+    for client_db, table in teardown:
+        client_db.command(f"DROP TABLE IF EXISTS {table}")
+
+    client.command(f"DROP DATABASE IF EXISTS {database}")
 
 
 @pytest.fixture
