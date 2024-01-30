@@ -850,6 +850,7 @@ def runserver(backend: str, host: str, port: int, **options):
                 env_file=env_file.name,
                 host=host,
                 port=port,
+                log_config=settings.LOGGING,
                 log_level="debug",
                 reload=True,
             )
