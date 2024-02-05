@@ -5,10 +5,13 @@ This tutorial shows you how to run Ralph LRS, step by step.
 !!! warning
 
     Ralph LRS will be executed locally for demonstration purpose.
-    If you want to deploy Ralph LRS on a production server, please refer to the section **Ralph LRS deployment**.
+    If you want to deploy Ralph LRS on a production server, please refer to the 
+    [deployment guide](../helm.md).
 
-Ralph LRS is based on [FastAPI](https://fastapi.tiangolo.com/).
-In this tutorial, we will run the server manually with [Uvicorn](https://www.uvicorn.org/), but other alternatives exists ([Hypercorn](https://pgjones.gitlab.io/hypercorn/), [Daphne](https://github.com/django/daphne)).
+Ralph LRS is based on [FastAPI](https://fastapi.tiangolo.com/). In this tutorial, we
+will run the server manually with [Uvicorn](https://www.uvicorn.org/), but other
+alternatives exists ([Hypercorn](https://pgjones.gitlab.io/hypercorn/),
+[Daphne](https://github.com/django/daphne)).
 
 !!! info "Prerequisites"
 

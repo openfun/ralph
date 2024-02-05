@@ -62,6 +62,7 @@ nav:
                 - tutorials/lrs/forwarding.md
                 - tutorials/lrs/sentry.md
         - Ralph Library Guide: tutorials/library.md
+        - Ralph Helm chart: tutorials/helm.md
         - Development Guide: tutorials/development_guide.md
     - Contributing: contribute.md
     - Migration: UPGRADE.md

@@ -1,51 +1,35 @@
-# Ralph Helm Chart
+# Ralph Helm chart
 
-## Dependencies
+Ralph LRS is distributed as a [Helm](https://helm.sh/) chart in the DockerHub OCI
+[openfuncharts](https://hub.docker.com/r/openfuncharts).
 
-- A running Kubernetes cluster
-- `kubectl`, the official Kubernetes CLI: https://kubernetes.io/docs/reference/kubectl/
-- `helm`, the package manager for kubernetes: https://helm.sh/fr/docs/intro/install/
-
-## Deploying Ralph
-
-This chart bootstraps a Ralph deployment on a [Kubernetes](https://kubernetes.io/)
-cluster using [Helm](https://helm.sh/) package manager.
-
-### Setting environment values
+## Setting environment values
 
 All default values are in the `values.yaml` file. With Helm, you can extend the values
 file: there is no need to copy/paste all the default values. You can create an
 environment values file, _e.g._ `custom-values.yaml` and only set needed customizations.
 
-Some of the environment values, needed for Ralph to work, are expected to be in an
-external ConfigMap Kubernetes object. Modify the `manifests/ralph-env-cm.yaml` file
-under the root of the chart to reflect your needs, and execute the following command to
-create the ConfigMap:
-```bash
-kubectl apply -f manifests/ralph-env-cm.yaml
-```
+All sensitive environment values, needed for Ralph to work, are expected to be in an
+external Secret Kubernetes object. An example manifest is provided in the
+`ralph-env-secret.yaml` file
+[here](https://github.com/openfun/ralph/blob/main/src/helm/manifests/ralph-env-secret.yaml)
+that you can adapt to fit your needs.
 
-Others environment values, also needed for Ralph to work, are expected to be in an
-external Secret Kubernetes object. Modify the `manifests/ralph-env-secret.yaml` file
-under the root of the chart to reflect your needs, and execute the following command to
-create the secret:
-```bash
-kubectl apply -f manifests/ralph-env-secret.yaml
-```
+All other non-sensitive environment values, also needed for Ralph to work, are expected
+to be in an external ConfigMap Kubernetes object. An example manifest is provided in the
+`ralph-env-cm.yaml` file
+[here](https://github.com/openfun/ralph/blob/main/src/helm/manifests/ralph-env-cm.yaml)
+that you can adapt to fit your needs.
 
-### Creating authentication secret
+## Creating authentication secret
 
-Ralph stores users credentials in an external Secret Kubernetes object. You can modify
-the `auth-demo.json` file to your needs (see [Ralph
-documentation](https://openfun.github.io/ralph/latest/tutorials/lrs/authentication/basic/#creating_user_credentials)
-on how to do so) and create a Secret object from it with the command:
+Ralph stores users credentials in an external Secret Kubernetes object. An example
+authentication file `auth-demo.json` is provided
+[here](https://github.com/openfun/ralph/blob/main/src/helm/manifests/auth-demo.json),
+that you can take inspiration from. Refer to the LRS guide for [creating user
+credentials](https://openfun.github.io/ralph/latest/tutorials/lrs/authentication/basic/#creating_user_credentials).
 
-```bash
-kubectl create secret generic ralph-auth-secret \
-    --from-file=auth.json=manifests/auth-demo.json
-```
-
-### Reviewing manifest
+## Reviewing manifest
 
 To generate and review your Helm generated manifest, under `./src/helm` run the
 following command:
@@ -54,7 +38,7 @@ following command:
 helm template oci://registry-1.docker.io/openfuncharts/ralph
 ```
 
-### Installing the chart
+## Installing the chart
 
 Ralph Helm chart is distributed on DockerHub, and you can install it with:
 ```bash
@@ -67,7 +51,8 @@ Tips:
 * `--set var=value` to replace one var/value
 * `--dry-run` to verify your manifest before deploying
 
-## Tutorial: Working on the Helm chart
+
+## Tutorial: deploying Ralph LRS on a local cluster
 
 This tutorial aims at deploying Ralph LRS on a local Kubernetes cluster using Helm. In
 this tutorial, you will learn to:
@@ -77,11 +62,18 @@ this tutorial, you will learn to:
 - deploy Ralph LRS (Learning Records Store) that receives and sends learning records in
   xAPI,
 
-> 💡 While working on the Helm Chart, suggested commands suppose that your current
-> directory is `./src/helm`.
+### Requirements
 
-We recommend using [Minikube](https://minikube.sigs.k8s.io/docs/start/) to run a local
-cluster that we will deploy Warren on.
+- [`curl`](https://curl.se/), the CLI to make HTTP requests.
+- [`jq`](https://stedolan.github.io/jq/), the JSON data Swiss-Knife.
+- [`kubectl`](https://kubernetes.io/docs/tasks/tools/#kubectl), the Kubernetes CLI.
+- [`helm`](https://helm.sh/), the package manager for Kubernetes.
+- [`minikube`](https://minikube.sigs.k8s.io/docs/start/), a lightweight kubernetes
+  distribution to work locally on the project.
+
+### Bootstrapping a local cluster
+
+Let's begin by running a local cluster with Minikube, where we will deploy Ralph on.
 
 ```bash
 # Start a local kubernetes cluster
@@ -121,11 +113,12 @@ helm repo update
 helm install elastic-operator elastic/eck-operator -n elastic-system --create-namespace
 ```
 
-Since CRDs are already deployed cluster-wide, we will now be able to deploy a two-nodes
-elasticsearch "cluster":
+Now that CRDs are already deployed cluster-wide, we can deploy an Elasticsearch cluster.
+To help you in this task, we provide an example manifest `data-lake.yml`, that deploy a
+two-nodes elasticsearch "cluster". Adapt it to match your needs, then apply it with:
 
 ```bash
-kubectl apply -f manifests/data-lake.yml
+kubectl apply -f data-lake.yml
 ```
 
 Once applied, your elasticsearch pod should be running. You can check this using the
@@ -154,29 +147,52 @@ LRS.
 
 ### Deploy the LRS: Ralph
 
-First and foremost, we should create a Secret object containing environment values
-needed for Ralph. To help us, we have the manifest under
-`manifest/ralph-env-secret.yaml`.
+First and foremost, we should create a Secret object containing the user credentials
+file. We provide an example authentication file
+[`auth-demo.json`](https://github.com/openfun/ralph/blob/main/src/helm/manifests/auth-demo.json)
+that you can take inspiration from. We can create a secret object directly from the file
+with the command:
 
-Let's replace the `<PASSWORD>` tag by the actual password of the `elastic` user with the
-command:
 ```bash
-sed -i -e "s|<PASSWORD>|$ELASTIC_PASSWORD|g" manifests/ralph-env-secret.yaml
+kubectl create secret generic ralph-auth-secret \
+    --from-file=auth.json=auth-demo.json
 ```
 
-We can now apply this manifest, to create the Secret object in our local cluster:
+Secondly, we should create two objects containing environment values necessary for Ralph:
+
+- a Secret containing sensitive environment variables such as passwords, tokens etc;
+- a ConfigMap containing all other non-sensitive environment variables.
+
+We provide two example manifests
+([`ralph-env-secret.yaml`](https://github.com/openfun/ralph/blob/main/src/helm/manifests/ralph-env-secret.yaml)
+and
+[`ralph-env-cm.yml`](https://github.com/openfun/ralph/blob/main/src/helm/manifests/ralph-env-cm.yaml))
+that you can adapt to fit your needs. 
+
+For this tutorial, we only need to replace the `<PASSWORD>` tag in the Secret manifest
+by the actual password of the `elastic` user with the command:
 ```bash
-kubectl apply -f manifests/ralph-env-secret.yaml
+sed -i -e "s|<PASSWORD>|$ELASTIC_PASSWORD|g" ralph-env-secret.yaml
+```
+
+We can now apply both manifests, to create a ConfigMap and a Secret object in our local
+cluster:
+```bash
+# Create Secret object
+kubectl apply -f ralph-env-secret.yaml
+
+# Create ConfigMap object
+kubectl apply -f ralph-env-cm.yaml
 ```
 
 We can now deploy Ralph:
 ```bash
-helm install lrs ./ralph --values development.yaml --debug --atomic
+helm install lrs oci://registry-1.docker.io/openfuncharts/ralph \
+  --values development.yaml
 ```
 
 One can check if the server is running by opening a network tunnel to the service using
 the `port-forward` sub-command:
-
 
 ```bash
 kubectl port-forward svc/lrs-ralph 8080:8080
@@ -210,4 +226,5 @@ Congrats 🎉
 Now that the LRS is running, we can go further and deploy the dashboard suite Warren.
 Refer to the
 [tutorial](https://github.com/openfun/warren/tree/main/src/helm#deploy-the-dashboard-suite-warren)
-of the Warren Helm chart
+of the Warren Helm chart.
+
