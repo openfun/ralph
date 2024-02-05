@@ -33,26 +33,32 @@ from ralph.backends.lrs.mongo import MongoLRSBackend
 def test_backends_loader_get_backends(caplog):
     """Test the `get_backends` function."""
 
-    # Given a non existing module name, the `get_backends` function should skip it.
-    with caplog.at_level(logging.WARNING):
-        assert not get_backends(("non_existent_package.foo",), (BaseDataBackend,))
+    # Given a non existing backend, the `get_backends` function should skip it.
+    with caplog.at_level(logging.DEBUG):
+        assert not get_backends(["non_existent_package.Foo"], (BaseDataBackend,))
 
     assert (
         "ralph.backends.loader",
-        logging.WARNING,
-        "Could not find 'non_existent_package.foo' package; skipping it",
+        logging.DEBUG,
+        "Failed to import 'non_existent_package.Foo' backend: "
+        "No module named 'non_existent_package'",
     ) in caplog.record_tuples
 
     # Given a module with a sub-module raising an exception during the import,
     # the `get_backends` function should skip it.
-    paths = ("tests.backends.test_utils_backends",)
+    paths = [
+        "tests.backends.test_utils_backends.invalid_backends.InvalidBackend",
+        "tests.backends.test_utils_backends.valid_backends.AsyncWSDataBackend",
+        "tests.backends.test_utils_backends.valid_backends.FSDataBackend",
+    ]
     with caplog.at_level(logging.DEBUG):
         assert get_backends(paths, (BaseDataBackend,)) == {"fs": FSDataBackend}
 
     assert (
         "ralph.backends.loader",
         logging.DEBUG,
-        "Failed to import tests.backends.test_utils_backends.invalid_backends module: "
+        "Failed to import "
+        "'tests.backends.test_utils_backends.invalid_backends.InvalidBackend' backend: "
         "No module named 'invalid_backends'",
     ) in caplog.record_tuples
 

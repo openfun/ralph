@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Backends: the first argument of the `get_backends` method now requires a list
+  of dotted backend paths instead of a tuple of packages containing backends.
+
 ## [4.1.0] - 2024-02-12
 
 ### Added

@@ -1,12 +1,8 @@
 """Ralph backend loader."""
 
 import logging
-import pkgutil
 from functools import lru_cache
-from importlib import import_module
-from importlib.util import find_spec
-from inspect import getmembers, isabstract, isclass
-from typing import Dict, Tuple, Type
+from typing import Dict, List, Tuple
 
 from ralph.backends.data.base import (
     AsyncListable,
@@ -17,54 +13,59 @@ from ralph.backends.data.base import (
     Writable,
 )
 from ralph.backends.lrs.base import BaseAsyncLRSBackend, BaseLRSBackend
+from ralph.utils import import_string
 
 logger = logging.getLogger(__name__)
 
+DATA_BACKENDS: List[str] = [
+    "ralph.backends.data.async_es.AsyncESDataBackend",
+    "ralph.backends.data.async_lrs.AsyncLRSDataBackend",
+    "ralph.backends.data.async_mongo.AsyncMongoDataBackend",
+    "ralph.backends.data.async_ws.AsyncWSDataBackend",
+    "ralph.backends.data.clickhouse.ClickHouseDataBackend",
+    "ralph.backends.data.es.ESDataBackend",
+    "ralph.backends.data.fs.FSDataBackend",
+    "ralph.backends.data.ldp.LDPDataBackend",
+    "ralph.backends.data.lrs.LRSDataBackend",
+    "ralph.backends.data.mongo.MongoDataBackend",
+    "ralph.backends.data.s3.S3DataBackend",
+    "ralph.backends.data.swift.SwiftDataBackend",
+]
+LRS_BACKENDS: List[str] = [
+    "ralph.backends.lrs.async_es.AsyncESLRSBackend",
+    "ralph.backends.lrs.async_mongo.AsyncMongoLRSBackend",
+    "ralph.backends.lrs.clickhouse.ClickHouseLRSBackend",
+    "ralph.backends.lrs.es.ESLRSBackend",
+    "ralph.backends.lrs.fs.FSLRSBackend",
+    "ralph.backends.lrs.mongo.MongoLRSBackend",
+]
 
-@lru_cache()
-def get_backends(packages: Tuple[str], base_backends: Tuple[Type]) -> Dict[str, Type]:
-    """Return sub-classes of `base_backends` found in sub-modules of `packages`.
+
+def get_backends(
+    backends: List[str], base_backends: Tuple[type, ...]
+) -> Dict[str, type]:
+    """Return sub-classes of `base_backends` from `backends`.
 
     Args:
-        packages (tuple of str): A tuple of dotted package names.
-            Ex.: ("ralph.backends.data", "ralph.backends.lrs").
-        base_backends (tuple of type): A tuple of base backend classes to search for.
+        backends (list of str): A list of dotted backend import paths.
+            Ex.: ["foo.bar.BackendA", "foo.bar.BackendB"].
+        base_backends (tuple of type): A tuple of base backend classes to filter for.
             Ex.: ("BaseDataBackend",)
 
     Return:
-        dict: A dictionary of found non-abstract backend classes by their name property.
+        dict: A dictionary of backend classes by their name property.
             Ex.: {"fs": FSDataBackend}
     """
-    module_specs = []
-    for package in packages:
+    backend_classes = []
+    for backend in backends:
         try:
-            module_spec = find_spec(package)
-        except ModuleNotFoundError:
-            module_spec = None
-
-        if not module_spec:
-            logger.warning("Could not find '%s' package; skipping it", package)
-            continue
-
-        module_specs.append(module_spec)
-
-    modules = []
-    for module_spec in module_specs:
-        paths = module_spec.submodule_search_locations
-        for module_info in pkgutil.iter_modules(paths, prefix=f"{module_spec.name}."):
-            modules.append(module_info.name)
-
-    backend_classes = set()
-    for module in modules:
-        try:
-            backend_module = import_module(module)
+            backend_class = import_string(backend)
         except Exception as error:  # noqa: BLE001
-            logger.debug("Failed to import %s module: %s", module, error)
+            logger.debug("Failed to import '%s' backend: %s", backend, error)
             continue
-        for _, class_ in getmembers(backend_module, isclass):
-            if issubclass(class_, base_backends) and not isabstract(class_):
-                backend_classes.add(class_)
 
+        if issubclass(backend_class, base_backends):
+            backend_classes.append(backend_class)
     return {
         backend.name: backend
         for backend in sorted(backend_classes, key=lambda x: x.name, reverse=True)
@@ -72,14 +73,14 @@ def get_backends(packages: Tuple[str], base_backends: Tuple[Type]) -> Dict[str, 
 
 
 @lru_cache(maxsize=1)
-def get_cli_backends() -> Dict[str, Type]:
+def get_cli_backends() -> Dict[str, type]:
     """Return Ralph's backend classes for cli usage."""
     base_backends = (BaseAsyncDataBackend, BaseDataBackend)
-    return get_backends(("ralph.backends.data",), base_backends)
+    return get_backends(DATA_BACKENDS, base_backends)
 
 
 @lru_cache(maxsize=1)
-def get_cli_write_backends() -> Dict[str, Type]:
+def get_cli_write_backends() -> Dict[str, type]:
     """Return Ralph's backends classes for cli write usage."""
     return {
         name: backend
@@ -89,7 +90,7 @@ def get_cli_write_backends() -> Dict[str, Type]:
 
 
 @lru_cache(maxsize=1)
-def get_cli_list_backends() -> Dict[str, Type]:
+def get_cli_list_backends() -> Dict[str, type]:
     """Return Ralph's backends classes for cli list usage."""
     return {
         name: backend
@@ -99,6 +100,6 @@ def get_cli_list_backends() -> Dict[str, Type]:
 
 
 @lru_cache(maxsize=1)
-def get_lrs_backends() -> Dict[str, Type]:
+def get_lrs_backends() -> Dict[str, type]:
     """Return Ralph's backend classes for LRS usage."""
-    return get_backends(("ralph.backends.lrs",), (BaseAsyncLRSBackend, BaseLRSBackend))
+    return get_backends(LRS_BACKENDS, (BaseAsyncLRSBackend, BaseLRSBackend))
