@@ -88,41 +88,40 @@ cli = [
 ]
 dev = [
     "anyio<4.2.1", # unpin until fastapi supports new major version of anyio
-    "black==23.12.1",
-    "cryptography==41.0.7",
+    "black==24.1.1",
+    "cryptography==42.0.2",
     "factory-boy==3.3.0",
     "hypothesis<6.92.0", # pin as hypothesis 6.92.0 observability feature seems broken
-    "logging-gelf==0.0.31",
+    "logging-gelf==0.0.32",
     "mike==2.0.0",
     "mkdocs==1.5.3",
     "mkdocs-click==0.8.1",
-    "mkdocs-material==9.5.3",
+    "mkdocs-material==9.5.7",
     "mkdocstrings[python-legacy]==0.24.0",
-    "moto==4.2.13",
+    "moto==5.0.1",
     "mypy==1.8.0",
-    "neoteroi-mkdocs==1.0.4",
-    "pyfakefs==5.3.2",
+    "neoteroi-mkdocs==1.0.5",
+    "pyfakefs==5.3.5",
     "pymdown-extensions==10.7",
-    "pytest==7.4.4",
-    "pytest-asyncio==0.23.3",
+    "pytest==8.0.0",
     "pytest-cov==4.1.0",
     "pytest-httpx<0.23.0", # pin as Python 3.8 is no longer supported from release 0.23.0
     "requests-mock==1.11.0",
     "responses==0.24.1",
-    "ruff==0.1.11",
+    "ruff==0.2.1",
     "types-python-dateutil ==2.8.19.20240106",
     "types-python-jose ==3.3.4.20240106",
-    "types-requests<2.31.0.20240107",
+    "types-requests<2.31.0.20240126",
     "types-cachetools ==5.3.0.7",
 ]
 lrs = [
     "bcrypt==4.1.2",
-    "fastapi==0.108.0",
+    "fastapi==0.109.2",
     "cachetools==5.3.2",
     "httpx<0.25.0", # pin as `pytest-httpx<0.23.0` requires `httpx==0.24.*`
-    "sentry_sdk==1.39.1",
+    "sentry_sdk==1.40.0",
     "python-jose==3.3.0",
-    "uvicorn[standard]==0.25.0",
+    "uvicorn[standard]==0.27.0.post1",
 ]
 full = [
     "ralph-malph[backends,cli,lrs]",
