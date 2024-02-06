@@ -12,13 +12,13 @@
         <meta name="author" content="Open FUN (France Universite Numerique)">
       
       
-        <link rel="canonical" href="https://openfun.github.io/ralph/latest/tutorials/library/">
+        <link rel="canonical" href="https://openfun.github.io/ralph/latest/tutorials/helm/">
       
       
-        <link rel="prev" href="../lrs/sentry/">
+        <link rel="prev" href="../library/">
       
       
-        <link rel="next" href="../helm/">
+        <link rel="next" href="../development_guide/">
       
       
       <link rel="icon" href="../../img/favicon.png">
@@ -26,7 +26,7 @@
     
     
       
-        <title>Ralph Library Guide - Ralph</title>
+        <title>Ralph Helm chart - Ralph</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#how_to_use_ralph_as_a_library" class="md-skip">
+        <a href="#ralph_helm_chart" class="md-skip">
           Skip to content
         </a>
       
@@ -131,7 +131,7 @@ for a seamless transition. 🚀
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Ralph Library Guide
+              Ralph Helm chart
             
           </span>
         </div>
@@ -915,6 +915,27 @@ for a seamless transition. 🚀
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../library/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Ralph Library Guide
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -931,7 +952,7 @@ for a seamless transition. 🚀
           
   
   <span class="md-ellipsis">
-    Ralph Library Guide
+    Ralph Helm chart
   </span>
   
 
@@ -942,7 +963,7 @@ for a seamless transition. 🚀
         
   
   <span class="md-ellipsis">
-    Ralph Library Guide
+    Ralph Helm chart
   </span>
   
 
@@ -964,20 +985,98 @@ for a seamless transition. 🚀
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#validate_method" class="md-nav__link">
+  <a href="#setting_environment_values" class="md-nav__link">
     <span class="md-ellipsis">
-      validate method
+      Setting environment values
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#convert_method" class="md-nav__link">
+  <a href="#creating_authentication_secret" class="md-nav__link">
     <span class="md-ellipsis">
-      convert method
+      Creating authentication secret
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reviewing_manifest" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reviewing manifest
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installing_the_chart" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installing the chart
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tutorial_deploying_ralph_lrs_on_a_local_cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tutorial: deploying Ralph LRS on a local cluster
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tutorial: deploying Ralph LRS on a local cluster">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      Requirements
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bootstrapping_a_local_cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      Bootstrapping a local cluster
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploying_the_data_lake_elasticsearch" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deploying the data lake: Elasticsearch
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploy_the_lrs_ralph" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deploy the LRS: Ralph
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#go_further" class="md-nav__link">
+    <span class="md-ellipsis">
+      Go further
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -985,27 +1084,6 @@ for a seamless transition. 🚀
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../helm/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Ralph Helm chart
-  </span>
-  
-
-      </a>
     </li>
   
 
@@ -1201,20 +1279,98 @@ for a seamless transition. 🚀
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#validate_method" class="md-nav__link">
+  <a href="#setting_environment_values" class="md-nav__link">
     <span class="md-ellipsis">
-      validate method
+      Setting environment values
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#convert_method" class="md-nav__link">
+  <a href="#creating_authentication_secret" class="md-nav__link">
     <span class="md-ellipsis">
-      convert method
+      Creating authentication secret
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reviewing_manifest" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reviewing manifest
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installing_the_chart" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installing the chart
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tutorial_deploying_ralph_lrs_on_a_local_cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tutorial: deploying Ralph LRS on a local cluster
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tutorial: deploying Ralph LRS on a local cluster">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      Requirements
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bootstrapping_a_local_cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      Bootstrapping a local cluster
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploying_the_data_lake_elasticsearch" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deploying the data lake: Elasticsearch
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploy_the_lrs_ralph" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deploy the LRS: Ralph
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#go_further" class="md-nav__link">
+    <span class="md-ellipsis">
+      Go further
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1237,12 +1393,173 @@ for a seamless transition. 🚀
   
 
 
-<h1 id="how_to_use_ralph_as_a_library">How to use Ralph as a library ?<a class="headerlink" href="#how_to_use_ralph_as_a_library" title="Permanent link">&para;</a></h1>
-<p>WIP.</p>
-<h2 id="validate_method"><code>validate</code> method<a class="headerlink" href="#validate_method" title="Permanent link">&para;</a></h2>
-<p>WIP.</p>
-<h2 id="convert_method"><code>convert</code> method<a class="headerlink" href="#convert_method" title="Permanent link">&para;</a></h2>
-<p>WIP.</p>
+<h1 id="ralph_helm_chart">Ralph Helm chart<a class="headerlink" href="#ralph_helm_chart" title="Permanent link">&para;</a></h1>
+<p>Ralph LRS is distributed as a <a href="https://helm.sh/">Helm</a> chart in the DockerHub OCI
+<a href="https://hub.docker.com/r/openfuncharts">openfuncharts</a>.</p>
+<h2 id="setting_environment_values">Setting environment values<a class="headerlink" href="#setting_environment_values" title="Permanent link">&para;</a></h2>
+<p>All default values are in the <code>values.yaml</code> file. With Helm, you can extend the values
+file: there is no need to copy/paste all the default values. You can create an
+environment values file, <em>e.g.</em> <code>custom-values.yaml</code> and only set needed customizations.</p>
+<p>All sensitive environment values, needed for Ralph to work, are expected to be in an
+external Secret Kubernetes object. An example manifest is provided in the
+<code>ralph-env-secret.yaml</code> file
+<a href="https://github.com/openfun/ralph/blob/main/src/helm/manifests/ralph-env-secret.yaml">here</a>
+that you can adapt to fit your needs.</p>
+<p>All other non-sensitive environment values, also needed for Ralph to work, are expected
+to be in an external ConfigMap Kubernetes object. An example manifest is provided in the
+<code>ralph-env-cm.yaml</code> file
+<a href="https://github.com/openfun/ralph/blob/main/src/helm/manifests/ralph-env-cm.yaml">here</a>
+that you can adapt to fit your needs.</p>
+<h2 id="creating_authentication_secret">Creating authentication secret<a class="headerlink" href="#creating_authentication_secret" title="Permanent link">&para;</a></h2>
+<p>Ralph stores users credentials in an external Secret Kubernetes object. An example
+authentication file <code>auth-demo.json</code> is provided
+<a href="https://github.com/openfun/ralph/blob/main/src/helm/manifests/auth-demo.json">here</a>,
+that you can take inspiration from. Refer to the LRS guide for <a href="https://openfun.github.io/ralph/latest/tutorials/lrs/authentication/basic/#creating_user_credentials">creating user
+credentials</a>.</p>
+<h2 id="reviewing_manifest">Reviewing manifest<a class="headerlink" href="#reviewing_manifest" title="Permanent link">&para;</a></h2>
+<p>To generate and review your Helm generated manifest, under <code>./src/helm</code> run the
+following command:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>helm<span class="w"> </span>template<span class="w"> </span>oci://registry-1.docker.io/openfuncharts/ralph
+</span></code></pre></div>
+<h2 id="installing_the_chart">Installing the chart<a class="headerlink" href="#installing_the_chart" title="Permanent link">&para;</a></h2>
+<p>Ralph Helm chart is distributed on DockerHub, and you can install it with:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>helm<span class="w"> </span>install<span class="w"> </span>RELEASE_NAME<span class="w"> </span>oci://registry-1.docker.io/openfuncharts/ralph
+</span></code></pre></div></p>
+<p>Tips:</p>
+<ul>
+<li>use <code>--values</code> to pass an env values file to extend and/or replace the default values</li>
+<li><code>--set var=value</code> to replace one var/value</li>
+<li><code>--dry-run</code> to verify your manifest before deploying</li>
+</ul>
+<h2 id="tutorial_deploying_ralph_lrs_on_a_local_cluster">Tutorial: deploying Ralph LRS on a local cluster<a class="headerlink" href="#tutorial_deploying_ralph_lrs_on_a_local_cluster" title="Permanent link">&para;</a></h2>
+<p>This tutorial aims at deploying Ralph LRS on a local Kubernetes cluster using Helm. In
+this tutorial, you will learn to:</p>
+<ul>
+<li>run and configure a small Kubernetes cluster on your machine,</li>
+<li>deploy a data lake that stores learning records: we choose Elasticsearch,</li>
+<li>deploy Ralph LRS (Learning Records Store) that receives and sends learning records in
+  xAPI,</li>
+</ul>
+<h3 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="https://curl.se/"><code>curl</code></a>, the CLI to make HTTP requests.</li>
+<li><a href="https://stedolan.github.io/jq/"><code>jq</code></a>, the JSON data Swiss-Knife.</li>
+<li><a href="https://kubernetes.io/docs/tasks/tools/#kubectl"><code>kubectl</code></a>, the Kubernetes CLI.</li>
+<li><a href="https://helm.sh/"><code>helm</code></a>, the package manager for Kubernetes.</li>
+<li><a href="https://minikube.sigs.k8s.io/docs/start/"><code>minikube</code></a>, a lightweight kubernetes
+  distribution to work locally on the project.</li>
+</ul>
+<h3 id="bootstrapping_a_local_cluster">Bootstrapping a local cluster<a class="headerlink" href="#bootstrapping_a_local_cluster" title="Permanent link">&para;</a></h3>
+<p>Let&rsquo;s begin by running a local cluster with Minikube, where we will deploy Ralph on.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Start a local kubernetes cluster</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>minikube<span class="w"> </span>start
+</span></code></pre></div>
+<p>We will now create our own Kubernetes namespace to work on:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># This is our namespace</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">K8S_NAMESPACE</span><span class="o">=</span><span class="s2">&quot;learning-analytics&quot;</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Check your namespace value</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="nb">echo</span><span class="w"> </span><span class="si">${</span><span class="nv">K8S_NAMESPACE</span><span class="si">}</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># Create the namespace</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>kubectl<span class="w"> </span>create<span class="w"> </span>namespace<span class="w"> </span><span class="si">${</span><span class="nv">K8S_NAMESPACE</span><span class="si">}</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="c1"># Activate the namespace</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>kubectl<span class="w"> </span>config<span class="w"> </span>set-context<span class="w"> </span>--current<span class="w"> </span>--namespace<span class="o">=</span><span class="si">${</span><span class="nv">K8S_NAMESPACE</span><span class="si">}</span>
+</span></code></pre></div>
+<h3 id="deploying_the_data_lake_elasticsearch">Deploying the data lake: Elasticsearch<a class="headerlink" href="#deploying_the_data_lake_elasticsearch" title="Permanent link">&para;</a></h3>
+<p>In its recent releases, Elastic recommends deploying its services using Custom Resource
+Definitions (CRDs) installed via its official Helm chart. We will first install the
+Elasticsearch (ECK) operator cluster-wide:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Add elastic official helm charts repository</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>helm<span class="w"> </span>repo<span class="w"> </span>add<span class="w"> </span>elastic<span class="w"> </span>https://helm.elastic.co
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Update available charts list</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>helm<span class="w"> </span>repo<span class="w"> </span>update
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># Install the ECK operator</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>helm<span class="w"> </span>install<span class="w"> </span>elastic-operator<span class="w"> </span>elastic/eck-operator<span class="w"> </span>-n<span class="w"> </span>elastic-system<span class="w"> </span>--create-namespace
+</span></code></pre></div>
+<p>Now that CRDs are already deployed cluster-wide, we can deploy an Elasticsearch cluster.
+To help you in this task, we provide an example manifest <code>data-lake.yml</code>, that deploy a
+two-nodes elasticsearch &ldquo;cluster&rdquo;. Adapt it to match your needs, then apply it with:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>data-lake.yml
+</span></code></pre></div>
+<p>Once applied, your elasticsearch pod should be running. You can check this using the
+following command:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-w
+</span></code></pre></div>
+<p>We expect to see two pods called <code>data-lake-es-default-0</code> and <code>data-lake-es-default-1</code>.</p>
+<p>When our Elasticsearch cluster is up (this can take few minutes), you may create the
+Elasticsearch index that will be used to store learning traces (xAPI statements):</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Store elastic user password</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">ELASTIC_PASSWORD</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>secret<span class="w"> </span>data-lake-es-elastic-user<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s2">&quot;{.data.elastic}&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="w"> </span>-d<span class="k">)</span><span class="s2">&quot;</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Execute an index creation request in the elasticsearch container</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>data-lake-es-default-0<span class="w"> </span>--container<span class="w"> </span>elasticsearch<span class="w"> </span>--<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span>curl<span class="w"> </span>-ks<span class="w"> </span>-X<span class="w"> </span>PUT<span class="w"> </span><span class="s2">&quot;https://elastic:</span><span class="si">${</span><span class="nv">ELASTIC_PASSWORD</span><span class="si">}</span><span class="s2">@localhost:9200/statements?pretty&quot;</span>
+</span></code></pre></div>
+<p>Our Elasticsearch cluster is all set. In the next section, we will now deploy Ralph, our
+LRS.</p>
+<h3 id="deploy_the_lrs_ralph">Deploy the LRS: Ralph<a class="headerlink" href="#deploy_the_lrs_ralph" title="Permanent link">&para;</a></h3>
+<p>First and foremost, we should create a Secret object containing the user credentials
+file. We provide an example authentication file
+<a href="https://github.com/openfun/ralph/blob/main/src/helm/manifests/auth-demo.json"><code>auth-demo.json</code></a>
+that you can take inspiration from. We can create a secret object directly from the file
+with the command:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>kubectl<span class="w"> </span>create<span class="w"> </span>secret<span class="w"> </span>generic<span class="w"> </span>ralph-auth-secret<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span>--from-file<span class="o">=</span>auth.json<span class="o">=</span>auth-demo.json
+</span></code></pre></div>
+<p>Secondly, we should create two objects containing environment values necessary for Ralph:</p>
+<ul>
+<li>a Secret containing sensitive environment variables such as passwords, tokens etc;</li>
+<li>a ConfigMap containing all other non-sensitive environment variables.</li>
+</ul>
+<p>We provide two example manifests
+(<a href="https://github.com/openfun/ralph/blob/main/src/helm/manifests/ralph-env-secret.yaml"><code>ralph-env-secret.yaml</code></a>
+and
+<a href="https://github.com/openfun/ralph/blob/main/src/helm/manifests/ralph-env-cm.yaml"><code>ralph-env-cm.yml</code></a>)
+that you can adapt to fit your needs. </p>
+<p>For this tutorial, we only need to replace the <code>&lt;PASSWORD&gt;</code> tag in the Secret manifest
+by the actual password of the <code>elastic</code> user with the command:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>sed<span class="w"> </span>-i<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;s|&lt;PASSWORD&gt;|</span><span class="nv">$ELASTIC_PASSWORD</span><span class="s2">|g&quot;</span><span class="w"> </span>ralph-env-secret.yaml
+</span></code></pre></div></p>
+<p>We can now apply both manifests, to create a ConfigMap and a Secret object in our local
+cluster:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Create Secret object</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>ralph-env-secret.yaml
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1"># Create ConfigMap object</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>ralph-env-cm.yaml
+</span></code></pre></div></p>
+<p>We can now deploy Ralph:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>helm<span class="w"> </span>install<span class="w"> </span>lrs<span class="w"> </span>oci://registry-1.docker.io/openfuncharts/ralph<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span>--values<span class="w"> </span>development.yaml
+</span></code></pre></div></p>
+<p>One can check if the server is running by opening a network tunnel to the service using
+the <code>port-forward</code> sub-command:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>kubectl<span class="w"> </span>port-forward<span class="w"> </span>svc/lrs-ralph<span class="w"> </span><span class="m">8080</span>:8080
+</span></code></pre></div>
+<p>And then send a request to the server using this tunnel:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>curl<span class="w"> </span>--user<span class="w"> </span>admin:password<span class="w"> </span>localhost:8080/whoami
+</span></code></pre></div>
+<p>We expect a valid JSON response stating about the user you are using for this request.</p>
+<p>If everything went well, we can send 22k xAPI statements to the LRS using:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>gunzip<span class="w"> </span>-c<span class="w"> </span>../../data/statements.jsonl.gz<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span>sed<span class="w"> </span><span class="s2">&quot;s/@timestamp/timestamp/g&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span>jq<span class="w"> </span>-s<span class="w"> </span>.<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">  </span>curl<span class="w"> </span>-Lk<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">    </span>--user<span class="w"> </span>admin:password<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">    </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="w">    </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="w">    </span>http://localhost:8080/xAPI/statements/<span class="w"> </span>-d<span class="w"> </span>@-
+</span></code></pre></div>
+<p>Congrats 🎉</p>
+<h3 id="go_further">Go further<a class="headerlink" href="#go_further" title="Permanent link">&para;</a></h3>
+<p>Now that the LRS is running, we can go further and deploy the dashboard suite Warren.
+Refer to the
+<a href="https://github.com/openfun/warren/tree/main/src/helm#deploy-the-dashboard-suite-warren">tutorial</a>
+of the Warren Helm chart.</p>
 
 
 

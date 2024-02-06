@@ -56,6 +56,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://openfun.github.io/ralph/latest/tutorials/helm/</loc>
+         <lastmod>2024-02-06</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://openfun.github.io/ralph/latest/tutorials/library/</loc>
          <lastmod>2024-02-06</lastmod>
          <changefreq>daily</changefreq>
