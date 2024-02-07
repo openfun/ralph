@@ -9,6 +9,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.3.0] - 2024-02-07
+
 ### Added
 
 - A NOTE.txt file with instructions for chart users
@@ -52,5 +54,6 @@ and this project adheres to
 - Add an official Helm Chart (experimental)
 
 [unreleased]: https://github.com/openfun/ralph/tree/main/src/helm
+[0.3.0]: https://github.com/openfun/ralph/releases/tag/helm-v0.3.0
 [0.2.0]: https://github.com/openfun/ralph/releases/tag/helm-v0.2.0
 [0.1.0]: https://github.com/openfun/ralph/releases/tag/helm-v0.1.0
