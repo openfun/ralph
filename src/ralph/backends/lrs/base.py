@@ -38,6 +38,35 @@ class StatementQueryResult:
     search_after: Optional[str]
 
 
+class IsoDatetimeStr(str):
+    """ISO 8601 date time string field type."""
+
+    @classmethod
+    def __get_validators__(cls):
+        """Return expected validators for the custom field."""
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        """Value is expected to be an ISO 8601 date time string.
+
+        Note that we also accept datetime python instance that will be converted
+        to an ISO 8601 date time string.
+        """
+        if not isinstance(v, (str, datetime)):
+            raise TypeError("a string or datetime is required")
+
+        if isinstance(v, datetime):
+            return cls(v.isoformat())
+
+        # Validate iso-string
+        try:
+            datetime.fromisoformat(v)
+        except ValueError as err:
+            raise ValueError("invalid ISO 8601 date time string") from err
+        return cls(v)
+
+
 class LRSStatementsQuery(BaseQuery):
     """Pydantic model for LRS query on Statements resource query parameters.
 
@@ -53,8 +82,8 @@ class LRSStatementsQuery(BaseQuery):
     registration: Optional[UUID]
     related_activities: Optional[bool] = False
     related_agents: Optional[bool] = False
-    since: Optional[datetime]
-    until: Optional[datetime]
+    since: Optional[IsoDatetimeStr]
+    until: Optional[IsoDatetimeStr]
     limit: Optional[NonNegativeInt] = 0
     format: Optional[Literal["ids", "exact", "canonical"]] = "exact"
     attachments: Optional[bool] = False
