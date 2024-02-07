@@ -1,7 +1,6 @@
 """Configurations for Ralph."""
 
 import io
-import sys
 from enum import Enum
 from pathlib import Path
 from typing import List, Sequence, Tuple, Union
@@ -9,13 +8,7 @@ from typing import List, Sequence, Tuple, Union
 from pydantic import AnyHttpUrl, AnyUrl, BaseModel, BaseSettings, Extra, root_validator
 
 from ralph.exceptions import ConfigurationException
-
-from .utils import import_string
-
-if sys.version_info >= (3, 8):
-    from typing import Literal
-else:
-    from typing_extensions import Literal
+from ralph.utils import import_string
 
 try:
     from click import get_app_dir
@@ -222,9 +215,7 @@ class Settings(BaseSettings):
     RUNSERVER_AUTH_BACKENDS: AuthBackends = AuthBackends([AuthBackend.BASIC])
     RUNSERVER_AUTH_OIDC_AUDIENCE: str = None
     RUNSERVER_AUTH_OIDC_ISSUER_URI: AnyHttpUrl = None
-    RUNSERVER_BACKEND: Literal[
-        "async_es", "async_mongo", "clickhouse", "es", "fs", "mongo"
-    ] = "es"
+    RUNSERVER_BACKEND: str = "es"
     RUNSERVER_HOST: str = "0.0.0.0"  # noqa: S104
     RUNSERVER_MAX_SEARCH_HITS_COUNT: int = 100
     RUNSERVER_POINT_IN_TIME_KEEP_ALIVE: str = "1m"

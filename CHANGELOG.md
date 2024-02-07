@@ -8,10 +8,18 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Backends: Add `ralph.backends.data` and `ralph.backends.lrs` entry points
+  to discover backends from plugins.
+
 ### Changed
 
 - Backends: the first argument of the `get_backends` method now requires a list
-  of dotted backend paths instead of a tuple of packages containing backends.
+  of `EntryPoints`, each pointing to a backend class, instead of a tuple of
+  packages containing backends.
+- API: The `RUNSERVER_BACKEND` configuration value is no longer validated to
+  point to an existing backend.
 
 ## [4.1.0] - 2024-02-12
 
