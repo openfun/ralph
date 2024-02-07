@@ -1,6 +1,7 @@
 """Tests for Ralph LRS data backend."""
 
 import asyncio
+import datetime
 import json
 import logging
 import re
@@ -365,6 +366,47 @@ async def test_backends_data_async_lrs_read_with_pagination_with_query(
     result = [x async for x in reader]
     assert result == [
         f"{json.dumps(statement)}\n".encode("utf-8") for statement in all_statements
+    ]
+    await backend.close()
+
+
+@pytest.mark.anyio
+async def test_backends_data_async_lrs_read_with_query_dates(
+    httpx_mock: HTTPXMock, lrs_backend
+):
+    """Test the LRS backend `read` method with a query containing dates."""
+    backend: AsyncLRSDataBackend = lrs_backend()
+    verb_id = "https://w3id.org/xapi/video/verbs/played"
+    since = datetime.datetime(2020, 1, 1, 0, 0)
+    until = datetime.datetime(2020, 2, 1, 0, 0)
+    query = LRSStatementsQuery(
+        verb=verb_id,
+        since=since,
+        until=until,
+    )
+    statements = [mock_statement(verb={"id": verb_id})]
+    response = {"statements": statements}
+
+    # Mock GET response of HTTPX with query parameter
+    url = (
+        f"http://fake-lrs.com/xAPI/statements/?"
+        "limit=500&"
+        f"verb={verb_id}&"
+        f"since={since.isoformat()}&"
+        f"until={until.isoformat()}"
+    )
+    httpx_mock.add_response(url=url, method="GET", json=response)
+
+    # Return an iterable of dict
+    reader = backend.read(query=query, raw_output=False)
+    result = [x async for x in reader]
+    assert result == statements
+
+    # Return an iterable of bytes
+    reader = backend.read(query=query, raw_output=True)
+    result = [x async for x in reader]
+    assert result == [
+        f"{json.dumps(statement)}\n".encode("utf-8") for statement in statements
     ]
     await backend.close()
 

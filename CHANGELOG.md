@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Backends: switch LRSStatementsQuery since/until field types to iso 8601 string
+
 ## [4.0.0] - 2024-01-23
 
 ### Added
