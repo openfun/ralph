@@ -420,7 +420,7 @@ jobs:
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
-    working_directory: ~/fun/src/helm
+    working_directory: ~/fun
     steps:
       # Checkout repository sources
       - checkout
@@ -438,21 +438,23 @@ jobs:
       - run:
           name: Get Helm chart target version from git tag
           command: |
-            echo "export HELM_TAG=$(echo ${CIRCLE_TAG} | sed 's/^v\(.*\)-helm.*/\1/'" >> "$BASH_ENV"
+            echo "export HELM_TAG=$(echo ${CIRCLE_TAG} | sed 's/^v\(.*\)-helm.*/\1/')" >> "$BASH_ENV"
             # Display:
             # - HELM_TAG: 1.1.2 (Git tag v1.1.2-helm)
             echo "HELM_TAG: ${HELM_TAG} (Git ${CIRCLE_TAG})"
       - run:
           name: Package Ralph Helm chart
-          command: | 
+          working_directory: src/helm
+          command: |
             helm dependency build ralph/
             helm package ralph
             # Check that chart version matches the tag
             ls | grep ralph-${HELM_TAG}.tgz
       - run:
           name: Upload built package to DockerHub
+          working_directory: src/helm
           command: |
-            helm push ralph-${HELM_TAG}.tgz oci://registry-1.docker.io/openfuncharts/ralph
+            helm push ralph-${HELM_TAG}.tgz oci://registry-1.docker.io/openfuncharts
 
   # ---- Packaging jobs ----
   package:
@@ -817,6 +819,8 @@ workflows:
 
       # Publish Ralph helm chart to DockerHub
       - publish-helm:
+          requires:
+            - test-helm
           filters:
             branches:
               ignore: /.*/
