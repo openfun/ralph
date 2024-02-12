@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [4.1.0] - 2024-02-12
+
 ### Added
 
 - Add LRS multitenancy support for user-specific target storage
@@ -439,7 +441,8 @@ as per the xAPI specification
 - Add optional sentry integration
 - Distribute Arnold's tray to deploy Ralph in a k8s cluster as cronjobs
 
-[unreleased]: https://github.com/openfun/ralph/compare/v4.0.0...main
+[unreleased]: https://github.com/openfun/ralph/compare/v4.1.0...main
+[4.1.0]: https://github.com/openfun/ralph/compare/v4.0.0...v4.1.0
 [4.0.0]: https://github.com/openfun/ralph/compare/v3.9.0...v4.0.0
 [3.9.0]: https://github.com/openfun/ralph/compare/v3.8.0...v3.9.0
 [3.8.0]: https://github.com/openfun/ralph/compare/v3.7.0...v3.8.0

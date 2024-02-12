@@ -4,7 +4,7 @@ All instructions to upgrade this project from one release to the next will be do
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-### 3.x.x to 4.0.0
+### 3.x to 4.y
 
 #### Upgrade user credentials
 To conform to xAPI specifications, we need to represent users as xAPI Agents. You must therefore delete and re-create the credentials file using the updated cli, OR you can modify it directly to add the `agents` field. The credentials file is located in `{ RALPH_APP_DIR }/{ RALPH_AUTH_FILE }` (defaults to `.ralph/auth.json`). Each user profile must follow the following pattern (see [this post](https://xapi.com/blog/deep-dive-actor-agent/) for examples of valid agent objects) :
