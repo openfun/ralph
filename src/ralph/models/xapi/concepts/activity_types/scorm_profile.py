@@ -21,9 +21,9 @@ class CMIInteractionActivityDefinition(BaseXapiActivityDefinition):
             `http://adlnet.gov/expapi/activities/cmi.interaction`.
     """
 
-    type: Literal[
+    type: Literal["http://adlnet.gov/expapi/activities/cmi.interaction"] = (
         "http://adlnet.gov/expapi/activities/cmi.interaction"
-    ] = "http://adlnet.gov/expapi/activities/cmi.interaction"
+    )
 
 
 class CMIInteractionActivity(BaseXapiActivity):
@@ -47,9 +47,9 @@ class ProfileActivityDefinition(BaseXapiActivityDefinition):
             `http://adlnet.gov/expapi/activities/profile`.
     """
 
-    type: Literal[
+    type: Literal["http://adlnet.gov/expapi/activities/profile"] = (
         "http://adlnet.gov/expapi/activities/profile"
-    ] = "http://adlnet.gov/expapi/activities/profile"
+    )
 
 
 class ProfileActivity(BaseXapiActivity):
@@ -73,9 +73,9 @@ class CourseActivityDefinition(BaseXapiActivityDefinition):
             `http://adlnet.gov/expapi/activities/course`.
     """
 
-    type: Literal[
+    type: Literal["http://adlnet.gov/expapi/activities/course"] = (
         "http://adlnet.gov/expapi/activities/course"
-    ] = "http://adlnet.gov/expapi/activities/course"
+    )
 
 
 class CourseActivity(BaseXapiActivity):
@@ -99,9 +99,9 @@ class ModuleActivityDefinition(BaseXapiActivityDefinition):
             `http://adlnet.gov/expapi/activities/module`.
     """
 
-    type: Literal[
+    type: Literal["http://adlnet.gov/expapi/activities/module"] = (
         "http://adlnet.gov/expapi/activities/module"
-    ] = "http://adlnet.gov/expapi/activities/module"
+    )
 
 
 class ModuleActivity(BaseXapiActivity):

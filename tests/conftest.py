@@ -1,6 +1,5 @@
 """Module py.test fixtures."""
 
-
 from .fixtures import (
     hypothesis_configuration,  # noqa: F401
     hypothesis_strategies,  # noqa: F401

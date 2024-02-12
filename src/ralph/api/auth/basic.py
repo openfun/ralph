@@ -103,11 +103,13 @@ def get_stored_credentials(auth_file: Path) -> ServerUsersCredentials:
     TTLCache(maxsize=settings.AUTH_CACHE_MAX_SIZE, ttl=settings.AUTH_CACHE_TTL),
     lock=Lock(),
     key=lambda credentials: (
-        credentials.username,
-        credentials.password,
-    )
-    if credentials is not None
-    else None,
+        (
+            credentials.username,
+            credentials.password,
+        )
+        if credentials is not None
+        else None
+    ),
 )
 def get_basic_auth_user(
     credentials: Optional[HTTPBasicCredentials] = Depends(security),

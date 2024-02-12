@@ -3,6 +3,7 @@
 Allows to be exactly as lax as we want when it comes to exact object shape and
 validation.
 """
+
 from typing import Optional, Union
 from uuid import UUID
 

@@ -66,9 +66,9 @@ class MongoDataBackendSettings(BaseDataBackendSettings):
 
     CONNECTION_URI: MongoDsn = MongoDsn("mongodb://localhost:27017/", scheme="mongodb")
     DEFAULT_DATABASE: constr(regex=r"^[^\s.$/\\\"\x00]+$") = "statements"
-    DEFAULT_COLLECTION: constr(
-        regex=r"^(?!.*\.\.)[^.$\x00]+(?:\.[^.$\x00]+)*$"
-    ) = "marsha"
+    DEFAULT_COLLECTION: constr(regex=r"^(?!.*\.\.)[^.$\x00]+(?:\.[^.$\x00]+)*$") = (
+        "marsha"
+    )
     CLIENT_OPTIONS: MongoClientOptions = MongoClientOptions()
 
 

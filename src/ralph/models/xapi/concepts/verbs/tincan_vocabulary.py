@@ -20,9 +20,9 @@ class ViewedVerb(BaseXapiVerb):
         display (dict): Consists of the dictionary `{"en-US": "viewed"}`.
     """
 
-    id: Literal[
+    id: Literal["http://id.tincanapi.com/verb/viewed"] = (
         "http://id.tincanapi.com/verb/viewed"
-    ] = "http://id.tincanapi.com/verb/viewed"
+    )
     display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["viewed"]]]
 
 
@@ -34,9 +34,9 @@ class DownloadedVerb(BaseXapiVerb):
         display (dict): Consists of the dictionary `{"en-US": "downloaded"}`.
     """
 
-    id: Literal[
+    id: Literal["http://id.tincanapi.com/verb/downloaded"] = (
         "http://id.tincanapi.com/verb/downloaded"
-    ] = "http://id.tincanapi.com/verb/downloaded"
+    )
     display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["downloaded"]]]
 
 
@@ -48,7 +48,7 @@ class UnregisteredVerb(BaseXapiVerb):
         display (dict): Consists of the dictionary `{"en-US": "unregistered"}`.
     """
 
-    id: Literal[
+    id: Literal["http://id.tincanapi.com/verb/unregistered"] = (
         "http://id.tincanapi.com/verb/unregistered"
-    ] = "http://id.tincanapi.com/verb/unregistered"
+    )
     display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["unregistered"]]]

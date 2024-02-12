@@ -1,4 +1,5 @@
 """Main module for Ralph's LRS API."""
+
 from functools import lru_cache
 from typing import Any, Dict, List, Union
 from urllib.parse import urlparse
