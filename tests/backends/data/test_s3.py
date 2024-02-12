@@ -9,7 +9,7 @@ from collections import namedtuple
 import boto3
 import pytest
 from botocore.exceptions import ClientError, ResponseStreamingError
-from moto import mock_s3
+from moto import mock_aws
 
 from ralph.backends.data.base import BaseOperationType, DataBackendStatus
 from ralph.backends.data.s3 import S3DataBackend, S3DataBackendSettings
@@ -74,7 +74,7 @@ def test_backends_data_s3_instantiation_with_settings():
         pytest.fail(f"S3DataBackend should not raise exceptions: {err}")
 
 
-@mock_s3
+@mock_aws
 def test_backends_data_s3_status(s3_backend):
     """Test the `S3DataBackend.status` method."""
 
@@ -93,7 +93,7 @@ def test_backends_data_s3_status(s3_backend):
     backend.close()
 
 
-@mock_s3
+@mock_aws
 def test_backends_data_s3_list_should_yield_archive_names(
     s3_backend,
 ):
@@ -152,7 +152,7 @@ def test_backends_data_s3_list_should_yield_archive_names(
     backend.close()
 
 
-@mock_s3
+@mock_aws
 def test_backends_data_s3_list_on_empty_bucket_should_do_nothing(
     s3_backend,
 ):
@@ -179,7 +179,7 @@ def test_backends_data_s3_list_on_empty_bucket_should_do_nothing(
     backend.close()
 
 
-@mock_s3
+@mock_aws
 def test_backends_data_s3_list_with_failed_connection_should_log_the_error(
     s3_backend, caplog
 ):
@@ -225,7 +225,7 @@ def test_backends_data_s3_list_with_failed_connection_should_log_the_error(
     backend.close()
 
 
-@mock_s3
+@mock_aws
 def test_backends_data_s3_read_with_valid_name_should_write_to_history(
     s3_backend,
     monkeypatch,
@@ -290,7 +290,7 @@ def test_backends_data_s3_read_with_valid_name_should_write_to_history(
     backend.close()
 
 
-@mock_s3
+@mock_aws
 def test_backends_data_s3_read_with_invalid_output_should_log_the_error(
     s3_backend, caplog
 ):
@@ -328,7 +328,7 @@ def test_backends_data_s3_read_with_invalid_output_should_log_the_error(
     backend.close()
 
 
-@mock_s3
+@mock_aws
 def test_backends_data_s3_read_with_invalid_name_should_log_the_error(
     s3_backend, caplog
 ):
@@ -379,7 +379,7 @@ def test_backends_data_s3_read_with_invalid_name_should_log_the_error(
     backend.close()
 
 
-@mock_s3
+@mock_aws
 def test_backends_data_s3_read_with_wrong_name_should_log_the_error(s3_backend, caplog):
     """Test that given `S3DataBackend.read` method fails to retrieve from the S3
     data the object with the provided name (the object does not exists on S3),
@@ -416,7 +416,7 @@ def test_backends_data_s3_read_with_wrong_name_should_log_the_error(s3_backend, 
     backend.close()
 
 
-@mock_s3
+@mock_aws
 def test_backends_data_s3_read_with_iter_error_should_log_the_error(
     s3_backend, caplog, monkeypatch
 ):
@@ -468,7 +468,7 @@ def test_backends_data_s3_read_with_iter_error_should_log_the_error(
     "operation_type",
     [None, BaseOperationType.CREATE, BaseOperationType.INDEX],
 )
-@mock_s3
+@mock_aws
 def test_backends_data_s3_write_with_parameter_error(
     operation_type, s3_backend, caplog
 ):
@@ -535,7 +535,7 @@ def test_backends_data_s3_write_with_append_or_delete_operation(
     "operation_type",
     [BaseOperationType.CREATE, BaseOperationType.INDEX],
 )
-@mock_s3
+@mock_aws
 def test_backends_data_s3_write_with_create_index_operation(
     operation_type, s3_backend, monkeypatch, caplog
 ):
@@ -637,7 +637,7 @@ def test_backends_data_s3_write_with_create_index_operation(
     backend.close()
 
 
-@mock_s3
+@mock_aws
 def test_backends_data_s3_write_with_no_data_should_skip(
     s3_backend,
 ):
@@ -662,7 +662,7 @@ def test_backends_data_s3_write_with_no_data_should_skip(
     backend.close()
 
 
-@mock_s3
+@mock_aws
 def test_backends_data_s3_write_with_failure_should_log_the_error(
     s3_backend,
 ):
@@ -709,7 +709,7 @@ def test_backends_data_s3_close_with_failure(s3_backend, monkeypatch):
         backend.close()
 
 
-@mock_s3
+@mock_aws
 def test_backends_data_s3_close(s3_backend, caplog):
     """Test the `S3DataBackend.close` method."""
 
