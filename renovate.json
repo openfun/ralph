@@ -9,6 +9,7 @@
         "backend-clickhouse/clickhouse-connect",
         "backend-lrs/httpx",
         "dev/hypothesis",
+        "dev/pytest",
         "dev/pytest-httpx",
         "dev/responses",
         "lrs/httpx",
