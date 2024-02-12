@@ -1,0 +1,2523 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A learning events processor to feed your LRS">
+      
+      
+        <meta name="author" content="Open FUN (France Universite Numerique)">
+      
+      
+        <link rel="canonical" href="https://openfun.github.io/ralph/latest/features/backends/">
+      
+      
+        <link rel="prev" href="../api/">
+      
+      
+        <link rel="next" href="../models/">
+      
+      
+      <link rel="icon" href="../../img/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.3">
+    
+    
+      
+        <title>Backends for data storage - Ralph</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.50c56a3b.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../css/mkdocsoad.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="pink" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#backends_for_data_storage" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+        <aside class="md-banner">
+          <div class="md-banner__inner md-grid md-typeset">
+            
+            
+  <!-- the following line is displayed in the announcement bar -->
+<!-- keep length under 164 characters (less HTML tags) to fit on 1280px desktop window -->
+🌟 Big News! Ralph v4 is here. Don't forget to check out our 
+<a href=https://github.com/openfun/ralph/blob/main/UPGRADE.md>migration guide</a> 
+for a seamless transition. 🚀
+
+          </div>
+          
+        </aside>
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Ralph" class="md-header__button md-logo" aria-label="Ralph" data-md-component="logo">
+      
+  <img src="../../img/ralph-white.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Ralph
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Backends for data storage
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/openfun/ralph/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    openfun/ralph
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+    
+  
+  Ralph
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../api/" class="md-tabs__link">
+          
+  
+    
+  
+  Features
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../tutorials/cli/" class="md-tabs__link">
+          
+  
+    
+  
+  Tutorials
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../contribute/" class="md-tabs__link">
+        
+  
+    
+  
+  Contributing
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../UPGRADE/" class="md-tabs__link">
+        
+  
+    
+  
+  Migration
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../CHANGELOG/" class="md-tabs__link">
+          
+  
+    
+  
+  About the project
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Ralph" class="md-nav__button md-logo" aria-label="Ralph" data-md-component="logo">
+      
+  <img src="../../img/ralph-white.png" alt="logo">
+
+    </a>
+    Ralph
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/openfun/ralph/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    openfun/ralph
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Ralph
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+      
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Features
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Features
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    LRS HTTP server
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Backends for data storage
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Backends for data storage
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#key_concepts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key concepts
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#elasticsearch" class="md-nav__link">
+    <span class="md-ellipsis">
+      Elasticsearch
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Elasticsearch">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.backends.data.es.ESDataBackendSettings" class="md-nav__link">
+    <span class="md-ellipsis">
+      ralph.backends.data.es.ESDataBackendSettings
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mongodb" class="md-nav__link">
+    <span class="md-ellipsis">
+      MongoDB
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MongoDB">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.backends.data.mongo.MongoDataBackendSettings" class="md-nav__link">
+    <span class="md-ellipsis">
+      ralph.backends.data.mongo.MongoDataBackendSettings
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#clickhouse" class="md-nav__link">
+    <span class="md-ellipsis">
+      ClickHouse
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ClickHouse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.backends.data.clickhouse.ClickHouseDataBackendSettings" class="md-nav__link">
+    <span class="md-ellipsis">
+      ralph.backends.data.clickhouse.ClickHouseDataBackendSettings
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ovh_-_log_data_platform_ldp" class="md-nav__link">
+    <span class="md-ellipsis">
+      OVH - Log Data Platform (LDP)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OVH - Log Data Platform (LDP)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.backends.data.ldp.LDPDataBackendSettings" class="md-nav__link">
+    <span class="md-ellipsis">
+      ralph.backends.data.ldp.LDPDataBackendSettings
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openstack_swift" class="md-nav__link">
+    <span class="md-ellipsis">
+      OpenStack Swift
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OpenStack Swift">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.backends.data.swift.SwiftDataBackendSettings" class="md-nav__link">
+    <span class="md-ellipsis">
+      ralph.backends.data.swift.SwiftDataBackendSettings
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#amazon_s3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Amazon S3
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Amazon S3">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.backends.data.s3.S3DataBackendSettings" class="md-nav__link">
+    <span class="md-ellipsis">
+      ralph.backends.data.s3.S3DataBackendSettings
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file_system" class="md-nav__link">
+    <span class="md-ellipsis">
+      File system
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="File system">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.backends.data.fs.FSDataBackendSettings" class="md-nav__link">
+    <span class="md-ellipsis">
+      ralph.backends.data.fs.FSDataBackendSettings
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#learning_record_store_lrs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Learning Record Store (LRS)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Learning Record Store (LRS)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.backends.data.lrs.LRSDataBackendSettings" class="md-nav__link">
+    <span class="md-ellipsis">
+      ralph.backends.data.lrs.LRSDataBackendSettings
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#websocket" class="md-nav__link">
+    <span class="md-ellipsis">
+      WebSocket
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="WebSocket">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.backends.data.async_ws.WSDataBackendSettings" class="md-nav__link">
+    <span class="md-ellipsis">
+      ralph.backends.data.async_ws.WSDataBackendSettings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ralph.backends.data.async_ws.WSClientOptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      ralph.backends.data.async_ws.WSClientOptions
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Learning statements models
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+      
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Tutorials
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Tutorials
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/cli/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Ralph CLI Guide
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../tutorials/lrs/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Ralph LRS Guide
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            Ralph LRS Guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/lrs/first-steps/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    First steps
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2_3" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../tutorials/lrs/authentication/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Authentication
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3_2_3" id="__nav_3_2_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Authentication
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/lrs/authentication/basic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    HTTP Basic Authentication
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/lrs/authentication/oidc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    OpenID Connect authentication
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/lrs/backends/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Backends
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/lrs/multitenancy/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Multitenancy
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2_6" id="__nav_3_2_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Additional configurations
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_2_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2_6">
+            <span class="md-nav__icon md-icon"></span>
+            Additional configurations
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/lrs/forwarding/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Forwarding to another LRS
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/lrs/sentry/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sentry
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/library/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Ralph Library Guide
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/helm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Ralph Helm chart
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/development_guide/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Development Guide
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contribute/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Contributing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../UPGRADE/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migration
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+      
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    About the project
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            About the project
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CHANGELOG/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Changelog
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../LICENSE/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    License
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#key_concepts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key concepts
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#elasticsearch" class="md-nav__link">
+    <span class="md-ellipsis">
+      Elasticsearch
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Elasticsearch">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.backends.data.es.ESDataBackendSettings" class="md-nav__link">
+    <span class="md-ellipsis">
+      ralph.backends.data.es.ESDataBackendSettings
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mongodb" class="md-nav__link">
+    <span class="md-ellipsis">
+      MongoDB
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MongoDB">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.backends.data.mongo.MongoDataBackendSettings" class="md-nav__link">
+    <span class="md-ellipsis">
+      ralph.backends.data.mongo.MongoDataBackendSettings
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#clickhouse" class="md-nav__link">
+    <span class="md-ellipsis">
+      ClickHouse
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ClickHouse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.backends.data.clickhouse.ClickHouseDataBackendSettings" class="md-nav__link">
+    <span class="md-ellipsis">
+      ralph.backends.data.clickhouse.ClickHouseDataBackendSettings
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ovh_-_log_data_platform_ldp" class="md-nav__link">
+    <span class="md-ellipsis">
+      OVH - Log Data Platform (LDP)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OVH - Log Data Platform (LDP)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.backends.data.ldp.LDPDataBackendSettings" class="md-nav__link">
+    <span class="md-ellipsis">
+      ralph.backends.data.ldp.LDPDataBackendSettings
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openstack_swift" class="md-nav__link">
+    <span class="md-ellipsis">
+      OpenStack Swift
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OpenStack Swift">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.backends.data.swift.SwiftDataBackendSettings" class="md-nav__link">
+    <span class="md-ellipsis">
+      ralph.backends.data.swift.SwiftDataBackendSettings
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#amazon_s3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Amazon S3
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Amazon S3">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.backends.data.s3.S3DataBackendSettings" class="md-nav__link">
+    <span class="md-ellipsis">
+      ralph.backends.data.s3.S3DataBackendSettings
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file_system" class="md-nav__link">
+    <span class="md-ellipsis">
+      File system
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="File system">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.backends.data.fs.FSDataBackendSettings" class="md-nav__link">
+    <span class="md-ellipsis">
+      ralph.backends.data.fs.FSDataBackendSettings
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#learning_record_store_lrs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Learning Record Store (LRS)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Learning Record Store (LRS)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.backends.data.lrs.LRSDataBackendSettings" class="md-nav__link">
+    <span class="md-ellipsis">
+      ralph.backends.data.lrs.LRSDataBackendSettings
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#websocket" class="md-nav__link">
+    <span class="md-ellipsis">
+      WebSocket
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="WebSocket">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph.backends.data.async_ws.WSDataBackendSettings" class="md-nav__link">
+    <span class="md-ellipsis">
+      ralph.backends.data.async_ws.WSDataBackendSettings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ralph.backends.data.async_ws.WSClientOptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      ralph.backends.data.async_ws.WSClientOptions
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+  
+                  
+
+  
+  
+
+
+<h1 id="backends_for_data_storage">Backends for data storage<a class="headerlink" href="#backends_for_data_storage" title="Permanent link">&para;</a></h1>
+<p>Ralph supports various backends that can be accessed to read from or write to (learning events or random data).
+Implemented backends are listed below along with their configuration parameters. 
+If your favourite data storage method is missing, feel free to submit your implementation or get in touch!</p>
+<h2 id="key_concepts">Key concepts<a class="headerlink" href="#key_concepts" title="Permanent link">&para;</a></h2>
+<p>Each backend has its own parameter requirements. These
+parameters can be set as command line options or environment variables; the
+later is the <strong>recommended solution</strong> for sensitive data such as service
+credentials. For example, the <code>os_username</code> (OpenStack user name) parameter
+of the OpenStack Swift backend, can be set as a command line option using
+<code>swift</code> as the option prefix (and replacing underscores in its name by dashes):</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>ralph<span class="w"> </span>list<span class="w"> </span>--backend<span class="w"> </span>swift<span class="w"> </span>--swift-os-username<span class="w"> </span>johndoe<span class="w"> </span><span class="c1"># [...] more options</span>
+</span></code></pre></div>
+<p>Alternatively, this parameter can be set as an environment variable (in upper
+case, prefixed by the program name, <em>e.g.</em> <code>RALPH_</code>):</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">RALPH_BACKENDS__DATA__SWIFT__OS_USERNAME</span><span class="o">=</span><span class="s2">&quot;johndoe&quot;</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>ralph<span class="w"> </span>list<span class="w"> </span>--backend<span class="w"> </span>swift<span class="w"> </span><span class="c1"># [...] more options</span>
+</span></code></pre></div>
+<p>The general patterns for backend parameters are:</p>
+<ul>
+<li><code>--{{ backend_name }}-{{ parameter | underscore_to_dash }}</code> for command options, and,</li>
+<li><code>RALPH_BACKENDS__DATA__{{ backend_name | uppercase }}__{{ parameter | uppercase }}</code> for environment variables.</li>
+</ul>
+<h2 id="elasticsearch">Elasticsearch<a class="headerlink" href="#elasticsearch" title="Permanent link">&para;</a></h2>
+<p>Elasticsearch backend is mostly used for indexation purpose (as a datalake) but
+it can also be used to fetch indexed data from it.</p>
+
+
+  <div class="doc doc-object doc-class">
+
+<a id="ralph.backends.data.es.ESDataBackendSettings"></a>
+    <div class="doc doc-contents first">
+
+      <p>Elasticsearch data backend default configuration.</p>
+
+<p><strong>Attributes:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>ALLOW_YELLOW_STATUS</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to consider Elasticsearch yellow health
+status to be ok.</p></td>
+      </tr>
+      <tr>
+        <td><code>CLIENT_OPTIONS</code></td>
+        <td><code>dict</code></td>
+        <td><p>A dictionary of valid options for the Elasticsearch class
+initialization.</p></td>
+      </tr>
+      <tr>
+        <td><code>DEFAULT_INDEX</code></td>
+        <td><code>str</code></td>
+        <td><p>The default index to use for querying Elasticsearch.</p></td>
+      </tr>
+      <tr>
+        <td><code>HOSTS</code></td>
+        <td><code>str or tuple</code></td>
+        <td><p>The comma-separated list of Elasticsearch nodes to
+connect to.</p></td>
+      </tr>
+      <tr>
+        <td><code>LOCALE_ENCODING</code></td>
+        <td><code>str</code></td>
+        <td><p>The encoding used for reading/writing documents.</p></td>
+      </tr>
+      <tr>
+        <td><code>POINT_IN_TIME_KEEP_ALIVE</code></td>
+        <td><code>str</code></td>
+        <td><p>The duration for which Elasticsearch should
+keep a point in time alive.</p></td>
+      </tr>
+      <tr>
+        <td><code>READ_CHUNK_SIZE</code></td>
+        <td><code>int</code></td>
+        <td><p>The default chunk size for reading batches of documents.</p></td>
+      </tr>
+      <tr>
+        <td><code>REFRESH_AFTER_WRITE</code></td>
+        <td><code>str or bool</code></td>
+        <td><p>Whether the Elasticsearch index should be
+refreshed after the write operation.</p></td>
+      </tr>
+      <tr>
+        <td><code>WRITE_CHUNK_SIZE</code></td>
+        <td><code>int</code></td>
+        <td><p>The default chunk size for writing batches of documents.</p></td>
+      </tr>
+  </tbody>
+</table>
+
+
+    </div>
+
+  </div>
+
+<h2 id="mongodb">MongoDB<a class="headerlink" href="#mongodb" title="Permanent link">&para;</a></h2>
+<p>MongoDB backend is mostly used for indexation purpose (as a datalake) but
+it can also be used to fetch collections of documents from it.</p>
+
+
+  <div class="doc doc-object doc-class">
+
+<a id="ralph.backends.data.mongo.MongoDataBackendSettings"></a>
+    <div class="doc doc-contents first">
+
+      <p>MongoDB data backend default configuration.</p>
+
+<p><strong>Attributes:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>CONNECTION_URI</code></td>
+        <td><code>str</code></td>
+        <td><p>The MongoDB connection URI.</p></td>
+      </tr>
+      <tr>
+        <td><code>DEFAULT_DATABASE</code></td>
+        <td><code>str</code></td>
+        <td><p>The MongoDB database to connect to.</p></td>
+      </tr>
+      <tr>
+        <td><code>DEFAULT_COLLECTION</code></td>
+        <td><code>str</code></td>
+        <td><p>The MongoDB database collection to get objects from.</p></td>
+      </tr>
+      <tr>
+        <td><code>CLIENT_OPTIONS</code></td>
+        <td><code>MongoClientOptions</code></td>
+        <td><p>A dictionary of MongoDB client options.</p></td>
+      </tr>
+      <tr>
+        <td><code>LOCALE_ENCODING</code></td>
+        <td><code>str</code></td>
+        <td><p>The locale encoding to use when none is provided.</p></td>
+      </tr>
+      <tr>
+        <td><code>READ_CHUNK_SIZE</code></td>
+        <td><code>int</code></td>
+        <td><p>The default chunk size for reading batches of documents.</p></td>
+      </tr>
+      <tr>
+        <td><code>WRITE_CHUNK_SIZE</code></td>
+        <td><code>int</code></td>
+        <td><p>The default chunk size for writing batches of documents.</p></td>
+      </tr>
+  </tbody>
+</table>
+
+
+    </div>
+
+  </div>
+
+<h2 id="clickhouse">ClickHouse<a class="headerlink" href="#clickhouse" title="Permanent link">&para;</a></h2>
+<p>The ClickHouse backend can be used as a data lake and to fetch collections of
+documents from it.</p>
+
+
+  <div class="doc doc-object doc-class">
+
+<a id="ralph.backends.data.clickhouse.ClickHouseDataBackendSettings"></a>
+    <div class="doc doc-contents first">
+
+      <p>ClickHouse data backend default configuration.</p>
+
+<p><strong>Attributes:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>HOST</code></td>
+        <td><code>str</code></td>
+        <td><p>ClickHouse server host to connect to.</p></td>
+      </tr>
+      <tr>
+        <td><code>PORT</code></td>
+        <td><code>int</code></td>
+        <td><p>ClickHouse server port to connect to.</p></td>
+      </tr>
+      <tr>
+        <td><code>DATABASE</code></td>
+        <td><code>str</code></td>
+        <td><p>ClickHouse database to connect to.</p></td>
+      </tr>
+      <tr>
+        <td><code>EVENT_TABLE_NAME</code></td>
+        <td><code>str</code></td>
+        <td><p>Table where events live.</p></td>
+      </tr>
+      <tr>
+        <td><code>USERNAME</code></td>
+        <td><code>str</code></td>
+        <td><p>ClickHouse username to connect as (optional).</p></td>
+      </tr>
+      <tr>
+        <td><code>PASSWORD</code></td>
+        <td><code>str</code></td>
+        <td><p>Password for the given ClickHouse username (optional).</p></td>
+      </tr>
+      <tr>
+        <td><code>CLIENT_OPTIONS</code></td>
+        <td><code>ClickHouseClientOptions</code></td>
+        <td><p>A dictionary of valid options for the
+ClickHouse client connection.</p></td>
+      </tr>
+      <tr>
+        <td><code>LOCALE_ENCODING</code></td>
+        <td><code>str</code></td>
+        <td><p>The locale encoding to use when none is provided.</p></td>
+      </tr>
+      <tr>
+        <td><code>READ_CHUNK_SIZE</code></td>
+        <td><code>int</code></td>
+        <td><p>The default chunk size for reading.</p></td>
+      </tr>
+      <tr>
+        <td><code>WRITE_CHUNK_SIZE</code></td>
+        <td><code>int</code></td>
+        <td><p>The default chunk size for writing.</p></td>
+      </tr>
+  </tbody>
+</table>
+
+
+    </div>
+
+  </div>
+
+<p>The ClickHouse client options supported in Ralph can be found in these locations:</p>
+<ul>
+<li><a href="https://clickhouse.com/docs/en/integrations/language-clients/python/driver-api#settings-argument">Python driver specific</a></li>
+<li><a href="https://clickhouse.com/docs/en/operations/settings/settings/">General ClickHouse client settings</a></li>
+</ul>
+<h2 id="ovh_-_log_data_platform_ldp">OVH - Log Data Platform (LDP)<a class="headerlink" href="#ovh_-_log_data_platform_ldp" title="Permanent link">&para;</a></h2>
+<p>LDP is a nice service built by OVH on top of Graylog to follow, analyse and
+store your logs. Learning events (<em>aka</em> tracking logs) can be stored in GELF
+format using this backend.</p>
+<div class="admonition info">
+<p class="admonition-title">Read-only backend</p>
+<p>For now the LDP backend is <strong>read-only</strong> as we consider that it is mostly
+used to collect primary logs and not as a Ralph target. Feel free to get in
+touch to prove us wrong, or better: submit your proposal for the <code>write</code>
+method implementation.</p>
+</div>
+<p>To access OVH&rsquo;s LDP API, you need to register Ralph as an authorized
+application and generate an application key, an application secret and a
+consumer key.</p>
+<p>While filling the registration form available at:
+<a href="https://eu.api.ovh.com/createToken/">eu.api.ovh.com/createToken/</a>, be sure to
+give an appropriate validity time span to your token and allow only GET
+requests on the <code>/dbaas/logs/*</code> path.</p>
+
+
+  <div class="doc doc-object doc-class">
+
+<a id="ralph.backends.data.ldp.LDPDataBackendSettings"></a>
+    <div class="doc doc-contents first">
+
+      <p>OVH LDP (Log Data Platform) data backend default configuration.</p>
+
+<p><strong>Attributes:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>APPLICATION_KEY</code></td>
+        <td><code>str</code></td>
+        <td><p>The OVH API application key (AK).</p></td>
+      </tr>
+      <tr>
+        <td><code>APPLICATION_SECRET</code></td>
+        <td><code>str</code></td>
+        <td><p>The OVH API application secret (AS).</p></td>
+      </tr>
+      <tr>
+        <td><code>CONSUMER_KEY</code></td>
+        <td><code>str</code></td>
+        <td><p>The OVH API consumer key (CK).</p></td>
+      </tr>
+      <tr>
+        <td><code>DEFAULT_STREAM_ID</code></td>
+        <td><code>str</code></td>
+        <td><p>The default stream identifier to query.</p></td>
+      </tr>
+      <tr>
+        <td><code>ENDPOINT</code></td>
+        <td><code>str</code></td>
+        <td><p>The OVH API endpoint.</p></td>
+      </tr>
+      <tr>
+        <td><code>READ_CHUNK_SIZE</code></td>
+        <td><code>str</code></td>
+        <td><p>The default chunk size for reading archives.</p></td>
+      </tr>
+      <tr>
+        <td><code>REQUEST_TIMEOUT</code></td>
+        <td><code>int</code></td>
+        <td><p>HTTP request timeout in seconds.</p></td>
+      </tr>
+      <tr>
+        <td><code>SERVICE_NAME</code></td>
+        <td><code>str</code></td>
+        <td><p>The default LDP account name.</p></td>
+      </tr>
+  </tbody>
+</table>
+
+
+    </div>
+
+  </div>
+
+<p>For more information about OVH&rsquo;s API client parameters, please refer to the
+project&rsquo;s documentation:
+<a href="https://github.com/ovh/python-ovh">github.com/ovh/python-ovh</a>.</p>
+<h2 id="openstack_swift">OpenStack Swift<a class="headerlink" href="#openstack_swift" title="Permanent link">&para;</a></h2>
+<p>Swift is the OpenStack object storage service. This storage backend is fully
+supported (read and write operations) to stream and store log archives.</p>
+<p>Parameters correspond to a standard authentication using
+OpenStack Keystone service and configuration to work with the target container.</p>
+
+
+  <div class="doc doc-object doc-class">
+
+<a id="ralph.backends.data.swift.SwiftDataBackendSettings"></a>
+    <div class="doc doc-contents first">
+
+      <p>Swift data backend default configuration.</p>
+
+<p><strong>Attributes:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>AUTH_URL</code></td>
+        <td><code>str</code></td>
+        <td><p>The authentication URL.</p></td>
+      </tr>
+      <tr>
+        <td><code>USERNAME</code></td>
+        <td><code>str</code></td>
+        <td><p>The name of the openstack swift user.</p></td>
+      </tr>
+      <tr>
+        <td><code>PASSWORD</code></td>
+        <td><code>str</code></td>
+        <td><p>The password of the openstack swift user.</p></td>
+      </tr>
+      <tr>
+        <td><code>IDENTITY_API_VERSION</code></td>
+        <td><code>str</code></td>
+        <td><p>The keystone API version to authenticate to.</p></td>
+      </tr>
+      <tr>
+        <td><code>TENANT_ID</code></td>
+        <td><code>str</code></td>
+        <td><p>The identifier of the tenant of the container.</p></td>
+      </tr>
+      <tr>
+        <td><code>TENANT_NAME</code></td>
+        <td><code>str</code></td>
+        <td><p>The name of the tenant of the container.</p></td>
+      </tr>
+      <tr>
+        <td><code>PROJECT_DOMAIN_NAME</code></td>
+        <td><code>str</code></td>
+        <td><p>The project domain name.</p></td>
+      </tr>
+      <tr>
+        <td><code>REGION_NAME</code></td>
+        <td><code>str</code></td>
+        <td><p>The region where the container is.</p></td>
+      </tr>
+      <tr>
+        <td><code>OBJECT_STORAGE_URL</code></td>
+        <td><code>str</code></td>
+        <td><p>The default storage URL.</p></td>
+      </tr>
+      <tr>
+        <td><code>USER_DOMAIN_NAME</code></td>
+        <td><code>str</code></td>
+        <td><p>The user domain name.</p></td>
+      </tr>
+      <tr>
+        <td><code>DEFAULT_CONTAINER</code></td>
+        <td><code>str</code></td>
+        <td><p>The default target container.</p></td>
+      </tr>
+      <tr>
+        <td><code>LOCALE_ENCODING</code></td>
+        <td><code>str</code></td>
+        <td><p>The encoding used for reading/writing documents.</p></td>
+      </tr>
+      <tr>
+        <td><code>READ_CHUNK_SIZE</code></td>
+        <td><code>str</code></td>
+        <td><p>The default chunk size for reading objects.</p></td>
+      </tr>
+      <tr>
+        <td><code>WRITE_CHUNK_SIZE</code></td>
+        <td><code>str</code></td>
+        <td><p>The default chunk size for writing objects.</p></td>
+      </tr>
+  </tbody>
+</table>
+
+
+    </div>
+
+  </div>
+
+<h2 id="amazon_s3">Amazon S3<a class="headerlink" href="#amazon_s3" title="Permanent link">&para;</a></h2>
+<p>S3 is the Amazon Simple Storage Service. This storage backend is fully
+supported (read and write operations) to stream and store log archives.</p>
+<p>Parameters correspond to a standard authentication with AWS CLI 
+and configuration to work with the target bucket.</p>
+
+
+  <div class="doc doc-object doc-class">
+
+<a id="ralph.backends.data.s3.S3DataBackendSettings"></a>
+    <div class="doc doc-contents first">
+
+      <p>S3 data backend default configuration.</p>
+
+<p><strong>Attributes:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>ACCESS_KEY_ID</code></td>
+        <td><code>str</code></td>
+        <td><p>The access key id for the S3 account.</p></td>
+      </tr>
+      <tr>
+        <td><code>SECRET_ACCESS_KEY</code></td>
+        <td><code>str</code></td>
+        <td><p>The secret key for the S3 account.</p></td>
+      </tr>
+      <tr>
+        <td><code>SESSION_TOKEN</code></td>
+        <td><code>str</code></td>
+        <td><p>The session token for the S3 account.</p></td>
+      </tr>
+      <tr>
+        <td><code>ENDPOINT_URL</code></td>
+        <td><code>str</code></td>
+        <td><p>The endpoint URL of the S3.</p></td>
+      </tr>
+      <tr>
+        <td><code>DEFAULT_REGION</code></td>
+        <td><code>str</code></td>
+        <td><p>The default region used in instantiating the client.</p></td>
+      </tr>
+      <tr>
+        <td><code>DEFAULT_BUCKET_NAME</code></td>
+        <td><code>str</code></td>
+        <td><p>The default bucket name targeted.</p></td>
+      </tr>
+      <tr>
+        <td><code>LOCALE_ENCODING</code></td>
+        <td><code>str</code></td>
+        <td><p>The encoding used for writing dictionaries to objects.</p></td>
+      </tr>
+      <tr>
+        <td><code>READ_CHUNK_SIZE</code></td>
+        <td><code>str</code></td>
+        <td><p>The default chunk size for reading objects.</p></td>
+      </tr>
+      <tr>
+        <td><code>WRITE_CHUNK_SIZE</code></td>
+        <td><code>str</code></td>
+        <td><p>The default chunk size for writing objects.</p></td>
+      </tr>
+  </tbody>
+</table>
+
+
+    </div>
+
+  </div>
+
+<h2 id="file_system">File system<a class="headerlink" href="#file_system" title="Permanent link">&para;</a></h2>
+<p>The file system backend is a dummy template that can be used to develop your own backend. 
+It is a &ldquo;dummy&rdquo; backend as it is not intended for practical use (UNIX <code>ls</code> and <code>cat</code> would be more practical).</p>
+<p>The only required parameter is the <code>path</code> we want to list or stream content from.</p>
+
+
+  <div class="doc doc-object doc-class">
+
+<a id="ralph.backends.data.fs.FSDataBackendSettings"></a>
+    <div class="doc doc-contents first">
+
+      <p>FileSystem data backend default configuration.</p>
+
+<p><strong>Attributes:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>DEFAULT_DIRECTORY_PATH</code></td>
+        <td><code>str or Path</code></td>
+        <td><p>The default target directory path where to
+perform list, read and write operations.</p></td>
+      </tr>
+      <tr>
+        <td><code>DEFAULT_QUERY_STRING</code></td>
+        <td><code>str</code></td>
+        <td><p>The default query string to match files for the read
+operation.</p></td>
+      </tr>
+      <tr>
+        <td><code>LOCALE_ENCODING</code></td>
+        <td><code>str</code></td>
+        <td><p>The encoding used for writing dictionaries to files.</p></td>
+      </tr>
+      <tr>
+        <td><code>READ_CHUNK_SIZE</code></td>
+        <td><code>int</code></td>
+        <td><p>The default chunk size for reading files.</p></td>
+      </tr>
+      <tr>
+        <td><code>WRITE_CHUNK_SIZE</code></td>
+        <td><code>int</code></td>
+        <td><p>The default chunk size for writing files.</p></td>
+      </tr>
+  </tbody>
+</table>
+
+
+    </div>
+
+  </div>
+
+<h2 id="learning_record_store_lrs">Learning Record Store (LRS)<a class="headerlink" href="#learning_record_store_lrs" title="Permanent link">&para;</a></h2>
+<p>The LRS backend is used to store and retrieve xAPI statements from various systems that follow the <a href="https://github.com/adlnet/xAPI-Spec/tree/master">xAPI specification</a> (such as our own Ralph LRS, which can be run from this package). 
+LRS systems are mostly used in e-learning infrastructures.</p>
+
+
+  <div class="doc doc-object doc-class">
+
+<a id="ralph.backends.data.lrs.LRSDataBackendSettings"></a>
+    <div class="doc doc-contents first">
+
+      <p>LRS data backend default configuration.</p>
+
+<p><strong>Attributes:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>BASE_URL</code></td>
+        <td><code>AnyHttpUrl</code></td>
+        <td><p>LRS server URL.</p></td>
+      </tr>
+      <tr>
+        <td><code>USERNAME</code></td>
+        <td><code>str</code></td>
+        <td><p>Basic auth username for LRS authentication.</p></td>
+      </tr>
+      <tr>
+        <td><code>PASSWORD</code></td>
+        <td><code>str</code></td>
+        <td><p>Basic auth password for LRS authentication.</p></td>
+      </tr>
+      <tr>
+        <td><code>HEADERS</code></td>
+        <td><code>dict</code></td>
+        <td><p>Headers defined for the LRS server connection.</p></td>
+      </tr>
+      <tr>
+        <td><code>LOCALE_ENCODING</code></td>
+        <td><code>str</code></td>
+        <td><p>The encoding used for reading statements.</p></td>
+      </tr>
+      <tr>
+        <td><code>READ_CHUNK_SIZE</code></td>
+        <td><code>int</code></td>
+        <td><p>The default chunk size for reading statements.</p></td>
+      </tr>
+      <tr>
+        <td><code>STATUS_ENDPOINT</code></td>
+        <td><code>str</code></td>
+        <td><p>Endpoint used to check server status.</p></td>
+      </tr>
+      <tr>
+        <td><code>STATEMENTS_ENDPOINT</code></td>
+        <td><code>str</code></td>
+        <td><p>Default endpoint for LRS statements resource.</p></td>
+      </tr>
+      <tr>
+        <td><code>WRITE_CHUNK_SIZE</code></td>
+        <td><code>int</code></td>
+        <td><p>The default chunk size for writing statements.</p></td>
+      </tr>
+  </tbody>
+</table>
+
+
+    </div>
+
+  </div>
+
+<h2 id="websocket">WebSocket<a class="headerlink" href="#websocket" title="Permanent link">&para;</a></h2>
+<p>The webSocket backend is <strong>read-only</strong> and can be used to get real-time events.</p>
+<blockquote>
+<p>If you use OVH&rsquo;s Logs Data Platform (LDP), you can retrieve a WebSocket URI to test your
+data stream by following instructions from the
+<a href="https://docs.ovh.com/gb/en/logs-data-platform/ldp-tail/#retrieve-your-websocket-address">official documentation</a>.</p>
+</blockquote>
+
+
+  <div class="doc doc-object doc-class">
+
+<a id="ralph.backends.data.async_ws.WSDataBackendSettings"></a>
+    <div class="doc doc-contents first">
+
+      <p>Websocket data backend default configuration.</p>
+
+<p><strong>Attributes:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>CLIENT_OPTIONS</code></td>
+        <td><code>dict</code></td>
+        <td><p>A dictionary of valid options for the websocket client
+connection. See <code>WSClientOptions</code>.</p></td>
+      </tr>
+      <tr>
+        <td><code>URI</code></td>
+        <td><code>str</code></td>
+        <td><p>The URI to connect to.</p></td>
+      </tr>
+  </tbody>
+</table>
+
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+<a id="ralph.backends.data.async_ws.WSClientOptions"></a>
+    <div class="doc doc-contents first">
+
+      <p>Client options for <code>websockets.connection</code>.</p>
+<p>For mode details, see the
+<a href="https://websockets.readthedocs.io/en/stable/reference/asyncio/client.html#websockets.client.connect">websockets.connection documentation</a></p>
+
+<p><strong>Attributes:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>close_timeout</code></td>
+        <td><code>float</code></td>
+        <td><p>Timeout for opening the connection in seconds.</p></td>
+      </tr>
+      <tr>
+        <td><code>compression</code></td>
+        <td><code>str</code></td>
+        <td><p>Per-message compression (deflate) is activated by default.
+Setting it to <code>None</code> disables compression.</p></td>
+      </tr>
+      <tr>
+        <td><code>max_size</code></td>
+        <td><code>int</code></td>
+        <td><p>Maximum size of incoming messages in bytes.
+Setting it to <code>None</code> disables the limit.</p></td>
+      </tr>
+      <tr>
+        <td><code>max_queue</code></td>
+        <td><code>int</code></td>
+        <td><p>Maximum number of incoming messages in receive buffer.
+Setting it to <code>None</code> disables the limit.</p></td>
+      </tr>
+      <tr>
+        <td><code>open_timeout</code></td>
+        <td><code>float</code></td>
+        <td><p>Timeout for opening the connection in seconds.
+Setting it to <code>None</code> disables the timeout.</p></td>
+      </tr>
+      <tr>
+        <td><code>origin</code></td>
+        <td><code>str</code></td>
+        <td><p>Value of the <code>Origin</code> header, for servers that require it.</p></td>
+      </tr>
+      <tr>
+        <td><code>ping_interval</code></td>
+        <td><code>float</code></td>
+        <td><p>Delay between keepalive pings in seconds.
+Setting it to <code>None</code> disables keepalive pings.</p></td>
+      </tr>
+      <tr>
+        <td><code>ping_timeout</code></td>
+        <td><code>float</code></td>
+        <td><p>Timeout for keepalive pings in seconds.
+Setting it to <code>None</code> disables timeouts.</p></td>
+      </tr>
+      <tr>
+        <td><code>read_limit</code></td>
+        <td><code>int</code></td>
+        <td><p>High-water mark of read buffer in bytes.</p></td>
+      </tr>
+      <tr>
+        <td><code>user_agent_header</code></td>
+        <td><code>str</code></td>
+        <td><p>Value of  the <code>User-Agent</code> request header.
+It defaults to &ldquo;Python/x.y.z websockets/X.Y&rdquo;.
+Setting it to <code>None</code> removes the header.</p></td>
+      </tr>
+      <tr>
+        <td><code>write_limit</code></td>
+        <td><code>int</code></td>
+        <td><p>High-water mark of write buffer in bytes.</p></td>
+      </tr>
+  </tbody>
+</table>
+
+
+    </div>
+
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+  
+
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      2020-present France Université Numérique
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["content.code.annotate", "content.code.copy", "content.tabs.link", "navigation.indexes", "navigation.tabs"], "search": "../../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7c377c4.min.js"></script>
+      
+    
+  </body>
+</html>
