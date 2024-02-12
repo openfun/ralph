@@ -1,4 +1,5 @@
 """Tests for Ralph fs data backend"""
+
 import json
 import logging
 import os

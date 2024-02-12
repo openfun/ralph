@@ -21,9 +21,9 @@ class VideoActivityDefinition(BaseXapiActivityDefinition):
             `https://w3id.org/xapi/video/activity-type/video`.
     """
 
-    type: Literal[
+    type: Literal["https://w3id.org/xapi/video/activity-type/video"] = (
         "https://w3id.org/xapi/video/activity-type/video"
-    ] = "https://w3id.org/xapi/video/activity-type/video"
+    )
 
 
 class VideoActivity(BaseXapiActivity):

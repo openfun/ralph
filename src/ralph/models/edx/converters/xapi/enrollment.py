@@ -1,4 +1,5 @@
 """Enrollment event xAPI Converter."""
+
 from typing import Set
 
 from ralph.models.converter import ConversionItem

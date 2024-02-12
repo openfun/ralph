@@ -28,9 +28,9 @@ class VirtualClassroomProfileActivity(ProfileActivity):
         id (str): Consists of the value `https://w3id.org/xapi/virtual-classroom`.
     """
 
-    id: Literal[
+    id: Literal["https://w3id.org/xapi/virtual-classroom"] = (
         "https://w3id.org/xapi/virtual-classroom"
-    ] = "https://w3id.org/xapi/virtual-classroom"
+    )
 
 
 class VirtualClassroomContextContextActivities(BaseXapiContextContextActivities):

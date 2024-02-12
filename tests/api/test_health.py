@@ -1,4 +1,5 @@
 """Tests for the health check endpoints."""
+
 import logging
 
 import pytest

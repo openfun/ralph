@@ -20,7 +20,7 @@ class PostedVerb(BaseXapiVerb):
         display (dict): Consists of the dictionary `{"en-US": "posted"}`.
     """
 
-    id: Literal[
+    id: Literal["https://w3id.org/xapi/acrossx/verbs/posted"] = (
         "https://w3id.org/xapi/acrossx/verbs/posted"
-    ] = "https://w3id.org/xapi/acrossx/verbs/posted"
+    )
     display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["posted"]]]

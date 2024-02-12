@@ -1,4 +1,5 @@
 """Tests for the xAPI verbs concepts."""
+
 import json
 
 import pytest

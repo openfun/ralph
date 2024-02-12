@@ -21,9 +21,9 @@ class MessageActivityDefinition(BaseXapiActivityDefinition):
             `https://w3id.org/xapi/acrossx/activities/message`.
     """
 
-    type: Literal[
+    type: Literal["https://w3id.org/xapi/acrossx/activities/message"] = (
         "https://w3id.org/xapi/acrossx/activities/message"
-    ] = "https://w3id.org/xapi/acrossx/activities/message"
+    )
 
 
 class MessageActivity(BaseXapiActivity):

@@ -1,4 +1,5 @@
 """Tests for the xAPI activity types concepts."""
+
 import json
 
 import pytest

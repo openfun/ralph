@@ -20,9 +20,9 @@ class PlayedVerb(BaseXapiVerb):
         display (dict): Consists of the dictionary `{"en-US": "played"}`.
     """
 
-    id: Literal[
+    id: Literal["https://w3id.org/xapi/video/verbs/played"] = (
         "https://w3id.org/xapi/video/verbs/played"
-    ] = "https://w3id.org/xapi/video/verbs/played"
+    )
     display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["played"]]]
 
 
@@ -34,9 +34,9 @@ class PausedVerb(BaseXapiVerb):
         display (dict): Consists of the dictionary `{"en-US": "paused"}`.
     """
 
-    id: Literal[
+    id: Literal["https://w3id.org/xapi/video/verbs/paused"] = (
         "https://w3id.org/xapi/video/verbs/paused"
-    ] = "https://w3id.org/xapi/video/verbs/paused"
+    )
     display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["paused"]]]
 
 
@@ -48,7 +48,7 @@ class SeekedVerb(BaseXapiVerb):
         display (dict): Consists of the dictionary `{"en-US": "seeked"}`.
     """
 
-    id: Literal[
+    id: Literal["https://w3id.org/xapi/video/verbs/seeked"] = (
         "https://w3id.org/xapi/video/verbs/seeked"
-    ] = "https://w3id.org/xapi/video/verbs/seeked"
+    )
     display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["seeked"]]]

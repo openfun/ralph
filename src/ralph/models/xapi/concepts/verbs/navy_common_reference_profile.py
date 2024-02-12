@@ -20,9 +20,9 @@ class AccessedVerb(BaseXapiVerb):
         display (dict): Consists of the dictionary `{"en-US": "accessed"}`.
     """
 
-    id: Literal[
+    id: Literal["https://w3id.org/xapi/netc/verbs/accessed"] = (
         "https://w3id.org/xapi/netc/verbs/accessed"
-    ] = "https://w3id.org/xapi/netc/verbs/accessed"
+    )
     display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["accessed"]]]
 
 
@@ -34,7 +34,7 @@ class UploadedVerb(BaseXapiVerb):
         display (dict): Consists of the dictionary `{"en-US": "uploaded"}`.
     """
 
-    id: Literal[
+    id: Literal["https://w3id.org/xapi/netc/verbs/uploaded"] = (
         "https://w3id.org/xapi/netc/verbs/uploaded"
-    ] = "https://w3id.org/xapi/netc/verbs/uploaded"
+    )
     display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["uploaded"]]]

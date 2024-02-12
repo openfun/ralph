@@ -1,6 +1,5 @@
 """Tests for the models selector."""
 
-
 import pytest
 from pydantic import BaseModel
 

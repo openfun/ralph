@@ -1,4 +1,5 @@
 """Main module for Ralph's LRS API authentication."""
+
 from typing import Optional
 
 from fastapi import Depends, HTTPException, status

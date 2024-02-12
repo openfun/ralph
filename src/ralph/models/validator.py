@@ -1,6 +1,5 @@
 """Event validator definition."""
 
-
 import json
 import logging
 from typing import Any, Generator, Optional, TextIO

@@ -20,9 +20,9 @@ class PageActivityDefinition(BaseXapiActivityDefinition):
        type (str): Consists of the value `http://activitystrea.ms/schema/1.0/page`.
     """
 
-    type: Literal[
+    type: Literal["http://activitystrea.ms/schema/1.0/page"] = (
         "http://activitystrea.ms/schema/1.0/page"
-    ] = "http://activitystrea.ms/schema/1.0/page"
+    )
 
 
 class PageActivity(BaseXapiActivity):

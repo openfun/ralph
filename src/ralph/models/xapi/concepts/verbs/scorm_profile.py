@@ -20,9 +20,9 @@ class CompletedVerb(BaseXapiVerb):
         display (dict): Consists of the dictionary `{"en-US": "completed"}`.
     """
 
-    id: Literal[
+    id: Literal["http://adlnet.gov/expapi/verbs/completed"] = (
         "http://adlnet.gov/expapi/verbs/completed"
-    ] = "http://adlnet.gov/expapi/verbs/completed"
+    )
     display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["completed"]]]
 
 
@@ -34,9 +34,9 @@ class InitializedVerb(BaseXapiVerb):
         display (Dict): Consists of the dictionary `{"en-US": "initialized"}`.
     """
 
-    id: Literal[
+    id: Literal["http://adlnet.gov/expapi/verbs/initialized"] = (
         "http://adlnet.gov/expapi/verbs/initialized"
-    ] = "http://adlnet.gov/expapi/verbs/initialized"
+    )
     display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["initialized"]]]
 
 
@@ -48,9 +48,9 @@ class InteractedVerb(BaseXapiVerb):
         display (dict): Consists of the dictionary `{"en-US": "interacted"}`.
     """
 
-    id: Literal[
+    id: Literal["http://adlnet.gov/expapi/verbs/interacted"] = (
         "http://adlnet.gov/expapi/verbs/interacted"
-    ] = "http://adlnet.gov/expapi/verbs/interacted"
+    )
     display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["interacted"]]]
 
 
@@ -62,7 +62,7 @@ class TerminatedVerb(BaseXapiVerb):
         display (dict): Consists of the dictionary `{"en-US": "terminated"}`.
     """
 
-    id: Literal[
+    id: Literal["http://adlnet.gov/expapi/verbs/terminated"] = (
         "http://adlnet.gov/expapi/verbs/terminated"
-    ] = "http://adlnet.gov/expapi/verbs/terminated"
+    )
     display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["terminated"]]]
