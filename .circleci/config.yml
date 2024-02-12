@@ -367,12 +367,12 @@ jobs:
             kubectl create namespace ci-ralph
             kubectl config set-context --current --namespace=ci-ralph
       - run:
-          name: Build production image and publish it to the k8s cluster docker registry
+          name: Build production image and load it in the k8s cluster docker registry
           command: |
-            export RALPH_IMAGE_BUILD_TARGET=production
-            export RALPH_IMAGE_TAG=${CIRCLE_SHA1} 
-            make build
-            minikube image load ralph:${RALPH_IMAGE_TAG}
+            RALPH_IMAGE_BUILD_TARGET=production \
+            RALPH_IMAGE_TAG=${CIRCLE_SHA1} \
+              make build
+            minikube image load ralph:${CIRCLE_SHA1}
       - run:
           name: Deploy Elasticsearch cluster
           command: |
@@ -405,6 +405,14 @@ jobs:
             sed -i -e "s|<PASSWORD>|${ELASTIC_PASSWORD}|g" manifests/ralph-env-secret.yaml
             kubectl apply -f manifests/ralph-env-secret.yaml
             kubectl apply -f manifests/ralph-env-cm.yaml
+            if [[ -z "${CIRCLE_TAG+x}" ]] || ! [[ "$CIRCLE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-helm$ ]]; then
+              # Not a tagged workflow, or tagged but not for a Helm release:
+              # change the repository and app version for the currently built version
+              sed -i "s|repository:.*$|repository: docker.io/library/ralph|" development.yaml
+              sed -i "s|tag:.*$|tag: \"${CIRCLE_SHA1}\"|" development.yaml
+            fi
+
+            # Install Ralph
             helm install -f development.yaml lrs ralph/
 
             # Test the deployment/switch
