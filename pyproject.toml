@@ -191,7 +191,7 @@ section-order = ["future", "standard-library", "third-party", "ralph", "first-pa
 [tool.ruff.lint.isort.sections]
 ralph = ["ralph"]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "tests/*" = [
     "ARG",  # flake8-unused-arguments
     "D",  # pydocstyle
@@ -203,7 +203,7 @@ ralph = ["ralph"]
     "D" # Pydocstyle rules
 ]
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 # Use Google-style docstrings.
 convention = "google"
 
