@@ -103,7 +103,7 @@ dev = [
     "neoteroi-mkdocs==1.0.5",
     "pyfakefs==5.3.5",
     "pymdown-extensions==10.7",
-    "pytest==8.0.0",
+    "pytest<8.0.0", # pin as pytest-httpx<0.23.0 is not compatible with pytest 8.0.0 
     "pytest-cov==4.1.0",
     "pytest-httpx<0.23.0", # pin as Python 3.8 is no longer supported from release 0.23.0
     "requests-mock==1.11.0",
