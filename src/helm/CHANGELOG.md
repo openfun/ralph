@@ -9,6 +9,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.4.0] - 2024-02-12
+
 ### Changed
 
 - Upgrade appVersion to `4.1.0`
@@ -58,6 +60,7 @@ and this project adheres to
 - Add an official Helm Chart (experimental)
 
 [unreleased]: https://github.com/openfun/ralph/tree/main/src/helm
-[0.3.0]: https://github.com/openfun/ralph/releases/tag/helm-v0.3.0
-[0.2.0]: https://github.com/openfun/ralph/releases/tag/helm-v0.2.0
-[0.1.0]: https://github.com/openfun/ralph/releases/tag/helm-v0.1.0
+[0.4.0]: https://github.com/openfun/ralph/releases/tag/v0.4.0-helm
+[0.3.0]: https://github.com/openfun/ralph/releases/tag/v0.3.0-helm
+[0.2.0]: https://github.com/openfun/ralph/releases/tag/v0.2.0-helm
+[0.1.0]: https://github.com/openfun/ralph/releases/tag/v0.1.0-helm
