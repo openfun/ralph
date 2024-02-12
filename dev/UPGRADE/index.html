@@ -1052,13 +1052,13 @@ for a seamless transition. 🚀
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#3xx_to_400" class="md-nav__link">
+  <a href="#3x_to_4y" class="md-nav__link">
     <span class="md-ellipsis">
-      3.x.x to 4.0.0
+      3.x to 4.y
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="3.x.x to 4.0.0">
+    <nav class="md-nav" aria-label="3.x to 4.y">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1241,13 +1241,13 @@ for a seamless transition. 🚀
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#3xx_to_400" class="md-nav__link">
+  <a href="#3x_to_4y" class="md-nav__link">
     <span class="md-ellipsis">
-      3.x.x to 4.0.0
+      3.x to 4.y
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="3.x.x to 4.0.0">
+    <nav class="md-nav" aria-label="3.x to 4.y">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1322,7 +1322,7 @@ for a seamless transition. 🚀
 <h1 id="upgrade">Upgrade<a class="headerlink" href="#upgrade" title="Permanent link">&para;</a></h1>
 <p>All instructions to upgrade this project from one release to the next will be documented in this file. Upgrades must be run sequentially, meaning you should not skip minor/major releases while upgrading (fix releases can be skipped).</p>
 <p>This project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
-<h3 id="3xx_to_400">3.x.x to 4.0.0<a class="headerlink" href="#3xx_to_400" title="Permanent link">&para;</a></h3>
+<h3 id="3x_to_4y">3.x to 4.y<a class="headerlink" href="#3x_to_4y" title="Permanent link">&para;</a></h3>
 <h4 id="upgrade_user_credentials">Upgrade user credentials<a class="headerlink" href="#upgrade_user_credentials" title="Permanent link">&para;</a></h4>
 <p>To conform to xAPI specifications, we need to represent users as xAPI Agents. You must therefore delete and re-create the credentials file using the updated cli, OR you can modify it directly to add the <code>agents</code> field. The credentials file is located in <code>{ RALPH_APP_DIR }/{ RALPH_AUTH_FILE }</code> (defaults to <code>.ralph/auth.json</code>). Each user profile must follow the following pattern (see <a href="https://xapi.com/blog/deep-dive-actor-agent/">this post</a> for examples of valid agent objects) :</p>
 <p><div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>{
