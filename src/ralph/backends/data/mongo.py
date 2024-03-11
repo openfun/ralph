@@ -126,10 +126,7 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
 
         # Check MongoDB server status.
         try:
-            if (
-                self.client.admin.command("serverStatus").get("ok")
-                != 1.0  # noqa: PLR2004
-            ):
+            if self.client.admin.command("serverStatus").get("ok") != 1.0:
                 logger.error("MongoDB `serverStatus` command did not return 1.0")
                 return DataBackendStatus.ERROR
         except PyMongoError as error:

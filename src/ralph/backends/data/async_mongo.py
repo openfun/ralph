@@ -68,7 +68,7 @@ class AsyncMongoDataBackend(
         # Check MongoDB server status.
         try:
             server_status = await self.client.admin.command("serverStatus")
-            if server_status.get("ok") != 1.0:  # noqa: PLR2004
+            if server_status.get("ok") != 1.0:
                 logger.error("MongoDB `serverStatus` command did not return 1.0")
                 return DataBackendStatus.ERROR
         except PyMongoError as error:
