@@ -41,6 +41,7 @@ from .open_response_assessment.statements import (
     ORASubmitFeedbackOnAssessments,
     ORAUploadFile,
 )
+from .poll.statements import XBlockPollSubmitted, XBlockPollViewResults
 from .peer_instruction.statements import (
     PeerInstructionAccessed,
     PeerInstructionOriginalSubmitted,
@@ -65,6 +66,7 @@ from .problem_interaction.statements import (
     UIProblemShow,
 )
 from .server import Server
+from .survey.statements import XBlockSurveySubmitted, XBlockSurveyViewResults
 from .textbook_interaction.statements import (
     UIBook,
     UITextbookPdfChapterNavigated,
