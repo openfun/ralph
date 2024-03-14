@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Added
 
+- Models: Add Edx drag and drop events support
 - Models: Add Edx cohort events support
 - Models: Add Edx content library interaction events support
 - Backends: Add `ralph.backends.data` and `ralph.backends.lrs` entry points
