@@ -13,6 +13,7 @@ from .content_library_interaction.statements import (
     EdxLibraryContentBlockContentAssigned,
     EdxLibraryContentBlockContentRemoved,
 )
+from .course_content_completion.statements import UIEdxDoneToggled, EdxDoneToggled
 from .drag_and_drop.statements import (
     EdxDragAndDropV2FeedbackClosed,
     EdxDragAndDropV2FeedbackOpened,

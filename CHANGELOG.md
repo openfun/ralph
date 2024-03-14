@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Added
 
+- Models: Add Edx Course Content Completion events support
 - Models: Add Edx drag and drop events support
 - Models: Add Edx cohort events support
 - Models: Add Edx content library interaction events support
