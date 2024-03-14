@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Added
 
+- Models: Add Edx drag and drop events support
 - Backends: Add `ralph.backends.data` and `ralph.backends.lrs` entry points
   to discover backends from plugins.
 
