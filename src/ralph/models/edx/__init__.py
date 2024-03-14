@@ -13,6 +13,13 @@ from .content_library_interaction.statements import (
     EdxLibraryContentBlockContentAssigned,
     EdxLibraryContentBlockContentRemoved,
 )
+from .drag_and_drop.statements import (
+    EdxDragAndDropV2FeedbackClosed,
+    EdxDragAndDropV2FeedbackOpened,
+    EdxDragAndDropV2ItemDropped,
+    EdxDragAndDropV2ItemPickedUp,
+    EdxDragAndDropV2Loaded,
+)
 from .enrollment.statements import (
     EdxCourseEnrollmentActivated,
     EdxCourseEnrollmentDeactivated,
