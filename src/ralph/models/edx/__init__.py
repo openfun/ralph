@@ -4,6 +4,7 @@
 
 from ralph.models.edx.navigational import statements
 
+from .course_content_completion.statements import UIEdxDoneToggled, EdxDoneToggled
 from .enrollment.statements import (
     EdxCourseEnrollmentActivated,
     EdxCourseEnrollmentDeactivated,
