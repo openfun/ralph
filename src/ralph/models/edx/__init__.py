@@ -4,6 +4,10 @@
 
 from ralph.models.edx.navigational import statements
 
+from .content_library_interaction.statements import (
+    EdxLibraryContentBlockContentAssigned,
+    EdxLibraryContentBlockContentRemoved,
+)
 from .enrollment.statements import (
     EdxCourseEnrollmentActivated,
     EdxCourseEnrollmentDeactivated,
