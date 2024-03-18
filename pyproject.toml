@@ -89,7 +89,7 @@ cli = [
 ]
 dev = [
     "anyio<4.3.1", # unpin until fastapi supports new major version of anyio
-    "black==24.2.0",
+    "black==24.3.0",
     "cryptography==42.0.5",
     "factory-boy==3.3.0",
     "hypothesis<6.92.0", # pin as hypothesis 6.92.0 observability feature seems broken
@@ -97,7 +97,7 @@ dev = [
     "mike==2.0.0",
     "mkdocs==1.5.3",
     "mkdocs-click==0.8.1",
-    "mkdocs-material==9.5.13",
+    "mkdocs-material==9.5.14",
     "mkdocstrings[python-legacy]==0.24.1",
     "moto==5.0.3",
     "mypy==1.9.0",
@@ -109,8 +109,8 @@ dev = [
     "pytest-httpx<0.23.0", # pin as Python 3.8 is no longer supported from release 0.23.0
     "requests-mock==1.11.0",
     "responses==0.24.1",
-    "ruff==0.3.2",
-    "types-python-dateutil ==2.8.19.20240311",
+    "ruff==0.3.3",
+    "types-python-dateutil ==2.9.0.20240316",
     "types-python-jose ==3.3.4.20240106",
     "types-requests<2.31.0.20240312",
     "types-cachetools ==5.3.0.7",
@@ -120,7 +120,7 @@ lrs = [
     "fastapi==0.110.0",
     "cachetools==5.3.3",
     "httpx<0.25.0", # pin as `pytest-httpx<0.23.0` requires `httpx==0.24.*`
-    "sentry_sdk==1.41.0",
+    "sentry_sdk==1.42.0",
     "python-jose==3.3.0",
     "uvicorn[standard]==0.28.0",
 ]
