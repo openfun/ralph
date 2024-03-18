@@ -11,6 +11,14 @@ from .bookmark.statements import (
     UIEdxBookmarkAccessed,
     UIEdxCourseToolAccessed,
 )
+from .certificate.statements import (
+    EdxCertificateCreated,
+    EdxCertificateEvidenceVisited,
+    EdxCertificateGenerationDisabled,
+    EdxCertificateGenerationEnabled,
+    EdxCertificateRevoked,
+    EdxCertificateShared,
+)
 from .cohort.statements import (
     EdxCohortCreated,
     EdxCohortUserAdded,
