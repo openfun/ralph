@@ -4,6 +4,14 @@
 
 from ralph.models.edx.navigational import statements
 
+from .certificate.statements import (
+    EdxCertificateCreated,
+    EdxCertificateEvidenceVisited,
+    EdxCertificateGenerationDisabled,
+    EdxCertificateGenerationEnabled,
+    EdxCertificateRevoked,
+    EdxCertificateShared,
+)
 from .enrollment.statements import (
     EdxCourseEnrollmentActivated,
     EdxCourseEnrollmentDeactivated,
