@@ -44,6 +44,15 @@ from .enrollment.statements import (
     UIEdxCourseEnrollmentUpgradeClicked,
 )
 from .navigational.statements import UIPageClose, UISeqGoto, UISeqNext, UISeqPrev
+from .notes.statements import (
+    UIEdxCourseStudentNotesViewed,
+    UIEdxCourseStudentNotesAdded,
+    UIEdxCourseStudentNotesDeleted,
+    UIEdxCourseStudentNotesEdited,
+    UIEdxCourseStudentNotesNotesPageViewed,
+    UIEdxCourseStudentNotesSearched,
+    UIEdxCourseStudentNotesUsedUnitLink,
+)
 from .open_response_assessment.statements import (
     ORACreateSubmission,
     ORAGetPeerSubmission,
