@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Added
 
+- Models: Add Edx teams-related events support
 - Models: Add Edx notes events support
 - Models: Add Edx certificate events support
 - Models: Add Edx bookmark (renamed Course Resource) events support

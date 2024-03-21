@@ -107,6 +107,16 @@ from .textbook_interaction.statements import (
     UITextbookPdfZoomButtonsChanged,
     UITextbookPdfZoomMenuChanged,
 )
+from .teams_related.statements import (
+    EdxTeamActivityUpdated,
+    EdxTeamChanged,
+    EdxTeamCreated,
+    EdxTeamDeleted,
+    EdxTeamLearnerAdded,
+    EdxTeamLearnerRemoved,
+    EdxTeamPageViewed,
+    EdxTeamSearched,
+)
 from .video.statements import (
     UIHideTranscript,
     UILoadVideo,
