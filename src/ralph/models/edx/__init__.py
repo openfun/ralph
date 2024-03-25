@@ -4,6 +4,13 @@
 
 from ralph.models.edx.navigational import statements
 
+from .bookmark.statements import (
+    EdxBookmarkRemoved,
+    EdxBookmarkAdded,
+    EdxBookmarkListed,
+    UIEdxBookmarkAccessed,
+    UIEdxCourseToolAccessed,
+)
 from .enrollment.statements import (
     EdxCourseEnrollmentActivated,
     EdxCourseEnrollmentDeactivated,
