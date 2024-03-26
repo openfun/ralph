@@ -43,7 +43,7 @@ class EdxDragAndDropV2ItemDroppedEventField(EdxDragAndDropV2ItemEventField):
             `false` either. For problems that require a number input, set to `true`
             if the item is dropped in the correct zone and the number input is
             correct, `false` either.
-        is_correct_location (bool): Set to `true`’` if the draggable item is in
+        is_correct_location (bool): Set to `true` if the draggable item is in
             the correct target zone, `false` either. For problems requiring a number
             input, it is equivalent to `is_correct`.
         location (str): Consists of the text identifier for the target zone in
