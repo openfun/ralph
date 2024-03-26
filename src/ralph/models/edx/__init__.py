@@ -4,6 +4,11 @@
 
 from ralph.models.edx.navigational import statements
 
+from .cohort.statements import (
+    EdxCohortCreated,
+    EdxCohortUserAdded,
+    EdxCohortUserRemoved,
+)
 from .content_library_interaction.statements import (
     EdxLibraryContentBlockContentAssigned,
     EdxLibraryContentBlockContentRemoved,
