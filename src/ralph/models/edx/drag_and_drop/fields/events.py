@@ -22,7 +22,7 @@ class EdxDragAndDropV2FeedbackEventField(AbstractBaseEventField):
 
 
 class EdxDragAndDropV2ItemEventField(AbstractBaseEventField):
-    """Pydantic model for drag and drog item statements `event` field.
+    """Pydantic model for drag and drop item statements `event` field.
 
     Attributes:
         item_id (str): Consists of the index assigned to the draggable item
