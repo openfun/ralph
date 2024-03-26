@@ -21,18 +21,7 @@ class EdxDragAndDropV2FeedbackEventField(AbstractBaseEventField):
     truncated: Optional[bool]
 
 
-class EdxDragAndDropV2ItemEventField(AbstractBaseEventField):
-    """Pydantic model for drag and drop item statements `event` field.
-
-    Attributes:
-        item_id (str): Consists of the index assigned to the draggable item
-            selected by the learner.
-    """
-
-    item_id: str
-
-
-class EdxDragAndDropV2ItemDroppedEventField(EdxDragAndDropV2ItemEventField):
+class EdxDragAndDropV2ItemDroppedEventField(AbstractBaseEventField):
     """Pydantic model for `edx.drag_and_drop_v2.item.dropped` `event` field.
 
     Attributes:
@@ -58,3 +47,14 @@ class EdxDragAndDropV2ItemDroppedEventField(EdxDragAndDropV2ItemEventField):
     is_correct_location: bool
     location: str
     location_id: Optional[int]
+
+
+class EdxDragAndDropV2ItemPickedUpEventField(AbstractBaseEventField):
+    """Pydantic model for `edx.drag_and_drop_v2.item.picked_up` `event` field.
+
+    Attributes:
+        item_id (int): Consists of the index assigned to the draggable item
+            selected by the learner.
+    """
+
+    item_id: int

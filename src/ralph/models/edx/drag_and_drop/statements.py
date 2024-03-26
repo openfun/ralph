@@ -8,7 +8,7 @@ from pydantic import Json
 from ralph.models.edx.drag_and_drop.fields.events import (
     EdxDragAndDropV2FeedbackEventField,
     EdxDragAndDropV2ItemDroppedEventField,
-    EdxDragAndDropV2ItemEventField,
+    EdxDragAndDropV2ItemPickedUpEventField,
 )
 from ralph.models.selector import selector
 
@@ -102,7 +102,8 @@ class EdxDragAndDropV2ItemPickedUp(BaseServerModel):
     drag and drop problem.
 
     Attributes:
-        event (EdxDragAndDropV2ItemEventField): See EdxDragAndDropV2ItemEventField.
+        event (EdxDragAndDropV2ItemPickedUpEventField): See
+            EdxDragAndDropV2ItemPickedUpEventField.
         event_type (str): Consists of the value `edx.drag_and_drop_v2.item.picked_up`.
         name (str): Consists either of the value `edx.drag_and_drop_v2.item.picked_up`.
     """
@@ -112,8 +113,8 @@ class EdxDragAndDropV2ItemPickedUp(BaseServerModel):
     )
 
     event: Union[
-        Json[EdxDragAndDropV2ItemEventField],
-        EdxDragAndDropV2ItemEventField,
+        Json[EdxDragAndDropV2ItemPickedUpEventField],
+        EdxDragAndDropV2ItemPickedUpEventField,
     ]
     event_type: Literal["edx.drag_and_drop_v2.item.picked_up"]
     name: Literal["edx.drag_and_drop_v2.item.picked_up"]
