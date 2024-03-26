@@ -25,7 +25,7 @@ from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
         EdxDragAndDropV2ItemDropped,
         EdxDragAndDropV2ItemPickedUp,
         EdxDragAndDropV2Loaded,
-        ],
+    ],
 )
 @custom_given(st.data())
 def test_models_edx_drag_and_drop_selectors_with_valid_statements(class_, data):
@@ -56,6 +56,7 @@ def test_models_edx_edx_drag_and_drop_v2_feedback_opened_with_valid_statement(
     assert statement.event_type == "edx.drag_and_drop_v2.feedback.opened"
     assert statement.name == "edx.drag_and_drop_v2.feedback.opened"
 
+
 @custom_given(EdxDragAndDropV2ItemDropped)
 def test_models_edx_edx_drag_and_drop_v2_item_dropped_with_valid_statement(
     statement,
@@ -64,6 +65,7 @@ def test_models_edx_edx_drag_and_drop_v2_item_dropped_with_valid_statement(
     `event_type` and `name`."""
     assert statement.event_type == "edx.drag_and_drop_v2.item.dropped"
     assert statement.name == "edx.drag_and_drop_v2.item.dropped"
+
 
 @custom_given(EdxDragAndDropV2ItemPickedUp)
 def test_models_edx_edx_drag_and_drop_v2_item_picked_up_with_valid_statement(
