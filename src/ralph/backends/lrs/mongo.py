@@ -90,7 +90,6 @@ class MongoLRSBackend(BaseLRSBackend[MongoLRSBackendSettings], MongoDataBackend)
         if params.activity:
             mongo_query_filters.update(
                 {
-                    "_source.object.objectType": "Activity",
                     "_source.object.id": params.activity,
                 },
             )

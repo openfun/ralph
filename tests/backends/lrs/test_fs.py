@@ -164,7 +164,7 @@ def test_backends_lrs_fs_query_statements_query(
             "id": "0",
             "actor": {"mbox_sha1sum": "foo_sha1sum"},
             "verb": {"id": "foo_verb"},
-            "object": {"id": "bar_object", "objectType": "Activity"},
+            "object": {"id": "bar_object"},
             "context": {
                 "registration": "de867099-77ee-453b-949e-2c1933734436",
                 "instructor": {"mbox": "mailto:bar@bar.baz"},
@@ -190,7 +190,7 @@ def test_backends_lrs_fs_query_statements_query(
             "id": "2",
             "actor": {"openid": "foo_openid"},
             "verb": {"id": "foo_verb"},
-            "object": {"id": "foo_object", "objectType": "Activity"},
+            "object": {"id": "foo_object"},
             "context": {
                 "registration": "b0d0e57d-9fbf-42e3-ba60-85e0be6f709d",
                 "contextActivities": {"grouping": [{"id": "bar_object"}]},
@@ -232,7 +232,7 @@ def test_backends_lrs_fs_query_statements_query(
                 "objectType": "SubStatement",
                 "actor": {"openid": "foo_openid"},
                 "verb": {"id": "bar_verb"},
-                "object": {"id": "bar_object", "objectType": "Activity"},
+                "object": {"id": "bar_object"},
                 "context": {
                     "instructor": {
                         "account": {"name": "foo_name", "homePage": "foo_home"}

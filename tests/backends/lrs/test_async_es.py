@@ -186,7 +186,6 @@ def test_backends_lrs_async_es_default_instantiation(monkeypatch, fs):
                                     )
                                 }
                             },
-                            {"term": {"object.objectType.keyword": "Activity"}},
                             {
                                 "term": {
                                     "object.id.keyword": (

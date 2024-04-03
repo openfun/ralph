@@ -147,7 +147,6 @@ def test_backends_lrs_mongo_default_instantiation(monkeypatch, fs):
                 "filter": {
                     "_source.verb.id": "http://adlnet.gov/expapi/verbs/attended",
                     "_source.object.id": "http://www.example.com/meetings/34534",
-                    "_source.object.objectType": "Activity",
                 },
                 "limit": 0,
                 "projection": None,
@@ -266,7 +265,7 @@ def test_backends_lrs_mongo_query_statements_with_success(mongo, mongo_lrs_backe
     meta = {
         "actor": {"account": {"name": "test_name", "homePage": "http://example.com"}},
         "verb": {"id": "https://xapi-example.com/verb-id"},
-        "object": {"id": "http://example.com", "objectType": "Activity"},
+        "object": {"id": "http://example.com"},
     }
     documents = [
         {"id": "62b9ce922c26b46b68ffc68f", **timestamp, **meta},

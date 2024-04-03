@@ -62,9 +62,6 @@ class ClickHouseLRSBackend(
             where.append("JSONExtractString(event, 'verb', 'id') = {verb:String}")
 
         if params.activity:
-            where.append(
-                "JSONExtractString(event, 'object', 'objectType') = 'Activity'"
-            )
             where.append("JSONExtractString(event, 'object', 'id') = {activity:String}")
 
         if params.since:

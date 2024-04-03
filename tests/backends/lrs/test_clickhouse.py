@@ -184,7 +184,6 @@ def test_backends_lrs_clickhouse_default_instantiation(monkeypatch, fs):
             {
                 "where": [
                     "JSONExtractString(event, 'verb', 'id') = {verb:String}",
-                    "JSONExtractString(event, 'object', 'objectType') = 'Activity'",
                     "JSONExtractString(event, 'object', 'id') = {activity:String}",
                 ],
                 "params": {
@@ -319,7 +318,7 @@ def test_backends_lrs_clickhouse_query_statements(clickhouse, clickhouse_lrs_bac
             "timestamp": datetime_object.isoformat(),
             "actor": {"account": {"name": "test_name"}},
             "verb": {"id": "verb_id"},
-            "object": {"id": "http://example.com", "objectType": "Activity"},
+            "object": {"id": "http://example.com"},
         },
     ]
     success = backend.write(statements, chunk_size=1)
@@ -335,7 +334,7 @@ def test_backends_lrs_clickhouse_query_statements(clickhouse, clickhouse_lrs_bac
             "timestamp": datetime_object.isoformat(),
             "actor": {"account": {"name": "test_name"}},
             "verb": {"id": "verb_id"},
-            "object": {"id": "http://example.com", "objectType": "Activity"},
+            "object": {"id": "http://example.com"},
         },
     ]
     success = backend.write(statements_custom, target=custom_target, chunk_size=1)
@@ -375,7 +374,7 @@ def test_backends_lrs_clickhouse__find(clickhouse, clickhouse_lrs_backend):
             "timestamp": datetime_object.isoformat(),
             "actor": {"account": {"name": "test_name"}},
             "verb": {"id": "verb_id"},
-            "object": {"id": "http://example.com", "objectType": "Activity"},
+            "object": {"id": "http://example.com"},
         },
     ]
 
@@ -420,7 +419,7 @@ def test_backends_lrs_clickhouse_query_statements_by_ids(
             "timestamp": datetime_object.isoformat(),
             "actor": {"account": {"name": "test_name"}},
             "verb": {"id": "verb_id"},
-            "object": {"id": "http://example.com", "objectType": "Activity"},
+            "object": {"id": "http://example.com"},
         },
     ]
     count = backend.write(statements, chunk_size=1)
@@ -436,7 +435,7 @@ def test_backends_lrs_clickhouse_query_statements_by_ids(
             "timestamp": datetime_object.isoformat(),
             "actor": {"account": {"name": "test_name"}},
             "verb": {"id": "verb_id"},
-            "object": {"id": "http://example.com", "objectType": "Activity"},
+            "object": {"id": "http://example.com"},
         },
     ]
     count = backend.write(statements_custom, target=custom_target, chunk_size=1)

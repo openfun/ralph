@@ -28,6 +28,11 @@ and this project adheres to
 - API: The `RUNSERVER_BACKEND` configuration value is no longer validated to
   point to an existing backend.
 
+### Fixed
+
+- LRS: Fix querying on `activity` when LRS contains statements with an object
+  lacking a `objectType` attribute
+
 ## [4.1.0] - 2024-02-12
 
 ### Added
