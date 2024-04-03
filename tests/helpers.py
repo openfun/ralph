@@ -67,7 +67,6 @@ def mock_activity(id_: int = 0):
 
     """
     return {
-        "objectType": "Activity",
         "id": f"http://example.com/activity_{id_}",
     }
 

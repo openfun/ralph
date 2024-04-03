@@ -82,7 +82,6 @@ class ESLRSBackend(BaseLRSBackend[ESLRSBackendSettings], ESDataBackend):
 
         if params.activity:
             es_query_filters += [
-                {"term": {"object.objectType.keyword": "Activity"}},
                 {"term": {"object.id.keyword": params.activity}},
             ]
 
