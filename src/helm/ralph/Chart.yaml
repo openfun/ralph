@@ -4,5 +4,5 @@ name: ralph
 description: Ralph, the ultimate Learning Record Store (and more!) for your learning analytics 
 type: application
 version: 0.4.0
-appVersion: "4.1.0"
+appVersion: "4.2.0"
 icon: https://raw.githubusercontent.com/openfun/logos/main/ralph/ralph-color-dark.png
