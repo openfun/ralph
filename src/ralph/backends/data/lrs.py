@@ -6,7 +6,13 @@ from typing import Iterable, Iterator, List, Optional, Union
 from urllib.parse import ParseResult, parse_qs, urljoin, urlparse
 
 from httpx import Client, HTTPError, HTTPStatusError, RequestError
-from pydantic import AnyHttpUrl, BaseModel, Field, PositiveInt, parse_obj_as
+from pydantic import (
+    AnyHttpUrl,
+    BaseModel,
+    Field,
+    PositiveInt,
+    TypeAdapter,
+)
 from pydantic_settings import SettingsConfigDict
 from typing_extensions import Annotated
 
@@ -90,7 +96,7 @@ class LRSDataBackend(
                 If `settings` is `None`, a default settings instance is used instead.
         """
         super().__init__(settings)
-        self.base_url = parse_obj_as(AnyHttpUrl, self.settings.BASE_URL)
+        self.base_url = TypeAdapter(AnyHttpUrl).validate_python(self.settings.BASE_URL)
         self.auth = (self.settings.USERNAME, self.settings.PASSWORD)
         self._client = None
 

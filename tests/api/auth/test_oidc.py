@@ -2,7 +2,7 @@
 
 import pytest
 import responses
-from pydantic import parse_obj_as
+from pydantic import TypeAdapter
 
 from ralph.api.auth.oidc import discover_provider, get_public_keys
 from ralph.conf import AuthBackend
@@ -40,7 +40,9 @@ async def test_api_auth_oidc_get_whoami_valid(
     assert response.status_code == 200
     assert len(response.json().keys()) == 2
     assert response.json()["agent"] == {"openid": "https://iss.example.com/123|oidc"}
-    assert parse_obj_as(BaseXapiAgentWithOpenId, response.json()["agent"])
+    assert TypeAdapter(BaseXapiAgentWithOpenId).validate_python(
+        response.json()["agent"]
+    )
     assert sorted(response.json()["scopes"]) == ["all", "profile/read"]
     assert "target" not in response.json()
 

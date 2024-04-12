@@ -13,8 +13,8 @@ from pydantic import (
     ConfigDict,
     Field,
     StringConstraints,
+    TypeAdapter,
     model_validator,
-    parse_obj_as,
 )
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing_extensions import Annotated
@@ -198,7 +198,9 @@ class Settings(BaseSettings):
         },
     }
     PARSERS: ParserSettings = ParserSettings()
-    RUNSERVER_AUTH_BACKENDS: AuthBackends = parse_obj_as(AuthBackends, "Basic")
+    RUNSERVER_AUTH_BACKENDS: AuthBackends = TypeAdapter(AuthBackends).validate_python(
+        "Basic"
+    )
     RUNSERVER_AUTH_OIDC_AUDIENCE: Optional[str] = None
     RUNSERVER_AUTH_OIDC_ISSUER_URI: Optional[AnyHttpUrl] = None
     RUNSERVER_BACKEND: str = "es"

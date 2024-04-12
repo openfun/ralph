@@ -11,7 +11,7 @@ from functools import partial
 import httpx
 import pytest
 from httpx import HTTPStatusError, RequestError
-from pydantic import AnyHttpUrl, AnyUrl, parse_obj_as
+from pydantic import AnyHttpUrl, AnyUrl, TypeAdapter
 from pytest_httpx import HTTPXMock
 
 from ralph.backends.data.async_lrs import AsyncLRSDataBackend
@@ -46,7 +46,9 @@ def test_backends_data_async_lrs_default_instantiation(monkeypatch, fs, lrs_back
     assert backend_class.settings_class == LRSDataBackendSettings
     backend = backend_class()
     assert backend.query_class == LRSStatementsQuery
-    assert backend.base_url == parse_obj_as(AnyHttpUrl, "http://0.0.0.0:8100")
+    assert backend.base_url == TypeAdapter(AnyHttpUrl).validate_python(
+        "http://0.0.0.0:8100"
+    )
     assert backend.auth == ("ralph", "secret")
     assert backend.settings.HEADERS == LRSHeaders()
     assert backend.settings.LOCALE_ENCODING == "utf8"
