@@ -153,137 +153,172 @@ async def get(  # noqa: PLR0912,PLR0913
     ###
     # Query string parameters defined by the LRS specification
     ###
-    statement_id: Optional[str] = Query(
-        None, description="Id of Statement to fetch", alias="statementId"
-    ),
-    voided_statement_id: Optional[str] = Query(
-        None,
-        description="**Not implemented** Id of voided Statement to fetch",
-        alias="voidedStatementId",
-    ),
-    agent: Optional[Json] = Query(
-        None,
-        description=(
-            "Filter, only return Statements for which the specified "
-            "Agent or Group is the Actor or Object of the Statement"
+    statement_id: Annotated[
+        Optional[str],
+        Query(description="Id of Statement to fetch", alias="statementId"),
+    ] = None,
+    voided_statement_id: Annotated[
+        Optional[str],
+        Query(
+            description="**Not implemented** Id of voided Statement to fetch",
+            alias="voidedStatementId",
         ),
-    ),
-    verb: Optional[str] = Query(
-        None,
-        description="Filter, only return Statements matching the specified Verb id",
-    ),
-    activity: Optional[str] = Query(
-        None,
-        description=(
-            "Filter, only return Statements for which the Object "
-            "of the Statement is an Activity with the specified id"
+    ] = None,
+    agent: Annotated[
+        Optional[Json],
+        Query(
+            description=(
+                "Filter, only return Statements for which the specified "
+                "Agent or Group is the Actor or Object of the Statement"
+            ),
         ),
-    ),
-    registration: Optional[UUID] = Query(
-        None,
-        description=(
-            "**Not implemented** "
-            "Filter, only return Statements matching the specified registration id"
+    ] = None,
+    verb: Annotated[
+        Optional[str],
+        Query(
+            description="Filter, only return Statements matching the specified Verb id",
         ),
-    ),
-    related_activities: Optional[bool] = Query(
-        False,
-        description=(
-            "**Not implemented** "
-            "Apply the Activity filter broadly. Include Statements for which "
-            "the Object, any of the context Activities, or any of those properties "
-            "in a contained SubStatement match the Activity parameter, "
-            "instead of that parameter's normal behaviour"
+    ] = None,
+    activity: Annotated[
+        Optional[str],
+        Query(
+            description=(
+                "Filter, only return Statements for which the Object "
+                "of the Statement is an Activity with the specified id"
+            ),
         ),
-    ),
-    related_agents: Optional[bool] = Query(
-        False,
-        description=(
-            "**Not implemented** "
-            "Apply the Agent filter broadly. Include Statements for which "
-            "the Actor, Object, Authority, Instructor, Team, or any of these "
-            "properties in a contained SubStatement match the Agent parameter, "
-            "instead of that parameter's normal behaviour."
+    ] = None,
+    registration: Annotated[
+        Optional[UUID],
+        Query(
+            description=(
+                "**Not implemented** "
+                "Filter, only return Statements matching the specified registration id"
+            ),
         ),
-    ),
-    since: Optional[datetime] = Query(
-        None,
-        description=(
-            "Only Statements stored since the "
-            "specified Timestamp (exclusive) are returned"
+    ] = None,
+    related_activities: Annotated[
+        Optional[bool],
+        Query(
+            description=(
+                "**Not implemented** "
+                "Apply the Activity filter broadly. Include Statements for which "
+                "the Object, any of the context Activities, or any of those properties "
+                "in a contained SubStatement match the Activity parameter, "
+                "instead of that parameter's normal behaviour"
+            ),
         ),
-    ),
-    until: Optional[datetime] = Query(
-        None,
-        description=(
-            "Only Statements stored at or "
-            "before the specified Timestamp are returned"
+    ] = False,
+    related_agents: Annotated[
+        Optional[bool],
+        Query(
+            description=(
+                "**Not implemented** "
+                "Apply the Agent filter broadly. Include Statements for which "
+                "the Actor, Object, Authority, Instructor, Team, or any of these "
+                "properties in a contained SubStatement match the Agent parameter, "
+                "instead of that parameter's normal behaviour."
+            ),
         ),
-    ),
-    limit: Optional[int] = Query(
-        settings.RUNSERVER_MAX_SEARCH_HITS_COUNT,
-        ge=0,
-        description=(
-            "Maximum number of Statements to return. "
-            "0 indicates return the maximum the server will allow"
+    ] = False,
+    since: Annotated[
+        Optional[datetime],
+        Query(
+            description=(
+                "Only Statements stored since the "
+                "specified Timestamp (exclusive) are returned"
+            ),
         ),
-    ),
-    format: Optional[Literal["ids", "exact", "canonical"]] = Query(  # noqa: ARG001
-        "exact",
-        description=(
-            "**Not implemented** "
-            'If "ids", only include minimum information necessary in Agent, Activity, '
-            "Verb and Group Objects to identify them. For Anonymous Groups this means "
-            "including the minimum information needed to identify each member. "
-            'If "exact", return Agent, Activity, Verb and Group Objects populated '
-            "exactly as they were when the Statement was received. An LRS requesting "
-            "Statements for the purpose of importing them would use a format of "
-            '"exact" in order to maintain Statement Immutability. '
-            'If "canonical", return Activity Objects and Verbs populated with the '
-            "canonical definition of the Activity Objects and Display of the Verbs "
-            "as determined by the LRS, after applying the language filtering process "
-            "defined below, and return the original Agent and Group Objects "
-            'as in "exact" mode.'
+    ] = None,
+    until: Annotated[
+        Optional[datetime],
+        Query(
+            description=(
+                "Only Statements stored at or "
+                "before the specified Timestamp are returned"
+            ),
         ),
-    ),
-    attachments: Optional[bool] = Query(  # noqa: ARG001
-        False,
-        description=(
-            "**Not implemented** "
-            'If "true", the LRS uses the multipart response format and includes '
-            'all attachments as described previously. If "false", the LRS sends '
-            "the prescribed response with Content-Type application/json and "
-            "does not send attachment data."
+    ] = None,
+    limit: Annotated[
+        Optional[int],
+        Query(
+            ge=0,
+            description=(
+                "Maximum number of Statements to return. "
+                "0 indicates return the maximum the server will allow"
+            ),
         ),
-    ),
-    ascending: Optional[bool] = Query(  # noqa: ARG001
-        False, description='If "true", return results in ascending order of stored time'
-    ),
-    mine: Optional[bool] = Query(
-        False,
-        description=(
-            'If "true", return only the results for which the authority matches the '
-            '"agent" associated to the user that is making the query.'
+    ] = settings.RUNSERVER_MAX_SEARCH_HITS_COUNT,
+    format: Annotated[  # noqa: ARG001
+        Optional[Literal["ids", "exact", "canonical"]],
+        Query(
+            description=(
+                "**Not implemented** "
+                'If "ids", only include minimum information necessary in Agent, '
+                "Activity, Verb and Group Objects to identify them. For Anonymous "
+                "Groups this means including the minimum information needed to "
+                'identify each member. If "exact", return Agent, Activity, Verb and '
+                "Group Objects populated exactly as they were when the Statement was "
+                "received. An LRS requesting Statements for the purpose of importing "
+                'them would use a format of "exact" in order to maintain Statement '
+                'Immutability. If "canonical", return Activity Objects and Verbs '
+                "populated with the canonical definition of the Activity Objects and "
+                "Display of the Verbs  as determined by the LRS, after applying the "
+                "language filtering process  defined below, and return the original "
+                'Agent and Group Objects as in "exact" mode.'
+            ),
         ),
-    ),
+    ] = "exact",
+    attachments: Annotated[  # noqa: ARG001
+        Optional[bool],
+        Query(
+            description=(
+                "**Not implemented** "
+                'If "true", the LRS uses the multipart response format and includes '
+                'all attachments as described previously. If "false", the LRS sends '
+                "the prescribed response with Content-Type application/json and "
+                "does not send attachment data."
+            ),
+        ),
+    ] = False,
+    ascending: Annotated[  # noqa: ARG001
+        Optional[bool],
+        Query(
+            description='If "true", return results in ascending order of stored time'
+        ),
+    ] = False,
+    mine: Annotated[
+        Optional[bool],
+        Query(
+            description=(
+                'If "true", return only the results for which the authority matches '
+                'the "agent" associated to the user that is making the query.'
+            ),
+        ),
+    ] = False,
     ###
     # Private use query string parameters
     ###
-    search_after: Optional[str] = Query(  # noqa: ARG001
-        None,
-        description=(
-            "Sorting data to allow pagination through large number of search results. "
-            "NB: for internal use, not part of the LRS specification."
+    search_after: Annotated[  # noqa: ARG001
+        Optional[str],
+        Query(
+            description=(
+                "Sorting data to allow pagination through large number of search "
+                "results."
+                "NB: for internal use, not part of the LRS specification."
+            ),
         ),
-    ),
-    pit_id: Optional[str] = Query(  # noqa: ARG001
-        None,
-        description=(
-            "Point-in-time ID to ensure consistency of search requests through "
-            "multiple pages."
-            "NB: for internal use, not part of the LRS specification."
+    ] = None,
+    pit_id: Annotated[  # noqa: ARG001
+        Optional[str],
+        Query(
+            description=(
+                "Point-in-time ID to ensure consistency of search requests through "
+                "multiple pages."
+                "NB: for internal use, not part of the LRS specification."
+            ),
         ),
-    ),
+    ] = None,
     _=Depends(strict_query_params),
 ) -> Dict:
     """Read a single xAPI Statement or multiple xAPI Statements.
