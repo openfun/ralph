@@ -3,7 +3,7 @@
 from importlib import reload
 
 import pytest
-from pydantic import ValidationError
+from pydantic import TypeAdapter, ValidationError
 
 from ralph import conf
 from ralph.backends.data.es import ESDataBackend
@@ -12,7 +12,6 @@ from ralph.conf import (
     AuthBackends,
     CommaSeparatedTuple,
     Settings,
-    parse_obj_as,
     settings,
 )
 from ralph.exceptions import ConfigurationException
@@ -54,7 +53,7 @@ def test_conf_settings_field_value_priority(fs, monkeypatch):
 )
 def test_conf_comma_separated_list_with_valid_values(value, expected, monkeypatch):
     """Test the CommaSeparatedTuple pydantic data type with valid values."""
-    assert parse_obj_as(CommaSeparatedTuple, value) == expected
+    assert TypeAdapter(CommaSeparatedTuple).validate_python(value) == expected
     monkeypatch.setenv("RALPH_BACKENDS__DATA__ES__HOSTS", "".join(value))
     assert ESDataBackend().settings.HOSTS == expected
 
@@ -63,7 +62,7 @@ def test_conf_comma_separated_list_with_valid_values(value, expected, monkeypatc
 def test_conf_comma_separated_list_with_invalid_values(value):
     """Test the CommaSeparatedTuple pydantic data type with invalid values."""
     with pytest.raises(ValidationError, match="2 validation errors for function-after"):
-        parse_obj_as(CommaSeparatedTuple, value)
+        TypeAdapter(CommaSeparatedTuple).validate_python(value)
 
 
 @pytest.mark.parametrize(
@@ -80,13 +79,13 @@ def test_conf_comma_separated_list_with_invalid_values(value):
 def test_conf_auth_backend(value, is_valid, expected, monkeypatch):
     """Test the AuthBackends data type with valid and invalid values."""
     if is_valid:
-        assert parse_obj_as(AuthBackends, value) == expected
+        assert TypeAdapter(AuthBackends).validate_python(value) == expected
         monkeypatch.setenv("RALPH_RUNSERVER_AUTH_BACKENDS", "".join(value))
         reload(conf)
         assert conf.settings.RUNSERVER_AUTH_BACKENDS == expected
     else:
         with pytest.raises(ValueError, match="'notvalid' is not a valid AuthBackend"):
-            parse_obj_as(AuthBackends, value)
+            TypeAdapter(AuthBackends).validate_python(value)
 
 
 def test_conf_core_settings_should_impact_settings_defaults(monkeypatch):

@@ -6,7 +6,7 @@ from typing import AsyncIterator, Iterable, Optional, Union
 from urllib.parse import ParseResult, parse_qs, urljoin, urlparse
 
 from httpx import AsyncClient, HTTPError, HTTPStatusError, RequestError
-from pydantic import AnyHttpUrl, PositiveInt, parse_obj_as
+from pydantic import AnyHttpUrl, PositiveInt, TypeAdapter
 
 from ralph.backends.data.base import (
     AsyncWritable,
@@ -44,7 +44,7 @@ class AsyncLRSDataBackend(
                 If `settings` is `None`, a default settings instance is used instead.
         """
         super().__init__(settings)
-        self.base_url = parse_obj_as(AnyHttpUrl, self.settings.BASE_URL)
+        self.base_url = TypeAdapter(AnyHttpUrl).validate_python(self.settings.BASE_URL)
         self.auth = (self.settings.USERNAME, self.settings.PASSWORD)
         self._client = None
 

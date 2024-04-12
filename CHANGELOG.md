@@ -12,6 +12,7 @@ and this project adheres to
 
 - Upgrade `pydantic` to `2.7.0`
 - Migrate model tests from hypothesis strategies to polyfactory
+- Replace soon-to-be deprecated `parse_obj_as` with `TypeAdapter`
 
 ## [4.2.0] - 2024-04-08
 

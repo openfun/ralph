@@ -18,7 +18,7 @@ import uvicorn
 import websockets
 from elasticsearch import BadRequestError, Elasticsearch
 from httpx import AsyncClient, ConnectError
-from pydantic import AnyHttpUrl, parse_obj_as
+from pydantic import AnyHttpUrl, TypeAdapter
 from pymongo import MongoClient
 from pymongo.errors import CollectionInvalid
 
@@ -313,7 +313,7 @@ def lrs_backend(
             "CONTENT_TYPE": "application/json",
         }
         settings = backend_class.settings_class(
-            BASE_URL=parse_obj_as(AnyHttpUrl, base_url),
+            BASE_URL=TypeAdapter(AnyHttpUrl).validate_python(base_url),
             USERNAME="user",
             PASSWORD="pass",
             HEADERS=LRSHeaders.model_validate(headers),

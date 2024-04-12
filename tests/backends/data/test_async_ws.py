@@ -6,7 +6,7 @@ import re
 
 import pytest
 import websockets
-from pydantic import AnyUrl, parse_obj_as
+from pydantic import AnyUrl, TypeAdapter
 
 from ralph.backends.data.async_ws import AsyncWSDataBackend, WSDataBackendSettings
 from ralph.backends.data.base import DataBackendStatus
@@ -49,7 +49,7 @@ def test_backends_data_async_ws_instantiation_with_settings(monkeypatch):
     uri = f"ws://{WS_TEST_HOST}:{WS_TEST_PORT}"
     settings = WSDataBackendSettings(URI=uri)
     backend = AsyncWSDataBackend(settings)
-    assert backend.settings.URI == parse_obj_as(AnyUrl, uri)
+    assert backend.settings.URI == TypeAdapter(AnyUrl).validate_python(uri)
     assert backend.settings.LOCALE_ENCODING == "utf8"
     assert backend.settings.READ_CHUNK_SIZE == 500
     assert backend.settings.WRITE_CHUNK_SIZE == 500
@@ -59,7 +59,7 @@ def test_backends_data_async_ws_instantiation_with_settings(monkeypatch):
     monkeypatch.setenv("RALPH_BACKENDS__DATA__WS__URI", "ws://foo")
     backend = AsyncWSDataBackend()
     assert backend.settings.READ_CHUNK_SIZE == 1
-    assert backend.settings.URI == parse_obj_as(AnyUrl, "ws://foo")
+    assert backend.settings.URI == TypeAdapter(AnyUrl).validate_python("ws://foo")
 
 
 @pytest.mark.anyio
@@ -79,7 +79,7 @@ async def test_backends_data_async_ws_status_with_error_status(ws, events, caplo
         "[Errno 111] Connect call failed ('127.0.0.1', 1)",
     ) in caplog.record_tuples
 
-    uri = parse_obj_as(AnyUrl, f"ws://{WS_TEST_HOST}:{WS_TEST_PORT}")
+    uri = TypeAdapter(AnyUrl).validate_python(f"ws://{WS_TEST_HOST}:{WS_TEST_PORT}")
     settings = WSDataBackendSettings(URI=uri)
     backend = AsyncWSDataBackend(settings)
     assert [_ async for _ in backend.read(raw_output=False)] == events
