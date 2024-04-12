@@ -11,7 +11,6 @@ import pytest
 from click.exceptions import BadParameter
 from click.testing import CliRunner
 from elasticsearch.helpers import bulk, scan
-from hypothesis import settings as hypothesis_settings
 from pydantic import ValidationError
 
 from ralph import cli as cli_module
@@ -30,13 +29,13 @@ from ralph.models.edx.navigational.statements import UIPageClose
 from ralph.models.xapi.navigation.statements import PageTerminated
 from ralph.utils import iter_over_async
 
+from tests.factories import mock_instance
 from tests.fixtures.backends import (
     ES_TEST_HOSTS,
     ES_TEST_INDEX,
     WS_TEST_HOST,
     WS_TEST_PORT,
 )
-from tests.fixtures.hypothesis_strategies import custom_given
 
 test_logger = logging.getLogger("ralph")
 
@@ -157,7 +156,7 @@ def test_cli_json_string_param_type_with_invalid_input(value):
 def test_cli_help_option():
     """Test ralph --help command."""
     runner = CliRunner()
-    result = runner.invoke(cli, ["--help"])
+    result = runner.invoke(cli, ["--help"], catch_exceptions=False)
 
     assert result.exit_code == 0
     assert (
@@ -502,21 +501,22 @@ def test_cli_extract_command_with_es_parser():
     assert "\n".join([json.dumps({"id": idx}) for idx in range(10)]) in result.output
 
 
-@custom_given(UIPageClose)
-def test_cli_validate_command_with_edx_format(event):
+def test_cli_validate_command_with_edx_format():
     """Test ralph validate command using the edx format."""
-    event_str = event.json()
+    event = mock_instance(UIPageClose)
+
+    event_str = event.model_dump_json()
     runner = CliRunner()
     result = runner.invoke(cli, ["validate", "-f", "edx"], input=event_str)
     assert event_str in result.output
 
 
-@hypothesis_settings(deadline=None)
-@custom_given(UIPageClose)
 @pytest.mark.parametrize("valid_uuid", ["ee241f8b-174f-5bdb-bae9-c09de5fe017f"])
-def test_cli_convert_command_from_edx_to_xapi_format(valid_uuid, event):
+def test_cli_convert_command_from_edx_to_xapi_format(valid_uuid):
     """Test ralph convert command from edx to xapi format."""
-    event_str = event.json()
+    event = mock_instance(UIPageClose)
+
+    event_str = event.model_dump_json()
     runner = CliRunner()
     command = f"-v ERROR convert -f edx -t xapi -u {valid_uuid} -p https://fun-mooc.fr"
     result = runner.invoke(cli, command.split(), input=event_str)
@@ -651,10 +651,11 @@ def test_cli_read_command_with_es_backend(es):
     runner = CliRunner()
     es_hosts = ",".join(ES_TEST_HOSTS)
     es_client_options = "verify_certs=True"
-    command = f"""-v ERROR read -b es --es-hosts {es_hosts}
+    command = f"""-v ERROR read -b es
         --es-default-index {ES_TEST_INDEX}
-        --es-client-options {es_client_options}"""
-    result = runner.invoke(cli, command.split())
+        --es-hosts {es_hosts} --es-client-options {es_client_options}"""
+    result = runner.invoke(cli, command.split(), catch_exceptions=False)
+
     assert result.exit_code == 0
     expected = (
         "\n".join(
@@ -682,8 +683,8 @@ def test_cli_read_command_client_options_with_es_backend(es):
 
     runner = CliRunner()
     es_client_options = "ca_certs=/path/,verify_certs=True"
-    command = f"""-v ERROR read -b es --es-client-options {es_client_options}"""
-    result = runner.invoke(cli, command.split())
+    command = f"""-v DEBUG read -b es --es-client-options {es_client_options}"""
+    result = runner.invoke(cli, command.split(), catch_exceptions=True)
     assert result.exit_code == 1
     assert "TLS options require scheme to be 'https'" in str(result.exception)
 
@@ -750,11 +751,11 @@ def test_cli_read_command_with_es_backend_query(es):
     assert result.exit_code > 0
     assert isinstance(result.exception, BackendParameterException)
     msg = (
-        "Invalid MongoQuery query string: "
-        "[{'loc': ('__root__',), 'msg': 'Expecting value: line 1 column 1 (char 0)', "
-        "'type': 'value_error.jsondecode', 'ctx': {'msg': 'Expecting value', "
-        "'doc': 'wrong_query_string', 'pos': 0, 'lineno': 1, 'colno': 1}}]"
+        "Invalid MongoQuery query string: [{'type': 'value_error.jsondecode',"
+        " 'loc': ('__root__',), 'msg': 'Expecting value: line 1 column 1 (char 0)',"
+        " 'input': 'wrong_query_string'}]"
     )
+
     assert str(result.exception) == msg
 
 
@@ -770,7 +771,12 @@ def test_cli_read_command_with_ws_backend(events, ws):
     with websocket():
         runner = CliRunner()
         uri = f"ws://{WS_TEST_HOST}:{WS_TEST_PORT}"
-        result = runner.invoke(cli, ["read", "-b", "async_ws", "--async-ws-uri", uri])
+        result = runner.invoke(
+            cli,
+            ["read", "-b", "async_ws", "--async-ws-uri", uri],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
         assert "\n".join([json.dumps(event) for event in events]) in result.output
 
 
@@ -991,10 +997,12 @@ def test_cli_write_command_with_es_backend(es):
 
     runner = CliRunner()
     es_hosts = ",".join(ES_TEST_HOSTS)
+
     result = runner.invoke(
         cli,
         f"write -b es --es-hosts {es_hosts} --es-default-index {ES_TEST_INDEX}".split(),
         input="\n".join(json.dumps(record) for record in records),
+        catch_exceptions=False,
     )
     assert result.exit_code == 0
 

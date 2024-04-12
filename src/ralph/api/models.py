@@ -7,7 +7,7 @@ validation.
 from typing import Optional, Union
 from uuid import UUID
 
-from pydantic import AnyUrl, BaseModel, Extra
+from pydantic import AnyUrl, BaseModel, ConfigDict
 
 from ..models.xapi.base.agents import BaseXapiAgent
 from ..models.xapi.base.groups import BaseXapiGroup
@@ -30,13 +30,7 @@ class BaseModelWithLaxConfig(BaseModel):
     we receive statements through the API.
     """
 
-    class Config:
-        """Enable extra properties.
-
-        Useful for not having to perform comprehensive validation.
-        """
-
-        extra = Extra.allow
+    model_config = ConfigDict(extra="allow", coerce_numbers_to_str=True)
 
 
 class LaxObjectField(BaseModelWithLaxConfig):
@@ -65,6 +59,6 @@ class LaxStatement(BaseModelWithLaxConfig):
     """
 
     actor: Union[BaseXapiAgent, BaseXapiGroup]
-    id: Optional[UUID]
+    id: Optional[UUID] = None
     object: LaxObjectField
     verb: LaxVerbField

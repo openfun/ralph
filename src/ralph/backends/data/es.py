@@ -8,6 +8,7 @@ from typing import Iterable, Iterator, List, Literal, Optional, TypeVar, Union
 from elasticsearch import ApiError, Elasticsearch, TransportError
 from elasticsearch.helpers import BulkIndexError, streaming_bulk
 from pydantic import BaseModel, PositiveInt, ValidationError
+from pydantic_settings import SettingsConfigDict
 from typing_extensions import Self
 
 from ralph.backends.data.base import (
@@ -19,7 +20,7 @@ from ralph.backends.data.base import (
     Listable,
     Writable,
 )
-from ralph.conf import BaseSettingsConfig, ClientOptions, CommaSeparatedTuple
+from ralph.conf import BASE_SETTINGS_CONFIG, ClientOptions, CommaSeparatedTuple
 from ralph.exceptions import BackendException
 
 logger = logging.getLogger(__name__)
@@ -52,17 +53,21 @@ class ESDataBackendSettings(BaseDataBackendSettings):
         WRITE_CHUNK_SIZE (int): The default chunk size for writing batches of documents.
     """
 
-    class Config(BaseSettingsConfig):
-        """Pydantic Configuration."""
-
-        env_prefix = "RALPH_BACKENDS__DATA__ES__"
+    model_config = {
+        **BASE_SETTINGS_CONFIG,
+        **SettingsConfigDict(env_prefix="RALPH_BACKENDS__DATA__ES__"),
+    }
 
     ALLOW_YELLOW_STATUS: bool = False
     CLIENT_OPTIONS: ESClientOptions = ESClientOptions()
     DEFAULT_INDEX: str = "statements"
-    HOSTS: CommaSeparatedTuple = ("http://localhost:9200",)
+    HOSTS: CommaSeparatedTuple = (
+        "http://localhost:9200"  # CommaSeparatedTuple("http://localhost:9200")
+    )
     POINT_IN_TIME_KEEP_ALIVE: str = "1m"
-    REFRESH_AFTER_WRITE: Union[Literal["false", "true", "wait_for"], bool, str, None]
+    REFRESH_AFTER_WRITE: Optional[
+        Union[Literal["false", "true", "wait_for"], bool, str]
+    ] = None
 
 
 class ESQueryPit(BaseModel):
@@ -74,8 +79,8 @@ class ESQueryPit(BaseModel):
             time alive.
     """
 
-    id: Union[str, None]
-    keep_alive: Union[str, None]
+    id: Union[str, None] = None
+    keep_alive: Union[str, None] = None
 
 
 class ESQuery(BaseQuery):
@@ -142,7 +147,7 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
         """Create an Elasticsearch client if it doesn't exist."""
         if not self._client:
             self._client = Elasticsearch(
-                self.settings.HOSTS, **self.settings.CLIENT_OPTIONS.dict()
+                self.settings.HOSTS, **self.settings.CLIENT_OPTIONS.model_dump()
             )
         return self._client
 
@@ -262,7 +267,7 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
                 raise BackendException(msg % error) from error
 
         limit = query.size
-        kwargs = query.dict()
+        kwargs = query.model_dump()
         count = chunk_size
         # The first condition is set to comprise either limit as None
         # (when the backend query does not have `size` parameter),

@@ -45,7 +45,7 @@ class AsyncESDataBackend(
         """Create an AsyncElasticsearch client if it doesn't exist."""
         if not self._client:
             self._client = AsyncElasticsearch(
-                self.settings.HOSTS, **self.settings.CLIENT_OPTIONS.dict()
+                self.settings.HOSTS, **self.settings.CLIENT_OPTIONS.model_dump()
             )
         return self._client
 
@@ -179,7 +179,7 @@ class AsyncESDataBackend(
                 raise BackendException(msg % error) from error
 
         limit = query.size
-        kwargs = query.dict()
+        kwargs = query.model_dump()
         count = chunk_size
         # The first condition is set to comprise either limit as None
         # (when the backend query does not have `size` parameter),

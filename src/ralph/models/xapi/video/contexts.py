@@ -4,7 +4,8 @@ import sys
 from typing import List, Optional, Union
 from uuid import UUID
 
-from pydantic import Field, NonNegativeFloat, validator
+from pydantic import Field, NonNegativeFloat, field_validator
+from typing_extensions import Annotated
 
 from ..base.contexts import BaseXapiContext, BaseXapiContextContextActivities
 from ..base.unnested_objects import BaseXapiActivity
@@ -51,7 +52,7 @@ class VideoContextContextActivities(BaseXapiContextContextActivities):
         VideoProfileActivity, List[Union[VideoProfileActivity, BaseXapiActivity]]
     ]
 
-    @validator("category")
+    @field_validator("category")
     @classmethod
     def check_presence_of_profile_activity_category(
         cls,
@@ -90,7 +91,7 @@ class VideoContextExtensions(BaseExtensionModelWithConfig):
         session (uuid): Consists of the ID of the active session.
     """
 
-    session_id: Optional[UUID] = Field(alias=CONTEXT_EXTENSION_SESSION_ID)
+    session_id: Annotated[Optional[UUID], Field(alias=CONTEXT_EXTENSION_SESSION_ID)]
 
 
 class VideoInitializedContextExtensions(VideoContextExtensions):
@@ -115,20 +116,30 @@ class VideoInitializedContextExtensions(VideoContextExtensions):
             consumed to trigger a completion.
     """
 
-    length: NonNegativeFloat = Field(alias=CONTEXT_EXTENSION_LENGTH)
-    ccSubtitleEnabled: Optional[bool] = Field(alias=CONTEXT_EXTENSION_CC_ENABLED)
-    ccSubtitleLang: Optional[str] = Field(alias=CONTEXT_EXTENSION_CC_SUBTITLE_LANG)
-    fullScreen: Optional[bool] = Field(alias=CONTEXT_EXTENSION_FULL_SCREEN)
-    screenSize: Optional[str] = Field(alias=CONTEXT_EXTENSION_SCREEN_SIZE)
-    videoPlaybackSize: Optional[str] = Field(
-        alias=CONTEXT_EXTENSION_VIDEO_PLAYBACK_SIZE
+    length: Annotated[NonNegativeFloat, Field(alias=CONTEXT_EXTENSION_LENGTH)]
+    ccSubtitleEnabled: Annotated[
+        Optional[bool], Field(alias=CONTEXT_EXTENSION_CC_ENABLED)
+    ] = None
+    ccSubtitleLang: Annotated[
+        Optional[str], Field(alias=CONTEXT_EXTENSION_CC_SUBTITLE_LANG)
+    ] = None
+    fullScreen: Annotated[
+        Optional[bool], Field(alias=CONTEXT_EXTENSION_FULL_SCREEN)
+    ] = None
+    screenSize: Annotated[Optional[str], Field(alias=CONTEXT_EXTENSION_SCREEN_SIZE)] = (
+        None
     )
-    speed: Optional[str] = Field(alias=CONTEXT_EXTENSION_SPEED)
-    userAgent: Optional[str] = Field(alias=CONTEXT_EXTENSION_USER_AGENT)
-    volume: Optional[int] = Field(alias=CONTEXT_EXTENSION_VOLUME)
-    completionThreshold: Optional[float] = Field(
-        alias=CONTEXT_EXTENSION_COMPLETION_THRESHOLD
+    videoPlaybackSize: Annotated[
+        Optional[str], Field(alias=CONTEXT_EXTENSION_VIDEO_PLAYBACK_SIZE)
+    ] = None
+    speed: Annotated[Optional[str], Field(alias=CONTEXT_EXTENSION_SPEED)] = None
+    userAgent: Annotated[Optional[str], Field(alias=CONTEXT_EXTENSION_USER_AGENT)] = (
+        None
     )
+    volume: Annotated[Optional[int], Field(alias=CONTEXT_EXTENSION_VOLUME)] = None
+    completionThreshold: Annotated[
+        Optional[float], Field(alias=CONTEXT_EXTENSION_COMPLETION_THRESHOLD)
+    ] = None
 
 
 class VideoBrowsingContextExtensions(VideoContextExtensions):
@@ -142,10 +153,10 @@ class VideoBrowsingContextExtensions(VideoContextExtensions):
         length (float): Consists of the length of the video.
     """
 
-    length: NonNegativeFloat = Field(alias=CONTEXT_EXTENSION_LENGTH)
-    completionThreshold: Optional[float] = Field(
-        alias=CONTEXT_EXTENSION_COMPLETION_THRESHOLD
-    )
+    length: Annotated[NonNegativeFloat, Field(alias=CONTEXT_EXTENSION_LENGTH)]
+    completionThreshold: Annotated[
+        Optional[float], Field(alias=CONTEXT_EXTENSION_COMPLETION_THRESHOLD)
+    ] = None
 
 
 class VideoEnableClosedCaptioningContextExtensions(VideoContextExtensions):
@@ -156,7 +167,7 @@ class VideoEnableClosedCaptioningContextExtensions(VideoContextExtensions):
             captioning.
     """
 
-    ccSubtitleLanguage: str = Field(alias=CONTEXT_EXTENSION_CC_SUBTITLE_LANG)
+    ccSubtitleLanguage: Annotated[str, Field(alias=CONTEXT_EXTENSION_CC_SUBTITLE_LANG)]
 
 
 class VideoVolumeChangeInteractionContextExtensions(VideoContextExtensions):
@@ -167,7 +178,7 @@ class VideoVolumeChangeInteractionContextExtensions(VideoContextExtensions):
         volume (int): Consists of the volume of the video.
     """  # noqa: D205
 
-    volume: int = Field(alias=CONTEXT_EXTENSION_VOLUME)
+    volume: Annotated[int, Field(alias=CONTEXT_EXTENSION_VOLUME)]
 
 
 class VideoScreenChangeInteractionContextExtensions(VideoContextExtensions):
@@ -181,9 +192,11 @@ class VideoScreenChangeInteractionContextExtensions(VideoContextExtensions):
             viewed by the user.
     """  # noqa: D205
 
-    fullScreen: bool = Field(alias=CONTEXT_EXTENSION_FULL_SCREEN)
-    screenSize: str = Field(alias=CONTEXT_EXTENSION_SCREEN_SIZE)
-    videoPlaybackSize: str = Field(alias=CONTEXT_EXTENSION_VIDEO_PLAYBACK_SIZE)
+    fullScreen: Annotated[bool, Field(alias=CONTEXT_EXTENSION_FULL_SCREEN)]
+    screenSize: Annotated[str, Field(alias=CONTEXT_EXTENSION_SCREEN_SIZE)]
+    videoPlaybackSize: Annotated[
+        str, Field(alias=CONTEXT_EXTENSION_VIDEO_PLAYBACK_SIZE)
+    ]
 
 
 class VideoInitializedContext(BaseVideoContext):
@@ -203,7 +216,7 @@ class VideoPlayedContext(BaseVideoContext):
         extensions (dict): See VideoContextExtensions.
     """
 
-    extensions: Optional[VideoContextExtensions]
+    extensions: Optional[VideoContextExtensions] = None
 
 
 class VideoPausedContext(BaseVideoContext):
@@ -223,7 +236,7 @@ class VideoSeekedContext(BaseVideoContext):
         extensions (dict): See VideoContextExtensions.
     """
 
-    extensions: Optional[VideoContextExtensions]
+    extensions: Optional[VideoContextExtensions] = None
 
 
 class VideoCompletedContext(BaseVideoContext):

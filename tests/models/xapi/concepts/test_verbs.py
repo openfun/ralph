@@ -3,8 +3,6 @@
 import json
 
 import pytest
-from hypothesis import settings
-from hypothesis import strategies as st
 
 from ralph.models.xapi.concepts.verbs.acrossx_profile import PostedVerb
 from ralph.models.xapi.concepts.verbs.activity_streams_vocabulary import (
@@ -43,10 +41,9 @@ from ralph.models.xapi.concepts.verbs.virtual_classroom import (
     UnsharedScreenVerb,
 )
 
-from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
+from tests.factories import mock_xapi_instance
 
 
-@settings(deadline=None)
 @pytest.mark.parametrize(
     "class_, verb_id",
     [
@@ -90,8 +87,7 @@ from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
         ),
     ],
 )
-@custom_given(st.data())
-def test_models_xapi_concept_verbs_with_valid_field(class_, verb_id, data):
+def test_models_xapi_concept_verbs_with_valid_field(class_, verb_id):
     """Test that a valid xAPI verb has the expected the `id` value."""
-    field = json.loads(data.draw(custom_builds(class_)).json())
+    field = json.loads(mock_xapi_instance(class_).model_dump_json())
     assert field["id"] == verb_id

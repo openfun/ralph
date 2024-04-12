@@ -66,7 +66,7 @@ class UIPlayVideo(BaseBrowserModel):
         PlayVideoEventField,
     ]
     event_type: Literal["play_video"]
-    name: Optional[Literal["play_video", "edx.video.played"]]
+    name: Optional[Literal["play_video", "edx.video.played"]] = None
 
 
 class UIPauseVideo(BaseBrowserModel):
@@ -88,7 +88,7 @@ class UIPauseVideo(BaseBrowserModel):
         PauseVideoEventField,
     ]
     event_type: Literal["pause_video"]
-    name: Optional[Literal["pause_video", "edx.video.paused"]]
+    name: Optional[Literal["pause_video", "edx.video.paused"]] = None
 
 
 class UISeekVideo(BaseBrowserModel):
@@ -111,7 +111,7 @@ class UISeekVideo(BaseBrowserModel):
         SeekVideoEventField,
     ]
     event_type: Literal["seek_video"]
-    name: Optional[Literal["seek_video", "edx.video.position.changed"]]
+    name: Optional[Literal["seek_video", "edx.video.position.changed"]] = None
 
 
 class UIStopVideo(BaseBrowserModel):
@@ -133,7 +133,7 @@ class UIStopVideo(BaseBrowserModel):
         StopVideoEventField,
     ]
     event_type: Literal["stop_video"]
-    name: Optional[Literal["stop_video", "edx.video.stopped"]]
+    name: Optional[Literal["stop_video", "edx.video.stopped"]] = None
 
 
 class UIHideTranscript(BaseBrowserModel):
@@ -200,7 +200,7 @@ class UISpeedChangeVideo(BaseBrowserModel):
         SpeedChangeVideoEventField,
     ]
     event_type: Literal["speed_change_video"]
-    name: Optional[Literal["speed_change_video"]]
+    name: Optional[Literal["speed_change_video"]] = None
 
 
 class UIVideoHideCCMenu(BaseBrowserModel):
@@ -221,7 +221,7 @@ class UIVideoHideCCMenu(BaseBrowserModel):
         VideoBaseEventField,
     ]
     event_type: Literal["video_hide_cc_menu"]
-    name: Optional[Literal["video_hide_cc_menu"]]
+    name: Optional[Literal["video_hide_cc_menu"]] = None
 
 
 class UIVideoShowCCMenu(BaseBrowserModel):
@@ -244,4 +244,4 @@ class UIVideoShowCCMenu(BaseBrowserModel):
         VideoBaseEventField,
     ]
     event_type: Literal["video_show_cc_menu"]
-    name: Optional[Literal["video_show_cc_menu"]]
+    name: Optional[Literal["video_show_cc_menu"]] = None

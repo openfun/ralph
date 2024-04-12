@@ -42,7 +42,7 @@ async def forward_xapi_statements(
             try:
                 # NB: post or put
                 req = await getattr(client, method)(
-                    forwarding.url,
+                    str(forwarding.url),
                     json=statements,
                     auth=(forwarding.basic_username, forwarding.basic_password),
                     timeout=forwarding.timeout,
@@ -50,8 +50,8 @@ async def forward_xapi_statements(
                 req.raise_for_status()
                 msg = "Forwarded %s statements to %s with success."
                 if isinstance(statements, list):
-                    logger.debug(msg, len(statements), forwarding.url)
+                    logger.debug(msg, len(statements), str(forwarding.url))
                 else:
-                    logger.debug(msg, 1, forwarding.url)
+                    logger.debug(msg, 1, str(forwarding.url))
             except (RequestError, HTTPStatusError) as error:
                 logger.error("Failed to forward xAPI statements. %s", error)

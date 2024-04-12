@@ -1,9 +1,5 @@
 """Module py.test fixtures."""
 
-from .fixtures import (
-    hypothesis_configuration,  # noqa: F401
-    hypothesis_strategies,  # noqa: F401
-)
 from .fixtures.api import client  # noqa: F401
 from .fixtures.auth import (  # noqa: F401
     basic_auth_credentials,

@@ -2,7 +2,6 @@
 
 import asyncio
 import logging
-import re
 from typing import Any, Dict, Generic, TypeVar, Union
 
 import pytest
@@ -50,13 +49,13 @@ def test_backends_data_base_instantiation(caplog):
     msg = (
         "Failed to instantiate default data backend settings: "
         "1 validation error for MockBaseDataBackendSettigns\nFOO\n  "
-        "field required (type=value_error.missing)"
     )
-    with pytest.raises(BackendParameterException, match=re.escape(msg)):
+    with pytest.raises(BackendParameterException, match=msg):
         with caplog.at_level(logging.ERROR):
             MockBaseDataBackend()
-
-    assert ("ralph.backends.data.base", logging.ERROR, msg) in caplog.record_tuples
+    assert "ralph.backends.data.base" == caplog.record_tuples[0][0]
+    assert logging.ERROR == caplog.record_tuples[0][1]
+    assert msg in caplog.record_tuples[0][2]
 
 
 def test_backends_data_base_async_instantiation(caplog):
@@ -87,15 +86,16 @@ def test_backends_data_base_async_instantiation(caplog):
     # Given missing required settings, the `AsyncDataBackend` should raise a
     # `BackendParameterException` on instantiation.
     msg = (
-        "Failed to instantiate default async data backend settings: "
-        "1 validation error for MockBaseAsyncDataBackendSettigns\nFOO\n  "
-        "field required (type=value_error.missing)"
+        "Failed to instantiate default async data backend settings: 1 validation "
+        "error for MockBaseAsyncDataBackendSettigns\nFOO\n  Field required "
     )
-    with pytest.raises(BackendParameterException, match=re.escape(msg)):
+    with pytest.raises(BackendParameterException, match=msg):
         with caplog.at_level(logging.ERROR):
             MockBaseAsyncDataBackend()
 
-    assert ("ralph.backends.data.base", logging.ERROR, msg) in caplog.record_tuples
+    assert "ralph.backends.data.base" == caplog.record_tuples[0][0]
+    assert logging.ERROR == caplog.record_tuples[0][1]
+    assert msg in caplog.record_tuples[0][2]
 
 
 def test_backends_data_base_validate_backend_query(caplog):
@@ -112,15 +112,13 @@ def test_backends_data_base_validate_backend_query(caplog):
 
         required_value: int
 
-    msg = (
-        "Invalid NonDefaultQuery default query: "
-        "[{'loc': ('required_value',), 'msg': 'field required', "
-        "'type': 'value_error.missing'}]"
-    )
-    with pytest.raises(BackendParameterException, match=re.escape(msg)):
+    msg = "Invalid NonDefaultQuery default query"
+    with pytest.raises(BackendParameterException, match=msg):
         validate_backend_query(None, NonDefaultQuery)
 
-    assert ("ralph.backends.data.base", logging.ERROR, msg) in caplog.record_tuples
+    assert ("ralph.backends.data.base") == caplog.record_tuples[0][0]
+    assert logging.ERROR == caplog.record_tuples[0][1]
+    assert msg in caplog.record_tuples[0][2]
 
     # Given `query` is an instance of the query model, the function should return the
     # `query` unchanged.

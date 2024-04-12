@@ -6,6 +6,7 @@ import re
 
 import pytest
 import websockets
+from pydantic import AnyUrl, parse_obj_as
 
 from ralph.backends.data.async_ws import AsyncWSDataBackend, WSDataBackendSettings
 from ralph.backends.data.base import DataBackendStatus
@@ -30,16 +31,17 @@ def test_backends_data_async_ws_default_instantiation(caplog, monkeypatch, fs):
 
     assert AsyncWSDataBackend.name == "async_ws"
     assert AsyncWSDataBackend.settings_class == WSDataBackendSettings
-    msg = (
-        "Failed to instantiate default async data backend settings: "
-        "1 validation error for WSDataBackendSettings\nURI\n  "
-        "field required (type=value_error.missing)"
-    )
-    with pytest.raises(BackendParameterException, match=re.escape(msg)):
+    msg = "Failed to instantiate default async data backend settings: "
+    with pytest.raises(
+        BackendParameterException,
+        match=msg,
+    ):
         with caplog.at_level(logging.ERROR):
             AsyncWSDataBackend()
 
-    assert ("ralph.backends.data.base", logging.ERROR, msg) in caplog.record_tuples
+    assert "ralph.backends.data.base" == caplog.record_tuples[0][0]
+    assert logging.ERROR == caplog.record_tuples[0][1]
+    assert msg in caplog.record_tuples[0][2]
 
 
 def test_backends_data_async_ws_instantiation_with_settings(monkeypatch):
@@ -47,10 +49,9 @@ def test_backends_data_async_ws_instantiation_with_settings(monkeypatch):
     uri = f"ws://{WS_TEST_HOST}:{WS_TEST_PORT}"
     settings = WSDataBackendSettings(URI=uri)
     backend = AsyncWSDataBackend(settings)
-    assert backend.settings.URI == uri
+    assert backend.settings.URI == parse_obj_as(AnyUrl, uri)
     assert backend.settings.LOCALE_ENCODING == "utf8"
     assert backend.settings.READ_CHUNK_SIZE == 500
-    assert backend.settings.URI == uri
     assert backend.settings.WRITE_CHUNK_SIZE == 500
 
     # Test overriding default values with environment variables.
@@ -58,7 +59,7 @@ def test_backends_data_async_ws_instantiation_with_settings(monkeypatch):
     monkeypatch.setenv("RALPH_BACKENDS__DATA__WS__URI", "ws://foo")
     backend = AsyncWSDataBackend()
     assert backend.settings.READ_CHUNK_SIZE == 1
-    assert backend.settings.URI == "ws://foo"
+    assert backend.settings.URI == parse_obj_as(AnyUrl, "ws://foo")
 
 
 @pytest.mark.anyio
@@ -74,11 +75,11 @@ async def test_backends_data_async_ws_status_with_error_status(ws, events, caplo
     assert (
         "ralph.backends.data.async_ws",
         logging.ERROR,
-        "Failed open websocket connection for ws://127.0.0.1:1: "
+        "Failed open websocket connection for ws://127.0.0.1:1/: "
         "[Errno 111] Connect call failed ('127.0.0.1', 1)",
     ) in caplog.record_tuples
 
-    uri = f"ws://{WS_TEST_HOST}:{WS_TEST_PORT}"
+    uri = parse_obj_as(AnyUrl, f"ws://{WS_TEST_HOST}:{WS_TEST_PORT}")
     settings = WSDataBackendSettings(URI=uri)
     backend = AsyncWSDataBackend(settings)
     assert [_ async for _ in backend.read(raw_output=False)] == events
@@ -88,7 +89,7 @@ async def test_backends_data_async_ws_status_with_error_status(ws, events, caplo
     assert (
         "ralph.backends.data.async_ws",
         logging.ERROR,
-        f"Failed to Ping {uri}: received 1000 (OK); then sent 1000 (OK)",
+        f"Failed to Ping {str(uri)}: received 1000 (OK); then sent 1000 (OK)",
     ) in caplog.record_tuples
 
 
@@ -178,7 +179,7 @@ async def test_backends_data_async_ws_read_with_connection_failure(monkeypatch, 
 
     monkeypatch.setattr(backend, "client", get_mock_client)
     msg = (
-        "Failed to receive message from websocket ws://foo: "
+        "Failed to receive message from websocket ws://foo/: "
         "no close frame received or sent"
     )
     with pytest.raises(BackendException, match=msg):
@@ -221,7 +222,7 @@ async def test_backends_data_async_ws_close_with_failure(monkeypatch, caplog):
 
     monkeypatch.setattr(backend, "_client", MockClient())
     msg = (
-        "Failed to close websocket connection for ws://foo: "
+        "Failed to close websocket connection for ws://foo/: "
         "no close frame received or sent"
     )
     with pytest.raises(BackendException, match=re.escape(msg)):

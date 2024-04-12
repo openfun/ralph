@@ -26,7 +26,7 @@ class EdxLibraryContentBlockContentComponent(BaseModelWithConfig):
         usage_key (str): Consists of the location of this component in the course.
     """  # noqa: D205
 
-    descendants: Optional[list]
+    descendants: Optional[list] = None
     original_usage_key: str
     original_usage_version: str
     usage_key: str

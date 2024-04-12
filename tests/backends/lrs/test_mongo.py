@@ -237,13 +237,13 @@ def test_backends_lrs_mongo_query_statements_query(
 
     def mock_read(query, target, chunk_size):
         """Mock the `MongoLRSBackend.read` method."""
-        assert query.dict() == expected_query
+        assert query.model_dump() == expected_query
         assert chunk_size == expected_query.get("limit")
         return [{"_id": "search_after_id", "_source": {}}]
 
     backend = mongo_lrs_backend()
     monkeypatch.setattr(backend, "read", mock_read)
-    result = backend.query_statements(RalphStatementsQuery.construct(**params))
+    result = backend.query_statements(RalphStatementsQuery.model_construct(**params))
     assert result.statements == [{}]
     assert not result.pit_id
     assert result.search_after == "search_after_id"
@@ -280,9 +280,9 @@ def test_backends_lrs_mongo_query_statements_with_success(mongo, mongo_lrs_backe
     ]
     assert backend.write(documents, target=custom_target) == 2
 
-    statement_parameters = RalphStatementsQuery.construct(
+    statement_parameters = RalphStatementsQuery.model_construct(
         statementId="62b9ce922c26b46b68ffc68f",
-        agent=AgentParameters.construct(
+        agent=AgentParameters.model_construct(
             account__name="test_name",
             account__home_page="http://example.com",
         ),
@@ -334,7 +334,7 @@ def test_backends_lrs_mongo_query_statements_with_query_failure(
 
     with caplog.at_level(logging.ERROR):
         with pytest.raises(BackendException, match=msg):
-            backend.query_statements(RalphStatementsQuery.construct())
+            backend.query_statements(RalphStatementsQuery.model_construct())
 
     assert (
         "ralph.backends.lrs.mongo",
@@ -363,7 +363,9 @@ def test_backends_lrs_mongo_query_statements_by_ids_with_query_failure(
 
     with caplog.at_level(logging.ERROR):
         with pytest.raises(BackendException, match=msg):
-            list(backend.query_statements_by_ids(RalphStatementsQuery.construct()))
+            list(
+                backend.query_statements_by_ids(RalphStatementsQuery.model_construct())
+            )
 
     assert (
         "ralph.backends.lrs.mongo",

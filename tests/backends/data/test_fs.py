@@ -6,6 +6,7 @@ import os
 import re
 from collections.abc import Iterable
 from operator import itemgetter
+from pathlib import Path
 from uuid import uuid4
 
 import pytest
@@ -42,7 +43,7 @@ def test_backends_data_fs_default_instantiation(monkeypatch, fs):
     assert backend.settings.WRITE_CHUNK_SIZE == 4096
 
     # Test overriding default values with environment variables.
-    monkeypatch.setenv("RALPH_BACKENDS__DATA__FS__READ_CHUNK_SIZE", 1)
+    monkeypatch.setenv("RALPH_BACKENDS__DATA__FS__READ_CHUNK_SIZE", "1")
     backend = FSDataBackend()
     assert backend.settings.READ_CHUNK_SIZE == 1
 
@@ -53,7 +54,7 @@ def test_backends_data_fs_instantiation_with_settings(fs):
     deep_path = "deep/directories/path"
     assert not os.path.exists(deep_path)
     settings = FSDataBackend.settings_class(
-        DEFAULT_DIRECTORY_PATH=deep_path,
+        DEFAULT_DIRECTORY_PATH=Path(deep_path),
         DEFAULT_QUERY_STRING="foo.txt",
         LOCALE_ENCODING="utf-16",
         READ_CHUNK_SIZE=1,
@@ -704,7 +705,7 @@ def test_backends_data_fs_read_with_query(fs_backend, fs):
     default_path = "foo/"
     fs.create_file(default_path + "file_3.txt", contents=valid_json)
     fs.create_file(default_path + "file_4.txt", contents=valid_json)
-    fs.create_file(default_path + "/bar/file_5.txt", contents=invalid_json)
+    fs.create_file(default_path.rstrip("/") + "/bar/file_5.txt", contents=invalid_json)
 
     backend = fs_backend()
 

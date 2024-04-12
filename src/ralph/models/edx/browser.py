@@ -3,7 +3,8 @@
 import sys
 from typing import Union
 
-from pydantic import AnyUrl, constr
+from pydantic import AnyUrl, StringConstraints
+from typing_extensions import Annotated
 
 from .base import BaseEdxModel
 
@@ -29,4 +30,6 @@ class BaseBrowserModel(BaseEdxModel):
 
     event_source: Literal["browser"]
     page: AnyUrl
-    session: Union[constr(regex=r"^[a-f0-9]{32}$"), Literal[""]]
+    session: Union[
+        Annotated[str, StringConstraints(pattern=r"^[a-f0-9]{32}$")], Literal[""]
+    ]

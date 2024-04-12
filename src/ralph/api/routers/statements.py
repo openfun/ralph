@@ -19,7 +19,7 @@ from fastapi import (
     status,
 )
 from fastapi.dependencies.models import Dependant
-from pydantic import parse_obj_as
+from pydantic import TypeAdapter
 from pydantic.types import Json
 from typing_extensions import Annotated
 
@@ -98,14 +98,17 @@ def _enrich_statement_with_authority(
 ) -> None:
     # authority: Information about whom or what has asserted the statement is true.
     # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#249-authority
-    statement["authority"] = current_user.agent
+    statement["authority"] = current_user.agent.model_dump(
+        exclude_none=True, mode="json"
+    )
 
 
 def _parse_agent_parameters(agent_obj: dict) -> AgentParameters:
     """Parse a dict and return an AgentParameters object to use in queries."""
     # Transform agent to `dict` as FastAPI cannot parse JSON (seen as string)
 
-    agent = parse_obj_as(BaseXapiAgent, agent_obj)
+    adapter = TypeAdapter(BaseXapiAgent)
+    agent = adapter.validate_python(agent_obj)
 
     agent_query_params = {}
     if isinstance(agent, BaseXapiAgentWithMbox):
@@ -119,7 +122,7 @@ def _parse_agent_parameters(agent_obj: dict) -> AgentParameters:
         agent_query_params["account__home_page"] = agent.account.homePage
 
     # Overwrite `agent` field
-    return AgentParameters.construct(**agent_query_params)
+    return AgentParameters.model_construct(**agent_query_params)
 
 
 def strict_query_params(request: Request) -> None:
@@ -141,7 +144,7 @@ def strict_query_params(request: Request) -> None:
 
 @router.get("")
 @router.get("/")
-async def get(  # noqa: PLR0913
+async def get(  # noqa: PLR0912,PLR0913
     request: Request,
     current_user: Annotated[
         AuthenticatedUser,
@@ -169,7 +172,7 @@ async def get(  # noqa: PLR0913
         None,
         description="Filter, only return Statements matching the specified Verb id",
     ),
-    activity: Optional[IRI] = Query(
+    activity: Optional[str] = Query(
         None,
         description=(
             "Filter, only return Statements for which the Object "
@@ -334,7 +337,14 @@ async def get(  # noqa: PLR0913
         # Overwrite `agent` field
         query_params["agent"] = _parse_agent_parameters(
             json.loads(query_params["agent"])
-        )
+        ).model_dump(mode="json", exclude_none=True)
+
+    # Coerce `verb` and `activity` as IRI
+    if query_params.get("verb"):
+        query_params["verb"] = IRI(query_params["verb"])
+
+    if query_params.get("activity"):
+        query_params["activity"] = IRI(query_params["activity"])
 
     # mine: If using scopes, only restrict users with limited scopes
     if settings.LRS_RESTRICT_BY_SCOPES:
@@ -346,7 +356,9 @@ async def get(  # noqa: PLR0913
 
     # Filter by authority if using `mine`
     if mine:
-        query_params["authority"] = _parse_agent_parameters(current_user.agent)
+        query_params["authority"] = _parse_agent_parameters(
+            current_user.agent.model_dump(mode="json")
+        ).model_dump(mode="json", exclude_none=True)
 
     if "mine" in query_params:
         query_params.pop("mine")
@@ -355,7 +367,7 @@ async def get(  # noqa: PLR0913
     try:
         query_result = await await_if_coroutine(
             BACKEND_CLIENT.query_statements(
-                params=RalphStatementsQuery.construct(
+                params=RalphStatementsQuery.model_construct(
                     **{**query_params, "limit": limit}
                 ),
                 target=current_user.target,
@@ -418,7 +430,7 @@ async def put(
     LRS Specification:
     https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#211-put-statements
     """
-    statement_as_dict = statement.dict(exclude_unset=True)
+    statement_as_dict = statement.model_dump(exclude_unset=True, mode="json")
     statement_id = str(statement_id)
 
     statement_as_dict.update(id=str(statement_as_dict.get("id", statement_id)))
@@ -516,7 +528,9 @@ async def post(  # noqa: PLR0912
 
     # Enrich statements before forwarding
     statements_dict = {}
-    for statement in (x.dict(exclude_unset=True) for x in statements):
+    for statement in (
+        x.model_dump(exclude_unset=True, mode="json") for x in statements
+    ):
         _enrich_statement_with_id(statement)
         # Requests with duplicate statement IDs are considered invalid
         if statement["id"] in statements_dict:

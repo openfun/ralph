@@ -23,7 +23,7 @@ class AskedVerb(BaseXapiVerb):
     id: Literal["http://adlnet.gov/expapi/verbs/asked"] = (
         "http://adlnet.gov/expapi/verbs/asked"
     )
-    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["asked"]]]
+    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["asked"]]] = None
 
 
 class AnsweredVerb(BaseXapiVerb):
@@ -37,7 +37,7 @@ class AnsweredVerb(BaseXapiVerb):
     id: Literal["http://adlnet.gov/expapi/verbs/answered"] = (
         "http://adlnet.gov/expapi/verbs/answered"
     )
-    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["answered"]]]
+    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["answered"]]] = None
 
 
 class RegisteredVerb(BaseXapiVerb):
@@ -51,4 +51,4 @@ class RegisteredVerb(BaseXapiVerb):
     id: Literal["http://adlnet.gov/expapi/verbs/registered"] = (
         "http://adlnet.gov/expapi/verbs/registered"
     )
-    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["registered"]]]
+    display: Optional[Dict[Literal[LANG_EN_US_DISPLAY], Literal["registered"]]] = None

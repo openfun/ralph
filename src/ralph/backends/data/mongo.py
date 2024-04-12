@@ -12,7 +12,8 @@ from uuid import uuid4
 from bson.errors import BSONError
 from bson.objectid import ObjectId
 from dateutil.parser import isoparse
-from pydantic import MongoDsn, PositiveInt, constr
+from pydantic import MongoDsn, PositiveInt, StringConstraints
+from pydantic_settings import SettingsConfigDict
 from pymongo import MongoClient, ReplaceOne
 from pymongo.collection import Collection
 from pymongo.errors import (
@@ -22,6 +23,7 @@ from pymongo.errors import (
     InvalidOperation,
     PyMongoError,
 )
+from typing_extensions import Annotated
 
 from ralph.backends.data.base import (
     BaseDataBackend,
@@ -32,7 +34,7 @@ from ralph.backends.data.base import (
     Listable,
     Writable,
 )
-from ralph.conf import BaseSettingsConfig, ClientOptions
+from ralph.conf import BASE_SETTINGS_CONFIG, ClientOptions
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import iter_by_batch
 
@@ -59,16 +61,21 @@ class MongoDataBackendSettings(BaseDataBackendSettings):
         WRITE_CHUNK_SIZE (int): The default chunk size for writing batches of documents.
     """
 
-    class Config(BaseSettingsConfig):
-        """Pydantic Configuration."""
+    model_config = {
+        **BASE_SETTINGS_CONFIG,
+        **SettingsConfigDict(
+            env_prefix="RALPH_BACKENDS__DATA__MONGO__", regex_engine="python-re"
+        ),
+    }  # We specify regex_engine as some regex are no longer supported in Pydantic V2
 
-        env_prefix = "RALPH_BACKENDS__DATA__MONGO__"
-
-    CONNECTION_URI: MongoDsn = MongoDsn("mongodb://localhost:27017/", scheme="mongodb")
-    DEFAULT_DATABASE: constr(regex=r"^[^\s.$/\\\"\x00]+$") = "statements"
-    DEFAULT_COLLECTION: constr(regex=r"^(?!.*\.\.)[^.$\x00]+(?:\.[^.$\x00]+)*$") = (
-        "marsha"
-    )
+    CONNECTION_URI: MongoDsn = MongoDsn("mongodb://localhost:27017/")
+    DEFAULT_DATABASE: Annotated[
+        str, StringConstraints(pattern=r"^[^\s.$/\\\"\x00]+$")
+    ] = "statements"
+    DEFAULT_COLLECTION: Annotated[
+        str,
+        StringConstraints(pattern=r"^(?!.*\.\.)[^.$\x00]+(?:\.[^.$\x00]+)*$"),
+    ] = "marsha"
     CLIENT_OPTIONS: MongoClientOptions = MongoClientOptions()
 
 
@@ -105,9 +112,8 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
                 If `settings` is `None`, a default settings instance is used instead.
         """
         super().__init__(settings)
-        self.client = MongoClient(
-            self.settings.CONNECTION_URI, **self.settings.CLIENT_OPTIONS.dict()
-        )
+        host = str(self.settings.CONNECTION_URI)
+        self.client = MongoClient(host, **self.settings.CLIENT_OPTIONS.model_dump())
         self.database = self.client[self.settings.DEFAULT_DATABASE]
         self.collection = self.database[self.settings.DEFAULT_COLLECTION]
 
@@ -216,7 +222,7 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
         ignore_errors: bool,  # noqa: ARG002
     ) -> Iterator[dict]:
         """Method called by `self.read` yielding dictionaries. See `self.read`."""
-        kwargs = query.dict(exclude_unset=True)
+        kwargs = query.model_dump(exclude_unset=True)
         collection = self._get_target_collection(target)
         try:
             documents = collection.find(batch_size=chunk_size, **kwargs)

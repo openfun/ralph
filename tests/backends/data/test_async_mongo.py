@@ -50,7 +50,7 @@ async def test_backends_data_async_mongo_default_instantiation(monkeypatch, fs):
     assert isinstance(backend.client, AsyncIOMotorClient)
     assert backend.database.name == "statements"
     assert backend.collection.name == "marsha"
-    assert backend.settings.CONNECTION_URI == "mongodb://localhost:27017/"
+    assert str(backend.settings.CONNECTION_URI) == "mongodb://localhost:27017/"
     assert backend.settings.CLIENT_OPTIONS == MongoClientOptions()
     assert backend.settings.LOCALE_ENCODING == "utf8"
     assert backend.settings.READ_CHUNK_SIZE == 500
@@ -71,7 +71,7 @@ async def test_backends_data_async_mongo_instantiation_with_settings(
     backend = async_mongo_backend(default_collection="foo")
     assert backend.database.name == MONGO_TEST_DATABASE
     assert backend.collection.name == "foo"
-    assert backend.settings.CONNECTION_URI == MONGO_TEST_CONNECTION_URI
+    assert str(backend.settings.CONNECTION_URI) == MONGO_TEST_CONNECTION_URI
     assert backend.settings.CLIENT_OPTIONS == MongoClientOptions()
     assert backend.settings.LOCALE_ENCODING == "utf8"
     assert backend.settings.READ_CHUNK_SIZE == 500

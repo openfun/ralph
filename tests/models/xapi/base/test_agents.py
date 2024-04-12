@@ -8,16 +8,14 @@ from pydantic import ValidationError
 
 from ralph.models.xapi.base.agents import BaseXapiAgentWithMboxSha1Sum
 
-from tests.fixtures.hypothesis_strategies import custom_given
+from tests.factories import mock_xapi_instance
 
 
-@custom_given(BaseXapiAgentWithMboxSha1Sum)
-def test_models_xapi_base_agent_with_mbox_sha1_sum_ifi_with_valid_field(
-    field,
-):
+def test_models_xapi_base_agent_with_mbox_sha1_sum_ifi_with_valid_field():
     """Test a valid BaseXapiAgentWithMboxSha1Sum has the expected
     `mbox_sha1sum` regex.
     """
+    field = mock_xapi_instance(BaseXapiAgentWithMboxSha1Sum)
 
     assert re.match(r"^[0-9a-f]{40}$", field.mbox_sha1sum)
 
@@ -30,18 +28,17 @@ def test_models_xapi_base_agent_with_mbox_sha1_sum_ifi_with_valid_field(
         "1baccdd9abcdfd4ae9b24dedfa939c7deffa3db3a7",
     ],
 )
-@custom_given(BaseXapiAgentWithMboxSha1Sum)
-def test_models_xapi_base_agent_with_mbox_sha1_sum_ifi_with_invalid_field(
-    mbox_sha1sum, field
-):
+def test_models_xapi_base_agent_with_mbox_sha1_sum_ifi_with_invalid_field(mbox_sha1sum):
     """Test an invalid `mbox_sha1sum` property in
     BaseXapiAgentWithMboxSha1Sum raises a `ValidationError`.
     """
 
-    invalid_field = json.loads(field.json())
+    field = mock_xapi_instance(BaseXapiAgentWithMboxSha1Sum)
+
+    invalid_field = json.loads(field.model_dump_json())
     invalid_field["mbox_sha1sum"] = mbox_sha1sum
 
     with pytest.raises(
-        ValidationError, match="mbox_sha1sum\n  string does not match regex"
+        ValidationError, match="mbox_sha1sum\n  String should match pattern"
     ):
         BaseXapiAgentWithMboxSha1Sum(**invalid_field)

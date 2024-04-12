@@ -7,6 +7,8 @@ from pathlib import Path
 from typing import Iterable, List, Literal, Optional, Union
 from uuid import UUID
 
+from pydantic_settings import SettingsConfigDict
+
 from ralph.backends.data.base import BaseOperationType
 from ralph.backends.data.fs import FSDataBackend, FSDataBackendSettings
 from ralph.backends.lrs.base import (
@@ -16,7 +18,7 @@ from ralph.backends.lrs.base import (
     RalphStatementsQuery,
     StatementQueryResult,
 )
-from ralph.conf import BaseSettingsConfig
+from ralph.conf import BASE_SETTINGS_CONFIG
 
 logger = logging.getLogger(__name__)
 
@@ -28,10 +30,10 @@ class FSLRSBackendSettings(BaseLRSBackendSettings, FSDataBackendSettings):
         DEFAULT_LRS_FILE (str): The default LRS filename to store statements.
     """
 
-    class Config(BaseSettingsConfig):
-        """Pydantic Configuration."""
-
-        env_prefix = "RALPH_BACKENDS__LRS__FS__"
+    model_config = {
+        **BASE_SETTINGS_CONFIG,
+        **SettingsConfigDict(env_prefix="RALPH_BACKENDS__LRS__FS__"),
+    }
 
     DEFAULT_LRS_FILE: str = "fs_lrs.jsonl"
 
@@ -118,7 +120,7 @@ class FSLRSBackend(BaseLRSBackend[FSLRSBackendSettings], FSDataBackend):
             return
 
         if not isinstance(agent, dict):
-            agent = agent.dict()
+            agent = agent.model_dump()
         FSLRSBackend._add_filter_by_mbox(filters, agent.get("mbox", None), related)
         FSLRSBackend._add_filter_by_sha1sum(
             filters, agent.get("mbox_sha1sum", None), related
@@ -141,7 +143,7 @@ class FSLRSBackend(BaseLRSBackend[FSLRSBackendSettings], FSDataBackend):
             return
 
         if not isinstance(authority, dict):
-            authority = authority.dict()
+            authority = authority.model_dump()
         FSLRSBackend._add_filter_by_mbox(
             filters, authority.get("mbox", None), field="authority"
         )

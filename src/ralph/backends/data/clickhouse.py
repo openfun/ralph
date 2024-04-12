@@ -22,6 +22,7 @@ import clickhouse_connect
 from clickhouse_connect.driver.client import Client
 from clickhouse_connect.driver.exceptions import ClickHouseError
 from pydantic import BaseModel, PositiveInt, ValidationError
+from pydantic_settings import SettingsConfigDict
 
 from ralph.backends.data.base import (
     BaseDataBackend,
@@ -32,7 +33,7 @@ from ralph.backends.data.base import (
     Listable,
     Writable,
 )
-from ralph.conf import BaseSettingsConfig, ClientOptions
+from ralph.conf import BASE_SETTINGS_CONFIG, ClientOptions
 from ralph.exceptions import BackendException
 from ralph.utils import iter_by_batch, parse_iterable_to_dict
 
@@ -77,10 +78,10 @@ class ClickHouseDataBackendSettings(BaseDataBackendSettings):
         WRITE_CHUNK_SIZE (int): The default chunk size for writing.
     """
 
-    class Config(BaseSettingsConfig):
-        """Pydantic Configuration."""
-
-        env_prefix = "RALPH_BACKENDS__DATA__CLICKHOUSE__"
+    model_config = {
+        **BASE_SETTINGS_CONFIG,
+        **SettingsConfigDict(env_prefix="RALPH_BACKENDS__DATA__CLICKHOUSE__"),
+    }
 
     HOST: str = "localhost"
     PORT: int = 8123
@@ -105,11 +106,11 @@ class ClickHouseQuery(BaseQuery):
     """
 
     select: Union[str, List[str]] = "event"
-    where: Union[str, List[str], None]
-    parameters: Union[Dict, None]
-    limit: Union[int, None]
-    sort: Union[str, None]
-    column_oriented: Union[bool, None] = False
+    where: Optional[Union[str, List[str]]] = None
+    parameters: Optional[Dict] = None
+    limit: Optional[int] = None
+    sort: Optional[str] = None
+    column_oriented: Optional[bool] = False
 
 
 Settings = TypeVar("Settings", bound=ClickHouseDataBackendSettings)
@@ -158,7 +159,7 @@ class ClickHouseDataBackend(
                 database=self.database,
                 username=self.settings.USERNAME,
                 password=self.settings.PASSWORD,
-                settings=self.settings.CLIENT_OPTIONS.dict(),
+                settings=self.settings.CLIENT_OPTIONS.model_dump(),
             )
         return self._client
 

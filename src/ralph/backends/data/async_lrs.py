@@ -52,13 +52,13 @@ class AsyncLRSDataBackend(
     def client(self) -> AsyncClient:
         """Create a `httpx.AsyncClient` if it doesn't exist."""
         if not self._client:
-            headers = self.settings.HEADERS.dict(by_alias=True)
+            headers = self.settings.HEADERS.model_dump(by_alias=True)
             self._client = AsyncClient(auth=self.auth, headers=headers)
         return self._client
 
     async def status(self) -> DataBackendStatus:
         """HTTP backend check for server status."""
-        status_url = urljoin(self.base_url, self.settings.STATUS_ENDPOINT)
+        status_url = urljoin(str(self.base_url), self.settings.STATUS_ENDPOINT)
         try:
             response = await self.client.get(status_url)
             response.raise_for_status()
@@ -138,8 +138,8 @@ class AsyncLRSDataBackend(
 
         # Create request URL
         target = ParseResult(
-            scheme=urlparse(self.base_url).scheme,
-            netloc=urlparse(self.base_url).netloc,
+            scheme=self.base_url.scheme,
+            netloc=urlparse(str(self.base_url)).netloc,
             path=target,
             query="",
             params="",
@@ -148,7 +148,7 @@ class AsyncLRSDataBackend(
 
         statements = self._fetch_statements(
             target=target,
-            query_params=query.dict(exclude_none=True, exclude_unset=True),
+            query_params=query.model_dump(exclude_none=True, exclude_unset=True),
         )
 
         # Iterate through results
@@ -204,8 +204,8 @@ class AsyncLRSDataBackend(
             target = self.settings.STATEMENTS_ENDPOINT
 
         target = ParseResult(
-            scheme=urlparse(self.base_url).scheme,
-            netloc=urlparse(self.base_url).netloc,
+            scheme=self.base_url.scheme,
+            netloc=urlparse(str(self.base_url)).netloc,
             path=target,
             query="",
             params="",

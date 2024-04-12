@@ -238,13 +238,15 @@ async def test_backends_lrs_async_mongo_query_statements_query(
 
     async def mock_read(query, target, chunk_size):
         """Mock the `AsyncMongoLRSBackend.read` method."""
-        assert query.dict() == expected_query
+        assert query.model_dump() == expected_query
         assert chunk_size == expected_query.get("limit")
         yield {"_id": "search_after_id", "_source": {}}
 
     backend = async_mongo_lrs_backend()
     monkeypatch.setattr(backend, "read", mock_read)
-    result = await backend.query_statements(RalphStatementsQuery.construct(**params))
+    result = await backend.query_statements(
+        RalphStatementsQuery.model_construct(**params)
+    )
     assert result.statements == [{}]
     assert not result.pit_id
     assert result.search_after == "search_after_id"
@@ -285,7 +287,7 @@ async def test_backends_lrs_async_mongo_query_statements_with_success(
     ]
     assert await backend.write(documents, target=custom_target) == 2
 
-    statement_parameters = RalphStatementsQuery.construct(
+    statement_parameters = RalphStatementsQuery.model_construct(
         statement_id="62b9ce922c26b46b68ffc68f",
         agent={
             "account__name": "test_name",
@@ -338,7 +340,7 @@ async def test_backends_lrs_async_mongo_query_statements_with_query_failure(
 
     with caplog.at_level(logging.ERROR):
         with pytest.raises(BackendException, match=msg):
-            await backend.query_statements(RalphStatementsQuery.construct())
+            await backend.query_statements(RalphStatementsQuery.model_construct())
 
     assert (
         "ralph.backends.lrs.async_mongo",
@@ -370,7 +372,7 @@ async def test_backends_lrs_mongo_query_statements_by_ids_query_failure(
             _ = [
                 statement
                 async for statement in backend.query_statements_by_ids(
-                    RalphStatementsQuery.construct()
+                    RalphStatementsQuery.model_construct()
                 )
             ]
 

@@ -5,6 +5,7 @@ from datetime import timedelta
 from typing import Optional
 
 from pydantic import Field, NonNegativeFloat
+from typing_extensions import Annotated
 
 from ..base.results import BaseXapiResult
 from ..concepts.constants.video import (
@@ -33,8 +34,10 @@ class VideoResultExtensions(BaseExtensionModelWithConfig):
         time (float): Consists of the video time code when the event was emitted.
     """
 
-    time: NonNegativeFloat = Field(alias=RESULT_EXTENSION_TIME)
-    playedSegments: Optional[str] = Field(alias=CONTEXT_EXTENSION_PLAYED_SEGMENTS)
+    time: Annotated[NonNegativeFloat, Field(alias=RESULT_EXTENSION_TIME)]
+    playedSegments: Annotated[
+        Optional[str], Field(alias=CONTEXT_EXTENSION_PLAYED_SEGMENTS)
+    ] = None
 
 
 class VideoPausedResultExtensions(VideoResultExtensions):
@@ -44,7 +47,9 @@ class VideoPausedResultExtensions(VideoResultExtensions):
         progress (float): Consists of the ratio of media consumed by the actor.
     """
 
-    progress: Optional[NonNegativeFloat] = Field(alias=RESULT_EXTENSION_PROGRESS)
+    progress: Annotated[
+        Optional[NonNegativeFloat], Field(alias=RESULT_EXTENSION_PROGRESS)
+    ] = None
 
 
 class VideoSeekedResultExtensions(BaseExtensionModelWithConfig):
@@ -57,8 +62,8 @@ class VideoSeekedResultExtensions(BaseExtensionModelWithConfig):
             object during a seek operation.
     """
 
-    timeFrom: NonNegativeFloat = Field(alias=RESULT_EXTENSION_TIME_FROM)
-    timeTo: NonNegativeFloat = Field(alias=RESULT_EXTENSION_TIME_TO)
+    timeFrom: Annotated[NonNegativeFloat, Field(alias=RESULT_EXTENSION_TIME_FROM)]
+    timeTo: Annotated[NonNegativeFloat, Field(alias=RESULT_EXTENSION_TIME_TO)]
 
 
 class VideoCompletedResultExtensions(VideoResultExtensions):
@@ -68,7 +73,7 @@ class VideoCompletedResultExtensions(VideoResultExtensions):
         progress (float): Consists of the percentage of media consumed by the actor.
     """
 
-    progress: NonNegativeFloat = Field(alias=RESULT_EXTENSION_PROGRESS)
+    progress: Annotated[NonNegativeFloat, Field(alias=RESULT_EXTENSION_PROGRESS)]
 
 
 class VideoTerminatedResultExtensions(VideoResultExtensions):
@@ -78,7 +83,7 @@ class VideoTerminatedResultExtensions(VideoResultExtensions):
         progress (float): Consists of the percentage of media consumed by the actor.
     """
 
-    progress: NonNegativeFloat = Field(alias=RESULT_EXTENSION_PROGRESS)
+    progress: Annotated[NonNegativeFloat, Field(alias=RESULT_EXTENSION_PROGRESS)]
 
 
 class VideoEnableClosedCaptioningResultExtensions(VideoResultExtensions):
@@ -88,7 +93,7 @@ class VideoEnableClosedCaptioningResultExtensions(VideoResultExtensions):
         ccEnabled (bool): Indicates whether subtitles are enabled.
     """
 
-    ccEnabled: bool = Field(alias=CONTEXT_EXTENSION_CC_ENABLED)
+    ccEnabled: Annotated[bool, Field(alias=CONTEXT_EXTENSION_CC_ENABLED)]
 
 
 class VideoPlayedResult(BaseXapiResult):
@@ -132,8 +137,8 @@ class VideoCompletedResult(BaseXapiResult):
     """
 
     extensions: VideoCompletedResultExtensions
-    completion: Optional[Literal[True]]
-    duration: Optional[timedelta]
+    completion: Optional[Literal[True]] = None
+    duration: Optional[timedelta] = None
 
 
 class VideoTerminatedResult(BaseXapiResult):

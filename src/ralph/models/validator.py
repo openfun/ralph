@@ -40,7 +40,7 @@ class Validator:
                 if fail_on_unknown:
                     raise err
             except ValidationError as err:
-                message = f"Input event is not a valid {err.model.__name__} event."
+                message = "Input event is not valid."
                 self._log_error(message, event_str, err)
                 if not ignore_errors:
                     raise BadFormatException(message) from err
@@ -59,7 +59,6 @@ class Validator:
                 return model(**event)
             except ValidationError as err:
                 error = err
-
         raise error
 
     def _validate_event(self, event_str: str) -> Any:
@@ -75,7 +74,7 @@ class Validator:
             event_str (str): The cleaned JSON-formatted input event_str.
         """
         event = json.loads(event_str)
-        return self.get_first_valid_model(event).json()
+        return self.get_first_valid_model(event).model_dump_json()
 
     @staticmethod
     def _log_error(

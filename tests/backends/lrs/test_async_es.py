@@ -275,7 +275,7 @@ async def test_backends_lrs_async_es_query_statements_query(
 
     async def mock_read(query, target, chunk_size):
         """Mock the `AsyncESLRSBackend.read` method."""
-        assert query.dict() == expected_query
+        assert query.model_dump() == expected_query
         assert chunk_size == expected_query.get("size")
         query.pit.id = "foo_pit_id"
         query.search_after = ["bar_search_after", "baz_search_after"]
@@ -283,7 +283,9 @@ async def test_backends_lrs_async_es_query_statements_query(
 
     backend = async_es_lrs_backend()
     monkeypatch.setattr(backend, "read", mock_read)
-    result = await backend.query_statements(RalphStatementsQuery.construct(**params))
+    result = await backend.query_statements(
+        RalphStatementsQuery.model_construct(**params)
+    )
     assert result.statements == [{}]
     assert result.pit_id == "foo_pit_id"
     assert result.search_after == "bar_search_after|baz_search_after"
@@ -310,7 +312,9 @@ async def test_backends_lrs_async_es_query_statements(es, async_es_lrs_backend):
     assert await backend.write(documents_custom, target=custom_target) == 1
 
     # Check the expected search query results.
-    result = await backend.query_statements(RalphStatementsQuery.construct(limit=10))
+    result = await backend.query_statements(
+        RalphStatementsQuery.model_construct(limit=10)
+    )
     assert result.statements == documents_default
     assert re.match(r"[0-9]+\|0", result.search_after)
 
@@ -344,7 +348,7 @@ async def test_backends_lrs_async_es_query_statements_pit_query_failure(
     msg = "Query error"
     with pytest.raises(BackendException, match=msg):
         with caplog.at_level(logging.ERROR):
-            await backend.query_statements(RalphStatementsQuery.construct())
+            await backend.query_statements(RalphStatementsQuery.model_construct())
 
     await backend.close()
 
@@ -376,7 +380,7 @@ async def test_backends_lrs_es_query_statements_by_ids_search_query_failure(
             _ = [
                 statement
                 async for statement in backend.query_statements_by_ids(
-                    RalphStatementsQuery.construct()
+                    RalphStatementsQuery.model_construct()
                 )
             ]
 

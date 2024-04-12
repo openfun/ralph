@@ -5,47 +5,49 @@ import logging
 
 import pytest
 from httpx import RequestError
-from hypothesis import HealthCheck
-from hypothesis import settings as hypothesis_settings
-from hypothesis import strategies as st
 from pydantic import ValidationError
 
 from ralph.api.forwarding import forward_xapi_statements, get_active_xapi_forwardings
 from ralph.conf import Settings, XapiForwardingConfigurationSettings
 
-from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
+from tests.factories import mock_instance
 
 
-@hypothesis_settings(suppress_health_check=(HealthCheck.function_scoped_fixture,))
-@custom_given(XapiForwardingConfigurationSettings)
-def test_api_forwarding_with_valid_configuration(monkeypatch, forwarding_settings):
+def test_api_forwarding_with_valid_configuration(
+    monkeypatch,
+):
     """Test the settings, given a valid forwarding configuration, should not raise an
     exception.
     """
+    forwarding_settings = mock_instance(XapiForwardingConfigurationSettings)
+
     monkeypatch.delenv("RALPH_XAPI_FORWARDINGS", raising=False)
     settings = Settings()
 
     assert settings.XAPI_FORWARDINGS == []
 
-    monkeypatch.setenv("RALPH_XAPI_FORWARDINGS", f"[{forwarding_settings.json()}]")
+    monkeypatch.setenv(
+        "RALPH_XAPI_FORWARDINGS", f"[{forwarding_settings.model_dump_json()}]"
+    )
     settings = Settings()
     assert len(settings.XAPI_FORWARDINGS) == 1
     assert settings.XAPI_FORWARDINGS[0] == forwarding_settings
 
 
-@hypothesis_settings(suppress_health_check=(HealthCheck.function_scoped_fixture,))
 @pytest.mark.parametrize(
     "missing_key",
     ["url", "is_active", "basic_username", "basic_password", "max_retries", "timeout"],
 )
-@custom_given(XapiForwardingConfigurationSettings)
-def test_api_forwarding_configuration_with_missing_field(missing_key, forwarding):
+def test_api_forwarding_configuration_with_missing_field(missing_key):
     """Test the forwarding configuration, given a missing field, should raise a
     validation exception.
     """
-    forwarding_dict = json.loads(forwarding.json())
+
+    forwarding = mock_instance(XapiForwardingConfigurationSettings)
+
+    forwarding_dict = json.loads(forwarding.model_dump_json())
     del forwarding_dict[missing_key]
-    with pytest.raises(ValidationError, match=f"{missing_key}\n  field required"):
+    with pytest.raises(ValidationError, match=f"{missing_key}\n  Field required"):
         XapiForwardingConfigurationSettings(**forwarding_dict)
 
 
@@ -75,20 +77,23 @@ def test_api_forwarding_get_active_xapi_forwardings_with_empty_forwardings(
     assert caplog.record_tuples[0][2] == expected_log
 
 
-@hypothesis_settings(suppress_health_check=(HealthCheck.function_scoped_fixture,))
-@custom_given(
-    custom_builds(XapiForwardingConfigurationSettings, is_active=st.just(True)),
-    custom_builds(XapiForwardingConfigurationSettings, is_active=st.just(False)),
-)
 def test_api_forwarding_get_active_xapi_forwardings_with_inactive_forwardings(
-    monkeypatch, caplog, active_forwarding, inactive_forwarding
+    monkeypatch, caplog
 ):
     """Test that the get_active_xapi_forwardings function, given a forwarding
     configuration containing inactive forwardings, should log which forwarding
     configurations are inactive and return a list containing only active forwardings.
     """
-    active_forwarding_json = active_forwarding.json()
-    inactive_forwarding_json = inactive_forwarding.json()
+
+    active_forwarding = mock_instance(
+        XapiForwardingConfigurationSettings, is_active=True
+    )
+    inactive_forwarding = mock_instance(
+        XapiForwardingConfigurationSettings, is_active=False
+    )
+
+    active_forwarding_json = active_forwarding.model_dump_json()
+    inactive_forwarding_json = inactive_forwarding.model_dump_json()
 
     # One inactive forwarding and no active forwarding.
     monkeypatch.setenv("RALPH_XAPI_FORWARDINGS", f"[{inactive_forwarding_json}]")
@@ -124,23 +129,17 @@ def test_api_forwarding_get_active_xapi_forwardings_with_inactive_forwardings(
 
 
 @pytest.mark.anyio
-@hypothesis_settings(
-    deadline=None, suppress_health_check=(HealthCheck.function_scoped_fixture,)
-)
 @pytest.mark.parametrize("statements", [[{}, {"id": 1}]])
-@custom_given(
-    custom_builds(
-        XapiForwardingConfigurationSettings,
-        max_retries=st.just(1),
-        is_active=st.just(True),
-    )
-)
 async def test_api_forwarding_forward_xapi_statements_with_successful_request(
-    monkeypatch, caplog, statements, forwarding
+    monkeypatch, caplog, statements
 ):
     """Test the forward_xapi_statements function should log the forwarded statements
     count if the request was successful.
     """
+
+    forwarding = mock_instance(
+        XapiForwardingConfigurationSettings, max_retries=1, is_active=True
+    )
 
     class MockSuccessfulResponse:
         """Dummy Successful Response."""
@@ -154,7 +153,7 @@ async def test_api_forwarding_forward_xapi_statements_with_successful_request(
         return MockSuccessfulResponse()
 
     monkeypatch.setattr("ralph.api.forwarding.AsyncClient.post", post_success)
-    monkeypatch.setenv("RALPH_XAPI_FORWARDINGS", f"[{forwarding.json()}]")
+    monkeypatch.setenv("RALPH_XAPI_FORWARDINGS", f"[{forwarding.model_dump_json()}]")
     monkeypatch.setattr("ralph.api.forwarding.settings", Settings())
     get_active_xapi_forwardings.cache_clear()
 
@@ -163,7 +162,7 @@ async def test_api_forwarding_forward_xapi_statements_with_successful_request(
         await forward_xapi_statements(statements, method="post")
 
     assert [
-        f"Forwarded {len(statements)} statements to {forwarding.url} with success."
+        f"Forwarded {len(statements)} statements to {str(forwarding.url)} with success."
     ] == [
         message
         for source, _, message in caplog.record_tuples
@@ -172,21 +171,19 @@ async def test_api_forwarding_forward_xapi_statements_with_successful_request(
 
 
 @pytest.mark.anyio
-@hypothesis_settings(suppress_health_check=(HealthCheck.function_scoped_fixture,))
 @pytest.mark.parametrize("statements", [[{}, {"id": 1}]])
-@custom_given(
-    custom_builds(
-        XapiForwardingConfigurationSettings,
-        max_retries=st.just(3),
-        is_active=st.just(True),
-    )
-)
 async def test_api_forwarding_forward_xapi_statements_with_unsuccessful_request(
-    monkeypatch, caplog, statements, forwarding
+    monkeypatch, caplog, statements
 ):
     """Test the forward_xapi_statements function should log the error if the request
     was successful.
     """
+
+    forwarding = mock_instance(
+        XapiForwardingConfigurationSettings,
+        max_retries=3,
+        is_active=True,
+    )
 
     class MockUnsuccessfulResponse:
         """Dummy Failing Response."""
@@ -201,7 +198,7 @@ async def test_api_forwarding_forward_xapi_statements_with_unsuccessful_request(
         return MockUnsuccessfulResponse()
 
     monkeypatch.setattr("ralph.api.forwarding.AsyncClient.post", post_fail)
-    monkeypatch.setenv("RALPH_XAPI_FORWARDINGS", f"[{forwarding.json()}]")
+    monkeypatch.setenv("RALPH_XAPI_FORWARDINGS", f"[{forwarding.model_dump_json()}]")
     monkeypatch.setattr("ralph.api.forwarding.settings", Settings())
     get_active_xapi_forwardings.cache_clear()
 
