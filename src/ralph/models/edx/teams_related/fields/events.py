@@ -3,7 +3,8 @@
 import sys
 from typing import List, Union
 
-from pydantic import constr, validator
+from pydantic import StringConstraints, validator
+from typing_extensions import Annotated
 
 from ...base import AbstractBaseEventField
 
@@ -38,8 +39,8 @@ class EdxTeamChangedEventField(TeamsEventField):
     """
 
     field: str
-    new: constr(max_length=1250)
-    old: constr(max_length=1250)
+    new: Annotated[str, StringConstraints(max_length=1250)]
+    old: Annotated[str, StringConstraints(max_length=1250)]
     truncated: List[str]
 
     @validator("truncated")

@@ -5,6 +5,7 @@ from typing import AsyncIterator, Optional, Union
 
 import websockets
 from pydantic import AnyUrl, PositiveInt
+from pydantic_settings import SettingsConfigDict
 from websockets.http import USER_AGENT
 
 from ralph.backends.data.base import (
@@ -12,7 +13,7 @@ from ralph.backends.data.base import (
     BaseDataBackendSettings,
     DataBackendStatus,
 )
-from ralph.conf import BaseSettingsConfig, ClientOptions
+from ralph.conf import BASE_SETTINGS_CONFIG, ClientOptions
 from ralph.exceptions import BackendException
 
 logger = logging.getLogger(__name__)
@@ -68,10 +69,10 @@ class WSDataBackendSettings(BaseDataBackendSettings):
         URI (str): The URI to connect to.
     """
 
-    class Config(BaseSettingsConfig):
-        """Pydantic Configuration."""
-
-        env_prefix = "RALPH_BACKENDS__DATA__WS__"
+    model_config = {
+        **BASE_SETTINGS_CONFIG,
+        **SettingsConfigDict(env_prefix="RALPH_BACKENDS__DATA__WS__"),
+    }
 
     CLIENT_OPTIONS: WSClientOptions = WSClientOptions()
     URI: AnyUrl
@@ -97,7 +98,7 @@ class AsyncWSDataBackend(BaseAsyncDataBackend[WSDataBackendSettings, str]):
         if not self._client:
             try:
                 self._client = await websockets.connect(
-                    self.settings.URI, **self.settings.CLIENT_OPTIONS.dict()
+                    str(self.settings.URI), **self.settings.CLIENT_OPTIONS.model_dump()
                 )
             except (websockets.WebSocketException, OSError, TimeoutError) as error:
                 msg = "Failed open websocket connection for %s: %s"

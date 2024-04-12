@@ -252,7 +252,7 @@ def fs_lrs_backend(fs, settings_fs):
     def get_fs_lrs_backend(path: str = "foo"):
         """Return an instance of FSLRSBackend."""
         settings = FSLRSBackend.settings_class(
-            DEFAULT_DIRECTORY_PATH=path,
+            DEFAULT_DIRECTORY_PATH=Path(path),
             DEFAULT_QUERY_STRING="*",
             LOCALE_ENCODING="utf8",
             READ_CHUNK_SIZE=1024,
@@ -316,7 +316,7 @@ def lrs_backend(
             BASE_URL=parse_obj_as(AnyHttpUrl, base_url),
             USERNAME="user",
             PASSWORD="pass",
-            HEADERS=LRSHeaders.parse_obj(headers),
+            HEADERS=LRSHeaders.model_validate(headers),
             LOCALE_ENCODING="utf8",
             STATUS_ENDPOINT="/__heartbeat__",
             STATEMENTS_ENDPOINT="/xAPI/statements/",
@@ -497,7 +497,7 @@ def get_clickhouse_fixture(
     """
     client_options = ClickHouseClientOptions(
         date_time_input_format="best_effort",  # Allows RFC dates
-    ).dict()
+    ).model_dump()
 
     client = clickhouse_connect.get_client(
         host=host,

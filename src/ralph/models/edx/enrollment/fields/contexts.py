@@ -1,7 +1,6 @@
 """Enrollment event models context fields definitions."""
 
 import sys
-from typing import Union
 
 from ...base import BaseContextField
 
@@ -22,7 +21,7 @@ class EdxCourseEnrollmentUpgradeClickedContextField(BaseContextField):
             enrollment mode when the user clicked <kbd>Challenge Yourself</kbd>.
     """
 
-    mode: Union[Literal["audit"], Literal["honor"]]
+    mode: Literal["audit", "honor"]
 
 
 class EdxCourseEnrollmentUpgradeSucceededContextField(BaseContextField):

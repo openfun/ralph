@@ -162,14 +162,22 @@ def mock_statement(
 
     # Verb
     if verb is None:
-        verb = {"id": f"https://w3id.org/xapi/video/verbs/{random.random()}"}
+        verb = {
+            "id": (
+                "https://w3id.org/xapi/video/verbs/"
+                f"{str(random.random()).replace('.', '_')}"
+            )
+        }
     elif isinstance(verb, int):
         verb = {"id": f"https://w3id.org/xapi/video/verbs/{verb}"}
 
     # Object
     if object is None:
         object = {
-            "id": f"http://example.adlnet.gov/xapi/example/activity_{random.random()}"
+            "id": (
+                "http://example.adlnet.gov/xapi/example/activity_"
+                f"{str(random.random()).replace('.', '_')}"
+            )
         }
     elif isinstance(object, int):
         object = {"id": f"http://example.adlnet.gov/xapi/example/activity_{object}"}

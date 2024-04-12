@@ -28,16 +28,16 @@ def test_models_xapi_base_common_field_iri_with_valid_data(values):
 
 
 @pytest.mark.parametrize(
-    "values,error",
+    "values",
     [
-        ({"iri": None}, "none is not an allowed value"),
-        ({"iri": {}}, "expected string"),
-        ({"iri": ""}, "not a valid 'IRI'"),
-        ({"iri": "localhost/foo/bar"}, "not a valid 'IRI'"),
-        ({"iri": "http://foo/<bar>"}, "not a valid 'IRI'"),
+        {"iri": None},
+        {"iri": {}},
+        {"iri": ""},
+        {"iri": "localhost/foo/bar"},
+        {"iri": "http://foo/<bar>"},
     ],
 )
-def test_models_xapi_base_common_field_iri_with_invalid_data(values, error):
+def test_models_xapi_base_common_field_iri_with_invalid_data(values):
     """Test that an invalid verb field raises a `ValidationError`."""
 
     class DummyIRIModel(BaseModel):
@@ -45,7 +45,7 @@ def test_models_xapi_base_common_field_iri_with_invalid_data(values, error):
 
         iri: IRI
 
-    with pytest.raises(ValidationError, match=error):
+    with pytest.raises(ValidationError, match="not a valid 'IRI'"):
         DummyIRIModel(**values)
 
 
@@ -72,15 +72,15 @@ def test_models_xapi_base_common_field_language_tag_with_valid_data(values):
 
 
 @pytest.mark.parametrize(
-    "values,error",
+    "values",
     [
-        ({"tag": None}, "none is not an allowed value"),
-        ({"tag": {}}, "unhashable type: 'dict'"),
-        ({"tag": ""}, "Invalid RFC 5646 Language tag"),
-        ({"tag": "en-US-en"}, "Invalid RFC 5646 Language tag"),
+        {"tag": None},
+        {"tag": {}},
+        {"tag": ""},
+        {"tag": "en-US-en"},
     ],
 )
-def test_models_xapi_base_common_field_language_tag_with_invalid_data(values, error):
+def test_models_xapi_base_common_field_language_tag_with_invalid_data(values):
     """Test that an invalid verb field raises a `ValidationError`."""
 
     class DummyLanguageTagModel(BaseModel):
@@ -88,7 +88,7 @@ def test_models_xapi_base_common_field_language_tag_with_invalid_data(values, er
 
         tag: LanguageTag
 
-    with pytest.raises(ValidationError, match=error):
+    with pytest.raises(TypeError, match="Invalid RFC 5646 Language tag"):
         DummyLanguageTagModel(**values)
 
 
@@ -108,15 +108,25 @@ def test_models_xapi_base_common_field_language_map_with_valid_data(values):
 
 
 @pytest.mark.parametrize(
-    "values,error",
+    "values,exception,error",
     [
-        ({"map": None}, "none is not an allowed value"),
-        ({"map": "en-US-en"}, "value is not a valid dict"),
-        ({"map": {"en-US-en": 1}}, "Invalid RFC 5646 Language tag"),
-        ({"map": {"en-US": []}}, "en-US\n  str type expected"),
+        ({"map": None}, ValidationError, "map\n  Input should be a valid dictionary"),
+        (
+            {"map": "en-US-en"},
+            ValidationError,
+            "map\n  Input should be a valid dictionary",
+        ),
+        ({"map": {"en-US-en": 1}}, TypeError, "Invalid RFC 5646 Language tag"),
+        (
+            {"map": {"en-US": []}},
+            ValidationError,
+            "en-US\n  Input should be a valid string",
+        ),
     ],
 )
-def test_models_xapi_base_common_field_language_map_with_invalid_data(values, error):
+def test_models_xapi_base_common_field_language_map_with_invalid_data(
+    values, exception, error
+):
     """Test that an invalid verb field raises a `ValidationError`."""
 
     class DummyLanguageTagModel(BaseModel):
@@ -124,5 +134,5 @@ def test_models_xapi_base_common_field_language_map_with_invalid_data(values, er
 
         map: LanguageMap
 
-    with pytest.raises(ValidationError, match=error):
+    with pytest.raises(exception, match=error):
         DummyLanguageTagModel(**values)

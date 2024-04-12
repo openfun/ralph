@@ -11,7 +11,7 @@ from functools import partial
 import httpx
 import pytest
 from httpx import HTTPStatusError, RequestError
-from pydantic import AnyHttpUrl, parse_obj_as
+from pydantic import AnyHttpUrl, AnyUrl, parse_obj_as
 from pytest_httpx import HTTPXMock
 
 from ralph.backends.data.async_lrs import AsyncLRSDataBackend
@@ -82,7 +82,8 @@ def test_backends_data_async_lrs_instantiation_with_settings(lrs_backend):
     assert AsyncLRSDataBackend.settings_class == LRSDataBackendSettings
     backend = AsyncLRSDataBackend(settings)
     assert backend.query_class == LRSStatementsQuery
-    assert isinstance(backend.base_url, AnyHttpUrl)
+    assert isinstance(backend.base_url, AnyUrl)
+    assert backend.base_url.scheme.lower() in ["http", "https"]
     assert backend.auth == ("user", "pass")
     assert backend.settings.HEADERS.CONTENT_TYPE == "application/json"
     assert backend.settings.HEADERS.X_EXPERIENCE_API_VERSION == "1.0.3"

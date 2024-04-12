@@ -5,7 +5,8 @@ from datetime import datetime
 from typing import List, Optional, Union
 from uuid import UUID
 
-from pydantic import Field, NonNegativeFloat, PositiveInt, condecimal, validator
+from pydantic import Field, NonNegativeFloat, PositiveInt, condecimal, field_validator
+from typing_extensions import Annotated
 
 from ..base.contexts import BaseXapiContext, BaseXapiContextContextActivities
 from ..base.unnested_objects import BaseXapiActivity
@@ -49,7 +50,7 @@ class LMSContextContextActivities(BaseXapiContextContextActivities):
         LMSProfileActivity, List[Union[LMSProfileActivity, BaseXapiActivity]]
     ]
 
-    @validator("category")
+    @field_validator("category")
     @classmethod
     def check_presence_of_profile_activity_category(
         cls,
@@ -94,9 +95,13 @@ class LMSRegistrationContextExtensions(BaseExtensionModelWithConfig):
             `guest`, `learner` or `staff`.
     """
 
-    starting_date: Optional[datetime] = Field(alias=CONTEXT_EXTENSION_STARTING_DATE)
-    ending_date: Optional[datetime] = Field(alias=CONTEXT_EXTENSION_ENDING_DATE)
-    role: Optional[str] = Field(alias=CONTEXT_EXTENSION_ROLE)
+    starting_date: Annotated[
+        Optional[datetime], Field(alias=CONTEXT_EXTENSION_STARTING_DATE)
+    ] = None
+    ending_date: Annotated[
+        Optional[datetime], Field(alias=CONTEXT_EXTENSION_ENDING_DATE)
+    ] = None
+    role: Annotated[Optional[str], Field(alias=CONTEXT_EXTENSION_ROLE)]
 
 
 class LMSRegistrationContext(LMSContext):
@@ -109,7 +114,7 @@ class LMSRegistrationContext(LMSContext):
         extensions (dict): see LMSRegistrationContextExtensions.
     """
 
-    extensions: Optional[LMSRegistrationContextExtensions]
+    extensions: Optional[LMSRegistrationContextExtensions] = None
 
 
 class LMSCommonContextExtensions(BaseExtensionModelWithConfig):
@@ -124,7 +129,9 @@ class LMSCommonContextExtensions(BaseExtensionModelWithConfig):
         session_id (uuid): ID of the active session.
     """
 
-    session_id: Optional[UUID] = Field(alias=CONTEXT_EXTENSION_SESSION_ID)
+    session_id: Annotated[Optional[UUID], Field(alias=CONTEXT_EXTENSION_SESSION_ID)] = (
+        None
+    )
 
 
 class LMSCommonContext(LMSContext):
@@ -134,7 +141,7 @@ class LMSCommonContext(LMSContext):
         extensions (dict): See LMSCommonContextExtensions.
     """
 
-    extensions: Optional[LMSCommonContextExtensions]
+    extensions: Optional[LMSCommonContextExtensions] = None
 
 
 class LMSDownloadedVideoContextExtensions(LMSCommonContextExtensions):
@@ -145,10 +152,13 @@ class LMSDownloadedVideoContextExtensions(LMSCommonContextExtensions):
         quality (int): Video resolution or quality of the video.
     """
 
-    length: Optional[condecimal(ge=0, decimal_places=3)] = Field(
-        alias=CONTEXT_EXTENSION_LENGTH
-    )
-    quality: Optional[PositiveInt] = Field(alias=CONTEXT_EXTENSION_QUALITY)
+    length: Annotated[
+        Optional[condecimal(ge=0, decimal_places=3)],
+        Field(alias=CONTEXT_EXTENSION_LENGTH),
+    ] = None
+    quality: Annotated[
+        Optional[PositiveInt], Field(alias=CONTEXT_EXTENSION_QUALITY)
+    ] = None
 
 
 class LMSDownloadedVideoContext(LMSContext):
@@ -158,7 +168,7 @@ class LMSDownloadedVideoContext(LMSContext):
         extensions (dict): See LMSDownloadedVideoContextExtensions.
     """
 
-    extensions: Optional[LMSDownloadedVideoContextExtensions]
+    extensions: Optional[LMSDownloadedVideoContextExtensions] = None
 
 
 class LMSDownloadedAudioContextExtensions(LMSCommonContextExtensions):
@@ -168,7 +178,9 @@ class LMSDownloadedAudioContextExtensions(LMSCommonContextExtensions):
         length (float): Length of the audio.
     """
 
-    length: Optional[NonNegativeFloat] = Field(alias=CONTEXT_EXTENSION_LENGTH)
+    length: Annotated[
+        Optional[NonNegativeFloat], Field(alias=CONTEXT_EXTENSION_LENGTH)
+    ] = None
 
 
 class LMSDownloadedAudioContext(LMSContext):
@@ -178,4 +190,4 @@ class LMSDownloadedAudioContext(LMSContext):
         extensions (dict): See LMSDownloadedAudioContextExtensions.
     """
 
-    extensions: Optional[LMSDownloadedAudioContextExtensions]
+    extensions: Optional[LMSDownloadedAudioContextExtensions] = None

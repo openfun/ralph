@@ -3,7 +3,8 @@
 import sys
 from typing import Optional, Union
 
-from pydantic import Field, constr
+from pydantic import Field, StringConstraints
+from typing_extensions import Annotated
 
 from ...base import AbstractBaseEventField
 
@@ -23,9 +24,12 @@ class TextbookInteractionBaseEventField(AbstractBaseEventField):
     """
 
     page: int
-    chapter: constr(
-        regex=(r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$")
-    )
+    chapter: Annotated[
+        str,
+        StringConstraints(
+            pattern=r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"
+        ),
+    ]
 
 
 class TextbookPdfThumbnailsToggledEventField(TextbookInteractionBaseEventField):
@@ -70,9 +74,12 @@ class TextbookPdfChapterNavigatedEventField(AbstractBaseEventField):
     """
 
     name: Literal["textbook.pdf.chapter.navigated"]
-    chapter: constr(
-        regex=(r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$")
-    )
+    chapter: Annotated[
+        str,
+        StringConstraints(
+            pattern=r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"
+        ),
+    ]
     chapter_title: str
 
 
@@ -95,7 +102,7 @@ class TextbookPdfZoomButtonsChangedEventField(TextbookInteractionBaseEventField)
     """
 
     name: Literal["textbook.pdf.zoom.buttons.changed"]
-    direction: Union[Literal["in"], Literal["out"]]
+    direction: Literal["in", "out"]
 
 
 class TextbookPdfZoomMenuChangedEventField(TextbookInteractionBaseEventField):
@@ -146,7 +153,7 @@ class TextbookPdfPageScrolledEventField(TextbookInteractionBaseEventField):
     """
 
     name: Literal["textbook.pdf.page.scrolled"]
-    direction: Union[Literal["up"], Literal["down"]]
+    direction: Literal["up", "down"]
 
 
 class TextbookPdfSearchExecutedEventField(TextbookInteractionBaseEventField):
@@ -256,14 +263,16 @@ class BookEventField(AbstractBaseEventField):
             clicked or `nextpage` value when the previous page button is clicked.
     """
 
-    chapter: constr(
-        regex=(r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$")
-    )
-    name: Union[
-        Literal["textbook.pdf.page.loaded"], Literal["textbook.pdf.page.navigatednext"]
+    chapter: Annotated[
+        str,
+        StringConstraints(
+            pattern=r"^\/asset-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+type@asset\+block.+$"
+        ),
     ]
+    name: Literal["textbook.pdf.page.loaded", "textbook.pdf.page.navigatednext"]
     new: int
-    old: Optional[int]
-    type: Union[Literal["gotopage"], Literal["prevpage"], Literal["nextpage"]] = Field(
-        alias="type"
-    )
+    old: Optional[int] = None
+    type: Annotated[
+        Literal["gotopage", "prevpage", "nextpage"],
+        Field(alias="type"),
+    ]

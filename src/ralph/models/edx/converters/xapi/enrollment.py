@@ -23,7 +23,10 @@ class LMSBaseXapiConverter(BaseXapiConverter):
                 ConversionItem(
                     "object__id",
                     "event__course_id",
-                    lambda course_id: f"{self.platform_url}/courses/{course_id}/info",
+                    lambda course_id: (
+                        f"{self.platform_url.rstrip('/')}/courses/"
+                        f"{course_id.strip('/')}/info"
+                    ),
                 ),
                 ConversionItem(
                     "context__contextActivities__category",

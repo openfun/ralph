@@ -3,7 +3,8 @@
 import sys
 from uuid import UUID
 
-from pydantic import AnyHttpUrl, constr
+from pydantic import AnyHttpUrl, StringConstraints
+from typing_extensions import Annotated
 
 from ...base import AbstractBaseEventField
 
@@ -30,7 +31,7 @@ class CertificateBaseEventField(AbstractBaseEventField):
 
     certificate_id: UUID
     certificate_url: AnyHttpUrl
-    course_id: constr(regex=r"^$|^course-v1:.+\+.+\+.+$")
+    course_id: Annotated[str, StringConstraints(pattern=r"^$|^course-v1:.+\+.+\+.+$")]
     enrollment_mode: Literal["audit", "honor", "professional", "verified"]
     user_id: int
 
@@ -91,4 +92,4 @@ class CertificateGenerationBaseEventField(AbstractBaseEventField):
             certificate is issued.
     """
 
-    course_id: constr(regex=r"^$|^course-v1:.+\+.+\+.+$")
+    course_id: Annotated[str, StringConstraints(pattern=r"^$|^course-v1:.+\+.+\+.+$")]

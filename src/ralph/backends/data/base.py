@@ -22,10 +22,11 @@ from typing import (
     get_origin,
 )
 
-from pydantic import BaseModel, BaseSettings, PositiveInt, ValidationError
+from pydantic import BaseModel, PositiveInt, ValidationError
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing_extensions import Self, get_original_bases
 
-from ralph.conf import BaseSettingsConfig, core_settings
+from ralph.conf import BASE_SETTINGS_CONFIG, core_settings
 from ralph.exceptions import BackendParameterException
 from ralph.utils import (
     async_parse_dict_to_bytes,
@@ -42,12 +43,14 @@ logger = logging.getLogger(__name__)
 class BaseDataBackendSettings(BaseSettings):
     """Data backend default configuration."""
 
-    class Config(BaseSettingsConfig):
-        """Pydantic Configuration."""
-
-        env_prefix = "RALPH_BACKENDS__DATA__"
-        env_file = ".env"
-        env_file_encoding = core_settings.LOCALE_ENCODING
+    model_config = {
+        **BASE_SETTINGS_CONFIG,
+        **SettingsConfigDict(
+            env_prefix="RALPH_BACKENDS__DATA__",
+            env_file=".env",
+            env_file_encoding=core_settings.LOCALE_ENCODING,
+        ),
+    }
 
     LOCALE_ENCODING: str = "utf8"
     READ_CHUNK_SIZE: int = 500
@@ -57,10 +60,9 @@ class BaseDataBackendSettings(BaseSettings):
 class BaseQuery(BaseModel):
     """Base query model."""
 
-    class Config:
-        """Base query model configuration."""
-
-        extra = "forbid"
+    model_config = SettingsConfigDict(
+        extra="forbid",
+    )
 
     @classmethod
     def from_string(cls, query: str) -> Self:

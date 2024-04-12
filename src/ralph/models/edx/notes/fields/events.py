@@ -3,7 +3,8 @@
 import sys
 from typing import Dict, List
 
-from pydantic import constr
+from pydantic import StringConstraints
+from typing_extensions import Annotated
 
 from ...base import AbstractBaseEventField
 
@@ -30,7 +31,7 @@ class NotesEventField(AbstractBaseEventField):
     component_usage_id: str
     highlighted_content: str
     note_id: str
-    note_text: constr(max_length=8333)
+    note_text: Annotated[str, StringConstraints(max_length=8333)]
     tags: List[str] = []
     truncated: List[
         Literal["note_text", "highlighted_content", "tags", "old_note_text", "old_tags"]
@@ -47,7 +48,7 @@ class UIEdxCourseStudentNotesEditedEventField(NotesEventField):
 
     """
 
-    old_note_text: constr(max_length=8333)
+    old_note_text: Annotated[str, StringConstraints(max_length=8333)]
     old_tags: List[str] = []
 
 

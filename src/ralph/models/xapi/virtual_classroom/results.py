@@ -1,6 +1,6 @@
 """Virtual classroom xAPI events result fields definitions."""
 
-from pydantic import StrictStr
+from ralph.conf import NonEmptyStrictStr
 
 from ..base.results import BaseXapiResult
 
@@ -12,4 +12,4 @@ class VirtualClassroomAnsweredPollResult(BaseXapiResult):
         response (str): Consists of the response for the given Activity.
     """
 
-    response: StrictStr  # = StrictStr()
+    response: NonEmptyStrictStr

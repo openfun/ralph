@@ -3,6 +3,8 @@
 import logging
 from typing import Generator, Iterator, List, Optional
 
+from pydantic_settings import SettingsConfigDict
+
 from ralph.backends.data.clickhouse import (
     ClickHouseDataBackend,
     ClickHouseDataBackendSettings,
@@ -14,7 +16,7 @@ from ralph.backends.lrs.base import (
     RalphStatementsQuery,
     StatementQueryResult,
 )
-from ralph.conf import BaseSettingsConfig
+from ralph.conf import BASE_SETTINGS_CONFIG
 from ralph.exceptions import BackendException, BackendParameterException
 
 logger = logging.getLogger(__name__)
@@ -29,10 +31,10 @@ class ClickHouseLRSBackendSettings(
         IDS_CHUNK_SIZE (int): The chunk size for querying by ids.
     """
 
-    class Config(BaseSettingsConfig):
-        """Pydantic Configuration."""
-
-        env_prefix = "RALPH_BACKENDS__LRS__CLICKHOUSE__"
+    model_config = {
+        **BASE_SETTINGS_CONFIG,
+        **SettingsConfigDict(env_prefix="RALPH_BACKENDS__LRS__CLICKHOUSE__"),
+    }
 
     IDS_CHUNK_SIZE: int = 10000
 
@@ -46,7 +48,11 @@ class ClickHouseLRSBackend(
         self, params: RalphStatementsQuery, target: Optional[str] = None
     ) -> StatementQueryResult:
         """Return the statements query payload using xAPI parameters."""
-        ch_params = params.dict(exclude_none=True)
+        ch_params = params.model_dump(exclude_none=True)
+
+        if "statement_id" in ch_params:
+            ch_params["statementId"] = ch_params["statement_id"]
+
         where = []
 
         if params.statement_id:
@@ -94,6 +100,7 @@ class ClickHouseLRSBackend(
             limit=params.limit,
             sort=order_by,
         )
+
         try:
             clickhouse_response = list(
                 self.read(
@@ -163,7 +170,7 @@ class ClickHouseLRSBackend(
             return
 
         if not isinstance(agent_params, dict):
-            agent_params = agent_params.dict()
+            agent_params = agent_params.model_dump()
 
         if agent_params.get("mbox"):
             ch_params[f"{target_field}__mbox"] = agent_params.get("mbox")

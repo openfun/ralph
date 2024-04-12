@@ -4,6 +4,7 @@ import sys
 from typing import Optional
 
 from pydantic import Field
+from typing_extensions import Annotated
 
 from ..concepts.activity_types.acrossx_profile import (
     WebpageActivity,
@@ -33,9 +34,10 @@ class LMSPageObjectDefinitionExtensions(BaseExtensionModelWithConfig):
             `course_list`, `user_space` value.
     """
 
-    type: Optional[Literal["course", "course_list", "user_space"]] = Field(
-        alias=ACTIVITY_EXTENSIONS_TYPE
-    )
+    type: Annotated[
+        Optional[Literal["course", "course_list", "user_space"]],
+        Field(alias=ACTIVITY_EXTENSIONS_TYPE),
+    ] = None
 
 
 class LMSPageObjectDefinition(WebpageActivityDefinition):
@@ -45,7 +47,7 @@ class LMSPageObjectDefinition(WebpageActivityDefinition):
         extensions (dict): see LMSPageObjectDefinitionExtensions.
     """
 
-    extensions: Optional[LMSPageObjectDefinitionExtensions]
+    extensions: Optional[LMSPageObjectDefinitionExtensions] = None
 
 
 class LMSPageObject(WebpageActivity):
@@ -68,7 +70,7 @@ class LMSFileObjectDefinitionExtensions(BaseExtensionModelWithConfig):
         type (str): Characterisation of the MIME type of the file.
     """
 
-    type: str = Field(alias=ACTIVITY_EXTENSIONS_TYPE)
+    type: Annotated[str, Field(alias=ACTIVITY_EXTENSIONS_TYPE)]
 
 
 class LMSFileObjectDefinition(FileActivityDefinition):
@@ -78,7 +80,7 @@ class LMSFileObjectDefinition(FileActivityDefinition):
         extensions (dict): see LMSFileObjectDefinitionExtensions.
     """
 
-    extensions: Optional[LMSFileObjectDefinitionExtensions]
+    extensions: Optional[LMSFileObjectDefinitionExtensions] = None
 
 
 class LMSFileObject(FileActivity):

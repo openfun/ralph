@@ -47,7 +47,7 @@ class VideoBaseXapiConverter(BaseXapiConverter):
                 ConversionItem(
                     "object__id",
                     None,
-                    lambda event: self.platform_url
+                    lambda event: self.platform_url.rstrip("/")
                     + "/xblock/block-v1:"
                     + event["context"]["course_id"]
                     + "-course-v1:+type@video+block@"

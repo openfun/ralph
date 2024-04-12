@@ -7,6 +7,8 @@ from urllib.parse import ParseResult, parse_qs, urljoin, urlparse
 
 from httpx import Client, HTTPError, HTTPStatusError, RequestError
 from pydantic import AnyHttpUrl, BaseModel, Field, PositiveInt, parse_obj_as
+from pydantic_settings import SettingsConfigDict
+from typing_extensions import Annotated
 
 from ralph.backends.data.base import (
     BaseDataBackend,
@@ -16,7 +18,7 @@ from ralph.backends.data.base import (
     Writable,
 )
 from ralph.backends.lrs.base import LRSStatementsQuery
-from ralph.conf import BaseSettingsConfig, HeadersParameters
+from ralph.conf import BASE_SETTINGS_CONFIG, HeadersParameters
 from ralph.exceptions import BackendException
 from ralph.utils import iter_by_batch
 
@@ -26,8 +28,10 @@ logger = logging.getLogger(__name__)
 class LRSHeaders(HeadersParameters):
     """Pydantic model for LRS headers."""
 
-    X_EXPERIENCE_API_VERSION: str = Field("1.0.3", alias="X-Experience-API-Version")
-    CONTENT_TYPE: str = Field("application/json", alias="content-type")
+    X_EXPERIENCE_API_VERSION: Annotated[
+        str, Field(alias="X-Experience-API-Version")
+    ] = "1.0.3"
+    CONTENT_TYPE: Annotated[str, Field(alias="content-type")] = "application/json"
 
 
 class LRSDataBackendSettings(BaseDataBackendSettings):
@@ -45,12 +49,12 @@ class LRSDataBackendSettings(BaseDataBackendSettings):
         WRITE_CHUNK_SIZE (int): The default chunk size for writing statements.
     """
 
-    class Config(BaseSettingsConfig):
-        """Pydantic Configuration."""
+    model_config = {
+        **BASE_SETTINGS_CONFIG,
+        **SettingsConfigDict(env_prefix="RALPH_BACKENDS__DATA__LRS__"),
+    }
 
-        env_prefix = "RALPH_BACKENDS__DATA__LRS__"
-
-    BASE_URL: AnyHttpUrl = Field("http://0.0.0.0:8100")
+    BASE_URL: Annotated[AnyHttpUrl, Field("http://0.0.0.0:8100")]
     USERNAME: str = "ralph"
     PASSWORD: str = "secret"
     HEADERS: LRSHeaders = LRSHeaders()
@@ -62,7 +66,7 @@ class StatementResponse(BaseModel):
     """Pydantic model for `get` statements response."""
 
     statements: Union[List[dict], dict]
-    more: Optional[str]
+    more: Optional[str] = None
 
 
 class LRSDataBackend(
@@ -94,13 +98,13 @@ class LRSDataBackend(
     def client(self) -> Client:
         """Create a `httpx.Client` if it doesn't exist."""
         if not self._client:
-            headers = self.settings.HEADERS.dict(by_alias=True)
+            headers = self.settings.HEADERS.model_dump(by_alias=True)
             self._client = Client(auth=self.auth, headers=headers)
         return self._client
 
     def status(self) -> DataBackendStatus:
         """HTTP backend check for server status."""
-        status_url = urljoin(self.base_url, self.settings.STATUS_ENDPOINT)
+        status_url = urljoin(str(self.base_url), self.settings.STATUS_ENDPOINT)
         try:
             response = self.client.get(status_url)
             response.raise_for_status()
@@ -169,8 +173,8 @@ class LRSDataBackend(
 
         # Create request URL
         target = ParseResult(
-            scheme=urlparse(self.base_url).scheme,
-            netloc=urlparse(self.base_url).netloc,
+            scheme=self.base_url.scheme,
+            netloc=urlparse(str(self.base_url)).netloc,
             path=target,
             query="",
             params="",
@@ -179,7 +183,7 @@ class LRSDataBackend(
 
         statements = self._fetch_statements(
             target=target,
-            query_params=query.dict(exclude_none=True, exclude_unset=True),
+            query_params=query.model_dump(exclude_none=True, exclude_unset=True),
         )
 
         # Iterate through results
@@ -230,8 +234,8 @@ class LRSDataBackend(
             target = self.settings.STATEMENTS_ENDPOINT
 
         target = ParseResult(
-            scheme=urlparse(self.base_url).scheme,
-            netloc=urlparse(self.base_url).netloc,
+            scheme=self.base_url.scheme,
+            netloc=urlparse(str(self.base_url)).netloc,
             path=target,
             query="",
             params="",

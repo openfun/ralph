@@ -2,6 +2,8 @@
 
 import sys
 
+from pydantic import ConfigDict, NonNegativeFloat
+
 from ...base import AbstractBaseEventField
 
 if sys.version_info >= (3, 8):
@@ -20,8 +22,7 @@ class VideoBaseEventField(AbstractBaseEventField):
             course creators, or the system-generated hash code otherwise.
     """
 
-    class Config:  # noqa: D106
-        extra = "allow"
+    model_config = ConfigDict(extra="allow", coerce_numbers_to_str=True)
 
     code: str
     id: str
@@ -35,7 +36,7 @@ class PlayVideoEventField(VideoBaseEventField):
             the statement was emitted.
     """
 
-    currentTime: float
+    currentTime: NonNegativeFloat
 
 
 class PauseVideoEventField(VideoBaseEventField):
@@ -46,7 +47,7 @@ class PauseVideoEventField(VideoBaseEventField):
             the statement was emitted.
     """
 
-    currentTime: float
+    currentTime: NonNegativeFloat
 
 
 class SeekVideoEventField(VideoBaseEventField):
@@ -61,8 +62,8 @@ class SeekVideoEventField(VideoBaseEventField):
             within the video, either `onCaptionSeek` or `onSlideSeek` value.
     """
 
-    new_time: float
-    old_time: float
+    new_time: NonNegativeFloat
+    old_time: NonNegativeFloat
     type: str
 
 
@@ -74,7 +75,7 @@ class StopVideoEventField(VideoBaseEventField):
             the statement was emitted.
     """
 
-    currentTime: float
+    currentTime: NonNegativeFloat
 
 
 class VideoHideTranscriptEventField(VideoBaseEventField):
@@ -85,7 +86,7 @@ class VideoHideTranscriptEventField(VideoBaseEventField):
             the statement was emitted.
     """
 
-    current_time: float
+    current_time: NonNegativeFloat
 
 
 class VideoShowTranscriptEventField(VideoBaseEventField):
@@ -96,7 +97,7 @@ class VideoShowTranscriptEventField(VideoBaseEventField):
             the statement was emitted.
     """
 
-    current_time: float
+    current_time: NonNegativeFloat
 
 
 class SpeedChangeVideoEventField(VideoBaseEventField):
@@ -107,6 +108,6 @@ class SpeedChangeVideoEventField(VideoBaseEventField):
             the statement was emitted.
     """
 
-    currentTime: float
+    currentTime: NonNegativeFloat
     new_speed: Literal["0.75", "1.0", "1.25", "1.50", "2.0"]
     old_speed: Literal["0.75", "1.0", "1.25", "1.50", "2.0"]

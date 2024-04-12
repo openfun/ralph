@@ -26,6 +26,7 @@ except ModuleNotFoundError:
     # dependencies are not installed.
     pass
 from click_option_group import optgroup
+from pydantic import AnyUrl
 
 from ralph import __version__ as ralph_version
 from ralph.backends.data.base import (
@@ -40,7 +41,7 @@ from ralph.backends.loader import (
     get_cli_write_backends,
     get_lrs_backends,
 )
-from ralph.conf import ClientOptions, CommaSeparatedTuple, HeadersParameters, settings
+from ralph.conf import ClientOptions, HeadersParameters, settings
 from ralph.logger import configure_logging
 from ralph.models.converter import Converter
 from ralph.models.selector import ModelSelector
@@ -76,6 +77,16 @@ class CommaSeparatedTupleParamType(click.ParamType):
             )
 
         return value
+
+
+class AnyUrlParamType(click.ParamType):
+    """AnyUrl parameter type."""
+
+    name = "URL"
+
+    def convert(self, value, param, ctx):  # noqa: ARG002
+        """Return str representation of AnyUrl instance."""
+        return str(value)
 
 
 class CommaSeparatedKeyValueParamType(click.ParamType):
@@ -256,9 +267,9 @@ def backends_options(backends: Dict[str, Type], name: Optional[str] = None):
         backend_names = []
         for backend_name, backend in backends.items():
             backend_names.append(backend_name)
-            fields = backend.settings_class.__fields__.items()
+            fields = backend.settings_class.model_fields.items()
             for field_name, field in sorted(fields, key=lambda x: x[0], reverse=True):
-                field_type = field.type_
+                field_type = field.annotation
                 field_name = (  # noqa: PLW2901
                     f"{backend_name}-{field_name.lower()}".replace("_", "-")
                 )
@@ -272,7 +283,7 @@ def backends_options(backends: Dict[str, Type], name: Optional[str] = None):
                     option_kwargs["is_flag"] = True
                 elif field_type is dict:
                     option_kwargs["type"] = CommaSeparatedKeyValueParamType()
-                elif field_type is CommaSeparatedTuple:
+                elif field_type is tuple:  # CommaSeparatedTuple
                     option_kwargs["type"] = CommaSeparatedTupleParamType()
                 elif isclass(field_type) and issubclass(field_type, ClientOptions):
                     option_kwargs["type"] = ClientOptionsParamType(field_type)
@@ -280,6 +291,8 @@ def backends_options(backends: Dict[str, Type], name: Optional[str] = None):
                     option_kwargs["type"] = HeadersParametersParamType(field_type)
                 elif field_type is Path:
                     option_kwargs["type"] = click.Path()
+                elif field_type is AnyUrl:
+                    option_kwargs["type"] = AnyUrlParamType()
 
                 command = optgroup.option(option.lower(), **option_kwargs)(command)
 
@@ -468,13 +481,21 @@ def auth(  # noqa: PLR0913
         auth_file.parent.mkdir(parents=True, exist_ok=True)
         auth_file.touch()
 
-        users = ServerUsersCredentials.parse_obj([])
+        users = ServerUsersCredentials.model_validate([])
         # Parse credentials file if not empty
         if auth_file.stat().st_size:
-            users = ServerUsersCredentials.parse_file(auth_file)
-        users += ServerUsersCredentials.parse_obj([credentials])
+            with open(auth_file, encoding=settings.LOCALE_ENCODING) as f:
+                users = ServerUsersCredentials.model_validate_json(f.read())
+
+        users += ServerUsersCredentials.model_validate(
+            [
+                credentials,
+            ]
+        )
+
         auth_file.write_text(
-            users.json(indent=2, exclude_none=True), encoding=settings.LOCALE_ENCODING
+            users.model_dump_json(indent=2, exclude_none=True),
+            encoding=settings.LOCALE_ENCODING,
         )
         logger.info("User %s has been added to: %s", username, settings.AUTH_FILE)
     else:
@@ -482,7 +503,7 @@ def auth(  # noqa: PLR0913
             (
                 f"Copy/paste the following credentials to your LRS authentication "
                 f"file located in: {settings.AUTH_FILE}\n"
-                f"{credentials.json(indent=2, exclude_none=True)}"
+                f"{credentials.model_dump_json(indent=2, exclude_none=True)}"
             )
         )
 

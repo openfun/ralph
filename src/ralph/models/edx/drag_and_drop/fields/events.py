@@ -18,7 +18,7 @@ class EdxDragAndDropV2FeedbackEventField(AbstractBaseEventField):
 
     content: str
     manually: bool
-    truncated: Optional[bool]
+    truncated: Optional[bool] = None
 
 
 class EdxDragAndDropV2ItemDroppedEventField(AbstractBaseEventField):
@@ -44,12 +44,12 @@ class EdxDragAndDropV2ItemDroppedEventField(AbstractBaseEventField):
     """
 
     input: int
-    item: Optional[str]
+    item: Optional[str] = None
     item_id: int
     is_correct: bool
     is_correct_location: bool
     location: str
-    location_id: Optional[int]
+    location_id: Optional[int] = None
 
 
 class EdxDragAndDropV2ItemPickedUpEventField(AbstractBaseEventField):

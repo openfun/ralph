@@ -3,7 +3,8 @@
 import sys
 from typing import Optional
 
-from pydantic import constr
+from pydantic import StringConstraints
+from typing_extensions import Annotated
 
 from ...base import AbstractBaseEventField
 
@@ -36,10 +37,15 @@ class EdxBookmarkBaseEventField(AbstractBaseEventField):
         "vertical",
         "video",
     ]
-    component_usage_id: constr(
-        regex=r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"
-        r"type@([a-z]+)\+block@[a-f0-9]{32}$"
-    )
+    component_usage_id: Annotated[
+        str,
+        StringConstraints(
+            pattern=(
+                r"^block-v1:[^\/+]+(\/|\+)[^\/+]+(\/|\+)[^\/?]+"
+                r"type@([a-z]+)\+block@[a-f0-9]{32}$"
+            )
+        ),
+    ]
 
 
 class EdxBookmarkAddedEventField(EdxBookmarkBaseEventField):
@@ -50,7 +56,7 @@ class EdxBookmarkAddedEventField(EdxBookmarkBaseEventField):
             the bookmark.
     """
 
-    course_id: constr(regex=r"^$|^course-v1:.+\+.+\+.+$")
+    course_id: Annotated[str, StringConstraints(pattern=r"^$|^course-v1:.+\+.+\+.+$")]
 
 
 class EdxBookmarkListedEventField(AbstractBaseEventField):
@@ -67,7 +73,9 @@ class EdxBookmarkListedEventField(AbstractBaseEventField):
     """
 
     bookmarks_count: int
-    course_id: Optional[constr(regex=r"^$|^course-v1:.+\+.+\+.+$")]
+    course_id: Optional[
+        Annotated[str, StringConstraints(pattern=r"^$|^course-v1:.+\+.+\+.+$")]
+    ]
     list_type: Literal["per_course", "all_courses"]
     page_number: int
     page_size: int
@@ -81,7 +89,7 @@ class EdxBookmarkRemovedEventField(EdxBookmarkBaseEventField):
             the bookmark.
     """
 
-    course_id: constr(regex=r"^$|^course-v1:.+\+.+\+.+$")
+    course_id: Annotated[str, StringConstraints(pattern=r"^$|^course-v1:.+\+.+\+.+$")]
 
 
 class UIEdxCourseToolAccessedEventField(AbstractBaseEventField):

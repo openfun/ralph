@@ -12,52 +12,52 @@ from ralph.models.edx.teams_related.fields.events import (
     EdxTeamPageViewedEventField,
 )
 
-from tests.fixtures.hypothesis_strategies import custom_given
+from tests.factories import mock_instance
 
 
-@custom_given(EdxTeamChangedEventField)
-def test_models_edx_edx_team_changed_event_field_with_valid_field(field):
+def test_models_edx_edx_team_changed_event_field_with_valid_field():
     """Test that a valid `EdxTeamChangedEventField` does not raise a
     `ValidationError`.
     """
+    field = mock_instance(EdxTeamChangedEventField)
     assert len(field.new) <= 1250
     assert len(field.old) <= 1250
     assert len(field.truncated) in (1, 2)
 
 
-@custom_given(EdxTeamChangedEventField)
-def test_models_edx_edx_team_changed_event_field_with_invalid_new(field):
+def test_models_edx_edx_team_changed_event_field_with_invalid_new():
     """Test that a valid `EdxTeamChangedEventField` does not raise a
     `ValidationError`.
     """
+    field = mock_instance(EdxTeamChangedEventField)
     invalid_field = json.loads(field.json())
     invalid_field["new"] = "x" * 1251
     with pytest.raises(
         ValidationError,
-        match="new\n  ensure this value has at most 1250 characters",
+        match="new\n  String should have at most 1250 characters",
     ):
         EdxTeamChangedEventField(**invalid_field)
 
 
-@custom_given(EdxTeamChangedEventField)
-def test_models_edx_edx_team_changed_event_field_with_invalid_old(field):
+def test_models_edx_edx_team_changed_event_field_with_invalid_old():
     """Test that a valid `EdxTeamChangedEventField` does not raise a
     `ValidationError`.
     """
+    field = mock_instance(EdxTeamChangedEventField)
     invalid_field = json.loads(field.json())
     invalid_field["old"] = "x" * 1251
     with pytest.raises(
         ValidationError,
-        match="old\n  ensure this value has at most 1250 characters",
+        match="old\n  String should have at most 1250 characters",
     ):
         EdxTeamChangedEventField(**invalid_field)
 
 
-@custom_given(EdxTeamLearnerAddedEventField)
-def test_models_edx_edx_team_learner_added_event_field_with_valid_field(field):
+def test_models_edx_edx_team_learner_added_event_field_with_valid_field():
     """Test that a valid `EdxTeamLearnerAddedEventField` does not raise a
     `ValidationError`.
     """
+    field = mock_instance(EdxTeamLearnerAddedEventField)
     assert field.add_method in (
         "added_on_create",
         "joined_from_team_view",
@@ -68,54 +68,48 @@ def test_models_edx_edx_team_learner_added_event_field_with_valid_field(field):
 @pytest.mark.parametrize(
     "add_method", ["added on create", "joined from team view", "added by another user"]
 )
-@custom_given(EdxTeamLearnerAddedEventField)
 def test_models_edx_edx_team_learner_added_event_field_with_invalid_add_method(
-    add_method, field
+    add_method,
 ):
     """Test that a valid `EdxTeamLearnerAddedEventField` does not raise a
     `ValidationError`.
     """
+    field = mock_instance(EdxTeamLearnerAddedEventField)
     invalid_field = json.loads(field.json())
     invalid_field["add_method"] = add_method
-    with pytest.raises(
-        ValidationError,
-        match="add_method\n  unexpected value",
-    ):
+    with pytest.raises(ValidationError, match="add_method"):
         EdxTeamLearnerAddedEventField(**invalid_field)
 
 
-@custom_given(EdxTeamLearnerRemovedEventField)
-def test_models_edx_edx_team_learner_removed_event_field_with_valid_field(field):
+def test_models_edx_edx_team_learner_removed_event_field_with_valid_field():
     """Test that a valid `EdxTeamLearnerRemovedEventField` does not raise a
     `ValidationError`.
     """
+    field = mock_instance(EdxTeamLearnerRemovedEventField)
     assert field.remove_method in ("self_removal", "team_deleted", "removed_by_admin")
 
 
 @pytest.mark.parametrize(
     "remove_method", ["self removal", "team deleted", "removed by admin"]
 )
-@custom_given(EdxTeamLearnerRemovedEventField)
 def test_models_edx_edx_team_learner_removed_event_field_with_invalid_remove_method(
-    remove_method, field
+    remove_method,
 ):
     """Test that a valid `EdxTeamLearnerRemovedEventField` does not raise a
     `ValidationError`.
     """
+    field = mock_instance(EdxTeamLearnerRemovedEventField)
     invalid_field = json.loads(field.json())
     invalid_field["remove_method"] = remove_method
-    with pytest.raises(
-        ValidationError,
-        match="remove_method\n  unexpected value",
-    ):
+    with pytest.raises(ValidationError, match="remove_method"):
         EdxTeamLearnerRemovedEventField(**invalid_field)
 
 
-@custom_given(EdxTeamPageViewedEventField)
-def test_models_edx_edx_team_page_viewed_event_field_with_valid_field(field):
+def test_models_edx_edx_team_page_viewed_event_field_with_valid_field():
     """Test that a valid `EdxTeamPageViewedEventField` does not raise a
     `ValidationError`.
     """
+    field = mock_instance(EdxTeamPageViewedEventField)
     assert field.page_name in (
         "browse",
         "edit-team",
@@ -139,17 +133,12 @@ def test_models_edx_edx_team_page_viewed_event_field_with_valid_field(field):
         "single topic",
     ],
 )
-@custom_given(EdxTeamPageViewedEventField)
-def test_models_edx_edx_team_page_viewed_event_field_with_invalid_page_name(
-    page_name, field
-):
+def test_models_edx_edx_team_page_viewed_event_field_with_invalid_page_name(page_name):
     """Test that a valid `EdxTeamPageViewedEventField` does not raise a
     `ValidationError`.
     """
+    field = mock_instance(EdxTeamPageViewedEventField)
     invalid_field = json.loads(field.json())
     invalid_field["page_name"] = page_name
-    with pytest.raises(
-        ValidationError,
-        match="page_name\n  unexpected value",
-    ):
+    with pytest.raises(ValidationError, match="page_name"):
         EdxTeamPageViewedEventField(**invalid_field)

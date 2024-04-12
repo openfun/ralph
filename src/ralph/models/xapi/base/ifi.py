@@ -1,6 +1,9 @@
 """Base xAPI `Inverse Functional Identifier` definitions."""
 
-from pydantic import AnyUrl, StrictStr, constr
+from pydantic import StringConstraints
+from typing_extensions import Annotated
+
+from ralph.conf import NonEmptyStrictStr
 
 from ..config import BaseModelWithConfig
 from .common import IRI, MailtoEmail
@@ -15,7 +18,7 @@ class BaseXapiAccount(BaseModelWithConfig):
     """
 
     homePage: IRI
-    name: StrictStr
+    name: NonEmptyStrictStr
 
 
 class BaseXapiMboxIFI(BaseModelWithConfig):
@@ -35,7 +38,7 @@ class BaseXapiMboxSha1SumIFI(BaseModelWithConfig):
         mbox_sha1sum (str): Consists of the SHA1 hash of the Agent's email address.
     """
 
-    mbox_sha1sum: constr(regex=r"^[0-9a-f]{40}$")
+    mbox_sha1sum: Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{40}$")]
 
 
 class BaseXapiOpenIdIFI(BaseModelWithConfig):
@@ -45,7 +48,7 @@ class BaseXapiOpenIdIFI(BaseModelWithConfig):
         openid (URI): Consists of an openID that uniquely identifies the Agent.
     """
 
-    openid: AnyUrl
+    openid: str
 
 
 class BaseXapiAccountIFI(BaseModelWithConfig):

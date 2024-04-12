@@ -66,7 +66,7 @@ def test_utils_get_backend_instance(options, expected):
 
     backend = ralph_utils.get_backend_instance(DummyTestBackend, options)
     assert isinstance(backend, DummyTestBackend)
-    assert backend.settings.dict() == expected
+    assert backend.settings.model_dump() == expected
 
 
 @pytest.mark.parametrize("path,value", [(["foo", "bar"], "bar_value")])

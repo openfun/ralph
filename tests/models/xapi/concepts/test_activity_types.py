@@ -3,8 +3,6 @@
 import json
 
 import pytest
-from hypothesis import settings
-from hypothesis import strategies as st
 
 from ralph.models.xapi.concepts.activity_types.acrossx_profile import (
     MessageActivity,
@@ -27,10 +25,9 @@ from ralph.models.xapi.concepts.activity_types.virtual_classroom import (
     VirtualClassroomActivity,
 )
 
-from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
+from tests.factories import mock_xapi_instance
 
 
-@settings(deadline=None)
 @pytest.mark.parametrize(
     "class_, definition_type",
     [
@@ -51,12 +48,9 @@ from tests.fixtures.hypothesis_strategies import custom_builds, custom_given
         (DocumentActivity, "http://id.tincanapi.com/activitytype/document"),
     ],
 )
-@custom_given(st.data())
-def test_models_xapi_concept_activity_types_with_valid_field(
-    class_, definition_type, data
-):
+def test_models_xapi_concept_activity_types_with_valid_field(class_, definition_type):
     """Test that a valid xAPI activity has the expected the `definition`.`type`
     value.
     """
-    field = json.loads(data.draw(custom_builds(class_)).json())
+    field = json.loads(mock_xapi_instance(class_).model_dump_json())
     assert field["definition"]["type"] == definition_type

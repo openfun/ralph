@@ -10,6 +10,7 @@ from clickhouse_connect.driver.exceptions import ClickHouseError
 from ralph.backends.lrs.base import RalphStatementsQuery
 from ralph.backends.lrs.clickhouse import ClickHouseLRSBackend
 from ralph.exceptions import BackendException
+from ralph.models.xapi.base.common import IRI
 
 
 def test_backends_lrs_clickhouse_default_instantiation(monkeypatch, fs):
@@ -19,7 +20,7 @@ def test_backends_lrs_clickhouse_default_instantiation(monkeypatch, fs):
     backend = ClickHouseLRSBackend()
     assert backend.settings.IDS_CHUNK_SIZE == 10000
 
-    monkeypatch.setenv("RALPH_BACKENDS__LRS__CLICKHOUSE__IDS_CHUNK_SIZE", 1)
+    monkeypatch.setenv("RALPH_BACKENDS__LRS__CLICKHOUSE__IDS_CHUNK_SIZE", "1")
     backend = ClickHouseLRSBackend()
     assert backend.settings.IDS_CHUNK_SIZE == 1
 
@@ -86,7 +87,7 @@ def test_backends_lrs_clickhouse_default_instantiation(monkeypatch, fs):
                 "sort": "emission_time DESCENDING, event_id DESCENDING",
             },
         ),
-        # # 3. Query by statementId and agent with mbox_sha1sum IFI.
+        # 3. Query by statementId and agent with mbox_sha1sum IFI.
         (
             {
                 "statementId": "test_id",
@@ -177,8 +178,8 @@ def test_backends_lrs_clickhouse_default_instantiation(monkeypatch, fs):
         # 6. Query by verb and activity with limit.
         (
             {
-                "verb": "http://adlnet.gov/expapi/verbs/attended",
-                "activity": "http://www.example.com/meetings/34534",
+                "verb": IRI("http://adlnet.gov/expapi/verbs/attended"),
+                "activity": IRI("http://www.example.com/meetings/34534"),
                 "limit": 100,
             },
             {
@@ -265,9 +266,8 @@ def test_backends_database_clickhouse_query_statements_query(
     clickhouse,
     clickhouse_lrs_backend,
 ):
-    """Test the ClickHouse backend query_statements method, given a search query
-    failure, should raise a BackendException and log the error.
-    """
+    """Test that the ClickHouse backend query_statements method uses the appropriate
+    query parameters."""
 
     def mock_read(query, target, ignore_errors):
         """Mock the `ClickHouseDataBackend.read` method."""
@@ -284,7 +284,8 @@ def test_backends_database_clickhouse_query_statements_query(
 
     backend = clickhouse_lrs_backend()
     monkeypatch.setattr(backend, "read", mock_read)
-    backend.query_statements(RalphStatementsQuery.construct(**params))
+    ralph_statements_query = RalphStatementsQuery.model_construct(**params)
+    backend.query_statements(ralph_statements_query)
     backend.close()
 
 
@@ -342,7 +343,7 @@ def test_backends_lrs_clickhouse_query_statements(clickhouse, clickhouse_lrs_bac
 
     # Check the expected search query results from default target.
     result = backend.query_statements(
-        RalphStatementsQuery.construct(statementId=test_id, limit=10)
+        RalphStatementsQuery.model_construct(statementId=test_id, limit=10)
     )
     assert result.statements == statements
 
@@ -382,7 +383,7 @@ def test_backends_lrs_clickhouse__find(clickhouse, clickhouse_lrs_backend):
     assert success == 1
 
     # Check the expected search query results.
-    result = backend.query_statements(RalphStatementsQuery.construct())
+    result = backend.query_statements(RalphStatementsQuery.model_construct())
     assert result.statements == statements
     backend.close()
 
@@ -472,7 +473,7 @@ def test_backends_lrs_clickhouse_query_statements_client_failure(
 
     msg = "Failed to read documents: Query error"
     with pytest.raises(BackendException, match=msg):
-        next(backend.query_statements(RalphStatementsQuery.construct()))
+        next(backend.query_statements(RalphStatementsQuery.model_construct()))
 
     assert (
         "ralph.backends.lrs.clickhouse",

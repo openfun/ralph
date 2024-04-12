@@ -8,7 +8,8 @@ from pathlib import Path
 from typing import Iterable, Iterator, Optional, Tuple, TypeVar, Union
 from uuid import uuid4
 
-from pydantic import PositiveInt
+from pydantic import PositiveInt, model_validator
+from pydantic_settings import SettingsConfigDict
 
 from ralph.backends.data.base import (
     BaseDataBackend,
@@ -19,7 +20,7 @@ from ralph.backends.data.base import (
     Writable,
 )
 from ralph.backends.data.mixins import HistoryMixin
-from ralph.conf import BaseSettingsConfig
+from ralph.conf import BASE_SETTINGS_CONFIG
 from ralph.exceptions import BackendException, BackendParameterException
 from ralph.utils import now, parse_iterable_to_dict
 
@@ -39,15 +40,26 @@ class FSDataBackendSettings(BaseDataBackendSettings):
         WRITE_CHUNK_SIZE (int): The default chunk size for writing files.
     """
 
-    class Config(BaseSettingsConfig):
-        """Pydantic Configuration."""
-
-        env_prefix = "RALPH_BACKENDS__DATA__FS__"
+    model_config = {
+        **BASE_SETTINGS_CONFIG,
+        **SettingsConfigDict(env_prefix="RALPH_BACKENDS__DATA__FS__"),
+    }
 
     DEFAULT_DIRECTORY_PATH: Path = Path(".")
     DEFAULT_QUERY_STRING: str = "*"
     READ_CHUNK_SIZE: int = 4096
     WRITE_CHUNK_SIZE: int = 4096
+
+    @model_validator(mode="before")
+    @classmethod
+    def validate_default_directory_path(cls, values):
+        """Coerce DEFAULT_DIRECTORY_PATH to `Path`."""
+        if "DEFAULT_DIRECTORY_PATH" in values:
+            if isinstance(values["DEFAULT_DIRECTORY_PATH"], str):
+                values["DEFAULT_DIRECTORY_PATH"] = Path(
+                    values["DEFAULT_DIRECTORY_PATH"]
+                )
+        return values
 
 
 Settings = TypeVar("Settings", bound=FSDataBackendSettings)
@@ -137,7 +149,6 @@ class FSDataBackend(
         if not details:
             for path in paths:
                 yield str(path)
-
             return
 
         for path in paths:

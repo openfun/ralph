@@ -51,4 +51,7 @@ async def whoami(
     user: AuthenticatedUser = Depends(get_authenticated_user),
 ) -> Dict[str, Any]:
     """Return the current user's username along with their scopes."""
-    return {"agent": user.agent, "scopes": user.scopes}
+    return {
+        "agent": user.agent.model_dump(mode="json", exclude_none=True),
+        "scopes": user.scopes,
+    }
