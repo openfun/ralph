@@ -60,6 +60,3 @@ bin/vault_password
 .team
 group_vars/
 k3d-storage/
-
-# hypothesis
-.hypothesis/
