@@ -19,7 +19,10 @@ from ralph.models.xapi.concepts.activity_types.scorm_profile import (
     ModuleActivity,
     ProfileActivity,
 )
-from ralph.models.xapi.concepts.activity_types.tincan_vocabulary import DocumentActivity
+from ralph.models.xapi.concepts.activity_types.tincan_vocabulary import (
+    DocumentActivity,
+    WebinarActivity,
+)
 from ralph.models.xapi.concepts.activity_types.video import VideoActivity
 from ralph.models.xapi.concepts.activity_types.virtual_classroom import (
     VirtualClassroomActivity,
@@ -46,6 +49,7 @@ from tests.factories import mock_xapi_instance
             "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
         ),
         (DocumentActivity, "http://id.tincanapi.com/activitytype/document"),
+        (WebinarActivity, "http://id.tincanapi.com/activitytype/webinar"),
     ],
 )
 def test_models_xapi_concept_activity_types_with_valid_field(class_, definition_type):
