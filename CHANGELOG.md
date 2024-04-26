@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Models: Add Webinar xAPI activity type
+
 ### Changed
 
 - Upgrade `pydantic` to `2.7.0`

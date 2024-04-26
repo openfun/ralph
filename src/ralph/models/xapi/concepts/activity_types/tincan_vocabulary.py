@@ -32,3 +32,27 @@ class DocumentActivity(BaseXapiActivity):
     """
 
     definition: DocumentActivityDefinition
+
+
+# Webinar
+
+
+class WebinarActivityDefinition(BaseXapiActivityDefinition):
+    """Pydantic model for webinar `Activity` type `definition` property.
+
+    Attributes:
+        type (str): Consists of the value
+            `http://id.tincanapi.com/activitytype/webinar`.
+    """
+
+    type: Literal["http://id.tincanapi.com/activitytype/webinar"]
+
+
+class WebinarActivity(BaseXapiActivity):
+    """Pydantic model for webinar `Activity` type.
+
+    Attributes:
+        definition (dict): see WebinarActivityDefinition.
+    """
+
+    definition: WebinarActivityDefinition
