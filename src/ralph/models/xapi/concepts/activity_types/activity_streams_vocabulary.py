@@ -45,7 +45,7 @@ class FileActivityDefinition(BaseXapiActivityDefinition):
        type (str): Consists of the value `http://activitystrea.ms/file`.
     """
 
-    type: Literal["http://activitystrea.ms/file"]
+    type: Literal["http://activitystrea.ms/file"] = "http://activitystrea.ms/file"
 
 
 class FileActivity(BaseXapiActivity):
