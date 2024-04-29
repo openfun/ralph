@@ -21,7 +21,9 @@ class DocumentActivityDefinition(BaseXapiActivityDefinition):
             `http://id.tincanapi.com/activitytype/document`.
     """
 
-    type: Literal["http://id.tincanapi.com/activitytype/document"]
+    type: Literal["http://id.tincanapi.com/activitytype/document"] = (
+        "http://id.tincanapi.com/activitytype/document"
+    )
 
 
 class DocumentActivity(BaseXapiActivity):
@@ -45,7 +47,9 @@ class WebinarActivityDefinition(BaseXapiActivityDefinition):
             `http://id.tincanapi.com/activitytype/webinar`.
     """
 
-    type: Literal["http://id.tincanapi.com/activitytype/webinar"]
+    type: Literal["http://id.tincanapi.com/activitytype/webinar"] = (
+        "http://id.tincanapi.com/activitytype/webinar"
+    )
 
 
 class WebinarActivity(BaseXapiActivity):

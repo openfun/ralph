@@ -21,7 +21,9 @@ class AudioActivityDefinition(BaseXapiActivityDefinition):
             `https://w3id.org/xapi/audio/activity-type/audio`.
     """
 
-    type: Literal["https://w3id.org/xapi/audio/activity-type/audio"]
+    type: Literal["https://w3id.org/xapi/audio/activity-type/audio"] = (
+        "https://w3id.org/xapi/audio/activity-type/audio"
+    )
 
 
 class AudioActivity(BaseXapiActivity):

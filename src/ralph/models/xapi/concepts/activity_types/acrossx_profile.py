@@ -47,7 +47,9 @@ class WebpageActivityDefinition(BaseXapiActivityDefinition):
             `https://w3id.org/xapi/acrossx/activities/webpage`.
     """
 
-    type: Literal["https://w3id.org/xapi/acrossx/activities/webpage"]
+    type: Literal["https://w3id.org/xapi/acrossx/activities/webpage"] = (
+        "https://w3id.org/xapi/acrossx/activities/webpage"
+    )
 
 
 class WebpageActivity(BaseXapiActivity):
