@@ -10,5 +10,5 @@ def configure_logging() -> None:
     """Set up Ralph logging configuration."""
     try:
         dictConfig(settings.LOGGING)
-    except Exception as error:  # noqa: BLE001
+    except Exception as error:
         raise ConfigurationException("Improperly configured logging") from error
