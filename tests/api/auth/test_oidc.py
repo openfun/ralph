@@ -39,7 +39,10 @@ async def test_api_auth_oidc_get_whoami_valid(
     )
     assert response.status_code == 200
     assert len(response.json().keys()) == 2
-    assert response.json()["agent"] == {"openid": "https://iss.example.com/123|oidc"}
+    assert response.json()["agent"] == {
+        "openid": "https://iss.example.com/123|oidc",
+        "objectType": "Agent",
+    }
     assert TypeAdapter(BaseXapiAgentWithOpenId).validate_python(
         response.json()["agent"]
     )

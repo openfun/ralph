@@ -219,7 +219,10 @@ async def test_api_statements_post_enriching_without_existing_values(
 
     # Test pre-processing: authority
     assert "authority" in statement
-    assert statement["authority"] == {"mbox": "mailto:test_ralph@example.com"}
+    assert statement["authority"] == {
+        "mbox": "mailto:test_ralph@example.com",
+        "objectType": "Agent",
+    }
 
 
 @pytest.mark.anyio
@@ -229,7 +232,11 @@ async def test_api_statements_post_enriching_without_existing_values(
         ("id", str(uuid4()), 200),
         ("timestamp", "2022-06-22T08:31:38Z", 200),
         ("stored", "2022-06-22T08:31:38Z", 200),
-        ("authority", {"mbox": "mailto:test_ralph@example.com"}, 200),
+        (
+            "authority",
+            {"mbox": "mailto:test_ralph@example.com", "objectType": "Agent"},
+            200,
+        ),
     ],
 )
 async def test_api_statements_post_enriching_with_existing_values(  # noqa: PLR0913

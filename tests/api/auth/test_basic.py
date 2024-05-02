@@ -231,7 +231,10 @@ async def test_api_auth_basic_get_whoami_correct_credentials(
     assert response.status_code == 200
 
     assert len(response.json().keys()) == 2
-    assert response.json()["agent"] == {"mbox": "mailto:ralph@example.com"}
+    assert response.json()["agent"] == {
+        "mbox": "mailto:ralph@example.com",
+        "objectType": "Agent",
+    }
     assert sorted(response.json()["scopes"]) == [
         "statements/read/mine",
         "statements/write",

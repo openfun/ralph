@@ -50,7 +50,10 @@ def test_models_edx_converters_xapi_video_ui_load_video_to_video_initialized(
 
     assert xapi_event_dict == {
         "id": str(uuid5(UUID(uuid_namespace), event_str)),
-        "actor": {"account": {"homePage": platform_url, "name": "1"}},
+        "actor": {
+            "account": {"homePage": platform_url, "name": "1"},
+            "objectType": "Agent",
+        },
         "verb": {"id": "http://adlnet.gov/expapi/verbs/initialized"},
         "context": {
             "contextActivities": {
@@ -108,7 +111,10 @@ def test_models_edx_converters_xapi_video_ui_play_video_to_video_played(uuid_nam
     )
     assert xapi_event_dict == {
         "id": str(uuid5(UUID(uuid_namespace), event_str)),
-        "actor": {"account": {"homePage": platform_url, "name": "1"}},
+        "actor": {
+            "account": {"homePage": platform_url, "name": "1"},
+            "objectType": "Agent",
+        },
         "verb": {"id": "https://w3id.org/xapi/video/verbs/played"},
         "object": {
             "id": platform_url.rstrip("/")
@@ -173,7 +179,10 @@ def test_models_edx_converters_xapi_video_ui_pause_video_to_video_paused(
     )
     assert xapi_event_dict == {
         "id": str(uuid5(UUID(uuid_namespace), event_str)),
-        "actor": {"account": {"homePage": platform_url, "name": "1"}},
+        "actor": {
+            "account": {"homePage": platform_url, "name": "1"},
+            "objectType": "Agent",
+        },
         "verb": {"id": "https://w3id.org/xapi/video/verbs/paused"},
         "object": {
             "id": platform_url.rstrip("/")
@@ -239,7 +248,10 @@ def test_models_edx_converters_xapi_video_ui_stop_video_to_video_terminated(
     )
     assert xapi_event_dict == {
         "id": str(uuid5(UUID(uuid_namespace), event_str)),
-        "actor": {"account": {"homePage": platform_url, "name": "1"}},
+        "actor": {
+            "account": {"homePage": platform_url, "name": "1"},
+            "objectType": "Agent",
+        },
         "verb": {"id": "http://adlnet.gov/expapi/verbs/terminated"},
         "object": {
             "id": platform_url.rstrip("/")
@@ -304,7 +316,10 @@ def test_models_edx_converters_xapi_video_ui_seek_video_to_video_seeked(uuid_nam
     )
     assert xapi_event_dict == {
         "id": str(uuid5(UUID(uuid_namespace), event_str)),
-        "actor": {"account": {"homePage": platform_url, "name": "1"}},
+        "actor": {
+            "account": {"homePage": platform_url, "name": "1"},
+            "objectType": "Agent",
+        },
         "verb": {"id": "https://w3id.org/xapi/video/verbs/seeked"},
         "object": {
             "id": platform_url.rstrip("/")
