@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [5.0.0] - 2024-05-02
+
 ### Added
 
 - Models: Add Webinar xAPI activity type
@@ -480,7 +482,8 @@ as per the xAPI specification
 - Add optional sentry integration
 - Distribute Arnold's tray to deploy Ralph in a k8s cluster as cronjobs
 
-[unreleased]: https://github.com/openfun/ralph/compare/v4.2.0...main
+[unreleased]: https://github.com/openfun/ralph/compare/v5.0.0...main
+[5.0.0]: https://github.com/openfun/ralph/compare/v4.2.0...v5.0.0
 [4.2.0]: https://github.com/openfun/ralph/compare/v4.1.0...v4.2.0
 [4.1.0]: https://github.com/openfun/ralph/compare/v4.0.0...v4.1.0
 [4.0.0]: https://github.com/openfun/ralph/compare/v3.9.0...v4.0.0
