@@ -55,6 +55,7 @@ def test_models_edx_converters_xapi_server_server_event_to_page_viewed(uuid_name
         "id": str(uuid5(UUID(uuid_namespace), event_str)),
         "actor": {
             "account": {"homePage": platform_url, "name": "1"},
+            "objectType": "Agent",
         },
         "object": {
             "definition": {

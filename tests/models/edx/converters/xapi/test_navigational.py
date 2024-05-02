@@ -34,6 +34,7 @@ def test_models_edx_converters_xapi_navigational_ui_page_close_to_page_terminate
     assert xapi_event_dict == {
         "id": str(uuid5(UUID(uuid_namespace), event_str)),
         "actor": {
+            "objectType": "Agent",
             "account": {"homePage": platform_url, "name": "1"},
         },
         "object": {

@@ -6,9 +6,21 @@ import re
 import pytest
 from pydantic import ValidationError
 
-from ralph.models.xapi.base.agents import BaseXapiAgentWithMboxSha1Sum
+from ralph.models.xapi.base.agents import (
+    BaseXapiAgentCommonProperties,
+    BaseXapiAgentWithMboxSha1Sum,
+)
 
 from tests.factories import mock_xapi_instance
+
+
+def test_models_xapi_base_agents_agent_common_properties_with_valid_field():
+    """Test a valid BaseXapiAgentCommonProperties has the expected
+    `objectType` value.
+    """
+    field = mock_xapi_instance(BaseXapiAgentCommonProperties)
+
+    assert field.objectType == "Agent"
 
 
 def test_models_xapi_base_agent_with_mbox_sha1_sum_ifi_with_valid_field():

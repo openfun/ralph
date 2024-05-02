@@ -43,7 +43,10 @@ def test_models_edx_converters_xapi_enrollment_edx_course_enrollment_activated_t
 
     assert xapi_event_dict == {
         "id": str(uuid5(UUID(uuid_namespace), event_str)),
-        "actor": {"account": {"homePage": platform_url, "name": "1"}},
+        "actor": {
+            "account": {"homePage": platform_url, "name": "1"},
+            "objectType": "Agent",
+        },
         "verb": {"id": "http://adlnet.gov/expapi/verbs/registered"},
         "context": {
             "contextActivities": {
@@ -99,7 +102,10 @@ def test_models_edx_converters_xapi_enrollment_edx_course_enrollment_deactivated
 
     assert xapi_event_dict == {
         "id": str(uuid5(UUID(uuid_namespace), event_str)),
-        "actor": {"account": {"homePage": platform_url, "name": "1"}},
+        "actor": {
+            "account": {"homePage": platform_url, "name": "1"},
+            "objectType": "Agent",
+        },
         "verb": {"id": "http://id.tincanapi.com/verb/unregistered"},
         "context": {
             "contextActivities": {
