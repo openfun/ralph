@@ -4,6 +4,20 @@ All instructions to upgrade this project from one release to the next will be do
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### 4.x to 5.y
+
+#### Upgrade learning events models
+
+xAPI learning statements validator and converter are built with Pydantic. Ralph 5.x
+is compatible with Pydantic 2.x. Please refer to [Pydantic migration
+guide](https://docs.pydantic.dev/dev/migration/) if you are using Ralph `models`
+feature.
+
+> Most of fields in Pydantic models that are optional are set with `None` as
+  default value in Ralph 5.y. If you serialize some Pydantic models from ralph
+  and want to keep the same content in your serialization, please set
+  `exclude_none` to `True` in the serialization method `model_dump`.
+ 
 ### 3.x to 4.y
 
 #### Upgrade user credentials
