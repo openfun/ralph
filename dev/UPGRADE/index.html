@@ -22,7 +22,7 @@
       
       
       <link rel="icon" href="../img/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.20">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
     
     
       
@@ -93,7 +93,7 @@
             
   <!-- the following line is displayed in the announcement bar -->
 <!-- keep length under 164 characters (less HTML tags) to fit on 1280px desktop window -->
-🌟 Big News! Ralph v4 is here. Don't forget to check out our 
+🌟 Big News! Ralph v5 is here. Don't forget to check out our 
 <a href=https://github.com/openfun/ralph/blob/main/UPGRADE.md>migration guide</a> 
 for a seamless transition. 🚀
 
@@ -1051,6 +1051,30 @@ for a seamless transition. 🚀
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#4x_to_5y" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.x to 5.y
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.x to 5.y">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#upgrade_learning_events_models" class="md-nav__link">
+    <span class="md-ellipsis">
+      Upgrade learning events models
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#3x_to_4y" class="md-nav__link">
     <span class="md-ellipsis">
       3.x to 4.y
@@ -1238,6 +1262,30 @@ for a seamless transition. 🚀
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#4x_to_5y" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.x to 5.y
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.x to 5.y">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#upgrade_learning_events_models" class="md-nav__link">
+    <span class="md-ellipsis">
+      Upgrade learning events models
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#3x_to_4y" class="md-nav__link">
     <span class="md-ellipsis">
       3.x to 4.y
@@ -1319,6 +1367,18 @@ for a seamless transition. 🚀
 <h1 id="upgrade">Upgrade<a class="headerlink" href="#upgrade" title="Permanent link">&para;</a></h1>
 <p>All instructions to upgrade this project from one release to the next will be documented in this file. Upgrades must be run sequentially, meaning you should not skip minor/major releases while upgrading (fix releases can be skipped).</p>
 <p>This project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
+<h3 id="4x_to_5y">4.x to 5.y<a class="headerlink" href="#4x_to_5y" title="Permanent link">&para;</a></h3>
+<h4 id="upgrade_learning_events_models">Upgrade learning events models<a class="headerlink" href="#upgrade_learning_events_models" title="Permanent link">&para;</a></h4>
+<p>xAPI learning statements validator and converter are built with Pydantic. Ralph 5.x
+is compatible with Pydantic 2.x. Please refer to <a href="https://docs.pydantic.dev/dev/migration/">Pydantic migration
+guide</a> if you are using Ralph <code>models</code>
+feature.</p>
+<blockquote>
+<p>Most of fields in Pydantic models that are optional are set with <code>None</code> as
+  default value in Ralph 5.y. If you serialize some Pydantic models from ralph
+  and want to keep the same content in your serialization, please set
+  <code>exclude_none</code> to <code>True</code> in the serialization method <code>model_dump</code>.</p>
+</blockquote>
 <h3 id="3x_to_4y">3.x to 4.y<a class="headerlink" href="#3x_to_4y" title="Permanent link">&para;</a></h3>
 <h4 id="upgrade_user_credentials">Upgrade user credentials<a class="headerlink" href="#upgrade_user_credentials" title="Permanent link">&para;</a></h4>
 <p>To conform to xAPI specifications, we need to represent users as xAPI Agents. You must therefore delete and re-create the credentials file using the updated cli, OR you can modify it directly to add the <code>agents</code> field. The credentials file is located in <code>{ RALPH_APP_DIR }/{ RALPH_AUTH_FILE }</code> (defaults to <code>.ralph/auth.json</code>). Each user profile must follow the following pattern (see <a href="https://xapi.com/blog/deep-dive-actor-agent/">this post</a> for examples of valid agent objects) :</p>
@@ -1709,7 +1769,7 @@ have many rows. The command to run is:</p>
     <script id="__config" type="application/json">{"base": "..", "features": ["content.code.annotate", "content.code.copy", "content.tabs.link", "navigation.indexes", "navigation.tabs"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.dd8806f2.min.js"></script>
+      <script src="../assets/javascripts/bundle.a7c05c9e.min.js"></script>
       
     
   </body>
