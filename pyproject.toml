@@ -80,7 +80,7 @@ backends = [
     "ralph-malph[backend-clickhouse,backend-es,backend-ldp,backend-lrs,backend-mongo,backend-s3,backend-swift]",
 ]
 ci = [
-    "twine==5.0.0",
+    "twine==5.1.0",
 ]
 cli = [
     "bcrypt>=4.0.0",
@@ -91,26 +91,26 @@ cli = [
 dev = [
     "anyio<4.3.1", # unpin until fastapi supports new major version of anyio
     "black==24.4.2",
-    "cryptography==42.0.6",
+    "cryptography==42.0.7",
     "factory-boy==3.3.0",
     "logging-gelf==0.0.32",
     "mike==2.1.1",
     "mkdocs==1.6.0",
     "mkdocs-click==0.8.1",
-    "mkdocs-material==9.5.21",
+    "mkdocs-material==9.5.23",
     "mkdocstrings[python-legacy]==0.25.1",
-    "moto==5.0.6",
+    "moto==5.0.7",
     "mypy==1.10.0",
     "neoteroi-mkdocs==1.0.5",
-    "polyfactory==2.15.0",
-    "pyfakefs==5.4.1",
+    "polyfactory==2.16.0",
+    "pyfakefs==5.5.0",
     "pymdown-extensions==10.8.1",
     "pytest<8.0.0", # pin as pytest-httpx<0.23.0 is not compatible with pytest 8.0.0 
     "pytest-cov==5.0.0",
     "pytest-httpx<0.23.0", # pin as Python 3.8 is no longer supported from release 0.23.0
     "requests-mock==1.12.1",
     "responses==0.24.1",
-    "ruff==0.4.3",
+    "ruff==0.4.4",
     "types-python-dateutil ==2.9.0.20240316",
     "types-python-jose ==3.3.4.20240106",
     "types-requests<2.31.0.20240407",
@@ -121,7 +121,7 @@ lrs = [
     "fastapi==0.111.0",
     "cachetools==5.3.3",
     "httpx<0.25.0", # pin as `pytest-httpx<0.23.0` requires `httpx==0.24.*`
-    "sentry_sdk==2.1.1",
+    "sentry_sdk==2.2.0",
     "python-jose==3.3.0",
     "uvicorn[standard]==0.29.0",
 ]

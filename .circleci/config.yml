@@ -350,7 +350,7 @@ jobs:
             tar -xf /tmp/helm.tar.gz --strip-components=1 -C ${HOME}/bin linux-amd64/helm
             chmod 755 "${HOME}/bin/helm"
 
-            export MINIKUBE_RELEASE="v1.32.0"
+            export MINIKUBE_RELEASE="v1.33.1"
             curl -Lo "${HOME}/bin/minikube" "https://github.com/kubernetes/minikube/releases/download/${MINIKUBE_RELEASE}/minikube-linux-amd64"
             curl -Lo /tmp/minikube.sha256 "https://github.com/kubernetes/minikube/releases/download/${MINIKUBE_RELEASE}/minikube-linux-amd64.sha256"
             echo "$(</tmp/minikube.sha256) ${HOME}/bin/minikube" | sha256sum --check
