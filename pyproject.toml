@@ -89,7 +89,7 @@ cli = [
     "sentry-sdk[fastapi]>=1.9.0",
 ]
 dev = [
-    "anyio<4.3.1", # unpin until fastapi supports new major version of anyio
+    "anyio<4.4.1", # unpin until fastapi supports new major version of anyio
     "black==24.4.2",
     "cryptography==42.0.7",
     "factory-boy==3.3.0",
@@ -97,9 +97,9 @@ dev = [
     "mike==2.1.1",
     "mkdocs==1.6.0",
     "mkdocs-click==0.8.1",
-    "mkdocs-material==9.5.23",
+    "mkdocs-material==9.5.25",
     "mkdocstrings[python-legacy]==0.25.1",
-    "moto==5.0.7",
+    "moto==5.0.8",
     "mypy==1.10.0",
     "neoteroi-mkdocs==1.0.5",
     "polyfactory==2.16.0",
@@ -110,10 +110,10 @@ dev = [
     "pytest-httpx<0.23.0", # pin as Python 3.8 is no longer supported from release 0.23.0
     "requests-mock==1.12.1",
     "responses==0.24.1",
-    "ruff==0.4.4",
+    "ruff==0.4.5",
     "types-python-dateutil ==2.9.0.20240316",
     "types-python-jose ==3.3.4.20240106",
-    "types-requests<2.31.0.20240407",
+    "types-requests<2.32.0.20240524",
     "types-cachetools ==5.3.0.7",
 ]
 lrs = [
@@ -121,7 +121,7 @@ lrs = [
     "fastapi==0.111.0",
     "cachetools==5.3.3",
     "httpx<0.25.0", # pin as `pytest-httpx<0.23.0` requires `httpx==0.24.*`
-    "sentry_sdk==2.2.0",
+    "sentry_sdk==2.3.1",
     "python-jose==3.3.0",
     "uvicorn[standard]==0.29.0",
 ]
