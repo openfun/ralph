@@ -144,7 +144,7 @@ def strict_query_params(request: Request) -> None:
 
 @router.get("")
 @router.get("/")
-async def get(  # noqa: PLR0912,PLR0913
+async def get(  # noqa: PLR0913
     request: Request,
     current_user: Annotated[
         AuthenticatedUser,
@@ -540,7 +540,7 @@ async def put(
 
 @router.post("/", responses=POST_PUT_RESPONSES)
 @router.post("", responses=POST_PUT_RESPONSES)
-async def post(  # noqa: PLR0912
+async def post(
     current_user: Annotated[
         AuthenticatedUser,
         Security(get_authenticated_user, scopes=["statements/write"]),
