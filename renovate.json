@@ -2,6 +2,7 @@
     "extends": [
         "github>openfun/renovate-configuration"
     ],
+    "enabledManagers": ["npm", "setup-cfg", "pep621", "dockerfile", "docker-compose", "circleci"],
     "commitMessagePrefix": "⬆️(project)",
     "commitMessageAction": "upgrade",
     "commitBodyTable": true,
@@ -12,5 +13,13 @@
         "dev/pytest-httpx",
         "dev/responses",
         "lrs/httpx"
+    ],
+    "packageRules": [
+        {
+            "groupName": "docker dependencies",
+            "matchManagers": ["dockerfile", "docker-compose", "circleci"],
+            "schedule": ["before 7am on monday"],
+            "matchPackagePatterns": ["*"]
+        }
     ]
 }
