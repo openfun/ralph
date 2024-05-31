@@ -17,6 +17,12 @@ from .lms.statements import (
     LMSUploadedVideo,
 )
 from .navigation.statements import PageTerminated, PageViewed
+from .quiz.statements import (
+    QuizCompleted,
+    QuizInitialized,
+    QuizLaunched,
+    QuizTerminated,
+)
 from .video.statements import (
     VideoCompleted,
     VideoEnableClosedCaptioning,
