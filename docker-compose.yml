@@ -23,7 +23,7 @@ services:
 
   # -- backends
   elasticsearch:
-    image: elasticsearch:8.1.0
+    image: elasticsearch:8.13.4
     environment:
       bootstrap.memory_lock: true
       discovery.type: single-node
@@ -41,7 +41,7 @@ services:
       retries: 60
 
   mongo:
-    image: mongo:5.0.9
+    image: mongo:7.0.11
     ports:
       - "27017:27017"
     healthcheck:
@@ -50,7 +50,7 @@ services:
       retries: 60
 
   clickhouse:
-      image: clickhouse/clickhouse-server:23.1.1.3077-alpine
+      image: clickhouse/clickhouse-server:24.5.1.1763-alpine
       environment:
           CLICKHOUSE_DB: xapi
           CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
