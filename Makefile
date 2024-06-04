@@ -38,7 +38,7 @@ RALPH_IMAGE_TAG          ?= development
 RALPH_IMAGE_BUILD_TARGET ?= development
 RALPH_LRS_AUTH_USER_NAME  = ralph
 RALPH_LRS_AUTH_USER_PWD   = secret
-RALPH_LRS_AUTH_USER_SCOPE = ralph_scope
+RALPH_LRS_AUTH_USER_SCOPE = all
 RALPH_LRS_AUTH_USER_AGENT_MBOX = mailto:ralph@example.com
 
 # -- K3D
