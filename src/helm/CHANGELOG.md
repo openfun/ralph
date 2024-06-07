@@ -9,9 +9,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.5.0] - 2024-07-01
+
 ### Changed
 
-- Upgrade appVersion to `4.2.0`
+- Upgrade appVersion to `5.0.0`
 
 ## [0.4.0] - 2024-02-12
 
