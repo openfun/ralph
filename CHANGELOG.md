@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Force Elasticserach REFRESH_AFTER_WRITE setting to be a string
+
 ## [5.0.0] - 2024-05-02
 
 ### Added

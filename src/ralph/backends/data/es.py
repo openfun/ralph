@@ -65,9 +65,7 @@ class ESDataBackendSettings(BaseDataBackendSettings):
         "http://localhost:9200"  # CommaSeparatedTuple("http://localhost:9200")
     )
     POINT_IN_TIME_KEEP_ALIVE: str = "1m"
-    REFRESH_AFTER_WRITE: Optional[
-        Union[Literal["false", "true", "wait_for"], bool, str]
-    ] = None
+    REFRESH_AFTER_WRITE: Optional[Union[Literal["false", "true", "wait_for"]]] = None
 
 
 class ESQueryPit(BaseModel):

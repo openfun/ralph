@@ -91,7 +91,7 @@ def test_backends_data_es_instantiation_with_settings():
         LOCALE_ENCODING="utf-16",
         POINT_IN_TIME_KEEP_ALIVE="5m",
         READ_CHUNK_SIZE=5000,
-        REFRESH_AFTER_WRITE=True,
+        REFRESH_AFTER_WRITE="true",
         WRITE_CHUNK_SIZE=4999,
     )
     backend = ESDataBackend(settings)

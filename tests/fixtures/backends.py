@@ -128,7 +128,7 @@ def get_async_es_test_backend(index: str = ES_TEST_INDEX):
         LOCALE_ENCODING="utf8",
         POINT_IN_TIME_KEEP_ALIVE="1m",
         READ_CHUNK_SIZE=500,
-        REFRESH_AFTER_WRITE=True,
+        REFRESH_AFTER_WRITE="true",
         WRITE_CHUNK_SIZE=499,
     )
     return AsyncESLRSBackend(settings)
@@ -707,7 +707,7 @@ def async_es_backend():
             HOSTS=ES_TEST_HOSTS,
             LOCALE_ENCODING="utf8",
             READ_CHUNK_SIZE=500,
-            REFRESH_AFTER_WRITE=True,
+            REFRESH_AFTER_WRITE="true",
             WRITE_CHUNK_SIZE=499,
         )
         return AsyncESDataBackend(settings)
@@ -788,7 +788,7 @@ def es_backend():
             HOSTS=ES_TEST_HOSTS,
             LOCALE_ENCODING="utf8",
             READ_CHUNK_SIZE=500,
-            REFRESH_AFTER_WRITE=True,
+            REFRESH_AFTER_WRITE="true",
             WRITE_CHUNK_SIZE=499,
         )
         return ESDataBackend(settings)
@@ -810,7 +810,7 @@ def es_lrs_backend():
             LOCALE_ENCODING="utf8",
             POINT_IN_TIME_KEEP_ALIVE="1m",
             READ_CHUNK_SIZE=500,
-            REFRESH_AFTER_WRITE=True,
+            REFRESH_AFTER_WRITE="true",
             WRITE_CHUNK_SIZE=499,
         )
         return ESLRSBackend(settings)
