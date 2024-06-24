@@ -194,18 +194,18 @@ jobs:
           password: $DOCKER_HUB_PASSWORD
         environment:
           RALPH_APP_DIR: ~/fun/.ralph
-      - image: elasticsearch:8.1.0
+      - image: elasticsearch:8.13.4
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
         environment:
           discovery.type: single-node
           xpack.security.enabled: "false"
-      - image: mongo:5.0.9
+      - image: mongo:7.0.11
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
-      - image: clickhouse/clickhouse-server:23.1.1.3077-alpine
+      - image: clickhouse/clickhouse-server:24.5.1.1763-alpine
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD

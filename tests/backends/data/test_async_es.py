@@ -748,7 +748,7 @@ async def test_backends_data_async_es_write_without_ignore_errors(
     msg = (
         r"1 document\(s\) failed to index. "
         r"\[\{'index': \{'_index': 'test-index-foo', '_id': '4', 'status': 400, 'error'"
-        r": \{'type': 'mapper_parsing_exception', 'reason': \"failed to parse field "
+        r": \{'type': 'document_parsing_exception', 'reason': \"\[1:17\] failed to parse field "
         r"\[count\] of type \[long\] in document with id '4'. Preview of field's value:"
         r" 'wrong'\", 'caused_by': \{'type': 'illegal_argument_exception', 'reason': "
         r"'For input string: \"wrong\"'\}\}, 'data': \{'id': 4, 'count': 'wrong'\}\}\}"
