@@ -7,7 +7,7 @@ validation.
 from typing import Optional, Union
 from uuid import UUID
 
-from pydantic import AnyUrl, BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict
 
 from ..models.xapi.base.agents import BaseXapiAgent
 from ..models.xapi.base.groups import BaseXapiGroup
@@ -39,7 +39,7 @@ class LaxObjectField(BaseModelWithLaxConfig):
     Lightest definition of an object field compliant to the specification.
     """
 
-    id: AnyUrl
+    id: str
 
 
 class LaxVerbField(BaseModelWithLaxConfig):
@@ -48,7 +48,7 @@ class LaxVerbField(BaseModelWithLaxConfig):
     Lightest definition of a verb field compliant to the specification.
     """
 
-    id: AnyUrl
+    id: str
 
 
 class LaxStatement(BaseModelWithLaxConfig):

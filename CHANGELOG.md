@@ -12,6 +12,10 @@ and this project adheres to
 
 - Force Elasticserach REFRESH_AFTER_WRITE setting to be a string
 
+### Fixed
+
+- Fix LaxStatement validation to prevent statements IDs modification
+
 ## [5.0.0] - 2024-05-02
 
 ### Added
