@@ -8,9 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [5.0.1] - 2024-07-11
+
 ### Changed
 
-- Force Elasticserach REFRESH_AFTER_WRITE setting to be a string
+- Force Elasticsearch REFRESH_AFTER_WRITE setting to be a string
 
 ### Fixed
 
@@ -490,7 +492,8 @@ as per the xAPI specification
 - Add optional sentry integration
 - Distribute Arnold's tray to deploy Ralph in a k8s cluster as cronjobs
 
-[unreleased]: https://github.com/openfun/ralph/compare/v5.0.0...main
+[unreleased]: https://github.com/openfun/ralph/compare/v5.0.1...main
+[5.0.1]: https://github.com/openfun/ralph/compare/v5.0.0...v5.0.1
 [5.0.0]: https://github.com/openfun/ralph/compare/v4.2.0...v5.0.0
 [4.2.0]: https://github.com/openfun/ralph/compare/v4.1.0...v4.2.0
 [4.1.0]: https://github.com/openfun/ralph/compare/v4.0.0...v4.1.0
