@@ -1,5 +1,5 @@
 # -- Base image --
-FROM python:3.12.0-slim as base
+FROM python:3.12.0-slim AS base
 
 # Upgrade pip to its latest release to speed up dependencies installation
 RUN pip install --upgrade pip
@@ -11,7 +11,7 @@ RUN apt-get update && \
 
 
 # -- Builder --
-FROM base as builder
+FROM base AS builder
 
 WORKDIR /build
 
@@ -29,7 +29,7 @@ RUN pip install .[full]
 
 
 # -- Core --
-FROM base as core
+FROM base AS core
 
 RUN apt-get update && \
     apt-get install -y \
@@ -44,7 +44,7 @@ WORKDIR /app
 
 
 # -- Development --
-FROM core as development
+FROM core AS development
 
 # Copy all sources, not only runtime-required files
 COPY . /app/
@@ -71,13 +71,15 @@ RUN pip uninstall -y ralph-malph
 RUN pip install -e .[dev]
 
 # Un-privileged user running the application
-USER ${DOCKER_USER:-1000}
+ARG DOCKER_USER=1000
+USER ${DOCKER_USER}
 
 
 # -- Production --
-FROM core as production
+FROM core AS production
 
 # Un-privileged user running the application
-USER ${DOCKER_USER:-1000}
+ARG DOCKER_USER=1000
+USER ${DOCKER_USER}
 
 CMD ["ralph"]
