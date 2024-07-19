@@ -17,13 +17,13 @@ class BaseXapiResultScore(BaseModelWithConfig):
     """Pydantic model for result `score` property.
 
     Attributes:
-        scaled (int): Consists of the normalized score related to the experience.
+        scaled (Decimal): Consists of the normalized score related to the experience.
         raw (Decimal): Consists of the non-normalized score achieved by the Actor.
         min (Decimal): Consists of the lowest possible score.
         max (Decimal): Consists of the highest possible score.
     """
 
-    scaled: Optional[Annotated[int, Field(ge=-1, le=1)]] = None
+    scaled: Optional[Annotated[Decimal, Field(ge=-1, le=1)]] = None
     raw: Optional[Decimal] = None
     min: Optional[Decimal] = None
     max: Optional[Decimal] = None
