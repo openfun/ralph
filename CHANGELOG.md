@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix type of `statement.result.score.scaled` from `int` to `Decimal`
+
 ## [5.0.1] - 2024-07-11
 
 ### Changed
