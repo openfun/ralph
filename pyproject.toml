@@ -53,7 +53,7 @@ backend-es = [
     "elasticsearch[async]>=8.0.0",
 ]
 backend-ldp = [
-    "ovh>=1.0.0",
+    "ovh==1.1.0",
     "requests>=2.0.0",
 ]
 backend-lrs = [
