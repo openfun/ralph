@@ -39,7 +39,7 @@ def test_backends_data_ldp_default_instantiation(monkeypatch, fs):
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__LDP__{name}", raising=False)
 
     assert LDPDataBackend.name == "ldp"
-    assert LDPDataBackend.query_class == str
+    assert LDPDataBackend.query_class is str
     backend = LDPDataBackend()
     assert isinstance(backend.client, ovh.Client)
     assert backend.service_name is None

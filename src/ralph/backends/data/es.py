@@ -287,7 +287,7 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
             kwargs["search_after"] = query.search_after
             yield from documents
 
-    def write(  # noqa: PLR0913
+    def write(
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Optional[str] = None,
@@ -321,7 +321,7 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
         """
         return super().write(data, target, chunk_size, ignore_errors, operation_type)
 
-    def _write_dicts(  # noqa: PLR0913
+    def _write_dicts(
         self,
         data: Iterable[dict],
         target: Optional[str],

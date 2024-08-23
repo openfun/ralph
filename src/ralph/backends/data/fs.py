@@ -264,7 +264,7 @@ class FSDataBackend(
             with path.open("rb") as file:
                 yield file, path
 
-    def write(  # noqa: PLR0913
+    def write(
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Optional[str] = None,
@@ -305,7 +305,7 @@ class FSDataBackend(
         """
         return super().write(data, target, chunk_size, ignore_errors, operation_type)
 
-    def _write_dicts(  # noqa: PLR0913
+    def _write_dicts(
         self,
         data: Iterable[dict],
         target: Optional[str],
@@ -318,7 +318,7 @@ class FSDataBackend(
             data, target, chunk_size, ignore_errors, operation_type
         )
 
-    def _write_bytes(  # noqa: PLR0913
+    def _write_bytes(
         self,
         data: Iterable[bytes],
         target: Optional[str],

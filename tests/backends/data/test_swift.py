@@ -45,7 +45,7 @@ def test_backends_data_swift_default_instantiation(monkeypatch, fs):
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__SWIFT__{name}", raising=False)
 
     assert SwiftDataBackend.name == "swift"
-    assert SwiftDataBackend.query_class == str
+    assert SwiftDataBackend.query_class is str
     assert SwiftDataBackend.default_operation_type == BaseOperationType.CREATE
     assert SwiftDataBackend.settings_class == SwiftDataBackendSettings
     backend = SwiftDataBackend()

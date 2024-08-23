@@ -249,7 +249,7 @@ class RalphCLI(click.Group):
     help="Either CRITICAL, ERROR, WARNING, INFO (default) or DEBUG",
 )
 @click.version_option(version=ralph_version)
-def cli(verbosity=None):  # noqa: ARG001
+def cli(verbosity=None):
     """The cli is a stream-based tool to play with your logs.
 
     It offers functionalities to:
