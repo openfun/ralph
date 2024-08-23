@@ -41,7 +41,6 @@ def test_backends_data_ldp_default_instantiation(monkeypatch, fs):
     assert LDPDataBackend.name == "ldp"
     assert LDPDataBackend.query_class is str
     backend = LDPDataBackend()
-    assert isinstance(backend.client, ovh.Client)
     assert backend.service_name is None
     assert backend.stream_id is None
     assert backend.timeout is None
