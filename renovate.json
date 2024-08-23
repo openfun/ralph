@@ -15,11 +15,24 @@
         "lrs/httpx"
     ],
     "packageRules": [
-        {
-            "groupName": "docker dependencies",
-            "matchManagers": ["dockerfile", "docker-compose", "circleci"],
-            "schedule": ["before 7am on monday"],
-            "matchPackagePatterns": ["*"]
-        }
+      {
+        "groupName": "js dependencies",
+        "matchManagers": ["npm"],
+        "schedule": ["before 7am on monday"],
+        "matchPackagePatterns": ["*"]
+      },
+      {
+        "groupName": "python dependencies",
+        "matchManagers": ["setup-cfg", "pep621"],
+        "schedule": ["before 7am on monday"],
+        "matchPackagePatterns": ["*"]
+      },
+      {
+         "groupName": "docker dependencies",
+         "matchManagers": ["dockerfile", "docker-compose", "circleci"],
+         "schedule": ["before 7am on monday"],
+         "matchPackagePatterns": ["*"]
+      }
     ]
+    
 }
