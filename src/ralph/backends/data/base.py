@@ -116,7 +116,7 @@ class Writable(Configurable, ABC):
     default_operation_type = BaseOperationType.INDEX
     unsupported_operation_types: Set[BaseOperationType] = set()
 
-    def write(  # noqa: PLR0913
+    def write(
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Optional[str] = None,
@@ -168,7 +168,7 @@ class Writable(Configurable, ABC):
         writer = self._write_bytes if is_bytes else self._write_dicts
         return writer(data, target, chunk_size, ignore_errors, operation_type)
 
-    def _write_bytes(  # noqa: PLR0913
+    def _write_bytes(
         self,
         data: Iterable[bytes],
         target: Optional[str],
@@ -183,7 +183,7 @@ class Writable(Configurable, ABC):
         )
 
     @abstractmethod
-    def _write_dicts(  # noqa: PLR0913
+    def _write_dicts(
         self,
         data: Iterable[dict],
         target: Optional[str],
@@ -448,7 +448,7 @@ class AsyncWritable(Configurable, ABC):
             count += sum(result)
         return count
 
-    async def _write_bytes(  # noqa: PLR0913
+    async def _write_bytes(
         self,
         data: Iterable[bytes],
         target: Optional[str],
@@ -463,7 +463,7 @@ class AsyncWritable(Configurable, ABC):
         )
 
     @abstractmethod
-    async def _write_dicts(  # noqa: PLR0913
+    async def _write_dicts(
         self,
         data: Iterable[dict],
         target: Optional[str],
@@ -703,7 +703,7 @@ def get_backend_generic_argument(
 
 
 def set_backend_settings_class(
-    backend_class: Type[Union[BaseDataBackend, BaseAsyncDataBackend]]
+    backend_class: Type[Union[BaseDataBackend, BaseAsyncDataBackend]],
 ) -> None:
     """Set `settings_class` attribute with `Config.env_prefix` for `backend_class`."""
     settings_class = get_backend_generic_argument(
@@ -714,7 +714,7 @@ def set_backend_settings_class(
 
 
 def set_backend_query_class(
-    backend_class: Type[Union[BaseDataBackend, BaseAsyncDataBackend]]
+    backend_class: Type[Union[BaseDataBackend, BaseAsyncDataBackend]],
 ) -> None:
     """Set `query_class` attribute for `backend_class`."""
     query_class = get_backend_generic_argument(backend_class, DataBackendArgument.QUERY)

@@ -225,7 +225,7 @@ class AsyncMongoDataBackend(
             data, target, chunk_size, ignore_errors, operation_type, concurrency
         )
 
-    async def _write_dicts(  # noqa: PLR0913
+    async def _write_dicts(
         self,
         data: Iterable[dict],
         target: Optional[str],

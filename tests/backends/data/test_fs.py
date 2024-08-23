@@ -32,7 +32,7 @@ def test_backends_data_fs_default_instantiation(monkeypatch, fs):
         monkeypatch.delenv(f"RALPH_BACKENDS__DATA__FS__{name}", raising=False)
 
     assert FSDataBackend.name == "fs"
-    assert FSDataBackend.query_class == str
+    assert FSDataBackend.query_class is str
     assert FSDataBackend.default_operation_type == BaseOperationType.CREATE
     assert FSDataBackend.settings_class == FSDataBackendSettings
     backend = FSDataBackend()

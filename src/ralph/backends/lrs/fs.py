@@ -41,7 +41,7 @@ class FSLRSBackendSettings(BaseLRSBackendSettings, FSDataBackendSettings):
 class FSLRSBackend(BaseLRSBackend[FSLRSBackendSettings], FSDataBackend):
     """FileSystem LRS Backend."""
 
-    def write(  # noqa: PLR0913
+    def write(
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Optional[str] = None,
