@@ -6,7 +6,7 @@ from typing import AsyncIterator, Optional, Union
 import websockets
 from pydantic import AnyUrl, PositiveInt
 from pydantic_settings import SettingsConfigDict
-from websockets.http import USER_AGENT
+from websockets.http11 import USER_AGENT
 
 from ralph.backends.data.base import (
     BaseAsyncDataBackend,
