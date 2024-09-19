@@ -8,11 +8,7 @@
     "commitBodyTable": true,
     "ignoreDeps": [
         "backend-clickhouse/clickhouse-connect",
-        "backend-lrs/httpx",
-        "dev/pytest",
-        "dev/pytest-httpx",
-        "dev/responses",
-        "lrs/httpx"
+        "dev/responses"
     ],
     "packageRules": [
       {
