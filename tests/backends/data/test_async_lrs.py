@@ -217,7 +217,7 @@ async def test_backends_data_async_lrs_read_backend_error(
     error = (
         "Failed to fetch statements: Server error '500 Internal Server Error' for url "
         "'http://fake-lrs.com/xAPI/statements/?limit=500'\nFor more information check: "
-        "https://httpstatuses.com/500"
+        "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500"
     )
     with pytest.raises(BackendException, match=re.escape(error)):
         with caplog.at_level(logging.ERROR):
@@ -660,7 +660,7 @@ async def test_backends_data_async_lrs_write_with_post_exception(
     msg = (
         "Failed to post statements: Server error '500 Internal Server Error' for url "
         "'http://fake-lrs.com/xAPI/statements/'\nFor more information check: "
-        "https://httpstatuses.com/500"
+        "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500"
     )
     assert (
         f"ralph.backends.data.{backend.name}",
