@@ -7,6 +7,7 @@ import websockets
 from pydantic import AnyUrl, PositiveInt
 from pydantic_settings import SettingsConfigDict
 from websockets.http11 import USER_AGENT
+from websockets.asyncio.client import connect, ClientConnection
 
 from ralph.backends.data.base import (
     BaseAsyncDataBackend,
@@ -40,7 +41,6 @@ class WSClientOptions(ClientOptions):
             Setting it to `None` disables keepalive pings.
         ping_timeout (float): Timeout for keepalive pings in seconds.
             Setting it to `None` disables timeouts.
-        read_limit (int): High-water mark of read buffer in bytes.
         user_agent_header (str): Value of  the `User-Agent` request header.
             It defaults to "Python/x.y.z websockets/X.Y".
             Setting it to `None` removes the header.
@@ -55,7 +55,6 @@ class WSClientOptions(ClientOptions):
     origin: Optional[str] = None
     ping_interval: Optional[float] = 20
     ping_timeout: Optional[float] = 20
-    read_limit: int = 2**16
     user_agent_header: Optional[str] = USER_AGENT
     write_limit: int = 2**16
 
@@ -93,11 +92,11 @@ class AsyncWSDataBackend(BaseAsyncDataBackend[WSDataBackendSettings, str]):
         super().__init__(settings)
         self._client = None
 
-    async def client(self) -> websockets.WebSocketClientProtocol:
+    async def client(self) -> ClientConnection:
         """Create a websocket client connected to `settings.URI` if it doesn't exist."""
         if not self._client:
             try:
-                self._client = await websockets.connect(
+                self._client = await connect(
                     str(self.settings.URI), **self.settings.CLIENT_OPTIONS.model_dump()
                 )
             except (websockets.WebSocketException, OSError, TimeoutError) as error:
