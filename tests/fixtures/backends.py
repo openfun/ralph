@@ -22,6 +22,8 @@ from pydantic import AnyHttpUrl, TypeAdapter
 from pymongo import MongoClient
 from pymongo.errors import CollectionInvalid
 
+from websockets.asyncio.server import serve
+
 from ralph.backends.data.async_es import AsyncESDataBackend
 from ralph.backends.data.async_lrs import AsyncLRSDataBackend
 from ralph.backends.data.async_mongo import AsyncMongoDataBackend
@@ -893,7 +895,7 @@ async def ws(events):
             await websocket.send(json.dumps(event))
             await asyncio.sleep(random.randrange(0, 500) / 10000.0)
 
-    async with websockets.serve(forward, "0.0.0.0", WS_TEST_PORT) as server:
+    async with serve(forward, "0.0.0.0", WS_TEST_PORT) as server:
         yield server
 
 

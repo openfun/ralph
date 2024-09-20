@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from importlib import reload
 from pathlib import Path
 from typing import Optional, Union
-
+import asyncio
 import pytest
 from click.exceptions import BadParameter
 from click.testing import CliRunner
