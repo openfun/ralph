@@ -247,7 +247,7 @@ async def test_api_statements_get_mine(
         "/xAPI/statements/?mine=BigBoat",
         headers={"Authorization": f"Basic {credentials_1_bis}"},
     )
-    assert response.status_code == 422
+    assert response.status_code == 400
 
 
 @pytest.mark.anyio
@@ -788,12 +788,12 @@ async def test_api_statements_get_invalid_query_parameters(
         "detail": "The following parameter is not allowed: `mamamia`"
     }
 
-    # Check for 422 status code when a negative limit parameter is provided
+    # Check for 400 status code when a negative limit parameter is provided
     response = await client.get(
         "/xAPI/statements/?limit=-1",
         headers={"Authorization": f"Basic {basic_auth_credentials}"},
     )
-    assert response.status_code == 422
+    assert response.status_code == 400
 
     # Check for 400 status code when both statementId and voidedStatementId are provided
     response = await client.get(

@@ -5,7 +5,9 @@ from typing import Any, Dict, List, Union
 from urllib.parse import urlparse
 
 import sentry_sdk
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Request, status
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
 from ralph.conf import settings
 
@@ -55,3 +57,23 @@ async def whoami(
         "agent": user.agent.model_dump(mode="json", exclude_none=True),
         "scopes": user.scopes,
     }
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(
+    _: Request, exc: RequestValidationError
+) -> JSONResponse:
+    """Called on invalid request data, return error detail as json response."""
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content={"detail": str(exc.errors())},
+    )
+
+
+@app.exception_handler(TypeError)
+async def type_exception_handler(_: Request, exc: TypeError) -> JSONResponse:
+    """Called on bad type or value, return error detail as json response."""
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content={"detail": str(exc)},
+    )

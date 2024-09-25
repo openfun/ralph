@@ -343,7 +343,7 @@ async def test_api_statements_put_list_of_one(  # noqa: PLR0913
         json=[statement],
     )
 
-    assert response.status_code == 422
+    assert response.status_code == 400
 
 
 @pytest.mark.anyio
