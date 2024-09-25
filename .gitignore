@@ -60,3 +60,10 @@ bin/vault_password
 .team
 group_vars/
 k3d-storage/
+
+# Mac OS
+.DS_Store
+
+# VSCode
+.vscode
+.devcontainer
