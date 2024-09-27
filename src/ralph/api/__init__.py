@@ -15,7 +15,7 @@ from ralph.conf import settings
 from .. import __version__
 from .auth import get_authenticated_user
 from .auth.user import AuthenticatedUser
-from .routers import health, statements
+from .routers import health, statements, xapi
 
 
 @lru_cache(maxsize=None)
@@ -47,6 +47,7 @@ if settings.SENTRY_DSN is not None:
 app = FastAPI()
 app.include_router(statements.router)
 app.include_router(health.router)
+app.include_router(xapi.router)
 
 
 @app.get("/whoami")
@@ -65,22 +66,24 @@ async def check_x_experience_api_version_header(
     request: Request, call_next: Callable[[Request], Response]
 ) -> Response:
     """Check the headers for the X-Experience-API-Version in every request."""
-    # check that request includes X-Experience-API-Version header
-    if "X-Experience-API-Version" not in request.headers:
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"detail": "Missing X-Experience-API-Version header"},
-        )
+    # about resource doesn't need the "X-Experience-API-Version" header
+    if not request.url.path == "/xAPI/about":
+        # check that request includes X-Experience-API-Version header
+        if "X-Experience-API-Version" not in request.headers:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"detail": "Missing X-Experience-API-Version header"},
+            )
 
-    # check that given X-Experience-API-Version is valid
-    if (
-        request.headers["X-Experience-API-Version"]
-        not in settings.XAPI_VERSIONS_SUPPORTED
-    ):
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"detail": "Invalid X-Experience-API-Version header"},
-        )
+        # check that given X-Experience-API-Version is valid
+        if (
+            request.headers["X-Experience-API-Version"]
+            not in settings.XAPI_VERSIONS_SUPPORTED
+        ):
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"detail": "Invalid X-Experience-API-Version header"},
+            )
 
     return await call_next(request)
 
