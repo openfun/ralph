@@ -5,6 +5,7 @@ from functools import lru_cache
 from typing import List, Literal, Union
 
 from httpx import AsyncClient, AsyncHTTPTransport, HTTPStatusError, RequestError
+from starlette.datastructures import Headers
 
 from ..conf import XapiForwardingConfigurationSettings, settings
 
@@ -33,7 +34,9 @@ def get_active_xapi_forwardings() -> List[XapiForwardingConfigurationSettings]:
 
 
 async def forward_xapi_statements(
-    statements: Union[dict, List[dict]], method: Literal["post", "put"]
+    statements: Union[dict, List[dict]],
+    method: Literal["post", "put"],
+    headers: Union[dict, Headers],
 ) -> None:
     """Forward xAPI statements."""
     for forwarding in get_active_xapi_forwardings():
@@ -46,6 +49,7 @@ async def forward_xapi_statements(
                     json=statements,
                     auth=(forwarding.basic_username, forwarding.basic_password),
                     timeout=forwarding.timeout,
+                    headers=headers,
                 )
                 req.raise_for_status()
                 msg = "Forwarded %s statements to %s with success."

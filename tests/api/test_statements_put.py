@@ -604,7 +604,9 @@ async def test_api_statements_put_with_forwarding(  # noqa: PLR0913
         )
         # Start forwarding LRS client
         async with AsyncClient(
-            app=app, base_url="http://testserver"
+            app=app,
+            base_url="http://testserver",
+            headers={"X-Experience-API-Version": "1.0.3"},
         ) as forwarding_client:
             # Send an xAPI statement to the forwarding client
             response = await forwarding_client.put(
@@ -628,7 +630,9 @@ async def test_api_statements_put_with_forwarding(  # noqa: PLR0913
             )
 
     # The statement should also be stored on the receiving client
-    async with AsyncClient() as receiving_client:
+    async with AsyncClient(
+        headers={"X-Experience-API-Version": "1.0.3"}
+    ) as receiving_client:
         response = await receiving_client.get(
             f"http://{RUNSERVER_TEST_HOST}:{RUNSERVER_TEST_PORT}/xAPI/statements/",
             headers={"Authorization": f"Basic {basic_auth_credentials}"},

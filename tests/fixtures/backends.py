@@ -915,7 +915,10 @@ def lrs():
                 server_ready = False
                 while not server_ready:
                     try:
-                        response = await client.get(f"http://{host}:{port}/whoami")
+                        response = await client.get(
+                            f"http://{host}:{port}/whoami",
+                            headers={"X-Experience-API-Version": "1.0.3"},
+                        )
                         assert response.status_code == 401
                         server_ready = True
                     except ConnectError:

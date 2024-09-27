@@ -11,6 +11,7 @@ from fastapi import (
     APIRouter,
     BackgroundTasks,
     Depends,
+    Header,
     HTTPException,
     Query,
     Request,
@@ -457,6 +458,7 @@ async def put(
     ],
     statement: LaxStatement,
     background_tasks: BackgroundTasks,
+    x_experience_api_version: Annotated[str | None, Header()],
     statement_id: UUID = Query(alias="statementId"),
     _=Depends(strict_query_params),
 ) -> None:
@@ -481,7 +483,10 @@ async def put(
 
     if get_active_xapi_forwardings():
         background_tasks.add_task(
-            forward_xapi_statements, statement_as_dict, method="put"
+            forward_xapi_statements,
+            statement_as_dict,
+            method="put",
+            headers={"X-Experience-API-Version": x_experience_api_version},
         )
 
     # Finish enriching statements after forwarding
@@ -547,6 +552,7 @@ async def post(
     ],
     statements: Union[LaxStatement, List[LaxStatement]],
     background_tasks: BackgroundTasks,
+    x_experience_api_version: Annotated[str | None, Header()],
     response: Response,
     _=Depends(strict_query_params),
 ) -> Union[List, None]:
@@ -581,7 +587,10 @@ async def post(
     # Forward statements
     if get_active_xapi_forwardings():
         background_tasks.add_task(
-            forward_xapi_statements, list(statements_dict.values()), method="post"
+            forward_xapi_statements,
+            list(statements_dict.values()),
+            method="post",
+            headers={"X-Experience-API-Version": x_experience_api_version},
         )
 
     try:
