@@ -145,6 +145,8 @@ def strict_query_params(request: Request) -> None:
 
 @router.get("")
 @router.get("/")
+@router.head("")
+@router.head("/")
 async def get(  # noqa: PLR0913
     request: Request,
     current_user: Annotated[
