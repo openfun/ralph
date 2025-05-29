@@ -718,7 +718,7 @@ workflows:
       - build:
           matrix:
             parameters:
-              python-image: [python:3.8, python:3.9, python:3.10, python:3.11, python:3.12]
+              python-image: [python:3.9, python:3.10, python:3.11, python:3.12]
           filters:
             tags:
               only: /.*/
@@ -731,7 +731,7 @@ workflows:
       - test:
           matrix:
             parameters:
-              python-image: [python:3.8, python:3.9, python:3.10, python:3.11, python:3.12]
+              python-image: [python:3.9, python:3.10, python:3.11, python:3.12]
           requires:
             - build
           filters:
@@ -741,7 +741,7 @@ workflows:
           matrix:
             parameters:
               python-image:
-                [python:3.8, python:3.9, python:3.10, python:3.11, python:3.12]
+                [python:3.9, python:3.10, python:3.11, python:3.12]
           filters:
             tags:
               only: /.*/
