@@ -215,19 +215,15 @@ async def test_backends_data_async_lrs_read_backend_error(
     url = "http://fake-lrs.com/xAPI/statements/?limit=500"
     httpx_mock.add_response(url=url, method="GET", status_code=500)
     error = (
-        "Failed to fetch statements: Server error '500 Internal Server Error' for url "
-        "'http://fake-lrs.com/xAPI/statements/?limit=500'\nFor more information check: "
-        "https://httpstatuses.com/500"
+        r"Failed to fetch statements: Server error '500 Internal Server Error' for url "
+        r"'http://fake-lrs.com/xAPI/statements/\?limit=500'.*"
     )
-    with pytest.raises(BackendException, match=re.escape(error)):
+    with pytest.raises(BackendException, match=error):
         with caplog.at_level(logging.ERROR):
             _ = [x async for x in backend.read(prefetch=prefetch)]
 
-    assert (
-        f"ralph.backends.data.{backend.name}",
-        logging.ERROR,
-        error,
-    ) in caplog.record_tuples
+    assert re.search(error, caplog.text)
+
     await backend.close()
 
 
@@ -249,7 +245,7 @@ async def test_backends_data_async_lrs_read_without_pagination(
 
     # Mock GET response of HTTPX without query parameter
     url = "http://fake-lrs.com/xAPI/statements/?limit=500"
-    httpx_mock.add_response(url=url, method="GET", json=response)
+    httpx_mock.add_response(url=url, method="GET", json=response, is_reusable=True)
 
     # Return an iterable of dict
     result = [x async for x in backend.read(raw_output=False, prefetch=prefetch)]
@@ -281,7 +277,7 @@ async def test_backends_data_async_lrs_read_without_pagination_with_query(
     response = {"statements": statements}
     # Mock GET response of HTTPX with query parameter
     url = f"http://fake-lrs.com/xAPI/statements/?limit=500&verb={verb_id}"
-    httpx_mock.add_response(url=url, method="GET", json=response)
+    httpx_mock.add_response(url=url, method="GET", json=response, is_reusable=True)
     # Return an iterable of dict
     reader = backend.read(query=query, raw_output=False, prefetch=prefetch)
     result = [x async for x in reader]
@@ -319,9 +315,9 @@ async def test_backends_data_async_lrs_read_with_pagination(
     more_response = {"statements": more_statements}
 
     url = "http://fake-lrs.com/xAPI/statements/?limit=500"
-    httpx_mock.add_response(url=url, method="GET", json=response)
+    httpx_mock.add_response(url=url, method="GET", json=response, is_reusable=True)
     url = "http://fake-lrs.com/xAPI/statements/?limit=500&pit_id=pit_id"
-    httpx_mock.add_response(url=url, method="GET", json=more_response)
+    httpx_mock.add_response(url=url, method="GET", json=more_response, is_reusable=True)
 
     # Return an iterable of dict
     result = [x async for x in backend.read(raw_output=False)]
@@ -355,9 +351,9 @@ async def test_backends_data_async_lrs_read_with_pagination_with_query(
 
     # Mock GET response of HTTPX with query parameter
     url = f"http://fake-lrs.com/xAPI/statements/?limit=500&verb={verb_id}"
-    httpx_mock.add_response(url=url, method="GET", json=response)
+    httpx_mock.add_response(url=url, method="GET", json=response, is_reusable=True)
     url = f"http://fake-lrs.com/xAPI/statements/?limit=500&verb={verb_id}&pit_id=pit_id"
-    httpx_mock.add_response(url=url, method="GET", json=more_response)
+    httpx_mock.add_response(url=url, method="GET", json=more_response, is_reusable=True)
 
     # Return an iterable of dict
     reader = backend.read(query=query, raw_output=False)
@@ -398,7 +394,7 @@ async def test_backends_data_async_lrs_read_with_query_dates(
         f"since={since.isoformat()}&"
         f"until={until.isoformat()}"
     )
-    httpx_mock.add_response(url=url, method="GET", json=response)
+    httpx_mock.add_response(url=url, method="GET", json=response, is_reusable=True)
 
     # Return an iterable of dict
     reader = backend.read(query=query, raw_output=False)
@@ -441,7 +437,7 @@ async def test_backends_data_async_lrs_write_without_operation(  # noqa: PLR0913
 
     # Mock HTTPX POST
     url = "http://fake-lrs.com/xAPI/statements/"
-    httpx_mock.add_response(url=url, method="POST", json=statements)
+    httpx_mock.add_response(url=url, method="POST", json=statements, is_reusable=True)
 
     with caplog.at_level(logging.DEBUG):
         assert await backend.write(
@@ -652,7 +648,9 @@ async def test_backends_data_async_lrs_write_with_post_exception(
 
     # Mock HTTPX POST
     url = "http://fake-lrs.com/xAPI/statements/"
-    httpx_mock.add_response(url=url, method="POST", json=data, status_code=500)
+    httpx_mock.add_response(
+        url=url, method="POST", json=data, status_code=500, is_reusable=True
+    )
     with pytest.raises(BackendException):
         with caplog.at_level(logging.ERROR):
             await backend.write(data=data)
@@ -660,7 +658,7 @@ async def test_backends_data_async_lrs_write_with_post_exception(
     msg = (
         "Failed to post statements: Server error '500 Internal Server Error' for url "
         "'http://fake-lrs.com/xAPI/statements/'\nFor more information check: "
-        "https://httpstatuses.com/500"
+        "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500"
     )
     assert (
         f"ralph.backends.data.{backend.name}",

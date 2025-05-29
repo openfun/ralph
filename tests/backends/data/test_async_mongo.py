@@ -786,8 +786,9 @@ async def test_backends_data_async_mongo_write_with_delete_operation_failure(
 
     backend = async_mongo_backend()
     msg = (
-        "Failed to delete document chunk: cannot encode object: <class 'object'>, "
-        "of type: <class 'type'>"
+        "Failed to delete document chunk: Invalid document "
+        "{'q': {'_source.id': {'$in': [<class 'object'>]}}, 'limit': 0} | "
+        "cannot encode object: <class 'object'>, of type: <class 'type'>"
     )
     with pytest.raises(BackendException, match=msg):
         await backend.write([{"id": object}], operation_type=BaseOperationType.DELETE)
