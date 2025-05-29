@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Removed
+
+- Drop support for Python 3.8
+
 ### Fixed
 
 - Fix type of `statement.result.score.scaled` from `int` to `Decimal`
