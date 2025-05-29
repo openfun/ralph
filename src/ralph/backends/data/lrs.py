@@ -292,7 +292,7 @@ class LRSDataBackend(
     def _post_and_raise_for_status(self, target, chunk, ignore_errors):
         """POST chunk of statements to `target` and return the number of insertions."""
         try:
-            request = self.client.post(target, content=chunk)
+            request = self.client.post(target, json=chunk)
             request.raise_for_status()
             return len(chunk)
         except HTTPError as error:

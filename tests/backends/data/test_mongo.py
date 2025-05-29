@@ -621,7 +621,8 @@ def test_backends_data_mongo_write_with_delete_operation_failure(
 
     backend = mongo_backend()
     msg = (
-        "Failed to delete document chunk: cannot encode object: <class 'object'>, "
+        "Failed to delete document chunk: Invalid document {'q': {'_source.id': {'$in':"
+        " [<class 'object'>]}}, 'limit': 0} | cannot encode object: <class 'object'>, "
         "of type: <class 'type'>"
     )
     with caplog.at_level(logging.ERROR):

@@ -7,12 +7,7 @@
     "commitMessageAction": "upgrade",
     "commitBodyTable": true,
     "ignoreDeps": [
-        "backend-clickhouse/clickhouse-connect",
-        "backend-lrs/httpx",
-        "dev/pytest",
-        "dev/pytest-httpx",
-        "dev/responses",
-        "lrs/httpx"
+        "backend-clickhouse/clickhouse-connect"
     ],
     "packageRules": [
       {
