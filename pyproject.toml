@@ -73,10 +73,10 @@ backend-swift = [
     "python-swiftclient>=4.0.0",
 ]
 backend-ws = [
-    "websockets>=13.0",
+    "websockets>=13.0,<14.0",
 ]
 backends = [
-    "ralph-malph[backend-clickhouse,backend-es,backend-ldp,backend-lrs,backend-mongo,backend-s3,backend-swift]",
+    "ralph-malph[backend-clickhouse,backend-es,backend-ldp,backend-lrs,backend-mongo,backend-s3,backend-swift,backend-ws]",
 ]
 ci = [
     "twine==5.1.1",
