@@ -83,7 +83,7 @@ ci = [
 ]
 cli = [
     "bcrypt>=4.0.0",
-    "click>=8.1.0",
+    "click>=8.1.0,<8.2.1", # until CliRunner is fixed (https://github.com/pallets/click/issues/2939)
     "click-option-group>=0.5.0",
     "sentry-sdk[fastapi]>=1.9.0",
 ]
