@@ -27,7 +27,7 @@ from ralph.conf import settings
 from ralph.exceptions import BackendParameterException, ConfigurationException
 from ralph.models.edx.navigational.statements import UIPageClose
 from ralph.models.xapi.navigation.statements import PageTerminated
-from ralph.utils import iter_over_async
+from ralph.utils import execute_async
 
 from tests.factories import mock_instance
 from tests.fixtures.backends import (
@@ -48,16 +48,14 @@ def test_cli_comma_separated_key_value_param_type():
     with pytest.raises(
         BadParameter,
         match=(
-            "You should provide key=value pairs separated by commas, "
-            "e.g. foo=bar,bar=2"
+            "You should provide key=value pairs separated by commas, e.g. foo=bar,bar=2"
         ),
     ):
         param_type.convert("foo=bar,baz", None, None)
     with pytest.raises(
         BadParameter,
         match=(
-            "You should provide key=value pairs separated by commas, "
-            "e.g. foo=bar,bar=2"
+            "You should provide key=value pairs separated by commas, e.g. foo=bar,bar=2"
         ),
     ):
         param_type.convert("foo=bar,", None, None)
@@ -160,10 +158,7 @@ def test_cli_help_option():
 
     assert result.exit_code == 0
     assert (
-        (
-            "-v, --verbosity LVL  Either CRITICAL, ERROR, WARNING, INFO (default) or "
-            "DEBUG"
-        )
+        "-v, --verbosity LVL  Either CRITICAL, ERROR, WARNING, INFO (default) or DEBUG"
     ) in result.output
 
 
@@ -766,7 +761,7 @@ def test_cli_read_command_with_ws_backend(events, ws):
     # async context, thus we wrap it into a sync contextmanager.
     @contextmanager
     def websocket():
-        yield from iter_over_async(ws)
+        yield execute_async(ws)
 
     with websocket():
         runner = CliRunner()
