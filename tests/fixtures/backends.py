@@ -884,7 +884,7 @@ def events():
 
 @pytest.mark.anyio
 @pytest.fixture
-async def ws(events):
+async def ws(events, anyio_backend):  # https://github.com/agronholm/anyio/issues/803
     """Return a websocket server instance."""
 
     async def forward(websocket):
