@@ -200,3 +200,4 @@ def test_backends_loader_get_lrs_backends(monkeypatch):
         "fs": FSLRSBackend,
         "mongo": MongoLRSBackend,
     }
+    get_lrs_backends.cache_clear()
