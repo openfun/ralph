@@ -45,7 +45,7 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 backend-clickhouse = [
-    "clickhouse-connect[numpy,pandas]<0.8",
+    "clickhouse-connect<0.8",
     "python-dateutil>=2.8.2",
 ]
 backend-es = [
