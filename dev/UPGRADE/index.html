@@ -1659,8 +1659,8 @@ data backend interface with these two methods.</p>
 </ul>
 <p><strong>Backend usage migration example</strong></p>
 <p>Ralph v3 using <code>ESDatabase</code>:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">from</span> <span class="nn">ralph.conf</span> <span class="kn">import</span> <span class="n">ESClientOptions</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kn">from</span> <span class="nn">ralph.backends.database.es</span> <span class="kn">import</span> <span class="n">ESDatabase</span><span class="p">,</span> <span class="n">ESQuery</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ralph.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">ESClientOptions</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ralph.backends.database.es</span><span class="w"> </span><span class="kn">import</span> <span class="n">ESDatabase</span><span class="p">,</span> <span class="n">ESQuery</span>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Instantiate the backend.</span>
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="n">backend</span> <span class="o">=</span> <span class="n">ESDatabase</span><span class="p">(</span>
@@ -1676,7 +1676,7 @@ data backend interface with these two methods.</p>
 </span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="n">backend</span><span class="o">.</span><span class="n">put</span><span class="p">([{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}])</span>
 </span></code></pre></div>
 <p>Ralph v4 using <code>ESDataBackend</code>:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">from</span> <span class="nn">ralph.backends.data.es</span> <span class="kn">import</span> <span class="p">(</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ralph.backends.data.es</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>  <span class="n">ESClientOptions</span><span class="p">,</span>
 </span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>  <span class="n">ESDataBackend</span><span class="p">,</span>
 </span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>  <span class="n">ESDataBackendSettings</span><span class="p">,</span>
