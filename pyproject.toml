@@ -29,7 +29,7 @@ keywords = ["LRS", "Analytics", "xAPI", "Open edX"]
 dependencies = [
     # By default, we only consider core dependencies required to use Ralph as a
     # library (mostly models).
-    "importlib-metadata>=8.5, <8.6",
+    "importlib-metadata>=8.7, <8.8",
     "langcodes>=3.2.0",
     "pydantic[email]>=2.5.3,<3.0",
     "pydantic_settings>=2.1.0,<3.0",
@@ -45,11 +45,11 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 backend-clickhouse = [
-    "clickhouse-connect<0.8",
+    "clickhouse-connect<0.9",
     "python-dateutil>=2.8.2",
 ]
 backend-es = [
-    "elasticsearch[async]>=8.0.0,<9.0.0",
+    "elasticsearch[async]>=9.0.2,<9.1.0",
 ]
 backend-ldp = [
     "ovh==1.2.0",
@@ -73,56 +73,56 @@ backend-swift = [
     "python-swiftclient>=4.0.0",
 ]
 backend-ws = [
-    "websockets>=13.0,<14.0",
+    "websockets>=15,<15.1",
 ]
 backends = [
     "ralph-malph[backend-clickhouse,backend-es,backend-ldp,backend-lrs,backend-mongo,backend-s3,backend-swift,backend-ws]",
 ]
 ci = [
-    "twine==5.1.1",
+    "twine==6.1.0",
 ]
 cli = [
     "bcrypt>=4.0.0",
-    "click>=8.1.0,<8.2.1", # until CliRunner is fixed (https://github.com/pallets/click/issues/2939)
+    "click>=8.2.1,<8.3.0", # until CliRunner is fixed (https://github.com/pallets/click/issues/2939)
     "click-option-group>=0.5.0",
     "sentry-sdk[fastapi]>=1.9.0",
 ]
 dev = [
     "anyio==4.9.0",
-    "black==24.8.0",
-    "cryptography==43.0.1",
-    "factory-boy==3.3.1",
+    "black==25.1.0",
+    "cryptography==45.0.4",
+    "factory-boy==3.3.3",
     "logging-gelf==0.0.32",
     "mike==2.1.3",
     "mkdocs==1.6.1",
-    "mkdocs-click==0.8.1",
-    "mkdocs-material==9.5.34",
-    "mkdocstrings[python-legacy]==0.26.1",
-    "moto==5.0.14",
-    "mypy==1.11.2",
-    "neoteroi-mkdocs==1.1.0",
-    "polyfactory==2.16.2",
-    "pyfakefs==5.6.0",
-    "pymdown-extensions==10.9",
-    "pytest==8.3.5",
-    "pytest-cov==5.0.0",
+    "mkdocs-click==0.9.0",
+    "mkdocs-material==9.6.14",
+    "mkdocstrings[python-legacy]==0.29.1",
+    "moto==5.1.6",
+    "mypy==1.16.0",
+    "neoteroi-mkdocs==1.1.2",
+    "polyfactory==2.21.0",
+    "pyfakefs==5.8.0",
+    "pymdown-extensions==10.15",
+    "pytest==8.4.0",
+    "pytest-cov==6.2.1",
     "pytest-httpx==0.35.0",
     "requests-mock==1.12.1",
-    "responses==0.25.3",
-    "ruff==0.6.5",
-    "types-python-dateutil ==2.9.0.20240906",
-    "types-python-jose ==3.3.4.20240106",
-    "types-requests<2.32.0.20240915",
-    "types-cachetools ==5.5.0.20240820",
+    "responses==0.25.7",
+    "ruff==0.11.13",
+    "types-python-dateutil ==2.9.0.20250516",
+    "types-python-jose ==3.5.0.20250531",
+    "types-requests<2.32.4.20250612",
+    "types-cachetools ==6.0.0.20250525",
 ]
 lrs = [
-    "bcrypt==4.2.0",
-    "fastapi==0.114.2",
-    "cachetools==5.5.0",
+    "bcrypt==4.3.0",
+    "fastapi==0.115.12",
+    "cachetools==6.0.0",
     "httpx==0.28.1",
-    "sentry_sdk==2.14.0",
-    "python-jose==3.3.0",
-    "uvicorn[standard]==0.30.6",
+    "sentry_sdk==2.30.0",
+    "python-jose==3.5.0",
+    "uvicorn[standard]==0.34.3",
 ]
 full = [
     "ralph-malph[backends,cli,lrs]",
