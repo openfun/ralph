@@ -12,6 +12,10 @@ and this project adheres to
 
 - Drop support for Python 3.8
 
+### Changed
+
+- Reload Basic Auth credentials file after change
+
 ### Fixed
 
 - Fix type of `statement.result.score.scaled` from `int` to `Decimal`
