@@ -46,6 +46,8 @@ class LanguageTag(RootModel[Union[str, "LanguageTag"]]):
 
 LanguageMap = Dict[LanguageTag, NonEmptyStrictStr]
 
+ExtensionMap = Dict[IRI, Union[str, int, bool, list, dict, None]]
+
 
 class MailtoEmail(RootModel[str]):
     """Pydantic custom data type validating `mailto:email` format."""

@@ -3,7 +3,7 @@
 import pytest
 from pydantic import BaseModel, ValidationError
 
-from ralph.models.xapi.base.common import IRI, LanguageMap, LanguageTag
+from ralph.models.xapi.base.common import IRI, ExtensionMap, LanguageMap, LanguageTag
 
 
 @pytest.mark.parametrize(
@@ -92,7 +92,7 @@ def test_models_xapi_base_common_field_language_tag_with_invalid_data(values):
         DummyLanguageTagModel(**values)
 
 
-@pytest.mark.parametrize("values", [({"map": {"en": "Hello"}})])
+@pytest.mark.parametrize("values", [{"map": {"en": "Hello"}}])
 def test_models_xapi_base_common_field_language_map_with_valid_data(values):
     """Test that a valid verb field does not raise a `ValidationError`."""
 
@@ -136,3 +136,62 @@ def test_models_xapi_base_common_field_language_map_with_invalid_data(
 
     with pytest.raises(exception, match=error):
         DummyLanguageTagModel(**values)
+
+
+@pytest.mark.parametrize(
+    "values",
+    [
+        ({"extensions": {}}),
+        ({"extensions": {"http://localhost/foo/bar": None}}),
+        ({"extensions": {"http://localhost/foo/bar": None}}),
+        ({"extensions": {"http://localhost/foo/bar": 42}}),
+        ({"extensions": {"http://localhost/foo/bar": []}}),
+        ({"extensions": {"http://localhost/foo/bar": {}}}),
+        ({"extensions": {"http://localhost/foo/bar": ""}}),
+        (
+            {
+                "extensions": {
+                    "http://localhost/foo/bar": "An explanation",
+                    "http://localhost/foost/barst": "Another explanation",
+                }
+            }
+        ),
+    ],
+)
+def test_models_xapi_base_common_field_extensions_with_valid_data(values):
+    """Test that a valid Extensions field does not raise a `ValidationError`."""
+
+    class DummyExtensionsModel(BaseModel):
+        """A dummy pydantic model with an Extensions field."""
+
+        extensions: ExtensionMap
+
+    try:
+        DummyExtensionsModel(**values)
+    except ValidationError as err:
+        pytest.fail(f"Valid Extensions should not raise exceptions: {err}")
+
+
+@pytest.mark.parametrize(
+    "values,exception,error",
+    [
+        (
+            {"extensions": []},
+            ValidationError,
+            "extensions\n  Input should be a valid dictionary",
+        ),
+        ({"extensions": {"localhost": 42}}, ValidationError, "not a valid 'IRI'"),
+    ],
+)
+def test_models_xapi_base_common_field_extensions_with_invalid_data(
+    values, exception, error
+):
+    """Test that an invalid Extensions field raises a `ValidationError`."""
+
+    class DummyExtensionsModel(BaseModel):
+        """A dummy pydantic model with a extensions field."""
+
+        extensions: ExtensionMap
+
+    with pytest.raises(exception, match=error):
+        DummyExtensionsModel(**values)

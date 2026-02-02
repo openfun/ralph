@@ -2,7 +2,7 @@
 
 from datetime import timedelta
 from decimal import Decimal
-from typing import Any, Dict, Optional, Union
+from typing import Any, Optional
 
 from pydantic import Field, StrictBool, model_validator
 from typing_extensions import Annotated
@@ -10,7 +10,7 @@ from typing_extensions import Annotated
 from ralph.conf import NonEmptyStrictStr
 
 from ..config import BaseModelWithConfig
-from .common import IRI
+from .common import ExtensionMap
 
 
 class BaseXapiResultScore(BaseModelWithConfig):
@@ -60,4 +60,4 @@ class BaseXapiResult(BaseModelWithConfig):
     completion: Optional[StrictBool] = None
     response: Optional[NonEmptyStrictStr] = None
     duration: Optional[timedelta] = None
-    extensions: Optional[Dict[IRI, Union[str, int, bool, list, dict, None]]] = None
+    extensions: Optional[ExtensionMap] = None
