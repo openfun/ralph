@@ -1,0 +1,27 @@
+---
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-yaml
+        exclude: mkdocs.yaml
+      - id: check-yaml
+        files: mkdocs.yaml
+        args:
+          - --unsafe
+      - id: check-added-large-files
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+  - repo: https://github.com/ambv/black
+    rev: 25.12.0
+    hooks:
+      - id: black
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.14.13
+    hooks:
+      # Run the linter.
+      - id: ruff-check
+        args: [--fix]
