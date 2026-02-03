@@ -15,6 +15,7 @@ and this project adheres to
 ### Fixed
 
 - Fix type of `statement.result.score.scaled` from `int` to `Decimal`
+- Fix optional `member` field in Identified Groups not actually being optional
 
 ## [5.0.1] - 2024-07-11
 
