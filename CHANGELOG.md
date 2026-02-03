@@ -15,6 +15,12 @@ and this project adheres to
 ### Fixed
 
 - Fix type of `statement.result.score.scaled` from `int` to `Decimal`
+- Fix XAPI definitions extensions not accepting empty strings as values.
+
+
+### Changed
+
+- Refactor statements' ExtensionMap
 
 ## [5.0.1] - 2024-07-11
 

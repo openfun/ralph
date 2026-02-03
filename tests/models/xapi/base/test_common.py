@@ -156,6 +156,26 @@ def test_models_xapi_base_common_field_language_map_with_invalid_data(
                 }
             }
         ),
+        (
+            {
+                "extensions": {
+                    "http://localhost/foo/bar": {
+                        "http://localhost/food/bard": "An explanation",
+                        "whatever": "that_is",
+                    },
+                }
+            }
+        ),
+        (
+            {
+                "extensions": {
+                    "http://localhost/foo/bar": {
+                        "http://localhost/food/bard": "An explanation",
+                        "nope": "",
+                    },
+                }
+            }
+        ),
     ],
 )
 def test_models_xapi_base_common_field_extensions_with_valid_data(values):
