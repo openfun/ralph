@@ -2,14 +2,20 @@
 
 Ralph LRS also supports OpenID Connect on top of OAuth 2.0 for authentication and authorization.
 
-To enable OpenID Connect authentication mode, we should change the `RALPH_RUNSERVER_AUTH_BACKENDS` environment variable to `oidc` and we should define the `RALPH_RUNSERVER_AUTH_OIDC_ISSUER_URI` environment variable with the identity provider's Issuer Identifier URI as follows:
+To enable OpenID Connect authentication mode, we should change the `RALPH_RUNSERVER_AUTH_BACKENDS` environment variable to `oidc` and we should define the environment variables as follows:
+
+- `RALPH_RUNSERVER_AUTH_OIDC_ISSUER_URI` the identity provider's Issuer Identifier URI
+  This address must be accessible to the LRS on startup as it will perform OpenID Connect Discovery to retrieve public keys and other information about the OpenID Connect environment.
+- `RALPH_RUNSERVER_AUTH_OIDC_CLIENT_ID` the OIDC client id issued by the identity provider for this instance
+- `RALPH_RUNSERVER_AUTH_OIDC_CLIENT_SECRET` the OIDC client secret issued by the identity provider for this instance
 
 ```bash
 RALPH_RUNSERVER_AUTH_BACKENDS=oidc
 RALPH_RUNSERVER_AUTH_OIDC_ISSUER_URI=http://{provider_host}:{provider_port}/auth/realms/{realm_name}
+RALPH_RUNSERVER_AUTH_OIDC_CLIENT_ID=some_client_id
+RALPH_RUNSERVER_AUTH_OIDC_CLIENT_SECRET=some_client_secret
 ```
 
-This address must be accessible to the LRS on startup as it will perform OpenID Connect Discovery to retrieve public keys and other information about the OpenID Connect environment.
 
 It is also strongly recommended to set the optional `RALPH_RUNSERVER_AUTH_OIDC_AUDIENCE` environment variable to the origin address of Ralph LRS itself (e.g. "http://localhost:8100") to enable verification that a given token was issued specifically for that Ralph LRS.
 
