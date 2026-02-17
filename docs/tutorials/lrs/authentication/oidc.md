@@ -2,14 +2,20 @@
 
 Ralph LRS also supports OpenID Connect on top of OAuth 2.0 for authentication and authorization.
 
-To enable OpenID Connect authentication mode, we should change the `RALPH_RUNSERVER_AUTH_BACKENDS` environment variable to `oidc` and we should define the `RALPH_RUNSERVER_AUTH_OIDC_ISSUER_URI` environment variable with the identity provider's Issuer Identifier URI as follows:
+To enable OpenID Connect authentication mode, we should change the `RALPH_RUNSERVER_AUTH_BACKENDS` environment variable to `oidc` and we should define the environment variables as follows:
+
+- `RALPH_RUNSERVER_AUTH_OIDC_ISSUER_URI` the identity provider's Issuer Identifier URI
+  This address must be accessible to the LRS on startup as it will perform OpenID Connect Discovery to retrieve public keys and other information about the OpenID Connect environment.
+- `RALPH_RUNSERVER_AUTH_OIDC_CLIENT_ID` the OIDC client id issued by the identity provider for this instance
+- `RALPH_RUNSERVER_AUTH_OIDC_CLIENT_SECRET` the OIDC client secret issued by the identity provider for this instance
 
 ```bash
 RALPH_RUNSERVER_AUTH_BACKENDS=oidc
 RALPH_RUNSERVER_AUTH_OIDC_ISSUER_URI=http://{provider_host}:{provider_port}/auth/realms/{realm_name}
+RALPH_RUNSERVER_AUTH_OIDC_CLIENT_ID=some_client_id
+RALPH_RUNSERVER_AUTH_OIDC_CLIENT_SECRET=some_client_secret
 ```
 
-This address must be accessible to the LRS on startup as it will perform OpenID Connect Discovery to retrieve public keys and other information about the OpenID Connect environment.
 
 It is also strongly recommended to set the optional `RALPH_RUNSERVER_AUTH_OIDC_AUDIENCE` environment variable to the origin address of Ralph LRS itself (e.g. "http://localhost:8100") to enable verification that a given token was issued specifically for that Ralph LRS.
 
@@ -74,7 +80,7 @@ services:
 networks:
   ralph:
     external: true
-    
+
 ```
 
 Again, we need to create the `.ralph` directory:
@@ -102,7 +108,7 @@ Now that both Keycloak and Ralph LRS server are up and running, we should be abl
     ```
 
     ```bash
-    {"access_token":"<access token content>","expires_in":300,"refresh_expires_in":1800,"refresh_token":"<refresh token content>","token_type":"Bearer","not-before-policy":0,"session_state":"0889b3a5-d742-45fb-98b3-20e967960e74","scope":"email profile"} 
+    {"access_token":"<access token content>","expires_in":300,"refresh_expires_in":1800,"refresh_token":"<refresh token content>","token_type":"Bearer","not-before-policy":0,"session_state":"0889b3a5-d742-45fb-98b3-20e967960e74","scope":"email profile"}
     ```
 === "HTTPie"
 
@@ -134,12 +140,12 @@ Now that both Keycloak and Ralph LRS server are up and running, we should be abl
 With this access token, we can now make a request to the Ralph LRS server:
 
 === "curl"
-    
+
     ```bash
     curl -H 'Authorization: Bearer <access token content>' \
     http://localhost:8100/whoami
     ```
-    
+
     ```bash
     {"agent":{"openid":"http://localhost:8080/auth/realms/fun-mooc/b6e85bd0-ce6e-4b24-9f0e-6e18d8744e54"},"scopes":["email","profile"]}
     ```
