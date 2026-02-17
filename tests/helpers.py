@@ -11,7 +11,7 @@ from uuid import UUID
 from ralph.api.auth import AuthBackend
 from ralph.utils import statements_are_equivalent
 
-from tests.fixtures.auth import AUDIENCE, ISSUER_URI
+from tests.fixtures.auth import AUDIENCE, ISSUER_URI,CLIENT_ID,CLIENT_SECRET
 
 
 def string_is_date(string: str):
@@ -231,4 +231,12 @@ def configure_env_for_mock_oidc_auth(
     monkeypatch.setattr(
         "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_AUDIENCE",
         AUDIENCE,
+    )
+    monkeypatch.setattr(
+        "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_CLIENT_ID",
+        CLIENT_ID,
+    )
+    monkeypatch.setattr(
+        "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_CLIENT_SECRET",
+        CLIENT_SECRET,
     )
