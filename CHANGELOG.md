@@ -21,6 +21,7 @@ and this project adheres to
 ### Changed
 
 - OIDC: Add query to `/userinfo` endpoint when receiving a token to support more OIDC IdPs
+- OIDC: Add token introspection to support querying from OIDC clients (Client Credentials flow)
 
 ## [5.0.1] - 2024-07-11
 

@@ -1,5 +1,6 @@
 """Configurations for Ralph."""
 
+import os
 import io
 from enum import Enum
 from pathlib import Path
@@ -40,6 +41,7 @@ NonEmptyStrictStr = Annotated[str, StringConstraints(min_length=1, strict=True)]
 
 BASE_SETTINGS_CONFIG = SettingsConfigDict(
     case_sensitive=True, env_nested_delimiter="__", env_prefix="RALPH_", extra="ignore"
+    , secrets_dir=os.environ.get("RALPH_SECRETS_DIR")
 )
 
 
@@ -203,6 +205,8 @@ class Settings(BaseSettings):
     )
     RUNSERVER_AUTH_OIDC_AUDIENCE: Optional[str] = None
     RUNSERVER_AUTH_OIDC_ISSUER_URI: Optional[AnyHttpUrl] = None
+    RUNSERVER_AUTH_OIDC_CLIENT_ID: Optional[str] = None
+    RUNSERVER_AUTH_OIDC_CLIENT_SECRET: Optional[str] = None
     RUNSERVER_BACKEND: str = "es"
     RUNSERVER_HOST: str = "0.0.0.0"  # noqa: S104
     RUNSERVER_MAX_SEARCH_HITS_COUNT: int = 100

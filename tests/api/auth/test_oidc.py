@@ -40,7 +40,7 @@ async def test_api_auth_oidc_get_whoami_valid(
     assert response.status_code == 200
     assert len(response.json().keys()) == 2
     assert response.json()["agent"] == {
-        "openid": "https://iss.example.com/123|oidc",
+        "openid": "https://iss.example.com/user/123|oidc",
         "objectType": "Agent",
     }
     assert TypeAdapter(BaseXapiAgentWithOpenId).validate_python(
@@ -132,7 +132,7 @@ async def test_api_auth_oidc_get_whoami_invalid_token(
 @pytest.mark.anyio
 @responses.activate
 async def test_api_auth_oidc_get_whoami_invalid_discovery(
-    client, monkeypatch, encoded_token
+    client, monkeypatch, access_token
 ):
     """Test API with an invalid provider discovery."""
 
@@ -152,7 +152,7 @@ async def test_api_auth_oidc_get_whoami_invalid_discovery(
 
     response = await client.get(
         "/whoami",
-        headers={"Authorization": f"Bearer {encoded_token}"},
+        headers={"Authorization": f"Bearer {access_token}"},
     )
 
     assert response.status_code == 401
@@ -163,7 +163,7 @@ async def test_api_auth_oidc_get_whoami_invalid_discovery(
 @pytest.mark.anyio
 @responses.activate
 async def test_api_auth_oidc_get_whoami_invalid_keys(
-    client, monkeypatch, mock_discovery_response, mock_oidc_jwks, encoded_token
+    client, monkeypatch, mock_discovery_response, mock_oidc_jwks, access_token
 ):
     """Test API with an invalid request for keys."""
 
@@ -191,7 +191,7 @@ async def test_api_auth_oidc_get_whoami_invalid_keys(
 
     response = await client.get(
         "/whoami",
-        headers={"Authorization": f"Bearer {encoded_token}"},
+        headers={"Authorization": f"Bearer {access_token}"},
     )
 
     assert response.status_code == 401
