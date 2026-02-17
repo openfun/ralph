@@ -18,6 +18,10 @@ and this project adheres to
 - Fix type of OIDC ID tokens
 - Fix error with OIDC scopes unrelated to Ralph
 
+### Changed
+
+- OIDC: Add query to `/userinfo` endpoint when receiving a token to support more OIDC IdPs
+
 ## [5.0.1] - 2024-07-11
 
 ### Changed
