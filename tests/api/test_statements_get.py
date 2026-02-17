@@ -30,7 +30,14 @@ from tests.fixtures.backends import (
     get_mongo_test_backend,
 )
 
-from ..fixtures.auth import AUDIENCE, ISSUER_URI, mock_basic_auth_user, mock_oidc_user
+from ..fixtures.auth import (
+    AUDIENCE,
+    CLIENT_ID,
+    CLIENT_SECRET,
+    ISSUER_URI,
+    mock_basic_auth_user,
+    mock_oidc_user,
+)
 from ..helpers import mock_activity, mock_agent
 
 
@@ -888,6 +895,14 @@ async def test_api_statements_get_scopes(  # noqa: PLR0913
         monkeypatch.setattr(
             "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_AUDIENCE",
             AUDIENCE,
+        )
+        monkeypatch.setattr(
+            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_CLIENT_ID",
+            CLIENT_ID,
+        )
+        monkeypatch.setattr(
+            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_CLIENT_SECRET",
+            CLIENT_SECRET,
         )
 
         sub = "123|oidc"
