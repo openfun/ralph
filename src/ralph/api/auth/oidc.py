@@ -2,7 +2,7 @@
 
 import logging
 from functools import lru_cache
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, Union, get_args
 
 import requests
 from fastapi import Depends, HTTPException, status
@@ -12,7 +12,7 @@ from jose.exceptions import JWTClaimsError
 from pydantic import AnyUrl, BaseModel, ConfigDict
 from typing_extensions import Annotated
 
-from ralph.api.auth.user import AuthenticatedUser, UserScopes
+from ralph.api.auth.user import AuthenticatedUser, Scope, UserScopes
 from ralph.conf import settings
 
 OPENID_CONFIGURATION_PATH = "/.well-known/openid-configuration"
@@ -94,6 +94,19 @@ def get_public_keys(jwks_uri: AnyUrl) -> Dict:
         ) from exc
 
 
+def get_user_scopes(oidc_scopes: Optional[str]) -> UserScopes:
+    """Extract Ralph's custom OAuth2 scopes from the global scope list.
+
+    Ignore incompatible scopes.
+    """
+    compatible_scopes = (
+        [scope for scope in oidc_scopes.split(" ") if scope in get_args(Scope)]
+        if oidc_scopes
+        else []
+    )
+    return UserScopes(compatible_scopes)
+
+
 def get_oidc_user(
     auth_header: Annotated[Optional[HTTPBearer], Depends(oauth2_scheme)],
 ) -> AuthenticatedUser:
@@ -147,7 +160,7 @@ def get_oidc_user(
 
     user = AuthenticatedUser(
         agent={"openid": f"{id_token.iss}/{id_token.sub}"},
-        scopes=UserScopes(id_token.scope.split(" ") if id_token.scope else []),
+        scopes=get_user_scopes(id_token.scope),
         target=id_token.target,
     )
     return user

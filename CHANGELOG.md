@@ -27,6 +27,7 @@ and this project adheres to
 - Drop the stale `add_ssh_keys` entry from the `deploy-docs` CI job so it
   pushes to `gh-pages` with the read-write checkout key
 - Fix type of OIDC ID tokens
+- Fix error with OIDC scopes unrelated to Ralph
 
 ## [5.0.1] - 2024-07-11
 
