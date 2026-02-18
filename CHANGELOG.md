@@ -15,6 +15,7 @@ and this project adheres to
 ### Fixed
 
 - Fix type of `statement.result.score.scaled` from `int` to `Decimal`
+- Fix type of OIDC ID tokens
 
 ## [5.0.1] - 2024-07-11
 
