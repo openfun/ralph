@@ -16,6 +16,7 @@ and this project adheres to
 
 - Fix type of `statement.result.score.scaled` from `int` to `Decimal`
 - Fix type of OIDC ID tokens
+- Fix error with OIDC scopes unrelated to Ralph
 
 ## [5.0.1] - 2024-07-11
 
