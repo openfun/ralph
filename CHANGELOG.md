@@ -33,6 +33,7 @@ and this project adheres to
 ### Changed
 
 - Refactor statements' ExtensionMap
+- Fix type of OIDC ID tokens
 
 ## [5.0.1] - 2024-07-11
 

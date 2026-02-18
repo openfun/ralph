@@ -2,7 +2,7 @@
 
 import logging
 from functools import lru_cache
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 
 import requests
 from fastapi import Depends, HTTPException, status
@@ -35,7 +35,7 @@ class IDToken(BaseModel):
     Attributes:
         iss (str): Issuer Identifier for the Issuer of the response.
         sub (str): Subject Identifier.
-        aud (str): Audience(s) that this ID Token is intended for.
+        aud (str or list of str): Audience(s) that this ID Token is intended for.
         exp (int): Expiration time on or after which the ID Token MUST NOT be
                    accepted for processing.
         iat (int): Time at which the JWT was issued.
@@ -45,9 +45,9 @@ class IDToken(BaseModel):
 
     iss: str
     sub: str
-    aud: Optional[str] = None
-    exp: int
-    iat: int
+    aud: Optional[Union[list[str], str]] = None
+    exp: float
+    iat: float
     scope: Optional[str] = None
     target: Optional[str] = None
 
