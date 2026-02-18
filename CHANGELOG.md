@@ -26,6 +26,7 @@ and this project adheres to
   `test-helm` CI job to fix flaky "no matching resources"/"status not found"
 - Drop the stale `add_ssh_keys` entry from the `deploy-docs` CI job so it
   pushes to `gh-pages` with the read-write checkout key
+- Fix type of OIDC ID tokens
 
 ## [5.0.1] - 2024-07-11
 
