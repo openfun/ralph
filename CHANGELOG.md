@@ -34,6 +34,7 @@ and this project adheres to
 
 - Refactor statements' ExtensionMap
 - Fix type of OIDC ID tokens
+- Fix error with OIDC scopes unrelated to Ralph
 
 ## [5.0.1] - 2024-07-11
 
