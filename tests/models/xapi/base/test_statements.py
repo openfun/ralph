@@ -186,13 +186,13 @@ def test_models_xapi_base_statement_with_invalid_data_types(path, value, err):
         (
             "actor",
             {"mbox": "example@mail.com"},
-            TypeError,
+            ValidationError,
             "Invalid `mailto:email` value",
         ),
         (
             "verb__display",
             {"bad language tag": "foo"},
-            TypeError,
+            ValidationError,
             "Invalid RFC 5646 Language tag",
         ),
         ("object__id", ["This is not an IRI"], ValidationError, "is not a valid 'IRI'"),
