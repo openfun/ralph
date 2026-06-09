@@ -4,10 +4,10 @@ Allows to be exactly as lax as we want when it comes to exact object shape and
 validation.
 """
 
-from typing import Optional, Union
+from typing import List, Optional, Union
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from ..models.xapi.base.agents import BaseXapiAgent
 from ..models.xapi.base.groups import BaseXapiGroup
@@ -49,6 +49,25 @@ class LaxVerbField(BaseModelWithLaxConfig):
     """
 
     id: str
+
+
+class PartialSuccessError(BaseModel):
+    """One rejected statement in a partial-success POST batch."""
+
+    index: int
+    reason: str
+
+
+class PartialSuccessResponse(BaseModel):
+    """Response body when ``partialSuccess=true`` on POST /xAPI/statements."""
+
+    inserted: int
+    rejected: int
+    ids: List[str] = Field(
+        default_factory=list,
+        description="IDs of statements stored by the LRS during this request",
+    )
+    errors: List[PartialSuccessError] = Field(default_factory=list)
 
 
 class LaxStatement(BaseModelWithLaxConfig):

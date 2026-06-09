@@ -26,7 +26,18 @@ from typing_extensions import Annotated
 from ralph.api.auth import get_authenticated_user
 from ralph.api.auth.user import AuthenticatedUser
 from ralph.api.forwarding import forward_xapi_statements, get_active_xapi_forwardings
-from ralph.api.models import ErrorDetail, LaxStatement
+from ralph.api.models import (
+    ErrorDetail,
+    LaxStatement,
+    PartialSuccessError,
+    PartialSuccessResponse,
+)
+from ralph.api.partial_success import (
+    build_partial_success_response,
+    partition_statements,
+    partial_success_enabled,
+    validate_strict_statements,
+)
 from ralph.backends.loader import get_lrs_backends
 from ralph.backends.lrs.base import (
     AgentParameters,
@@ -74,6 +85,14 @@ POST_PUT_RESPONSES = {
     },
 }
 
+POST_RESPONSES = {
+    **POST_PUT_RESPONSES,
+    200: {
+        "model": PartialSuccessResponse,
+        "description": "Partial success report (only when partialSuccess=true).",
+    },
+}
+
 
 def _enrich_statement_with_id(statement: dict) -> None:
     # id: Statement UUID identifier.
@@ -91,6 +110,106 @@ def _enrich_statement_with_timestamp(statement: dict) -> None:
     # timestamp: Time of the action. If not provided, it takes the same value as stored.
     # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#247-timestamp
     statement["timestamp"] = statement.get("timestamp", statement["stored"])
+
+
+def _statements_to_dict(
+    statements: List[LaxStatement],
+    current_user: AuthenticatedUser,
+    *,
+    partial_success: bool = False,
+) -> Dict[str, dict]:
+    """Turn validated statements into an id-keyed dict (enriched)."""
+    statements_dict: Dict[str, dict] = {}
+    for statement in (
+        x.model_dump(exclude_unset=True, mode="json") for x in statements
+    ):
+        _enrich_statement_with_id(statement)
+        if statement["id"] in statements_dict:
+            message = "Duplicate statement IDs in the list of statements"
+            if partial_success:
+                raise ValueError(message)
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=message,
+            )
+        _enrich_statement_with_stored(statement)
+        _enrich_statement_with_timestamp(statement)
+        _enrich_statement_with_authority(statement, current_user)
+        statements_dict[statement["id"]] = statement
+    return statements_dict
+
+
+async def _filter_existing_statements(
+    statements_dict: Dict[str, dict],
+    current_user: AuthenticatedUser,
+    *,
+    partial_success: bool = False,
+) -> Dict[str, dict]:
+    """Drop statements already stored; raise on conflicting duplicates."""
+    try:
+        if isinstance(BACKEND_CLIENT, BaseLRSBackend):
+            existing_statements = list(
+                BACKEND_CLIENT.query_statements_by_ids(
+                    ids=list(statements_dict), target=current_user.target
+                )
+            )
+        else:
+            existing_statements = [
+                x
+                async for x in BACKEND_CLIENT.query_statements_by_ids(
+                    ids=list(statements_dict), target=current_user.target
+                )
+            ]
+    except BackendException as error:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="xAPI statements query failed",
+        ) from error
+
+    if not existing_statements:
+        return statements_dict
+
+    existing_ids = set()
+    for existing in existing_statements:
+        existing_ids.add(existing["id"])
+        if not statements_are_equivalent(statements_dict[existing["id"]], existing):
+            message = (
+                "Differing statements already exist with the same ID: "
+                f"{existing['id']}"
+            )
+            if partial_success:
+                raise ValueError(message)
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=message,
+            )
+
+    return {
+        key: value
+        for key, value in statements_dict.items()
+        if key not in existing_ids
+    }
+
+
+async def _write_statements(
+    statements_dict: Dict[str, dict],
+    current_user: AuthenticatedUser,
+) -> int:
+    """Persist statements and return the number of indexed documents."""
+    try:
+        return await await_if_coroutine(
+            BACKEND_CLIENT.write(
+                data=statements_dict.values(),
+                target=current_user.target,
+                ignore_errors=False,
+            )
+        )
+    except (BackendException, BadFormatException) as exc:
+        logger.error("Failed to index submitted statements")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Statements bulk indexation failed",
+        ) from exc
 
 
 def _enrich_statement_with_authority(
@@ -538,118 +657,139 @@ async def put(
     logger.info("Indexed %d statements with success", success_count)
 
 
-@router.post("/", responses=POST_PUT_RESPONSES)
-@router.post("", responses=POST_PUT_RESPONSES)
-async def post(
-    current_user: Annotated[
-        AuthenticatedUser,
-        Security(get_authenticated_user, scopes=["statements/write"]),
-    ],
-    statements: Union[LaxStatement, List[LaxStatement]],
+async def _post_statements_standard(
+    statements: List[LaxStatement],
+    current_user: AuthenticatedUser,
     background_tasks: BackgroundTasks,
     response: Response,
-    _=Depends(strict_query_params),
-) -> Union[List, None]:
-    """Store a set of statements (or a single statement as a single member of a set).
+) -> Union[List[str], None]:
+    """Default xAPI POST behaviour (atomic batch)."""
+    statements_dict = _statements_to_dict(statements, current_user)
 
-    NB: at this time, using POST to make a GET request, is not supported.
-    LRS Specification:
-    https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#212-post-statements
-    """
-    # As we accept both a single statement as a dict, and multiple statements as a list,
-    # we need to normalize the data into a list in all cases before we can process it.
-    if not isinstance(statements, list):
-        statements = [statements]
+    if get_active_xapi_forwardings():
+        background_tasks.add_task(
+            forward_xapi_statements, list(statements_dict.values()), method="post"
+        )
 
-    # Enrich statements before forwarding
-    statements_dict = {}
-    for statement in (
-        x.model_dump(exclude_unset=True, mode="json") for x in statements
-    ):
-        _enrich_statement_with_id(statement)
-        # Requests with duplicate statement IDs are considered invalid
-        if statement["id"] in statements_dict:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Duplicate statement IDs in the list of statements",
-            )
-        _enrich_statement_with_stored(statement)
-        _enrich_statement_with_timestamp(statement)
-        _enrich_statement_with_authority(statement, current_user)
-        statements_dict[statement["id"]] = statement
+    statements_dict = await _filter_existing_statements(
+        statements_dict, current_user
+    )
+    if not statements_dict:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return None
 
-    # Forward statements
+    success_count = await _write_statements(statements_dict, current_user)
+    logger.info("Indexed %d statements with success", success_count)
+    return list(statements_dict)
+
+
+async def _post_statements_partial_success(
+    body: object,
+    current_user: AuthenticatedUser,
+    background_tasks: BackgroundTasks,
+    response: Response,
+) -> PartialSuccessResponse:
+    """Opt-in partial ingestion for bulk backfill (issue #622)."""
+    valid_items, errors = partition_statements(body)
+    inserted_ids: List[str] = []
+
+    if not valid_items:
+        payload = build_partial_success_response(
+            inserted_ids=inserted_ids, errors=errors
+        )
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return payload
+
+    statements = [statement for _, statement in valid_items]
+    statements_dict = _statements_to_dict(
+        statements, current_user, partial_success=True
+    )
+
     if get_active_xapi_forwardings():
         background_tasks.add_task(
             forward_xapi_statements, list(statements_dict.values()), method="post"
         )
 
     try:
-        if isinstance(BACKEND_CLIENT, BaseLRSBackend):
-            existing_statements = list(
-                BACKEND_CLIENT.query_statements_by_ids(
-                    ids=list(statements_dict), target=current_user.target
-                )
-            )
-        else:
-            existing_statements = [
-                x
-                async for x in BACKEND_CLIENT.query_statements_by_ids(
-                    ids=list(statements_dict), target=current_user.target
-                )
-            ]
-    except BackendException as error:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="xAPI statements query failed",
-        ) from error
-
-    # If there are duplicate statements, remove them from our id list and
-    # dictionary for insertion. We will return the shortened list of ids below
-    # so that consumers can derive which statements were inserted and which
-    # were skipped for being duplicates.
-    # See: https://github.com/openfun/ralph/issues/345
-    if existing_statements:
-        existing_ids = set()
-        for existing in existing_statements:
-            existing_ids.add(existing["id"])
-
-            # The LRS specification calls for deep comparison of duplicates. This
-            # is done here. If they are not exactly the same, we raise an error.
-            if not statements_are_equivalent(statements_dict[existing["id"]], existing):
-                raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT,
-                    detail="Differing statements already exist with the same ID: "
-                    f"{existing['id']}",
-                )
-
-        # Filter existing statements from the incoming statements
-        statements_dict = {
-            key: value
-            for key, value in statements_dict.items()
-            if key not in existing_ids
-        }
-        if not statements_dict:
-            response.status_code = status.HTTP_204_NO_CONTENT
-            return
-
-    # For valid requests, perform the bulk indexing of all incoming statements
-    try:
-        success_count = await await_if_coroutine(
-            BACKEND_CLIENT.write(
-                data=statements_dict.values(),
-                target=current_user.target,
-                ignore_errors=False,
-            )
+        statements_dict = await _filter_existing_statements(
+            statements_dict, current_user, partial_success=True
         )
-    except (BackendException, BadFormatException) as exc:
-        logger.error("Failed to index submitted statements")
+    except ValueError as exc:
+        payload = build_partial_success_response(inserted_ids=[], errors=errors)
+        payload.errors.append(PartialSuccessError(index=-1, reason=str(exc)))
+        response.status_code = status.HTTP_409_CONFLICT
+        return payload
+
+    if statements_dict:
+        success_count = await _write_statements(statements_dict, current_user)
+        logger.info(
+            "Partial success: indexed %d statements (%d rejected)",
+            success_count,
+            len(errors),
+        )
+        inserted_ids = list(statements_dict)
+
+    payload = build_partial_success_response(
+        inserted_ids=inserted_ids, errors=errors
+    )
+    if payload.inserted == 0:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+    return payload
+
+
+@router.post("/", responses=POST_RESPONSES)
+@router.post("", responses=POST_RESPONSES)
+async def post(
+    request: Request,
+    current_user: Annotated[
+        AuthenticatedUser,
+        Security(get_authenticated_user, scopes=["statements/write"]),
+    ],
+    background_tasks: BackgroundTasks,
+    response: Response,
+    partial_success: Annotated[
+        bool,
+        Query(
+            alias="partialSuccess",
+            description="When true, valid statements are stored and invalid ones "
+            "are reported without rejecting the whole batch.",
+        ),
+    ] = False,
+    ignore_invalid: Annotated[
+        bool,
+        Query(
+            alias="ignoreInvalid",
+            description="Alias of partialSuccess.",
+        ),
+    ] = False,
+    _=Depends(strict_query_params),
+) -> Union[List[str], PartialSuccessResponse, None]:
+    """Store a set of statements (or a single statement as a single member of a set).
+
+    By default the batch is atomic: one invalid statement rejects the entire request
+    (xAPI-strict). Pass ``?partialSuccess=true`` (or ``?ignoreInvalid=true``) to
+    index valid statements and return a per-index error report for invalid ones.
+
+    NB: at this time, using POST to make a GET request, is not supported.
+    LRS Specification:
+    https://github.com/adlnet/xAPI-Spec/blob/1.0.3/xAPI-Communication.md#212-post-statements
+    """
+    try:
+        body = await request.json()
+    except json.JSONDecodeError as exc:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Statements bulk indexation failed",
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid JSON body",
         ) from exc
 
-    logger.info("Indexed %d statements with success", success_count)
+    if partial_success_enabled(
+        partial_success=partial_success, ignore_invalid=ignore_invalid
+    ):
+        return await _post_statements_partial_success(
+            body, current_user, background_tasks, response
+        )
 
-    # Return the list of IDs in the same order they were stored
-    return list(statements_dict)
+    statements = validate_strict_statements(body)
+    return await _post_statements_standard(
+        statements, current_user, background_tasks, response
+    )

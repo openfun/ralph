@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- API: optional `partialSuccess` / `ignoreInvalid` query flag on `POST /xAPI/statements`
+  for bulk backfill — valid statements are indexed and invalid ones are reported
+  per index without rejecting the entire batch (see issue #622).
+
 ### Removed
 
 - Drop support for Python 3.8
