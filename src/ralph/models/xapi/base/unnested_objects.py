@@ -1,6 +1,6 @@
 """Base xAPI `Object` definitions (1)."""
 
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, List, Literal, Optional, Union
 from uuid import UUID
 
 from pydantic import AnyUrl, StringConstraints, field_validator
@@ -9,7 +9,7 @@ from typing_extensions import Annotated
 from ralph.conf import NonEmptyStrictStr
 
 from ..config import BaseModelWithConfig
-from .common import IRI, LanguageMap
+from .common import IRI, ExtensionMap, LanguageMap
 
 
 class BaseXapiActivityDefinition(BaseModelWithConfig):
@@ -27,7 +27,7 @@ class BaseXapiActivityDefinition(BaseModelWithConfig):
     description: Optional[LanguageMap] = None
     type: Optional[IRI] = None
     moreInfo: Optional[AnyUrl] = None
-    extensions: Optional[Dict[IRI, Union[str, int, bool, list, dict, None]]] = None
+    extensions: Optional[ExtensionMap] = None
 
 
 class BaseXapiInteractionComponent(BaseModelWithConfig):
