@@ -3,7 +3,8 @@
 import base64
 import json
 import os
-from typing import Optional
+import urllib.parse
+from typing import Literal, Optional
 
 import bcrypt
 import pytest
@@ -21,6 +22,9 @@ from . import private_key, public_key
 ALGORITHM = "RS256"
 AUDIENCE = "http://clientHost:8100"
 ISSUER_URI = "http://providerHost:8080/auth/realms/real_name"
+CLIENT_ID = "my-client-id"
+OTHER_CLIENT_ID = "my-other-client-id"
+CLIENT_SECRET = "my-client-secret"
 PUBLIC_KEY_ID = "example-key-id"
 
 
@@ -116,6 +120,7 @@ def _mock_discovery_response():
         "authorization_endpoint": "https://providerHost:8080/auth/oauth/v2/authorize",
         "token_endpoint": "https://providerHost:8080/auth/oauth/v2/token",
         "jwks_uri": "https://providerHost:8080/openid/connect/jwks.json",
+        "introspection_endpoint": "https://providerHost:8080/auth/oauth/v2/introspect",
         "response_types_supported": [
             "code",
             "token id_token",
@@ -229,33 +234,47 @@ def mock_oidc_jwks():
     return _mock_oidc_jwks()
 
 
-def _create_oidc_token(sub, scopes, target=None):
-    """Encode token with the private key."""
-    claims = {
+def _mock_access_token(sub, scopes, target=None):
+    return base64.urlsafe_b64encode(
+        f"opaque_string_{sub}_{scopes}_{target}".encode()
+    ).decode()
+
+
+def _mock_oidc_token_info(sub, scopes, target=None):
+    """Mock OIDC Token Introspection response with provided params."""
+    user_info = {
         "sub": sub,
         "iss": "https://iss.example.com",
         "aud": AUDIENCE,
         "iat": 0,  # Issued the 1/1/1970
         "exp": 9999999999,  # Expiring in 11/20/2286
         "scope": " ".join(scopes),
+        "active": True,
+        "client_id": OTHER_CLIENT_ID,
+        "token_type": "Bearer",
     }
     if target is not None:
-        claims["target"] = target
-    return jwt.encode(
-        claims=claims,
-        key=private_key.private_bytes(
-            serialization.Encoding.PEM,
-            serialization.PrivateFormat.PKCS8,
-            serialization.NoEncryption(),
-        ),
-        algorithm=ALGORITHM,
-        headers={
-            "kid": PUBLIC_KEY_ID,
-        },
-    )
+        user_info["target"] = target
+    return user_info
 
 
-def mock_oidc_user(sub="123|oidc", scopes=None, target=None):
+def _mock_oidc_user_info_plain(sub, scopes, target=None):
+    """Mock unencoded OIDC user info claims with provided params."""
+    user_info = {
+        "sub": sub,
+        "scope": " ".join(scopes),
+    }
+    if target is not None:
+        user_info["target"] = target
+    return user_info
+
+
+def mock_oidc_user(
+    sub="123|oidc",
+    scopes=None,
+    target=None,
+    userinfo_response_type: Literal["plain", "jwt"] = "jwt",
+):
     """Instantiate mock oidc user and return auth token."""
     # Default value for scope
     if scopes is None:
@@ -265,27 +284,98 @@ def mock_oidc_user(sub="123|oidc", scopes=None, target=None):
     discover_provider.cache_clear()
     get_public_keys.cache_clear()
 
+    provider_config = _mock_discovery_response()
     # Mock request to get provider configuration
     responses.add(
         responses.GET,
         f"{ISSUER_URI}/.well-known/openid-configuration",
-        json=_mock_discovery_response(),
+        json=provider_config,
         status=200,
     )
+
+    oidc_access_token = _mock_access_token(sub=sub, scopes=scopes, target=target)
 
     # Mock request to get keys
     responses.add(
         responses.GET,
-        _mock_discovery_response()["jwks_uri"],
+        provider_config["jwks_uri"],
         json=_mock_oidc_jwks(),
         status=200,
     )
 
-    oidc_token = _create_oidc_token(sub=sub, scopes=scopes, target=target)
-    return oidc_token
+    # Mock request to get token info
+    def _oidc_introspection_callback(request):
+        payload = urllib.parse.parse_qs(request.body)
+        auth_header = request.headers["Authorization"]
+        auth_method = auth_header.split(" ")[0]
+        if auth_method.lower() != "basic":
+            return (401, {}, "")
+        client_secret_basic_token = auth_header.split(" ")[-1]
+        decoded_client_secret_basic_token = base64.b64decode(
+            client_secret_basic_token.encode("utf-8")
+        ).decode("utf-8")
+        client_id = decoded_client_secret_basic_token.split(":")[0]
+        client_secret = decoded_client_secret_basic_token.split(":")[1]
+        if client_id != CLIENT_ID or client_secret != CLIENT_SECRET:
+            return (401, {}, "")
+        token = payload["token"][0]
+        if token != oidc_access_token:
+            return (200, {}, json.dumps({"active": False}))
+        return (
+            200,
+            {},
+            json.dumps(_mock_oidc_token_info(sub=sub, scopes=scopes, target=target)),
+        )
+
+    responses.add_callback(
+        responses.POST,
+        provider_config["introspection_endpoint"],
+        callback=_oidc_introspection_callback,
+    )
+
+    # Mock request to get ID token
+    def _oidc_userinfo_callback(request):
+        auth_header = request.headers["Authorization"]
+        auth_method = auth_header.split(" ")[0]
+        if auth_method.lower() != "bearer":
+            return (401, {}, "")
+        access_token = auth_header.split(" ")[-1]
+        if access_token != oidc_access_token:
+            return (401, {}, "")
+        user_info = _mock_oidc_user_info_plain(sub=sub, scopes=scopes, target=target)
+        if userinfo_response_type == "plain":
+            return (200, {"Content-Type": "application/json"}, json.dumps(user_info))
+        elif userinfo_response_type == "jwt":
+            encoded_user_info = jwt.encode(
+                claims=user_info,
+                key=private_key.private_bytes(
+                    serialization.Encoding.PEM,
+                    serialization.PrivateFormat.PKCS8,
+                    serialization.NoEncryption(),
+                ),
+                algorithm=ALGORITHM,
+                headers={
+                    "kid": PUBLIC_KEY_ID,
+                },
+            )
+            return (
+                200,
+                {"Content-Type": "application/jwt"},
+                json.dumps(encoded_user_info),
+            )
+        else:
+            return (500, {}, "")
+
+    responses.add_callback(
+        responses.GET,
+        provider_config["userinfo_endpoint"],
+        callback=_oidc_userinfo_callback,
+    )
+
+    return oidc_access_token
 
 
 @pytest.fixture
-def encoded_token():
-    """Encode token with the private key (fixture)."""
-    return _create_oidc_token(sub="123|oidc", scopes=["all", "statements/read"])
+def access_token():
+    """Get opaque OAuth2 access token (fixture)."""
+    return _mock_access_token(sub="123|oidc", scopes=["all", "statements/read"])
