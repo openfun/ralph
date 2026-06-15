@@ -748,13 +748,15 @@ async def post(
     background_tasks: BackgroundTasks,
     response: Response,
     partial_success: Annotated[
-        bool,
+        Optional[bool],
         Query(
             alias="partialSuccess",
             description="When true, valid statements are stored and invalid ones "
-            "are reported without rejecting the whole batch.",
+            "are reported without rejecting the whole batch. When false, forces "
+            "xAPI-strict even if RALPH_LRS_PARTIAL_SUCCESS_DEFAULT is set. "
+            "When omitted, the server default applies.",
         ),
-    ] = False,
+    ] = None,
     ignore_invalid: Annotated[
         bool,
         Query(
@@ -769,6 +771,9 @@ async def post(
     By default the batch is atomic: one invalid statement rejects the entire request
     (xAPI-strict). Pass ``?partialSuccess=true`` (or ``?ignoreInvalid=true``) to
     index valid statements and return a per-index error report for invalid ones.
+    Set ``RALPH_LRS_PARTIAL_SUCCESS_DEFAULT=true`` to enable partial ingestion
+    for clients that do not send the query flag (e.g. Moodle logstore). Use
+    ``?partialSuccess=false`` to force strict mode when the server default is on.
 
     NB: at this time, using POST to make a GET request, is not supported.
     LRS Specification:
@@ -783,7 +788,9 @@ async def post(
         ) from exc
 
     if partial_success_enabled(
-        partial_success=partial_success, ignore_invalid=ignore_invalid
+        partial_success=partial_success,
+        ignore_invalid=ignore_invalid,
+        default_enabled=settings.LRS_PARTIAL_SUCCESS_DEFAULT,
     ):
         return await _post_statements_partial_success(
             body, current_user, background_tasks, response

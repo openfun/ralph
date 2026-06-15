@@ -11,6 +11,14 @@ Ralph therefore supports an **opt-in** query flag:
 - `?partialSuccess=true`
 - `?ignoreInvalid=true` (alias)
 
+Or set the server default (no query flag required on clients such as Moodle logstore):
+
+```bash
+RALPH_LRS_PARTIAL_SUCCESS_DEFAULT=true
+```
+
+Clients can still force xAPI-strict with `?partialSuccess=false` when the server default is on.
+
 ## Behaviour
 
 | Mode | Invalid statement in batch | HTTP | Body |

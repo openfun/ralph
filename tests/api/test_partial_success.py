@@ -4,7 +4,11 @@ import pytest
 from pydantic import ValidationError
 
 from ralph.api.models import LaxStatement
-from ralph.api.partial_success import partition_statements, validate_strict_statements
+from ralph.api.partial_success import (
+    partition_statements,
+    partial_success_enabled,
+    validate_strict_statements,
+)
 
 from ..helpers import mock_statement
 
@@ -28,3 +32,24 @@ def test_validate_strict_statements_raises_on_invalid():
     with pytest.raises(Exception) as exc_info:
         validate_strict_statements([mock_statement(), {}])
     assert exc_info.value.status_code == 422
+
+
+@pytest.mark.parametrize(
+    "partial_success, ignore_invalid, default_enabled, expected",
+    [
+        (None, False, False, False),
+        (None, False, True, True),
+        (True, False, False, True),
+        (False, False, True, False),
+        (None, True, False, True),
+    ],
+)
+def test_partial_success_enabled(partial_success, ignore_invalid, default_enabled, expected):
+    assert (
+        partial_success_enabled(
+            partial_success=partial_success,
+            ignore_invalid=ignore_invalid,
+            default_enabled=default_enabled,
+        )
+        is expected
+    )

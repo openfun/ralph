@@ -13,6 +13,8 @@ and this project adheres to
 - API: optional `partialSuccess` / `ignoreInvalid` query flag on `POST /xAPI/statements`
   for bulk backfill — valid statements are indexed and invalid ones are reported
   per index without rejecting the entire batch (see issue #622).
+- API: `RALPH_LRS_PARTIAL_SUCCESS_DEFAULT` — enable partial-success ingestion for
+  clients that do not send the query flag (opt out with `?partialSuccess=false`).
 
 ### Removed
 

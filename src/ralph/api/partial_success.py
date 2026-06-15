@@ -16,10 +16,21 @@ from ralph.api.models import LaxStatement, PartialSuccessError, PartialSuccessRe
 
 
 def partial_success_enabled(
-    *, partial_success: bool, ignore_invalid: bool
+    *,
+    partial_success: Optional[bool],
+    ignore_invalid: bool,
+    default_enabled: bool = False,
 ) -> bool:
-    """Return whether the client requested partial statement ingestion."""
-    return partial_success or ignore_invalid
+    """Return whether partial statement ingestion is active for this POST.
+
+    Precedence: ``ignoreInvalid`` → explicit ``partialSuccess`` query param →
+  server default (``RALPH_LRS_PARTIAL_SUCCESS_DEFAULT``).
+    """
+    if ignore_invalid:
+        return True
+    if partial_success is not None:
+        return partial_success
+    return default_enabled
 
 
 def _validation_error_detail(

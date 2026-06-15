@@ -128,3 +128,47 @@ async def test_api_statements_post_partial_success_unknown_query_param_still_blo
     )
     assert response.status_code == 400
     assert "notAllowed" in response.json()["detail"]
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("backend", [get_async_es_test_backend, get_es_test_backend])
+async def test_api_statements_post_partial_success_server_default(
+    client, backend, monkeypatch, basic_auth_credentials, es
+):
+    """RALPH_LRS_PARTIAL_SUCCESS_DEFAULT enables partial mode without query flag."""
+    monkeypatch.setattr(
+        "ralph.api.routers.statements.settings.LRS_PARTIAL_SUCCESS_DEFAULT", True
+    )
+    monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
+
+    response = await client.post(
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
+        json=_mixed_batch(),
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["inserted"] == 2
+    assert payload["rejected"] == 1
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("backend", [get_async_es_test_backend, get_es_test_backend])
+async def test_api_statements_post_partial_success_server_default_opt_out_strict(
+    client, backend, monkeypatch, basic_auth_credentials, es
+):
+    """?partialSuccess=false forces strict mode when server default is on."""
+    monkeypatch.setattr(
+        "ralph.api.routers.statements.settings.LRS_PARTIAL_SUCCESS_DEFAULT", True
+    )
+    monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
+
+    response = await client.post(
+        "/xAPI/statements/?partialSuccess=false",
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
+        json=_mixed_batch(),
+    )
+
+    assert response.status_code == 422
+    assert "detail" in response.json()

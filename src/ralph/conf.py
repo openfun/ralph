@@ -210,6 +210,7 @@ class Settings(BaseSettings):
     RUNSERVER_PORT: int = 8100
     LRS_RESTRICT_BY_AUTHORITY: bool = False
     LRS_RESTRICT_BY_SCOPES: bool = False
+    LRS_PARTIAL_SUCCESS_DEFAULT: bool = False
     SENTRY_CLI_TRACES_SAMPLE_RATE: float = 1.0
     SENTRY_DSN: Optional[str] = None
     SENTRY_IGNORE_HEALTH_CHECKS: bool = False
