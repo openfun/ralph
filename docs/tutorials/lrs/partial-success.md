@@ -27,6 +27,10 @@ Clients can still force xAPI-strict with `?partialSuccess=false` when the server
 | `partialSuccess=true` | Some | `200` | Report with `inserted`, `rejected`, `ids`, `errors` |
 | `partialSuccess=true` | All | `400` | Report with `inserted: 0` |
 
+In partial-success mode, statements that pass Pydantic validation but are rejected
+by Elasticsearch (e.g. dynamic mapping errors) are skipped individually: the batch
+still returns HTTP `200` when at least one statement is indexed.
+
 ### Example
 
 ```bash

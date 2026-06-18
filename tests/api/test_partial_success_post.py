@@ -79,6 +79,9 @@ async def test_api_statements_post_strict_still_rejects_batch(
     client, backend, monkeypatch, basic_auth_credentials, es
 ):
     """Without the flag, a mixed batch is rejected atomically."""
+    monkeypatch.setattr(
+        "ralph.api.routers.statements.settings.LRS_PARTIAL_SUCCESS_DEFAULT", False
+    )
     monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
 
     response = await client.post(
@@ -172,3 +175,48 @@ async def test_api_statements_post_partial_success_server_default_opt_out_strict
 
     assert response.status_code == 422
     assert "detail" in response.json()
+
+
+def _es_invalid_match_statement():
+    """Statement valid for Pydantic but rejected by Elasticsearch (empty field name)."""
+    stmt = mock_statement()
+    stmt["result"] = {
+        "extensions": {
+            "http://learninglocker.net/xapi/cmi/matching/response": {"": None},
+        }
+    }
+    return stmt
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("backend", [get_async_es_test_backend, get_es_test_backend])
+async def test_api_statements_post_partial_success_skips_es_indexation_failures(
+    client, backend, monkeypatch, basic_auth_credentials, es
+):
+    """Pydantic-valid statements rejected by ES are skipped without HTTP 500."""
+    monkeypatch.setattr("ralph.api.routers.statements.BACKEND_CLIENT", backend())
+    good = mock_statement()
+    bad_es = _es_invalid_match_statement()
+    good2 = mock_statement()
+
+    response = await client.post(
+        "/xAPI/statements/?partialSuccess=true",
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
+        json=[good, bad_es, good2],
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["inserted"] == 2
+    assert payload["rejected"] == 1
+    assert len(payload["ids"]) == 2
+    assert payload["errors"][0]["index"] == 1
+    assert "elasticsearch" in payload["errors"][0]["reason"].lower()
+
+    es.indices.refresh()
+    get_response = await client.get(
+        "/xAPI/statements/",
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
+    )
+    assert get_response.status_code == 200
+    assert len(get_response.json()["statements"]) == 2

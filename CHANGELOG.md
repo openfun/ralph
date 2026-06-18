@@ -16,6 +16,12 @@ and this project adheres to
 - API: `RALPH_LRS_PARTIAL_SUCCESS_DEFAULT` — enable partial-success ingestion for
   clients that do not send the query flag (opt out with `?partialSuccess=false`).
 
+### Changed
+
+- API: partial-success mode now skips Elasticsearch indexation failures per statement
+  (statements are written one-by-one with `ignore_errors`) instead of failing the
+  whole batch with HTTP 500.
+
 ### Removed
 
 - Drop support for Python 3.8

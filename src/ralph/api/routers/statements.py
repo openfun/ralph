@@ -3,7 +3,7 @@
 import json
 import logging
 from datetime import datetime
-from typing import Dict, List, Literal, Optional, Union
+from typing import Dict, List, Literal, Optional, Tuple, Union
 from urllib.parse import ParseResult, urlencode
 from uuid import UUID, uuid4
 
@@ -210,6 +210,51 @@ async def _write_statements(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Statements bulk indexation failed",
         ) from exc
+
+
+async def _write_statements_partial(
+    statements_dict: Dict[str, dict],
+    current_user: AuthenticatedUser,
+    index_by_id: Dict[str, int],
+) -> Tuple[List[str], List[PartialSuccessError]]:
+    """Persist statements one-by-one, skipping Elasticsearch indexation failures.
+
+    Used only in partial-success mode so a statement that passes Pydantic validation
+    but is rejected by Elasticsearch does not fail the entire batch.
+    """
+    inserted_ids: List[str] = []
+    errors: List[PartialSuccessError] = []
+    for stmt_id, statement in statements_dict.items():
+        body_index = index_by_id.get(stmt_id, -1)
+        try:
+            count = await await_if_coroutine(
+                BACKEND_CLIENT.write(
+                    data=[statement],
+                    target=current_user.target,
+                    ignore_errors=True,
+                )
+            )
+        except (BackendException, BadFormatException) as exc:
+            logger.warning(
+                "Partial success: failed to index statement %s: %s", stmt_id, exc
+            )
+            errors.append(
+                PartialSuccessError(
+                    index=body_index,
+                    reason=f"elasticsearch indexation failed: {exc}",
+                )
+            )
+            continue
+        if count:
+            inserted_ids.append(stmt_id)
+        else:
+            errors.append(
+                PartialSuccessError(
+                    index=body_index,
+                    reason="elasticsearch indexation failed",
+                )
+            )
+    return inserted_ids, errors
 
 
 def _enrich_statement_with_authority(
@@ -704,6 +749,10 @@ async def _post_statements_partial_success(
     statements_dict = _statements_to_dict(
         statements, current_user, partial_success=True
     )
+    index_by_id = {
+        stmt_id: body_index
+        for (body_index, _), stmt_id in zip(valid_items, statements_dict.keys())
+    }
 
     if get_active_xapi_forwardings():
         background_tasks.add_task(
@@ -720,14 +769,22 @@ async def _post_statements_partial_success(
         response.status_code = status.HTTP_409_CONFLICT
         return payload
 
+    index_by_id = {
+        stmt_id: body_index
+        for stmt_id, body_index in index_by_id.items()
+        if stmt_id in statements_dict
+    }
+
     if statements_dict:
-        success_count = await _write_statements(statements_dict, current_user)
+        inserted_ids, es_errors = await _write_statements_partial(
+            statements_dict, current_user, index_by_id
+        )
+        errors.extend(es_errors)
         logger.info(
             "Partial success: indexed %d statements (%d rejected)",
-            success_count,
+            len(inserted_ids),
             len(errors),
         )
-        inserted_ids = list(statements_dict)
 
     payload = build_partial_success_response(
         inserted_ids=inserted_ids, errors=errors
