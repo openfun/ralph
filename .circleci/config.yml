@@ -388,10 +388,16 @@ jobs:
             # Deploy a two-nodes elasticsearch cluster
             kubectl apply -f src/helm/manifests/data-lake.yml
 
-            # Wait on the Elasticsearch resource itself: it exists right after
-            # `apply`, so this avoids the "no matching resources found" race of
-            # `kubectl wait pod` against an empty selector (see kubectl#1516).
-            kubectl wait --for=jsonpath='{.status.phase}'=Ready elasticsearch/data-lake --timeout=600s
+            # The operator writes `.status` asynchronously, so `kubectl wait
+            # --for=jsonpath` errors with "status is not found" when the field
+            # does not exist yet. Poll until the cluster reports a Ready phase.
+            for i in $(seq 1 60); do
+              phase=$(kubectl get elasticsearch data-lake -o jsonpath='{.status.phase}' 2>/dev/null || true)
+              echo "Elasticsearch phase: ${phase:-<none>} ($i/60)"
+              if [ "$phase" = "Ready" ]; then break; fi
+              sleep 10
+            done
+            [ "$phase" = "Ready" ]
 
             # Store elastic user password
             echo 'ELASTIC_PASSWORD="$(kubectl get secret data-lake-es-elastic-user -o jsonpath="{.data.elastic}" | base64 -d)"' >> $BASH_ENV
