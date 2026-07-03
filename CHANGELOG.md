@@ -15,6 +15,9 @@ and this project adheres to
 ### Fixed
 
 - Fix type of `statement.result.score.scaled` from `int` to `Decimal`
+- Fix `check-changelog` CI job by replacing the removed `git whatchanged`
+  command with `git log --name-only`
+- Make MongoDB delete-failure tests tolerant to pymongo error message changes
 
 ## [5.0.1] - 2024-07-11
 

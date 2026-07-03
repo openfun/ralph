@@ -620,16 +620,20 @@ def test_backends_data_mongo_write_with_delete_operation_failure(
     """
 
     backend = mongo_backend()
-    msg = (
-        "Failed to delete document chunk: Invalid document {'q': {'_source.id': {'$in':"
-        " [<class 'object'>]}}, 'limit': 0} | cannot encode object: <class 'object'>, "
-        "of type: <class 'type'>"
-    )
+    # The tail of the error message is produced by pymongo/bson and its exact
+    # wording changes across pymongo versions; only assert on the stable prefix
+    # controlled by Ralph.
+    msg_prefix = "Failed to delete document chunk: "
     with caplog.at_level(logging.ERROR):
-        with pytest.raises(BackendException, match=msg):
+        with pytest.raises(BackendException, match=re.escape(msg_prefix)):
             backend.write([{"id": object}], operation_type=BaseOperationType.DELETE)
 
-    assert ("ralph.backends.data.mongo", logging.ERROR, msg) in caplog.record_tuples
+    assert any(
+        name == "ralph.backends.data.mongo"
+        and level == logging.ERROR
+        and message.startswith(msg_prefix)
+        for name, level, message in caplog.record_tuples
+    )
 
     # Given `ignore_errors` argument set to `True`, the `write` method should not raise
     # an exception.
@@ -643,7 +647,12 @@ def test_backends_data_mongo_write_with_delete_operation_failure(
             == 0
         )
 
-    assert ("ralph.backends.data.mongo", logging.WARNING, msg) in caplog.record_tuples
+    assert any(
+        name == "ralph.backends.data.mongo"
+        and level == logging.WARNING
+        and message.startswith(msg_prefix)
+        for name, level, message in caplog.record_tuples
+    )
     backend.close()
 
 

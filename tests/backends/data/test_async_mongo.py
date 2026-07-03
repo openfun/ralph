@@ -785,12 +785,11 @@ async def test_backends_data_async_mongo_write_with_delete_operation_failure(
     """
 
     backend = async_mongo_backend()
-    msg = (
-        "Failed to delete document chunk: Invalid document "
-        "{'q': {'_source.id': {'$in': [<class 'object'>]}}, 'limit': 0} | "
-        "cannot encode object: <class 'object'>, of type: <class 'type'>"
-    )
-    with pytest.raises(BackendException, match=msg):
+    # The tail of the error message is produced by pymongo/bson and its exact
+    # wording changes across pymongo versions; only assert on the stable prefix
+    # controlled by Ralph.
+    msg_prefix = "Failed to delete document chunk: "
+    with pytest.raises(BackendException, match=re.escape(msg_prefix)):
         await backend.write([{"id": object}], operation_type=BaseOperationType.DELETE)
 
     # Given `ignore_errors` argument set to `True`, the `write` method should not raise
@@ -805,11 +804,12 @@ async def test_backends_data_async_mongo_write_with_delete_operation_failure(
             == 0
         )
 
-    assert (
-        "ralph.backends.data.async_mongo",
-        logging.WARNING,
-        msg,
-    ) in caplog.record_tuples
+    assert any(
+        name == "ralph.backends.data.async_mongo"
+        and level == logging.WARNING
+        and message.startswith(msg_prefix)
+        for name, level, message in caplog.record_tuples
+    )
 
 
 @pytest.mark.anyio
