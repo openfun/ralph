@@ -378,16 +378,20 @@ jobs:
           command: |
             helm repo add elastic https://helm.elastic.co
             helm repo update
-            helm install elastic-operator elastic/eck-operator
+            # Pin the ECK operator: an unpinned chart drifts and breaks CI
+            helm install elastic-operator elastic/eck-operator --version 2.16.1
+
+            # The operator must be running before it can reconcile the
+            # Elasticsearch resource, otherwise no pods are ever created.
+            kubectl rollout status statefulset/elastic-operator --timeout=300s
             
             # Deploy a two-nodes elasticsearch cluster
             kubectl apply -f src/helm/manifests/data-lake.yml
 
-            # Wait for pods to be ready
-            # Still need to wait for pods to be created before waiting for them
-            # to be ready (see https://github.com/kubernetes/kubectl/issues/1516)
-            sleep 5
-            kubectl wait --for=condition=ready pod --selector=common.k8s.elastic.co/type=elasticsearch --timeout=120s
+            # Wait on the Elasticsearch resource itself: it exists right after
+            # `apply`, so this avoids the "no matching resources found" race of
+            # `kubectl wait pod` against an empty selector (see kubectl#1516).
+            kubectl wait --for=jsonpath='{.status.phase}'=Ready elasticsearch/data-lake --timeout=600s
 
             # Store elastic user password
             echo 'ELASTIC_PASSWORD="$(kubectl get secret data-lake-es-elastic-user -o jsonpath="{.data.elastic}" | base64 -d)"' >> $BASH_ENV
