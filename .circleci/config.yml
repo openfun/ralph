@@ -624,9 +624,6 @@ jobs:
       - restore_cache:
           keys:
             - v1-dependencies-python:3.12-{{ .Revision }}
-      - add_ssh_keys:
-          fingerprints:
-            - "43:a9:5b:a0:b5:8b:f5:b4:6d:73:66:a0:27:b1:ce:92"
       - run:
           name: Deploying to GitHub Pages
           command: |
