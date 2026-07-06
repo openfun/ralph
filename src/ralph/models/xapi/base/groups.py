@@ -56,7 +56,7 @@ class BaseXapiIdentifiedGroup(BaseXapiGroupCommonProperties):
         member (list): Consist of a list of the members of this Group.
     """
 
-    member: Optional[List[BaseXapiAgent]]
+    member: Optional[List[BaseXapiAgent]] = None
 
 
 class BaseXapiIdentifiedGroupWithMbox(BaseXapiIdentifiedGroup, BaseXapiMboxIFI):

@@ -15,6 +15,7 @@ and this project adheres to
 ### Fixed
 
 - Fix type of `statement.result.score.scaled` from `int` to `Decimal`
+- Fix optional `member` field in Identified Groups not actually being optional
 - Fix misregistered `TypeError` in Pydantic models validation
 - Fix `check-changelog` CI job by replacing the removed `git whatchanged`
   command with `git log --name-only`
