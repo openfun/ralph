@@ -4,7 +4,7 @@ echo -n "Loading k3d cluster environment... "
 
 export ARNOLD_DEFAULT_VAULT_PASSWORD=arnold
 export ANSIBLE_VAULT_PASSWORD="${ARNOLD_DEFAULT_VAULT_PASSWORD}"
-export ARNOLD_IMAGE_TAG=master
+export ARNOLD_IMAGE_TAG=6.23.0
 export K3D_BIND_HOST_PORT_HTTP=80
 export K3D_BIND_HOST_PORT_HTTPS=443
 export K3D_CLUSTER_NAME=ralph

@@ -26,7 +26,7 @@ ES_INDEX    = statements
 ES_URL      = $(ES_PROTOCOL)://$(ES_HOST):$(ES_PORT)
 
 # -- Arnold
-ARNOLD              = ARNOLD_IMAGE_TAG=master bin/arnold
+ARNOLD              = ARNOLD_IMAGE_TAG=6.23.0 bin/arnold
 ARNOLD_APP          = ralph
 ARNOLD_APP_VARS     = group_vars/customer/$(ARNOLD_CUSTOMER)/$(ARNOLD_ENVIRONMENT)/main.yml
 ARNOLD_CUSTOMER    ?= ralph
@@ -56,11 +56,11 @@ K8S_NAMESPACE                  = $(ARNOLD_ENVIRONMENT)-$(ARNOLD_CUSTOMER)
 default: help
 
 bin/arnold:
-	curl -Lo "bin/arnold" "https://raw.githubusercontent.com/openfun/arnold/master/bin/arnold"
+	curl -Lo "bin/arnold" "https://raw.githubusercontent.com/openfun/arnold/v6.23.0/bin/arnold"
 	chmod +x bin/arnold
 
 bin/init-cluster:
-	curl -Lo "bin/init-cluster" "https://raw.githubusercontent.com/openfun/arnold/master/bin/init-cluster"
+	curl -Lo "bin/init-cluster" "https://raw.githubusercontent.com/openfun/arnold/v6.23.0/bin/init-cluster"
 	chmod +x bin/init-cluster
 
 .env:

@@ -77,7 +77,7 @@ jobs:
       - run:
           name: Check that the CHANGELOG has been modified in the current branch
           command: |
-            git whatchanged --name-only --pretty="" origin..HEAD | grep CHANGELOG
+            git log --name-only --pretty=format: origin..HEAD | grep CHANGELOG
 
   # Check that the CHANGELOG max line length does not exceed 80 characters
   lint-changelog:
@@ -378,16 +378,26 @@ jobs:
           command: |
             helm repo add elastic https://helm.elastic.co
             helm repo update
-            helm install elastic-operator elastic/eck-operator
+            # Pin the ECK operator: an unpinned chart drifts and breaks CI
+            helm install elastic-operator elastic/eck-operator --version 2.16.1
+
+            # The operator must be running before it can reconcile the
+            # Elasticsearch resource, otherwise no pods are ever created.
+            kubectl rollout status statefulset/elastic-operator --timeout=300s
             
             # Deploy a two-nodes elasticsearch cluster
             kubectl apply -f src/helm/manifests/data-lake.yml
 
-            # Wait for pods to be ready
-            # Still need to wait for pods to be created before waiting for them
-            # to be ready (see https://github.com/kubernetes/kubectl/issues/1516)
-            sleep 5
-            kubectl wait --for=condition=ready pod --selector=common.k8s.elastic.co/type=elasticsearch --timeout=120s
+            # The operator writes `.status` asynchronously, so `kubectl wait
+            # --for=jsonpath` errors with "status is not found" when the field
+            # does not exist yet. Poll until the cluster reports a Ready phase.
+            for i in $(seq 1 60); do
+              phase=$(kubectl get elasticsearch data-lake -o jsonpath='{.status.phase}' 2>/dev/null || true)
+              echo "Elasticsearch phase: ${phase:-<none>} ($i/60)"
+              if [ "$phase" = "Ready" ]; then break; fi
+              sleep 10
+            done
+            [ "$phase" = "Ready" ]
 
             # Store elastic user password
             echo 'ELASTIC_PASSWORD="$(kubectl get secret data-lake-es-elastic-user -o jsonpath="{.data.elastic}" | base64 -d)"' >> $BASH_ENV
