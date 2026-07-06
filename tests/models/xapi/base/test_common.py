@@ -88,7 +88,7 @@ def test_models_xapi_base_common_field_language_tag_with_invalid_data(values):
 
         tag: LanguageTag
 
-    with pytest.raises(TypeError, match="Invalid RFC 5646 Language tag"):
+    with pytest.raises(ValidationError, match="Invalid RFC 5646 Language tag"):
         DummyLanguageTagModel(**values)
 
 
@@ -116,7 +116,7 @@ def test_models_xapi_base_common_field_language_map_with_valid_data(values):
             ValidationError,
             "map\n  Input should be a valid dictionary",
         ),
-        ({"map": {"en-US-en": 1}}, TypeError, "Invalid RFC 5646 Language tag"),
+        ({"map": {"en-US-en": 1}}, ValidationError, "Invalid RFC 5646 Language tag"),
         (
             {"map": {"en-US": []}},
             ValidationError,
