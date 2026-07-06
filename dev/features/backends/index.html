@@ -1680,13 +1680,13 @@ later is the <strong>recommended solution</strong> for sensitive data such as se
 credentials. For example, the <code>os_username</code> (OpenStack user name) parameter
 of the OpenStack Swift backend, can be set as a command line option using
 <code>swift</code> as the option prefix (and replacing underscores in its name by dashes):</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>ralph<span class="w"> </span>list<span class="w"> </span>--backend<span class="w"> </span>swift<span class="w"> </span>--swift-os-username<span class="w"> </span>johndoe<span class="w"> </span><span class="c1"># [...] more options</span>
-</span></code></pre></div>
+<p><code>bash
+ralph list --backend swift --swift-os-username johndoe # [...] more options</code></p>
 <p>Alternatively, this parameter can be set as an environment variable (in upper
 case, prefixed by the program name, <em>e.g.</em> <code>RALPH_</code>):</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">RALPH_BACKENDS__DATA__SWIFT__OS_USERNAME</span><span class="o">=</span><span class="s2">&quot;johndoe&quot;</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>ralph<span class="w"> </span>list<span class="w"> </span>--backend<span class="w"> </span>swift<span class="w"> </span><span class="c1"># [...] more options</span>
-</span></code></pre></div>
+<p><code>bash
+export RALPH_BACKENDS__DATA__SWIFT__OS_USERNAME="johndoe"
+ralph list --backend swift # [...] more options</code></p>
 <p>The general patterns for backend parameters are:</p>
 <ul>
 <li><code>--{{ backend_name }}-{{ parameter | underscore_to_dash }}</code> for command options, and,</li>

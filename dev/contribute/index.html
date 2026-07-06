@@ -1564,13 +1564,13 @@ If you want to make changes or add new features, please follow these steps to su
 <p>Begin by forking Ralph project&rsquo;s repository. </p>
 <h3 id="2_clone_the_fork">2. Clone the fork<a class="headerlink" href="#2_clone_the_fork" title="Permanent link">&para;</a></h3>
 <p>Clone the forked repository to your local machine and change the directory to the project folder using the following commands (replace <code>&lt;your_fork&gt;</code> with your GitHub username):</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/&lt;your_fork&gt;/ralph.git
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>ralph
-</span></code></pre></div>
+<p><code>bash
+git clone https://github.com/&lt;your_fork&gt;/ralph.git
+cd ralph</code></p>
 <h3 id="3_create_a_new_branch">3. Create a new branch<a class="headerlink" href="#3_create_a_new_branch" title="Permanent link">&para;</a></h3>
 <p>Create a new branch for your changes, ideally with a descriptive name:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>your-new-feature
-</span></code></pre></div>
+<p><code>bash
+git checkout -b your-new-feature</code></p>
 <h3 id="4_make_changes">4. Make changes<a class="headerlink" href="#4_make_changes" title="Permanent link">&para;</a></h3>
 <p>Implement the changes or additions to the code, ensuring it follows <a href="https://handbook.openfun.fr/python">OpenFUN coding and documentation standards</a>.</p>
 <p>For comprehensive guidance on starting your development journey with Ralph and preparing your pull request, please refer to our dedicated <a href="../tutorials/development_guide/">Start developing with Ralph</a> tutorial.</p>
@@ -1578,8 +1578,8 @@ If you want to make changes or add new features, please follow these steps to su
 Follow the low granularity commit splitting approach and use commit messages based on the Angular commit message guidelines. </p>
 <h3 id="5_push_changes">5. Push changes<a class="headerlink" href="#5_push_changes" title="Permanent link">&para;</a></h3>
 <p>Push your branch to your GitHub repository:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>feature/your-new-feature
-</span></code></pre></div>
+<p><code>bash
+git push origin feature/your-new-feature</code></p>
 <h3 id="6_create_a_pull_request">6. Create a pull request<a class="headerlink" href="#6_create_a_pull_request" title="Permanent link">&para;</a></h3>
 <p>To initiate a Pull Request (PR), head to Ralph project&rsquo;s GitHub repository and click on <kbd>New Pull Request</kbd>.</p>
 <p>Set your branch as the source and Ralph project&rsquo;s <code>main</code> branch as the target.</p>

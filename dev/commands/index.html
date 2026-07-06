@@ -1209,82 +1209,82 @@ for a seamless transition. 🚀
 - Read and write learning data to various databases or servers
 - Manage an instance of a Ralph LRS server</p>
 <p><strong>Usage:</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>ralph [OPTIONS] COMMAND [ARGS]...
-</span></code></pre></div>
+<p><code>text
+ralph [OPTIONS] COMMAND [ARGS]...</code></p>
 <p><strong>Options:</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>  -v, --verbosity LVL  Either CRITICAL, ERROR, WARNING, INFO (default) or
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>                       DEBUG
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>  --version            Show the version and exit.
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>  --help               Show this message and exit.
-</span></code></pre></div>
+<p><code>text
+  -v, --verbosity LVL  Either CRITICAL, ERROR, WARNING, INFO (default) or
+                       DEBUG
+  --version            Show the version and exit.
+  --help               Show this message and exit.</code></p>
 <h3 id="ralph-auth">ralph auth<a class="headerlink" href="#ralph-auth" title="Permanent link">&para;</a></h3>
 <p>Generate credentials for LRS HTTP basic authentication.</p>
 <p><strong>Usage:</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>ralph auth [OPTIONS]
-</span></code></pre></div>
+<p><code>text
+ralph auth [OPTIONS]</code></p>
 <p><strong>Options:</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>  -u, --username TEXT             The user for which we generate credentials.
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>                                  [required]
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>  -p, --password TEXT             The password to encrypt for this user. Will
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>                                  be prompted if missing.  [required]
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>  -s, --scope TEXT                The user scope(s). This option can be
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>                                  provided multiple times.  [required]
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>  -t, --target TEXT               The target location where statements are
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>                                  stored for the user.
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>  -M, --agent-ifi-mbox TEXT       The mbox Inverse Functional Identifier of
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>                                  the associated agent.
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>  -S, --agent-ifi-mbox-sha1sum TEXT
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>                                  The mbox-sha1sum Inverse Functional
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>                                  Identifier of the associated agent.
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>  -O, --agent-ifi-openid TEXT     The openid Inverse Functional Identifier of
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>                                  the associated agent.
-</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>  -A, --agent-ifi-account TEXT...
-</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>                                  Input &quot;{name} {homePage}&quot;. The account
-</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>                                  Inverse Functional Identifier of the
-</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>                                  associated agent.
-</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>  -N, --agent-name TEXT           The name of the associated agent.
-</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a>  -w, --write-to-disk             Write new credentials to the LRS
-</span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>                                  authentication file.
-</span><span id="__span-3-23"><a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a>  --help                          Show this message and exit.
-</span></code></pre></div>
+<p><code>text
+  -u, --username TEXT             The user for which we generate credentials.
+                                  [required]
+  -p, --password TEXT             The password to encrypt for this user. Will
+                                  be prompted if missing.  [required]
+  -s, --scope TEXT                The user scope(s). This option can be
+                                  provided multiple times.  [required]
+  -t, --target TEXT               The target location where statements are
+                                  stored for the user.
+  -M, --agent-ifi-mbox TEXT       The mbox Inverse Functional Identifier of
+                                  the associated agent.
+  -S, --agent-ifi-mbox-sha1sum TEXT
+                                  The mbox-sha1sum Inverse Functional
+                                  Identifier of the associated agent.
+  -O, --agent-ifi-openid TEXT     The openid Inverse Functional Identifier of
+                                  the associated agent.
+  -A, --agent-ifi-account TEXT...
+                                  Input "{name} {homePage}". The account
+                                  Inverse Functional Identifier of the
+                                  associated agent.
+  -N, --agent-name TEXT           The name of the associated agent.
+  -w, --write-to-disk             Write new credentials to the LRS
+                                  authentication file.
+  --help                          Show this message and exit.</code></p>
 <h3 id="ralph-convert">ralph convert<a class="headerlink" href="#ralph-convert" title="Permanent link">&para;</a></h3>
 <p>Convert input events to a given format.</p>
 <p><strong>Usage:</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>ralph convert [OPTIONS]
-</span></code></pre></div>
+<p><code>text
+ralph convert [OPTIONS]</code></p>
 <p><strong>Options:</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>  From edX to xAPI converter options: 
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    -u, --uuid-namespace TEXT     The UUID namespace to use for the `ID` field
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>                                  generation
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    -p, --platform-url TEXT       The `actor.account.homePage` to use in the
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>                                  xAPI statements  [required]
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>  -f, --from [edx]                Input events format to convert  [required]
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>  -t, --to [xapi]                 Output events format  [required]
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>  -I, --ignore-errors             Continue writing regardless of raised errors
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>  -F, --fail-on-unknown           Stop converting at first unknown event
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>  --help                          Show this message and exit.
-</span></code></pre></div>
+<p><code>text
+  From edX to xAPI converter options: 
+    -u, --uuid-namespace TEXT     The UUID namespace to use for the `ID` field
+                                  generation
+    -p, --platform-url TEXT       The `actor.account.homePage` to use in the
+                                  xAPI statements  [required]
+  -f, --from [edx]                Input events format to convert  [required]
+  -t, --to [xapi]                 Output events format  [required]
+  -I, --ignore-errors             Continue writing regardless of raised errors
+  -F, --fail-on-unknown           Stop converting at first unknown event
+  --help                          Show this message and exit.</code></p>
 <h3 id="ralph-extract">ralph extract<a class="headerlink" href="#ralph-extract" title="Permanent link">&para;</a></h3>
 <p>Extract input events from a container format using a dedicated parser.</p>
 <p><strong>Usage:</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>ralph extract [OPTIONS]
-</span></code></pre></div>
+<p><code>text
+ralph extract [OPTIONS]</code></p>
 <p><strong>Options:</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>  -p, --parser [gelf|es]  Container format parser used to extract events
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>                          [required]
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>  --help                  Show this message and exit.
-</span></code></pre></div>
+<p><code>text
+  -p, --parser [gelf|es]  Container format parser used to extract events
+                          [required]
+  --help                  Show this message and exit.</code></p>
 <h3 id="ralph-validate">ralph validate<a class="headerlink" href="#ralph-validate" title="Permanent link">&para;</a></h3>
 <p>Validate input events of given format.</p>
 <p><strong>Usage:</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>ralph validate [OPTIONS]
-</span></code></pre></div>
+<p><code>text
+ralph validate [OPTIONS]</code></p>
 <p><strong>Options:</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>  -f, --format [edx|xapi]  Input events format to validate  [required]
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>  -I, --ignore-errors      Continue validating regardless of raised errors
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>  -F, --fail-on-unknown    Stop validating at first unknown event
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>  --help                   Show this message and exit.
-</span></code></pre></div>
+<p><code>text
+  -f, --format [edx|xapi]  Input events format to validate  [required]
+  -I, --ignore-errors      Continue validating regardless of raised errors
+  -F, --fail-on-unknown    Stop validating at first unknown event
+  --help                   Show this message and exit.</code></p>
 
 
 

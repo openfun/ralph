@@ -1050,33 +1050,6 @@ for a seamless transition. 🚀
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#deploying_the_data_lake_elasticsearch" class="md-nav__link">
-    <span class="md-ellipsis">
-      Deploying the data lake: Elasticsearch
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#deploy_the_lrs_ralph" class="md-nav__link">
-    <span class="md-ellipsis">
-      Deploy the LRS: Ralph
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#go_further" class="md-nav__link">
-    <span class="md-ellipsis">
-      Go further
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1342,33 +1315,6 @@ for a seamless transition. 🚀
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#deploying_the_data_lake_elasticsearch" class="md-nav__link">
-    <span class="md-ellipsis">
-      Deploying the data lake: Elasticsearch
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#deploy_the_lrs_ralph" class="md-nav__link">
-    <span class="md-ellipsis">
-      Deploy the LRS: Ralph
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#go_further" class="md-nav__link">
-    <span class="md-ellipsis">
-      Go further
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1419,12 +1365,12 @@ credentials</a>.</p>
 <h2 id="reviewing_manifest">Reviewing manifest<a class="headerlink" href="#reviewing_manifest" title="Permanent link">&para;</a></h2>
 <p>To generate and review your Helm generated manifest, under <code>./src/helm</code> run the
 following command:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>helm<span class="w"> </span>template<span class="w"> </span>oci://registry-1.docker.io/openfuncharts/ralph
-</span></code></pre></div>
+<p><code>bash
+helm template oci://registry-1.docker.io/openfuncharts/ralph</code></p>
 <h2 id="installing_the_chart">Installing the chart<a class="headerlink" href="#installing_the_chart" title="Permanent link">&para;</a></h2>
 <p>Ralph Helm chart is distributed on DockerHub, and you can install it with:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>helm<span class="w"> </span>install<span class="w"> </span>RELEASE_NAME<span class="w"> </span>oci://registry-1.docker.io/openfuncharts/ralph
-</span></code></pre></div></p>
+<code>bash
+helm install RELEASE_NAME oci://registry-1.docker.io/openfuncharts/ralph</code></p>
 <p>Tips:</p>
 <ul>
 <li>use <code>--values</code> to pass an env values file to extend and/or replace the default values</li>
@@ -1451,54 +1397,52 @@ this tutorial, you will learn to:</p>
 </ul>
 <h3 id="bootstrapping_a_local_cluster">Bootstrapping a local cluster<a class="headerlink" href="#bootstrapping_a_local_cluster" title="Permanent link">&para;</a></h3>
 <p>Let&rsquo;s begin by running a local cluster with Minikube, where we will deploy Ralph on.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Start a local kubernetes cluster</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>minikube<span class="w"> </span>start
-</span></code></pre></div>
+<p>```bash</p>
+<h1 id="start_a_local_kubernetes_cluster">Start a local kubernetes cluster<a class="headerlink" href="#start_a_local_kubernetes_cluster" title="Permanent link">&para;</a></h1>
+<p>minikube start
+```</p>
 <p>We will now create our own Kubernetes namespace to work on:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># This is our namespace</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">K8S_NAMESPACE</span><span class="o">=</span><span class="s2">&quot;learning-analytics&quot;</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Check your namespace value</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="nb">echo</span><span class="w"> </span><span class="si">${</span><span class="nv">K8S_NAMESPACE</span><span class="si">}</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># Create the namespace</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>kubectl<span class="w"> </span>create<span class="w"> </span>namespace<span class="w"> </span><span class="si">${</span><span class="nv">K8S_NAMESPACE</span><span class="si">}</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="c1"># Activate the namespace</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>kubectl<span class="w"> </span>config<span class="w"> </span>set-context<span class="w"> </span>--current<span class="w"> </span>--namespace<span class="o">=</span><span class="si">${</span><span class="nv">K8S_NAMESPACE</span><span class="si">}</span>
-</span></code></pre></div>
+<p>```bash</p>
+<h1 id="this_is_our_namespace">This is our namespace<a class="headerlink" href="#this_is_our_namespace" title="Permanent link">&para;</a></h1>
+<p>export K8S_NAMESPACE=&rdquo;learning-analytics&rdquo;</p>
+<h1 id="check_your_namespace_value">Check your namespace value<a class="headerlink" href="#check_your_namespace_value" title="Permanent link">&para;</a></h1>
+<p>echo ${K8S_NAMESPACE}</p>
+<h1 id="create_the_namespace">Create the namespace<a class="headerlink" href="#create_the_namespace" title="Permanent link">&para;</a></h1>
+<p>kubectl create namespace ${K8S_NAMESPACE}</p>
+<h1 id="activate_the_namespace">Activate the namespace<a class="headerlink" href="#activate_the_namespace" title="Permanent link">&para;</a></h1>
+<p>kubectl config set-context &ndash;current &ndash;namespace=${K8S_NAMESPACE}
+```</p>
 <h3 id="deploying_the_data_lake_elasticsearch">Deploying the data lake: Elasticsearch<a class="headerlink" href="#deploying_the_data_lake_elasticsearch" title="Permanent link">&para;</a></h3>
 <p>In its recent releases, Elastic recommends deploying its services using Custom Resource
 Definitions (CRDs) installed via its official Helm chart. We will first install the
 Elasticsearch (ECK) operator cluster-wide:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Add elastic official helm charts repository</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>helm<span class="w"> </span>repo<span class="w"> </span>add<span class="w"> </span>elastic<span class="w"> </span>https://helm.elastic.co
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Update available charts list</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>helm<span class="w"> </span>repo<span class="w"> </span>update
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># Install the ECK operator</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>helm<span class="w"> </span>install<span class="w"> </span>elastic-operator<span class="w"> </span>elastic/eck-operator<span class="w"> </span>-n<span class="w"> </span>elastic-system<span class="w"> </span>--create-namespace
-</span></code></pre></div>
+<p>```bash</p>
+<h1 id="add_elastic_official_helm_charts_repository">Add elastic official helm charts repository<a class="headerlink" href="#add_elastic_official_helm_charts_repository" title="Permanent link">&para;</a></h1>
+<p>helm repo add elastic https://helm.elastic.co</p>
+<h1 id="update_available_charts_list">Update available charts list<a class="headerlink" href="#update_available_charts_list" title="Permanent link">&para;</a></h1>
+<p>helm repo update</p>
+<h1 id="install_the_eck_operator">Install the ECK operator<a class="headerlink" href="#install_the_eck_operator" title="Permanent link">&para;</a></h1>
+<p>helm install elastic-operator elastic/eck-operator -n elastic-system &ndash;create-namespace
+```</p>
 <p>Now that CRDs are already deployed cluster-wide, we can deploy an Elasticsearch cluster.
 To help you in this task, we provide an example manifest <code>data-lake.yml</code>, that deploy a
 two-nodes elasticsearch &ldquo;cluster&rdquo;. Adapt it to match your needs, then apply it with:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>data-lake.yml
-</span></code></pre></div>
+<p><code>bash
+kubectl apply -f data-lake.yml</code></p>
 <p>Once applied, your elasticsearch pod should be running. You can check this using the
 following command:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-w
-</span></code></pre></div>
+<p><code>bash
+kubectl get pods -w</code></p>
 <p>We expect to see two pods called <code>data-lake-es-default-0</code> and <code>data-lake-es-default-1</code>.</p>
 <p>When our Elasticsearch cluster is up (this can take few minutes), you may create the
 Elasticsearch index that will be used to store learning traces (xAPI statements):</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Store elastic user password</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">ELASTIC_PASSWORD</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>secret<span class="w"> </span>data-lake-es-elastic-user<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s2">&quot;{.data.elastic}&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="w"> </span>-d<span class="k">)</span><span class="s2">&quot;</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Execute an index creation request in the elasticsearch container</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>data-lake-es-default-0<span class="w"> </span>--container<span class="w"> </span>elasticsearch<span class="w"> </span>--<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span>curl<span class="w"> </span>-ks<span class="w"> </span>-X<span class="w"> </span>PUT<span class="w"> </span><span class="s2">&quot;https://elastic:</span><span class="si">${</span><span class="nv">ELASTIC_PASSWORD</span><span class="si">}</span><span class="s2">@localhost:9200/statements?pretty&quot;</span>
-</span></code></pre></div>
+<p>```bash</p>
+<h1 id="store_elastic_user_password">Store elastic user password<a class="headerlink" href="#store_elastic_user_password" title="Permanent link">&para;</a></h1>
+<p>export ELASTIC_PASSWORD=&rdquo;$(kubectl get secret data-lake-es-elastic-user -o jsonpath=&rdquo;{.data.elastic}&rdquo; | base64 -d)&rdquo;</p>
+<h1 id="execute_an_index_creation_request_in_the_elasticsearch_container">Execute an index creation request in the elasticsearch container<a class="headerlink" href="#execute_an_index_creation_request_in_the_elasticsearch_container" title="Permanent link">&para;</a></h1>
+<p>kubectl exec data-lake-es-default-0 &ndash;container elasticsearch &ndash; \
+    curl -ks -X PUT &ldquo;https://elastic:${ELASTIC_PASSWORD}@localhost:9200/statements?pretty&rdquo;
+```</p>
 <p>Our Elasticsearch cluster is all set. In the next section, we will now deploy Ralph, our
 LRS.</p>
 <h3 id="deploy_the_lrs_ralph">Deploy the LRS: Ralph<a class="headerlink" href="#deploy_the_lrs_ralph" title="Permanent link">&para;</a></h3>
@@ -1507,9 +1451,9 @@ file. We provide an example authentication file
 <a href="https://github.com/openfun/ralph/blob/main/src/helm/manifests/auth-demo.json"><code>auth-demo.json</code></a>
 that you can take inspiration from. We can create a secret object directly from the file
 with the command:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>kubectl<span class="w"> </span>create<span class="w"> </span>secret<span class="w"> </span>generic<span class="w"> </span>ralph-auth-secret<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span>--from-file<span class="o">=</span>auth.json<span class="o">=</span>auth-demo.json
-</span></code></pre></div>
+<p><code>bash
+kubectl create secret generic ralph-auth-secret \
+    --from-file=auth.json=auth-demo.json</code></p>
 <p>Secondly, we should create two objects containing environment values necessary for Ralph:</p>
 <ul>
 <li>a Secret containing sensitive environment variables such as passwords, tokens etc;</li>
@@ -1522,38 +1466,38 @@ and
 that you can adapt to fit your needs. </p>
 <p>For this tutorial, we only need to replace the <code>&lt;PASSWORD&gt;</code> tag in the Secret manifest
 by the actual password of the <code>elastic</code> user with the command:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>sed<span class="w"> </span>-i<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;s|&lt;PASSWORD&gt;|</span><span class="nv">$ELASTIC_PASSWORD</span><span class="s2">|g&quot;</span><span class="w"> </span>ralph-env-secret.yaml
-</span></code></pre></div></p>
+<code>bash
+sed -i -e "s|&lt;PASSWORD&gt;|$ELASTIC_PASSWORD|g" ralph-env-secret.yaml</code></p>
 <p>We can now apply both manifests, to create a ConfigMap and a Secret object in our local
 cluster:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Create Secret object</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>ralph-env-secret.yaml
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1"># Create ConfigMap object</span>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>ralph-env-cm.yaml
-</span></code></pre></div></p>
+```bash</p>
+<h1 id="create_secret_object">Create Secret object<a class="headerlink" href="#create_secret_object" title="Permanent link">&para;</a></h1>
+<p>kubectl apply -f ralph-env-secret.yaml</p>
+<h1 id="create_configmap_object">Create ConfigMap object<a class="headerlink" href="#create_configmap_object" title="Permanent link">&para;</a></h1>
+<p>kubectl apply -f ralph-env-cm.yaml
+```</p>
 <p>We can now deploy Ralph:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>helm<span class="w"> </span>install<span class="w"> </span>lrs<span class="w"> </span>oci://registry-1.docker.io/openfuncharts/ralph<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span>--values<span class="w"> </span>development.yaml
-</span></code></pre></div></p>
+<code>bash
+helm install lrs oci://registry-1.docker.io/openfuncharts/ralph \
+  --values development.yaml</code></p>
 <p>One can check if the server is running by opening a network tunnel to the service using
 the <code>port-forward</code> sub-command:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>kubectl<span class="w"> </span>port-forward<span class="w"> </span>svc/lrs-ralph<span class="w"> </span><span class="m">8080</span>:8080
-</span></code></pre></div>
+<p><code>bash
+kubectl port-forward svc/lrs-ralph 8080:8080</code></p>
 <p>And then send a request to the server using this tunnel:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>curl<span class="w"> </span>--user<span class="w"> </span>admin:password<span class="w"> </span>localhost:8080/whoami
-</span></code></pre></div>
+<p><code>bash
+curl --user admin:password localhost:8080/whoami</code></p>
 <p>We expect a valid JSON response stating about the user you are using for this request.</p>
 <p>If everything went well, we can send 22k xAPI statements to the LRS using:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>gunzip<span class="w"> </span>-c<span class="w"> </span>../../data/statements.jsonl.gz<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span>sed<span class="w"> </span><span class="s2">&quot;s/@timestamp/timestamp/g&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span>jq<span class="w"> </span>-s<span class="w"> </span>.<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">  </span>curl<span class="w"> </span>-Lk<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">    </span>--user<span class="w"> </span>admin:password<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">    </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="w">    </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="w">    </span>http://localhost:8080/xAPI/statements/<span class="w"> </span>-d<span class="w"> </span>@-
-</span></code></pre></div>
+<p><code>bash
+gunzip -c ../../data/statements.jsonl.gz | \
+  sed "s/@timestamp/timestamp/g" | \
+  jq -s . | \
+  curl -Lk \
+    --user admin:password \
+    -X POST \
+    -H "Content-Type: application/json" \
+    http://localhost:8080/xAPI/statements/ -d @-</code></p>
 <p>Congrats 🎉</p>
 <h3 id="go_further">Go further<a class="headerlink" href="#go_further" title="Permanent link">&para;</a></h3>
 <p>Now that the LRS is running, we can go further and deploy the dashboard suite Warren.

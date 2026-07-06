@@ -1244,9 +1244,9 @@ for a seamless transition. 🚀
 <h1 id="openid_connect_authentication">OpenID Connect authentication<a class="headerlink" href="#openid_connect_authentication" title="Permanent link">&para;</a></h1>
 <p>Ralph LRS also supports OpenID Connect on top of OAuth 2.0 for authentication and authorization.</p>
 <p>To enable OpenID Connect authentication mode, we should change the <code>RALPH_RUNSERVER_AUTH_BACKENDS</code> environment variable to <code>oidc</code> and we should define the <code>RALPH_RUNSERVER_AUTH_OIDC_ISSUER_URI</code> environment variable with the identity provider&rsquo;s Issuer Identifier URI as follows:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">RALPH_RUNSERVER_AUTH_BACKENDS</span><span class="o">=</span>oidc
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nv">RALPH_RUNSERVER_AUTH_OIDC_ISSUER_URI</span><span class="o">=</span>http://<span class="o">{</span>provider_host<span class="o">}</span>:<span class="o">{</span>provider_port<span class="o">}</span>/auth/realms/<span class="o">{</span>realm_name<span class="o">}</span>
-</span></code></pre></div>
+<p><code>bash
+RALPH_RUNSERVER_AUTH_BACKENDS=oidc
+RALPH_RUNSERVER_AUTH_OIDC_ISSUER_URI=http://{provider_host}:{provider_port}/auth/realms/{realm_name}</code></p>
 <p>This address must be accessible to the LRS on startup as it will perform OpenID Connect Discovery to retrieve public keys and other information about the OpenID Connect environment.</p>
 <p>It is also strongly recommended to set the optional <code>RALPH_RUNSERVER_AUTH_OIDC_AUDIENCE</code> environment variable to the origin address of Ralph LRS itself (e.g. &ldquo;http://localhost:8100&rdquo;) to enable verification that a given token was issued specifically for that Ralph LRS.</p>
 <h2 id="identity_providers">Identity Providers<a class="headerlink" href="#identity_providers" title="Permanent link">&para;</a></h2>
@@ -1254,15 +1254,15 @@ for a seamless transition. 🚀
 <h2 id="an_example_with_keycloak">An example with Keycloak<a class="headerlink" href="#an_example_with_keycloak" title="Permanent link">&para;</a></h2>
 <p>The <a href="https://github.com/openfun/learning-analytics-playground/">Learning analytics playground</a> repository contains a Docker Compose file and configuration for a demonstration instance of Keycloak with a <code>ralph</code> client.</p>
 <p>First, we should stop the Ralph LRS server (if it&rsquo;s still running):
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>down
-</span></code></pre></div></p>
+<code>bash
+docker compose down</code></p>
 <p>We can clone the <code>learning-analytics-playground</code> repository:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:openfun/learning-analytics-playground
-</span></code></pre></div></p>
+<code>bash
+git clone git@github.com:openfun/learning-analytics-playground</code></p>
 <p>And then bootstrap the project:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">cd</span><span class="w"> </span>learning-analytics-playground/
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>make<span class="w"> </span>bootstrap
-</span></code></pre></div></p>
+<code>bash
+cd learning-analytics-playground/
+make bootstrap</code></p>
 <p>After a couple of minutes, the playground containers should be up and running.</p>
 <p>Create another docker compose file, let&rsquo;s call it <code>docker-compose.oidc.yml</code>, with the following content:
 <div class="language-yaml highlight"><span class="filename">docker-compose.oidc.yml</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;3.9&quot;</span>
@@ -1298,48 +1298,48 @@ for a seamless transition. 🚀
 </span></span><span id="__span-4-31"><a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a><span class="hll"><span class="w">    </span><span class="nt">external</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </span></span></code></pre></div></p>
 <p>Again, we need to create the <code>.ralph</code> directory:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>mkdir<span class="w"> </span>.ralph
-</span></code></pre></div></p>
+<code>bash
+mkdir .ralph</code></p>
 <p>Then we can start the <code>lrs</code> service:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>docker-compose.oidc.yml<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>lrs
-</span></code></pre></div></p>
+<code>bash
+docker compose -f docker-compose.oidc.yml up -d lrs</code></p>
 <p>Now that both Keycloak and Ralph LRS server are up and running, we should be able to get the access token from Keycloak with the command:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">curl</label><label for="__tabbed_1_2">HTTPie</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;grant_type=password&quot;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;client_id=ralph&quot;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;client_secret=bcef3562-730d-4575-9e39-63e185f99bca&quot;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;username=ralph_admin&quot;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;password=funfunfun&quot;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">  </span>http://localhost:8080/auth/realms/fun-mooc/protocol/openid-connect/token
-</span></code></pre></div>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="o">{</span><span class="s2">&quot;access_token&quot;</span>:<span class="s2">&quot;&lt;access token content&gt;&quot;</span>,<span class="s2">&quot;expires_in&quot;</span>:300,<span class="s2">&quot;refresh_expires_in&quot;</span>:1800,<span class="s2">&quot;refresh_token&quot;</span>:<span class="s2">&quot;&lt;refresh token content&gt;&quot;</span>,<span class="s2">&quot;token_type&quot;</span>:<span class="s2">&quot;Bearer&quot;</span>,<span class="s2">&quot;not-before-policy&quot;</span>:0,<span class="s2">&quot;session_state&quot;</span>:<span class="s2">&quot;0889b3a5-d742-45fb-98b3-20e967960e74&quot;</span>,<span class="s2">&quot;scope&quot;</span>:<span class="s2">&quot;email profile&quot;</span><span class="o">}</span><span class="w"> </span>
-</span></code></pre></div>
+<p><code>bash
+curl -X POST \
+  -d "grant_type=password" \
+  -d "client_id=ralph" \
+  -d "client_secret=bcef3562-730d-4575-9e39-63e185f99bca" \
+  -d "username=ralph_admin" \
+  -d "password=funfunfun" \
+  http://localhost:8080/auth/realms/fun-mooc/protocol/openid-connect/token</code></p>
+<p><code>bash
+{"access_token":"&lt;access token content&gt;","expires_in":300,"refresh_expires_in":1800,"refresh_token":"&lt;refresh token content&gt;","token_type":"Bearer","not-before-policy":0,"session_state":"0889b3a5-d742-45fb-98b3-20e967960e74","scope":"email profile"}</code></p>
 </div>
 <div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>http<span class="w"> </span>-f<span class="w"> </span>POST<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span>:8080/auth/realms/fun-mooc/protocol/openid-connect/token<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="nv">grant_type</span><span class="o">=</span>password<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="nv">client_id</span><span class="o">=</span>ralph<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="nv">client_secret</span><span class="o">=</span>bcef3562-730d-4575-9e39-63e185f99bca<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">  </span><span class="nv">username</span><span class="o">=</span>ralph_admin<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">  </span><span class="nv">password</span><span class="o">=</span>funfunfun
-</span></code></pre></div>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>HTTP/1.1<span class="w"> </span><span class="m">200</span><span class="w"> </span>OK
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>...
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="o">{</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span><span class="s2">&quot;access_token&quot;</span>:<span class="w"> </span><span class="s2">&quot;&lt;access token content&gt;&quot;</span>,
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">    </span><span class="s2">&quot;expires_in&quot;</span>:<span class="w"> </span><span class="m">300</span>,
-</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">    </span><span class="s2">&quot;not-before-policy&quot;</span>:<span class="w"> </span><span class="m">0</span>,
-</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">    </span><span class="s2">&quot;refresh_expires_in&quot;</span>:<span class="w"> </span><span class="m">1800</span>,
-</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">    </span><span class="s2">&quot;refresh_token&quot;</span>:<span class="w"> </span><span class="s2">&quot;&lt;refresh token content&gt;&quot;</span>,
-</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="w">    </span><span class="s2">&quot;scope&quot;</span>:<span class="w"> </span><span class="s2">&quot;email profile&quot;</span>,
-</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="w">    </span><span class="s2">&quot;session_state&quot;</span>:<span class="w"> </span><span class="s2">&quot;1e826fa2-b4b3-42bf-837f-158fe9d5e1e5&quot;</span>,
-</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="w">    </span><span class="s2">&quot;token_type&quot;</span>:<span class="w"> </span><span class="s2">&quot;Bearer&quot;</span>
-</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="o">}</span>
-</span></code></pre></div>
+<p><code>bash
+http -f POST \
+  :8080/auth/realms/fun-mooc/protocol/openid-connect/token \
+  grant_type=password \
+  client_id=ralph \
+  client_secret=bcef3562-730d-4575-9e39-63e185f99bca \
+  username=ralph_admin \
+  password=funfunfun</code></p>
+<p><code>bash
+HTTP/1.1 200 OK
+...
+{
+    "access_token": "&lt;access token content&gt;",
+    "expires_in": 300,
+    "not-before-policy": 0,
+    "refresh_expires_in": 1800,
+    "refresh_token": "&lt;refresh token content&gt;",
+    "scope": "email profile",
+    "session_state": "1e826fa2-b4b3-42bf-837f-158fe9d5e1e5",
+    "token_type": "Bearer"
+}</code></p>
 </div>
 </div>
 </div>
@@ -1347,27 +1347,27 @@ for a seamless transition. 🚀
 <div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">curl</label><label for="__tabbed_2_2">HTTPie</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>curl<span class="w"> </span>-H<span class="w"> </span><span class="s1">&#39;Authorization: Bearer &lt;access token content&gt;&#39;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>http://localhost:8100/whoami
-</span></code></pre></div>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="o">{</span><span class="s2">&quot;agent&quot;</span>:<span class="o">{</span><span class="s2">&quot;openid&quot;</span>:<span class="s2">&quot;http://localhost:8080/auth/realms/fun-mooc/b6e85bd0-ce6e-4b24-9f0e-6e18d8744e54&quot;</span><span class="o">}</span>,<span class="s2">&quot;scopes&quot;</span>:<span class="o">[</span><span class="s2">&quot;email&quot;</span>,<span class="s2">&quot;profile&quot;</span><span class="o">]}</span>
-</span></code></pre></div>
+<p><code>bash
+curl -H 'Authorization: Bearer &lt;access token content&gt;' \
+http://localhost:8100/whoami</code></p>
+<p><code>bash
+{"agent":{"openid":"http://localhost:8080/auth/realms/fun-mooc/b6e85bd0-ce6e-4b24-9f0e-6e18d8744e54"},"scopes":["email","profile"]}</code></p>
 </div>
 <div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>http<span class="w"> </span>-A<span class="w"> </span>bearer<span class="w"> </span>-a<span class="w"> </span>&lt;access<span class="w"> </span>token<span class="w"> </span>content&gt;<span class="w"> </span>:8100/whoami
-</span></code></pre></div>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>HTTP/1.1<span class="w"> </span><span class="m">200</span><span class="w"> </span>OK
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>...
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="o">{</span>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">    </span><span class="s2">&quot;agent&quot;</span>:<span class="w"> </span><span class="o">{</span>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">        </span><span class="s2">&quot;openid&quot;</span>:<span class="w"> </span><span class="s2">&quot;http://localhost:8080/auth/realms/fun-mooc/b6e85bd0-ce6e-4b24-9f0e-6e18d8744e54&quot;</span>
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">    </span><span class="o">}</span>,
-</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="w">    </span><span class="s2">&quot;scopes&quot;</span>:<span class="w"> </span><span class="o">[</span>
-</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="w">        </span><span class="s2">&quot;email&quot;</span>,
-</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="w">        </span><span class="s2">&quot;profile&quot;</span>
-</span><span id="__span-14-10"><a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="w">    </span><span class="o">]</span>
-</span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="o">}</span>
-</span></code></pre></div>
+<p><code>bash
+http -A bearer -a &lt;access token content&gt; :8100/whoami</code></p>
+<p><code>bash
+HTTP/1.1 200 OK
+...
+{
+    "agent": {
+        "openid": "http://localhost:8080/auth/realms/fun-mooc/b6e85bd0-ce6e-4b24-9f0e-6e18d8744e54"
+    },
+    "scopes": [
+        "email",
+        "profile"
+    ]
+}</code></p>
 </div>
 </div>
 </div>

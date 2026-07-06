@@ -1195,35 +1195,35 @@ for a seamless transition. 🚀
 </span></code></pre></div>
 <p>For now, we are using the <code>fs</code> (File System) backend, meaning that Ralph LRS will store learning records in local files.</p>
 <p>First, we need to manually create the <code>.ralph</code> directory alongside the <code>docker-compose.yml</code> file with the command:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>mkdir<span class="w"> </span>.ralph
-</span></code></pre></div>
+<p><code>bash
+mkdir .ralph</code></p>
 <p>We can then run Ralph LRS from a terminal with the command:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>lrs
-</span></code></pre></div>
+<p><code>bash
+docker compose up -d lrs</code></p>
 <p>Ralph LRS server should be up and running!</p>
 <p>We can request the <code>whoami</code> endpoint to check if the user is authenticated. On success, the endpoint returns the username and permission scopes.</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">curl</label><label for="__tabbed_1_2">HTTPie</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<p><div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>curl<span class="w"> </span>http://localhost:8100/whoami
-</span></code></pre></div>
-<div class="language-console highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="go">{&quot;detail&quot;:&quot;Invalid authentication credentials&quot;}% </span>
-</span></code></pre></div></p>
+<p><code>bash
+curl http://localhost:8100/whoami</code>
+<code>console
+{"detail":"Invalid authentication credentials"}%</code></p>
 </div>
 <div class="tabbed-block">
-<p><div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>http<span class="w"> </span>:8100/whoami
-</span></code></pre></div>
-<div class="language-console highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="go">HTTP/1.1 401 Unauthorized</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="go">content-length: 47</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="go">content-type: application/json</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="go">date: Mon, 06 Nov 2023 15:37:32 GMT</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="go">server: uvicorn</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="go">www-authenticate: Basic</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="go">{</span>
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="go">    &quot;detail&quot;: &quot;Invalid authentication credentials&quot;</span>
-</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="go">}</span>
-</span></code></pre></div></p>
+<p><code>bash
+http :8100/whoami</code>
+```console
+HTTP/1.1 401 Unauthorized
+content-length: 47
+content-type: application/json
+date: Mon, 06 Nov 2023 15:37:32 GMT
+server: uvicorn
+www-authenticate: Basic</p>
+<p>{
+    &ldquo;detail&rdquo;: &ldquo;Invalid authentication credentials&rdquo;
+}</p>
+<p>```</p>
 </div>
 </div>
 </div>

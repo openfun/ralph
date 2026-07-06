@@ -1317,20 +1317,20 @@ for a seamless transition. 🚀
 <ul>
 <li>Create in the terminal a dummy statement as follows: </li>
 </ul>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">invalid_statement</span><span class="o">=</span><span class="s1">&#39;{&quot;foo&quot;: &quot;invalid xapi&quot;}&#39;</span>
-</span></code></pre></div>
+<p><code>bash
+invalid_statement='{"foo": "invalid xapi"}'</code></p>
 <ul>
 <li>Run validation on this statement with this command:</li>
 </ul>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$invalid_statement</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>ralph<span class="w"> </span>validate<span class="w"> </span>-f<span class="w"> </span>xapi<span class="w"> </span>
-</span></code></pre></div>
+<p><code>bash
+echo "$invalid_statement" | ralph validate -f xapi</code></p>
 <ul>
 <li>You should observe the following output from the terminal:</li>
 </ul>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>INFO     ralph.cli Validating xapi events (ignore_errors=False | fail-on-unknown=False)
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>ERROR    ralph.models.validator No matching pydantic model found for input event
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>INFO     ralph.models.validator Total events: 1, Invalid events: 1
-</span></code></pre></div>
+<p><code>plaintext
+INFO     ralph.cli Validating xapi events (ignore_errors=False | fail-on-unknown=False)
+ERROR    ralph.models.validator No matching pydantic model found for input event
+INFO     ralph.models.validator Total events: 1, Invalid events: 1</code></p>
 <h3 id="with_a_valid_xapi_statement">With a valid xAPI statement<a class="headerlink" href="#with_a_valid_xapi_statement" title="Permanent link">&para;</a></h3>
 <p>Now, let&rsquo;s test the <code>validate</code> command with a valid xAPI statement.</p>
 <p>The tutorial is made on a <a href="https://profiles.adlnet.gov/profile/90b2c849-d744-4d0c-8bd0-403e7859a35b/templates/22d6bb8b-c562-46d7-a773-a01aa179826a"><code>completed video</code></a> xAPI statement.</p>
@@ -1346,19 +1346,19 @@ for a seamless transition. 🚀
 <ul>
 <li>Create in the terminal a valid xAPI statement as follows: </li>
 </ul>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nv">valid_statement</span><span class="o">=</span><span class="s1">&#39;{&quot;actor&quot;: {&quot;mbox&quot;: &quot;mailto:johndoe@example.com&quot;, &quot;name&quot;: &quot;John Doe&quot;}, &quot;verb&quot;: {&quot;id&quot;: &quot;http://adlnet.gov/expapi/verbs/completed&quot;}, &quot;object&quot;: {&quot;id&quot;: &quot;http://example.com/video/001-introduction&quot;}, &quot;timestamp&quot;: &quot;2023-10-31T15:30:00Z&quot;}&#39;</span>
-</span></code></pre></div>
+<p><code>bash
+valid_statement='{"actor": {"mbox": "mailto:johndoe@example.com", "name": "John Doe"}, "verb": {"id": "http://adlnet.gov/expapi/verbs/completed"}, "object": {"id": "http://example.com/video/001-introduction"}, "timestamp": "2023-10-31T15:30:00Z"}'</code></p>
 <ul>
 <li>Run validation on this statement with this command:</li>
 </ul>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$valid_statement</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>bin/ralph<span class="w"> </span>validate<span class="w"> </span>-f<span class="w"> </span>xapi<span class="w"> </span>
-</span></code></pre></div>
+<p><code>bash
+echo "$valid_statement" | bin/ralph validate -f xapi</code></p>
 <ul>
 <li>You should observe the following output from the terminal: </li>
 </ul>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>INFO     ralph.cli Validating xapi events (ignore_errors=False | fail-on-unknown=False)
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>INFO     ralph.models.validator Total events: 1, Invalid events: 1
-</span></code></pre></div>
+<p><code>plaintext
+INFO     ralph.cli Validating xapi events (ignore_errors=False | fail-on-unknown=False)
+INFO     ralph.models.validator Total events: 1, Invalid events: 1</code></p>
 <h2 id="convert_command"><code>convert</code> command<a class="headerlink" href="#convert_command" title="Permanent link">&para;</a></h2>
 <p>In this tutorial, you&rsquo;ll learn how to convert OpenEdx events into xAPI statements with Ralph. </p>
 <div class="admonition note">
@@ -1370,57 +1370,57 @@ When converting Edx events to xAPI statements, always refer to the <a href="">li
 <ul>
 <li>Create in the terminal a <code>page_close</code> OpenEdx event as follows: </li>
 </ul>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nv">edx_statements</span><span class="o">={</span><span class="s2">&quot;username&quot;</span>:<span class="w"> </span><span class="s2">&quot;&quot;</span>,<span class="w"> </span><span class="s2">&quot;ip&quot;</span>:<span class="w"> </span><span class="s2">&quot;0.0.0.0&quot;</span>,<span class="w"> </span><span class="s2">&quot;agent&quot;</span>:<span class="w"> </span><span class="s2">&quot;0&quot;</span>,<span class="w"> </span><span class="s2">&quot;host&quot;</span>:<span class="w"> </span><span class="s2">&quot;0&quot;</span>,<span class="w"> </span><span class="s2">&quot;referer&quot;</span>:<span class="w"> </span><span class="s2">&quot;&quot;</span>,<span class="w"> </span><span class="s2">&quot;accept_language&quot;</span>:<span class="w"> </span><span class="s2">&quot;0&quot;</span>,<span class="w"> </span><span class="s2">&quot;context&quot;</span>:<span class="w"> </span><span class="o">{</span><span class="s2">&quot;course_id&quot;</span>:<span class="w"> </span><span class="s2">&quot;&quot;</span>,<span class="w"> </span><span class="s2">&quot;course_user_tags&quot;</span>:<span class="w"> </span>null,<span class="w"> </span><span class="s2">&quot;module&quot;</span>:<span class="w"> </span>null,<span class="w"> </span><span class="s2">&quot;org_id&quot;</span>:<span class="w"> </span><span class="s2">&quot;0&quot;</span>,<span class="w"> </span><span class="s2">&quot;path&quot;</span>:<span class="w"> </span><span class="s2">&quot;.&quot;</span>,<span class="w"> </span><span class="s2">&quot;user_id&quot;</span>:<span class="w"> </span>null<span class="o">}</span>,<span class="w"> </span><span class="s2">&quot;time&quot;</span>:<span class="w"> </span><span class="s2">&quot;2000-01-01T00:00:00&quot;</span>,<span class="w"> </span><span class="s2">&quot;page&quot;</span>:<span class="w"> </span><span class="s2">&quot;http://A.ac/&quot;</span>,<span class="w"> </span><span class="s2">&quot;event_source&quot;</span>:<span class="w"> </span><span class="s2">&quot;browser&quot;</span>,<span class="w"> </span><span class="s2">&quot;session&quot;</span>:<span class="w"> </span><span class="s2">&quot;&quot;</span>,<span class="w"> </span><span class="s2">&quot;event&quot;</span>:<span class="w"> </span><span class="s2">&quot;{}&quot;</span>,<span class="w"> </span><span class="s2">&quot;event_type&quot;</span>:<span class="w"> </span><span class="s2">&quot;page_close&quot;</span>,<span class="w"> </span><span class="s2">&quot;name&quot;</span>:<span class="w"> </span><span class="s2">&quot;page_close&quot;</span><span class="o">}</span>
-</span></code></pre></div>
+<p><code>bash
+edx_statements={"username": "", "ip": "0.0.0.0", "agent": "0", "host": "0", "referer": "", "accept_language": "0", "context": {"course_id": "", "course_user_tags": null, "module": null, "org_id": "0", "path": ".", "user_id": null}, "time": "2000-01-01T00:00:00", "page": "http://A.ac/", "event_source": "browser", "session": "", "event": "{}", "event_type": "page_close", "name": "page_close"}</code></p>
 <ul>
 <li>Convert this statement into a <code>terminated a page</code> statement with this command:</li>
 </ul>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$edx_statements</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\ </span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>ralph<span class="w"> </span>convert<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span>--platform-url<span class="w"> </span><span class="s2">&quot;http://lms-example.com&quot;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span>--uuid-namespace<span class="w"> </span><span class="s2">&quot;ee241f8b-174f-5bdb-bae9-c09de5fe017f&quot;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span>--from<span class="w"> </span>edx<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span>--to<span class="w"> </span>xapi<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span>jq
-</span></code></pre></div>
+<p><code>bash
+echo "$edx_statements" | \ 
+ralph convert \
+    --platform-url "http://lms-example.com" \
+    --uuid-namespace "ee241f8b-174f-5bdb-bae9-c09de5fe017f" \
+    --from edx \
+    --to xapi | \
+    jq</code></p>
 <ul>
 <li>You should observe the following output from the terminal: </li>
 </ul>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="err">INFO</span><span class="w">     </span><span class="err">ralph.cli</span><span class="w"> </span><span class="err">Co</span><span class="kc">n</span><span class="err">ver</span><span class="kc">t</span><span class="err">i</span><span class="kc">n</span><span class="err">g</span><span class="w"> </span><span class="err">edx</span><span class="w"> </span><span class="err">eve</span><span class="kc">nts</span><span class="w"> </span><span class="kc">t</span><span class="err">o</span><span class="w"> </span><span class="err">xapi</span><span class="w"> </span><span class="kc">f</span><span class="err">orma</span><span class="kc">t</span><span class="w"> </span><span class="err">(ig</span><span class="kc">n</span><span class="err">ore_errors=False</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="kc">fa</span><span class="err">il</span><span class="mi">-</span><span class="err">o</span><span class="kc">n</span><span class="mi">-</span><span class="err">u</span><span class="kc">n</span><span class="err">k</span><span class="kc">n</span><span class="err">ow</span><span class="kc">n</span><span class="err">=False)</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="err">INFO</span><span class="w">     </span><span class="err">ralph.models.co</span><span class="kc">n</span><span class="err">ver</span><span class="kc">ter</span><span class="w"> </span><span class="err">To</span><span class="kc">tal</span><span class="w"> </span><span class="err">eve</span><span class="kc">nts</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="err">I</span><span class="kc">n</span><span class="err">valid</span><span class="w"> </span><span class="err">eve</span><span class="kc">nts</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="p">{</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;8670c7d4-5485-52bd-b10a-a8ae27a51501&quot;</span><span class="p">,</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="nt">&quot;actor&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="nt">&quot;account&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">      </span><span class="nt">&quot;homePage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://lms-example.com&quot;</span><span class="p">,</span>
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;anonymous&quot;</span>
-</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">  </span><span class="p">},</span>
-</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">  </span><span class="nt">&quot;verb&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://adlnet.gov/expapi/verbs/terminated&quot;</span>
-</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">  </span><span class="p">},</span>
-</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">  </span><span class="nt">&quot;object&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://A.ac/&quot;</span><span class="p">,</span>
-</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="w">    </span><span class="nt">&quot;definition&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://activitystrea.ms/schema/1.0/page&quot;</span>
-</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="w">  </span><span class="p">},</span>
-</span><span id="__span-8-20"><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="w">  </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2000-01-01T00:00:00&quot;</span><span class="p">,</span>
-</span><span id="__span-8-21"><a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="w">  </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1.0.0&quot;</span>
-</span><span id="__span-8-22"><a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="p">}</span>
-</span></code></pre></div>
+<p><code>json
+INFO     ralph.cli Converting edx events to xapi format (ignore_errors=False | fail-on-unknown=False)
+INFO     ralph.models.converter Total events: 1, Invalid events: 0
+{
+  "id": "8670c7d4-5485-52bd-b10a-a8ae27a51501",
+  "actor": {
+    "account": {
+      "homePage": "http://lms-example.com",
+      "name": "anonymous"
+    }
+  },
+  "verb": {
+    "id": "http://adlnet.gov/expapi/verbs/terminated"
+  },
+  "object": {
+    "id": "http://A.ac/",
+    "definition": {
+      "type": "http://activitystrea.ms/schema/1.0/page"
+    }
+  },
+  "timestamp": "2000-01-01T00:00:00",
+  "version": "1.0.0"
+}</code></p>
 <p>🎉 Congratulations! You just have converted an event generated from OpenEdx LMS to a standardised xAPI statement! </p>
 <details class="tip" open="open">
 <summary>Store locally converted statements</summary>
 <p>To stored the converted statements locally on your machine, send the output of the <code>convert</code> command to a <code>JSON</code> file as follows:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$edx_statements</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\ </span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>ralph<span class="w"> </span>convert<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span>--platform-url<span class="w"> </span><span class="s2">&quot;http://lms-example.com&quot;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span>--uuid-namespace<span class="w"> </span><span class="s2">&quot;ee241f8b-174f-5bdb-bae9-c09de5fe017f&quot;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span>--from<span class="w"> </span>edx<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span>--to<span class="w"> </span>xapi<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">    </span>&gt;<span class="w"> </span>converted_event.json
-</span></code></pre></div></p>
+<code>bash
+echo "$edx_statements" | \ 
+ralph convert \
+    --platform-url "http://lms-example.com" \
+    --uuid-namespace "ee241f8b-174f-5bdb-bae9-c09de5fe017f" \
+    --from edx \
+    --to xapi \
+    &gt; converted_event.json</code></p>
 </details>
 
 

@@ -2996,6 +2996,15 @@ and this project adheres to
 <h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Fix type of <code>statement.result.score.scaled</code> from <code>int</code> to <code>Decimal</code></li>
+<li>Fix <code>check-changelog</code> CI job by replacing the removed <code>git whatchanged</code>
+  command with <code>git log --name-only</code></li>
+<li>Make MongoDB delete-failure tests tolerant to pymongo error message changes</li>
+<li>Pin Arnold to <code>6.23.0</code> (was <code>master</code>) to fix the CircleCI <code>tray</code> job broken
+  by the ansible-core <code>2.14.18</code> vault handling change</li>
+<li>Pin the ECK operator and poll the Elasticsearch resource status in the
+  <code>test-helm</code> CI job to fix flaky &ldquo;no matching resources&rdquo;/&rdquo;status not found&rdquo;</li>
+<li>Drop the stale <code>add_ssh_keys</code> entry from the <code>deploy-docs</code> CI job so it
+  pushes to <code>gh-pages</code> with the read-write checkout key</li>
 </ul>
 <h2 id="501_-_2024-07-11"><a href="https://github.com/openfun/ralph/compare/v5.0.0...v5.0.1">5.0.1</a> - 2024-07-11<a class="headerlink" href="#501_-_2024-07-11" title="Permanent link">&para;</a></h2>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>

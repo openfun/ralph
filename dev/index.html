@@ -1384,22 +1384,22 @@ for a seamless transition. 🚀
 In particular, it defines:</p>
 <ul>
 <li>the <a href="https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#part-two-experience-api-data">xAPI format</a> of the learning events. xAPI statements include an <code>actor</code>, a <code>verb</code>, an <code>object</code> as well as contextual information. Here&rsquo;s an example statement: 
-<div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;12345678-1234-5678-1234-567812345678&quot;</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="nt">&quot;actor&quot;</span><span class="p">:{</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">        </span><span class="nt">&quot;mbox&quot;</span><span class="p">:</span><span class="s2">&quot;mailto:xapi@adlnet.gov&quot;</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="p">},</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="nt">&quot;verb&quot;</span><span class="p">:{</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">        </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;http://adlnet.gov/expapi/verbs/created&quot;</span><span class="p">,</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">        </span><span class="nt">&quot;display&quot;</span><span class="p">:{</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">            </span><span class="nt">&quot;en-US&quot;</span><span class="p">:</span><span class="s2">&quot;created&quot;</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">        </span><span class="p">}</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="p">},</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">    </span><span class="nt">&quot;object&quot;</span><span class="p">:{</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">        </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;http://example.adlnet.gov/xapi/example/activity&quot;</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="p">}</span>
-</span></code></pre></div></li>
+<code>json
+{
+    "id": "12345678-1234-5678-1234-567812345678",
+    "actor":{
+        "mbox":"mailto:xapi@adlnet.gov"
+    },
+    "verb":{
+        "id":"http://adlnet.gov/expapi/verbs/created",
+        "display":{
+            "en-US":"created"
+        }
+    },
+    "object":{
+        "id":"http://example.adlnet.gov/xapi/example/activity"
+    }
+}</code></li>
 <li>the <a href="https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#part-three-data-processing-validation-and-security">Learning Record Store</a> (LRS), is a RESTful API that collects, stores and retrieves these events. Think of it as a learning database that unifies data from various learning platforms and applications. 
 These events can come from an LMS (<em>Moodle</em>, <em>edX</em>), or any other learning component that supports sending xAPI statements to an LRS (e.g. an embedded video player), from various platforms.</li>
 </ul>
@@ -1418,54 +1418,54 @@ These events can come from an LMS (<em>Moodle</em>, <em>edX</em>), or any other 
 <ul>
 <li>
 <p>Create a virtual environment:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python3.12<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>&lt;path-to-virtual-environment&gt;
-</span></code></pre></div></p>
+<code>bash
+python3.12 -m venv &lt;path-to-virtual-environment&gt;</code></p>
 </li>
 <li>
 <p>Activate the virtual environment:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">source</span><span class="w"> </span>venv/bin/activate
-</span></code></pre></div></p>
+<code>bash
+source venv/bin/activate</code></p>
 </li>
 </ul>
 </details>
 <p>If you want to generate xAPI statements from your application and only need to integrate <a href="features/models/">learning statement models</a> in your project, you don&rsquo;t need to
 install the <code>backends</code>, <code>cli</code> or <code>lrs</code> extra dependencies, the <strong>core library</strong> is what you need:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ralph-malph
-</span></code></pre></div>
+<p><code>bash
+pip install ralph-malph</code></p>
 <p>If you want to use the <a href="features/api/">Ralph LRS server</a>, add the <code>lrs</code> flavour in your installation. 
 You also have to choose the type of backend you will use for LRS data storage (<code>backend-clickhouse</code>,<code>backend-es</code>,<code>backend-mongo</code>).</p>
 <ul>
 <li>Install the <strong>core package</strong> with the LRS and the Elasticsearch backend. For example:</li>
 </ul>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ralph-malph<span class="o">[</span>backend-es,lrs<span class="o">]</span>
-</span></code></pre></div>
+<p><code>bash
+pip install ralph-malph[backend-es,lrs]</code></p>
 <ul>
 <li>Add the <code>cli</code> flavour if you want to use the LRS on the command line: </li>
 </ul>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ralph-malph<span class="o">[</span>backend-es,lrs,cli<span class="o">]</span>
-</span></code></pre></div>
+<p><code>bash
+pip install ralph-malph[backend-es,lrs,cli]</code></p>
 <ul>
 <li>If you want to play around with backends with Ralph as a library, you can install: </li>
 </ul>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ralph-malph<span class="o">[</span>backends<span class="o">]</span>
-</span></code></pre></div>
+<p><code>bash
+pip install ralph-malph[backends]</code></p>
 <ul>
 <li>If you have various uses for Ralph&rsquo;s features or would like to discover all the existing functionnalities, it is recommended to install the <strong>full package</strong>: </li>
 </ul>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ralph-malph<span class="o">[</span>full<span class="o">]</span>
-</span></code></pre></div>
+<p><code>bash
+pip install ralph-malph[full]</code></p>
 <h3 id="install_from_dockerhub">Install from DockerHub<a class="headerlink" href="#install_from_dockerhub" title="Permanent link">&para;</a></h3>
 <p>Ralph is distributed as a <a href="https://hub.docker.com/repository/docker/fundocker/ralph">Docker
 image</a>. If
 <a href="https://docs.docker.com/get-docker/">Docker</a> is installed on your machine, it
 can be pulled from DockerHub:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-i<span class="w"> </span>fundocker/ralph:latest<span class="w"> </span>ralph<span class="w"> </span>--help
-</span></code></pre></div>
+<p><code>bash
+docker run --rm -i fundocker/ralph:latest ralph --help</code></p>
 <details class="tip" open="open">
 <summary>Use a <code>ralph</code> alias in your local environment</summary>
 <p>Simplify your workflow by creating an alias for easy access to Ralph commands:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nb">alias</span><span class="w"> </span><span class="nv">ralph</span><span class="o">=</span><span class="s2">&quot;docker run --rm -i fundocker/ralph:latest ralph&quot;</span>
-</span></code></pre></div>
+<p><code>bash
+alias ralph="docker run --rm -i fundocker/ralph:latest ralph"</code></p>
 </details>
 <h2 id="lrs_specification_compliance">LRS specification compliance<a class="headerlink" href="#lrs_specification_compliance" title="Permanent link">&para;</a></h2>
 <p>WIP.</p>
