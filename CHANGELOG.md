@@ -22,6 +22,8 @@ and this project adheres to
   by the ansible-core `2.14.18` vault handling change
 - Pin the ECK operator and poll the Elasticsearch resource status in the
   `test-helm` CI job to fix flaky "no matching resources"/"status not found"
+- Drop the stale `add_ssh_keys` entry from the `deploy-docs` CI job so it
+  pushes to `gh-pages` with the read-write checkout key
 
 ## [5.0.1] - 2024-07-11
 
