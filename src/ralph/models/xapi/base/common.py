@@ -40,7 +40,7 @@ class LanguageTag(RootModel[Union[str, "LanguageTag"]]):
     def validate_language_tag(cls, tag):
         """Check whether the provided tag is a valid RFC 5646 Language tag."""
         if not tag_is_valid(str(tag)):
-            raise TypeError("Invalid RFC 5646 Language tag")
+            raise ValueError("Invalid RFC 5646 Language tag")
         return str(tag)
 
 
@@ -54,7 +54,7 @@ class MailtoEmail(RootModel[str]):
     def validate(self) -> Type["MailtoEmail"]:
         """Check whether the provided value follows the `mailto:email` format."""
         if not self.root.startswith("mailto:"):
-            raise TypeError("Invalid `mailto:email` value")
+            raise ValueError("Invalid `mailto:email` value")
         valid = validate_email(self.root[7:])
         self.root = f"mailto:{valid[1]}"
         return self

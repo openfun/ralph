@@ -56,7 +56,7 @@ def validate_iso_datetime_str(value: Union[str, datetime]) -> datetime:
     to an ISO 8601 date time string.
     """
     if not isinstance(value, (str, datetime)):
-        raise TypeError("a string or datetime is required")
+        raise ValueError("a string or datetime is required")
 
     if isinstance(value, datetime):
         return value.isoformat()
