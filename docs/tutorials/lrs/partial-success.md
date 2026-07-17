@@ -31,6 +31,25 @@ In partial-success mode, statements that pass Pydantic validation but are reject
 by Elasticsearch (e.g. dynamic mapping errors) are skipped individually: the batch
 still returns HTTP `200` when at least one statement is indexed.
 
+### Elasticsearch-compatible dict keys (`5.0.3-beta1`)
+
+When `RUNSERVER_BACKEND=es` and `RALPH_LRS_ELASTICSEARCH_VALIDATE_KEYS=true` (default),
+statements with incompatible JSON object keys are rejected during API validation (before
+ES indexation), with an explicit `errors[]` reason in partial-success mode:
+
+| Key | Example | Rejected? |
+|-----|---------|-----------|
+| Empty string | `""` in quiz match extension | Yes |
+| Non-IRI with `.` | `nested.key` in extension value map | Yes |
+| xAPI IRI | `http://id.tincanapi.com/extension/quiz` | No (dots in URL are OK) |
+
+Environment:
+
+```bash
+RALPH_LRS_ELASTICSEARCH_VALIDATE_KEYS=true   # default
+RALPH_RUNSERVER_BACKEND=es
+```
+
 ### Example
 
 ```bash

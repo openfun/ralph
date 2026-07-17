@@ -4,6 +4,37 @@ All instructions to upgrade this project from one release to the next will be do
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### Unreleased (5.0.2-beta1 → 5.0.3-beta1) — branch `feat/partial-success-issue-622`
+
+#### partialSuccess (issue #622)
+
+Optional bulk ingestion when some statements in a batch are invalid:
+
+- Query: `?partialSuccess=true` or `?ignoreInvalid=true`
+- Server default: `RALPH_LRS_PARTIAL_SUCCESS_DEFAULT=true` (opt out with `?partialSuccess=false`)
+
+See [docs/tutorials/lrs/partial-success.md](docs/tutorials/lrs/partial-success.md).
+
+#### Elasticsearch per-statement isolation (5.0.2-beta1)
+
+In partial-success mode, statements that pass Pydantic validation but fail Elasticsearch
+indexation are skipped individually (`_write_statements_partial`) instead of failing the
+whole batch with HTTP 500.
+
+#### Elasticsearch-compatible dict keys (5.0.3-beta1)
+
+When `RUNSERVER_BACKEND=es` and `RALPH_LRS_ELASTICSEARCH_VALIDATE_KEYS=true` (default),
+`POST /xAPI/statements` rejects statements whose JSON object keys are incompatible with
+Elasticsearch **before** indexation:
+
+- empty string key (`""`) — e.g. quiz match extension with no response key
+- non-IRI key containing `.` — e.g. `nested.key` inside an extension map
+
+**xAPI extension IRI keys** (URLs with dots) remain valid. Only local / non-IRI keys with
+a dot are rejected.
+
+Opt out: `RALPH_LRS_ELASTICSEARCH_VALIDATE_KEYS=false`.
+
 ### 4.x to 5.y
 
 #### Upgrade learning events models

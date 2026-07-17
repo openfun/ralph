@@ -16,8 +16,9 @@ and this project adheres to
 - API: `RALPH_LRS_PARTIAL_SUCCESS_DEFAULT` — enable partial-success ingestion for
   clients that do not send the query flag (opt out with `?partialSuccess=false`).
 - API: reject statements containing Elasticsearch-incompatible dict keys (empty key
-  or key containing `.`) when `RUNSERVER_BACKEND=es` and
-  `RALPH_LRS_ELASTICSEARCH_VALIDATE_KEYS=true` (default).
+  or non-IRI key containing `.`) when `RUNSERVER_BACKEND=es` and
+  `RALPH_LRS_ELASTICSEARCH_VALIDATE_KEYS=true` (default). xAPI extension IRI keys
+  (URLs with dots) remain valid.
 
 ### Changed
 
