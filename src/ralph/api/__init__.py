@@ -6,6 +6,7 @@ from urllib.parse import urlparse
 
 import sentry_sdk
 from fastapi import Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from ralph.conf import settings
 
@@ -42,6 +43,15 @@ if settings.SENTRY_DSN is not None:
     )
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.RUNSERVER_CORS_ALLOW_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT"],
+    allow_headers=[
+        "Authorization,User-Agent,Keep-Alive,Content-Type,X-Experience-API-Version"
+    ],
+)
 app.include_router(statements.router)
 app.include_router(health.router)
 

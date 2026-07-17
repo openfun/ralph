@@ -3,7 +3,8 @@
 import io
 from enum import Enum
 from pathlib import Path
-from typing import List, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union
+from urllib.parse import urlparse
 
 from pydantic import (
     AfterValidator,
@@ -14,6 +15,9 @@ from pydantic import (
     Field,
     StringConstraints,
     TypeAdapter,
+    UrlConstraints,
+    ValidatorFunctionWrapHandler,
+    WrapValidator,
     model_validator,
 )
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -132,7 +136,7 @@ class AuthBackend(str, Enum):
 
 
 def validate_auth_backends(
-    value: Union[str, Tuple[str, ...], List[str]]
+    value: Union[str, Tuple[str, ...], List[str]],
 ) -> Tuple[AuthBackend]:
     """Check whether the value is a comma separated string or a list/tuple."""
     if isinstance(value, (tuple, list)):
@@ -147,6 +151,52 @@ def validate_auth_backends(
 AuthBackends = Annotated[
     Union[str, Tuple[str, ...], List[str]], AfterValidator(validate_auth_backends)
 ]
+
+CorsAllowOriginUrlTypeAdapter = TypeAdapter(
+    Annotated[
+        AnyHttpUrl,
+        UrlConstraints(
+            allowed_schemes=["http", "https"],
+            host_required=True,
+            preserve_empty_path=True,
+        ),
+    ]
+)
+
+
+def validate_cors_allow_origin_url(
+    value: Any, _handler: ValidatorFunctionWrapHandler
+) -> str:
+    """Accepts url strings set in the 'Origin' header of a HTTP/HTTPS request.
+
+    Validates scheme (http or https), host, and an port.
+
+    Note: Pydantic's URL parser automatically adds the default port for
+          a given schema to URLs.
+          This is good in most cases, except preflight requests
+          expect the 'Origin' header (which do not specify port if not default)
+          to match our allowed URL EXACTLY.
+          So we remove the port from Pydantic's output if we did not provide it
+          in the first place.
+    """
+    url: AnyHttpUrl = CorsAllowOriginUrlTypeAdapter.validate_python(value)
+    if url.username is not None or url.password is not None:
+        raise ValueError(
+            "CORS AllowOrigin URLs should not include username or password"
+        )
+    if url.path is not None:
+        raise ValueError("CORS AllowOrigin URLs should have an empty path")
+    parsed_url = urlparse(value)
+    explicit_port = parsed_url.port
+    origin = f"{url.scheme}://{url.host}{
+           ':' + str(explicit_port) if explicit_port is not None
+           else ''}"
+    if origin != str(value):
+        raise ValueError("CORS AllowOrigin URL format incorrect")
+    return origin
+
+
+CorsAllowOriginUrl = Annotated[str, WrapValidator(validate_cors_allow_origin_url)]
 
 
 class Settings(BaseSettings):
@@ -208,6 +258,14 @@ class Settings(BaseSettings):
     RUNSERVER_MAX_SEARCH_HITS_COUNT: int = 100
     RUNSERVER_POINT_IN_TIME_KEEP_ALIVE: str = "1m"
     RUNSERVER_PORT: int = 8100
+    RUNSERVER_CORS_ALLOW_ORIGINS: List[CorsAllowOriginUrl] = Field(
+        [],
+        title="CORS Allowed Origins",
+        description="List of allowed origins URL when using CORS",
+        examples=[
+            ["https://my-allowed-origin.com", "https://my-other-allowed-origin.com"]
+        ],
+    )
     LRS_RESTRICT_BY_AUTHORITY: bool = False
     LRS_RESTRICT_BY_SCOPES: bool = False
     SENTRY_CLI_TRACES_SAMPLE_RATE: float = 1.0
