@@ -15,6 +15,9 @@ and this project adheres to
   per index without rejecting the entire batch (see issue #622).
 - API: `RALPH_LRS_PARTIAL_SUCCESS_DEFAULT` — enable partial-success ingestion for
   clients that do not send the query flag (opt out with `?partialSuccess=false`).
+- API: reject statements containing Elasticsearch-incompatible dict keys (empty key
+  or key containing `.`) when `RUNSERVER_BACKEND=es` and
+  `RALPH_LRS_ELASTICSEARCH_VALIDATE_KEYS=true` (default).
 
 ### Changed
 

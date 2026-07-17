@@ -9,6 +9,7 @@ from ralph.api.partial_success import (
     partial_success_enabled,
     validate_strict_statements,
 )
+from ralph.backends.lrs import es_key_validation
 
 from ..helpers import mock_statement
 
@@ -53,3 +54,60 @@ def test_partial_success_enabled(partial_success, ignore_invalid, default_enable
         )
         is expected
     )
+
+
+@pytest.fixture
+def es_key_validation_enabled(monkeypatch):
+    monkeypatch.setattr(es_key_validation.settings, "RUNSERVER_BACKEND", "es")
+    monkeypatch.setattr(es_key_validation.settings, "LRS_ELASTICSEARCH_VALIDATE_KEYS", True)
+
+
+def test_partition_statements_rejects_elasticsearch_incompatible_keys(
+    es_key_validation_enabled,
+):
+    good = mock_statement()
+    bad_empty_key = {
+        **mock_statement(),
+        "context": {
+            "extensions": {
+                "http://example.com/quiz": {"": "match"},
+            }
+        },
+    }
+    bad_dot_key = {
+        **mock_statement(),
+        "context": {
+            "extensions": {
+                "http://example.com/quiz": {"nested.key": 1},
+            }
+        },
+    }
+
+    valid, errors = partition_statements([good, bad_empty_key, bad_dot_key])
+
+    assert len(valid) == 1
+    assert valid[0][0] == 0
+    assert len(errors) == 2
+    assert errors[0].index == 1
+    assert "empty string" in errors[0].reason
+    assert errors[1].index == 2
+    assert "nested.key" in errors[1].reason
+
+
+def test_validate_strict_statements_rejects_elasticsearch_incompatible_keys(
+    es_key_validation_enabled,
+):
+    bad = {
+        **mock_statement(),
+        "context": {
+            "extensions": {
+                "http://example.com/quiz": {"": "match"},
+            }
+        },
+    }
+
+    with pytest.raises(Exception) as exc_info:
+        validate_strict_statements([mock_statement(), bad])
+
+    assert exc_info.value.status_code == 422
+    assert "empty string" in str(exc_info.value.detail)

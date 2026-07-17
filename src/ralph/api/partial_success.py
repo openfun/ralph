@@ -13,6 +13,11 @@ from fastapi import HTTPException, status
 from pydantic import ValidationError
 
 from ralph.api.models import LaxStatement, PartialSuccessError, PartialSuccessResponse
+from ralph.backends.lrs.es_key_validation import (
+    ElasticsearchKeyValidationError,
+    elasticsearch_key_validation_enabled,
+    validate_elasticsearch_keys,
+)
 
 
 def partial_success_enabled(
@@ -91,12 +96,48 @@ def _validate_one_statement(item: Any, index: Optional[int]) -> LaxStatement:
             ],
         )
     try:
-        return LaxStatement.model_validate(item)
+        statement = LaxStatement.model_validate(item)
     except ValidationError as exc:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=_validation_error_detail(exc, index),
         ) from exc
+    _raise_if_elasticsearch_keys_invalid(statement, index)
+    return statement
+
+
+def _statement_payload(statement: LaxStatement) -> dict:
+    return statement.model_dump(exclude_unset=True, mode="json")
+
+
+def _raise_if_elasticsearch_keys_invalid(
+    statement: LaxStatement, index: Optional[int]
+) -> None:
+    if not elasticsearch_key_validation_enabled():
+        return
+    try:
+        validate_elasticsearch_keys(_statement_payload(statement))
+    except ElasticsearchKeyValidationError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=[
+                {
+                    "type": "elasticsearch_key_validation",
+                    "loc": ["body"] if index is None else ["body", index],
+                    "msg": str(exc),
+                }
+            ],
+        ) from exc
+
+
+def _elasticsearch_key_rejection_reason(statement: LaxStatement) -> Optional[str]:
+    if not elasticsearch_key_validation_enabled():
+        return None
+    try:
+        validate_elasticsearch_keys(_statement_payload(statement))
+    except ElasticsearchKeyValidationError as exc:
+        return str(exc)
+    return None
 
 
 def partition_statements(
@@ -128,6 +169,16 @@ def partition_statements(
                 PartialSuccessError(
                     index=index,
                     reason=_reason_from_validation_error(exc),
+                )
+            )
+            continue
+
+        key_reason = _elasticsearch_key_rejection_reason(statement)
+        if key_reason is not None:
+            errors.append(
+                PartialSuccessError(
+                    index=index,
+                    reason=key_reason,
                 )
             )
             continue
