@@ -3,9 +3,11 @@
 import base64
 import logging
 from functools import lru_cache
+from threading import Lock
 from typing import Dict, Literal, Optional, Union, get_args
 
 import requests
+from cachetools import TTLCache, cached
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, OpenIdConnect
 from jose import ExpiredSignatureError, JWTError, jwt
@@ -87,7 +89,7 @@ class TokenInfo(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
 
-@lru_cache()
+@lru_cache(maxsize=1)
 def discover_provider(base_url: AnyUrl) -> Dict:
     """Discover the authentication server (or OpenId Provider) configuration."""
     try:
@@ -116,7 +118,10 @@ def get_user_info(provider_config: dict, access_token: str) -> UserInfo:
     return decode_user_info(user_info, provider_config=provider_config)
 
 
-@ttl_cache()
+@cached(
+    cache=TTLCache(maxsize=settings.AUTH_CACHE_MAX_SIZE, ttl=settings.AUTH_CACHE_TTL),
+    lock=Lock(),
+)
 def get_user_info_data(
     userinfo_endpoint: AnyUrl, access_token: str
 ) -> Union[tuple[dict, Literal[False]], tuple[str, Literal[True]]]:
@@ -201,7 +206,10 @@ def encode_client_secret_basic_token(client_id: str, client_secret: str) -> str:
     ).decode("utf-8")
 
 
-@lru_cache()
+@cached(
+    cache=TTLCache(maxsize=settings.AUTH_CACHE_MAX_SIZE, ttl=settings.AUTH_CACHE_TTL),
+    lock=Lock(),
+)
 def get_token_info(
     introspection_endpoint: AnyUrl, token: str, client_id: str, client_secret: str
 ) -> TokenInfo:
@@ -240,7 +248,7 @@ def get_token_info(
     return TokenInfo.model_validate(token_info)
 
 
-@lru_cache()
+@lru_cache(maxsize=1)
 def get_public_keys(jwks_uri: AnyUrl) -> Dict:
     """Retrieve the public keys used by the provider server for signing."""
     try:
