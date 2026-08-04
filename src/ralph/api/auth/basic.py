@@ -2,7 +2,6 @@
 
 import logging
 import os
-from functools import lru_cache
 from pathlib import Path
 from threading import Lock
 from typing import Any, Iterator, List, Optional
@@ -75,7 +74,21 @@ class ServerUsersCredentials(RootModel[List[UserCredentials]]):
         return self
 
 
-@lru_cache()
+def basic_auth_file_cache_key(auth_file_path: os.PathLike = settings.AUTH_FILE):
+    """Key used by cachetools to index cached user credentials results."""
+    if not os.path.exists(auth_file_path):
+        return None
+    return (
+        auth_file_path,
+        os.path.getmtime(auth_file_path),
+    )
+
+
+@cached(
+    TTLCache(maxsize=settings.AUTH_CACHE_MAX_SIZE, ttl=settings.AUTH_CACHE_TTL),
+    lock=Lock(),
+    key=basic_auth_file_cache_key,
+)
 def get_stored_credentials(auth_file: os.PathLike) -> ServerUsersCredentials:
     """Helper to read the credentials/scopes file.
 
@@ -99,20 +112,31 @@ def get_stored_credentials(auth_file: os.PathLike) -> ServerUsersCredentials:
         return ServerUsersCredentials.model_validate_json(f.read())
 
 
+def basic_auth_user_cache_key(
+    credentials: Optional[HTTPBasicCredentials] = Depends(security),
+    auth_file_path: os.PathLike = settings.AUTH_FILE,
+):
+    """Key used by cachetools to index cached user credentials results."""
+    if credentials is None:
+        return None
+    if not os.path.exists(auth_file_path):
+        return None
+    return (
+        auth_file_path,
+        os.path.getmtime(auth_file_path),
+        credentials.username,
+        credentials.password,
+    )
+
+
 @cached(
     TTLCache(maxsize=settings.AUTH_CACHE_MAX_SIZE, ttl=settings.AUTH_CACHE_TTL),
     lock=Lock(),
-    key=lambda credentials: (
-        (
-            credentials.username,
-            credentials.password,
-        )
-        if credentials is not None
-        else None
-    ),
+    key=basic_auth_user_cache_key,
 )
 def get_basic_auth_user(
     credentials: Optional[HTTPBasicCredentials] = Depends(security),
+    auth_file_path: os.PathLike = settings.AUTH_FILE,
 ) -> AuthenticatedUser:
     """Check valid auth parameters.
 
@@ -121,6 +145,7 @@ def get_basic_auth_user(
 
     Args:
         credentials (iterator): auth parameters from the Authorization header
+        auth_file_path (os.PathLike): path to credentials file
 
     Raises:
         HTTPException
@@ -128,15 +153,15 @@ def get_basic_auth_user(
     if not credentials:
         logger.debug("No credentials were found for Basic auth")
         return None
-
     try:
         user = next(
             filter(
                 lambda u: u.username == credentials.username,
-                get_stored_credentials(settings.AUTH_FILE),
+                get_stored_credentials(auth_file_path),
             )
         )
         hashed_password = user.hash
+
     except StopIteration:
         # next() gets the first item in the enumerable; if there is none, it
         # raises a StopIteration error as it is out of bounds.
