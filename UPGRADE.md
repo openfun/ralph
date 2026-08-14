@@ -26,7 +26,7 @@ image without setting it changes nothing for them.
 Once the server default is on, a client can still force strict behaviour per
 request with `?partialSuccess=false`.
 
-See [docs/tutorials/lrs/partial-success.md](docs/tutorials/lrs/partial-success.md).
+See the [partial success tutorial](https://openfun.github.io/ralph/tutorials/lrs/partial-success/).
 
 #### Elasticsearch per-statement isolation (5.0.2-beta1)
 
