@@ -8,10 +8,23 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 #### partialSuccess (issue #622)
 
-Optional bulk ingestion when some statements in a batch are invalid:
+Optional bulk ingestion when some statements in a batch are invalid.
 
-- Query: `?partialSuccess=true` or `?ignoreInvalid=true`
-- Server default: `RALPH_LRS_PARTIAL_SUCCESS_DEFAULT=true` (opt out with `?partialSuccess=false`)
+**This feature is disabled by default and does nothing until you turn it on.**
+`POST /xAPI/statements` stays atomic (xAPI-strict) unless one of the following
+applies:
+
+| Trigger | Set by |
+|---------|--------|
+| `?partialSuccess=true` or `?ignoreInvalid=true` | the client, per request |
+| `RALPH_LRS_PARTIAL_SUCCESS_DEFAULT=true` (default: `false`) | the server, globally |
+
+Clients that cannot add a query parameter — the Moodle `logstore_xapi` plugin is
+the typical case — are **only** covered by the server setting. Upgrading the
+image without setting it changes nothing for them.
+
+Once the server default is on, a client can still force strict behaviour per
+request with `?partialSuccess=false`.
 
 See [docs/tutorials/lrs/partial-success.md](docs/tutorials/lrs/partial-success.md).
 
@@ -34,6 +47,12 @@ Elasticsearch **before** indexation:
 a dot are rejected.
 
 Opt out: `RALPH_LRS_ELASTICSEARCH_VALIDATE_KEYS=false`.
+
+> **Enable `RALPH_LRS_PARTIAL_SUCCESS_DEFAULT` first.** In strict mode this check
+> rejects the whole batch *before* any write, so nothing is indexed. Up to
+> `5.0.2-beta1`, such a batch returned HTTP 500 while the valid statements were
+> still written to Elasticsearch. Deployments relying on that partial write will
+> lose those statements unless partial-success mode is turned on beforehand.
 
 ### 4.x to 5.y
 

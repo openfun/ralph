@@ -82,7 +82,9 @@ Response (`200`):
 - **Backfill / ETL** pipelines that can tolerate skipping corrupt lines
 - **Not** for standard LMS real-time ingestion where xAPI-strict behaviour is expected
 
-Standard Moodle / logstore clients should **not** set this flag unless you control
-the sender.
+Standard Moodle / logstore clients cannot set the query flag themselves. Enabling
+partial success for them means setting `RALPH_LRS_PARTIAL_SUCCESS_DEFAULT=true` on
+the server, which applies to **every** client of that instance — only do it when you
+own the deployment and accept non-atomic batches for all senders.
 
 See also: [GitHub issue #622](https://github.com/openfun/ralph/issues/622).
