@@ -257,6 +257,36 @@ def test_backends_lrs_clickhouse_default_instantiation(monkeypatch, fs):
                 "sort": "emission_time DESCENDING, event_id DESCENDING",
             },
         ),
+        # 9. Query by multiple authorities with OpenID.
+        (
+            {
+                "authority": [
+                    {"openid": "http://toby.openid.example.org/"},
+                    {"openid": "http://alex.openid.example.org/"},
+                ]
+            },
+            {
+                "where": [
+                    "JSONExtractString(event, 'authority', 'openid') = {"
+                    "authority_0__openid:String}"
+                    " OR "
+                    "JSONExtractString(event, 'authority', 'openid') = {"
+                    "authority_1__openid:String}",
+                ],
+                "params": {
+                    "authority_0__openid": "http://toby.openid.example.org/",
+                    "authority_1__openid": "http://alex.openid.example.org/",
+                    "ascending": False,
+                    "attachments": False,
+                    "format": "exact",
+                    "limit": 0,
+                    "related_activities": False,
+                    "related_agents": False,
+                },
+                "limit": 0,
+                "sort": "emission_time DESCENDING, event_id DESCENDING",
+            },
+        ),
     ],
 )
 def test_backends_database_clickhouse_query_statements_query(
