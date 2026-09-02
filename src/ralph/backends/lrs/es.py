@@ -108,6 +108,7 @@ class ESLRSBackend(BaseLRSBackend[ESLRSBackendSettings], ESDataBackend):
             es_query["search_after"] = params.search_after.split("|")
 
         # Note: `params` fields are validated thus we skip their validation in ESQuery.
+        logger.debug(es_query)
         return ESQuery.model_construct(**es_query)
 
     @staticmethod
@@ -115,25 +116,46 @@ class ESLRSBackend(BaseLRSBackend[ESLRSBackendSettings], ESDataBackend):
         es_query_filters: list, agent_params: AgentParameters, target_field: str
     ) -> None:
         """Add filters relative to agents to `es_query_filters`."""
+
+        def _get_agent_filters(_params: AgentParameters) -> dict | None:
+            if not _params:
+                return None
+
+            if not isinstance(_params, dict):
+                _params = _params.model_dump()
+
+            if _params.get("mbox"):
+                field = f"{target_field}.mbox.keyword"
+                return {"term": {field: _params.get("mbox")}}
+            elif _params.get("mbox_sha1sum"):
+                field = f"{target_field}.mbox_sha1sum.keyword"
+                return {"term": {field: _params.get("mbox_sha1sum")}}
+            elif _params.get("openid"):
+                field = f"{target_field}.openid.keyword"
+                return {"term": {field: _params.get("openid")}}
+            elif _params.get("account__name"):
+                field_name = f"{target_field}.account.name.keyword"
+                field_homepage = f"{target_field}.account.homePage.keyword"
+                return {
+                    "bool": {
+                        "filter": [
+                            {"term": {field_name: _params.get("account__name")}},
+                            {
+                                "term": {
+                                    field_homepage: _params.get("account__home_page")
+                                }
+                            },
+                        ]
+                    }
+                }
+            return None
+
         if not agent_params:
             return
-
-        if not isinstance(agent_params, dict):
-            agent_params = agent_params.model_dump()
-
-        if agent_params.get("mbox"):
-            field = f"{target_field}.mbox.keyword"
-            es_query_filters += [{"term": {field: agent_params.get("mbox")}}]
-        elif agent_params.get("mbox_sha1sum"):
-            field = f"{target_field}.mbox_sha1sum.keyword"
-            es_query_filters += [{"term": {field: agent_params.get("mbox_sha1sum")}}]
-        elif agent_params.get("openid"):
-            field = f"{target_field}.openid.keyword"
-            es_query_filters += [{"term": {field: agent_params.get("openid")}}]
-        elif agent_params.get("account__name"):
-            field = f"{target_field}.account.name.keyword"
-            es_query_filters += [{"term": {field: agent_params.get("account__name")}}]
-            field = f"{target_field}.account.homePage.keyword"
-            es_query_filters += [
-                {"term": {field: agent_params.get("account__home_page")}}
-            ]
+        elif not isinstance(agent_params, list):
+            filters = _get_agent_filters(agent_params)
+            if filters:
+                es_query_filters += [filters]
+        else:
+            filters = [_get_agent_filters(params) for params in agent_params if params]
+            es_query_filters += [{"bool": {"should": filters}}]

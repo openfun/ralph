@@ -117,7 +117,9 @@ class RalphStatementsQuery(LRSStatementsQuery):
     agent: Optional[AgentParameters] = AgentParameters.model_construct()
     search_after: Optional[str] = None
     pit_id: Optional[str] = None
-    authority: Optional[AgentParameters] = AgentParameters.model_construct()
+    authority: Optional[AgentParameters | list[AgentParameters]] = (
+        AgentParameters.model_construct()
+    )
     ignore_order: Optional[bool] = None
 
 
