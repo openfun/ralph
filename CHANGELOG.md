@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- API: support for CORS request
+
 ### Removed
 
 - Drop support for Python 3.8
