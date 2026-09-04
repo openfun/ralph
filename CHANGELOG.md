@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Backends: (internal) add support for multiple authority queries
+
 ### Removed
 
 - Drop support for Python 3.8

@@ -136,29 +136,43 @@ class FSLRSBackend(BaseLRSBackend[FSLRSBackendSettings], FSDataBackend):
     @staticmethod
     def _add_filter_by_authority(
         filters: list,
-        authority: Optional[AgentParameters],
+        authority: Optional[list[AgentParameters] | AgentParameters],
     ) -> None:
         """Add authority filters to `filters` if `authority` is set."""
+
+        def _add_filter_by_authority_single(
+            _filter: list, _params: AgentParameters
+        ) -> None:
+            if not _params:
+                return
+            if not isinstance(_params, dict):
+                _params = _params.model_dump()
+
+            FSLRSBackend._add_filter_by_mbox(
+                _filter, _params.get("mbox", None), field="authority"
+            )
+            FSLRSBackend._add_filter_by_sha1sum(
+                _filter, _params.get("mbox_sha1sum", None), field="authority"
+            )
+            FSLRSBackend._add_filter_by_openid(
+                _filter, _params.get("openid", None), field="authority"
+            )
+            FSLRSBackend._add_filter_by_account(
+                _filter,
+                _params.get("account__name", None),
+                _params.get("account__home_page", None),
+                field="authority",
+            )
+
         if not authority:
             return
-
-        if not isinstance(authority, dict):
-            authority = authority.model_dump()
-        FSLRSBackend._add_filter_by_mbox(
-            filters, authority.get("mbox", None), field="authority"
-        )
-        FSLRSBackend._add_filter_by_sha1sum(
-            filters, authority.get("mbox_sha1sum", None), field="authority"
-        )
-        FSLRSBackend._add_filter_by_openid(
-            filters, authority.get("openid", None), field="authority"
-        )
-        FSLRSBackend._add_filter_by_account(
-            filters,
-            authority.get("account__name", None),
-            authority.get("account__home_page", None),
-            field="authority",
-        )
+        elif not isinstance(authority, list):
+            _add_filter_by_authority_single(filters, authority)
+        else:
+            or_filters = []
+            for params in authority:
+                _add_filter_by_authority_single(or_filters, params)
+            FSLRSBackend._add_or_filter(filters, or_filters=or_filters)
 
     @staticmethod
     def _add_filter_by_id(filters: list, statement_id: Optional[str]) -> None:
@@ -333,6 +347,14 @@ class FSLRSBackend(BaseLRSBackend[FSLRSBackendSettings], FSDataBackend):
 
         if object_id:
             filters.append(match_related_object_id if related else match_object_id)
+
+    @staticmethod
+    def _add_or_filter(filters: list, or_filters: Optional[list]) -> None:
+        """Add a filter that passes if the input passes any of `or_filters`."""
+        if or_filters:
+            filters.append(
+                lambda statement: any(filter(statement) for filter in or_filters)
+            )
 
     def _add_filter_by_timestamp_since(
         self, filters: list, timestamp: Optional[datetime]
