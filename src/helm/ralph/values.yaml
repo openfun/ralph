@@ -139,6 +139,7 @@ lrs:
       enabled: false
       audience: "http://localhost:8100"
       issuerURI: "http://learning-analytics-playground_keycloak_1:8080/auth/realms/fun-mooc"
+      cacheTTL: 60
   sentry:
     enabled: false
     dsn: "https://fake@key.ingest.sentry.io/1234567"
