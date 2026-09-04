@@ -119,7 +119,9 @@ def get_user_info(provider_config: dict, access_token: str) -> UserInfo:
 
 
 @cached(
-    cache=TTLCache(maxsize=settings.AUTH_CACHE_MAX_SIZE, ttl=settings.AUTH_CACHE_TTL),
+    cache=TTLCache(
+        maxsize=settings.AUTH_CACHE_MAX_SIZE, ttl=settings.AUTH_OIDC_CACHE_TTL
+    ),
     lock=Lock(),
 )
 def get_user_info_data(
@@ -149,7 +151,7 @@ def get_user_info_data(
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 error="invalid_request",
-                detail=f"Invalid Media type in header: {media_type},"
+                detail=f"Invalid Media type in header: {media_type}, "
                 "expected application/jwt or application/json",
                 headers={"WWW-Authenticate": "Bearer"},
             )
@@ -207,7 +209,9 @@ def encode_client_secret_basic_token(client_id: str, client_secret: str) -> str:
 
 
 @cached(
-    cache=TTLCache(maxsize=settings.AUTH_CACHE_MAX_SIZE, ttl=settings.AUTH_CACHE_TTL),
+    cache=TTLCache(
+        maxsize=settings.AUTH_CACHE_MAX_SIZE, ttl=settings.AUTH_OIDC_CACHE_TTL
+    ),
     lock=Lock(),
 )
 def get_token_info(
