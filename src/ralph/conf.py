@@ -1,6 +1,7 @@
 """Configurations for Ralph."""
 
 import io
+import os
 from enum import Enum
 from pathlib import Path
 from typing import List, Optional, Tuple, Union
@@ -39,7 +40,11 @@ NonEmptyStr = Annotated[str, Field(min_length=1)]
 NonEmptyStrictStr = Annotated[str, StringConstraints(min_length=1, strict=True)]
 
 BASE_SETTINGS_CONFIG = SettingsConfigDict(
-    case_sensitive=True, env_nested_delimiter="__", env_prefix="RALPH_", extra="ignore"
+    case_sensitive=True,
+    env_nested_delimiter="__",
+    env_prefix="RALPH_",
+    extra="ignore",
+    secrets_dir=os.environ.get("RALPH_SECRETS_DIR"),
 )
 
 
@@ -132,7 +137,7 @@ class AuthBackend(str, Enum):
 
 
 def validate_auth_backends(
-    value: Union[str, Tuple[str, ...], List[str]]
+    value: Union[str, Tuple[str, ...], List[str]],
 ) -> Tuple[AuthBackend]:
     """Check whether the value is a comma separated string or a list/tuple."""
     if isinstance(value, (tuple, list)):
@@ -162,7 +167,8 @@ class Settings(BaseSettings):
     _CORE: CoreSettings = core_settings
     AUTH_FILE: Path = _CORE.APP_DIR / "auth.json"
     AUTH_CACHE_MAX_SIZE: int = 100
-    AUTH_CACHE_TTL: int = 3600
+    AUTH_CACHE_TTL: int = 36000
+    AUTH_OIDC_CACHE_TTL: int = 60
     CONVERTER_EDX_XAPI_UUID_NAMESPACE: Optional[str] = None
     EXECUTION_ENVIRONMENT: str = "development"
     HISTORY_FILE: Path = _CORE.APP_DIR / "history.json"
@@ -203,6 +209,8 @@ class Settings(BaseSettings):
     )
     RUNSERVER_AUTH_OIDC_AUDIENCE: Optional[str] = None
     RUNSERVER_AUTH_OIDC_ISSUER_URI: Optional[AnyHttpUrl] = None
+    RUNSERVER_AUTH_OIDC_CLIENT_ID: Optional[str] = None
+    RUNSERVER_AUTH_OIDC_CLIENT_SECRET: Optional[str] = None
     RUNSERVER_BACKEND: str = "es"
     RUNSERVER_HOST: str = "0.0.0.0"  # noqa: S104
     RUNSERVER_MAX_SEARCH_HITS_COUNT: int = 100

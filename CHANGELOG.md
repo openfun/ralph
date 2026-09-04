@@ -26,6 +26,16 @@ and this project adheres to
   `test-helm` CI job to fix flaky "no matching resources"/"status not found"
 - Drop the stale `add_ssh_keys` entry from the `deploy-docs` CI job so it
   pushes to `gh-pages` with the read-write checkout key
+- Fix type of OIDC ID tokens
+- Fix error with OIDC scopes unrelated to Ralph
+
+### Changed
+
+- Auth: changed default TTL of cache to 60 seconds 
+- OIDC: Add query to `/userinfo` endpoint when receiving a
+  token to support more OIDC IdPs
+- OIDC: Add token introspection to support querying from OIDC clients
+  (Client Credentials flow)
 
 ## [5.0.1] - 2024-07-11
 
