@@ -1,13 +1,13 @@
 """Base xAPI `Context` definitions."""
 
-from typing import Dict, List, Optional, Union
+from typing import List, Optional, Union
 from uuid import UUID
 
 from ralph.conf import NonEmptyStrictStr
 
 from ..config import BaseModelWithConfig
 from .agents import BaseXapiAgent
-from .common import IRI, LanguageTag
+from .common import ExtensionMap, LanguageTag
 from .groups import BaseXapiGroup
 from .unnested_objects import BaseXapiActivity, BaseXapiStatementRef
 
@@ -54,4 +54,4 @@ class BaseXapiContext(BaseModelWithConfig):
     platform: Optional[NonEmptyStrictStr] = None
     language: Optional[LanguageTag] = None
     statement: Optional[BaseXapiStatementRef] = None
-    extensions: Optional[Dict[IRI, Union[str, int, bool, list, dict, None]]] = None
+    extensions: Optional[ExtensionMap] = None

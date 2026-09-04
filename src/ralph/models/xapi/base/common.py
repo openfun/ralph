@@ -1,9 +1,14 @@
 """Common for xAPI base definitions."""
 
-from typing import Dict, Type, Union
+from typing import Annotated, Dict, Type, Union
 
 from langcodes import tag_is_valid
-from pydantic import RootModel, model_validator, validate_email
+from pydantic import (
+    RootModel,
+    StringConstraints,
+    model_validator,
+    validate_email,
+)
 from rfc3987 import parse
 
 from ralph.conf import NonEmptyStrictStr
@@ -45,6 +50,14 @@ class LanguageTag(RootModel[Union[str, "LanguageTag"]]):
 
 
 LanguageMap = Dict[LanguageTag, NonEmptyStrictStr]
+
+ExtensionValue = Union[
+    Annotated[str, StringConstraints(min_length=0)], bool, int, float, list, dict, None
+]
+
+
+class ExtensionMap(RootModel[Dict[IRI, ExtensionValue]]):
+    """Pydantic custom data type for XAPI context and object definitions extensions."""
 
 
 class MailtoEmail(RootModel[str]):
