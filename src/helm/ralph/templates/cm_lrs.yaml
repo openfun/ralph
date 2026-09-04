@@ -31,6 +31,7 @@ data:
   {{- if .Values.lrs.auth.oidc.enabled }}
   RALPH_RUNSERVER_AUTH_OIDC_AUDIENCE: {{ .Values.lrs.authOIDCAudience | quote }}
   RALPH_RUNSERVER_AUTH_OIDC_ISSUER_URI: {{ .Values.lrs.authOIDCIssuerURI | quote }}
+  RALPH_AUTH_OIDC_CACHE_TTL: {{ .Values.lrs.auth.oidc.cacheTTL | quote }}
    {{ end }}
 
   # Sentry
