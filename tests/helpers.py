@@ -11,7 +11,7 @@ from uuid import UUID
 from ralph.api.auth import AuthBackend
 from ralph.utils import statements_are_equivalent
 
-from tests.fixtures.auth import AUDIENCE, ISSUER_URI,CLIENT_ID,CLIENT_SECRET
+from tests.fixtures.auth import AUDIENCE, CLIENT_ID, CLIENT_SECRET, ISSUER_URI
 
 
 def string_is_date(string: str):

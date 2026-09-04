@@ -2,8 +2,8 @@
 
 from .fixtures.api import client  # noqa: F401
 from .fixtures.auth import (  # noqa: F401
-    basic_auth_credentials,
     access_token,
+    basic_auth_credentials,
     mock_discovery_response,
     mock_oidc_jwks,
 )
