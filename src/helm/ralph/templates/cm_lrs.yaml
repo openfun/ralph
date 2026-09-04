@@ -27,6 +27,7 @@ data:
   {{- if .Values.lrs.auth.basic.enabled }}
   RALPH_AUTH_CACHE_MAX_SIZE: {{ .Values.lrs.auth.basic.cacheMaxSize | quote }}
   RALPH_AUTH_CACHE_TTL: {{ .Values.lrs.auth.basic.cacheTTL | quote }}
+  RALPH_AUTH_OIDC_CACHE_TTL: {{ .Values.lrs.auth.oidc.cacheTTL | quote }}
   {{- end }}
   {{- if .Values.lrs.auth.oidc.enabled }}
   RALPH_RUNSERVER_AUTH_OIDC_AUDIENCE: {{ .Values.lrs.authOIDCAudience | quote }}
