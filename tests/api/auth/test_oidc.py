@@ -1,24 +1,24 @@
 """Tests for the api.auth.oidc module."""
 
-import pytest
-import responses
-from pydantic import TypeAdapter
-from fastapi import HTTPException
 import json
 
+import pytest
+import responses
+from fastapi import HTTPException
+from pydantic import TypeAdapter
+
 from ralph.api.auth.oidc import (
+    UserInfo,
     discover_provider,
     get_public_keys,
-    get_token_info,
-    get_user_info_data,
+    get_token_introspection,
     get_user_info,
-    UserInfo,
-    TokenInfo,
+    get_user_info_data,
 )
-from ralph.models.xapi.base.agents import BaseXapiAgentWithOpenId
 from ralph.conf import AuthBackend
+from ralph.models.xapi.base.agents import BaseXapiAgentWithOpenId
 
-from tests.fixtures.auth import ISSUER_URI, mock_oidc_user, encode_jwt
+from tests.fixtures.auth import ISSUER_URI, encode_jwt, mock_oidc_user
 from tests.fixtures.backends import get_es_test_backend
 from tests.helpers import (
     assert_statement_get_responses_are_equivalent,
@@ -165,7 +165,7 @@ async def test_api_auth_oidc_get_whoami_invalid_discovery(
     # Clear LRU cache
     discover_provider.cache_clear()
     get_public_keys.cache_clear()
-    get_token_info.cache_clear()
+    get_token_introspection.cache_clear()
     get_user_info_data.cache_clear()
 
     # Mock request to get provider configuration

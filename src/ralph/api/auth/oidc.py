@@ -50,7 +50,7 @@ class UserInfo(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
 
-class TokenInfo(BaseModel):
+class TokenIntrospection(BaseModel):
     """Pydantic model representing the Introspection response of the OIDC IdP.
 
     Based on the RFC 7662 section 2.2 definition of token /introspect response
@@ -107,10 +107,10 @@ def discover_provider(base_url: AnyUrl) -> Dict:
         ) from exc
 
 
-def get_user_info(provider_config: dict, access_token: str) -> UserInfo:
+def get_user_info(provider_config: dict, auth_header: str) -> UserInfo:
     """Get the user's info from the IdP using the /userinfo OIDC endpoint."""
     user_info, is_encoded = get_user_info_data(
-        provider_config["userinfo_endpoint"], access_token
+        userinfo_endpoint=provider_config["userinfo_endpoint"], auth_header=auth_header
     )
     if not is_encoded:
         # nothing to do
@@ -125,7 +125,7 @@ def get_user_info(provider_config: dict, access_token: str) -> UserInfo:
     lock=Lock(),
 )
 def get_user_info_data(
-    userinfo_endpoint: AnyUrl, access_token: str
+    userinfo_endpoint: AnyUrl, auth_header: str
 ) -> Union[tuple[dict, Literal[False]], tuple[str, Literal[True]]]:
     """Get the user's info from the IdP using the /userinfo OIDC endpoint.
 
@@ -139,7 +139,7 @@ def get_user_info_data(
     try:
         response = requests.get(
             f"{userinfo_endpoint}",
-            headers={"Authorization": f"Bearer {access_token}"},
+            headers={"Authorization": auth_header},
             timeout=5,
         )
         response.raise_for_status()
@@ -209,26 +209,29 @@ def encode_client_secret_basic_token(client_id: str, client_secret: str) -> str:
     ).decode("utf-8")
 
 
+def get_client_basic_auth_header(client_id: str, client_secret: str) -> str:
+    """Get a `client_secret_basic` token endpoint authentication header."""
+    token = encode_client_secret_basic_token(
+        client_id=client_id, client_secret=client_secret
+    )
+    return f"Basic {token}"
+
+
 @cached(
     cache=TTLCache(
         maxsize=settings.AUTH_CACHE_MAX_SIZE, ttl=settings.AUTH_OIDC_CACHE_TTL
     ),
     lock=Lock(),
 )
-def get_token_info(
-    introspection_endpoint: AnyUrl, token: str, client_id: str, client_secret: str
-) -> TokenInfo:
+def get_token_introspection(
+    introspection_endpoint: AnyUrl, token: str, client_basic_auth_header: str
+) -> TokenIntrospection:
     """Get info on given token from the IdP using /introspection OIDC endpoint."""
     token_info = None
     try:
         response = requests.post(
             f"{introspection_endpoint}",
-            headers={
-                "Authorization": "Basic "
-                + encode_client_secret_basic_token(
-                    client_id=client_id, client_secret=client_secret
-                )
-            },
+            headers={"Authorization": client_basic_auth_header},
             data={
                 "token": f"{token}",
             },
@@ -250,7 +253,7 @@ def get_token_info(
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return TokenInfo.model_validate(token_info)
+    return TokenIntrospection.model_validate(token_info)
 
 
 @lru_cache(maxsize=1)
@@ -314,15 +317,19 @@ def get_oidc_user(
     access_token = auth_header.split(" ")[-1]
     provider_config = discover_provider(settings.RUNSERVER_AUTH_OIDC_ISSUER_URI)
 
-    token_info = get_token_info(
-        provider_config["introspection_endpoint"],
-        token=access_token,
+    client_basic_auth_header = get_client_basic_auth_header(
         client_id=settings.RUNSERVER_AUTH_OIDC_CLIENT_ID,
         client_secret=settings.RUNSERVER_AUTH_OIDC_CLIENT_SECRET,
     )
+
+    token_info = get_token_introspection(
+        provider_config["introspection_endpoint"],
+        token=access_token,
+        client_basic_auth_header=client_basic_auth_header,
+    )
     if token_info.sub:
         # This is a real user, we can retrieve their user info
-        user_info = get_user_info(provider_config, access_token=access_token)
+        user_info = get_user_info(provider_config, auth_header=auth_header)
         if user_info.sub != token_info.sub:
             logger.error(
                 ("Inconsistent token subject: %s != %s"), user_info.sub, token_info.sub

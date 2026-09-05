@@ -44,15 +44,12 @@ and this project adheres to
 - Keep CORS disabled by default in `.env.dist` so a bootstrapped `.env` no
   longer breaks the `RUNSERVER_CORS_ALLOW_ORIGINS` settings unit tests
 - Fix Ralph returning 500 errors on query parameter validation errors
-
-### Changed
-
-- Refactor statements' ExtensionMap
 - Fix type of OIDC ID tokens
 - Fix error with OIDC scopes unrelated to Ralph
 
 ### Changed
 
+- Refactor statements' ExtensionMap
 - Auth: changed default TTL of cache to 60 seconds
 - OIDC: Add query to `/userinfo` endpoint when receiving a
   token to support more OIDC IdPs
