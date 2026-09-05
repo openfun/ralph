@@ -9,11 +9,8 @@ import json
 from ralph.api.auth.oidc import (
     discover_provider,
     get_public_keys,
-    get_token_info,
+    get_token_introspection,
     get_user_info_data,
-    get_user_info,
-    UserInfo,
-    TokenInfo,
 )
 from ralph.models.xapi.base.agents import BaseXapiAgentWithOpenId
 from ralph.conf import AuthBackend
@@ -165,7 +162,7 @@ async def test_api_auth_oidc_get_whoami_invalid_discovery(
     # Clear LRU cache
     discover_provider.cache_clear()
     get_public_keys.cache_clear()
-    get_token_info.cache_clear()
+    get_token_introspection.cache_clear()
     get_user_info_data.cache_clear()
 
     # Mock request to get provider configuration
