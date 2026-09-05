@@ -139,7 +139,11 @@ def test_helpers_mock_statement_no_input():
     assert "timestamp" not in statement
 
 
-def test_helpers_mock_statement_value_input():
+@pytest.mark.parametrize(
+    "authority",
+    ["authority_1", None],
+)
+def test_helpers_mock_statement_value_input(authority):
     """Test that mocked statement has the expected fields with value input."""
 
     reference_statement = {
@@ -156,6 +160,8 @@ def test_helpers_mock_statement_value_input():
         "timestamp": "2022-03-15T14:07:51Z",
         "verb": {"id": "https://example.com/verb-id/1/"},
     }
+    if authority is not None:
+        reference_statement["authority"] = authority
 
     statement = mock_statement(
         id_=reference_statement["id"],
@@ -163,6 +169,9 @@ def test_helpers_mock_statement_value_input():
         verb=reference_statement["verb"],
         object=reference_statement["object"],
         timestamp=reference_statement["timestamp"],
+        authority=reference_statement["authority"]
+        if "authority" in reference_statement
+        else None,
     )
 
     assert statement == reference_statement
