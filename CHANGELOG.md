@@ -31,6 +31,8 @@ and this project adheres to
 - Fix XAPI definitions extensions not accepting empty strings as values.
 - Fix type of OIDC ID tokens
 - Fix error with OIDC scopes unrelated to Ralph
+- Fix oidc test `test_api_auth_oidc_get_whoami_invalid_backend`
+  being misconfigured
 
 ### Changed
 

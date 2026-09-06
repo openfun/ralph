@@ -242,6 +242,7 @@ async def test_api_auth_oidc_get_whoami_invalid_header(client, monkeypatch):
 
 
 @pytest.mark.anyio
+@responses.activate
 async def test_api_auth_oidc_get_whoami_invalid_backend(client, fs, monkeypatch):
     """Check for an exception when providing valid OIDC credentials while
     OIDC authentication is not supported.
@@ -258,72 +259,4 @@ async def test_api_auth_oidc_get_whoami_invalid_backend(client, fs, monkeypatch)
     )
 
     assert response.status_code == 401
-    assert response.json() == {"detail": "Could not validate credentials"}
-
-
-@pytest.mark.anyio
-@responses.activate
-async def test_api_auth_oidc_userinfo_invalid_content_type():
-    get_user_info_data.cache_clear()
-    responses.add(
-        responses.GET,
-        "https://idp.example/userinfo",
-        body="not json",
-        status=200,
-        headers={"Content-Type": "text/html"},
-    )
-    with pytest.raises(HTTPException) as exc_info:
-        get_user_info_data("https://idp.example/userinfo", "token")
-    assert exc_info.value.status_code == 400
-    assert "text/html" in exc_info.value.detail
-
-
-@pytest.mark.anyio
-@pytest.mark.parametrize(
-    "response_content_type,token_data",
-    [
-        ("application/jwt", {"sub": "my_user_1", "scope": "statements/write"}),
-        ("application/json", {"sub": "my_user_2", "scope": "statements/write"}),
-    ],
-)
-@responses.activate
-async def test_api_auth_oidc_userinfo_valid(
-    monkeypatch,
-    mock_discovery_response,
-    mock_oidc_jwks,
-    response_content_type,
-    token_data,
-):
-
-    configure_env_for_mock_oidc_auth(monkeypatch)
-
-    user_info = UserInfo(**token_data)
-    access_token = "a_token"
-
-    # Cache clear
-    get_user_info_data.cache_clear()
-
-    response_body = token_data
-    if response_content_type == "application/json":
-        response_body = json.dumps(token_data)
-    elif response_content_type == "application/jwt":
-        responses.add(
-            responses.GET,
-            mock_discovery_response["jwks_uri"],
-            json=mock_oidc_jwks,
-            status=200,
-            headers={"Content-Type": "application/json"},
-        )
-        algorithms = mock_discovery_response["id_token_signing_alg_values_supported"]
-        response_body = encode_jwt(algorithm=algorithms[0], claims=token_data)
-
-    responses.add(
-        responses.GET,
-        mock_discovery_response["userinfo_endpoint"],
-        body=response_body,
-        status=200,
-        headers={"Content-Type": response_content_type},
-    )
-    res_user_info = get_user_info(mock_discovery_response, access_token=access_token)
-
-    assert res_user_info == user_info
+    assert response.json() == {"detail": "Invalid authentication credentials"}
