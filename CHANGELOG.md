@@ -33,6 +33,8 @@ and this project adheres to
 ### Changed
 
 - Refactor statements' ExtensionMap
+- Fix oidc test `test_api_auth_oidc_get_whoami_invalid_backend`
+  being misconfigured
 
 ## [5.0.1] - 2024-07-11
 
