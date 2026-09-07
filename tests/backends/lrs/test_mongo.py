@@ -126,8 +126,12 @@ def test_backends_lrs_mongo_default_instantiation(monkeypatch, fs):
             {
                 "filter": {
                     "_source.id": "statementId",
-                    "_source.actor.account.name": "13936749",
-                    "_source.actor.account.homePage": "http://www.example.com",
+                    "$and": [
+                        {"_source.actor.account.name": "13936749"},
+                        {
+                            "_source.actor.account.homePage": "http://www.example.com",
+                        },
+                    ],
                 },
                 "limit": 0,
                 "projection": None,
@@ -223,6 +227,48 @@ def test_backends_lrs_mongo_default_instantiation(monkeypatch, fs):
                 "sort": [
                     ("_source.timestamp", ASCENDING),
                     ("_id", ASCENDING),
+                ],
+            },
+        ),
+        # 11. Query by authority with openid IFI.
+        (
+            {
+                "authority": {"openid": "http://toby.openid.example.org/"},
+            },
+            {
+                "filter": {
+                    "_source.authority.openid": "http://toby.openid.example.org/",
+                },
+                "limit": 0,
+                "projection": None,
+                "sort": [
+                    ("_source.timestamp", DESCENDING),
+                    ("_id", DESCENDING),
+                ],
+            },
+        ),
+        # 12. Query by multiple authority (OR) with openid IFI.
+        (
+            {
+                "statementId": "statementId",
+                "authority": [
+                    {"openid": "http://toby.openid.example.org/"},
+                    {"openid": "http://alex.openid.example.org/"},
+                ],
+            },
+            {
+                "filter": {
+                    "_source.id": "statementId",
+                    "$or": [
+                        {"_source.authority.openid": "http://toby.openid.example.org/"},
+                        {"_source.authority.openid": "http://alex.openid.example.org/"},
+                    ],
+                },
+                "limit": 0,
+                "projection": None,
+                "sort": [
+                    ("_source.timestamp", DESCENDING),
+                    ("_id", DESCENDING),
                 ],
             },
         ),

@@ -1,7 +1,8 @@
 """ClickHouse LRS backend for Ralph."""
 
 import logging
-from typing import Generator, Iterator, List, Optional
+from functools import reduce
+from typing import Generator, Iterator, List, Optional, Union
 
 from pydantic_settings import SettingsConfigDict
 
@@ -159,51 +160,91 @@ class ClickHouseLRSBackend(
             raise error
 
     @staticmethod
+    def _get_agent_filters(
+        agent_params: AgentParameters,
+        target_field: str,
+        idx: Optional[int] = None,
+    ) -> Union[tuple[list[str], dict], None]:
+        if not agent_params:
+            return None
+
+        if not isinstance(agent_params, dict):
+            agent_params = agent_params.model_dump()
+
+        extract_string_field = f"'{target_field}'"
+        param_field = f"{target_field}_{idx}" if idx is not None else target_field
+
+        if agent_params.get("mbox"):
+            return (
+                [
+                    f"JSONExtractString(event, {extract_string_field}, 'mbox') = "
+                    f"{{{param_field}__mbox:String}}"
+                ],
+                {f"{param_field}__mbox": agent_params.get("mbox")},
+            )
+        elif agent_params.get("mbox_sha1sum"):
+            return (
+                [
+                    f"JSONExtractString(event, {extract_string_field},"
+                    f" 'mbox_sha1sum') = "
+                    f"{{{param_field}__mbox_sha1sum:String}}"
+                ],
+                {f"{param_field}__mbox_sha1sum": agent_params.get("mbox_sha1sum")},
+            )
+        elif agent_params.get("openid"):
+            return (
+                [
+                    f"JSONExtractString(event, {extract_string_field}, 'openid') = "
+                    f"{{{param_field}__openid:String}}"
+                ],
+                {f"{param_field}__openid": agent_params.get("openid")},
+            )
+        elif agent_params.get("account__name"):
+            return (
+                [
+                    f"JSONExtractString(event, {extract_string_field}, 'account',"
+                    f" 'name') = "
+                    f"{{{param_field}__account__name:String}}",
+                    f"JSONExtractString(event, {extract_string_field}, 'account',"
+                    f" 'homePage') = "
+                    f"{{{param_field}__account__home_page:String}}",
+                ],
+                {
+                    f"{param_field}__account__name": agent_params.get("account__name"),
+                    f"{param_field}__account__home_page": agent_params.get(
+                        "account__home_page"
+                    ),
+                },
+            )
+
+    @classmethod
     def _add_agent_filters(
+        cls,
         ch_params: dict,
         where: list,
-        agent_params: AgentParameters,
+        agent_params: Union[AgentParameters, list[AgentParameters]],
         target_field: str,
     ) -> None:
         """Add filters relative to agents to `where`."""
         if not agent_params:
             return
-
-        if not isinstance(agent_params, dict):
-            agent_params = agent_params.model_dump()
-
-        if agent_params.get("mbox"):
-            ch_params[f"{target_field}__mbox"] = agent_params.get("mbox")
-            where.append(
-                f"JSONExtractString(event, '{target_field}', 'mbox') = "
-                f"{{{target_field}__mbox:String}}"
+        elif not isinstance(agent_params, list):
+            filters = cls._get_agent_filters(
+                agent_params=agent_params, target_field=target_field
             )
-        elif agent_params.get("mbox_sha1sum"):
-            ch_params[f"{target_field}__mbox_sha1sum"] = agent_params.get(
-                "mbox_sha1sum"
-            )
-            where.append(
-                f"JSONExtractString(event, '{target_field}', 'mbox_sha1sum') = "
-                f"{{{target_field}__mbox_sha1sum:String}}"
-            )
-        elif agent_params.get("openid"):
-            ch_params[f"{target_field}__openid"] = agent_params.get("openid")
-            where.append(
-                f"JSONExtractString(event, '{target_field}', 'openid') = "
-                f"{{{target_field}__openid:String}}"
-            )
-        elif agent_params.get("account__name"):
-            ch_params[f"{target_field}__account__name"] = agent_params.get(
-                "account__name"
-            )
-            where.append(
-                f"JSONExtractString(event, '{target_field}', 'account', 'name') = "
-                f"{{{target_field}__account__name:String}}"
-            )
-            ch_params[f"{target_field}__account__home_page"] = agent_params.get(
-                "account__home_page"
-            )
-            where.append(
-                f"JSONExtractString(event, '{target_field}', 'account', 'homePage') = "
-                f"{{{target_field}__account__home_page:String}}"
-            )
+            if filters:
+                _where, _ch_params = filters
+                ch_params.update(_ch_params)
+                where.extend(_where)
+        else:
+            filters = [
+                cls._get_agent_filters(
+                    agent_params=params, target_field=target_field, idx=idx
+                )
+                for idx, params in enumerate(agent_params)
+                if params
+            ]
+            _ch_params = reduce(lambda acc, el: acc | el[1], filters, {})
+            _where = [" OR ".join([" AND ".join(el[0]) for el in filters])]
+            ch_params.update(_ch_params)
+            where.extend(_where)

@@ -150,12 +150,24 @@ def test_backends_lrs_es_default_instantiation(monkeypatch, fs):
                     "bool": {
                         "filter": [
                             {"term": {"_id": "statementId"}},
-                            {"term": {"actor.account.name.keyword": ("13936749")}},
                             {
-                                "term": {
-                                    "actor.account.homePage.keyword": (
-                                        "http://www.example.com"
-                                    )
+                                "bool": {
+                                    "filter": [
+                                        {
+                                            "term": {
+                                                "actor.account.name.keyword": (
+                                                    "13936749"
+                                                )
+                                            }
+                                        },
+                                        {
+                                            "term": {
+                                                "actor.account.homePage.keyword": (
+                                                    "http://www.example.com"
+                                                )
+                                            }
+                                        },
+                                    ]
                                 }
                             },
                         ]
@@ -260,6 +272,76 @@ def test_backends_lrs_es_default_instantiation(monkeypatch, fs):
                 "search_after": None,
                 "size": 0,
                 "sort": "_shard_doc",
+                "track_total_hits": False,
+            },
+        ),
+        # 10. Query by Authority with openid IFI.
+        (
+            {
+                "authority": {"openid": "http://toby.openid.example.org/"},
+            },
+            {
+                "pit": {"id": None, "keep_alive": None},
+                "q": None,
+                "query": {
+                    "bool": {
+                        "filter": [
+                            {
+                                "term": {
+                                    "authority.openid.keyword": (
+                                        "http://toby.openid.example.org/"
+                                    )
+                                }
+                            },
+                        ]
+                    }
+                },
+                "search_after": None,
+                "size": 0,
+                "sort": [{"timestamp": {"order": "desc"}}],
+                "track_total_hits": False,
+            },
+        ),
+        # 11. Query by Authority with multiple openid IFI.
+        (
+            {
+                "authority": [
+                    {"openid": "http://toby.openid.example.org/"},
+                    {"openid": "http://alex.openid.example.org/"},
+                ]
+            },
+            {
+                "pit": {"id": None, "keep_alive": None},
+                "q": None,
+                "query": {
+                    "bool": {
+                        "filter": [
+                            {
+                                "bool": {
+                                    "should": [
+                                        {
+                                            "term": {
+                                                "authority.openid.keyword": (
+                                                    "http://toby.openid.example.org/"
+                                                )
+                                            },
+                                        },
+                                        {
+                                            "term": {
+                                                "authority.openid.keyword": (
+                                                    "http://alex.openid.example.org/"
+                                                )
+                                            }
+                                        },
+                                    ]
+                                },
+                            },
+                        ]
+                    }
+                },
+                "search_after": None,
+                "size": 0,
+                "sort": [{"timestamp": {"order": "desc"}}],
                 "track_total_hits": False,
             },
         ),

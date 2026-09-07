@@ -1,7 +1,7 @@
 """MongoDB LRS backend for Ralph."""
 
 import logging
-from typing import Iterator, List, Optional
+from typing import Iterator, List, Optional, Union
 
 from bson.objectid import ObjectId
 from pydantic_settings import SettingsConfigDict
@@ -121,8 +121,46 @@ class MongoLRSBackend(BaseLRSBackend[MongoLRSBackendSettings], MongoDataBackend)
         )
 
     @staticmethod
+    def _get_agent_filters(
+        agent_params: AgentParameters,
+        target_field: str,
+    ) -> Union[dict, None]:
+        if not agent_params:
+            return None
+        if not isinstance(agent_params, dict):
+            agent_params = agent_params.model_dump()
+
+        if agent_params.get("mbox"):
+            key = f"_source.{target_field}.mbox"
+            return {key: agent_params.get("mbox")}
+
+        if agent_params.get("mbox_sha1sum"):
+            key = f"_source.{target_field}.mbox_sha1sum"
+            return {key: agent_params.get("mbox_sha1sum")}
+
+        if agent_params.get("openid"):
+            key = f"_source.{target_field}.openid"
+            return {key: agent_params.get("openid")}
+
+        if agent_params.get("account__name"):
+            key_name = f"_source.{target_field}.account.name"
+            key_homepage = f"_source.{target_field}.account.homePage"
+            return {
+                "$and": [
+                    {key_name: agent_params.get("account__name")},
+                    {
+                        key_homepage: agent_params.get("account__home_page"),
+                    },
+                ]
+            }
+        return None
+
+    @classmethod
     def _add_agent_filters(
-        mongo_query_filters: dict, agent_params: AgentParameters, target_field: str
+        cls,
+        mongo_query_filters: dict,
+        agent_params: Union[AgentParameters, list[AgentParameters]],
+        target_field: str,
     ) -> None:
         """Add filters relative to agents to mongo_query_filters.
 
@@ -133,24 +171,16 @@ class MongoLRSBackend(BaseLRSBackend[MongoLRSBackendSettings], MongoDataBackend)
         """
         if not agent_params:
             return
-
-        if not isinstance(agent_params, dict):
-            agent_params = agent_params.model_dump()
-
-        if agent_params.get("mbox"):
-            key = f"_source.{target_field}.mbox"
-            mongo_query_filters.update({key: agent_params.get("mbox")})
-
-        if agent_params.get("mbox_sha1sum"):
-            key = f"_source.{target_field}.mbox_sha1sum"
-            mongo_query_filters.update({key: agent_params.get("mbox_sha1sum")})
-
-        if agent_params.get("openid"):
-            key = f"_source.{target_field}.openid"
-            mongo_query_filters.update({key: agent_params.get("openid")})
-
-        if agent_params.get("account__name"):
-            key = f"_source.{target_field}.account.name"
-            mongo_query_filters.update({key: agent_params.get("account__name")})
-            key = f"_source.{target_field}.account.homePage"
-            mongo_query_filters.update({key: agent_params.get("account__home_page")})
+        elif not isinstance(agent_params, list):
+            filters = cls._get_agent_filters(
+                agent_params=agent_params, target_field=target_field
+            )
+            if filters:
+                mongo_query_filters.update(filters)
+        else:
+            filters = [
+                cls._get_agent_filters(agent_params=params, target_field=target_field)
+                for params in agent_params
+                if params
+            ]
+            mongo_query_filters.update({"$or": filters})

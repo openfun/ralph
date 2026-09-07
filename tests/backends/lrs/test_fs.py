@@ -151,6 +151,22 @@ def test_backends_lrs_fs_default_instantiation(monkeypatch, fs):
             },
             [],
         ),
+        # 32. Query by multiple authorities with OpenID
+        ({"authority": [{"openid": "bar_openid"}, {"openid": "foo_openid"}]}, ["6"]),
+        # 33. Query by multiple authorities with OpenID and ifi
+        (
+            {
+                "authority": [
+                    {"openid": "bar_openid"},
+                    {
+                        "account__home_page": "foo_home",
+                        "account__name": "foo_name",
+                    },
+                    {"openid": "foo_openid"},
+                ]
+            },
+            ["2", "6"],
+        ),
     ],
 )
 def test_backends_lrs_fs_query_statements_query(
