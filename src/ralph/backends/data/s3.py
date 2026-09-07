@@ -2,7 +2,7 @@
 
 import logging
 from io import IOBase
-from typing import Iterable, Iterator, Optional, Union
+from typing import Iterable, Iterator, Optional, Union, override
 from uuid import uuid4
 
 import boto3
@@ -156,7 +156,8 @@ class S3DataBackend(
             logger.error(msg, target, error_msg)
             raise BackendException(msg % (target, error_msg)) from err
 
-    def read(  # noqa: PLR0913
+    @override
+    def read(
         self,
         query: Optional[str] = None,
         target: Optional[str] = None,

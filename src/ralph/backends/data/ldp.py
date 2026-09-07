@@ -1,7 +1,7 @@
 """OVH's LDP data backend for Ralph."""
 
 import logging
-from typing import Iterator, Literal, Optional, Union
+from typing import Iterator, Literal, Optional, Union, override
 
 import ovh
 import requests
@@ -153,7 +153,8 @@ class LDPDataBackend(
             if detail:
                 yield detail
 
-    def read(  # noqa: PLR0913
+    @override
+    def read(
         self,
         query: Optional[str] = None,
         target: Optional[str] = None,

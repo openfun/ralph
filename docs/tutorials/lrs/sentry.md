@@ -18,7 +18,7 @@ RALPH_SENTRY_CLI_TRACES_SAMPLE_RATE=0.1
 RALPH_SENTRY_LRS_TRACES_SAMPLE_RATE=0.3
 ```
 !!! info "Sample rate"
-    
+
     A sample rate of `1.0` means 100% of transactions are sent to sentry and `0.1` only 10%.
 
 If you want to lower noisy transactions (_e.g._ in a Kubernetes cluster), you can disable health checks related ones:

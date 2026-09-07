@@ -15,6 +15,7 @@ from typing import (
     Optional,
     TypeVar,
     Union,
+    override,
 )
 from uuid import UUID, uuid4
 
@@ -211,7 +212,8 @@ class ClickHouseDataBackend(
             else:
                 yield str(table.get("name"))
 
-    def read(  # noqa: PLR0913
+    @override
+    def read(
         self,
         query: Optional[ClickHouseQuery] = None,
         target: Optional[str] = None,

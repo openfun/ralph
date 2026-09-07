@@ -2,7 +2,7 @@
 
 import logging
 from io import IOBase
-from typing import AsyncIterator, Iterable, Optional, TypeVar, Union
+from typing import AsyncIterator, Iterable, Optional, TypeVar, Union, override
 
 from bson.errors import BSONError
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorCollection
@@ -119,7 +119,8 @@ class AsyncMongoDataBackend(
             logger.error(msg, error)
             raise BackendException(msg % error) from error
 
-    async def read(  # noqa: PLR0913
+    @override
+    async def read(
         self,
         query: Optional[MongoQuery] = None,
         target: Optional[str] = None,
@@ -187,7 +188,8 @@ class AsyncMongoDataBackend(
             logger.error(msg, error)
             raise BackendException(msg % error) from error
 
-    async def write(  # noqa: PLR0913
+    @override
+    async def write(
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Optional[str] = None,

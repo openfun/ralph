@@ -52,7 +52,7 @@ CLICKHOUSE_TEST_HOST = os.environ.get(
     "RALPH_BACKENDS__DATA__CLICKHOUSE__TEST_HOST", "localhost"
 )
 CLICKHOUSE_TEST_PORT = os.environ.get(
-    "RALPH_BACKENDS__DATA__CLICKHOUSE__TEST_PORT", 8123
+    "RALPH_BACKENDS__DATA__CLICKHOUSE__TEST_PORT", "8123"
 )
 CLICKHOUSE_TEST_TABLE_NAME = os.environ.get(
     "RALPH_BACKENDS__DATA__CLICKHOUSE__TEST_TABLE_NAME", "test_xapi_events_all"
@@ -88,7 +88,7 @@ MONGO_TEST_CONNECTION_URI = os.environ.get(
 )
 
 RUNSERVER_TEST_HOST = os.environ.get("RALPH_RUNSERVER_TEST_HOST", "0.0.0.0")
-RUNSERVER_TEST_PORT = int(os.environ.get("RALPH_RUNSERVER_TEST_PORT", 8101))
+RUNSERVER_TEST_PORT = int(os.environ.get("RALPH_RUNSERVER_TEST_PORT", "8101"))
 
 # Websocket test backend defaults
 WS_TEST_HOST = "localhost"

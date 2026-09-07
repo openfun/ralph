@@ -2,7 +2,7 @@
 
 import logging
 from io import IOBase
-from typing import AsyncIterator, Iterable, Optional, TypeVar, Union
+from typing import AsyncIterator, Iterable, Optional, TypeVar, Union, override
 
 from elasticsearch import ApiError, AsyncElasticsearch, TransportError
 from elasticsearch.helpers import BulkIndexError, async_streaming_bulk
@@ -109,7 +109,8 @@ class AsyncESDataBackend(
         for index in indices:
             yield index
 
-    async def read(  # noqa: PLR0913
+    @override
+    async def read(
         self,
         query: Optional[ESQuery] = None,
         target: Optional[str] = None,
@@ -202,7 +203,8 @@ class AsyncESDataBackend(
             for document in documents:
                 yield document
 
-    async def write(  # noqa: PLR0913
+    @override
+    async def write(
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Optional[str] = None,

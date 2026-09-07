@@ -6,7 +6,17 @@ import hashlib
 import logging
 import struct
 from io import IOBase
-from typing import Generator, Iterable, Iterator, List, Optional, Tuple, TypeVar, Union
+from typing import (
+    Generator,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Tuple,
+    TypeVar,
+    Union,
+    override,
+)
 from uuid import uuid4
 
 from bson.errors import BSONError
@@ -177,7 +187,8 @@ class MongoDataBackend(BaseDataBackend[Settings, MongoQuery], Writable, Listable
             logger.error(msg, error)
             raise BackendException(msg % error) from error
 
-    def read(  # noqa: PLR0913
+    @override
+    def read(
         self,
         query: Optional[MongoQuery] = None,
         target: Optional[str] = None,
