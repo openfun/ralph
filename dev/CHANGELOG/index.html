@@ -3050,6 +3050,8 @@ and this project adheres to
 <li>Bump the Elasticsearch test service to <code>8.8.1</code> so its bundled JDK can read
   cgroup v2 hosts, fixing the <code>test-python</code> CI jobs</li>
 <li>Fix XAPI definitions extensions not accepting empty strings as values.</li>
+<li>Keep CORS disabled by default in <code>.env.dist</code> so a bootstrapped <code>.env</code> no
+  longer breaks the <code>RUNSERVER_CORS_ALLOW_ORIGINS</code> settings unit tests</li>
 </ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <ul>
