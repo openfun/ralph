@@ -26,7 +26,9 @@ and this project adheres to
   `test-helm` CI job to fix flaky "no matching resources"/"status not found"
 - Drop the stale `add_ssh_keys` entry from the `deploy-docs` CI job so it
   pushes to `gh-pages` with the read-write checkout key
-- Fix XAPI definitions extensions not accepting empty strings as values.
+- Bump the Elasticsearch test service to `8.8.1` so its bundled JDK can read
+  cgroup v2 hosts, fixing the `test-python` CI jobs
+- Fix XAPI definitions extensions not accepting empty strings as values.
 
 ### Changed
 

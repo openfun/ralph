@@ -643,24 +643,21 @@ def test_backends_data_es_write_without_ignore_errors(es, es_backend, caplog):
     assert len(list(backend.read())) == 0
 
     # By default, we should raise an error and stop the importation.
-    msg = (
-        r"1 document\(s\) failed to index. "
-        r"\[\{'index': \{'_index': 'test-index-foo', '_id': '4', 'status': 400, 'error'"
-        r": \{'type': 'mapper_parsing_exception', 'reason': \"failed to parse field "
-        r"\[count\] of type \[long\] in document with id '4'. Preview of field's value:"
-        r" 'wrong'\", 'caused_by': \{'type': 'illegal_argument_exception', 'reason': "
-        r"'For input string: \"wrong\"'\}\}, 'data': \{'id': 4, 'count': 'wrong'\}\}\}"
-        r"\] Total succeeded writes: 5"
-    )
-    with pytest.raises(BackendException, match=msg):
+    # Only assert on the parts Ralph controls: Elasticsearch rewords its own
+    # parsing errors between releases.
+    msg_prefix = "1 document(s) failed to index."
+    msg_suffix = "Total succeeded writes: 5"
+    with pytest.raises(BackendException, match=re.escape(msg_prefix)):
         with caplog.at_level(logging.ERROR):
             backend.write(data, chunk_size=2)
 
-    assert (
-        "ralph.backends.data.es",
-        logging.ERROR,
-        msg.replace("\\", ""),
-    ) in caplog.record_tuples
+    assert any(
+        name == "ralph.backends.data.es"
+        and level == logging.ERROR
+        and message.startswith(msg_prefix)
+        and message.endswith(msg_suffix)
+        for name, level, message in caplog.record_tuples
+    )
 
     es.indices.refresh(index=ES_TEST_INDEX)
     hits = list(backend.read())
