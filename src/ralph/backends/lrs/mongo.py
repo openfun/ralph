@@ -122,7 +122,9 @@ class MongoLRSBackend(BaseLRSBackend[MongoLRSBackendSettings], MongoDataBackend)
 
     @staticmethod
     def _add_agent_filters(
-        mongo_query_filters: dict, agent_params: AgentParameters, target_field: str
+        mongo_query_filters: dict,
+        agent_params: AgentParameters | list[AgentParameters],
+        target_field: str,
     ) -> None:
         """Add filters relative to agents to mongo_query_filters.
 
@@ -131,26 +133,42 @@ class MongoLRSBackend(BaseLRSBackend[MongoLRSBackendSettings], MongoDataBackend)
             agent_params (AgentParameters): Agent query parameters to search for.
             target_field (str): The target agent field name to perform the search.
         """
+
+        def _get_agent_filters(
+            _params: AgentParameters,
+        ) -> dict | None:
+            if not _params:
+                return None
+            if not isinstance(_params, dict):
+                _params = _params.model_dump()
+
+            if _params.get("mbox"):
+                key = f"_source.{target_field}.mbox"
+                return {key: _params.get("mbox")}
+
+            if _params.get("mbox_sha1sum"):
+                key = f"_source.{target_field}.mbox_sha1sum"
+                return {key: _params.get("mbox_sha1sum")}
+
+            if _params.get("openid"):
+                key = f"_source.{target_field}.openid"
+                return {key: _params.get("openid")}
+
+            if _params.get("account__name"):
+                key_name = f"_source.{target_field}.account.name"
+                key_homepage = f"_source.{target_field}.account.homePage"
+                return {
+                    key_name: _params.get("account__name"),
+                    key_homepage: _params.get("account__home_page"),
+                }
+            return None
+
         if not agent_params:
             return
-
-        if not isinstance(agent_params, dict):
-            agent_params = agent_params.model_dump()
-
-        if agent_params.get("mbox"):
-            key = f"_source.{target_field}.mbox"
-            mongo_query_filters.update({key: agent_params.get("mbox")})
-
-        if agent_params.get("mbox_sha1sum"):
-            key = f"_source.{target_field}.mbox_sha1sum"
-            mongo_query_filters.update({key: agent_params.get("mbox_sha1sum")})
-
-        if agent_params.get("openid"):
-            key = f"_source.{target_field}.openid"
-            mongo_query_filters.update({key: agent_params.get("openid")})
-
-        if agent_params.get("account__name"):
-            key = f"_source.{target_field}.account.name"
-            mongo_query_filters.update({key: agent_params.get("account__name")})
-            key = f"_source.{target_field}.account.homePage"
-            mongo_query_filters.update({key: agent_params.get("account__home_page")})
+        elif not isinstance(agent_params, list):
+            filters = _get_agent_filters(agent_params)
+            if filters:
+                mongo_query_filters.update(filters)
+        else:
+            filters = [_get_agent_filters(params) for params in agent_params if params]
+            mongo_query_filters.update({"$or": filters})
