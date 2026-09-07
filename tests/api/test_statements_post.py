@@ -766,6 +766,8 @@ async def test_api_statements_post_list_with_forwarding(  # noqa: PLR0913
         (["all/read"], False),
         (["statements/read/mine"], False),
         (["profile/write"], False),
+        (["authority/write"], False),
+        (["authority/write", "statements/write"], True),
         ([], False),
     ],
 )
@@ -824,3 +826,70 @@ async def test_api_statements_post_scopes(  # noqa: PLR0913
         assert response.json() == {
             "detail": 'Access not authorized to scope: "statements/write".'
         }
+
+
+@pytest.mark.anyio
+@responses.activate
+@pytest.mark.parametrize("auth_method", ["basic", "oidc"])
+@pytest.mark.parametrize(
+    "scopes,can_set_authority",
+    [
+        (["all"], True),
+        (["statements/write"], False),
+        (["authority/write", "statements/write"], True),
+        (["all/read"], False),
+        ([], False),
+    ],
+)
+async def test_api_statements_post_set_authority(  # noqa: PLR0913
+    client, monkeypatch, fs, es, auth_method, scopes, can_set_authority
+):
+    """Test that posting statements behaves properly when setting authority.
+
+    We can't actually check the statement's authority in database,
+    but we can at least see if there are any errors when submitting
+    a statement with an authority.
+    """
+
+    if auth_method == "basic":
+        agent = mock_agent("mbox", 1)
+        credentials = mock_basic_auth_user(fs, scopes=scopes, agent=agent)
+        headers = {"Authorization": f"Basic {credentials}"}
+
+        get_basic_auth_user.cache_clear()
+
+    elif auth_method == "oidc":
+        sub = "123|oidc"
+        agent = {"openid": sub}
+        oidc_token = mock_oidc_user(sub=sub, scopes=scopes)
+        headers = {"Authorization": f"Bearer {oidc_token}"}
+
+        monkeypatch.setenv("RUNSERVER_AUTH_BACKENDS", "oidc")
+        monkeypatch.setattr(
+            "ralph.api.auth.settings.RUNSERVER_AUTH_BACKENDS", [AuthBackend.OIDC]
+        )
+        monkeypatch.setattr(
+            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_ISSUER_URI",
+            ISSUER_URI,
+        )
+        monkeypatch.setattr(
+            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_AUDIENCE",
+            AUDIENCE,
+        )
+
+    authority = mock_agent(id_="my_authority")
+    statement = mock_statement(authority=authority)
+
+    # NB: scopes are not linked to statements and backends, we therefore test with ES
+    backend_client_class_path = "ralph.api.routers.statements.BACKEND_CLIENT"
+    monkeypatch.setattr(backend_client_class_path, get_es_test_backend())
+
+    response = await client.post(
+        "/xAPI/statements/",
+        headers=headers,
+        json=statement,
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 1
