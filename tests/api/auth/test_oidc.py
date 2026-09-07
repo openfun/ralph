@@ -4,7 +4,12 @@ import pytest
 import responses
 from pydantic import TypeAdapter
 
-from ralph.api.auth.oidc import discover_provider, get_public_keys
+from ralph.api.auth.oidc import (
+    discover_provider,
+    get_public_keys,
+    get_token_info,
+    get_user_info_data,
+)
 from ralph.conf import AuthBackend
 from ralph.models.xapi.base.agents import BaseXapiAgentWithOpenId
 
@@ -19,18 +24,24 @@ from tests.helpers import (
 
 @pytest.mark.anyio
 @pytest.mark.parametrize(
-    "runserver_auth_backends",
-    [[AuthBackend.BASIC, AuthBackend.OIDC], [AuthBackend.OIDC]],
+    "runserver_auth_backends,userinfo_response_type",
+    [
+        ([AuthBackend.BASIC, AuthBackend.OIDC], "jwt"),
+        ([AuthBackend.OIDC], "plain"),
+        ([AuthBackend.OIDC], "jwt"),
+    ],
 )
 @responses.activate
 async def test_api_auth_oidc_get_whoami_valid(
-    client, monkeypatch, runserver_auth_backends
+    client, monkeypatch, runserver_auth_backends, userinfo_response_type
 ):
     """Test a valid OpenId Connect authentication."""
 
     configure_env_for_mock_oidc_auth(monkeypatch, runserver_auth_backends)
 
-    oidc_token = mock_oidc_user(scopes=["all", "profile/read"])
+    oidc_token = mock_oidc_user(
+        scopes=["all", "profile/read"], userinfo_response_type=userinfo_response_type
+    )
 
     headers = {"Authorization": f"Bearer {oidc_token}"}
     response = await client.get(
@@ -40,7 +51,7 @@ async def test_api_auth_oidc_get_whoami_valid(
     assert response.status_code == 200
     assert len(response.json().keys()) == 2
     assert response.json()["agent"] == {
-        "openid": "https://iss.example.com/123|oidc",
+        "openid": "https://iss.example.com/user/123|oidc",
         "objectType": "Agent",
     }
     assert TypeAdapter(BaseXapiAgentWithOpenId).validate_python(
@@ -52,12 +63,16 @@ async def test_api_auth_oidc_get_whoami_valid(
 
 @pytest.mark.anyio
 @pytest.mark.parametrize(
-    "runserver_auth_backends",
-    [[AuthBackend.BASIC, AuthBackend.OIDC], [AuthBackend.OIDC]],
+    "runserver_auth_backends,userinfo_response_type",
+    [
+        ([AuthBackend.BASIC, AuthBackend.OIDC], "jwt"),
+        ([AuthBackend.OIDC], "plain"),
+        ([AuthBackend.OIDC], "jwt"),
+    ],
 )
 @responses.activate
 async def test_api_auth_oidc_post_statements_to_target(
-    client, monkeypatch, runserver_auth_backends, es_custom
+    client, monkeypatch, runserver_auth_backends, es_custom, userinfo_response_type
 ):
     """Test a valid OpenId Connect authentication."""
 
@@ -65,7 +80,11 @@ async def test_api_auth_oidc_post_statements_to_target(
 
     # Create user pointing to a custom target
     target = "custom_target"
-    oidc_token = mock_oidc_user(scopes=["all", "profile/read"], target=target)
+    oidc_token = mock_oidc_user(
+        scopes=["all", "profile/read"],
+        target=target,
+        userinfo_response_type=userinfo_response_type,
+    )
 
     monkeypatch.setattr(
         "ralph.api.routers.statements.BACKEND_CLIENT", get_es_test_backend()
@@ -105,15 +124,19 @@ async def test_api_auth_oidc_post_statements_to_target(
 
 
 @pytest.mark.anyio
+@pytest.mark.parametrize(
+    "userinfo_response_type",
+    ["jwt", "plain"],
+)
 @responses.activate
 async def test_api_auth_oidc_get_whoami_invalid_token(
-    client, monkeypatch, mock_discovery_response, mock_oidc_jwks
+    client, monkeypatch, userinfo_response_type
 ):
     """Test API with an invalid audience."""
 
     configure_env_for_mock_oidc_auth(monkeypatch)
 
-    mock_oidc_user()
+    mock_oidc_user(userinfo_response_type=userinfo_response_type)
 
     response = await client.get(
         "/whoami",
@@ -128,7 +151,7 @@ async def test_api_auth_oidc_get_whoami_invalid_token(
 @pytest.mark.anyio
 @responses.activate
 async def test_api_auth_oidc_get_whoami_invalid_discovery(
-    client, monkeypatch, encoded_token
+    client, monkeypatch, access_token
 ):
     """Test API with an invalid provider discovery."""
 
@@ -137,6 +160,8 @@ async def test_api_auth_oidc_get_whoami_invalid_discovery(
     # Clear LRU cache
     discover_provider.cache_clear()
     get_public_keys.cache_clear()
+    get_token_info.cache_clear()
+    get_user_info_data.cache_clear()
 
     # Mock request to get provider configuration
     responses.add(
@@ -148,7 +173,7 @@ async def test_api_auth_oidc_get_whoami_invalid_discovery(
 
     response = await client.get(
         "/whoami",
-        headers={"Authorization": f"Bearer {encoded_token}"},
+        headers={"Authorization": f"Bearer {access_token}"},
     )
 
     assert response.status_code == 401
@@ -159,7 +184,7 @@ async def test_api_auth_oidc_get_whoami_invalid_discovery(
 @pytest.mark.anyio
 @responses.activate
 async def test_api_auth_oidc_get_whoami_invalid_keys(
-    client, monkeypatch, mock_discovery_response, mock_oidc_jwks, encoded_token
+    client, monkeypatch, mock_discovery_response, mock_oidc_jwks, access_token
 ):
     """Test API with an invalid request for keys."""
 
@@ -187,7 +212,7 @@ async def test_api_auth_oidc_get_whoami_invalid_keys(
 
     response = await client.get(
         "/whoami",
-        headers={"Authorization": f"Bearer {encoded_token}"},
+        headers={"Authorization": f"Bearer {access_token}"},
     )
 
     assert response.status_code == 401
