@@ -33,6 +33,8 @@ and this project adheres to
 - Bump the Elasticsearch test service to `8.8.1` so its bundled JDK can read
   cgroup v2 hosts, fixing the `test-python` CI jobs
 - Fix XAPI definitions extensions not accepting empty strings as values.
+- Keep CORS disabled by default in `.env.dist` so a bootstrapped `.env` no
+  longer breaks the `RUNSERVER_CORS_ALLOW_ORIGINS` settings unit tests
 
 ### Changed
 
