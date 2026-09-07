@@ -2,7 +2,7 @@
 
 import logging
 from io import IOBase
-from typing import AsyncIterator, Iterable, Optional, Union
+from typing import AsyncIterator, Iterable, Optional, Union, override
 from urllib.parse import ParseResult, parse_qs, urljoin, urlparse
 
 from httpx import AsyncClient, HTTPError, HTTPStatusError, RequestError
@@ -71,7 +71,8 @@ class AsyncLRSDataBackend(
 
         return DataBackendStatus.OK
 
-    async def read(  # noqa: PLR0913
+    @override
+    async def read(
         self,
         query: Optional[Union[str, LRSStatementsQuery]] = None,
         target: Optional[str] = None,
@@ -160,7 +161,8 @@ class AsyncLRSDataBackend(
             logger.error(msg, error)
             raise BackendException(msg % (error,)) from error
 
-    async def write(  # noqa: PLR0913
+    @override
+    async def write(
         self,
         data: Union[IOBase, Iterable[bytes], Iterable[dict]],
         target: Optional[str] = None,

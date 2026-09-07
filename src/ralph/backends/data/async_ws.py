@@ -1,7 +1,7 @@
 """Websocket stream backend for Ralph."""
 
 import logging
-from typing import AsyncIterator, Optional, Union
+from typing import AsyncIterator, Optional, Union, override
 
 import websockets
 from pydantic import AnyUrl, PositiveInt
@@ -123,7 +123,8 @@ class AsyncWSDataBackend(BaseAsyncDataBackend[WSDataBackendSettings, str]):
             return DataBackendStatus.AWAY
         return DataBackendStatus.OK
 
-    async def read(  # noqa: PLR0913
+    @override
+    async def read(
         self,
         query: Optional[str] = None,
         target: Optional[str] = None,

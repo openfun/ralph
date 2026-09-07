@@ -11,7 +11,7 @@ Ralph LRS supports the following databases:
 Let's add the service of your choice to the `docker-compose.yml` file:
 
 === "Elasticsearch"
-  
+
     ``` yaml title="docker-compose.yml" hl_lines="4-19 25-26"
     version: "3.9"
 
@@ -51,7 +51,7 @@ Let's add the service of your choice to the `docker-compose.yml` file:
           - "8100"
         volumes:
           - .ralph:/app/.ralph
-    ``` 
+    ```
 
     We can now start the database service and wait for it to be up and healthy:
     ```bash
@@ -104,7 +104,7 @@ Let's add the service of your choice to the `docker-compose.yml` file:
           - "8100"
         volumes:
           - .ralph:/app/.ralph
-    ``` 
+    ```
     We can now start the database service and wait for it to be up and healthy:
     ```bash
     docker compose up -d --wait db
@@ -155,14 +155,14 @@ Let's add the service of your choice to the `docker-compose.yml` file:
           - "8100"
         volumes:
           - .ralph:/app/.ralph
-    ``` 
+    ```
     We can now start the database service and wait for it to be up and healthy:
     ```bash
     docker compose up -d --wait db
     ```
 
     Before using ClickHouse, we need to create a table in the `xapi` database, which we call `xapi_events_all`:
-    
+
     === "curl"
         ```bash
           echo "CREATE TABLE xapi.xapi_events_all (
@@ -219,7 +219,7 @@ We can finally send some xAPI statements to Ralph LRS:
     ```
 
 
-And fetch, them back: 
+And fetch, them back:
 
 === "curl"
 

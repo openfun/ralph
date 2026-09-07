@@ -17,7 +17,7 @@ feature.
   default value in Ralph 5.y. If you serialize some Pydantic models from ralph
   and want to keep the same content in your serialization, please set
   `exclude_none` to `True` in the serialization method `model_dump`.
- 
+
 ### 3.x to 4.y
 
 #### Upgrade user credentials
@@ -32,7 +32,7 @@ To conform to xAPI specifications, we need to represent users as xAPI Agents. Yo
 }
 ```
 Agent can take one of the following forms, as specified by the [xAPI specification](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#2423-inverse-functional-identifier):
-- mbox: 
+- mbox:
 ```
 "agent": {
       "mbox": "mailto:john.doe@example.com"
@@ -59,7 +59,7 @@ Agent can take one of the following forms, as specified by the [xAPI specificati
 }
 ```
 
-For example here is a valid `auth.json` file: 
+For example here is a valid `auth.json` file:
 
 ```
 [
@@ -245,12 +245,12 @@ backend.write([{"id": 1}])
 #### Upgrade ClickHouse schema
 
 If you are using the ClickHouse backend, schema changes have been made
-to drop the existing JSON column in favor of the String version of the 
-same data. See [this issue](https://github.com/openfun/ralph/issues/482) 
-for details. 
+to drop the existing JSON column in favor of the String version of the
+same data. See [this issue](https://github.com/openfun/ralph/issues/482)
+for details.
 
-Ralph does not manage the ClickHouse schema, so if you have existing 
-data you will need to manually alter it as an admin user. Note: this 
+Ralph does not manage the ClickHouse schema, so if you have existing
+data you will need to manually alter it as an admin user. Note: this
 will rewrite the statements table, which may take a long time if you
 have many rows. The command to run is:
 

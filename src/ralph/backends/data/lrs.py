@@ -2,7 +2,7 @@
 
 import logging
 from io import IOBase
-from typing import Iterable, Iterator, List, Optional, Union
+from typing import Iterable, Iterator, List, Optional, Union, override
 from urllib.parse import ParseResult, parse_qs, urljoin, urlparse
 
 from httpx import Client, HTTPError, HTTPStatusError, RequestError
@@ -123,7 +123,8 @@ class LRSDataBackend(
 
         return DataBackendStatus.OK
 
-    def read(  # noqa: PLR0913
+    @override
+    def read(
         self,
         query: Optional[LRSStatementsQuery] = None,
         target: Optional[str] = None,

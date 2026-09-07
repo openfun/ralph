@@ -3,7 +3,7 @@
 import logging
 from io import IOBase
 from pathlib import Path
-from typing import Iterable, Iterator, List, Literal, Optional, TypeVar, Union
+from typing import Iterable, Iterator, List, Literal, Optional, TypeVar, Union, override
 
 from elasticsearch import ApiError, Elasticsearch, TransportError
 from elasticsearch.helpers import BulkIndexError, streaming_bulk
@@ -209,7 +209,8 @@ class ESDataBackend(BaseDataBackend[Settings, ESQuery], Writable, Listable):
         for index in indices:
             yield index
 
-    def read(  # noqa: PLR0913
+    @override
+    def read(
         self,
         query: Optional[ESQuery] = None,
         target: Optional[str] = None,

@@ -3,7 +3,7 @@
 import logging
 from functools import cached_property
 from io import IOBase
-from typing import Any, Iterable, Iterator, Optional, Tuple, Union
+from typing import Any, Iterable, Iterator, Optional, Tuple, Union, override
 from uuid import uuid4
 
 from pydantic import PositiveInt
@@ -168,7 +168,8 @@ class SwiftDataBackend(
                 continue
             yield self._details(target, obj) if details else obj
 
-    def read(  # noqa: PLR0913
+    @override
+    def read(
         self,
         query: Optional[str] = None,
         target: Optional[str] = None,

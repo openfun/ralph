@@ -5,7 +5,7 @@ This tutorial shows you how to run Ralph LRS, step by step.
 !!! warning
 
     Ralph LRS will be executed locally for demonstration purpose.
-    If you want to deploy Ralph LRS on a production server, please refer to the 
+    If you want to deploy Ralph LRS on a production server, please refer to the
     [deployment guide](../helm.md).
 
 Ralph LRS is based on [FastAPI](https://fastapi.tiangolo.com/). In this tutorial, we

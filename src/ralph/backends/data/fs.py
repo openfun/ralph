@@ -5,7 +5,7 @@ import os
 from datetime import datetime, timezone
 from io import BufferedReader, IOBase
 from pathlib import Path
-from typing import Iterable, Iterator, Optional, Tuple, TypeVar, Union
+from typing import Iterable, Iterator, Optional, Tuple, TypeVar, Union, override
 from uuid import uuid4
 
 from pydantic import PositiveInt, model_validator
@@ -160,7 +160,8 @@ class FSDataBackend(
                 "modified_at": modified_at.isoformat(),
             }
 
-    def read(  # noqa: PLR0913
+    @override
+    def read(
         self,
         query: Optional[str] = None,
         target: Optional[str] = None,
