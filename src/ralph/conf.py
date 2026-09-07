@@ -132,7 +132,7 @@ class AuthBackend(str, Enum):
 
 
 def validate_auth_backends(
-    value: Union[str, Tuple[str, ...], List[str]]
+    value: Union[str, Tuple[str, ...], List[str]],
 ) -> Tuple[AuthBackend]:
     """Check whether the value is a comma separated string or a list/tuple."""
     if isinstance(value, (tuple, list)):
