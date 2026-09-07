@@ -23,7 +23,7 @@ services:
 
   # -- backends
   elasticsearch:
-    image: elasticsearch:8.1.0
+    image: elasticsearch:8.8.1
     environment:
       bootstrap.memory_lock: true
       discovery.type: single-node
