@@ -223,6 +223,22 @@ def get_jwk(pub_key):
     }
 
 
+def encode_jwt(
+    claims, algorithm: str = "HS256", headers: dict = None, access_token: str = None
+):
+    return jwt.encode(
+        access_token=access_token,
+        algorithm=algorithm,
+        key=private_key.private_bytes(
+            serialization.Encoding.PEM,
+            serialization.PrivateFormat.PKCS8,
+            serialization.NoEncryption(),
+        ),
+        headers=headers,
+        claims=claims,
+    )
+
+
 def _mock_oidc_jwks():
     """Mock OpenID Connect keys."""
     return {"keys": [get_jwk(public_key)]}
@@ -346,13 +362,8 @@ def mock_oidc_user(
         if userinfo_response_type == "plain":
             return (200, {"Content-Type": "application/json"}, json.dumps(user_info))
         elif userinfo_response_type == "jwt":
-            encoded_user_info = jwt.encode(
+            encoded_user_info = encode_jwt(
                 claims=user_info,
-                key=private_key.private_bytes(
-                    serialization.Encoding.PEM,
-                    serialization.PrivateFormat.PKCS8,
-                    serialization.NoEncryption(),
-                ),
                 algorithm=ALGORITHM,
                 headers={
                     "kid": PUBLIC_KEY_ID,
@@ -364,7 +375,7 @@ def mock_oidc_user(
                 encoded_user_info,
             )
         else:
-            return (500, {}, "")
+            return (400, {}, "")
 
     responses.add_callback(
         responses.GET,

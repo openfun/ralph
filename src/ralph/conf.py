@@ -167,7 +167,7 @@ class Settings(BaseSettings):
     _CORE: CoreSettings = core_settings
     AUTH_FILE: Path = _CORE.APP_DIR / "auth.json"
     AUTH_CACHE_MAX_SIZE: int = 100
-    AUTH_CACHE_TTL: int = 36000
+    AUTH_CACHE_TTL: int = 3600
     AUTH_OIDC_CACHE_TTL: int = 60
     CONVERTER_EDX_XAPI_UUID_NAMESPACE: Optional[str] = None
     EXECUTION_ENVIRONMENT: str = "development"
