@@ -150,9 +150,10 @@ def get_user_info_data(
         if not is_jwt and not is_json:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                error="invalid_request",
-                detail=f"Invalid Media type in header: {media_type}, "
-                "expected application/jwt or application/json",
+                detail=(
+                    f"Invalid Media type in header: {media_type}, "
+                    "expected application/jwt or application/json"
+                ),
                 headers={"WWW-Authenticate": "Bearer"},
             )
         body = response.text if is_jwt else response.json()
