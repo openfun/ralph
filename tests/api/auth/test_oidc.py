@@ -15,7 +15,7 @@ from ralph.api.auth.oidc import (
 from ralph.models.xapi.base.agents import BaseXapiAgentWithOpenId
 from ralph.conf import AuthBackend
 
-from tests.fixtures.auth import ISSUER_URI, mock_oidc_user, encode_jwt
+from tests.fixtures.auth import ISSUER_URI, TOKEN_ISS, mock_oidc_user
 from tests.fixtures.backends import get_es_test_backend
 from tests.helpers import (
     assert_statement_get_responses_are_equivalent,
@@ -53,7 +53,7 @@ async def test_api_auth_oidc_get_whoami_valid(
     assert response.status_code == 200
     assert len(response.json().keys()) == 2
     assert response.json()["agent"] == {
-        "openid": "https://iss.example.com/123|oidc",
+        "openid": f"{TOKEN_ISS}/123|oidc",
         "objectType": "Agent",
     }
     assert TypeAdapter(BaseXapiAgentWithOpenId).validate_python(

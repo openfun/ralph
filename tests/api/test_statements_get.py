@@ -35,6 +35,7 @@ from ..fixtures.auth import (
     CLIENT_ID,
     CLIENT_SECRET,
     ISSUER_URI,
+    TOKEN_ISS,
     mock_basic_auth_user,
     mock_oidc_user,
 )
@@ -906,18 +907,17 @@ async def test_api_statements_get_scopes(  # noqa: PLR0913
         )
 
         sub = "123|oidc"
-        iss = "https://iss.example.com"
-        agent = {"openid": f"{iss}/{sub}"}
+        agent = {"openid": f"{TOKEN_ISS}/{sub}"}
         oidc_token = mock_oidc_user(sub=sub, scopes=scopes)
         headers = {"Authorization": f"Bearer {oidc_token}"}
 
         monkeypatch.setattr(
             "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_ISSUER_URI",
-            "http://providerHost:8080/auth/realms/real_name",
+            ISSUER_URI
         )
         monkeypatch.setattr(
             "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_AUDIENCE",
-            "http://clientHost:8100",
+            AUDIENCE
         )
 
     # Mock statements

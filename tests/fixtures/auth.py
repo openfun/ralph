@@ -4,7 +4,7 @@ import base64
 import json
 import os
 import urllib.parse
-from typing import Literal, Optional
+from typing import Callable, Literal, Optional, Union
 
 import bcrypt
 import pytest
@@ -22,6 +22,7 @@ from . import private_key, public_key
 ALGORITHM = "RS256"
 AUDIENCE = "http://clientHost:8100"
 ISSUER_URI = "http://providerHost:8080/auth/realms/real_name"
+TOKEN_ISS = "https://iss.example.com"
 CLIENT_ID = "my-client-id"
 OTHER_CLIENT_ID = "my-other-client-id"
 CLIENT_SECRET = "my-client-secret"
@@ -256,11 +257,11 @@ def _mock_access_token(sub, scopes, target=None):
     ).decode()
 
 
-def _mock_oidc_token_info(sub, scopes, target=None):
+def _mock_oidc_introspection_response(sub, scopes, target=None):
     """Mock OIDC Token Introspection response with provided params."""
     user_info = {
         "sub": sub,
-        "iss": "https://iss.example.com",
+        "iss": TOKEN_ISS,
         "aud": AUDIENCE,
         "iat": 0,  # Issued the 1/1/1970
         "exp": 9999999999,  # Expiring in 11/20/2286
@@ -274,7 +275,7 @@ def _mock_oidc_token_info(sub, scopes, target=None):
     return user_info
 
 
-def _mock_oidc_user_info_plain(sub, scopes, target=None):
+def _mock_oidc_user_info_plain_response(sub, scopes, target=None):
     """Mock unencoded OIDC user info claims with provided params."""
     user_info = {
         "sub": sub,
@@ -283,6 +284,55 @@ def _mock_oidc_user_info_plain(sub, scopes, target=None):
     if target is not None:
         user_info["target"] = target
     return user_info
+
+
+def protect_oidc_client_basic_callback(
+    result: Union[dict, Callable[[dict], tuple]], client_id: str, client_secret: str
+):
+    def _callback(request):
+        auth_header = request.headers["Authorization"]
+        auth_method = auth_header.split(" ")[0]
+        if auth_method.lower() != "basic":
+            return (401, {}, "")
+        client_secret_basic_token = auth_header.split(" ")[-1]
+        decoded_client_secret_basic_token = base64.b64decode(
+            client_secret_basic_token.encode("utf-8")
+        ).decode("utf-8")
+        id = decoded_client_secret_basic_token.split(":")[0]
+        secret = decoded_client_secret_basic_token.split(":")[1]
+        if id != client_id or secret != client_secret:
+            return (401, {}, "")
+        if isinstance(result, Callable):
+            return result(request)
+        return (
+            200,
+            {"Content-Type": "application/json"},
+            json.dumps(result),
+        )
+
+    return _callback
+
+
+def protect_oidc_token_callback(
+    result: Union[dict, Callable[[dict], tuple]], access_token: str
+):
+    def _callback(request):
+        auth_header = request.headers["Authorization"]
+        auth_method = auth_header.split(" ")[0]
+        if auth_method.lower() != "bearer":
+            return (401, {}, "")
+        token = auth_header.split(" ")[-1]
+        if token != access_token:
+            return (401, {}, "")
+        if isinstance(result, Callable):
+            return result(request)
+        return (
+            200,
+            {"Content-Type": "application/json"},
+            json.dumps(result),
+        )
+
+    return _callback
 
 
 def mock_oidc_user(
@@ -322,43 +372,32 @@ def mock_oidc_user(
     # Mock request to get token info
     def _oidc_introspection_callback(request):
         payload = urllib.parse.parse_qs(request.body)
-        auth_header = request.headers["Authorization"]
-        auth_method = auth_header.split(" ")[0]
-        if auth_method.lower() != "basic":
-            return (401, {}, "")
-        client_secret_basic_token = auth_header.split(" ")[-1]
-        decoded_client_secret_basic_token = base64.b64decode(
-            client_secret_basic_token.encode("utf-8")
-        ).decode("utf-8")
-        client_id = decoded_client_secret_basic_token.split(":")[0]
-        client_secret = decoded_client_secret_basic_token.split(":")[1]
-        if client_id != CLIENT_ID or client_secret != CLIENT_SECRET:
-            return (401, {}, "")
         token = payload["token"][0]
         if token != oidc_access_token:
             return (200, {}, json.dumps({"active": False}))
         return (
             200,
             {},
-            json.dumps(_mock_oidc_token_info(sub=sub, scopes=scopes, target=target)),
+            json.dumps(
+                _mock_oidc_introspection_response(sub=sub, scopes=scopes, target=target)
+            ),
         )
 
     responses.add_callback(
         responses.POST,
         provider_config["introspection_endpoint"],
-        callback=_oidc_introspection_callback,
+        callback=protect_oidc_client_basic_callback(
+            _oidc_introspection_callback,
+            client_id=CLIENT_ID,
+            client_secret=CLIENT_SECRET,
+        ),
     )
 
     # Mock request to get ID token
     def _oidc_userinfo_callback(request):
-        auth_header = request.headers["Authorization"]
-        auth_method = auth_header.split(" ")[0]
-        if auth_method.lower() != "bearer":
-            return (401, {}, "")
-        access_token = auth_header.split(" ")[-1]
-        if access_token != oidc_access_token:
-            return (401, {}, "")
-        user_info = _mock_oidc_user_info_plain(sub=sub, scopes=scopes, target=target)
+        user_info = _mock_oidc_user_info_plain_response(
+            sub=sub, scopes=scopes, target=target
+        )
         if userinfo_response_type == "plain":
             return (200, {"Content-Type": "application/json"}, json.dumps(user_info))
         elif userinfo_response_type == "jwt":
@@ -380,7 +419,9 @@ def mock_oidc_user(
     responses.add_callback(
         responses.GET,
         provider_config["userinfo_endpoint"],
-        callback=_oidc_userinfo_callback,
+        callback=protect_oidc_token_callback(
+            _oidc_userinfo_callback, access_token=oidc_access_token
+        ),
     )
 
     return oidc_access_token
