@@ -158,25 +158,37 @@ async def test_api_auth_oidc_introspection(
             )
             assert exc_info.value.status_code == 401
 
+
 @pytest.mark.anyio
 @responses.activate
 @pytest.mark.parametrize(
-    "runserver_auth_backends,userinfo_response_type",
+    "runserver_auth_backends,sub,enable_oidc_client,userinfo_response_type",
     [
-        ([AuthBackend.BASIC, AuthBackend.OIDC], "jwt"),
-        ([AuthBackend.OIDC], "plain"),
-        ([AuthBackend.OIDC], "jwt"),
+        ([AuthBackend.BASIC, AuthBackend.OIDC], "user_1", True, "jwt"),
+        ([AuthBackend.OIDC], "user_2", True, "plain"),
+        ([AuthBackend.OIDC], "user_3", True, "jwt"),
+        ([AuthBackend.OIDC], None, True, "jwt"),
+        ([AuthBackend.OIDC], "user_4", False, None),
     ],
 )
 async def test_api_auth_oidc_get_whoami_valid(
-    client, monkeypatch, runserver_auth_backends, userinfo_response_type
+    client,
+    monkeypatch,
+    runserver_auth_backends,
+    sub,
+    enable_oidc_client,
+    userinfo_response_type,
 ):
     """Test a valid OpenId Connect authentication."""
 
-    configure_env_for_mock_oidc_auth(monkeypatch, runserver_auth_backends)
+    configure_env_for_mock_oidc_auth(
+        monkeypatch, runserver_auth_backends, enable_oidc_client=enable_oidc_client
+    )
 
     oidc_token = mock_oidc_user(
-        scopes=["all", "profile/read"], userinfo_response_type=userinfo_response_type
+        sub=sub,
+        scopes=["all", "profile/read"],
+        userinfo_response_type=userinfo_response_type,
     )
 
     headers = {"Authorization": f"Bearer {oidc_token}"}
@@ -186,10 +198,16 @@ async def test_api_auth_oidc_get_whoami_valid(
     )
     assert response.status_code == 200
     assert len(response.json().keys()) == 2
-    assert response.json()["agent"] == {
-        "openid": f"{TOKEN_ISS}/123|oidc",
+    agent = {
+        "openid": (
+            f"{TOKEN_ISS}/application/{OTHER_CLIENT_ID}"
+            if sub is None
+            else f"{TOKEN_ISS}/{sub}"
+        ),
         "objectType": "Agent",
     }
+
+    assert response.json()["agent"] == agent
     assert TypeAdapter(BaseXapiAgentWithOpenId).validate_python(
         response.json()["agent"]
     )
@@ -394,4 +412,3 @@ async def test_api_auth_oidc_get_whoami_invalid_backend(client, fs, monkeypatch)
 
     assert response.status_code == 401
     assert response.json() == {"detail": "Invalid authentication credentials"}
-
