@@ -88,6 +88,26 @@ class TokenIntrospection(BaseModel):
 
     model_config = ConfigDict(extra="ignore")
 
+def make_authenticated_oidc_user(iss: str, user_info: UserInfo) -> AuthenticatedUser:
+    """
+
+    """
+    return AuthenticatedUser(
+        agent={"openid": f"{iss}/{user_info.sub}"},
+        scopes=get_user_scopes(user_info.scope),
+        target=user_info.target,
+    )
+def make_authenticated_oidc_client(token_info: TokenIntrospection) -> AuthenticatedUser:
+    """
+
+    This is an application token, we don't have a user to get
+    So we use the client_id to indentify it instead
+    """
+    return AuthenticatedUser(
+        agent={"openid": f"{token_info.iss}/application/{token_info.client_id}"},
+        scopes=get_user_scopes(token_info.scope),
+        target=token_info.target,
+    )
 
 @lru_cache(maxsize=1)
 def discover_provider(base_url: AnyUrl) -> Dict:
@@ -115,7 +135,8 @@ def get_user_info(provider_config: dict, auth_header: str) -> UserInfo:
     if not is_encoded:
         # nothing to do
         return UserInfo.model_validate(user_info)
-    return decode_user_info(user_info, provider_config=provider_config)
+    token = decode_jwt_token(user_info, provider_config=provider_config)
+    return UserInfo.model_validate(token)
 
 
 @cached(
@@ -167,7 +188,7 @@ def get_user_info_data(
         ) from exc
 
 
-def decode_user_info(encoded_user_info: str, provider_config: dict) -> UserInfo:
+def decode_jwt_token(encoded_user_info: str, provider_config: dict) -> dict:
     """Decode and verify an OpenID Connect ID token."""
     key = get_public_keys(provider_config["jwks_uri"])
     algorithms = provider_config["id_token_signing_alg_values_supported"]
@@ -178,7 +199,7 @@ def decode_user_info(encoded_user_info: str, provider_config: dict) -> UserInfo:
         "verify_exp": True,
     }
     try:
-        decoded_token = jwt.decode(
+        return jwt.decode(
             token=encoded_user_info,
             key=key,
             algorithms=algorithms,
@@ -192,8 +213,6 @@ def decode_user_info(encoded_user_info: str, provider_config: dict) -> UserInfo:
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
-
-    return UserInfo.model_validate(decoded_token)
 
 
 def encode_client_secret_basic_token(client_id: str, client_secret: str) -> str:
@@ -290,6 +309,18 @@ def get_user_scopes(oidc_scopes: Optional[str]) -> UserScopes:
     )
     return UserScopes(compatible_scopes)
 
+def _can_query_user_info(provider_config: dict) -> bool:
+    """Check whether the IdP can be queried for `UserInfo` using an access token.
+    
+    True when Ralph has client credentials and the IdP exposes
+    both `/introspect` and `/userinfo` endpoints.
+    """
+    return bool(
+        settings.RUNSERVER_AUTH_OIDC_CLIENT_ID
+        and settings.RUNSERVER_AUTH_OIDC_CLIENT_SECRET
+        and provider_config.get("introspection_endpoint")
+        and provider_config.get("userinfo_endpoint")
+    )
 
 def get_oidc_user(
     auth_header: Annotated[Optional[HTTPBearer], Depends(oauth2_scheme)],
@@ -317,6 +348,13 @@ def get_oidc_user(
     access_token = auth_header.split(" ")[-1]
     provider_config = discover_provider(settings.RUNSERVER_AUTH_OIDC_ISSUER_URI)
 
+    if not _can_query_user_info(provider_config):
+        # We have to assume that the access token is an ID Token
+        # in the JWT format, and can be decoded offline.
+        id_token = decode_jwt_token(encoded_user_info=access_token, provider_config=provider_config)
+        user_info = UserInfo.model_validate(id_token)
+        return make_authenticated_oidc_user(iss=id_token["iss"],user_info=user_info)
+
     client_basic_auth_header = get_client_basic_auth_header(
         client_id=settings.RUNSERVER_AUTH_OIDC_CLIENT_ID,
         client_secret=settings.RUNSERVER_AUTH_OIDC_CLIENT_SECRET,
@@ -327,7 +365,10 @@ def get_oidc_user(
         token=access_token,
         client_basic_auth_header=client_basic_auth_header,
     )
-    if token_info.sub:
+
+    if not token_info.sub:
+        return make_authenticated_oidc_client(token_info)
+    else:
         # This is a real user, we can retrieve their user info
         user_info = get_user_info(provider_config, auth_header=auth_header)
         if user_info.sub != token_info.sub:
@@ -340,16 +381,4 @@ def get_oidc_user(
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
-        return AuthenticatedUser(
-            agent={"openid": f"{token_info.iss}/{user_info.sub}"},
-            scopes=get_user_scopes(user_info.scope),
-            target=user_info.target,
-        )
-    else:
-        # this is an application token, we don't have a user to get
-        # so we use the client_id to indentify it instead
-        return AuthenticatedUser(
-            agent={"openid": f"{token_info.iss}/application/{token_info.client_id}"},
-            scopes=get_user_scopes(token_info.scope),
-            target=token_info.target,
-        )
+        return make_authenticated_oidc_user(iss=token_info.iss, user_info=user_info)

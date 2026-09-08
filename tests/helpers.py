@@ -221,7 +221,8 @@ def mock_statement(  # noqa: PLR0913
 
 
 def configure_env_for_mock_oidc_auth(
-    monkeypatch, runserver_auth_backends: List[AuthBackend] = None
+    monkeypatch, runserver_auth_backends: List[AuthBackend] = None,
+    enable_oidc_client: Optional[bool] = True
 ):
     """Configure environment variables to simulate OIDC use."""
 
@@ -243,11 +244,12 @@ def configure_env_for_mock_oidc_auth(
         "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_AUDIENCE",
         AUDIENCE,
     )
-    monkeypatch.setattr(
-        "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_CLIENT_ID",
-        CLIENT_ID,
-    )
-    monkeypatch.setattr(
-        "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_CLIENT_SECRET",
-        CLIENT_SECRET,
-    )
+    if enable_oidc_client:
+        monkeypatch.setattr(
+            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_CLIENT_ID",
+            CLIENT_ID,
+        )
+        monkeypatch.setattr(
+            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_CLIENT_SECRET",
+            CLIENT_SECRET,
+        )
