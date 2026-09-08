@@ -259,8 +259,7 @@ def _mock_access_token(sub, scopes, target=None):
 
 def _mock_oidc_introspection_response(sub, scopes, target=None):
     """Mock OIDC Token Introspection response with provided params."""
-    user_info = {
-        "sub": sub,
+    token_introspection = {
         "iss": TOKEN_ISS,
         "aud": AUDIENCE,
         "iat": 0,  # Issued the 1/1/1970
@@ -270,13 +269,19 @@ def _mock_oidc_introspection_response(sub, scopes, target=None):
         "client_id": OTHER_CLIENT_ID,
         "token_type": "Bearer",
     }
+    if sub is not None:
+        token_introspection["sub"] = sub
     if target is not None:
-        user_info["target"] = target
-    return user_info
+        token_introspection["target"] = target
+    return token_introspection
 
 
-def _mock_oidc_user_info_plain_response(sub, scopes, target=None):
+def _mock_oidc_user_info_plain_response(sub: str, scopes, target=None):
     """Mock unencoded OIDC user info claims with provided params."""
+    if sub is None:
+        raise ValueError(
+            "The IdP `/userinfo` endpoint cannot return `UserInfo` without a `sub` claim."
+        )
     user_info = {
         "sub": sub,
         "scope": " ".join(scopes),
@@ -336,15 +341,30 @@ def protect_oidc_token_callback(
 
 
 def mock_oidc_user(
-    sub="123|oidc",
+    sub: Union[str, None] = "123|oidc",
     scopes=None,
     target=None,
-    userinfo_response_type: Literal["plain", "jwt"] = "jwt",
+    userinfo_response_type: Union[Literal["plain", "jwt"], None] = "jwt",
 ):
-    """Instantiate mock oidc user and return auth token."""
+    """Instantiate mock oidc user and return auth token.
+
+    If `userinfo_response_type` is None, produces an OIDC Id token in the JWT format,
+    from which the `UserInfo` can be decoded without another request to IdP.
+    Otherwise, creates an opaque access token.
+    If `sub` is None, the access token can be inspected with
+    the IdP's `/introspection`.
+    If `sub` is not None, the access token can be traded for`UserInfo` using
+    the IdP's `/introspection` and `/userinfo` endpoints.
+    """
     # Default value for scope
     if scopes is None:
         scopes = ["all", "statements/read"]
+
+    if sub is None and userinfo_response_type is None:
+        raise ValueError(
+            "Cannot return a Client Credentials access token"
+            "if not using the IdP's `/introspection` and `/userinfo` endpoints"
+        )
 
     # Clear LRU cache
     discover_provider.cache_clear()
@@ -359,8 +379,6 @@ def mock_oidc_user(
         status=200,
     )
 
-    oidc_access_token = _mock_access_token(sub=sub, scopes=scopes, target=target)
-
     # Mock request to get keys
     responses.add(
         responses.GET,
@@ -368,6 +386,21 @@ def mock_oidc_user(
         json=_mock_oidc_jwks(),
         status=200,
     )
+
+    if userinfo_response_type is None:
+        user_info = _mock_oidc_user_info_plain_response(
+            sub=sub, scopes=scopes, target=target
+        )
+        oidc_jwt_token = encode_jwt(
+            claims={**user_info, "iss": TOKEN_ISS},
+            algorithm=ALGORITHM,
+            headers={
+                "kid": PUBLIC_KEY_ID,
+            },
+        )
+        return oidc_jwt_token
+
+    oidc_access_token = _mock_access_token(sub=sub, scopes=scopes, target=target)
 
     # Mock request to get token info
     def _oidc_introspection_callback(request):
@@ -395,6 +428,9 @@ def mock_oidc_user(
 
     # Mock request to get ID token
     def _oidc_userinfo_callback(request):
+        if sub is None:
+            return (401, {}, "")
+
         user_info = _mock_oidc_user_info_plain_response(
             sub=sub, scopes=scopes, target=target
         )
