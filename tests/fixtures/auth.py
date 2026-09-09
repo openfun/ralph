@@ -280,7 +280,8 @@ def _mock_oidc_user_info_plain_response(sub: str, scopes, target=None):
     """Mock unencoded OIDC user info claims with provided params."""
     if sub is None:
         raise ValueError(
-            "The IdP `/userinfo` endpoint cannot return `UserInfo` without a `sub` claim."
+            "The IdP `/userinfo` endpoint cannot "
+            "return `UserInfo` without a `sub` claim."
         )
     user_info = {
         "sub": sub,
