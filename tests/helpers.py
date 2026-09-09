@@ -210,8 +210,9 @@ def mock_statement(
 
 
 def configure_env_for_mock_oidc_auth(
-    monkeypatch, runserver_auth_backends: List[AuthBackend] = None,
-    enable_oidc_client: Optional[bool] = True
+    monkeypatch,
+    runserver_auth_backends: List[AuthBackend] = None,
+    enable_oidc_client: Optional[bool] = True,
 ):
     """Configure environment variables to simulate OIDC use."""
 

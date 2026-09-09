@@ -912,12 +912,10 @@ async def test_api_statements_get_scopes(  # noqa: PLR0913
         headers = {"Authorization": f"Bearer {oidc_token}"}
 
         monkeypatch.setattr(
-            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_ISSUER_URI",
-            ISSUER_URI
+            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_ISSUER_URI", ISSUER_URI
         )
         monkeypatch.setattr(
-            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_AUDIENCE",
-            AUDIENCE
+            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_AUDIENCE", AUDIENCE
         )
 
     # Mock statements

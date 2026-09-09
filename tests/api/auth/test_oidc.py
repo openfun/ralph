@@ -1,30 +1,38 @@
 """Tests for the api.auth.oidc module."""
 
-import pytest
-import responses
-from pydantic import TypeAdapter
-from fastapi import HTTPException
 import json
 
+import pytest
+import responses
+from fastapi import HTTPException
+from pydantic import TypeAdapter
+
 from ralph.api.auth.oidc import (
+    TokenIntrospection,
+    UserInfo,
     discover_provider,
     get_public_keys,
     get_token_introspection,
-    get_user_info_data,
     get_user_info,
-    UserInfo,
-    TokenIntrospection,
+    get_user_info_data,
 )
-from ralph.models.xapi.base.agents import BaseXapiAgentWithOpenId
 from ralph.conf import AuthBackend
+from ralph.models.xapi.base.agents import BaseXapiAgentWithOpenId
 
-from tests.fixtures.auth import ISSUER_URI, TOKEN_ISS, OTHER_CLIENT_ID, mock_oidc_user, encode_jwt
+from tests.fixtures.auth import (
+    ISSUER_URI,
+    OTHER_CLIENT_ID,
+    TOKEN_ISS,
+    encode_jwt,
+    mock_oidc_user,
+)
 from tests.fixtures.backends import get_es_test_backend
 from tests.helpers import (
     assert_statement_get_responses_are_equivalent,
     configure_env_for_mock_oidc_auth,
     mock_statement,
 )
+
 
 @pytest.mark.anyio
 @pytest.mark.parametrize(
@@ -171,7 +179,7 @@ async def test_api_auth_oidc_introspection(
         ([AuthBackend.OIDC], "user_4", False, None),
     ],
 )
-async def test_api_auth_oidc_get_whoami_valid(
+async def test_api_auth_oidc_get_whoami_valid(  # noqa: PLR0913
     client,
     monkeypatch,
     runserver_auth_backends,
