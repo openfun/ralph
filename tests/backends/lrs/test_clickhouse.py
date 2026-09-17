@@ -257,6 +257,159 @@ def test_backends_lrs_clickhouse_default_instantiation(monkeypatch, fs):
                 "sort": "emission_time DESCENDING, event_id DESCENDING",
             },
         ),
+        # 9. Query agent with account IFI, with related_agents.
+        (
+            {
+                "agent": {
+                    "account__home_page": "http://www.example.com",
+                    "account__name": "13936749",
+                },
+                "ascending": True,
+                "related_agents": True,
+            },
+            {
+                "where": [
+                    "JSONExtractString(event, 'actor', 'account', 'name') = {"
+                    "actor__account__name:String}"
+                    " AND "
+                    "JSONExtractString(event, 'actor', 'account', 'homePage') = {"
+                    "actor__account__home_page:String}"
+                    " OR "
+                    "JSONExtractString(event, 'object', 'account', 'name') = {"
+                    "object__account__name:String}"
+                    " AND "
+                    "JSONExtractString(event, 'object', 'account', 'homePage') = {"
+                    "object__account__home_page:String}"
+                    " OR "
+                    "JSONExtractString(event, 'authority', 'account', 'name') = {"
+                    "authority__account__name:String}"
+                    " AND "
+                    "JSONExtractString(event, 'authority', 'account', 'homePage') = {"
+                    "authority__account__home_page:String}"
+                    " OR "
+                    "JSONExtractString(event, 'context', 'instructor', 'account', 'name') = {"  # noqa: E501
+                    "context__instructor__account__name:String}"
+                    " AND "
+                    "JSONExtractString(event, 'context', 'instructor', 'account', 'homePage') = {"  # noqa: E501
+                    "context__instructor__account__home_page:String}"
+                    " OR "
+                    "JSONExtractString(event, 'context', 'team', 'account', 'name') = {"
+                    "context__team__account__name:String}"
+                    " AND "
+                    "JSONExtractString(event, 'context', 'team', 'account', 'homePage') = {"  # noqa: E501
+                    "context__team__account__home_page:String}"
+                    " OR "
+                    "JSONExtractString(event, 'object', 'actor', 'account', 'name') = {"
+                    "object__actor__account__name:String}"
+                    " AND "
+                    "JSONExtractString(event, 'object', 'actor', 'account', 'homePage') = {"  # noqa: E501
+                    "object__actor__account__home_page:String}"
+                    " OR "
+                    "JSONExtractString(event, 'object', 'object', 'account', 'name') = {"  # noqa: E501
+                    "object__object__account__name:String}"
+                    " AND "
+                    "JSONExtractString(event, 'object', 'object', 'account', 'homePage') = {"  # noqa: E501
+                    "object__object__account__home_page:String}"
+                    " OR "
+                    "JSONExtractString(event, 'object', 'context', 'instructor', 'account', 'name') = {"  # noqa: E501
+                    "object__context__instructor__account__name:String}"
+                    " AND "
+                    "JSONExtractString(event, 'object', 'context', 'instructor', 'account', 'homePage') = {"  # noqa: E501
+                    "object__context__instructor__account__home_page:String}"
+                    " OR "
+                    "JSONExtractString(event, 'object', 'context', 'team', 'account', 'name') = {"  # noqa: E501
+                    "object__context__team__account__name:String}"
+                    " AND "
+                    "JSONExtractString(event, 'object', 'context', 'team', 'account', 'homePage') = {"  # noqa: E501
+                    "object__context__team__account__home_page:String}"
+                ],
+                "params": {
+                    "actor__account__name": "13936749",
+                    "actor__account__home_page": "http://www.example.com",
+                    "object__account__name": "13936749",
+                    "object__account__home_page": "http://www.example.com",
+                    "authority__account__name": "13936749",
+                    "authority__account__home_page": "http://www.example.com",
+                    "context__instructor__account__name": "13936749",
+                    "context__instructor__account__home_page": "http://www.example.com",
+                    "context__team__account__name": "13936749",
+                    "context__team__account__home_page": "http://www.example.com",
+                    "object__actor__account__name": "13936749",
+                    "object__actor__account__home_page": "http://www.example.com",
+                    "object__object__account__name": "13936749",
+                    "object__object__account__home_page": "http://www.example.com",
+                    "object__context__instructor__account__name": "13936749",
+                    "object__context__instructor__account__home_page": "http://www.example.com",
+                    "object__context__team__account__name": "13936749",
+                    "object__context__team__account__home_page": "http://www.example.com",
+                    "ascending": True,
+                    "attachments": False,
+                    "format": "exact",
+                    "limit": 0,
+                    "related_activities": False,
+                    "related_agents": True,
+                },
+                "limit": 0,
+                "sort": "emission_time ASCENDING, event_id ASCENDING",
+            },
+        ),
+        # 10. Query agent with openid IFI, with related_agents.
+        (
+            {
+                "agent": {"openid": "http://toby.openid.example.org/"},
+                "ascending": True,
+                "related_agents": True,
+            },
+            {
+                "where": [
+                    "JSONExtractString(event, 'actor', 'openid') = {"
+                    "actor__openid:String}"
+                    " OR "
+                    "JSONExtractString(event, 'object', 'openid') = {"
+                    "object__openid:String}"
+                    " OR "
+                    "JSONExtractString(event, 'authority', 'openid') = {"
+                    "authority__openid:String}"
+                    " OR "
+                    "JSONExtractString(event, 'context', 'instructor', 'openid') = {"
+                    "context__instructor__openid:String}"
+                    " OR "
+                    "JSONExtractString(event, 'context', 'team', 'openid') = {"
+                    "context__team__openid:String}"
+                    " OR "
+                    "JSONExtractString(event, 'object', 'actor', 'openid') = {"
+                    "object__actor__openid:String}"
+                    " OR "
+                    "JSONExtractString(event, 'object', 'object', 'openid') = {"
+                    "object__object__openid:String}"
+                    " OR "
+                    "JSONExtractString(event, 'object', 'context', 'instructor', 'openid') = {"  # noqa: E501
+                    "object__context__instructor__openid:String}"
+                    " OR "
+                    "JSONExtractString(event, 'object', 'context', 'team', 'openid') = {"  # noqa: E501
+                    "object__context__team__openid:String}"
+                ],
+                "params": {
+                    "actor__openid": "http://toby.openid.example.org/",
+                    "object__openid": "http://toby.openid.example.org/",
+                    "authority__openid": "http://toby.openid.example.org/",
+                    "context__instructor__openid": "http://toby.openid.example.org/",
+                    "context__team__openid": "http://toby.openid.example.org/",
+                    "object__actor__openid": "http://toby.openid.example.org/",
+                    "object__object__openid": "http://toby.openid.example.org/",
+                    "object__context__instructor__openid": "http://toby.openid.example.org/",
+                    "object__context__team__openid": "http://toby.openid.example.org/",
+                    "ascending": True,
+                    "attachments": False,
+                    "format": "exact",
+                    "limit": 0,
+                    "related_activities": False,
+                    "related_agents": True,
+                },
+                "limit": 0,
+                "sort": "emission_time ASCENDING, event_id ASCENDING",
+            },
+        ),
     ],
 )
 def test_backends_database_clickhouse_query_statements_query(

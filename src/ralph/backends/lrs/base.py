@@ -72,6 +72,19 @@ IsoDatetimeStr = Annotated[
     Union[str, datetime], AfterValidator(validate_iso_datetime_str)
 ]
 
+# NOTE: SubStatements cannot have an authority or another SubStatement
+RELATED_AGENTS_FIELDS: list[Union[str, tuple[str, ...]]] = [
+    "actor",
+    "object",
+    "authority",
+    ("context", "instructor"),
+    ("context", "team"),
+    ("object", "actor"),  # SubStatement object
+    ("object", "object"),  # SubStatement object
+    ("object", "context", "instructor"),  # SubStatement object
+    ("object", "context", "team"),  # SubStatement object
+]
+
 
 class LRSStatementsQuery(BaseQuery):
     """Pydantic model for LRS query on Statements resource query parameters.

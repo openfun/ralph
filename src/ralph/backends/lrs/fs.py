@@ -12,6 +12,7 @@ from pydantic_settings import SettingsConfigDict
 from ralph.backends.data.base import BaseOperationType
 from ralph.backends.data.fs import FSDataBackend, FSDataBackendSettings
 from ralph.backends.lrs.base import (
+    RELATED_AGENTS_FIELDS,
     AgentParameters,
     BaseLRSBackend,
     BaseLRSBackendSettings,
@@ -173,12 +174,14 @@ class FSLRSBackend(BaseLRSBackend[FSLRSBackendSettings], FSDataBackend):
 
     @staticmethod
     def _get_related_agents(statement: dict) -> Iterable[dict]:
-        yield statement.get("actor", {})
-        yield statement.get("object", {})
-        yield statement.get("authority", {})
-        context = statement.get("context", {})
-        yield context.get("instructor", {})
-        yield context.get("team", {})
+        for field in RELATED_AGENTS_FIELDS:
+            if isinstance(field, str):
+                yield statement.get(field, {})
+            else:
+                d = statement
+                for part in field:
+                    d = d.get(part, {})
+                yield d
 
     @staticmethod
     def _add_filter_by_mbox(
