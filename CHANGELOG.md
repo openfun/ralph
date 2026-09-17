@@ -11,6 +11,7 @@ and this project adheres to
 ### Added
 
 - API: support for CORS request
+- API: implement GET '/statements' 'related_agents' query parameter
 
 ### Removed
 

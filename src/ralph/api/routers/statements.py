@@ -201,7 +201,6 @@ async def get(  # noqa: PLR0913
         Optional[bool],
         Query(
             description=(
-                "**Not implemented** "
                 "Apply the Activity filter broadly. Include Statements for which "
                 "the Object, any of the context Activities, or any of those properties "
                 "in a contained SubStatement match the Activity parameter, "
@@ -213,7 +212,6 @@ async def get(  # noqa: PLR0913
         Optional[bool],
         Query(
             description=(
-                "**Not implemented** "
                 "Apply the Agent filter broadly. Include Statements for which "
                 "the Actor, Object, Authority, Instructor, Team, or any of these "
                 "properties in a contained SubStatement match the Agent parameter, "

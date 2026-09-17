@@ -1,7 +1,7 @@
 """Elasticsearch LRS backend for Ralph."""
 
 import logging
-from typing import Iterator, List, Optional
+from typing import Iterator, List, Optional, Union
 
 from pydantic_settings import SettingsConfigDict
 
@@ -12,6 +12,7 @@ from ralph.backends.data.es import (
     ESQueryPit,
 )
 from ralph.backends.lrs.base import (
+    RELATED_AGENTS_FIELDS,
     AgentParameters,
     BaseLRSBackend,
     BaseLRSBackendSettings,
@@ -76,7 +77,10 @@ class ESLRSBackend(BaseLRSBackend[ESLRSBackendSettings], ESDataBackend):
         if params.statement_id:
             es_query_filters += [{"term": {"_id": params.statement_id}}]
 
-        ESLRSBackend._add_agent_filters(es_query_filters, params.agent, "actor")
+        if params.related_agents:
+            ESLRSBackend._add_related_agent_filters(es_query_filters, params.agent)
+        else:
+            ESLRSBackend._add_agent_filters(es_query_filters, params.agent, "actor")
         ESLRSBackend._add_agent_filters(es_query_filters, params.authority, "authority")
 
         if params.verb:
@@ -110,9 +114,50 @@ class ESLRSBackend(BaseLRSBackend[ESLRSBackendSettings], ESDataBackend):
         # Note: `params` fields are validated thus we skip their validation in ESQuery.
         return ESQuery.model_construct(**es_query)
 
+    def _get_agent_filters(
+        agent_params: AgentParameters,
+        target_field: Union[str, tuple[str, ...]],
+    ) -> None:
+        """Get filters relative to agents."""
+        if not agent_params:
+            return None
+        if not isinstance(agent_params, dict):
+            agent_params = agent_params.model_dump()
+
+        if not isinstance(target_field, str):
+            target_field = ".".join(target_field)
+
+        if agent_params.get("mbox"):
+            field = f"{target_field}.mbox.keyword"
+            return {"term": {field: agent_params.get("mbox")}}
+        elif agent_params.get("mbox_sha1sum"):
+            field = f"{target_field}.mbox_sha1sum.keyword"
+            return {"term": {field: agent_params.get("mbox_sha1sum")}}
+        elif agent_params.get("openid"):
+            field = f"{target_field}.openid.keyword"
+            return {"term": {field: agent_params.get("openid")}}
+        elif agent_params.get("account__name"):
+            field_name = f"{target_field}.account.name.keyword"
+            field_homepage = f"{target_field}.account.homePage.keyword"
+            return {
+                "bool": {
+                    "filter": [
+                        {"term": {field_name: agent_params.get("account__name")}},
+                        {
+                            "term": {
+                                field_homepage: agent_params.get("account__home_page")
+                            }
+                        },
+                    ]
+                }
+            }
+        return None
+
     @staticmethod
     def _add_agent_filters(
-        es_query_filters: list, agent_params: AgentParameters, target_field: str
+        es_query_filters: list,
+        agent_params: AgentParameters,
+        target_field: Union[str, tuple[str, ...]],
     ) -> None:
         """Add filters relative to agents to `es_query_filters`."""
         if not agent_params:
@@ -120,6 +165,9 @@ class ESLRSBackend(BaseLRSBackend[ESLRSBackendSettings], ESDataBackend):
 
         if not isinstance(agent_params, dict):
             agent_params = agent_params.model_dump()
+
+        if not isinstance(target_field, str):
+            target_field = ".".join(target_field)
 
         if agent_params.get("mbox"):
             field = f"{target_field}.mbox.keyword"
@@ -131,9 +179,38 @@ class ESLRSBackend(BaseLRSBackend[ESLRSBackendSettings], ESDataBackend):
             field = f"{target_field}.openid.keyword"
             es_query_filters += [{"term": {field: agent_params.get("openid")}}]
         elif agent_params.get("account__name"):
-            field = f"{target_field}.account.name.keyword"
-            es_query_filters += [{"term": {field: agent_params.get("account__name")}}]
-            field = f"{target_field}.account.homePage.keyword"
+            field_name = f"{target_field}.account.name.keyword"
+            field_homepage = f"{target_field}.account.homePage.keyword"
             es_query_filters += [
-                {"term": {field: agent_params.get("account__home_page")}}
+                {
+                    "bool": {
+                        "filter": [
+                            {"term": {field_name: agent_params.get("account__name")}},
+                            {
+                                "term": {
+                                    field_homepage: agent_params.get(
+                                        "account__home_page"
+                                    )
+                                }
+                            },
+                        ]
+                    }
+                }
             ]
+
+    @classmethod
+    def _add_related_agent_filters(
+        cls, es_query_filters: list, agent_params: AgentParameters
+    ) -> None:
+        """Add filters relative to agents to `where`, including any 'related agents'."""
+        if not agent_params:
+            return
+        related_filters = []
+        for field in RELATED_AGENTS_FIELDS:
+            field_filters = cls._get_agent_filters(
+                agent_params=agent_params, target_field=field
+            )
+            if field_filters is not None:
+                related_filters.append(field_filters)
+        if len(related_filters) > 0:
+            es_query_filters += [{"bool": {"should": related_filters}}]
