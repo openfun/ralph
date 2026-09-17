@@ -31,7 +31,7 @@ from tests.fixtures.backends import (
 )
 
 from ..fixtures.auth import AUDIENCE, ISSUER_URI, mock_basic_auth_user, mock_oidc_user
-from ..helpers import mock_activity, mock_agent
+from ..helpers import mock_activity, mock_agent, mock_verb
 
 
 def insert_es_statements(es_client, statements, index=ES_TEST_INDEX):
@@ -806,7 +806,7 @@ async def test_api_statements_get_invalid_query_parameters(
     for invalid_param, value in [
         ("activity", mock_activity()["id"]),
         ("agent", json.dumps(mock_agent("mbox", 1))),
-        ("verb", "verb_1"),
+        ("verb", mock_verb()),
     ]:
         response = await client.get(
             f"/xAPI/statements/?{id_param}={id_1}&{invalid_param}={value}",
