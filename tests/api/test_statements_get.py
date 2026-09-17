@@ -30,7 +30,15 @@ from tests.fixtures.backends import (
     get_mongo_test_backend,
 )
 
-from ..fixtures.auth import AUDIENCE, ISSUER_URI, mock_basic_auth_user, mock_oidc_user
+from ..fixtures.auth import (
+    AUDIENCE,
+    CLIENT_ID,
+    CLIENT_SECRET,
+    ISSUER_URI,
+    TOKEN_ISS,
+    mock_basic_auth_user,
+    mock_oidc_user,
+)
 from ..helpers import mock_activity, mock_agent
 
 
@@ -889,20 +897,25 @@ async def test_api_statements_get_scopes(  # noqa: PLR0913
             "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_AUDIENCE",
             AUDIENCE,
         )
+        monkeypatch.setattr(
+            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_CLIENT_ID",
+            CLIENT_ID,
+        )
+        monkeypatch.setattr(
+            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_CLIENT_SECRET",
+            CLIENT_SECRET,
+        )
 
         sub = "123|oidc"
-        iss = "https://iss.example.com"
-        agent = {"openid": f"{iss}/{sub}"}
+        agent = {"openid": f"{TOKEN_ISS}/{sub}"}
         oidc_token = mock_oidc_user(sub=sub, scopes=scopes)
         headers = {"Authorization": f"Bearer {oidc_token}"}
 
         monkeypatch.setattr(
-            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_ISSUER_URI",
-            "http://providerHost:8080/auth/realms/real_name",
+            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_ISSUER_URI", ISSUER_URI
         )
         monkeypatch.setattr(
-            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_AUDIENCE",
-            "http://clientHost:8100",
+            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_AUDIENCE", AUDIENCE
         )
 
     # Mock statements
