@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- API: support for CORS request
+
 ### Removed
 
 - Drop support for Python 3.8
@@ -33,6 +37,8 @@ and this project adheres to
 - Fix error with OIDC scopes unrelated to Ralph
 - Fix oidc test `test_api_auth_oidc_get_whoami_invalid_backend`
   being misconfigured
+- Keep CORS disabled by default in `.env.dist` so a bootstrapped `.env` no
+  longer breaks the `RUNSERVER_CORS_ALLOW_ORIGINS` settings unit tests
 
 ### Changed
 
