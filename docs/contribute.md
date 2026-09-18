@@ -8,7 +8,7 @@ Issues are a valuable way to contribute to Ralph. They can include bug reports, 
 
 ### 1. Search for existing issues
 
-Before creating a new issue, search the [existing issues](https://github.com/openfun/ralph/issues) to see if your concern has already been raised. 
+Before creating a new issue, search the [existing issues](https://github.com/openfun/ralph/issues) to see if your concern has already been raised.
 If you find a related issue, you can add your input or follow the discussion.
 Feel free to engage in discussions, offer help, or provide feedback on existing issues.
 Your input is valuable in shaping the project's future.
@@ -18,10 +18,10 @@ Your input is valuable in shaping the project's future.
 Use the provided [issue template](https://github.com/openfun/ralph/issues/new/choose) that fits the best to your concern.
 Provide as much information as possible when writing your issue.
 Your issue will be reviewed by a project maintainer and you may be offered to open a PR if you want to contribute to the code.
-If not, and if your issue is relevant, a contributor will apply the changes to the project. 
+If not, and if your issue is relevant, a contributor will apply the changes to the project.
 The issue will then be automatically closed when the PR is merged.
 
-Issues will be closed by project maintainers if they are deemed invalid. 
+Issues will be closed by project maintainers if they are deemed invalid.
 You can always reopen an issue if you believe it hasn't been adequately addressed.
 
 ### 3. Code of conduct in discussion
@@ -48,12 +48,12 @@ Discussions in the Ralph repository are a place for open-ended conversations, qu
 
 ## Pull Requests (PR)
 
-Contributing to Ralph through pull requests is a powerful way to advance the project. 
+Contributing to Ralph through pull requests is a powerful way to advance the project.
 If you want to make changes or add new features, please follow these steps to submit a PR:
 
 ### 1. Fork the repository
 
-Begin by forking Ralph project's repository. 
+Begin by forking Ralph project's repository.
 
 ### 2. Clone the fork
 
@@ -72,14 +72,14 @@ Create a new branch for your changes, ideally with a descriptive name:
 git checkout -b your-new-feature
 ```
 
-### 4. Make changes 
+### 4. Make changes
 
 Implement the changes or additions to the code, ensuring it follows [OpenFUN coding and documentation standards](https://handbook.openfun.fr/python).
 
 For comprehensive guidance on starting your development journey with Ralph and preparing your pull request, please refer to our dedicated [Start developing with Ralph](./tutorials/development_guide.md) tutorial.
 
-When committing your changes, please adhere to [OpenFUN commit practices](https://handbook.openfun.fr/git#git-conventions). 
-Follow the low granularity commit splitting approach and use commit messages based on the Angular commit message guidelines. 
+When committing your changes, please adhere to [OpenFUN commit practices](https://handbook.openfun.fr/git#git-conventions).
+Follow the low granularity commit splitting approach and use commit messages based on the Angular commit message guidelines.
 
 ### 5. Push changes
 
@@ -100,11 +100,11 @@ This helps streamline the review process and maintain a well-documented project 
 
 ### 7. Review and discussion
 
-Ralph project maintainers will review your PR. 
-Be prepared to make necessary changes or address any feedback. 
+Ralph project maintainers will review your PR.
+Be prepared to make necessary changes or address any feedback.
 Patience during this process is appreciated.
 
 ### 8. Merge
 
-Once your PR is approved, Ralph maintainers will merge your changes into the main project. 
+Once your PR is approved, Ralph maintainers will merge your changes into the main project.
 Congratulations, you've successfully contributed to Ralph! 🎉

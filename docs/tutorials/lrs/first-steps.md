@@ -55,7 +55,7 @@ We can request the `whoami` endpoint to check if the user is authenticated. On s
     curl http://localhost:8100/whoami
     ```
     ```console
-    {"detail":"Invalid authentication credentials"}% 
+    {"detail":"Invalid authentication credentials"}%
     ```
 
 === "HTTPie"

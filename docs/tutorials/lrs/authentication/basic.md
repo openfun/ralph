@@ -20,7 +20,7 @@ To create a new user credentials, Ralph CLI provides a dedicated command:
     ```
 
 === "Docker Compose"
-    
+
     ```bash
     docker compose run --rm lrs \
       ralph auth \
@@ -39,24 +39,24 @@ This command updates your credentials file with the new `janedoe` user.
 Here is the file that has been created by the `ralph auth` command:
 
 ```json title="auth.json"
-[                                                                               
-  {                                                                             
-    "agent": {                                                                  
-      "mbox": "mailto:janedoe@example.com",                                     
-      "objectType": "Agent",                                                    
-      "name": null                                                              
-    },                                                                          
-    "scopes": [                                                                 
-      "statements/write",                                                           
+[
+  {
+    "agent": {
+      "mbox": "mailto:janedoe@example.com",
+      "objectType": "Agent",
+      "name": null
+    },
+    "scopes": [
+      "statements/write",
       "statements/read"
-    ],                                                                          
-    "hash": "$2b$12$eQmMF/7ALdNuksL4lkI.NuTibNjKLd0fw2Xe.FZqD0mNkgnnjLLPa",     
-    "username": "janedoe"                                                       
-  }                                                                             
-] 
+    ],
+    "hash": "$2b$12$eQmMF/7ALdNuksL4lkI.NuTibNjKLd0fw2Xe.FZqD0mNkgnnjLLPa",
+    "username": "janedoe"
+  }
+]
 ```
 
-Alternatively, the credentials file **can also be created manually**. It is expected to be a valid JSON file. Its location is specified by the `RALPH_AUTH_FILE` configuration value. 
+Alternatively, the credentials file **can also be created manually**. It is expected to be a valid JSON file. Its location is specified by the `RALPH_AUTH_FILE` configuration value.
 
 !!! tip
     By default, Ralph LRS looks for the `auth.json` file in the application directory (see [click
@@ -68,7 +68,7 @@ The expected format is a list of entries (JSON objects) each containing:
 - the username
 - the user's hashed+salted password
 - the scopes they can access
-- an `agent` object used to represent the user in the LRS. 
+- an `agent` object used to represent the user in the LRS.
 
 !!! info
 
@@ -123,8 +123,8 @@ we can request the `whoami` endpoint again, but this time sending our username a
 
 === "HTTPie"
 
-    ``` 
-    http -a janedoe:supersecret :8100/whoami 
+    ```
+    http -a janedoe:supersecret :8100/whoami
     ```
     ``` console
     HTTP/1.1 200 OK
@@ -157,7 +157,7 @@ Congrats! 🎉 You have been successfully authenticated!
 
     To configure this cache, you can define the following environment variables:
 
-    - the maximum number of entries in the cache. Select a value greater than the maximum number of individual user credentials, for better performance. Defaults to 100. 
+    - the maximum number of entries in the cache. Select a value greater than the maximum number of individual user credentials, for better performance. Defaults to 100.
 
     ```bash
     RALPH_AUTH_CACHE_MAX_SIZE=100

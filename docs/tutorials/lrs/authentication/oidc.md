@@ -74,7 +74,7 @@ services:
 networks:
   ralph:
     external: true
-    
+
 ```
 
 Again, we need to create the `.ralph` directory:
@@ -102,7 +102,7 @@ Now that both Keycloak and Ralph LRS server are up and running, we should be abl
     ```
 
     ```bash
-    {"access_token":"<access token content>","expires_in":300,"refresh_expires_in":1800,"refresh_token":"<refresh token content>","token_type":"Bearer","not-before-policy":0,"session_state":"0889b3a5-d742-45fb-98b3-20e967960e74","scope":"email profile"} 
+    {"access_token":"<access token content>","expires_in":300,"refresh_expires_in":1800,"refresh_token":"<refresh token content>","token_type":"Bearer","not-before-policy":0,"session_state":"0889b3a5-d742-45fb-98b3-20e967960e74","scope":"email profile"}
     ```
 === "HTTPie"
 
@@ -134,12 +134,12 @@ Now that both Keycloak and Ralph LRS server are up and running, we should be abl
 With this access token, we can now make a request to the Ralph LRS server:
 
 === "curl"
-    
+
     ```bash
     curl -H 'Authorization: Bearer <access token content>' \
     http://localhost:8100/whoami
     ```
-    
+
     ```bash
     {"agent":{"openid":"http://localhost:8080/auth/realms/fun-mooc/b6e85bd0-ce6e-4b24-9f0e-6e18d8744e54"},"scopes":["email","profile"]}
     ```
