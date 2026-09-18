@@ -11,6 +11,8 @@ and this project adheres to
 ### Added
 
 - API: support for CORS request
+- API: allow users with new `authority/write` scope to override authority
+       when PUTting or POSTing statements
 
 ### Removed
 

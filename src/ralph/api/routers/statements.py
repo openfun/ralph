@@ -19,7 +19,7 @@ from fastapi import (
     status,
 )
 from fastapi.dependencies.models import Dependant
-from pydantic import TypeAdapter
+from pydantic import TypeAdapter, ValidationError
 from pydantic.types import Json
 from typing_extensions import Annotated
 
@@ -98,9 +98,21 @@ def _enrich_statement_with_authority(
 ) -> None:
     # authority: Information about whom or what has asserted the statement is true.
     # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#249-authority
-    statement["authority"] = current_user.agent.model_dump(
-        exclude_none=True, mode="json"
-    )
+    can_set_authority = current_user.scopes.is_authorized("authority/write")
+    authority = None
+    if can_set_authority and "authority" in statement:
+        # If user is permitted to manually set authority,
+        # extract it from the statement and validate it.
+        try:
+            # NOTE: Hack to validate authority, whatever its IFI type.
+            temp_user = AuthenticatedUser(agent=statement["authority"])
+            authority = temp_user.agent
+        except ValidationError:
+            logger.warning("Failed to set authority as requested, validation error.")
+            authority = None
+    if authority is None:
+        authority = current_user.agent.model_dump(exclude_none=True, mode="json")
+    statement["authority"] = authority
 
 
 def _parse_agent_parameters(agent_obj: dict) -> AgentParameters:

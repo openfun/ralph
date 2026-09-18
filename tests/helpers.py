@@ -129,12 +129,13 @@ def mock_agent(
     raise ValueError("No valid ifi was provided to mock_agent")
 
 
-def mock_statement(
+def mock_statement(  # noqa: PLR0913
     id_: Optional[Union[UUID, int]] = None,
     actor: Optional[Union[dict, int]] = None,
     verb: Optional[Union[dict, int]] = None,
     object: Optional[Union[dict, int]] = None,
     timestamp: Optional[Union[str, int]] = None,
+    authority: Optional[Union[dict, int]] = None,
 ):
     """Generate fake statements with random or provided parameters.
 
@@ -150,15 +151,24 @@ def mock_statement(
         timestamp: timestamp of the statement. Use `""` to omit timestamp
     """
 
+    statement = {}
     # Id
     if id_ is None:
         id_ = str(uuid.uuid4())
+    statement["id"] = id_
 
     # Actor
     if actor is None:
         actor = mock_agent()
     elif isinstance(actor, int):
         actor = mock_agent(id_=actor)
+    statement["actor"] = actor
+
+    # Authority
+    if isinstance(authority, int):
+        authority = mock_agent(id_=authority)
+    if authority is not None:
+        statement["authority"] = authority
 
     # Verb
     if verb is None:
@@ -170,6 +180,7 @@ def mock_statement(
         }
     elif isinstance(verb, int):
         verb = {"id": f"https://w3id.org/xapi/video/verbs/{verb}"}
+    statement["verb"] = verb
 
     # Object
     if object is None:
@@ -181,6 +192,7 @@ def mock_statement(
         }
     elif isinstance(object, int):
         object = {"id": f"http://example.adlnet.gov/xapi/example/activity_{object}"}
+    statement["object"] = object
 
     # Timestamp
     if timestamp is None:
@@ -192,21 +204,10 @@ def mock_statement(
         timestamp = datetime.strftime(
             datetime.fromtimestamp(1696236665 + timestamp), "%Y-%m-%dT%H:%M:%S+00:00"
         )
-    elif timestamp == "":
-        return {
-            "id": id_,
-            "actor": actor,
-            "verb": verb,
-            "object": object,
-        }
+    if timestamp != "":
+        statement["timestamp"] = timestamp
 
-    return {
-        "id": id_,
-        "actor": actor,
-        "verb": verb,
-        "object": object,
-        "timestamp": timestamp,
-    }
+    return statement
 
 
 def configure_env_for_mock_oidc_auth(
