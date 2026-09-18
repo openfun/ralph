@@ -35,6 +35,7 @@ and this project adheres to
 - Fix XAPI definitions extensions not accepting empty strings as values.
 - Keep CORS disabled by default in `.env.dist` so a bootstrapped `.env` no
   longer breaks the `RUNSERVER_CORS_ALLOW_ORIGINS` settings unit tests
+- Fix Ralph returning 500 errors on query parameter validation errors
 
 ### Changed
 

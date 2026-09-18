@@ -1,5 +1,6 @@
 """Common for xAPI base definitions."""
 
+import re
 from typing import Annotated, Dict, Type, Union
 
 from langcodes import tag_is_valid
@@ -9,12 +10,23 @@ from pydantic import (
     model_validator,
     validate_email,
 )
-from rfc3987 import parse
+from rfc3987 import parse, patterns_no_names
 
 from ralph.conf import NonEmptyStrictStr
 
+# NOTE: Pydantic uses Rust's regex crate by default.
+#       That implementation is faster but it does not
+#       support all the features that `re` does.
+#       As such, it is not compatible with the regex from the `rfc3987`.
+#       However, we can force Pydantic to use the `re` engine
+#       for this specific regular expression
+#       by compiling the pattern beforehand.
+# see: https://pydantic.dev/docs/validation/latest/get-started/migration/#patterns--regex-on-strings
+compiled_iri_pattern = re.compile(patterns_no_names["IRI"])
+IRIStr = Annotated[str, StringConstraints(pattern=compiled_iri_pattern)]
 
-class IRI(RootModel[Union["IRI", str]]):
+
+class IRI(RootModel[Union[IRIStr, "IRI"]]):
     """Pydantic custom data type validating RFC 3987 IRIs."""
 
     def __hash__(self):  # noqa: D105
