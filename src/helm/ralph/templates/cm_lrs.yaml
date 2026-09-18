@@ -9,7 +9,7 @@ data:
   RALPH_APP_DIR: {{ .Values.lrs.appDir | quote }}
   RALPH_RUNSERVER_BACKEND: {{ .Values.lrs.backend | quote }}
   RALPH_RUNSERVER_MAX_SEARCH_HITS_COUNT: {{ .Values.lrs.maxSearchHitsCount | quote }}
-  
+
   # CLI
   RALPH_CONVERTER_EDX_XAPI_UUID_NAMESPACE: {{ .Values.lrs.converterNamespace | quote }}
 
@@ -41,4 +41,3 @@ data:
   RALPH_SENTRY_LRS_TRACES_SAMPLE_RATE: {{ .Values.lrs.sentry.lrsSampleRate | quote }}
   RALPH_SENTRY_IGNORE_HEALTH_CHECKS: {{ .Values.lrs.sentry.ignoreHealthChecks | quote }}
   {{- end }}
-

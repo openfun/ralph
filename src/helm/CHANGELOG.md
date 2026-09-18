@@ -43,7 +43,7 @@ and this project adheres to
 - Upgrade appVersion to `4.0.0`
 - Environment variables are now provided through a ConfigMap and a Secret
 - Improve Ingress configuration
-- Improved values based on Helm chart template file 
+- Improved values based on Helm chart template file
 
 ### Removed
 

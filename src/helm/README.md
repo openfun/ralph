@@ -167,7 +167,7 @@ We provide two example manifests
 ([`ralph-env-secret.yaml`](https://github.com/openfun/ralph/blob/main/src/helm/manifests/ralph-env-secret.yaml)
 and
 [`ralph-env-cm.yml`](https://github.com/openfun/ralph/blob/main/src/helm/manifests/ralph-env-cm.yaml))
-that you can adapt to fit your needs. 
+that you can adapt to fit your needs.
 
 For this tutorial, we only need to replace the `<PASSWORD>` tag in the Secret manifest
 by the actual password of the `elastic` user with the command:
@@ -227,4 +227,3 @@ Now that the LRS is running, we can go further and deploy the dashboard suite Wa
 Refer to the
 [tutorial](https://github.com/openfun/warren/tree/main/src/helm#deploy-the-dashboard-suite-warren)
 of the Warren Helm chart.
-

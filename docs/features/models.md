@@ -25,14 +25,14 @@ Learning statement models encompass a wide array of xAPI and OpenEdx statement t
 
 ## Statements validation
 
-In learning analytics, the validation of statements takes on significant importance. 
-These statements, originating from diverse sources, systems or applications, must align with specific standards such as [xAPI](https://xapi.com/) for the best known. 
-The validation process becomes essential in ensuring that these statements meet the required standards, facilitating data quality and reliability. 
+In learning analytics, the validation of statements takes on significant importance.
+These statements, originating from diverse sources, systems or applications, must align with specific standards such as [xAPI](https://xapi.com/) for the best known.
+The validation process becomes essential in ensuring that these statements meet the required standards, facilitating data quality and reliability.
 
-Ralph allows you to automate the validation process in your production stack. 
+Ralph allows you to automate the validation process in your production stack.
 OpenEdx related events and xAPI statements are supported.
 
-!!! warning 
+!!! warning
 
     For now, validation is effective only with supported [learning statement models](#learning-statement-models) on Ralph. About xAPI statements, an [issue](https://github.com/openfun/ralph/issues/388) is open to extend validation to any xAPI statement.
 
@@ -43,7 +43,7 @@ Check out tutorials to test the validation feature:
 
 ## Statements conversion
 
-Ralph currently supports conversion from OpenEdx learning events to xAPI statements. Here is the up-to-date conversion sets availables: 
+Ralph currently supports conversion from OpenEdx learning events to xAPI statements. Here is the up-to-date conversion sets availables:
 
 | FROM | TO |
 |---|---|
