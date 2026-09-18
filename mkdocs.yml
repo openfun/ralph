@@ -19,7 +19,7 @@ theme:
     - content.code.annotate
     - content.code.copy
     - content.tabs.link
-    - navigation.indexes 
+    - navigation.indexes
     - navigation.tabs
 
 markdown_extensions:
@@ -49,7 +49,7 @@ nav:
         - Learning statements models: features/models.md
     - Tutorials:
         - Ralph CLI Guide: tutorials/cli.md
-        - Ralph LRS Guide: 
+        - Ralph LRS Guide:
             - tutorials/lrs/index.md
             - tutorials/lrs/first-steps.md
             - Authentication:

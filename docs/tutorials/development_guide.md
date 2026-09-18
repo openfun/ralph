@@ -58,7 +58,7 @@ RALPH_BACKENDS__LRS__ES__TEST_INDEX=test-index
 
 !!! warning "Disk space for Elasticsearch"
 
-    Ensure that you have at least **10%** of available disk space on your machine to run Elasticsearch. 
+    Ensure that you have at least **10%** of available disk space on your machine to run Elasticsearch.
 
 Once configured, start the database container using the following command, substituting `[BACKEND]` by the backend name (_e.g._ `es` for Elasticsearch):
 

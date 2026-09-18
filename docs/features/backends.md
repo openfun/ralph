@@ -1,7 +1,7 @@
 # Backends for data storage
 
 Ralph supports various backends that can be accessed to read from or write to (learning events or random data).
-Implemented backends are listed below along with their configuration parameters. 
+Implemented backends are listed below along with their configuration parameters.
 If your favourite data storage method is missing, feel free to submit your implementation or get in touch!
 
 ## Key concepts
@@ -40,7 +40,7 @@ it can also be used to fetch indexed data from it.
     options:
       show_root_heading: false
       show_source: false
-      members: 
+      members:
         - attributes
 
 ## MongoDB
@@ -53,7 +53,7 @@ it can also be used to fetch collections of documents from it.
     options:
       show_root_heading: false
       show_source: false
-      members: 
+      members:
         - attributes
 
 ## ClickHouse
@@ -66,7 +66,7 @@ documents from it.
     options:
       show_root_heading: false
       show_source: false
-      members: 
+      members:
         - attributes
 
 The ClickHouse client options supported in Ralph can be found in these locations:
@@ -101,7 +101,7 @@ requests on the `/dbaas/logs/*` path.
     options:
       show_root_heading: false
       show_source: false
-      members: 
+      members:
         - attributes
 
 For more information about OVH's API client parameters, please refer to the
@@ -121,7 +121,7 @@ OpenStack Keystone service and configuration to work with the target container.
     options:
       show_root_heading: false
       show_source: false
-      members: 
+      members:
         - attributes
 
 ## Amazon S3
@@ -129,7 +129,7 @@ OpenStack Keystone service and configuration to work with the target container.
 S3 is the Amazon Simple Storage Service. This storage backend is fully
 supported (read and write operations) to stream and store log archives.
 
-Parameters correspond to a standard authentication with AWS CLI 
+Parameters correspond to a standard authentication with AWS CLI
 and configuration to work with the target bucket.
 
 ### ::: ralph.backends.data.s3.S3DataBackendSettings
@@ -137,12 +137,12 @@ and configuration to work with the target bucket.
     options:
       show_root_heading: false
       show_source: false
-      members: 
+      members:
         - attributes
 
 ## File system
 
-The file system backend is a dummy template that can be used to develop your own backend. 
+The file system backend is a dummy template that can be used to develop your own backend.
 It is a "dummy" backend as it is not intended for practical use (UNIX `ls` and `cat` would be more practical).
 
 The only required parameter is the `path` we want to list or stream content from.
@@ -152,12 +152,12 @@ The only required parameter is the `path` we want to list or stream content from
     options:
       show_root_heading: false
       show_source: false
-      members: 
+      members:
         - attributes
 
 ## Learning Record Store (LRS)
 
-The LRS backend is used to store and retrieve xAPI statements from various systems that follow the [xAPI specification](https://github.com/adlnet/xAPI-Spec/tree/master) (such as our own Ralph LRS, which can be run from this package). 
+The LRS backend is used to store and retrieve xAPI statements from various systems that follow the [xAPI specification](https://github.com/adlnet/xAPI-Spec/tree/master) (such as our own Ralph LRS, which can be run from this package).
 LRS systems are mostly used in e-learning infrastructures.
 
 ### ::: ralph.backends.data.lrs.LRSDataBackendSettings
@@ -165,7 +165,7 @@ LRS systems are mostly used in e-learning infrastructures.
     options:
       show_root_heading: false
       show_source: false
-      members: 
+      members:
         - attributes
 
 ## WebSocket
@@ -181,7 +181,7 @@ The webSocket backend is **read-only** and can be used to get real-time events.
     options:
       show_root_heading: false
       show_source: false
-      members: 
+      members:
         - attributes
 
 ### ::: ralph.backends.data.async_ws.WSClientOptions

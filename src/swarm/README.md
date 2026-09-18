@@ -39,7 +39,7 @@ For informations about nodes in the swarm, execute:
 docker node ls
 ```
 
-> 💡 Tip 
+> 💡 Tip
 > If you want to add more nodes to the cluster, refer to this
 > [documentation](https://docs.docker.com/engine/swarm/swarm-tutorial/add-nodes/).
 
@@ -90,7 +90,7 @@ Docker Engine in swarm mode can deploy services defined in a Compose file.
 Adjust the `docker-compose.prod.yml` file and the environment file `ralph.env` as per
 your requirements, including Ralph's docker image tags.
 
-Once ready, deploy the service using the command: 
+Once ready, deploy the service using the command:
 ```bash
 docker stack deploy lrs --compose-file docker-compose.prod.yml --with-registry-auth
 ```
