@@ -2,6 +2,7 @@
 
 import base64
 import json
+import os
 
 import bcrypt
 import pytest
@@ -12,7 +13,6 @@ from ralph.api.auth.basic import (
     ServerUsersCredentials,
     UserCredentials,
     get_basic_auth_user,
-    get_stored_credentials,
 )
 from ralph.api.auth.user import AuthenticatedUser, UserScopes
 from ralph.conf import AuthBackend, Settings, settings
@@ -28,6 +28,25 @@ STORED_CREDENTIALS = json.dumps(
             "agent": {"mbox": "mailto:ralph@example.com"},
             "target": "custom_target",
         }
+    ]
+)
+
+STORED_CREDENTIALS_MORE = json.dumps(
+    [
+        {
+            "username": "ralph",
+            "hash": bcrypt.hashpw(b"admin", bcrypt.gensalt()).decode("UTF-8"),
+            "scopes": ["statements/read/mine", "statements/write"],
+            "agent": {"mbox": "mailto:ralph@example.com"},
+            "target": "custom_target",
+        },
+        {
+            "username": "foo",
+            "hash": bcrypt.hashpw(b"bar", bcrypt.gensalt()).decode("UTF-8"),
+            "scopes": ["statements/read/mine", "statements/write"],
+            "agent": {"mbox": "mailto:foo@example.com"},
+            "target": "custom_target",
+        },
     ]
 )
 
@@ -101,8 +120,8 @@ def test_api_auth_basic_caching_credentials(fs):
 
     auth_file_path = settings.APP_DIR / "auth.json"
     fs.create_file(auth_file_path, contents=STORED_CREDENTIALS)
+    auth_file_modified_time = os.path.getmtime(auth_file_path)
     get_basic_auth_user.cache_clear()
-    get_stored_credentials.cache_clear()
 
     credentials = HTTPBasicCredentials(username="ralph", password="admin")
 
@@ -110,13 +129,61 @@ def test_api_auth_basic_caching_credentials(fs):
     get_basic_auth_user(credentials=credentials)
 
     assert get_basic_auth_user.cache.popitem() == (
-        ("ralph", "admin"),
+        (auth_file_path, auth_file_modified_time, "ralph", "admin"),
         AuthenticatedUser(
             agent={"mbox": "mailto:ralph@example.com"},
             scopes=UserScopes(["statements/read/mine", "statements/write"]),
             target="custom_target",
         ),
     )
+
+
+def test_api_auth_basic_new_credentials(fs):
+    """Test the authentication with new credentials and without clearing cache"""
+
+    auth_file_path = settings.APP_DIR / "auth.json"
+    fs.create_file(auth_file_path, contents=STORED_CREDENTIALS)
+    get_basic_auth_user.cache_clear()
+
+    credentials = HTTPBasicCredentials(username="ralph", password="admin")
+    # Try to authenticate with known user, create cache entry
+    get_basic_auth_user(credentials)
+    # Add a new user to credentials file
+    # In order to test this, we do NOT clear cache
+    auth_file_mtime = os.path.getmtime(auth_file_path)
+    # FIX: Force update of modification time.
+    # It does not seem to be updated by setting the content of the pyfakefs file
+    os.remove(auth_file_path)
+    fs.create_file(auth_file_path, contents=STORED_CREDENTIALS_MORE)
+    assert os.path.getmtime(auth_file_path) > auth_file_mtime
+    credentials_new = HTTPBasicCredentials(username="foo", password="bar")
+
+    # Try to authenticate with new user, should succeed
+    get_basic_auth_user(credentials_new)
+
+
+def test_api_auth_basic_deleted_credentials(fs):
+    """Test the authentication with deleted credentials and without clearing cache."""
+
+    auth_file_path = settings.APP_DIR / "auth.json"
+    fs.create_file(auth_file_path, contents=STORED_CREDENTIALS_MORE)
+    get_basic_auth_user.cache_clear()
+
+    credentials = HTTPBasicCredentials(username="foo", password="bar")
+    # Try to authenticate with known user, create cache entry
+    get_basic_auth_user(credentials)
+
+    # In order to test this, we do NOT clear cache
+    auth_file_mtime = os.path.getmtime(auth_file_path)
+    # FIX: Force update of modification time.
+    # It does not seem to be updated by setting the content of the pyfakefs file
+    os.remove(auth_file_path)
+    fs.create_file(auth_file_path, contents=STORED_CREDENTIALS)
+    assert os.path.getmtime(auth_file_path) > auth_file_mtime
+
+    # Try to authenticate with a deleted user, should fail
+    with pytest.raises(HTTPException):
+        get_basic_auth_user(credentials)
 
 
 def test_api_auth_basic_with_wrong_password(fs):
