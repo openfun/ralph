@@ -11,6 +11,8 @@ and this project adheres to
 ### Added
 
 - API: support for CORS request
+- Improve validation error reporting for empty or invalid values
+  in xAPI statements
 
 ### Removed
 
