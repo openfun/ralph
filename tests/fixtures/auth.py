@@ -276,7 +276,7 @@ def _mock_oidc_introspection_response(sub, scopes, target=None):
     return token_introspection
 
 
-def _mock_oidc_user_info_plain_response(sub: str, scopes, target=None):
+def _mock_oidc_user_info_plain_response(sub: str, target=None):
     """Mock unencoded OIDC user info claims with provided params."""
     if sub is None:
         raise ValueError(
@@ -285,7 +285,6 @@ def _mock_oidc_user_info_plain_response(sub: str, scopes, target=None):
         )
     user_info = {
         "sub": sub,
-        "scope": " ".join(scopes),
     }
     if target is not None:
         user_info["target"] = target
@@ -389,11 +388,9 @@ def mock_oidc_user(
     )
 
     if userinfo_response_type is None:
-        user_info = _mock_oidc_user_info_plain_response(
-            sub=sub, scopes=scopes, target=target
-        )
+        user_info = _mock_oidc_user_info_plain_response(sub=sub, target=target)
         oidc_jwt_token = encode_jwt(
-            claims={**user_info, "iss": TOKEN_ISS},
+            claims={**user_info, "iss": TOKEN_ISS, "scope": " ".join(scopes)},
             algorithm=ALGORITHM,
             headers={
                 "kid": PUBLIC_KEY_ID,
@@ -432,9 +429,7 @@ def mock_oidc_user(
         if sub is None:
             return (401, {}, "")
 
-        user_info = _mock_oidc_user_info_plain_response(
-            sub=sub, scopes=scopes, target=target
-        )
+        user_info = _mock_oidc_user_info_plain_response(sub=sub, target=target)
         if userinfo_response_type == "plain":
             return (200, {"Content-Type": "application/json"}, json.dumps(user_info))
         elif userinfo_response_type == "jwt":

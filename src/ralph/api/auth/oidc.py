@@ -44,7 +44,6 @@ class UserInfo(BaseModel):
     """
 
     sub: str
-    scope: Optional[str] = None
     target: Optional[str] = None
 
     model_config = ConfigDict(extra="ignore")
@@ -89,11 +88,13 @@ class TokenIntrospection(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
 
-def make_authenticated_oidc_user(iss: str, user_info: UserInfo) -> AuthenticatedUser:
+def make_authenticated_oidc_user(
+    user_info: UserInfo, iss: str, scope: Optional[str]
+) -> AuthenticatedUser:
     """Factory function for `AuthenticatedUser` when it is an OIDC user."""
     return AuthenticatedUser(
         agent={"openid": f"{iss}/{user_info.sub}"},
-        scopes=get_user_scopes(user_info.scope),
+        scopes=get_user_scopes(scope),
         target=user_info.target,
     )
 
@@ -359,7 +360,9 @@ def get_oidc_user(
             encoded_user_info=access_token, provider_config=provider_config
         )
         user_info = UserInfo.model_validate(id_token)
-        return make_authenticated_oidc_user(iss=id_token["iss"], user_info=user_info)
+        return make_authenticated_oidc_user(
+            user_info=user_info, iss=id_token["iss"], scope=id_token.get("scope")
+        )
 
     client_basic_auth_header = get_client_basic_auth_header(
         client_id=settings.RUNSERVER_AUTH_OIDC_CLIENT_ID,
@@ -387,4 +390,6 @@ def get_oidc_user(
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
-        return make_authenticated_oidc_user(iss=token_info.iss, user_info=user_info)
+        return make_authenticated_oidc_user(
+            user_info=user_info, iss=token_info.iss, scope=token_info.scope
+        )
