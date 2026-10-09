@@ -224,7 +224,6 @@ async def get(  # noqa: PLR0913
         Optional[bool],
         Query(
             description=(
-                "**Not implemented** "
                 "Apply the Agent filter broadly. Include Statements for which "
                 "the Actor, Object, Authority, Instructor, Team, or any of these "
                 "properties in a contained SubStatement match the Agent parameter, "

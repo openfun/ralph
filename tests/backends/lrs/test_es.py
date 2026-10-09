@@ -150,12 +150,24 @@ def test_backends_lrs_es_default_instantiation(monkeypatch, fs):
                     "bool": {
                         "filter": [
                             {"term": {"_id": "statementId"}},
-                            {"term": {"actor.account.name.keyword": ("13936749")}},
                             {
-                                "term": {
-                                    "actor.account.homePage.keyword": (
-                                        "http://www.example.com"
-                                    )
+                                "bool": {
+                                    "filter": [
+                                        {
+                                            "term": {
+                                                "actor.account.name.keyword": (
+                                                    "13936749"
+                                                )
+                                            }
+                                        },
+                                        {
+                                            "term": {
+                                                "actor.account.homePage.keyword": (
+                                                    "http://www.example.com"
+                                                )
+                                            }
+                                        },
+                                    ]
                                 }
                             },
                         ]
@@ -260,6 +272,306 @@ def test_backends_lrs_es_default_instantiation(monkeypatch, fs):
                 "search_after": None,
                 "size": 0,
                 "sort": "_shard_doc",
+                "track_total_hits": False,
+            },
+        ),
+        # 10. Query by agent with account IFI and related_agents.
+        (
+            {
+                "agent": {
+                    "account__home_page": "http://www.example.com",
+                    "account__name": "13936749",
+                },
+                "related_agents": True,
+            },
+            {
+                "pit": {"id": None, "keep_alive": None},
+                "q": None,
+                "query": {
+                    "bool": {
+                        "filter": [
+                            {
+                                "bool": {
+                                    "should": [
+                                        {
+                                            "bool": {
+                                                "filter": [
+                                                    {
+                                                        "term": {
+                                                            "actor.account.name.keyword": (  # noqa: E501
+                                                                "13936749"
+                                                            )
+                                                        }
+                                                    },
+                                                    {
+                                                        "term": {
+                                                            "actor.account.homePage.keyword": (  # noqa: E501
+                                                                "http://www.example.com"
+                                                            )
+                                                        }
+                                                    },
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "bool": {
+                                                "filter": [
+                                                    {
+                                                        "term": {
+                                                            "object.account.name.keyword": (  # noqa: E501
+                                                                "13936749"
+                                                            )
+                                                        }
+                                                    },
+                                                    {
+                                                        "term": {
+                                                            "object.account.homePage.keyword": (  # noqa: E501
+                                                                "http://www.example.com"
+                                                            )
+                                                        }
+                                                    },
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "bool": {
+                                                "filter": [
+                                                    {
+                                                        "term": {
+                                                            "authority.account.name.keyword": (  # noqa: E501
+                                                                "13936749"
+                                                            )
+                                                        }
+                                                    },
+                                                    {
+                                                        "term": {
+                                                            "authority.account.homePage.keyword": (  # noqa: E501
+                                                                "http://www.example.com"
+                                                            )
+                                                        }
+                                                    },
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "bool": {
+                                                "filter": [
+                                                    {
+                                                        "term": {
+                                                            "context.instructor.account.name.keyword": (  # noqa: E501
+                                                                "13936749"
+                                                            )
+                                                        }
+                                                    },
+                                                    {
+                                                        "term": {
+                                                            "context.instructor.account.homePage.keyword": (  # noqa: E501
+                                                                "http://www.example.com"
+                                                            )
+                                                        }
+                                                    },
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "bool": {
+                                                "filter": [
+                                                    {
+                                                        "term": {
+                                                            "context.team.account.name.keyword": (  # noqa: E501
+                                                                "13936749"
+                                                            )
+                                                        }
+                                                    },
+                                                    {
+                                                        "term": {
+                                                            "context.team.account.homePage.keyword": (  # noqa: E501
+                                                                "http://www.example.com"
+                                                            )
+                                                        }
+                                                    },
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "bool": {
+                                                "filter": [
+                                                    {
+                                                        "term": {
+                                                            "object.actor.account.name.keyword": (  # noqa: E501
+                                                                "13936749"
+                                                            )
+                                                        }
+                                                    },
+                                                    {
+                                                        "term": {
+                                                            "object.actor.account.homePage.keyword": (  # noqa: E501
+                                                                "http://www.example.com"
+                                                            )
+                                                        }
+                                                    },
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "bool": {
+                                                "filter": [
+                                                    {
+                                                        "term": {
+                                                            "object.object.account.name.keyword": (  # noqa: E501
+                                                                "13936749"
+                                                            )
+                                                        }
+                                                    },
+                                                    {
+                                                        "term": {
+                                                            "object.object.account.homePage.keyword": (  # noqa: E501
+                                                                "http://www.example.com"
+                                                            )
+                                                        }
+                                                    },
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "bool": {
+                                                "filter": [
+                                                    {
+                                                        "term": {
+                                                            "object.context.instructor.account.name.keyword": (  # noqa: E501
+                                                                "13936749"
+                                                            )
+                                                        }
+                                                    },
+                                                    {
+                                                        "term": {
+                                                            "object.context.instructor.account.homePage.keyword": (  # noqa: E501
+                                                                "http://www.example.com"
+                                                            )
+                                                        }
+                                                    },
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "bool": {
+                                                "filter": [
+                                                    {
+                                                        "term": {
+                                                            "object.context.team.account.name.keyword": (  # noqa: E501
+                                                                "13936749"
+                                                            )
+                                                        }
+                                                    },
+                                                    {
+                                                        "term": {
+                                                            "object.context.team.account.homePage.keyword": (  # noqa: E501
+                                                                "http://www.example.com"
+                                                            )
+                                                        }
+                                                    },
+                                                ]
+                                            }
+                                        },
+                                    ],
+                                }
+                            },
+                        ]
+                    }
+                },
+                "search_after": None,
+                "size": 0,
+                "sort": [{"timestamp": {"order": "desc"}}],
+                "track_total_hits": False,
+            },
+        ),
+        # 11. Query by agent with openid IFI and related_agents.
+        (
+            {
+                "agent": {"openid": "http://toby.openid.example.org/"},
+                "related_agents": True,
+            },
+            {
+                "pit": {"id": None, "keep_alive": None},
+                "q": None,
+                "query": {
+                    "bool": {
+                        "filter": [
+                            {
+                                "bool": {
+                                    "should": [
+                                        {
+                                            "term": {
+                                                "actor.openid.keyword": (
+                                                    "http://toby.openid.example.org/"
+                                                )
+                                            }
+                                        },
+                                        {
+                                            "term": {
+                                                "object.openid.keyword": (
+                                                    "http://toby.openid.example.org/"
+                                                )
+                                            }
+                                        },
+                                        {
+                                            "term": {
+                                                "authority.openid.keyword": (
+                                                    "http://toby.openid.example.org/"
+                                                )
+                                            }
+                                        },
+                                        {
+                                            "term": {
+                                                "context.instructor.openid.keyword": (
+                                                    "http://toby.openid.example.org/"
+                                                )
+                                            }
+                                        },
+                                        {
+                                            "term": {
+                                                "context.team.openid.keyword": (
+                                                    "http://toby.openid.example.org/"
+                                                )
+                                            }
+                                        },
+                                        {
+                                            "term": {
+                                                "object.actor.openid.keyword": (
+                                                    "http://toby.openid.example.org/"
+                                                )
+                                            }
+                                        },
+                                        {
+                                            "term": {
+                                                "object.object.openid.keyword": (
+                                                    "http://toby.openid.example.org/"
+                                                )
+                                            }
+                                        },
+                                        {
+                                            "term": {
+                                                "object.context.instructor.openid.keyword": (  # noqa: E501
+                                                    "http://toby.openid.example.org/"
+                                                )
+                                            }
+                                        },
+                                        {
+                                            "term": {
+                                                "object.context.team.openid.keyword": (
+                                                    "http://toby.openid.example.org/"
+                                                )
+                                            }
+                                        },
+                                    ],
+                                }
+                            },
+                        ]
+                    }
+                },
+                "search_after": None,
+                "size": 0,
+                "sort": [{"timestamp": {"order": "desc"}}],
                 "track_total_hits": False,
             },
         ),

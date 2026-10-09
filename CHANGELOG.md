@@ -15,6 +15,7 @@ and this project adheres to
   in xAPI statements
 - API: allow users with new `authority/write` scope to override authority
        when PUTting or POSTing statements
+- API: implement GET '/statements' 'related_agents' query parameter
 
 ### Removed
 

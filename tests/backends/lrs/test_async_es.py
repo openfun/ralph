@@ -150,12 +150,24 @@ def test_backends_lrs_async_es_default_instantiation(monkeypatch, fs):
                     "bool": {
                         "filter": [
                             {"term": {"_id": "statementId"}},
-                            {"term": {"actor.account.name.keyword": ("13936749")}},
                             {
-                                "term": {
-                                    "actor.account.homePage.keyword": (
-                                        "http://www.example.com"
-                                    )
+                                "bool": {
+                                    "filter": [
+                                        {
+                                            "term": {
+                                                "actor.account.name.keyword": (
+                                                    "13936749"
+                                                )
+                                            }
+                                        },
+                                        {
+                                            "term": {
+                                                "actor.account.homePage.keyword": (
+                                                    "http://www.example.com"
+                                                )
+                                            }
+                                        },
+                                    ]
                                 }
                             },
                         ]

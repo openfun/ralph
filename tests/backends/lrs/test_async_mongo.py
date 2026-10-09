@@ -126,8 +126,12 @@ def test_backends_lrs_async_mongo_default_instantiation(monkeypatch, fs):
             {
                 "filter": {
                     "_source.id": "statementId",
-                    "_source.actor.account.name": "13936749",
-                    "_source.actor.account.homePage": "http://www.example.com",
+                    "$and": [
+                        {"_source.actor.account.name": "13936749"},
+                        {
+                            "_source.actor.account.homePage": "http://www.example.com",
+                        },
+                    ],
                 },
                 "limit": 0,
                 "projection": None,
