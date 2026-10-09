@@ -3041,6 +3041,8 @@ and this project adheres to
 <li>Fix <code>check-changelog</code> CI job by replacing the removed <code>git whatchanged</code>
   command with <code>git log --name-only</code></li>
 <li>Make MongoDB delete-failure tests tolerant to pymongo error message changes</li>
+<li>Replace the <code>check-changelog</code> tag filter lookahead regex, no longer
+  supported by CircleCI, with an <code>ignore</code> filter to fix all CI pipelines</li>
 <li>Pin Arnold to <code>6.23.0</code> (was <code>master</code>) to fix the CircleCI <code>tray</code> job broken
   by the ansible-core <code>2.14.18</code> vault handling change</li>
 <li>Pin the ECK operator and poll the Elasticsearch resource status in the
