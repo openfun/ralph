@@ -697,7 +697,8 @@ workflows:
             branches:
               ignore: main
             tags:
-              only: /(?!^v).*/
+              only: /.*/
+              ignore: /^v.*/
       - lint-changelog:
           filters:
             branches:
