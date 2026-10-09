@@ -421,6 +421,48 @@ def test_backends_lrs_mongo_default_instantiation(monkeypatch, fs):
                 ],
             },
         ),
+        # 13. Query by authority with openid IFI.
+        (
+            {
+                "authority": {"openid": "http://toby.openid.example.org/"},
+            },
+            {
+                "filter": {
+                    "_source.authority.openid": "http://toby.openid.example.org/",
+                },
+                "limit": 0,
+                "projection": None,
+                "sort": [
+                    ("_source.timestamp", DESCENDING),
+                    ("_id", DESCENDING),
+                ],
+            },
+        ),
+        # 14. Query by multiple authority (OR) with openid IFI.
+        (
+            {
+                "statementId": "statementId",
+                "authority": [
+                    {"openid": "http://toby.openid.example.org/"},
+                    {"openid": "http://alex.openid.example.org/"},
+                ],
+            },
+            {
+                "filter": {
+                    "_source.id": "statementId",
+                    "$or": [
+                        {"_source.authority.openid": "http://toby.openid.example.org/"},
+                        {"_source.authority.openid": "http://alex.openid.example.org/"},
+                    ],
+                },
+                "limit": 0,
+                "projection": None,
+                "sort": [
+                    ("_source.timestamp", DESCENDING),
+                    ("_id", DESCENDING),
+                ],
+            },
+        ),
     ],
 )
 def test_backends_lrs_mongo_query_statements_query(

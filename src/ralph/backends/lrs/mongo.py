@@ -129,18 +129,12 @@ class MongoLRSBackend(BaseLRSBackend[MongoLRSBackendSettings], MongoDataBackend)
         )
 
     @staticmethod
-    def _add_agent_filters(
+    def _add_one_agent_filter(
         mongo_query_filters: dict,
         agent_params: AgentParameters,
         target_field: Union[str, tuple[str, ...]],
     ) -> None:
-        """Add filters relative to agents to mongo_query_filters.
-
-        Args:
-            mongo_query_filters (dict): Filters passed to MongoDB query.
-            agent_params (AgentParameters): Agent query parameters to search for.
-            target_field (str): The target agent field name to perform the search.
-        """
+        """Add filters for a single agent to mongo_query_filters."""
         if not agent_params:
             return
 
@@ -173,6 +167,50 @@ class MongoLRSBackend(BaseLRSBackend[MongoLRSBackendSettings], MongoDataBackend)
                 mongo_query_filters["$and"].extend(clauses)
             else:
                 mongo_query_filters["$and"] = clauses
+
+    @classmethod
+    def _add_agent_filters(
+        cls,
+        mongo_query_filters: dict,
+        agent_params: Union[AgentParameters, list[AgentParameters]],
+        target_field: Union[str, tuple[str, ...]],
+    ) -> None:
+        """Add filters relative to agents to mongo_query_filters.
+
+        Args:
+            mongo_query_filters (dict): Filters passed to MongoDB query.
+            agent_params (AgentParameters): Agent query parameters to search for.
+            target_field (str): The target agent field name to perform the search.
+        """
+        if not agent_params:
+            return
+
+        if not isinstance(agent_params, list):
+            cls._add_one_agent_filter(mongo_query_filters, agent_params, target_field)
+            return
+
+        filters = []
+        for params in agent_params:
+            if not params:
+                continue
+            one_filter: dict = {}
+            cls._add_one_agent_filter(one_filter, params, target_field)
+            if one_filter:
+                filters.append(one_filter)
+        if not filters:
+            return
+        # A related-agents clause may already occupy `$or`. Keep both.
+        if "$or" in mongo_query_filters:
+            clauses = [
+                {"$or": mongo_query_filters.pop("$or")},
+                {"$or": filters},
+            ]
+            if "$and" in mongo_query_filters:
+                mongo_query_filters["$and"].extend(clauses)
+            else:
+                mongo_query_filters["$and"] = clauses
+        else:
+            mongo_query_filters["$or"] = filters
 
     @classmethod
     def _add_related_agent_filters(

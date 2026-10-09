@@ -16,6 +16,7 @@ and this project adheres to
 - API: allow users with new `authority/write` scope to override authority
        when PUTting or POSTing statements
 - API: implement GET '/statements' 'related_agents' query parameter
+- Backends: (internal) add support for multiple authority queries
 
 ### Removed
 
