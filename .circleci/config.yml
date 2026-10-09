@@ -384,7 +384,7 @@ jobs:
             # The operator must be running before it can reconcile the
             # Elasticsearch resource, otherwise no pods are ever created.
             kubectl rollout status statefulset/elastic-operator --timeout=300s
-            
+
             # Deploy a two-nodes elasticsearch cluster
             kubectl apply -f src/helm/manifests/data-lake.yml
 

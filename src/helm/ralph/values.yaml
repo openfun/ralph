@@ -202,7 +202,7 @@ loggingConfig:
       propagate: false
 
 cronjobs: []
-# Ralph cronjob should define a name, a cronjob schedule, the schedule suspension 
+# Ralph cronjob should define a name, a cronjob schedule, the schedule suspension
 # and a command to execute
 #   - name: "daily-ldp-to-es"
 #     schedule: "30 2 * * *"

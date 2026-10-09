@@ -34,10 +34,10 @@ Ralph is a toolbox for your learning analytics, it can be used as a:
 
 A Learning Record Store, or LRS, is a key component in the context of learning analytics and the Experience API (xAPI).
 
-The [Experience API](https://github.com/adlnet/xAPI-Spec) (or Tin Can API) is a standard for tracking and reporting learning experiences. 
+The [Experience API](https://github.com/adlnet/xAPI-Spec) (or Tin Can API) is a standard for tracking and reporting learning experiences.
 In particular, it defines:
 
-- the [xAPI format](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#part-two-experience-api-data) of the learning events. xAPI statements include an `actor`, a `verb`, an `object` as well as contextual information. Here's an example statement: 
+- the [xAPI format](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#part-two-experience-api-data) of the learning events. xAPI statements include an `actor`, a `verb`, an `object` as well as contextual information. Here's an example statement:
 ```json
 {
     "id": "12345678-1234-5678-1234-567812345678",
@@ -55,7 +55,7 @@ In particular, it defines:
     }
 }
 ```
-- the [Learning Record Store](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#part-three-data-processing-validation-and-security) (LRS), is a RESTful API that collects, stores and retrieves these events. Think of it as a learning database that unifies data from various learning platforms and applications. 
+- the [Learning Record Store](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#part-three-data-processing-validation-and-security) (LRS), is a RESTful API that collects, stores and retrieves these events. Think of it as a learning database that unifies data from various learning platforms and applications.
 These events can come from an LMS (*Moodle*, *edX*), or any other learning component that supports sending xAPI statements to an LRS (e.g. an embedded video player), from various platforms.
 
 
@@ -74,7 +74,7 @@ Ralph is distributed as a standard python package; it can be installed _via_
 ???+ tip "Use a virtual environment for installation"
 
     To maintain a clean and controlled environment when installing `ralph-malph`, consider using a [virtual environment](https://docs.python.org/3/library/venv.html).
-    
+
     - Create a virtual environment:
     ```bash
     python3.12 -m venv <path-to-virtual-environment>
@@ -92,7 +92,7 @@ install the `backends`, `cli` or `lrs` extra dependencies, the **core library** 
 pip install ralph-malph
 ```
 
-If you want to use the [Ralph LRS server](./features/api.md), add the `lrs` flavour in your installation. 
+If you want to use the [Ralph LRS server](./features/api.md), add the `lrs` flavour in your installation.
 You also have to choose the type of backend you will use for LRS data storage (`backend-clickhouse`,`backend-es`,`backend-mongo`).
 
 - Install the **core package** with the LRS and the Elasticsearch backend. For example:
@@ -101,19 +101,19 @@ You also have to choose the type of backend you will use for LRS data storage (`
 pip install ralph-malph[backend-es,lrs]
 ```
 
-- Add the `cli` flavour if you want to use the LRS on the command line: 
+- Add the `cli` flavour if you want to use the LRS on the command line:
 
 ```bash
 pip install ralph-malph[backend-es,lrs,cli]
 ```
 
-- If you want to play around with backends with Ralph as a library, you can install: 
+- If you want to play around with backends with Ralph as a library, you can install:
 
 ```bash
 pip install ralph-malph[backends]
 ```
 
-- If you have various uses for Ralph's features or would like to discover all the existing functionnalities, it is recommended to install the **full package**: 
+- If you have various uses for Ralph's features or would like to discover all the existing functionnalities, it is recommended to install the **full package**:
 
 ```bash
 pip install ralph-malph[full]
@@ -145,7 +145,7 @@ WIP.
 
 ## Contributing to Ralph
 
-If you're interested in contributing to Ralph, whether it's by reporting issues, suggesting improvements, or submitting code changes, please head over to our dedicated [Contributing to Ralph](./contribute.md) page. 
+If you're interested in contributing to Ralph, whether it's by reporting issues, suggesting improvements, or submitting code changes, please head over to our dedicated [Contributing to Ralph](./contribute.md) page.
 There, you'll find detailed guidelines and instructions on how to take part in the project.
 
 We look forward to your contributions and appreciate your commitment to making Ralph a more valuable tool for everyone.
