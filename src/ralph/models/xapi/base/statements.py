@@ -4,7 +4,8 @@ from datetime import datetime
 from typing import Any, List, Optional, Union
 from uuid import UUID
 
-from pydantic import StringConstraints, model_validator
+from pydantic import StringConstraints, ValidationError, model_validator
+from pydantic_core import InitErrorDetails, PydanticCustomError
 from typing_extensions import Annotated
 
 from ..config import BaseModelWithConfig
@@ -54,11 +55,33 @@ class BaseXapiStatement(BaseModelWithConfig):
         Check that the `context` field contains `platform` and `revision` fields
         only if the `object.objectType` property is equal to `Activity`.
         """
-        for field, value in list(values.items()):
-            if value in [None, "", {}]:
-                raise ValueError(f"{field}: invalid empty value")
-            if isinstance(value, dict) and field != "extensions":
-                cls.check_absence_of_empty_and_invalid_values(value)
+
+        def _is_empty_value(v) -> bool:
+            return v in [None, "", {}]
+
+        def _check_absence_of_empty_values(
+            _values: Any, loc: tuple[Union[int, str], ...]
+        ) -> Any:
+            for field, value in list(_values.items()):
+                if _is_empty_value(value):
+                    raise ValidationError.from_exception_data(
+                        "XapiEmptyValueError",
+                        [
+                            InitErrorDetails(
+                                type=PydanticCustomError(
+                                    "no_empty_value",
+                                    "Statements may not contain empty values "
+                                    "except inside Extensions.",
+                                ),
+                                loc=loc + (field,),
+                                input=value,
+                            )
+                        ],
+                    )
+                if isinstance(value, dict) and field != "extensions":
+                    _check_absence_of_empty_values(value, loc + (field,))
+
+        _check_absence_of_empty_values(values, ())
 
         context = dict(values.get("context", {}))
         if context:
@@ -66,8 +89,18 @@ class BaseXapiStatement(BaseModelWithConfig):
             revision = context.get("revision", {})
             object_type = dict(values["object"]).get("objectType", "Activity")
             if (platform or revision) and object_type != "Activity":
-                raise ValueError(
-                    "revision and platform properties can only be used if the "
-                    "Statement's Object is an Activity"
+                raise ValidationError.from_exception_data(
+                    "XapiInvalidContextError",
+                    [
+                        InitErrorDetails(
+                            type=PydanticCustomError(
+                                "invalid_context",
+                                "revision and platform properties can only be used "
+                                "if the Statement's Object is an Activity",
+                            ),
+                            loc=("context",),
+                            input=context,
+                        )
+                    ],
                 )
         return values
