@@ -874,6 +874,14 @@ async def test_api_statements_post_set_authority(  # noqa: PLR0913
             "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_AUDIENCE",
             AUDIENCE,
         )
+        monkeypatch.setattr(
+            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_CLIENT_ID",
+            CLIENT_ID,
+        )
+        monkeypatch.setattr(
+            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_CLIENT_SECRET",
+            CLIENT_SECRET,
+        )
 
         sub = "123|oidc"
         agent = {"openid": sub}

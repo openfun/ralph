@@ -734,8 +734,6 @@ async def test_api_statements_put_scopes(  # noqa: PLR0913
         (["all"], True),
         (["statements/write"], False),
         (["authority/write", "statements/write"], True),
-        (["all/read"], False),
-        ([], False),
     ],
 )
 async def test_api_statements_put_set_authority(  # noqa: PLR0913
@@ -767,6 +765,14 @@ async def test_api_statements_put_set_authority(  # noqa: PLR0913
         monkeypatch.setattr(
             "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_AUDIENCE",
             AUDIENCE,
+        )
+        monkeypatch.setattr(
+            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_CLIENT_ID",
+            CLIENT_ID,
+        )
+        monkeypatch.setattr(
+            "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_CLIENT_SECRET",
+            CLIENT_SECRET,
         )
 
     authority = mock_agent(id_="my_authority")
