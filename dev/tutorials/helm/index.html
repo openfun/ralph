@@ -93,8 +93,8 @@
             
   <!-- the following line is displayed in the announcement bar -->
 <!-- keep length under 164 characters (less HTML tags) to fit on 1280px desktop window -->
-🌟 Big News! Ralph v5 is here. Don't forget to check out our 
-<a href=https://github.com/openfun/ralph/blob/main/UPGRADE.md>migration guide</a> 
+🌟 Big News! Ralph v5 is here. Don't forget to check out our
+<a href=https://github.com/openfun/ralph/blob/main/UPGRADE.md>migration guide</a>
 for a seamless transition. 🚀
 
           </div>
@@ -1519,7 +1519,7 @@ with the command:</p>
 (<a href="https://github.com/openfun/ralph/blob/main/src/helm/manifests/ralph-env-secret.yaml"><code>ralph-env-secret.yaml</code></a>
 and
 <a href="https://github.com/openfun/ralph/blob/main/src/helm/manifests/ralph-env-cm.yaml"><code>ralph-env-cm.yml</code></a>)
-that you can adapt to fit your needs. </p>
+that you can adapt to fit your needs.</p>
 <p>For this tutorial, we only need to replace the <code>&lt;PASSWORD&gt;</code> tag in the Secret manifest
 by the actual password of the <code>elastic</code> user with the command:
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>sed<span class="w"> </span>-i<span class="w"> </span>-e<span class="w"> </span><span class="s2">"s|&lt;PASSWORD&gt;|</span><span class="nv">$ELASTIC_PASSWORD</span><span class="s2">|g"</span><span class="w"> </span>ralph-env-secret.yaml

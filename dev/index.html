@@ -91,8 +91,8 @@
             
   <!-- the following line is displayed in the announcement bar -->
 <!-- keep length under 164 characters (less HTML tags) to fit on 1280px desktop window -->
-🌟 Big News! Ralph v5 is here. Don't forget to check out our 
-<a href=https://github.com/openfun/ralph/blob/main/UPGRADE.md>migration guide</a> 
+🌟 Big News! Ralph v5 is here. Don't forget to check out our
+<a href=https://github.com/openfun/ralph/blob/main/UPGRADE.md>migration guide</a>
 for a seamless transition. 🚀
 
           </div>
@@ -1380,10 +1380,10 @@ for a seamless transition. 🚀
 </ul>
 <h2 id="what_is_an_lrs">What is an LRS?<a class="headerlink" href="#what_is_an_lrs" title="Permanent link">&para;</a></h2>
 <p>A Learning Record Store, or LRS, is a key component in the context of learning analytics and the Experience API (xAPI).</p>
-<p>The <a href="https://github.com/adlnet/xAPI-Spec">Experience API</a> (or Tin Can API) is a standard for tracking and reporting learning experiences. 
+<p>The <a href="https://github.com/adlnet/xAPI-Spec">Experience API</a> (or Tin Can API) is a standard for tracking and reporting learning experiences.
 In particular, it defines:</p>
 <ul>
-<li>the <a href="https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#part-two-experience-api-data">xAPI format</a> of the learning events. xAPI statements include an <code>actor</code>, a <code>verb</code>, an <code>object</code> as well as contextual information. Here&rsquo;s an example statement: 
+<li>the <a href="https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#part-two-experience-api-data">xAPI format</a> of the learning events. xAPI statements include an <code>actor</code>, a <code>verb</code>, an <code>object</code> as well as contextual information. Here&rsquo;s an example statement:
 <div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"12345678-1234-5678-1234-567812345678"</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="nt">"actor"</span><span class="p">:{</span>
@@ -1400,7 +1400,7 @@ In particular, it defines:</p>
 </span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">    </span><span class="p">}</span>
 </span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="p">}</span>
 </span></code></pre></div></li>
-<li>the <a href="https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#part-three-data-processing-validation-and-security">Learning Record Store</a> (LRS), is a RESTful API that collects, stores and retrieves these events. Think of it as a learning database that unifies data from various learning platforms and applications. 
+<li>the <a href="https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#part-three-data-processing-validation-and-security">Learning Record Store</a> (LRS), is a RESTful API that collects, stores and retrieves these events. Think of it as a learning database that unifies data from various learning platforms and applications.
 These events can come from an LMS (<em>Moodle</em>, <em>edX</em>), or any other learning component that supports sending xAPI statements to an LRS (e.g. an embedded video player), from various platforms.</li>
 </ul>
 <div class="admonition info">
@@ -1432,7 +1432,7 @@ These events can come from an LMS (<em>Moodle</em>, <em>edX</em>), or any other 
 install the <code>backends</code>, <code>cli</code> or <code>lrs</code> extra dependencies, the <strong>core library</strong> is what you need:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ralph-malph
 </span></code></pre></div>
-<p>If you want to use the <a href="features/api/">Ralph LRS server</a>, add the <code>lrs</code> flavour in your installation. 
+<p>If you want to use the <a href="features/api/">Ralph LRS server</a>, add the <code>lrs</code> flavour in your installation.
 You also have to choose the type of backend you will use for LRS data storage (<code>backend-clickhouse</code>,<code>backend-es</code>,<code>backend-mongo</code>).</p>
 <ul>
 <li>Install the <strong>core package</strong> with the LRS and the Elasticsearch backend. For example:</li>
@@ -1440,17 +1440,17 @@ You also have to choose the type of backend you will use for LRS data storage (<
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ralph-malph<span class="o">[</span>backend-es,lrs<span class="o">]</span>
 </span></code></pre></div>
 <ul>
-<li>Add the <code>cli</code> flavour if you want to use the LRS on the command line: </li>
+<li>Add the <code>cli</code> flavour if you want to use the LRS on the command line:</li>
 </ul>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ralph-malph<span class="o">[</span>backend-es,lrs,cli<span class="o">]</span>
 </span></code></pre></div>
 <ul>
-<li>If you want to play around with backends with Ralph as a library, you can install: </li>
+<li>If you want to play around with backends with Ralph as a library, you can install:</li>
 </ul>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ralph-malph<span class="o">[</span>backends<span class="o">]</span>
 </span></code></pre></div>
 <ul>
-<li>If you have various uses for Ralph&rsquo;s features or would like to discover all the existing functionnalities, it is recommended to install the <strong>full package</strong>: </li>
+<li>If you have various uses for Ralph&rsquo;s features or would like to discover all the existing functionnalities, it is recommended to install the <strong>full package</strong>:</li>
 </ul>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>pip<span class="w"> </span>install<span class="w"> </span>ralph-malph<span class="o">[</span>full<span class="o">]</span>
 </span></code></pre></div>
@@ -1470,7 +1470,7 @@ can be pulled from DockerHub:</p>
 <h2 id="lrs_specification_compliance">LRS specification compliance<a class="headerlink" href="#lrs_specification_compliance" title="Permanent link">&para;</a></h2>
 <p>WIP.</p>
 <h2 id="contributing_to_ralph">Contributing to Ralph<a class="headerlink" href="#contributing_to_ralph" title="Permanent link">&para;</a></h2>
-<p>If you&rsquo;re interested in contributing to Ralph, whether it&rsquo;s by reporting issues, suggesting improvements, or submitting code changes, please head over to our dedicated <a href="contribute/">Contributing to Ralph</a> page. 
+<p>If you&rsquo;re interested in contributing to Ralph, whether it&rsquo;s by reporting issues, suggesting improvements, or submitting code changes, please head over to our dedicated <a href="contribute/">Contributing to Ralph</a> page.
 There, you&rsquo;ll find detailed guidelines and instructions on how to take part in the project.</p>
 <p>We look forward to your contributions and appreciate your commitment to making Ralph a more valuable tool for everyone.</p>
 <h2 id="contributors">Contributors<a class="headerlink" href="#contributors" title="Permanent link">&para;</a></h2>
