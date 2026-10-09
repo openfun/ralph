@@ -22,7 +22,9 @@ from ralph.conf import NonEmptyStrictStr
 #       for this specific regular expression
 #       by compiling the pattern beforehand.
 # see: https://pydantic.dev/docs/validation/latest/get-started/migration/#patterns--regex-on-strings
-compiled_iri_pattern = re.compile(patterns_no_names["IRI"])
+#       The `rfc3987` patterns are not anchored, and Pydantic searches
+#       the pattern anywhere in the string, so we anchor it like `parse` does.
+compiled_iri_pattern = re.compile(f"^(?:{patterns_no_names['IRI']})$")
 IRIStr = Annotated[str, StringConstraints(pattern=compiled_iri_pattern)]
 
 
