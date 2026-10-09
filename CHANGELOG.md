@@ -52,7 +52,7 @@ and this project adheres to
 ### Changed
 
 - Refactor statements' ExtensionMap
-- Auth: changed default TTL of cache to 60 seconds
+- OIDC: cache IdP responses for 60 seconds
 - OIDC: Add query to `/userinfo` endpoint when receiving a
   token to support more OIDC IdPs
 - OIDC: Add token introspection to support querying from OIDC clients

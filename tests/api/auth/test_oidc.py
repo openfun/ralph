@@ -164,7 +164,7 @@ async def test_api_auth_oidc_introspection(
                 token=access_token,
                 client_basic_auth_header=client_basic_auth_header,
             )
-            assert exc_info.value.status_code == 401
+        assert exc_info.value.status_code == 401
 
 
 @pytest.mark.anyio
@@ -221,6 +221,23 @@ async def test_api_auth_oidc_get_whoami_valid(  # noqa: PLR0913
     )
     assert sorted(response.json()["scopes"]) == ["all", "profile/read"]
     assert "target" not in response.json()
+
+
+@pytest.mark.anyio
+@responses.activate
+async def test_api_auth_oidc_rejects_unexpected_audience(client, monkeypatch):
+    """Introspection accepts the token only when its audience matches."""
+    configure_env_for_mock_oidc_auth(monkeypatch)
+    monkeypatch.setattr(
+        "ralph.api.auth.oidc.settings.RUNSERVER_AUTH_OIDC_AUDIENCE",
+        "http://not-this-lrs",
+    )
+    oidc_token = mock_oidc_user(scopes=["all", "profile/read"])
+    response = await client.get(
+        "/whoami",
+        headers={"Authorization": f"Bearer {oidc_token}"},
+    )
+    assert response.status_code == 401
 
 
 @pytest.mark.anyio

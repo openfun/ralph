@@ -268,7 +268,7 @@ def get_token_introspection(
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
-    if not token_info["active"]:
+    if not token_info.get("active"):
         logger.error("Inactive or invalid token info.")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -311,6 +311,18 @@ def get_user_scopes(oidc_scopes: Optional[str]) -> UserScopes:
         else []
     )
     return UserScopes(compatible_scopes)
+
+
+def _has_expected_audience(aud: Optional[Union[list[str], str]]) -> bool:
+    """True when no audience is configured, or the token includes it."""
+    expected = settings.RUNSERVER_AUTH_OIDC_AUDIENCE
+    if not expected:
+        return True
+    if isinstance(aud, str):
+        return aud == expected
+    if isinstance(aud, list):
+        return expected in aud
+    return False
 
 
 def _can_query_user_info(provider_config: dict) -> bool:
@@ -374,6 +386,14 @@ def get_oidc_user(
         token=access_token,
         client_basic_auth_header=client_basic_auth_header,
     )
+
+    if not _has_expected_audience(token_info.aud):
+        logger.error("Token audience does not match the configured audience")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
     if not token_info.sub:
         return make_authenticated_oidc_client(token_info)
