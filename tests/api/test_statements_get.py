@@ -31,7 +31,7 @@ from tests.fixtures.backends import (
 )
 
 from ..fixtures.auth import AUDIENCE, ISSUER_URI, mock_basic_auth_user, mock_oidc_user
-from ..helpers import mock_activity, mock_agent
+from ..helpers import mock_activity, mock_agent, mock_verb
 
 
 def insert_es_statements(es_client, statements, index=ES_TEST_INDEX):
@@ -769,6 +769,29 @@ async def test_api_statements_get_with_database_query_failure(
 
 
 @pytest.mark.anyio
+@pytest.mark.parametrize(
+    "param,value",
+    [
+        ("verb", "verb_1"),
+        ("verb", "foo bar http://example.com/verb_1"),
+        ("activity", "http://example.com/activity 1"),
+        ("agent", json.dumps({"foo": "bar"})),
+        ("agent", json.dumps([1, 2])),
+        ("agent", "not json"),
+    ],
+)
+async def test_api_statements_get_malformed_filter_parameters(
+    client, basic_auth_credentials, param, value
+):
+    """Test that malformed `verb`, `activity` and `agent` return a 422 error."""
+    response = await client.get(
+        f"/xAPI/statements/?{param}={quote_plus(value)}",
+        headers={"Authorization": f"Basic {basic_auth_credentials}"},
+    )
+    assert response.status_code == 422
+
+
+@pytest.mark.anyio
 @pytest.mark.parametrize("id_param", ["statementId", "voidedStatementId"])
 async def test_api_statements_get_invalid_query_parameters(
     client, monkeypatch, es, basic_auth_credentials, id_param
@@ -806,7 +829,7 @@ async def test_api_statements_get_invalid_query_parameters(
     for invalid_param, value in [
         ("activity", mock_activity()["id"]),
         ("agent", json.dumps(mock_agent("mbox", 1))),
-        ("verb", "verb_1"),
+        ("verb", mock_verb()["id"]),
     ]:
         response = await client.get(
             f"/xAPI/statements/?{id_param}={id_1}&{invalid_param}={value}",

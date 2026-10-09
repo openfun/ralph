@@ -1,9 +1,15 @@
 """Tests for common xAPI fields."""
 
 import pytest
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, TypeAdapter, ValidationError
 
-from ralph.models.xapi.base.common import IRI, ExtensionMap, LanguageMap, LanguageTag
+from ralph.models.xapi.base.common import (
+    IRI,
+    ExtensionMap,
+    IRIStr,
+    LanguageMap,
+    LanguageTag,
+)
 
 
 @pytest.mark.parametrize(
@@ -47,6 +53,36 @@ def test_models_xapi_base_common_field_iri_with_invalid_data(values):
 
     with pytest.raises(ValidationError, match="not a valid 'IRI'"):
         DummyIRIModel(**values)
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        "http://localhost/foo/bar",
+        "http://www.greek-one-half-sign-alternate-form.org/\U00010176",
+        "urn:uuid:be67b160-d958-4f51-b8b8-1892002dbac6",
+    ],
+)
+def test_models_xapi_base_common_iri_str_with_valid_data(value):
+    """Test that a valid `IRIStr` does not raise a `ValidationError`."""
+    assert TypeAdapter(IRIStr).validate_python(value) == value
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        "",
+        "verb_1",
+        "localhost/foo/bar",
+        "http://foo/<bar>",
+        "foo bar http://localhost/foo",
+        "http://localhost/foo bar",
+    ],
+)
+def test_models_xapi_base_common_iri_str_with_invalid_data(value):
+    """Test that an invalid `IRIStr` raises a `ValidationError`."""
+    with pytest.raises(ValidationError, match="String should match pattern"):
+        TypeAdapter(IRIStr).validate_python(value)
 
 
 @pytest.mark.parametrize(

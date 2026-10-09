@@ -43,7 +43,7 @@ from ralph.models.xapi.base.agents import (
     BaseXapiAgentWithMboxSha1Sum,
     BaseXapiAgentWithOpenId,
 )
-from ralph.models.xapi.base.common import IRI
+from ralph.models.xapi.base.common import IRI, IRIStr
 from ralph.utils import (
     await_if_coroutine,
     get_backend_class,
@@ -165,7 +165,7 @@ async def get(  # noqa: PLR0913
         ),
     ] = None,
     agent: Annotated[
-        Optional[Json],
+        Optional[Json[BaseXapiAgent]],
         Query(
             description=(
                 "Filter, only return Statements for which the specified "
@@ -174,13 +174,13 @@ async def get(  # noqa: PLR0913
         ),
     ] = None,
     verb: Annotated[
-        Optional[str],
+        Optional[IRIStr],
         Query(
             description="Filter, only return Statements matching the specified Verb id",
         ),
     ] = None,
     activity: Annotated[
-        Optional[str],
+        Optional[IRIStr],
         Query(
             description=(
                 "Filter, only return Statements for which the Object "
@@ -370,9 +370,10 @@ async def get(  # noqa: PLR0913
     # Parse the "agent" parameter (JSON) into multiple string parameters
     if query_params.get("agent") is not None:
         # Overwrite `agent` field
-        query_params["agent"] = _parse_agent_parameters(
-            json.loads(query_params["agent"])
-        ).model_dump(mode="json", exclude_none=True)
+        agent = json.loads(query_params["agent"])
+        query_params["agent"] = _parse_agent_parameters(agent).model_dump(
+            mode="json", exclude_none=True
+        )
 
     # Coerce `verb` and `activity` as IRI
     if query_params.get("verb"):

@@ -63,12 +63,22 @@ def mock_activity(id_: int = 0):
     """Create distinct activites with valid IRIs.
 
     Args:
-        id_: An integer used to uniquely identify the created agent.
+        id_: An integer used to uniquely identify the created activity.
 
     """
     return {
         "id": f"http://example.com/activity_{id_}",
     }
+
+
+def mock_verb(id_: int = 0):
+    """Create distinct verbs with valid IRIs.
+
+    Args:
+        id_: An integer used to uniquely identify the created verb.
+
+    """
+    return {"id": (f"http://example.com/verb_{id_}")}
 
 
 def mock_agent(
