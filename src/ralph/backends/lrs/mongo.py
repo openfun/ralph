@@ -165,16 +165,14 @@ class MongoLRSBackend(BaseLRSBackend[MongoLRSBackendSettings], MongoDataBackend)
         if agent_params.get("account__name"):
             key_name = f"_source.{target_field}.account.name"
             key_homepage = f"_source.{target_field}.account.homePage"
-            mongo_query_filters.update(
-                {
-                    "$and": [
-                        {key_name: agent_params.get("account__name")},
-                        {
-                            key_homepage: agent_params.get("account__home_page"),
-                        },
-                    ]
-                }
-            )
+            clauses = [
+                {key_name: agent_params.get("account__name")},
+                {key_homepage: agent_params.get("account__home_page")},
+            ]
+            if "$and" in mongo_query_filters:
+                mongo_query_filters["$and"].extend(clauses)
+            else:
+                mongo_query_filters["$and"] = clauses
 
     @classmethod
     def _add_related_agent_filters(

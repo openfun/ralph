@@ -242,4 +242,6 @@ class ClickHouseLRSBackend(
             if len(field_where) > 0:
                 related_where.append(" AND ".join(field_where))
         if len(related_where) > 0:
-            where.append(" OR ".join(related_where))
+            # Parentheses: this clause is later joined with AND, and AND binds
+            # tighter than OR.
+            where.append("(" + " OR ".join(related_where) + ")")

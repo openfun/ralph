@@ -141,6 +141,39 @@ def test_backends_lrs_mongo_default_instantiation(monkeypatch, fs):
                 ],
             },
         ),
+        # 5b. Account agent and account authority must both stay in the filter.
+        (
+            {
+                "agent": {
+                    "account__name": "13936749",
+                    "account__home_page": "http://www.example.com",
+                },
+                "authority": {
+                    "account__name": "other",
+                    "account__home_page": "http://other.example.com",
+                },
+            },
+            {
+                "filter": {
+                    "$and": [
+                        {"_source.actor.account.name": "13936749"},
+                        {"_source.actor.account.homePage": "http://www.example.com"},
+                        {"_source.authority.account.name": "other"},
+                        {
+                            "_source.authority.account.homePage": (
+                                "http://other.example.com"
+                            ),
+                        },
+                    ],
+                },
+                "limit": 0,
+                "projection": None,
+                "sort": [
+                    ("_source.timestamp", DESCENDING),
+                    ("_id", DESCENDING),
+                ],
+            },
+        ),
         # 6. Query by verb and activity.
         (
             {

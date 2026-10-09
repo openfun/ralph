@@ -269,7 +269,7 @@ def test_backends_lrs_clickhouse_default_instantiation(monkeypatch, fs):
             },
             {
                 "where": [
-                    "JSONExtractString(event, 'actor', 'account', 'name') = {"
+                    "(JSONExtractString(event, 'actor', 'account', 'name') = {"
                     "actor__account__name:String}"
                     " AND "
                     "JSONExtractString(event, 'actor', 'account', 'homePage') = {"
@@ -321,7 +321,7 @@ def test_backends_lrs_clickhouse_default_instantiation(monkeypatch, fs):
                     "object__context__team__account__name:String}"
                     " AND "
                     "JSONExtractString(event, 'object', 'context', 'team', 'account', 'homePage') = {"  # noqa: E501
-                    "object__context__team__account__home_page:String}"
+                    "object__context__team__account__home_page:String})"
                 ],
                 "params": {
                     "actor__account__name": "13936749",
@@ -362,7 +362,7 @@ def test_backends_lrs_clickhouse_default_instantiation(monkeypatch, fs):
             },
             {
                 "where": [
-                    "JSONExtractString(event, 'actor', 'openid') = {"
+                    "(JSONExtractString(event, 'actor', 'openid') = {"
                     "actor__openid:String}"
                     " OR "
                     "JSONExtractString(event, 'object', 'openid') = {"
@@ -387,7 +387,7 @@ def test_backends_lrs_clickhouse_default_instantiation(monkeypatch, fs):
                     "object__context__instructor__openid:String}"
                     " OR "
                     "JSONExtractString(event, 'object', 'context', 'team', 'openid') = {"  # noqa: E501
-                    "object__context__team__openid:String}"
+                    "object__context__team__openid:String})"
                 ],
                 "params": {
                     "actor__openid": "http://toby.openid.example.org/",
