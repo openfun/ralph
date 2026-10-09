@@ -1254,7 +1254,7 @@ for a seamless transition. 🚀
 <h1 id="multitenancy">Multitenancy<a class="headerlink" href="#multitenancy" title="Permanent link">&para;</a></h1>
 <p>By default, all authenticated users have full read and write access to the server. Ralph LRS implements the specified <a href="https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#249-authority">Authority mechanism</a> to restrict behavior.</p>
 <h2 id="filtering_results_by_authority_multitenancy">Filtering results by authority (multitenancy)<a class="headerlink" href="#filtering_results_by_authority_multitenancy" title="Permanent link">&para;</a></h2>
-<p>In Ralph LRS, all incoming statements are assigned an <code>authority</code> (or ownership) derived from the user that makes the request. You may restrict read access to users &ldquo;own&rdquo; statements (thus enabling multitenancy) by setting the following environment variable: </p>
+<p>In Ralph LRS, all incoming statements are assigned an <code>authority</code> (or ownership) derived from the user that makes the request. You may restrict read access to users &ldquo;own&rdquo; statements (thus enabling multitenancy) by setting the following environment variable:</p>
 <div class="language-bash highlight"><span class="filename">.env</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">RALPH_LRS_RESTRICT_BY_AUTHORITY</span><span class="o">=</span>True<span class="w"> </span><span class="c1"># Default: False</span>
 </span></code></pre></div>
 <div class="admonition warning">
@@ -1266,7 +1266,7 @@ for a seamless transition. 🚀
 <p>If not using &ldquo;scopes&rdquo;, or for users with limited &ldquo;scopes&rdquo;, using this option will make the use of option <code>?mine=True</code> implicit when fetching statement.</p>
 </div>
 <h3 id="scopes">Scopes<a class="headerlink" href="#scopes" title="Permanent link">&para;</a></h3>
-<p>In Ralph, users are assigned scopes which may be used to restrict endpoint access or 
+<p>In Ralph, users are assigned scopes which may be used to restrict endpoint access or
 functionalities. You may enable this option by setting the following environment variable:</p>
 <div class="language-bash highlight"><span class="filename">.env</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">RALPH_LRS_RESTRICT_BY_SCOPES</span><span class="o">=</span>True<span class="w"> </span><span class="c1"># Default: False</span>
 </span></code></pre></div>
@@ -1281,6 +1281,7 @@ functionalities. You may enable this option by setting the following environment
 <li>define</li>
 <li>profile/write</li>
 <li>profile/read</li>
+<li>authority/write</li>
 <li>all/read</li>
 <li>all</li>
 </ul>
