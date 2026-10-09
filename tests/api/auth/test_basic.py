@@ -261,3 +261,12 @@ async def test_api_auth_basic_get_whoami_invalid_backend(fs, monkeypatch, client
 
     assert response.status_code == 401
     assert response.json() == {"detail": "Invalid authentication credentials"}
+
+
+def test_api_auth_user_all_scope_includes_authority_write():
+    """The `all` scope includes `authority/write` and `all/read`."""
+    scopes = UserScopes(["all"])
+    assert scopes.is_authorized("authority/write")
+    assert scopes.is_authorized("all/read")
+    assert scopes.is_authorized("statements/write")
+    assert not UserScopes(["statements/write"]).is_authorized("authority/write")

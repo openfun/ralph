@@ -731,12 +731,7 @@ async def test_api_statements_put_scopes(  # noqa: PLR0913
 async def test_api_statements_put_set_authority(  # noqa: PLR0913
     client, monkeypatch, fs, es, auth_method, scopes, can_set_authority
 ):
-    """Test that putting statements behaves properly when setting authority.
-
-    We can't actually check the statement's authority in database,
-    but we can at least see if there are any errors when submitting
-    a statement with an authority.
-    """
+    """Test that putting statements keeps a valid authority when allowed."""
 
     if auth_method == "basic":
         agent = mock_agent("mbox", 1)
@@ -778,3 +773,15 @@ async def test_api_statements_put_set_authority(  # noqa: PLR0913
     )
 
     assert response.status_code == 204
+
+    es.indices.refresh()
+    stored = await client.get(
+        f"/xAPI/statements/?statementId={statement['id']}",
+        headers=headers,
+    )
+    assert stored.status_code == 200
+    stored_authority = stored.json()["statements"][0]["authority"]
+    if can_set_authority:
+        assert stored_authority["mbox"] == authority["mbox"]
+    else:
+        assert stored_authority.get("mbox") != authority["mbox"]

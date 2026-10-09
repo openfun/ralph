@@ -44,7 +44,8 @@ class UserScopes(RootModel[FrozenSet[Scope]]):
                 "define",
                 "profile/read",
                 "profile/write",
-                "authority/write" "all/read",
+                "authority/write",
+                "all/read",
                 "all",
             },
         }

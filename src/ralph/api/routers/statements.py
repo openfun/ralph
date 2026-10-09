@@ -104,9 +104,8 @@ def _enrich_statement_with_authority(
         # If user is permitted to manually set authority,
         # extract it from the statement and validate it.
         try:
-            # NOTE: Hack to validate authority, whatever its IFI type.
-            temp_user = AuthenticatedUser(agent=statement["authority"])
-            authority = temp_user.agent
+            agent = TypeAdapter(BaseXapiAgent).validate_python(statement["authority"])
+            authority = agent.model_dump(exclude_none=True, mode="json")
         except ValidationError:
             logger.warning("Failed to set authority as requested, validation error.")
             authority = None
