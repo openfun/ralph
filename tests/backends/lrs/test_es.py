@@ -575,6 +575,76 @@ def test_backends_lrs_es_default_instantiation(monkeypatch, fs):
                 "track_total_hits": False,
             },
         ),
+        # 14. Query by Authority with openid IFI.
+        (
+            {
+                "authority": {"openid": "http://toby.openid.example.org/"},
+            },
+            {
+                "pit": {"id": None, "keep_alive": None},
+                "q": None,
+                "query": {
+                    "bool": {
+                        "filter": [
+                            {
+                                "term": {
+                                    "authority.openid.keyword": (
+                                        "http://toby.openid.example.org/"
+                                    )
+                                }
+                            },
+                        ]
+                    }
+                },
+                "search_after": None,
+                "size": 0,
+                "sort": [{"timestamp": {"order": "desc"}}],
+                "track_total_hits": False,
+            },
+        ),
+        # 15. Query by Authority with multiple openid IFI.
+        (
+            {
+                "authority": [
+                    {"openid": "http://toby.openid.example.org/"},
+                    {"openid": "http://alex.openid.example.org/"},
+                ]
+            },
+            {
+                "pit": {"id": None, "keep_alive": None},
+                "q": None,
+                "query": {
+                    "bool": {
+                        "filter": [
+                            {
+                                "bool": {
+                                    "should": [
+                                        {
+                                            "term": {
+                                                "authority.openid.keyword": (
+                                                    "http://toby.openid.example.org/"
+                                                )
+                                            },
+                                        },
+                                        {
+                                            "term": {
+                                                "authority.openid.keyword": (
+                                                    "http://alex.openid.example.org/"
+                                                )
+                                            }
+                                        },
+                                    ]
+                                },
+                            },
+                        ]
+                    }
+                },
+                "search_after": None,
+                "size": 0,
+                "sort": [{"timestamp": {"order": "desc"}}],
+                "track_total_hits": False,
+            },
+        ),
     ],
 )
 def test_backends_lrs_es_query_statements_query(

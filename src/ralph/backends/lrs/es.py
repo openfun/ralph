@@ -114,6 +114,7 @@ class ESLRSBackend(BaseLRSBackend[ESLRSBackendSettings], ESDataBackend):
         # Note: `params` fields are validated thus we skip their validation in ESQuery.
         return ESQuery.model_construct(**es_query)
 
+    @staticmethod
     def _get_agent_filters(
         agent_params: AgentParameters,
         target_field: Union[str, tuple[str, ...]],
@@ -153,50 +154,31 @@ class ESLRSBackend(BaseLRSBackend[ESLRSBackendSettings], ESDataBackend):
             }
         return None
 
-    @staticmethod
+    @classmethod
     def _add_agent_filters(
+        cls,
         es_query_filters: list,
-        agent_params: AgentParameters,
+        agent_params: Union[AgentParameters, list[AgentParameters]],
         target_field: Union[str, tuple[str, ...]],
     ) -> None:
         """Add filters relative to agents to `es_query_filters`."""
         if not agent_params:
             return
-
-        if not isinstance(agent_params, dict):
-            agent_params = agent_params.model_dump()
-
-        if not isinstance(target_field, str):
-            target_field = ".".join(target_field)
-
-        if agent_params.get("mbox"):
-            field = f"{target_field}.mbox.keyword"
-            es_query_filters += [{"term": {field: agent_params.get("mbox")}}]
-        elif agent_params.get("mbox_sha1sum"):
-            field = f"{target_field}.mbox_sha1sum.keyword"
-            es_query_filters += [{"term": {field: agent_params.get("mbox_sha1sum")}}]
-        elif agent_params.get("openid"):
-            field = f"{target_field}.openid.keyword"
-            es_query_filters += [{"term": {field: agent_params.get("openid")}}]
-        elif agent_params.get("account__name"):
-            field_name = f"{target_field}.account.name.keyword"
-            field_homepage = f"{target_field}.account.homePage.keyword"
-            es_query_filters += [
-                {
-                    "bool": {
-                        "filter": [
-                            {"term": {field_name: agent_params.get("account__name")}},
-                            {
-                                "term": {
-                                    field_homepage: agent_params.get(
-                                        "account__home_page"
-                                    )
-                                }
-                            },
-                        ]
-                    }
-                }
-            ]
+        if not isinstance(agent_params, list):
+            filters = cls._get_agent_filters(
+                agent_params=agent_params, target_field=target_field
+            )
+            if filters:
+                es_query_filters += [filters]
+            return
+        filters = [
+            cls._get_agent_filters(agent_params=params, target_field=target_field)
+            for params in agent_params
+            if params
+        ]
+        filters = [item for item in filters if item]
+        if filters:
+            es_query_filters += [{"bool": {"should": filters}}]
 
     @classmethod
     def _add_related_agent_filters(
