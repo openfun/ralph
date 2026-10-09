@@ -15,6 +15,7 @@ Scope = Literal[
     "define",
     "profile/write",
     "profile/read",
+    "authority/write",
     "all/read",
     "all",
 ]
@@ -43,6 +44,7 @@ class UserScopes(RootModel[FrozenSet[Scope]]):
                 "define",
                 "profile/read",
                 "profile/write",
+                "authority/write",
                 "all/read",
                 "all",
             },

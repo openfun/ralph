@@ -13,6 +13,8 @@ and this project adheres to
 - API: support for CORS request
 - Improve validation error reporting for empty or invalid values
   in xAPI statements
+- API: allow users with new `authority/write` scope to override authority
+       when PUTting or POSTing statements
 
 ### Removed
 
