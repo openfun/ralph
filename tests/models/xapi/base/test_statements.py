@@ -1,6 +1,7 @@
 """Tests for the BaseXapiStatement."""
 
 import json
+import re
 
 import pytest
 from pydantic import ValidationError
@@ -28,7 +29,12 @@ from tests.factories import ModelFactory, mock_xapi_instance
 
 @pytest.mark.parametrize(
     "path",
-    ["id", "store", ("verb", "display"), ("result", "score", "raw")],
+    [
+        ("id",),
+        ("stored",),
+        ("verb", "display"),
+        ("result", "score", "raw"),
+    ],
 )
 @pytest.mark.parametrize("value", [None, "", {}])
 def test_models_xapi_base_statement_with_invalid_null_values(path, value):
@@ -46,8 +52,9 @@ def test_models_xapi_base_statement_with_invalid_null_values(path, value):
 
     path_var = ".".join(path)
     msg = (
-        f"1 validation error for BaseXapiStatement\n{path_var}\n  "
-        f"Statements may not contain empty values"
+        r"1 validation error for BaseXapiStatement\n"
+        + re.escape(path_var)
+        + r"\n  Statements may not contain empty values"
     )
     with pytest.raises(ValidationError, match=msg):
         BaseXapiStatement(**statement)
