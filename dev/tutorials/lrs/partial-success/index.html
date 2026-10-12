@@ -972,9 +972,9 @@ for a seamless transition. 🚀
 </li>
         
           <li class="md-nav__item">
-  <a href="#elasticsearch-compatible_dict_keys_503-beta1" class="md-nav__link">
+  <a href="#elasticsearch-compatible_dict_keys_510" class="md-nav__link">
     <span class="md-ellipsis">
-      Elasticsearch-compatible dict keys (5.0.3-beta1)
+      Elasticsearch-compatible dict keys (5.1.0)
     </span>
   </a>
   
@@ -1316,9 +1316,9 @@ for a seamless transition. 🚀
 </li>
         
           <li class="md-nav__item">
-  <a href="#elasticsearch-compatible_dict_keys_503-beta1" class="md-nav__link">
+  <a href="#elasticsearch-compatible_dict_keys_510" class="md-nav__link">
     <span class="md-ellipsis">
-      Elasticsearch-compatible dict keys (5.0.3-beta1)
+      Elasticsearch-compatible dict keys (5.1.0)
     </span>
   </a>
   
@@ -1446,7 +1446,7 @@ still returns HTTP <code>200</code> when at least one statement is indexed.</p>
 <p>With Docker Compose:</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">services</span><span class="p">:</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">lrs</span><span class="p">:</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fundocker/ralph:5.0.3-beta1</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fundocker/ralph:5.1.0</span>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">      </span><span class="nt">RALPH_LRS_PARTIAL_SUCCESS_DEFAULT</span><span class="p">:</span><span class="w"> </span><span class="s">"true"</span>
 </span></code></pre></div>
@@ -1469,7 +1469,7 @@ recreated rather than merely restarted.</p>
 </span></code></pre></div>
 <p>To try partial success on a single request without touching the server
 configuration, send <code>?partialSuccess=true</code> instead.</p>
-<h3 id="elasticsearch-compatible_dict_keys_503-beta1">Elasticsearch-compatible dict keys (<code>5.0.3-beta1</code>)<a class="headerlink" href="#elasticsearch-compatible_dict_keys_503-beta1" title="Permanent link">&para;</a></h3>
+<h3 id="elasticsearch-compatible_dict_keys_510">Elasticsearch-compatible dict keys (<code>5.1.0</code>)<a class="headerlink" href="#elasticsearch-compatible_dict_keys_510" title="Permanent link">&para;</a></h3>
 <p>When <code>RUNSERVER_BACKEND=es</code> and <code>RALPH_LRS_ELASTICSEARCH_VALIDATE_KEYS=true</code> (default),
 statements with incompatible JSON object keys are rejected during API validation (before
 ES indexation), with an explicit <code>errors[]</code> reason in partial-success mode:</p>
