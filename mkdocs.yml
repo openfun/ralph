@@ -60,6 +60,7 @@ nav:
             - tutorials/lrs/multitenancy.md
             - Additional configurations:
                 - tutorials/lrs/forwarding.md
+                - tutorials/lrs/partial-success.md
                 - tutorials/lrs/sentry.md
         - Ralph Library Guide: tutorials/library.md
         - Ralph Helm chart: tutorials/helm.md

@@ -4,6 +4,56 @@ All instructions to upgrade this project from one release to the next will be do
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### Unreleased — partial success (issue #622)
+
+#### partialSuccess (issue #622)
+
+Optional bulk ingestion when some statements in a batch are invalid.
+
+**This feature is disabled by default and does nothing until you turn it on.**
+`POST /xAPI/statements` stays atomic (xAPI-strict) unless one of the following
+applies:
+
+| Trigger | Set by |
+|---------|--------|
+| `?partialSuccess=true` or `?ignoreInvalid=true` | the client, per request |
+| `RALPH_LRS_PARTIAL_SUCCESS_DEFAULT=true` (default: `false`) | the server, globally |
+
+Clients that cannot add a query parameter — the Moodle `logstore_xapi` plugin is
+the typical case — are **only** covered by the server setting. Upgrading the
+image without setting it changes nothing for them.
+
+Once the server default is on, a client can still force strict behaviour per
+request with `?partialSuccess=false`.
+
+See the [partial success tutorial](https://openfun.github.io/ralph/tutorials/lrs/partial-success/).
+
+#### Elasticsearch per-statement isolation (5.0.2-beta1)
+
+In partial-success mode, statements that pass Pydantic validation but fail Elasticsearch
+indexation are skipped individually (`_write_statements_partial`) instead of failing the
+whole batch with HTTP 500.
+
+#### Elasticsearch-compatible dict keys (5.0.3-beta1)
+
+When `RUNSERVER_BACKEND=es` and `RALPH_LRS_ELASTICSEARCH_VALIDATE_KEYS=true` (default),
+`POST /xAPI/statements` rejects statements whose JSON object keys are incompatible with
+Elasticsearch **before** indexation:
+
+- empty string key (`""`) — e.g. quiz match extension with no response key
+- non-IRI key containing `.` — e.g. `nested.key` inside an extension map
+
+**xAPI extension IRI keys** (URLs with dots) remain valid. Only local / non-IRI keys with
+a dot are rejected.
+
+Opt out: `RALPH_LRS_ELASTICSEARCH_VALIDATE_KEYS=false`.
+
+> **Enable `RALPH_LRS_PARTIAL_SUCCESS_DEFAULT` first.** In strict mode this check
+> rejects the whole batch *before* any write, so nothing is indexed. Up to
+> `5.0.2-beta1`, such a batch returned HTTP 500 while the valid statements were
+> still written to Elasticsearch. Deployments relying on that partial write will
+> lose those statements unless partial-success mode is turned on beforehand.
+
 ### 4.x to 5.y
 
 #### Upgrade learning events models
