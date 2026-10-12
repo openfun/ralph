@@ -2,7 +2,7 @@
 
 Welcome to our developer contribution guidelines!
 
-You should know that we would be glad to help you contribute to Ralph! Here's our [Discord](https://discord.gg/vYx6YWxJCS) to contact us easily.
+You should know that we would be glad to help you contribute to Ralph! Here's our [Rocket.Chat](https://chat.esup-portail.org/invite/mzMct3) to contact us easily.
 
 
 ## Preparation

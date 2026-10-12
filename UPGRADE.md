@@ -4,7 +4,7 @@ All instructions to upgrade this project from one release to the next will be do
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-### Unreleased — partial success (issue #622)
+### 5.1.0 — partial success (issue #622)
 
 #### partialSuccess (issue #622)
 
@@ -34,7 +34,7 @@ In partial-success mode, statements that pass Pydantic validation but fail Elast
 indexation are skipped individually (`_write_statements_partial`) instead of failing the
 whole batch with HTTP 500.
 
-#### Elasticsearch-compatible dict keys (5.0.3-beta1)
+#### Elasticsearch-compatible dict keys (5.1.0)
 
 When `RUNSERVER_BACKEND=es` and `RALPH_LRS_ELASTICSEARCH_VALIDATE_KEYS=true` (default),
 `POST /xAPI/statements` rejects statements whose JSON object keys are incompatible with

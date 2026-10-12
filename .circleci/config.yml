@@ -415,15 +415,20 @@ jobs:
             sed -i -e "s|<PASSWORD>|${ELASTIC_PASSWORD}|g" manifests/ralph-env-secret.yaml
             kubectl apply -f manifests/ralph-env-secret.yaml
             kubectl apply -f manifests/ralph-env-cm.yaml
+            HELM_IMAGE_ARGS=()
             if [[ -z "${CIRCLE_TAG+x}" ]] || ! [[ "$CIRCLE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-helm$ ]]; then
               # Not a tagged workflow, or tagged but not for a Helm release:
-              # change the repository and app version for the currently built version
-              sed -i "s|repository:.*$|repository: docker.io/library/ralph|" development.yaml
-              sed -i "s|tag:.*$|tag: \"${CIRCLE_SHA1}\"|" development.yaml
+              # point the chart at the image just built and loaded into minikube.
+              # development.yaml no longer has image.repository or image.tag, so
+              # editing that file cannot override values.yaml.
+              HELM_IMAGE_ARGS=(
+                --set image.repository=docker.io/library/ralph
+                --set "image.tag=${CIRCLE_SHA1}"
+              )
             fi
 
             # Install Ralph
-            helm install -f development.yaml lrs ralph/
+            helm install -f development.yaml "${HELM_IMAGE_ARGS[@]}" lrs ralph/
 
             # Test the deployment/switch
             kubectl wait --for=condition=ready pod --selector=app=ralph --timeout=120s

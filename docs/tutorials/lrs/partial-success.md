@@ -56,7 +56,7 @@ With Docker Compose:
 ```yaml
 services:
   lrs:
-    image: fundocker/ralph:5.0.3-beta1
+    image: fundocker/ralph:5.1.0
     environment:
       RALPH_LRS_PARTIAL_SUCCESS_DEFAULT: "true"
 ```
@@ -93,7 +93,7 @@ RALPH_LRS_PARTIAL_SUCCESS_DEFAULT=false
 To try partial success on a single request without touching the server
 configuration, send `?partialSuccess=true` instead.
 
-### Elasticsearch-compatible dict keys (`5.0.3-beta1`)
+### Elasticsearch-compatible dict keys (`5.1.0`)
 
 When `RUNSERVER_BACKEND=es` and `RALPH_LRS_ELASTICSEARCH_VALIDATE_KEYS=true` (default),
 statements with incompatible JSON object keys are rejected during API validation (before

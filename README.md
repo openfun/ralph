@@ -23,8 +23,8 @@
 <a href="https://hub.docker.com/r/openfuncharts/ralph/tags">
     <img src="https://img.shields.io/docker/v/openfuncharts/ralph?label=Helm+chart&color=blue" alt="Helm chart version">
 </a>
-<a href="https://discord.gg/vYx6YWxJCS">
-    <img src="https://img.shields.io/discord/1082704478463082496?label=Discord&logo=discord&style=shield" alt="Discord">
+<a href="https://chat.esup-portail.org/invite/mzMct3">
+    <img src="https://img.shields.io/badge/Rocket.Chat-ESUP-F5455C?logo=rocketchat&logoColor=white" alt="Rocket.Chat">
 </a>
 </p>
 
