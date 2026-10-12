@@ -1,6 +1,6 @@
 services:
   ralph:
-    image: fundocker/ralph:5.0.1
+    image: fundocker/ralph:5.1.0
     env_file:
       - env.d/ralph.env
     ports:

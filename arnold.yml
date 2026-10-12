@@ -1,5 +1,5 @@
 metadata:
   name: ralph
-  version: 5.0.1
+  version: 5.1.0
 source:
   path: src/tray
