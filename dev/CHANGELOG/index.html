@@ -3033,6 +3033,7 @@ and this project adheres to
 <li>API: allow users with new <code>authority/write</code> scope to override authority
        when PUTting or POSTing statements</li>
 <li>API: implement GET &lsquo;/statements&rsquo; &lsquo;related_agents&rsquo; query parameter</li>
+<li>Backends: (internal) add support for multiple authority queries</li>
 </ul>
 <h3 id="removed">Removed<a class="headerlink" href="#removed" title="Permanent link">&para;</a></h3>
 <ul>
@@ -3060,10 +3061,19 @@ and this project adheres to
 <li>Keep CORS disabled by default in <code>.env.dist</code> so a bootstrapped <code>.env</code> no
   longer breaks the <code>RUNSERVER_CORS_ALLOW_ORIGINS</code> settings unit tests</li>
 <li>Fix Ralph returning 500 errors on query parameter validation errors</li>
+<li>Fix type of OIDC ID tokens</li>
+<li>Fix error with OIDC scopes unrelated to Ralph</li>
+<li>Fix oidc test <code>test_api_auth_oidc_get_whoami_invalid_backend</code>
+  being misconfigured</li>
 </ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Refactor statements&rsquo; ExtensionMap</li>
+<li>OIDC: cache IdP responses for 60 seconds</li>
+<li>OIDC: Add query to <code>/userinfo</code> endpoint when receiving a
+  token to support more OIDC IdPs</li>
+<li>OIDC: Add token introspection to support querying from OIDC clients
+  (Client Credentials flow)</li>
 </ul>
 <h2 id="501_-_2024-07-11"><a href="https://github.com/openfun/ralph/compare/v5.0.0...v5.0.1">5.0.1</a> - 2024-07-11<a class="headerlink" href="#501_-_2024-07-11" title="Permanent link">&para;</a></h2>
 <h3 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">&para;</a></h3>

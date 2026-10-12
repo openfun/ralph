@@ -1243,11 +1243,18 @@ for a seamless transition. 🚀
 
 <h1 id="openid_connect_authentication">OpenID Connect authentication<a class="headerlink" href="#openid_connect_authentication" title="Permanent link">&para;</a></h1>
 <p>Ralph LRS also supports OpenID Connect on top of OAuth 2.0 for authentication and authorization.</p>
-<p>To enable OpenID Connect authentication mode, we should change the <code>RALPH_RUNSERVER_AUTH_BACKENDS</code> environment variable to <code>oidc</code> and we should define the <code>RALPH_RUNSERVER_AUTH_OIDC_ISSUER_URI</code> environment variable with the identity provider&rsquo;s Issuer Identifier URI as follows:</p>
+<p>To enable OpenID Connect authentication mode, we should change the <code>RALPH_RUNSERVER_AUTH_BACKENDS</code> environment variable to <code>oidc</code> and we should define the environment variables as follows:</p>
+<ul>
+<li><code>RALPH_RUNSERVER_AUTH_OIDC_ISSUER_URI</code> the identity provider&rsquo;s Issuer Identifier URI
+  This address must be accessible to the LRS on startup as it will perform OpenID Connect Discovery to retrieve public keys and other information about the OpenID Connect environment.</li>
+<li><code>RALPH_RUNSERVER_AUTH_OIDC_CLIENT_ID</code> the OIDC client id issued by the identity provider for this instance</li>
+<li><code>RALPH_RUNSERVER_AUTH_OIDC_CLIENT_SECRET</code> the OIDC client secret issued by the identity provider for this instance</li>
+</ul>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">RALPH_RUNSERVER_AUTH_BACKENDS</span><span class="o">=</span>oidc
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nv">RALPH_RUNSERVER_AUTH_OIDC_ISSUER_URI</span><span class="o">=</span>http://<span class="o">{</span>provider_host<span class="o">}</span>:<span class="o">{</span>provider_port<span class="o">}</span>/auth/realms/<span class="o">{</span>realm_name<span class="o">}</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nv">RALPH_RUNSERVER_AUTH_OIDC_CLIENT_ID</span><span class="o">=</span>some_client_id
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nv">RALPH_RUNSERVER_AUTH_OIDC_CLIENT_SECRET</span><span class="o">=</span>some_client_secret
 </span></code></pre></div>
-<p>This address must be accessible to the LRS on startup as it will perform OpenID Connect Discovery to retrieve public keys and other information about the OpenID Connect environment.</p>
 <p>It is also strongly recommended to set the optional <code>RALPH_RUNSERVER_AUTH_OIDC_AUDIENCE</code> environment variable to the origin address of Ralph LRS itself (e.g. &ldquo;http://localhost:8100&rdquo;) to enable verification that a given token was issued specifically for that Ralph LRS.</p>
 <h2 id="identity_providers">Identity Providers<a class="headerlink" href="#identity_providers" title="Permanent link">&para;</a></h2>
 <p>OpenID Connect support is currently developed and tested against <a href="https://www.keycloak.org/">Keycloak</a> but may work with other identity providers that implement the specification.</p>
