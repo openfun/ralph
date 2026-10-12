@@ -44,10 +44,19 @@ and this project adheres to
 - Keep CORS disabled by default in `.env.dist` so a bootstrapped `.env` no
   longer breaks the `RUNSERVER_CORS_ALLOW_ORIGINS` settings unit tests
 - Fix Ralph returning 500 errors on query parameter validation errors
+- Fix type of OIDC ID tokens
+- Fix error with OIDC scopes unrelated to Ralph
+- Fix oidc test `test_api_auth_oidc_get_whoami_invalid_backend`
+  being misconfigured
 
 ### Changed
 
 - Refactor statements' ExtensionMap
+- OIDC: cache IdP responses for 60 seconds
+- OIDC: Add query to `/userinfo` endpoint when receiving a
+  token to support more OIDC IdPs
+- OIDC: Add token introspection to support querying from OIDC clients
+  (Client Credentials flow)
 
 ## [5.0.1] - 2024-07-11
 
