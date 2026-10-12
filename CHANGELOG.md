@@ -10,6 +10,16 @@ and this project adheres to
 
 ### Added
 
+- API: optional `partialSuccess` / `ignoreInvalid` query flag on
+  `POST /xAPI/statements` for bulk backfill. Valid statements are indexed
+  and invalid ones are reported per index (issue #622).
+- API: `RALPH_LRS_PARTIAL_SUCCESS_DEFAULT` enables partial-success
+  ingestion for clients that do not send the query flag (opt out with
+  `?partialSuccess=false`).
+- API: reject statements containing Elasticsearch-incompatible dict keys
+  (empty key or non-IRI key containing `.`) when `RUNSERVER_BACKEND=es`
+  and `RALPH_LRS_ELASTICSEARCH_VALIDATE_KEYS=true` (default). xAPI
+  extension IRI keys remain valid.
 - API: support for CORS request
 - Improve validation error reporting for empty or invalid values
   in xAPI statements
@@ -51,6 +61,8 @@ and this project adheres to
 
 ### Changed
 
+- API: partial-success mode skips Elasticsearch indexation failures per
+  statement instead of failing the whole batch with HTTP 500.
 - Refactor statements' ExtensionMap
 - OIDC: cache IdP responses for 60 seconds
 - OIDC: Add query to `/userinfo` endpoint when receiving a
