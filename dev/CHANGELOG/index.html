@@ -819,6 +819,8 @@ for a seamless transition. 🚀
       
         
       
+        
+      
     
     
       
@@ -862,6 +864,27 @@ for a seamless transition. 🚀
   
   <span class="md-ellipsis">
     Forwarding to another LRS
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/lrs/partial-success/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Partial success on bulk POST (issue #622)
   </span>
   
 
@@ -3027,6 +3050,16 @@ and this project adheres to
 <h2 id="unreleased"><a href="https://github.com/openfun/ralph/compare/v5.0.1...main">Unreleased</a><a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
 <h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
 <ul>
+<li>API: optional <code>partialSuccess</code> / <code>ignoreInvalid</code> query flag on
+  <code>POST /xAPI/statements</code> for bulk backfill. Valid statements are indexed
+  and invalid ones are reported per index (issue #622).</li>
+<li>API: <code>RALPH_LRS_PARTIAL_SUCCESS_DEFAULT</code> enables partial-success
+  ingestion for clients that do not send the query flag (opt out with
+  <code>?partialSuccess=false</code>).</li>
+<li>API: reject statements containing Elasticsearch-incompatible dict keys
+  (empty key or non-IRI key containing <code>.</code>) when <code>RUNSERVER_BACKEND=es</code>
+  and <code>RALPH_LRS_ELASTICSEARCH_VALIDATE_KEYS=true</code> (default). xAPI
+  extension IRI keys remain valid.</li>
 <li>API: support for CORS request</li>
 <li>Improve validation error reporting for empty or invalid values
   in xAPI statements</li>
@@ -3068,6 +3101,8 @@ and this project adheres to
 </ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <ul>
+<li>API: partial-success mode skips Elasticsearch indexation failures per
+  statement instead of failing the whole batch with HTTP 500.</li>
 <li>Refactor statements&rsquo; ExtensionMap</li>
 <li>OIDC: cache IdP responses for 60 seconds</li>
 <li>OIDC: Add query to <code>/userinfo</code> endpoint when receiving a
