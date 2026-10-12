@@ -75,7 +75,7 @@ An environment variable that never reaches the process is the most common cause 
 
 ```bash
 docker compose exec lrs python -c \
-  "from ralph.conf import settings; print(settings.LRS_PARTIAL_SUCCESS_DEFAULT)"
+  "from ralph.conf import settings; import sys; sys.stdout.write(str(settings.LRS_PARTIAL_SUCCESS_DEFAULT) + '\n')"
 ```
 
 This must print `True`. If it prints `False`, the variable did not reach the process:
