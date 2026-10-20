@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Backends: rename LDP data backend `DEFAULT_STREAM_ID` setting to `STREAM_ID`
+  (`--ldp-stream-id` CLI option) (BC)
+
 ## [5.1.0] - 2026-10-12
 
 ### Added

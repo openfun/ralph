@@ -4,6 +4,23 @@ All instructions to upgrade this project from one release to the next will be do
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### Unreleased
+
+#### Rename LDP `DEFAULT_STREAM_ID` setting (issue #572)
+
+The `DEFAULT_STREAM_ID` setting of the LDP data backend has been renamed to
+`STREAM_ID`. The old name is no longer read, so you must update your
+configuration:
+
+- environment variable: `RALPH_BACKENDS__DATA__LDP__DEFAULT_STREAM_ID` becomes
+  `RALPH_BACKENDS__DATA__LDP__STREAM_ID`
+- CLI option: `--ldp-default-stream-id` becomes `--ldp-stream-id`
+- Python: `LDPDataBackendSettings(DEFAULT_STREAM_ID=...)` becomes
+  `LDPDataBackendSettings(STREAM_ID=...)`
+
+As before, the stream can still be selected per command with the `--target`
+option, which takes precedence over this setting.
+
 ### 5.1.0 — partial success (issue #622)
 
 #### partialSuccess (issue #622)
