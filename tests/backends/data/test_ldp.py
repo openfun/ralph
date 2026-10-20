@@ -28,9 +28,9 @@ def test_backends_data_ldp_default_instantiation(monkeypatch, fs):
         "APPLICATION_KEY",
         "APPLICATION_SECRET",
         "CONSUMER_KEY",
-        "DEFAULT_STREAM_ID",
         "ENDPOINT",
         "SERVICE_NAME",
+        "STREAM_ID",
         "READ_CHUNK_SIZE",
         "REQUEST_TIMEOUT",
         "WRITE_CHUNK_SIZE",
@@ -47,8 +47,10 @@ def test_backends_data_ldp_default_instantiation(monkeypatch, fs):
 
     # Test overriding default values with environment variables.
     monkeypatch.setenv("RALPH_BACKENDS__DATA__LDP__SERVICE_NAME", "foo")
+    monkeypatch.setenv("RALPH_BACKENDS__DATA__LDP__STREAM_ID", "bar")
     backend = LDPDataBackend()
     assert backend.service_name == "foo"
+    assert backend.stream_id == "bar"
     assert backend.settings.READ_CHUNK_SIZE == 4096
     assert backend.settings.WRITE_CHUNK_SIZE == 500
 

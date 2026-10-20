@@ -29,11 +29,11 @@ class LDPDataBackendSettings(BaseDataBackendSettings):
         APPLICATION_KEY (str): The OVH API application key (AK).
         APPLICATION_SECRET (str): The OVH API application secret (AS).
         CONSUMER_KEY (str): The OVH API consumer key (CK).
-        DEFAULT_STREAM_ID (str):  The default stream identifier to query.
         ENDPOINT (str): The OVH API endpoint.
         READ_CHUNK_SIZE (str): The default chunk size for reading archives.
         REQUEST_TIMEOUT (int): HTTP request timeout in seconds.
         SERVICE_NAME (str): The default LDP account name.
+        STREAM_ID (str): The stream identifier to query when no `target` is given.
     """
 
     model_config = {
@@ -44,7 +44,6 @@ class LDPDataBackendSettings(BaseDataBackendSettings):
     APPLICATION_KEY: Optional[str] = None
     APPLICATION_SECRET: Optional[str] = None
     CONSUMER_KEY: Optional[str] = None
-    DEFAULT_STREAM_ID: Optional[str] = None
     ENDPOINT: Literal[
         "ovh-eu",
         "ovh-us",
@@ -56,6 +55,7 @@ class LDPDataBackendSettings(BaseDataBackendSettings):
     ] = "ovh-eu"
     REQUEST_TIMEOUT: Optional[int] = None
     SERVICE_NAME: Optional[str] = None
+    STREAM_ID: Optional[str] = None
     READ_CHUNK_SIZE: int = 4096
 
 
@@ -77,7 +77,7 @@ class LDPDataBackend(
         """
         super().__init__(settings)
         self.service_name = self.settings.SERVICE_NAME
-        self.stream_id = self.settings.DEFAULT_STREAM_ID
+        self.stream_id = self.settings.STREAM_ID
         self.timeout = self.settings.REQUEST_TIMEOUT
         self._client = None
 
@@ -112,7 +112,7 @@ class LDPDataBackend(
 
         Args:
             target (str or None): The target stream_id where to list the archives.
-                If target is `None`, the `DEFAULT_STREAM_ID` is used instead.
+                If target is `None`, the `STREAM_ID` is used instead.
             details (bool): Get detailed archive information in addition to archive IDs.
             new (bool): Given the history, list only not already read archives.
 
@@ -122,7 +122,7 @@ class LDPDataBackend(
 
         Raise:
             BackendParameterException: If the `target` is `None` and no
-                `DEFAULT_STREAM_ID` is given.
+                `STREAM_ID` is given.
             BackendException: If a failure during retrieval of archives list occurs.
         """
         list_archives_endpoint = self._get_archive_endpoint(stream_id=target)
@@ -167,7 +167,7 @@ class LDPDataBackend(
         Args:
             query (str or BaseQuery): The ID of the archive to read.
             target (str or None): The target stream_id containing the archives.
-                If target is `None`, the `DEFAULT_STREAM_ID` is used instead.
+                If target is `None`, the `STREAM_ID` is used instead.
             chunk_size (int or None): The chunk size when reading archives by batch.
                 If `chunk_size` is `None` it defaults to `READ_CHUNK_SIZE`.
             raw_output (bool): Should always be set to `True`.
